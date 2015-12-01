@@ -85,6 +85,10 @@ standard. Please also browse the code for more examples.
 #ifndef EXAMPLECLASSB_HPP_
 #define EXAMPLECLASSB_HPP_
 
+// Always include standard libs first, then external libs, then our own headers.
+#include <memory>
+#include <string>
+
 #include "exampleclassa.hpp"
 
 namespace opendlv {
@@ -104,6 +108,7 @@ class ExampleClassB : public ExampleClassA {
     ExampleClassB(ExampleClassB const &) = delete;
     ExampleClassB &operator=(ExampleClassB const &) = delete;
     virtual ~ExampleClassB();
+    std::shared_ptr<ExampleClassC> GetClassMemberPointer() const;
     bool IsValid() const;
 
   private:
@@ -112,7 +117,7 @@ class ExampleClassB : public ExampleClassA {
 
     // In general, start listing objects before primitives, group on type, then 
     // go alphabetically.
-    std::unique_ptr<ExampleClassC> m_classMemberPointer;
+    std::shared_ptr<ExampleClassC> m_classMemberPointer;
     uint32_t m_classMember;
 };
 
@@ -135,12 +140,12 @@ namespace system {
 
 // Note that we pass references and that const goes after type.
 // All member must be declared in the initialization list and the constructor.
-ExampleClassB::ExampleClassB(std::string const &a_arg2) :
+ExampleClassB::ExampleClassB(std::string const &a_arg) :
     ExampleClassA(),
     m_classMember(42),
     m_classMemberPointer(new ExampleClassC)
 {
-  std::cout << "This is a very long text thats prints the argument " << a_arg2
+  std::cout << "This is a very long text thats prints the argument " << a_arg
       << " and breaks the line at column 80 with a double indent." 
       << std::endl; 
 }
@@ -148,6 +153,11 @@ ExampleClassB::ExampleClassB(std::string const &a_arg2) :
 // Method brackets begins on new lines.
 ExampleClassB::~ExampleClassB() 
 {
+}
+
+std::shared_ptr<ExampleClassC> ExampleClassB::GetClassMemberPointer() const
+{
+  return m_classMemberPointer;
 }
 
 /**
