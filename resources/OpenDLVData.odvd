@@ -1,0 +1,85 @@
+/*
+ * Copyright (C) 2015 Chalmers REVERE
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
+// Cartesian messages
+
+message cartesian.Constants [id = 50] {
+  const double PI = 3.141592653589793;
+  const double DEG2RAD = 0.017453292522222;  // PI/180.0
+  const double RAD2DEG = 57.295779513082325; // 1.0 / DEG2RAD;
+}
+
+message cartesian.Point2 [id = 51] {
+  float p[2] [id = 1];
+}
+
+message cartesian.Point3 [id = 52] {
+  float p[3] [id = 1];
+}
+
+message cartesian.Position2d [id = 53] {
+  cartesian.Point2 position [id = 1];
+  cartesian.Point2 rotation [id = 2];
+}
+
+message cartesian.Position3d [id = 54] {
+  cartesian.Point3 position [id = 1];
+  cartesian.Point3 rotation [id = 2];
+}
+
+message cartesian.Matrix3x3 [id = 55] {
+  double a11 [id = 1];
+  double a12 [id = 2];
+  double a13 [id = 3];
+  double a21 [id = 4];
+  double a22 [id = 5];
+  double a23 [id = 6];
+  double a31 [id = 7];
+  double a32 [id = 8];
+  double a33 [id = 9];
+}
+
+message cartesian.Matrix4x4 [id = 56] {
+  double a11 [id = 1];
+  double a12 [id = 2];
+  double a13 [id = 3];
+  double a14 [id = 4];
+  double a21 [id = 5];
+  double a22 [id = 6];
+  double a23 [id = 7];
+  double a24 [id = 8];
+  double a31 [id = 9];
+  double a32 [id = 10];
+  double a33 [id = 11];
+  double a34 [id = 12];
+  double a41 [id = 13];
+  double a42 [id = 14];
+  double a43 [id = 15];
+  double a44 [id = 16];
+}
+
+// Sensor messages
+message sensor.Reading [id = 60] {
+  core::data::TimeStamp timestamp [id = 1];
+  string sensorName;
+}
+
+message sensor.Radar [id = 60] {
+  sensor.Reading reading [id = 1]; 
+  double distance [id = 2];
+}

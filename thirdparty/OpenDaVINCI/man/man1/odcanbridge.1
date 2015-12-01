@@ -1,0 +1,114 @@
+.\" Manpage for odcanbridge
+.\" Author: Christian Berger <christian.berger@gu.se>.
+
+.TH odcanbridge 1 "11 October 2015" "2.0.32" "odcanbridge man page"
+
+.SH NAME
+odcanbridge \- This tool bridges low-level CAN messages between two CAN device nodes and maps the generic CAN messages to high-level C++ data structures.
+
+
+
+.SH SYNOPSIS
+.B odcanbridge --cid=<CID> [OPTIONS]
+
+
+
+.SH DESCRIPTION
+odcanbridge is a tool to bridge low-level CAN messages between two
+CAN device nodes. In addition, it maps low-level CAN messages to high-level C++ data structures
+to be used with OpenDaVINCI. It combines the features from odcanproxy(1) and odcanmapper(1)
+into one single tool.
+
+The following parameters need to be present in the configuration file supplied by
+odsupercomponent(1) to correctly configure canproxy:
+
+.RS
+.B odcanbridge.devicenodeA = /dev/pcan0
+
+.B odcanbridge.devicenodeA.receivesContainers = 1
+
+.B odcanbridge.devicenodeB = /dev/pcan1
+
+.B odcanbridge.devicenodeB.receivesContainers = 0
+.RE
+
+The parameter 'odcanbridge.devicenodeA' defines, which first CAN device shall be used to read
+and write the data.
+
+If the boolean parameter 'odcanbridge.devicenodeA.receivesContainers' is set to 1, this CAN
+device will receive all containers from OpenDaVINCI to be transformed as CAN messages.
+
+The parameter 'odcanbridge.devicenodeB' defines, which second CAN device shall be used to read
+and write the data.
+
+If the boolean parameter 'odcanbridge.devicenodeB.receivesContainers' is set to 0, this CAN
+device will not receive containers from OpenDaVINCI.
+
+odcanbridge will forward all low-level CAN message received from the first CAN device to the
+second and vice versa.
+
+odcanbridge will automatically create a recording from all data received from the device
+nodes.
+
+This tool can only be used within an existing OpenDaVINCI container conference session
+created by odsupercomponent(1).
+
+
+
+.SH OPTIONS
+.B --cid=<CID>
+.RS
+This parameter specifies the conference identifier (CID) that is used to join a
+running container conference session. The session itself needs to be created by
+odsupercomponent(1).
+.RE
+
+
+.B --freq=<FREQ>
+.RS
+This parameter specifies the runtime frequency in Hz that is used to run odcanbridge.
+If this parameter is omitted, a runtime frequency of 1 Hz is used.
+.RE
+
+
+.B --realtime=<0..49>
+.RS
+This parameter will schedule odcanbridge to use the SCHED_FIFO soft realtime
+scheduler. The parameter specifies the scheduling priority.
+
+Please note that this feature is only available on Linux-based systems having a
+CONFIG_PREEMPT_RT kernel. In addition, odcanbridge needs to be executed with
+superuser privileges.
+
+This parameter has no effect if odsupercomponent(1) is started using the
+parameter '--managed'.
+.RE
+
+
+.B --verbose=<0..10>
+.RS
+This parameter specifies the verbosity level that is used to print some information to stdlog.
+.RE
+
+
+
+.SH EXAMPLES
+The following command runs the program at 10 Hz.
+
+.B odcanbridge --cid=111 --freq=10
+
+
+
+.SH SEE ALSO
+odcanascreplay(1), odcanbridge(1), odcanmapper(1), odproxy(1), odcanproxymapper(1), odsupercomponent(1)
+
+
+
+.SH BUGS
+No known bugs.
+
+
+
+.SH AUTHOR
+Christian Berger (christian.berger@gu.se)
+

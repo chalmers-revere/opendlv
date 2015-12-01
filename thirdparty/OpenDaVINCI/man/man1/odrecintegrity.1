@@ -1,0 +1,51 @@
+.\" Manpage for odrecintegrity
+.\" Author: Christian Berger <christian.berger@gu.se>.
+
+.TH odrecintegrity 1 "11 October 2015" "2.0.32" "odrecintegrity man page"
+
+.SH NAME
+odrecintegrity \- This tool verifies if an existing recording file contains valid container data.
+
+
+
+.SH SYNOPSIS
+.B odrecintegrity <FILENAME>
+
+
+
+.SH DESCRIPTION
+odrecintegrity belongs to OpenDaVINCI and is a tool to verify the integrity of a
+recording file containing dumps from an OpenDaVINCI container conference session.
+
+
+.SH OPTIONS
+.B <FILENAME>
+.RS
+This parameter specifies the file to be checked.
+.RE
+
+
+
+.SH EXAMPLES
+The following command verifies the content for the file specified as commandline parameter.
+
+.B odrecintegrity myRecording.rec
+
+The following command verifies the content for the file containing dumps from shared images specified as commandline parameter.
+
+.B odrecintegrity myRecording.rec.mem
+
+
+.SH SEE ALSO
+odplayer(1), odrecorder(1), odrecintegrity(1), odredirector(1), odsplit(1), odspy(1)
+
+
+
+.SH BUGS
+No known bugs.
+
+
+
+.SH AUTHOR
+Christian Berger (christian.berger@gu.se)
+

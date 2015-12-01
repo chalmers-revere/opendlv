@@ -1,0 +1,26 @@
+/*
+ * THIS IS A GENERATED FILE - CHANGES WILL BE OVERWRITTEN.
+ */
+
+#include "generated/coredata/LogMessage.h"
+#include "generated/coredata/reflection/AbstractField.h"
+#include "generated/coredata/dmcp/Constants.h"
+#include "generated/coredata/dmcp/TestConstants.h"
+#include "generated/coredata/dmcp/ServerInformation.h"
+#include "generated/coredata/dmcp/DiscoverMessage.h"
+#include "generated/coredata/dmcp/ModuleDescriptor.h"
+#include "generated/coredata/dmcp/RuntimeStatistic.h"
+#include "generated/coredata/dmcp/ModuleStatistic.h"
+#include "generated/coredata/dmcp/ModuleStatistics.h"
+#include "generated/coredata/dmcp/ModuleStateMessage.h"
+#include "generated/coredata/dmcp/ModuleExitCodeMessage.h"
+#include "generated/coredata/dmcp/PulseMessage.h"
+#include "generated/coredata/dmcp/PulseAckMessage.h"
+#include "generated/coredata/dmcp/PulseAckContainersMessage.h"
+#include "generated/coredata/Configuration.h"
+#include "generated/coredata/buffer/MemorySegment.h"
+#include "generated/coredata/player/PlayerCommand.h"
+#include "generated/coredata/recorder/RecorderCommand.h"
+#include "generated/coredata/SharedData.h"
+#include "generated/coredata/image/SharedImage.h"
+#include "generated/coredata/image/CompressedImage.h"

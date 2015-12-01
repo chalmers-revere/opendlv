@@ -1,0 +1,83 @@
+.\" Manpage for vboreplay
+.\" Author: Christian Berger <christian.berger@gu.se>.
+
+.TH vboreplay 1 "11 October 2015" "1.0.0" "vboreplay man page"
+
+.SH NAME
+vboreplay \- This tool allows to replay raw VBOX message dumps in VBO format supplied via stdin as EgoStates to an OpenDaVINCI conference.
+
+
+
+.SH SYNOPSIS
+.B vboreplay --cid=<CID> [OPTIONS] < myVBOXRecordingInVBOformat.vbo
+
+
+
+.SH DESCRIPTION
+vboreplay is a tool to read raw VBOX message dumps in VBO format from stdin and
+replays the individual messages converted as EgoState to a running
+OpenDaVINCI conference.
+
+This tool can only be used within an existing OpenDaVINCI container conference session
+created by odsupercomponent(1).
+
+
+
+.SH OPTIONS
+.B --cid=<CID>
+.RS
+This parameter specifies the conference identifier (CID) that is used to join a
+running container conference session. The session itself needs to be created by
+odsupercomponent(1).
+.RE
+
+
+.B --freq=<FREQ>
+.RS
+This parameter specifies the runtime frequency in Hz that is used to run vboreplay.
+If this parameter is omitted, a runtime frequency of 1 Hz is used.
+.RE
+
+
+.B --realtime=<0..49>
+.RS
+This parameter will schedule vboreplay to use the SCHED_FIFO soft realtime
+scheduler. The parameter specifies the scheduling priority.
+
+Please note that this feature is only available on Linux-based systems having a
+CONFIG_PREEMPT_RT kernel. In addition, vboreplay needs to be executed with
+superuser privileges.
+
+This parameter has no effect if odsupercomponent(1) is started using the
+parameter '--managed'.
+.RE
+
+
+.B --verbose=<0..10>
+.RS
+This parameter specifies the verbosity level that is used to print some information to stdlog.
+.RE
+
+
+
+.SH EXAMPLES
+The following command runs the program at 10 Hz replaying the content from myCANdump.asc with
+100ms delay between the separate messages.
+
+.B vboreplay --cid=111 --freq=10 < myDumpFile.vbo
+
+
+
+.SH SEE ALSO
+odsupercomponent(1)
+
+
+
+.SH BUGS
+No known bugs.
+
+
+
+.SH AUTHOR
+Christian Berger (christian.berger@gu.se)
+

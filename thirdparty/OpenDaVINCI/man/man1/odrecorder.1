@@ -1,0 +1,112 @@
+.\" Manpage for odrecorder
+.\" Author: Christian Berger <christian.berger@gu.se>.
+
+.TH odrecorder 1 "11 October 2015" "2.0.32" "odrecorder man page"
+
+.SH NAME
+odrecorder \- This tool records data exchanged in an OpenDaVINCI container conference session.
+
+
+
+.SH SYNOPSIS
+.B odrecorder --cid=<CID> [OPTIONS]
+
+
+
+.SH DESCRIPTION
+odrecorder belongs to OpenDaVINCI and is a tool to record data exchanged in an
+OpenDaVINCI container conference session.
+
+The following parameters need to be present in the configuration file supplied by
+odsupercomponent(1) to correctly configure odrecorder:
+
+.RS
+.B global.buffer.memorySegmentSize = 1000000
+
+.B global.buffer.numberOfMemorySegments = 20
+
+.B recorder.remoteControl = 0
+
+.B recorder.output = file://myRecording.rec
+
+.B recorder.dumpSharedData = 1
+.RE
+
+The parameter 'global.buffer.memorySegementSize' defines the size of buffer segment
+that is used to hold data from captured images temporarily for example; typical values
+are 921600 bytes corresponding to a VGA full-color image.
+
+odrecorder will allocate the number segments as specified in the parameter 'global.buffer.numberOfMemorySegments'
+in total during the recording process.
+
+The parameter 'recorder.remoteControl' has no effect during interactive use of odrecorder.
+
+The parameter 'recorder.output' defines the resulting filename.
+
+If the parameter 'recorder.dumpSharedDump' is set to 1, binary large objects (BLOBs)
+like captured images are also dumped. This data is stored separately in a file
+ending with .mem.
+
+This tool can only be used within an existing OpenDaVINCI container conference session
+created by odsupercomponent(1).
+
+
+
+.SH OPTIONS
+.B --cid=<CID>
+.RS
+This parameter specifies the conference identifier (CID) that is used to join a
+running container conference session. The session itself needs to be created by
+odsupercomponent(1).
+.RE
+
+
+.B --freq=<FREQ>
+.RS
+This parameter specifies the runtime frequency in Hz that is used to run odrecorder.
+If this parameter is omitted, a runtime frequency of 1 Hz is used.
+.RE
+
+
+.B --realtime=<0..49>
+.RS
+This parameter will schedule odrecorder to use the SCHED_FIFO soft realtime
+scheduler. The parameter specifies the scheduling priority.
+
+Please note that this feature is only available on Linux-based systems having a
+CONFIG_PREEMPT_RT kernel. In addition, odrecorder needs to be executed with
+superuser privileges.
+
+This parameter has no effect if odsupercomponent(1) is started using the
+parameter '--managed'.
+.RE
+
+
+.B --verbose=<0..10>
+.RS
+This parameter specifies the verbosity level that is used to print some information to stdlog.
+.RE
+
+
+
+.SH EXAMPLES
+The following command records the exchanged data from an OpenDaVINCI container conference session
+using a frequency of 10 Hz.
+
+.B odrecorder --cid=111 --freq=10
+
+
+
+.SH SEE ALSO
+odplayer(1), odrecorder(1), odrecintegrity(1), odredirector(1), odsplit(1), odspy(1)
+
+
+
+.SH BUGS
+No known bugs.
+
+
+
+.SH AUTHOR
+Christian Berger (christian.berger@gu.se)
+

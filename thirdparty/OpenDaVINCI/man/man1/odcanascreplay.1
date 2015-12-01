@@ -1,0 +1,83 @@
+.\" Manpage for odcanascreplay
+.\" Author: Christian Berger <christian.berger@gu.se>.
+
+.TH odcanascreplay 1 "11 October 2015" "2.0.32" "odcanascreplay man page"
+
+.SH NAME
+odcanascreplay \- This tool allows to replay raw CAN message dumps in ASC format supplied via stdin as GenericCANMessages to an OpenDaVINCI conference.
+
+
+
+.SH SYNOPSIS
+.B odcanascreplay --cid=<CID> [OPTIONS] < myCANfileInASCformat.asc
+
+
+
+.SH DESCRIPTION
+odcanascreplay is a tool to read raw CAN message dumps in ASC format from stdin and
+replays the individual messages wrapped as GenericCANMessages to a running
+OpenDaVINCI conference.
+
+This tool can only be used within an existing OpenDaVINCI container conference session
+created by odsupercomponent(1).
+
+
+
+.SH OPTIONS
+.B --cid=<CID>
+.RS
+This parameter specifies the conference identifier (CID) that is used to join a
+running container conference session. The session itself needs to be created by
+odsupercomponent(1).
+.RE
+
+
+.B --freq=<FREQ>
+.RS
+This parameter specifies the runtime frequency in Hz that is used to run odcanascreplay.
+If this parameter is omitted, a runtime frequency of 1 Hz is used.
+.RE
+
+
+.B --realtime=<0..49>
+.RS
+This parameter will schedule odcanascreplay to use the SCHED_FIFO soft realtime
+scheduler. The parameter specifies the scheduling priority.
+
+Please note that this feature is only available on Linux-based systems having a
+CONFIG_PREEMPT_RT kernel. In addition, odcanascreplay needs to be executed with
+superuser privileges.
+
+This parameter has no effect if odsupercomponent(1) is started using the
+parameter '--managed'.
+.RE
+
+
+.B --verbose=<0..10>
+.RS
+This parameter specifies the verbosity level that is used to print some information to stdlog.
+.RE
+
+
+
+.SH EXAMPLES
+The following command runs the program at 10 Hz replaying the content from myCANdump.asc with
+100ms delay between the separate messages.
+
+.B odcanascreplay --cid=111 --freq=10 < myCANdump.asc
+
+
+
+.SH SEE ALSO
+odcanascreplay(1), odcanbridge(1), odcanmapper(1), odproxy(1), odcanproxymapper(1), odsupercomponent(1)
+
+
+
+.SH BUGS
+No known bugs.
+
+
+
+.SH AUTHOR
+Christian Berger (christian.berger@gu.se)
+
