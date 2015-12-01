@@ -37,13 +37,13 @@ Terminal 2:
 ## Development policy
 
 The development of OpenDLV should follow some principles:
-* The code is intended to run on modern Linux systems, but we should avoid linking libraries which is not cross-platform
+* The code is intended to run on modern Linux systems, but we should avoid linking libraries which is not cross-platform.
 * We should minimize the number of dependencies in order to keep control of code quality and portability. Currently the following external libraries are allowed:
   - OpenDaVINCI
   - Eigen
   - OpenCV
   - Qt (only for the visualization layer)
-* The code should be well tested
+* The code should be well tested.
 * (Can we test branch code coverage?)
 
 ## Coding standard
@@ -55,6 +55,7 @@ self-explanatory.
 
 General layout rules:
 * Use double space indentation, and four space indentation when breaking a line.
+* Always break the line at any class inheritence (after the ':') or initalization list when declaring a constructor, and indent four spaces (see below).
 * Namespaces does not indent.
 * Generally break lines that are longer than 80 characters.
 * Use Doxygen-style documentation.
@@ -71,10 +72,10 @@ Naming rules:
 Specific coding rules:
 * Use the C++11 standard (we might soon change to C++14).
 * Do _not_ use 'using namespace'.
-* Use smart pointers, _avoid_ using raw pointers
-  - std::shared_ptr<TYPE> whenever an object needs to be shared
-  - std::unique_ptr<TYPE> whenever an object is _not_ shared
-  - std::weak_ptr<TYPE> when an object is optional or when breaking dependencies 
+* Use smart pointers, _avoid_ using raw pointers:
+  - std::shared_ptr<TYPE> whenever an object needs to be shared.
+  - std::unique_ptr<TYPE> whenever an object is _not_ shared.
+  - std::weak_ptr<TYPE> when an object is optional or when breaking dependencies.
 
 Here follows a code example that shows many of the aspects of the coding
 standard. Please also browse the code for more examples.
