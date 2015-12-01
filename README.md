@@ -55,9 +55,10 @@ self-explanatory.
 
 General layout rules:
 * Use double space indentation, and four space indentation when breaking a line.
-* Always break the line at any class inheritence (after the ':') or initalization list when declaring a constructor, and indent four spaces (see below).
-* Namespaces does not indent.
+* When declaring a constructor, always break the line at any class inheritance (after ':') or initialization list, then indent four spaces (see below).
+* Namespaces do not indent.
 * Generally break lines that are longer than 80 characters.
+* When listing variables and methods, generally list them alphabetically.
 * Use Doxygen-style documentation.
 
 Naming rules:
@@ -66,13 +67,13 @@ Naming rules:
 * Classes and methods should be in camelcase and start in _uppercase_.
 * Variables should be in camelcase and start in _lowercase_. 
 * Abbreviations should be treated as a single word, staring in uppercase followed by lowercase letters.
-* Always use explanatory names, there is _no_ need for short names.
+* Always use explanatory names, there are _no need_ for short names.
 * Use the Hungarian notations 'm_' and 'a_' for members and arguments.
 
 Specific coding rules:
 * Use the C++11 standard (we might soon change to C++14).
-* Do _not_ use 'using namespace'.
-* Use smart pointers, _avoid_ using raw pointers:
+* Do _not_ use 'using namespace', the full path should be written for readability.
+* _Avoid_ using raw pointers, instead use smart pointers:
   - std::shared_ptr<TYPE> whenever an object needs to be shared.
   - std::unique_ptr<TYPE> whenever an object is _not_ shared.
   - std::weak_ptr<TYPE> when an object is optional or when breaking dependencies.
@@ -109,8 +110,8 @@ class ExampleClassB : public ExampleClassA {
     // Generally list methods alphabetically.
     void FancyMethod();
 
-    // In general, start listing objects before primitives, then go 
-    // alphabetically.
+    // In general, start listing objects before primitives, group on type, then 
+    // go alphabetically.
     std::unique_ptr<ExampleClassC> m_classMemberPointer;
     uint32_t m_classMember;
 };
