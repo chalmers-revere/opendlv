@@ -34,6 +34,18 @@ Terminal 2:
     $ cd opendlv/build/out
     $ LD_LIBRARY_PATH=lib bin/opendlv-system-core-diagnostics --cid=111
 
+## Development policy
+
+The development of OpenDLV should follow some principles:
+* The code is intended to run on modern Linux systems, but we should avoid linking libraries which is not cross-platform
+* We should minimize the number of dependencies in order to keep control of code quality and portability. Currently the following external libraries are allowed:
+  - OpenDaVINCI
+  - Eigen
+  - OpenCV
+  - Qt (only for the visualization layer)
+* The code should be well tested
+* (Can we test branch code coverage?)
+
 ## Coding standard
 
 This section describes the coding standard used within OpenDLV. Make sure to
@@ -41,16 +53,28 @@ keep the code readable, especially when it comes to variable, class, and method
 names. Only add meaningful comments, the code itself should be
 self-explanatory. 
 
-Some general things:
+General layout rules:
 * Use double space indentation, and four space indentation when breaking a line.
 * Namespaces does not indent.
-* Do _not_ use 'using namespace'.
+* Generally break lines that are longer than 80 characters.
+* Use Doxygen-style documentation.
+
+Naming rules:
+* Files should generally be named in lowercase only.
+* C++ files should end with 'cpp' for source files, and 'hpp' for header files.
+* Classes and methods should be in camelcase and start in _uppercase_.
+* Variables should be in camelcase and start in _lowercase_. 
+* Abbreviations should be treated as a single word, staring in uppercase followed by lowercase letters.
+* Always use explanatory names, there is _no_ need for short names.
 * Use the Hungarian notations 'm_' and 'a_' for members and arguments.
-* Use the C++14 standard.
+
+Specific coding rules:
+* Use the C++11 standard (we might soon change to C++14).
+* Do _not_ use 'using namespace'.
 * Use smart pointers, _avoid_ using raw pointers
-  - shared_ptr<TYPE> whenever an object needs to be shared
-  - unique_ptr<TYPE> whenever an object is _not_ shared
-  - weak_ptr<TYPE> when an object is optional or when breaking dependencies 
+  - std::shared_ptr<TYPE> whenever an object needs to be shared
+  - std::unique_ptr<TYPE> whenever an object is _not_ shared
+  - std::weak_ptr<TYPE> when an object is optional or when breaking dependencies 
 
 Here follows a code example that shows many of the aspects of the coding
 standard. Please also browse the code for more examples.
@@ -130,9 +154,9 @@ ExampleClassB::~ExampleClassB()
  */
 void ExampleClassB::FancyMethod() const 
 {
-  int const numberOfRuns = 10;
+  uint32_t const numberOfRuns = 10;
 
-  for (int i = 0; i < numberOfRuns; i++) {
+  for (uint32_t i = 0; i < numberOfRuns; i++) {
     // Even short statements should have brackets.
     if (i > 5) {
       m_classMember += i;
