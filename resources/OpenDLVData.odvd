@@ -79,7 +79,7 @@ message sensor.Reading [id = 60] {
   string sensorName;
 }
 
-message sensor.Radar [id = 60] {
+message sensor.Radar [id = 61] {
   sensor.Reading reading [id = 1]; 
   double distance [id = 2];
 }
