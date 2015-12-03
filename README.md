@@ -1,6 +1,6 @@
 # OpenDLV
 
-OpenDLV is an open software environment intended to run in autonomous self-driving vehicles. It runs on the vehicle itself and should handle hardware communication, safety and override functions, sensor fusion, decision making, and visualisation. It is written entirely in standard C++, and is formally tested (unit tests and code coverage).
+OpenDLV is an open software environment intended to run in autonomous self-driving vehicles. It runs on the vehicle itself and should handle hardware communication, safety and override functions, sensor fusion, decision making, and visualisation. It is written entirely in standard C++, and is formally tested (unit tests and code coverage). Its focus is on code clarity, portability, and performance.
 
 The software is based on the compact middle-ware OpenDaVINCI (http://www.opendavinci.org).
 
@@ -24,7 +24,7 @@ Alternatively you can use locally compiled version of OpenDaVINCI by instead run
 
 Next, you can test the software by executing different parts of the software stack.
 
-Terminal 1 (odsupercomponent will load and provide the configuration data):
+Terminal 1 (odsupercomponent will load and provide the configuration data and realize the other components' life-cycle management; cf. http://docs.opendavinci.org):
 
     $ cd opendlv/build/out
     $ LD_LIBRARY_PATH=lib bin/odsupercomponent --cid=111 --verbose=1
@@ -36,14 +36,20 @@ Terminal 2:
 
 ## Development policy
 
-The development of OpenDLV should follow some principles:
-* The code is intended to run on modern Linux systems, but we should avoid linking libraries which is not cross-platform.
-* We should minimize the number of dependencies in order to keep control of code quality and portability. Currently the following external libraries are allowed:
+The development of OpenDLV shall follow some principles:
+* The code is intended to run on modern Linux systems, but we should avoid linking libraries which are not cross-platform.
+* Always use the highest compiler warning level that is offered; let the compiler treat warnings as errors.
+* Avoid using int/long; instead, use types with explicit size information like uint32_t for a 4 byte unsigned integer to improve portability.
+* Obey the DRY principle: Don't repeat yourself (for comments, code-cloning, etc.).
+* Write ISO-compliant code and avoid specific compiler-hacks; enable strict adherence to standards in the compiler.
+* _NEVER_ use macros as they violate type safety.
+* If you have to deal with critical resources, _always_ use scoped locks (cf. http://opendavinci.readthedocs.org/en/latest/tutorials.html#dining-philosophers).
+* We shall minimize the number of dependencies in order to keep control of code quality, clarity, and portability. Currently the following external libraries are allowed:
   - OpenDaVINCI
   - Eigen
   - OpenCV
   - Qt (only for the visualization layer)
-* The code should be well tested.
+* The code shall be well tested. Consider that code is written once but read often. To avoid unintended side-effects make sure to provide proper test code (there are many CxxTest unit test cases available that will be run automatically during the build).
 * (Can we test branch code coverage?)
 
 ## Coding standard
@@ -51,7 +57,12 @@ The development of OpenDLV should follow some principles:
 This section describes the coding standard used within OpenDLV. Make sure to
 keep the code readable, especially when it comes to variable, class, and method
 names. Only add meaningful comments, the code itself should be
-self-explanatory. 
+self-explanatory.
+
+Further information about coding guidelines are found here:
+* https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md
+* J. Lakos: Large-Scale C++ Software Design: http://www.amazon.de/Large-Scale-Software-Addison-Wesley-Professional-Computing/dp/0201633620
+* A. Hunt and D. Thomas: The Pragmatic Programmer. http://www.amazon.de/Pragmatic-Programmer-From-Journeyman-Master/dp/020161622X
 
 General layout rules:
 * Use double space indentation, and four space indentation when breaking a line.
@@ -73,7 +84,7 @@ Naming rules:
 Specific coding rules:
 * Use the C++11 standard (we might soon change to C++14).
 * Do _not_ use 'using namespace', the full path should be written for readability.
-* _Avoid_ using raw pointers, instead use smart pointers:
+* _Never_ use raw pointers, instead use smart pointers to delegate resource management:
   - std::shared_ptr<TYPE> whenever an object needs to be shared.
   - std::unique_ptr<TYPE> whenever an object is _not_ shared.
   - std::weak_ptr<TYPE> when an object is optional or when breaking dependencies.
@@ -94,7 +105,7 @@ standard. Please also browse the code for more examples.
 namespace opendlv {
 namespace system {
 
-// Use forward declaration whenever possible.
+// Use forward declaration whenever possible to speed up the compilation of a translation unit (cf. J. Lakos).
 class ExampleClassC;
 
 /**
@@ -104,10 +115,11 @@ class ExampleClassB : public ExampleClassA {
   public:
     ExampleClassB(std::string const &); // Argument names are omitted.
     // C++11 style method deletion. These two methods should almost always be 
-    // deleted.
+    // deleted to let the compiler warn us of unwanted object copying or assignment.
     ExampleClassB(ExampleClassB const &) = delete;
     ExampleClassB &operator=(ExampleClassB const &) = delete;
     virtual ~ExampleClassB();
+
     std::shared_ptr<ExampleClassC> GetClassMemberPointer() const;
     bool IsValid() const;
 
@@ -139,7 +151,7 @@ namespace opendlv {
 namespace system {
 
 // Note that we pass references and that const goes after type.
-// All member must be declared in the initialization list and the constructor.
+// All member MUST be declared in the initialization list and the constructor.
 ExampleClassB::ExampleClassB(std::string const &a_arg) :
     ExampleClassA(),
     m_classMember(42),
