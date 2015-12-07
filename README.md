@@ -78,7 +78,7 @@ Naming rules:
 * Classes and methods should be in camelcase and start in _uppercase_.
 * Variables should be in camelcase and start in _lowercase_. 
 * Abbreviations should be treated as a single word, staring in uppercase followed by lowercase letters.
-* Always use explanatory names, there are _no need_ for short names.
+* Always use explanatory names, there is _no need_ for short names.
 * Use the Hungarian notations 'm_' and 'a_' for members and arguments.
 
 Specific coding rules:
