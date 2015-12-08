@@ -4,7 +4,11 @@ OpenDLV is an open software environment intended to run in autonomous self-drivi
 
 The software is based on the compact middle-ware OpenDaVINCI (http://www.opendavinci.org).
 
-## Clone and build source repository
+## Getting started
+
+OpenDLV is designed to work with standard C++ (C++11 or newer) and to depend on few dependencies.
+
+### Clone and build source repository
 
 Clone this repository:
 
@@ -20,7 +24,7 @@ Alternatively you can use locally compiled version of OpenDaVINCI by instead run
 
     $ cmake -DOPENDAVINCI_DIR=/path/to/opendavinci ..
 
-## Test the software
+### Run the software
 
 Next, you can test the software by executing different parts of the software stack.
 
@@ -34,7 +38,7 @@ Terminal 2:
     $ cd opendlv/build/out
     $ LD_LIBRARY_PATH=lib bin/opendlv-system-core-diagnostics --cid=111
 
-## Development policy
+## Development
 
 The development of OpenDLV shall follow some principles:
 * The code is intended to run on modern Linux systems, but we should avoid linking libraries which are not cross-platform.
@@ -52,7 +56,15 @@ The development of OpenDLV shall follow some principles:
 * The code shall be well tested. Consider that code is written once but read often. To avoid unintended side-effects make sure to provide proper test code (there are many CxxTest unit test cases available that will be run automatically during the build).
 * (Can we test branch code coverage?)
 
-## Coding standard
+### Function testing
+
+TODO: Christian please add some guidelines and perhaps an example.
+
+### Code coverage
+
+TODO: Is this something we should test? In that case, how?
+
+### Coding standard
 
 This section describes the coding standard used within OpenDLV. Make sure to
 keep the code readable, especially when it comes to variable, class, and method
