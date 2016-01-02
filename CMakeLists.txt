@@ -17,6 +17,10 @@
 
 cmake_minimum_required(VERSION 2.8)
 
+# To compile OpenDLV using OpenDaVINCI installed at /opt/od, call CMake like:
+#
+# PATH=/opt/od/bin:$PATH cmake -D CMAKE_INSTALL_PREFIX=/opt/od ..
+
 project(opendlv)
 
 # Enable the configuration of external projects, as used below.
@@ -26,27 +30,27 @@ include(ExternalProject)
 include(FindJava REQUIRED)
 
 set(PROJECT_ROOT ${CMAKE_SOURCE_DIR})
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake.Modules)
+
+# Set the search path for .cmake files.
+SET (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake.Modules" ${CMAKE_MODULE_PATH})
+SET (CMAKE_MODULE_PATH "${CMAKE_INSTALL_PREFIX}/share/cmake-2.8/Modules" ${CMAKE_MODULE_PATH})
+#SET (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/code/generated/libopendlvdata/cmake.Modules" ${CMAKE_MODULE_PATH})
+
 
 # OpenDaVINCI
-if(NOT DEFINED ${OPENDAVINCI_DIR})
-  message(STATUS "No OPENDAVINCI_DIR was supplied, using the default (./thirdparty/OpenDaVINCI) directory.")
-  set(OPENDAVINCI_DIR ${CMAKE_SOURCE_DIR}/thirdparty/OpenDaVINCI)
-endif()
-
 find_package(OpenDaVINCI REQUIRED)
 include(FindodDataStructureGenerator REQUIRED)
 
 # CxxTest
-if(NOT DEFINED ${CXXTEST_INCLUDE_DIR})
-  message(STATUS "No CXXTEST_DIR was supplied, using the default (./thirdparty/cxxtest) directory.")
+if("${CXXTEST_INCLUDE_DIR}" STREQUAL "")
+  message(STATUS "No CXXTEST_INCLUDE_DIR was supplied, using the default (./thirdparty/cxxtest) directory.")
   set(CXXTEST_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/thirdparty/cxxtest) 
 endif()
 
 include(CheckCxxTestEnvironment REQUIRED)
 
 # Install output
-if(NOT DEFINED ${CMAKE_INSTALL_PREFIX})
+if("${CMAKE_INSTALL_PREFIX}" STREQUAL "")
   message(STATUS "No CMAKE_INSTALL_PREFIX was supplied, using the default (./build/out) directory.")
   set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/build/out)
 endif()
@@ -66,7 +70,7 @@ ExternalProject_Add(libopendlvdata-cleanup
     TEST_COMMAND ""
     INSTALL_COMMAND "")
 
-# TODO: Improvement to generated CMkaeLists.txt is possible, remove line 37 and instead add as CMAKE_ARGS
+# TODO: Improvement to generated CMakeLists.txt is possible, remove line 37 and instead add as CMAKE_ARGS
 # Workaround: Hardcoded path to OpenDaVINCI in FindOpenDaVINCI
 
 # TODO: Improvement to generated CMakeLists.txt is possible, it assumes relative path to cxxtest
@@ -79,9 +83,15 @@ ExternalProject_Add(libopendlvdata
     UPDATE_COMMAND cd ${CMAKE_SOURCE_DIR}/code/generated && ${Java_JAVA_EXECUTABLE} -jar ${ODDATASTRUCTUREGENERATOR_EXECUTABLE} --withCMake ${CMAKE_SOURCE_DIR}/resources/OpenDLVData.odvd
     PATCH_COMMAND ""
     SOURCE_DIR "${CMAKE_SOURCE_DIR}/code/generated/libopendlvdata"
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} -DCMAKE_MODULE_PATH=${CMAKE_SOURCE_DIR}/cmake.Modules -DPROJECT_ROOT=${PROJECT_ROOT}
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+    CMAKE_ARGS -DCMAKE_MODULE_PATH=${PROJECT_ROOT}/cmake.Modules:${CMAKE_INSTALL_PREFIX}/share/cmake-2.8/Modules:${CMAKE_MODULE_PATH}
+    CMAKE_ARGS -DPROJECT_ROOT=${PROJECT_ROOT}
+    CMAKE_ARGS -DOPENDAVINCI_DIR=${OPENDAVINCI_DIR}
+    CMAKE_ARGS -DCXXTEST_INCLUDE_DIR=${CXXTEST_INCLUDE_DIR}
     TEST_BEFORE_INSTALL 1
+    TEST_COMMAND ""
     INSTALL_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/libopendlvdata-prefix/src/libopendlvdata-build --target install COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/libopendlvdata-prefix/src/libopendlvdata-build --target ${MAKE_PACKAGE})
+
 
 # Build and install the system software stack.
 ExternalProject_Add(system
@@ -89,7 +99,11 @@ ExternalProject_Add(system
     DOWNLOAD_COMMAND ""
     UPDATE_COMMAND ""
     SOURCE_DIR "${CMAKE_SOURCE_DIR}/code/system"
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} -DCMAKE_MODULE_PATH=${CMAKE_SOURCE_DIR}/cmake.Modules -DPROJECT_ROOT=${PROJECT_ROOT} -DOPENDAVINCI_DIR=${OPENDAVINCI_DIR} -DCXXTEST_INCLUDE_DIR=${CXXTEST_INCLUDE_DIR}
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+    CMAKE_ARGS -DCMAKE_MODULE_PATH=${PROJECT_ROOT}/cmake.Modules:${CMAKE_INSTALL_PREFIX}/share/cmake-2.8/Modules:${CMAKE_MODULE_PATH}
+    CMAKE_ARGS -DPROJECT_ROOT=${PROJECT_ROOT}
+    CMAKE_ARGS -DOPENDAVINCI_DIR=${OPENDAVINCI_DIR}
+    CMAKE_ARGS -DCXXTEST_INCLUDE_DIR=${CXXTEST_INCLUDE_DIR}
     TEST_BEFORE_INSTALL 1
     INSTALL_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/system-prefix/src/system-build --target install COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/system-prefix/src/system-build --target ${MAKE_PACKAGE})
 

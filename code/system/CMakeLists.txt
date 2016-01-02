@@ -19,7 +19,8 @@ cmake_minimum_required(VERSION 2.8)
 
 project(opendlv-system)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_INSTALL_PREFIX}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules")
+SET (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../cmake.Modules" ${CMAKE_MODULE_PATH})
+SET (CMAKE_MODULE_PATH "${CMAKE_INSTALL_PREFIX}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules" ${CMAKE_MODULE_PATH})
 
 include(CompileFlags)
 
@@ -46,8 +47,8 @@ set(LIBRARIES ${OPENDAVINCI_LIBRARIES} ${OPENDLVDATA_LIBRARIES})
 add_subdirectory(core)
 add_subdirectory(application)
 
-install(PROGRAMS ${OPENDAVINCI_DIR}/bin/odsupercomponent DESTINATION bin COMPONENT system)
-install(FILES ${OPENDAVINCI_DIR}/lib/libopendavinci.so DESTINATION lib COMPONENT system)
-install(FILES ${OPENDAVINCI_DIR}/lib/libopendavinci-static.a DESTINATION lib COMPONENT system)
+#install(PROGRAMS ${OPENDAVINCI_DIR}/bin/odsupercomponent DESTINATION bin COMPONENT system)
+#install(FILES ${OPENDAVINCI_DIR}/lib/libopendavinci.so DESTINATION lib COMPONENT system)
+#install(FILES ${OPENDAVINCI_DIR}/lib/libopendavinci-static.a DESTINATION lib COMPONENT system)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../config/configuration DESTINATION . COMPONENT system)
 
