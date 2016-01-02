@@ -17,16 +17,18 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-# PATH=/opt/od/bin:$PATH cmake -D CMAKE_INSTALL_PREFIX=/opt/ReVeRe -D OPENDAVINCI_DIR=/opt/od -D CXXTEST_INCLUDE_DIR=/home/msv/GITHUB/OpenDaVINCI/cxxtest/ ..
+# To create a proper build environment, you are supposed to call CMake as follows:
+#
+# PATH=/opt/od/bin:$PATH cmake -D CMAKE_INSTALL_PREFIX=<Where shall OpenDLV be installed?> 
+#                              -D OPENDAVINCI_DIR=<Where is OpenDaVINCI installed?> 
+#                              -D CXXTEST_INCLUDE_DIR=<Where is CxxTest installed?> ..
+#
+# The adjusted PATH variable is required to find odDataStructureGenerator-latest.jar.
+# CMAKE_INSTALL_PREFIX specifies where to install OpenDLV.
+# OPENDAVINCI_DIR specifies where OpenDaVINCI is installed (if different from /usr/include and /usr/lib).
+# CXXTEST_INCLUDE_DIR specifies where the UnitTest environment CxxTest can be found.
 
 project(opendlv)
-
-###########################################################################
-# Enable the configuration of external projects, as used below.
-include(ExternalProject)
-
-# Java is needed to run the odDataStructureGenerator tool.
-include(FindJava REQUIRED)
 
 ###########################################################################
 # If dpkg and rpmbuild are available, .deb and .rpm packages will be
@@ -40,32 +42,36 @@ ELSE()
     # If the platform does not provide dpkg and rpmbuild, make package is
     # replaced with make install.
     SET(MAKE_PACKAGE install)
-
 ENDIF()
-
-###########################################################################
-
-set(PROJECT_ROOT ${CMAKE_SOURCE_DIR})
 
 ###########################################################################
 # Set the search path for .cmake files.
 SET (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake.Modules" ${CMAKE_MODULE_PATH})
 SET (CMAKE_MODULE_PATH "${OPENDAVINCI_DIR}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules" ${CMAKE_MODULE_PATH})
 
+###########################################################################
+# Enable the configuration of external projects, as used below.
+include(ExternalProject)
 
 ###########################################################################
-# OpenDaVINCI
+# Java is needed to run the odDataStructureGenerator tool
+# for generating the data structures.
+include(FindJava REQUIRED)
+
+###########################################################################
+# Find OpenDaVINCI.
 include(FindodDataStructureGenerator REQUIRED)
 find_package(OpenDaVINCI REQUIRED)
 
-# CxxTest
+###########################################################################
+# Find CxxTest.
 if("${CXXTEST_INCLUDE_DIR}" STREQUAL "")
   message(STATUS "No CXXTEST_INCLUDE_DIR was supplied, using the default (./thirdparty/cxxtest) directory.")
   set(CXXTEST_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/thirdparty/cxxtest) 
 endif()
-
 include(CheckCxxTestEnvironment REQUIRED)
 
+###########################################################################
 # Install output
 if("${CMAKE_INSTALL_PREFIX}" STREQUAL "")
   message(STATUS "No CMAKE_INSTALL_PREFIX was supplied, using the default (./build/out) directory.")
@@ -73,10 +79,11 @@ if("${CMAKE_INSTALL_PREFIX}" STREQUAL "")
 endif()
 
 set(INSTALL_DIR ${CMAKE_INSTALL_PREFIX})
+set(PROJECT_ROOT ${CMAKE_SOURCE_DIR})
 
-
-
-# This "external project" deletes the existing libopendlvdata.
+###########################################################################
+###########################################################################
+# This "external project" deletes any previously generated data structures libopendlvdata.
 ExternalProject_Add(libopendlvdata-cleanup
     DOWNLOAD_COMMAND ""
     UPDATE_COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_SOURCE_DIR}/code/generated/libopendlvdata
@@ -87,7 +94,8 @@ ExternalProject_Add(libopendlvdata-cleanup
     TEST_COMMAND ""
     INSTALL_COMMAND "")
 
-# This "external project" generates the data structures.
+###########################################################################
+# This "external project" generates the data structures in libopendlvdata.
 ExternalProject_Add(libopendlvdata
     DEPENDS libopendlvdata-cleanup
     DOWNLOAD_COMMAND ""
@@ -100,8 +108,8 @@ ExternalProject_Add(libopendlvdata
     TEST_BEFORE_INSTALL 1
     INSTALL_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/libopendlvdata-prefix/src/libopendlvdata-build --target install COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/libopendlvdata-prefix/src/libopendlvdata-build --target ${MAKE_PACKAGE})
 
-
-# Build and install the system software stack.
+###########################################################################
+# This "external project" builds and installs the system software stack.
 ExternalProject_Add(system
     DEPENDS libopendlvdata
     DOWNLOAD_COMMAND ""
