@@ -27,7 +27,7 @@
 /**
  * This class derives from Perception to allow access to protected methods.
  */
-class PerceptionTestling : public opendlv::system::core::Perception {
+class PerceptionTestling : public opendlv::system::application::Perception {
   private:
     PerceptionTestling();
     

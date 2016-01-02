@@ -1,6 +1,6 @@
 if(CXXTEST_FOUND)
-  file(GLOB thisproject-testsuites "${CMAKE_CURRENT_SOURCE_DIR}/testsuites/*.h")
-    
+  file(GLOB thisproject-testsuites "${CMAKE_CURRENT_SOURCE_DIR}/testsuites/*.hpp")
+
   foreach(testsuite ${thisproject-testsuites})
     string(REPLACE "/" ";" testsuite-list ${testsuite})
 
@@ -14,9 +14,9 @@ if(CXXTEST_FOUND)
       if(   ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
          OR ("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD")
          OR ("${CMAKE_SYSTEM_NAME}" STREQUAL "DragonFly") )
-        set_source_files_properties(${testsuite-short}-TestSuite.cpp PROPERTIES COMPILE_FLAGS "-Wno-effc++ -Wno-float-equal -Wno-error=suggest-attribute=noreturn")
+        set_source_files_properties(${testsuite-short}-TestSuite.cpp PROPERTIES COMPILE_FLAGS "-Wno-effc++ -Wno-float-equal -Wno-error=suggest-attribute=noreturn -Wno-switch-default")
       else()
-        set_source_files_properties(${testsuite-short}-TestSuite.cpp PROPERTIES COMPILE_FLAGS "-Wno-effc++ -Wno-float-equal")
+        set_source_files_properties(${testsuite-short}-TestSuite.cpp PROPERTIES COMPILE_FLAGS "-Wno-effc++ -Wno-float-equal -Wno-switch-default")
       endif()
     endif()
     if(WIN32)

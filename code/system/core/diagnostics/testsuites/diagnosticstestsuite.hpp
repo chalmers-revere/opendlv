@@ -27,7 +27,7 @@
 /**
  * This class derives from Diagnostics to allow access to protected methods.
  */
-class DiagnosticsTestling : public opendlv::system::core::Diagnostics {
+class DiagnosticsTestling : public opendlv::system::Diagnostics {
   private:
     DiagnosticsTestling();
     

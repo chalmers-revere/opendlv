@@ -27,7 +27,7 @@
 /**
  * This class derives from Action to allow access to protected methods.
  */
-class ActionTestling : public opendlv::system::core::Action {
+class ActionTestling : public opendlv::system::application::Action {
   private:
     ActionTestling();
     
