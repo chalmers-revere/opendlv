@@ -72,13 +72,9 @@ endif()
 include(CheckCxxTestEnvironment REQUIRED)
 
 ###########################################################################
-# Install output
-if("${CMAKE_INSTALL_PREFIX}" STREQUAL "")
-  message(STATUS "No CMAKE_INSTALL_PREFIX was supplied, using the default (./build/out) directory.")
-  set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/build/out)
-endif()
-
+# Global project variables.
 set(INSTALL_DIR ${CMAKE_INSTALL_PREFIX})
+message(STATUS "Installing OpenDLV to ${INSTALL_DIR}.")
 set(PROJECT_ROOT ${CMAKE_SOURCE_DIR})
 
 ###########################################################################
