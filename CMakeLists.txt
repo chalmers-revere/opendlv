@@ -17,34 +17,46 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-# To compile OpenDLV using OpenDaVINCI installed at /opt/od, call CMake like:
-#
-# PATH=/opt/od/bin:$PATH cmake -D CMAKE_INSTALL_PREFIX=/opt/od ..
+# PATH=/opt/od/bin:$PATH cmake -D CMAKE_INSTALL_PREFIX=/opt/ReVeRe -D OPENDAVINCI_DIR=/opt/od -D CXXTEST_INCLUDE_DIR=/home/msv/GITHUB/OpenDaVINCI/cxxtest/ ..
 
 project(opendlv)
 
+###########################################################################
 # Enable the configuration of external projects, as used below.
 include(ExternalProject)
 
 # Java is needed to run the odDataStructureGenerator tool.
 include(FindJava REQUIRED)
 
+###########################################################################
+# If dpkg and rpmbuild are available, .deb and .rpm packages will be
+# created. Otherwise, the software is simply installed.
+IF(     NOT("${DPKG_EXECUTABLE}" STREQUAL "DPKG_EXECUTABLE-NOTFOUND")
+    AND NOT("${RPMBUILD_EXECUTABLE}" STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND") )
+    MESSAGE(STATUS "Enabling building .deb and .rpm packages.")
+#    SET(MAKE_PACKAGE package) # TODO: Enable packaging for code/system.
+    SET(MAKE_PACKAGE install)
+ELSE()
+    # If the platform does not provide dpkg and rpmbuild, make package is
+    # replaced with make install.
+    SET(MAKE_PACKAGE install)
+
+ENDIF()
+
+###########################################################################
+
 set(PROJECT_ROOT ${CMAKE_SOURCE_DIR})
 
+###########################################################################
 # Set the search path for .cmake files.
 SET (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake.Modules" ${CMAKE_MODULE_PATH})
-SET (CMAKE_MODULE_PATH "${CMAKE_INSTALL_PREFIX}/share/cmake-2.8/Modules" ${CMAKE_MODULE_PATH})
-#SET (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/code/generated/libopendlvdata/cmake.Modules" ${CMAKE_MODULE_PATH})
-
-SET (SEARCH_PATH_FOR_CMAKE_MODULES ${CMAKE_CURRENT_SOURCE_DIR}/cmake.Modules:${CMAKE_INSTALL_PREFIX}/share/cmake-2.8/Modules)
-if(NOT ("${OPENDAVINCI_DIR}" STREQUAL ""))
-    SET (SEARCH_PATH_FOR_CMAKE_MODULES ${SEARCH_PATH_FOR_CMAKE_MODULES}:${OPENDAVINCI_DIR}/share/cmake-2.8/Modules)
-endif()
+SET (CMAKE_MODULE_PATH "${OPENDAVINCI_DIR}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules" ${CMAKE_MODULE_PATH})
 
 
+###########################################################################
 # OpenDaVINCI
-find_package(OpenDaVINCI REQUIRED)
 include(FindodDataStructureGenerator REQUIRED)
+find_package(OpenDaVINCI REQUIRED)
 
 # CxxTest
 if("${CXXTEST_INCLUDE_DIR}" STREQUAL "")
@@ -75,12 +87,6 @@ ExternalProject_Add(libopendlvdata-cleanup
     TEST_COMMAND ""
     INSTALL_COMMAND "")
 
-# TODO: Improvement to generated CMakeLists.txt is possible, remove line 37 and instead add as CMAKE_ARGS
-# Workaround: Hardcoded path to OpenDaVINCI in FindOpenDaVINCI
-
-# TODO: Improvement to generated CMakeLists.txt is possible, it assumes relative path to cxxtest
-# Workaround: Install cxxtest on system(?), seems to work.
-
 # This "external project" generates the data structures.
 ExternalProject_Add(libopendlvdata
     DEPENDS libopendlvdata-cleanup
@@ -89,12 +95,9 @@ ExternalProject_Add(libopendlvdata
     PATCH_COMMAND ""
     SOURCE_DIR "${CMAKE_SOURCE_DIR}/code/generated/libopendlvdata"
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-    CMAKE_ARGS -DCMAKE_MODULE_PATH=${PROJECT_ROOT}/cmake.Modules:${SEARCH_PATH_FOR_CMAKE_MODULES}:${CMAKE_MODULE_PATH}
-    CMAKE_ARGS -DPROJECT_ROOT=${PROJECT_ROOT}
-    CMAKE_ARGS -DOPENDAVINCI_DIR=${OPENDAVINCI_DIR}
-    CMAKE_ARGS -DCXXTEST_INCLUDE_DIR=${CXXTEST_INCLUDE_DIR}
+               -DOPENDAVINCI_DIR=${OPENDAVINCI_DIR}
+               -DCXXTEST_INCLUDE_DIR=${CXXTEST_INCLUDE_DIR}
     TEST_BEFORE_INSTALL 1
-    TEST_COMMAND ""
     INSTALL_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/libopendlvdata-prefix/src/libopendlvdata-build --target install COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/libopendlvdata-prefix/src/libopendlvdata-build --target ${MAKE_PACKAGE})
 
 
@@ -105,10 +108,8 @@ ExternalProject_Add(system
     UPDATE_COMMAND ""
     SOURCE_DIR "${CMAKE_SOURCE_DIR}/code/system"
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-    CMAKE_ARGS -DCMAKE_MODULE_PATH=${PROJECT_ROOT}/cmake.Modules:${SEARCH_PATH_FOR_CMAKE_MODULES}:${CMAKE_MODULE_PATH}
-    CMAKE_ARGS -DPROJECT_ROOT=${PROJECT_ROOT}
-    CMAKE_ARGS -DOPENDAVINCI_DIR=${OPENDAVINCI_DIR}
-    CMAKE_ARGS -DCXXTEST_INCLUDE_DIR=${CXXTEST_INCLUDE_DIR}
+               -DOPENDAVINCI_DIR=${OPENDAVINCI_DIR}
+               -DCXXTEST_INCLUDE_DIR=${CXXTEST_INCLUDE_DIR}
     TEST_BEFORE_INSTALL 1
     INSTALL_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/system-prefix/src/system-build --target install COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/system-prefix/src/system-build --target ${MAKE_PACKAGE})
 
