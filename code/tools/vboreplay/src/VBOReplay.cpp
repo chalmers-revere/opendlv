@@ -17,6 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+#include <iomanip>
 #include <iostream>
 
 #include <core/data/Container.h>
@@ -86,8 +87,11 @@ namespace revere {
         const uint32_t MAX_LINE_LENGTH = 2000;
         char buffer[MAX_LINE_LENGTH];
         while (getModuleStateAndWaitForRemainingTimeInTimeslice() == coredata::dmcp::ModuleStateMessage::RUNNING) {
-            // Read next line from STDIN.
-            cin.getline(buffer, MAX_LINE_LENGTH);
+            // Skip some lines to fasten playback.
+            for(int i = 0; i < 15; i++) {
+                // Read next line from STDIN.
+                cin.getline(buffer, MAX_LINE_LENGTH);
+            }
 
             // Tokenize the read line.
             vector<string> tokens = StringToolbox::split(string(buffer), ' ');
@@ -136,6 +140,10 @@ namespace revere {
                     coordinate = WGS84Coordinate(latInDEG * -1.0, WGS84Coordinate::SOUTH, lonInDEG * -1.0, WGS84Coordinate::EAST);
                 }
 
+                // Distribute data.
+                Container c(Container::USER_DATA_0, coordinate);
+                getConference().send(c);
+
                 // Calculate cartesian coordinate from WGS84 coordinate using specified reference frame.
                 Point3 cartesianCoordinate = m_reference.transform(coordinate);
 
@@ -169,8 +177,8 @@ namespace revere {
                 es.setRotation(orientation);
 
                 // Distribute data.
-                Container c(Container::EGOSTATE, es);
-                getConference().send(c);
+                Container c2(Container::EGOSTATE, es);
+                getConference().send(c2);
             }
         }
 

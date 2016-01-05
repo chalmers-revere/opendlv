@@ -117,3 +117,16 @@ ExternalProject_Add(system
     TEST_BEFORE_INSTALL 1
     INSTALL_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/system-prefix/src/system-build --target install COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/system-prefix/src/system-build --target ${MAKE_PACKAGE})
 
+###########################################################################
+# This "external project" builds and installs the tools software stack.
+ExternalProject_Add(tools
+    DEPENDS libopendlvdata
+    DOWNLOAD_COMMAND ""
+    UPDATE_COMMAND ""
+    SOURCE_DIR "${CMAKE_SOURCE_DIR}/code/tools"
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+               -DOPENDAVINCI_DIR=${OPENDAVINCI_DIR}
+               -DCXXTEST_INCLUDE_DIR=${CXXTEST_INCLUDE_DIR}
+    TEST_BEFORE_INSTALL 1
+    INSTALL_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/tools-prefix/src/tools-build --target install COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/tools-prefix/src/tools-build --target ${MAKE_PACKAGE})
+

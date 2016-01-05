@@ -35,6 +35,7 @@ ENDIF()
 ###########################################################################
 # Include flags for compiling.
 INCLUDE (CompileFlags)
+SET(CMAKE_CXX_FLAGS "-fPIC -Wall -Weffc++ -Werror -Wextra -Wshadow")
 
 ###########################################################################
 # Find and configure CxxTest.
