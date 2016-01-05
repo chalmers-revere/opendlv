@@ -27,7 +27,7 @@
 /**
  * This class derives from Safety to allow access to protected methods.
  */
-class SafetyTestling : public opendlv::system::core::Safety {
+class SafetyTestling : public opendlv::system::Safety {
   private:
     SafetyTestling();
     

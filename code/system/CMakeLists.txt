@@ -19,35 +19,42 @@ cmake_minimum_required(VERSION 2.8)
 
 project(opendlv-system)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_INSTALL_PREFIX}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules")
+###########################################################################
+# Set the search path for .cmake files.
+SET (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../cmake.Modules" ${CMAKE_MODULE_PATH})
+SET (CMAKE_MODULE_PATH "${CMAKE_INSTALL_PREFIX}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules" ${CMAKE_MODULE_PATH})
+SET (CMAKE_MODULE_PATH "${OPENDAVINCI_DIR}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules" ${CMAKE_MODULE_PATH})
 
+###########################################################################
+# Global compile flags.
 include(CompileFlags)
 
-# OpenDaVINCI
+###########################################################################
+# Find CxxTest.
+include(CheckCxxTestEnvironment)
+
+###########################################################################
+# Find OpenDaVINCI.
 find_package(OpenDaVINCI REQUIRED)
 
+###########################################################################
+# Find OpenDLV data structures.
 set(OPENDLVDATA_DIR "${CMAKE_INSTALL_PREFIX}")
 find_package(OpenDLVData REQUIRED)
 
-# CxxTest
-include(CheckCxxTestEnvironment)
-
-# Set common include directories
+###########################################################################
+# Set common include directories.
 include_directories(SYSTEM ${OPENDAVINCI_INCLUDE_DIRS}/opendavinci)
 include_directories(SYSTEM ${OPENDLVDATA_INCLUDE_DIRS}/opendlvdata)
 
-# Set libraries
+###########################################################################
+# Set libraries to link against.
 set(LIBRARIES ${OPENDAVINCI_LIBRARIES} ${OPENDLVDATA_LIBRARIES})
 
-
-#set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-pedantic-errors")
-
-
+###########################################################################
+# Add subfolders with sources.
 add_subdirectory(core)
 add_subdirectory(application)
 
-install(PROGRAMS ${OPENDAVINCI_DIR}/bin/odsupercomponent DESTINATION bin COMPONENT system)
-install(FILES ${OPENDAVINCI_DIR}/lib/libopendavinci.so DESTINATION lib COMPONENT system)
-install(FILES ${OPENDAVINCI_DIR}/lib/libopendavinci-static.a DESTINATION lib COMPONENT system)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../config/configuration DESTINATION . COMPONENT system)
 

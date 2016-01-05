@@ -27,7 +27,7 @@
 /**
  * This class derives from Sensation to allow access to protected methods.
  */
-class SensationTestling : public opendlv::system::core::Sensation {
+class SensationTestling : public opendlv::system::application::Sensation {
   private:
     SensationTestling();
     

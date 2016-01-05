@@ -27,7 +27,7 @@
 /**
  * This class derives from Proxy to allow access to protected methods.
  */
-class ProxyTestling : public opendlv::system::core::Proxy {
+class ProxyTestling : public opendlv::system::Proxy {
   private:
     ProxyTestling();
     

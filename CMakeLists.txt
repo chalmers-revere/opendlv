@@ -17,45 +17,69 @@
 
 cmake_minimum_required(VERSION 2.8)
 
+# To create a proper build environment, you are supposed to call CMake as follows:
+#
+# PATH=/opt/od/bin:$PATH cmake -D CMAKE_INSTALL_PREFIX=<Where shall OpenDLV be installed?> 
+#                              -D OPENDAVINCI_DIR=<Where is OpenDaVINCI installed?> 
+#                              -D CXXTEST_INCLUDE_DIR=<Where is CxxTest installed?> ..
+#
+# The adjusted PATH variable is required to find odDataStructureGenerator-latest.jar.
+# CMAKE_INSTALL_PREFIX specifies where to install OpenDLV.
+# OPENDAVINCI_DIR specifies where OpenDaVINCI is installed (if different from /usr/include and /usr/lib).
+# CXXTEST_INCLUDE_DIR specifies where the UnitTest environment CxxTest can be found.
+
 project(opendlv)
 
+###########################################################################
+# If dpkg and rpmbuild are available, .deb and .rpm packages will be
+# created. Otherwise, the software is simply installed.
+IF(     NOT("${DPKG_EXECUTABLE}" STREQUAL "DPKG_EXECUTABLE-NOTFOUND")
+    AND NOT("${RPMBUILD_EXECUTABLE}" STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND") )
+    MESSAGE(STATUS "Enabling building .deb and .rpm packages.")
+#    SET(MAKE_PACKAGE package) # TODO: Enable packaging for code/system.
+    SET(MAKE_PACKAGE install)
+ELSE()
+    # If the platform does not provide dpkg and rpmbuild, make package is
+    # replaced with make install.
+    SET(MAKE_PACKAGE install)
+ENDIF()
+
+###########################################################################
+# Set the search path for .cmake files.
+SET (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake.Modules" ${CMAKE_MODULE_PATH})
+SET (CMAKE_MODULE_PATH "${OPENDAVINCI_DIR}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules" ${CMAKE_MODULE_PATH})
+
+###########################################################################
 # Enable the configuration of external projects, as used below.
 include(ExternalProject)
 
-# Java is needed to run the odDataStructureGenerator tool.
+###########################################################################
+# Java is needed to run the odDataStructureGenerator tool
+# for generating the data structures.
 include(FindJava REQUIRED)
 
-set(PROJECT_ROOT ${CMAKE_SOURCE_DIR})
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake.Modules)
-
-# OpenDaVINCI
-if(NOT DEFINED ${OPENDAVINCI_DIR})
-  message(STATUS "No OPENDAVINCI_DIR was supplied, using the default (./thirdparty/OpenDaVINCI) directory.")
-  set(OPENDAVINCI_DIR ${CMAKE_SOURCE_DIR}/thirdparty/OpenDaVINCI)
-endif()
-
-find_package(OpenDaVINCI REQUIRED)
+###########################################################################
+# Find OpenDaVINCI.
 include(FindodDataStructureGenerator REQUIRED)
+find_package(OpenDaVINCI REQUIRED)
 
-# CxxTest
-if(NOT DEFINED ${CXXTEST_INCLUDE_DIR})
-  message(STATUS "No CXXTEST_DIR was supplied, using the default (./thirdparty/cxxtest) directory.")
+###########################################################################
+# Find CxxTest.
+if("${CXXTEST_INCLUDE_DIR}" STREQUAL "")
+  message(STATUS "No CXXTEST_INCLUDE_DIR was supplied, using the default (./thirdparty/cxxtest) directory.")
   set(CXXTEST_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/thirdparty/cxxtest) 
 endif()
-
 include(CheckCxxTestEnvironment REQUIRED)
 
-# Install output
-if(NOT DEFINED ${CMAKE_INSTALL_PREFIX})
-  message(STATUS "No CMAKE_INSTALL_PREFIX was supplied, using the default (./build/out) directory.")
-  set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/build/out)
-endif()
-
+###########################################################################
+# Global project variables.
 set(INSTALL_DIR ${CMAKE_INSTALL_PREFIX})
+message(STATUS "Installing OpenDLV to ${INSTALL_DIR}.")
+set(PROJECT_ROOT ${CMAKE_SOURCE_DIR})
 
-
-
-# This "external project" deletes the existing libopendlvdata.
+###########################################################################
+###########################################################################
+# This "external project" deletes any previously generated data structures libopendlvdata.
 ExternalProject_Add(libopendlvdata-cleanup
     DOWNLOAD_COMMAND ""
     UPDATE_COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_SOURCE_DIR}/code/generated/libopendlvdata
@@ -66,30 +90,30 @@ ExternalProject_Add(libopendlvdata-cleanup
     TEST_COMMAND ""
     INSTALL_COMMAND "")
 
-# TODO: Improvement to generated CMkaeLists.txt is possible, remove line 37 and instead add as CMAKE_ARGS
-# Workaround: Hardcoded path to OpenDaVINCI in FindOpenDaVINCI
-
-# TODO: Improvement to generated CMakeLists.txt is possible, it assumes relative path to cxxtest
-# Workaround: Install cxxtest on system(?), seems to work.
-
-# This "external project" generates the data structures.
+###########################################################################
+# This "external project" generates the data structures in libopendlvdata.
 ExternalProject_Add(libopendlvdata
     DEPENDS libopendlvdata-cleanup
     DOWNLOAD_COMMAND ""
     UPDATE_COMMAND cd ${CMAKE_SOURCE_DIR}/code/generated && ${Java_JAVA_EXECUTABLE} -jar ${ODDATASTRUCTUREGENERATOR_EXECUTABLE} --withCMake ${CMAKE_SOURCE_DIR}/resources/OpenDLVData.odvd
     PATCH_COMMAND ""
     SOURCE_DIR "${CMAKE_SOURCE_DIR}/code/generated/libopendlvdata"
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} -DCMAKE_MODULE_PATH=${CMAKE_SOURCE_DIR}/cmake.Modules -DPROJECT_ROOT=${PROJECT_ROOT}
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+               -DOPENDAVINCI_DIR=${OPENDAVINCI_DIR}
+               -DCXXTEST_INCLUDE_DIR=${CXXTEST_INCLUDE_DIR}
     TEST_BEFORE_INSTALL 1
     INSTALL_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/libopendlvdata-prefix/src/libopendlvdata-build --target install COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/libopendlvdata-prefix/src/libopendlvdata-build --target ${MAKE_PACKAGE})
 
-# Build and install the system software stack.
+###########################################################################
+# This "external project" builds and installs the system software stack.
 ExternalProject_Add(system
     DEPENDS libopendlvdata
     DOWNLOAD_COMMAND ""
     UPDATE_COMMAND ""
     SOURCE_DIR "${CMAKE_SOURCE_DIR}/code/system"
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} -DCMAKE_MODULE_PATH=${CMAKE_SOURCE_DIR}/cmake.Modules -DPROJECT_ROOT=${PROJECT_ROOT} -DOPENDAVINCI_DIR=${OPENDAVINCI_DIR} -DCXXTEST_INCLUDE_DIR=${CXXTEST_INCLUDE_DIR}
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+               -DOPENDAVINCI_DIR=${OPENDAVINCI_DIR}
+               -DCXXTEST_INCLUDE_DIR=${CXXTEST_INCLUDE_DIR}
     TEST_BEFORE_INSTALL 1
     INSTALL_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/system-prefix/src/system-build --target install COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/system-prefix/src/system-build --target ${MAKE_PACKAGE})
 
