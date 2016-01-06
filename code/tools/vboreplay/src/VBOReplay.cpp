@@ -45,37 +45,33 @@ namespace revere {
     VBOReplay::~VBOReplay() {}
 
     void VBOReplay::setUp() {
-        const string LAT = getKeyValueConfiguration().getValue<string>("global.reference.WGS84.latitude");
-        const string LON = getKeyValueConfiguration().getValue<string>("global.reference.WGS84.longitude");
-
-        stringstream sstrLAT(LAT);
-        double vLAT = 0; sstrLAT >> vLAT;
-        string sLAT; sstrLAT >> sLAT >> sLAT;
-
-        stringstream sstrLON(LON);
-        double vLON = 0; sstrLON >> vLON;
-        string sLON; sstrLON >> sLON >> sLON;
+        const double LAT = getKeyValueConfiguration().getValue<double>("global.reference.WGS84.latitude");
+        const double LON = getKeyValueConfiguration().getValue<double>("global.reference.WGS84.longitude");
 
         WGS84Coordinate ref;
-        if (StringToolbox::equalsIgnoreCase(sLAT, "_north") && StringToolbox::equalsIgnoreCase(sLON, "_west")) {
-            ref = WGS84Coordinate(vLAT, WGS84Coordinate::NORTH, vLON, WGS84Coordinate::WEST);
+        if (!(LAT < 0) && !(LON < 0) ) {
+            // NORTH/WEST
+            ref = WGS84Coordinate(LAT, WGS84Coordinate::NORTH, LON, WGS84Coordinate::WEST);
         }
-        else if (StringToolbox::equalsIgnoreCase(sLAT, "_north") && StringToolbox::equalsIgnoreCase(sLON, "_east")) {
-            ref = WGS84Coordinate(vLAT, WGS84Coordinate::NORTH, vLON, WGS84Coordinate::EAST);
+        else if (!(LAT < 0) && (LON < 0) ) {
+            // NORTH/EAST
+            ref = WGS84Coordinate(LAT, WGS84Coordinate::NORTH, LON * -1.0, WGS84Coordinate::EAST);
         }
-        else if (StringToolbox::equalsIgnoreCase(sLAT, "_south") && StringToolbox::equalsIgnoreCase(sLON, "_west")) {
-            ref = WGS84Coordinate(vLAT, WGS84Coordinate::SOUTH, vLON, WGS84Coordinate::WEST);
+        else if ((LAT < 0) && !(LON < 0) ) {
+            // SOUTH/WEST
+            ref = WGS84Coordinate(LAT * -1.0, WGS84Coordinate::SOUTH, LON, WGS84Coordinate::WEST);
         }
-        else if (StringToolbox::equalsIgnoreCase(sLAT, "_south") && StringToolbox::equalsIgnoreCase(sLON, "_east")) {
-            ref = WGS84Coordinate(vLAT, WGS84Coordinate::SOUTH, vLON, WGS84Coordinate::EAST);
+        else if ((LAT < 0) && (LON < 0) ) {
+            // SOUTH/EAST
+            ref = WGS84Coordinate(LAT * -1.0, WGS84Coordinate::SOUTH, LON * -1.0, WGS84Coordinate::EAST);
         }
         else {
-            cerr << "[vboxreplay] Invalid specification of global.reference.WGS84.latitude and global.reference.WGS84.longitude." << endl;
-            cerr << "[vboxreplay] Expected values like global.reference.WGS84.latitude = 57.687745843_NORTH and global.reference.WGS84.longitude = 11.98219965283333_EAST." << endl;
+            cerr << "[vboreplay] Invalid specification of global.reference.WGS84.latitude and global.reference.WGS84.longitude." << endl;
+            cerr << "[vboreplay] Expected values like global.reference.WGS84.latitude = 57.687745843 and global.reference.WGS84.longitude = -11.98219965283333." << endl;
+            ref = WGS84Coordinate(57.70485804, WGS84Coordinate::NORTH, 11.93831921, WGS84Coordinate::EAST);
         }
         m_reference = ref;
-
-        clog << "[vboxreplay] Reference frame located at " << m_reference.toString() << endl;
+        CLOG1 << "[vboreplay] Reference frame located at " << m_reference.toString() << endl;
     }
 
     void VBOReplay::tearDown() {}
@@ -88,7 +84,7 @@ namespace revere {
         char buffer[MAX_LINE_LENGTH];
         while (getModuleStateAndWaitForRemainingTimeInTimeslice() == coredata::dmcp::ModuleStateMessage::RUNNING) {
             // Skip some lines to fasten playback.
-            for(int i = 0; i < 15; i++) {
+            for(int i = 0; i < 10; i++) {
                 // Read next line from STDIN.
                 cin.getline(buffer, MAX_LINE_LENGTH);
             }
@@ -141,7 +137,7 @@ namespace revere {
                 }
 
                 // Distribute data.
-                Container c(Container::USER_DATA_0, coordinate);
+                Container c(Container::WGS84COORDINATE, coordinate);
                 getConference().send(c);
 
                 // Calculate cartesian coordinate from WGS84 coordinate using specified reference frame.

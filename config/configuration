@@ -19,6 +19,10 @@
 # GLOBAL CONFIGURATION
 #
 
+# Location of the origin of the reference frame (example: 57.70485804 N, 11.93831921 E)
+global.reference.WGS84.latitude = 57.70485804
+global.reference.WGS84.longitude = -11.93831921
+
 # The following attributes define the buffer sizes for recording and
 # replaying. You need to adjust these parameters depending on the
 # camera resolution for example (640x480x3 --> 1000000 for memorySegment,
