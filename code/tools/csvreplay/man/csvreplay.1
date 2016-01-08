@@ -1,22 +1,23 @@
-.\" Manpage for vboreplay
+.\" Manpage for csvreplay
 .\" Author: Christian Berger <christian.berger@gu.se>.
 
-.TH vboreplay 1 "11 October 2015" "1.0.0" "vboreplay man page"
+.TH csvreplay 1 "08 January 2016" "1.0.0" "csvreplay man page"
 
 .SH NAME
-vboreplay \- This tool allows to replay raw VBOX message dumps in VBO format supplied via stdin as EgoStates and WGS84 coordinates to an OpenDaVINCI conference.
+csvreplay \- This tool allows to replay GPS recordings from a CSV file supplied via stdin as EgoStates and WGS84 coordinates to an OpenDaVINCI conference.
 
 
 
 .SH SYNOPSIS
-.B vboreplay --cid=<CID> [OPTIONS] < myVBOXRecordingInVBOformat.vbo
+.B csvreplay --cid=<CID> [OPTIONS] < myGPSRecordings.csv
 
 
 
 .SH DESCRIPTION
-vboreplay is a tool to read raw VBOX message dumps in VBO format from stdin and
-replays the individual messages converted as EgoState to a running
-OpenDaVINCI conference.
+csvreplay is a tool to read GPS recordings in a comma-separated format from
+stdin and replays the individual messages converted as EgoState and WGS84Coordinate
+to a running OpenDaVINCI conference. The CSV file needs to have 32 fields and the
+latitude/longitude coordinate needs to be in field 4 and 5.
 
 This tool can only be used within an existing OpenDaVINCI container conference session
 created by odsupercomponent(1).
@@ -34,18 +35,18 @@ odsupercomponent(1).
 
 .B --freq=<FREQ>
 .RS
-This parameter specifies the runtime frequency in Hz that is used to run vboreplay.
+This parameter specifies the runtime frequency in Hz that is used to run csvreplay.
 If this parameter is omitted, a runtime frequency of 1 Hz is used.
 .RE
 
 
 .B --realtime=<0..49>
 .RS
-This parameter will schedule vboreplay to use the SCHED_FIFO soft realtime
+This parameter will schedule csvreplay to use the SCHED_FIFO soft realtime
 scheduler. The parameter specifies the scheduling priority.
 
 Please note that this feature is only available on Linux-based systems having a
-CONFIG_PREEMPT_RT kernel. In addition, vboreplay needs to be executed with
+CONFIG_PREEMPT_RT kernel. In addition, csvreplay needs to be executed with
 superuser privileges.
 
 This parameter has no effect if odsupercomponent(1) is started using the
@@ -61,10 +62,10 @@ This parameter specifies the verbosity level that is used to print some informat
 
 
 .SH EXAMPLES
-The following command runs the program at 10 Hz replaying the content from myCANdump.vbo with
+The following command runs the program at 10 Hz replaying the content from myDumpFile.csv with
 100ms delay between the separate messages.
 
-.B vboreplay --cid=111 --freq=10 < myDumpFile.vbo
+.B csvreplay --cid=111 --freq=10 < myDumpFile.csv
 
 
 
