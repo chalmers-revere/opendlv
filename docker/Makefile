@@ -36,7 +36,3 @@ docker:
 
 docker-tag-latest:
 	docker tag -f $(shell tail -1 $(BUILDLOG) | cut -f3 -d" ") $(REPOSITORY)/$(PRODUCT):latest
-
-#push: docker-tag-latest
-#	docker push $(REPOSITORY)/$(PRODUCT):$(VERSION) && docker push $(REPOSITORY)/$(PRODUCT):latest && docker rmi $(REPOSITORY)/$(PRODUCT):$(VERSION) && docker rmi $(REPOSITORY)/$(PRODUCT):latest
-

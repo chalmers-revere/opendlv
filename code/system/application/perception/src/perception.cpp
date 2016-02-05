@@ -58,7 +58,7 @@ void Perception::nextContainer(core::data::Container &c)
 
     if (c.getDataType() == core::data::Container::USER_DATA_6) {
         sensor::Radar radar = c.getData<sensor::Radar>();
-        std::cout << "[perception]: " << radar.toString() << std::endl;
+        std::cout << "[perception]: " << radar.toString() << ", " << radar.getDistance() << std::endl;
     }
 }
 
