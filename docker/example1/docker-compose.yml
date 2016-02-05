@@ -3,3 +3,9 @@ odsupercomponent:
   net: "host"
   working_dir: "/opt/opendlv"
   command: "odsupercomponent --cid=111"
+
+opendlv-system-core-proxy:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  command: "./opendlv-system-core-proxy --cid=111"
