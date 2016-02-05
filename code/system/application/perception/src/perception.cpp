@@ -50,30 +50,19 @@ void Perception::tearDown()
   // This method will be call automatically _after_ return from body().
 }
 
-void Perception::nextContainer(core::data::Container &) 
+void Perception::nextContainer(core::data::Container &c) 
 {
+    std::cout << "[perception] received container of type " << c.getDataType() <<
+                                                " sent at " << c.getSentTimeStamp().getYYYYMMDD_HHMMSSms() <<
+                                            " received at " << c.getReceivedTimeStamp().getYYYYMMDD_HHMMSSms() << std::endl;
+
+    if (c.getDataType() == core::data::Container::USER_DATA_6) {
+        sensor::Radar radar = c.getData<sensor::Radar>();
+        std::cout << "[perception]: " << radar.toString() << std::endl;
+    }
 }
 
 } // application
 } // system
 } // opendlv
 
-
-
-      /*
-        cout << "[perception] received container of type " << c.getDataType() <<
-                                               " sent at " << c.getSentTimeStamp().getYYYYMMDD_HHMMSSms() <<
-                                           " received at " << c.getReceivedTimeStamp().getYYYYMMDD_HHMMSSms() << endl;
-
-        if (c.getDataType() == Container::USER_DATA_2) {
-            revere::generic::ExampleMessageForPerception payload = c.getData<revere::generic::ExampleMessageForPerception>();
-            cout << "[perception]: " << payload.toString() << endl;
-
-            // Example: Create message revere.generic.ExampleMessageForSafety.
-            revere::generic::ExampleMessageForDecision nextMessage;
-            nextMessage.setData1(5.2345);
-
-            Container c2(Container::USER_DATA_3, nextMessage);
-            getConference().send(c2);
-        }
-        */

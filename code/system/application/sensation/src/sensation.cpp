@@ -17,6 +17,7 @@
  */
 
 #include <iostream>
+#include <core/data/Container.h>
 #include "GeneratedHeaders_OpenDLVData.h"
 
 #include "sensation.hpp"
@@ -32,7 +33,7 @@ namespace application {
   * @param a_argv Command line arguments.
   */
 Sensation::Sensation(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, "sensation")
+    TimeTriggeredConferenceClientModule(a_argc, a_argv, "sensation")
 {
 }
 
@@ -50,8 +51,20 @@ void Sensation::tearDown()
   // This method will be call automatically _after_ return from body().
 }
 
-void Sensation::nextContainer(core::data::Container &) 
-{
+coredata::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
+    std::cout << "Hello OpenDaVINCI World!" << std::endl;
+    while (getModuleStateAndWaitForRemainingTimeInTimeslice() == coredata::dmcp::ModuleStateMessage::RUNNING) {
+        std::cout << "Inside the main processing loop." << std::endl;
+
+        sensor::Reading reading;
+        reading.setSensorName("Example Sensor");
+        sensor::Radar radar(reading, 1.234);
+
+        core::data::Container c(core::data::Container::USER_DATA_6, radar);
+        getConference().send(c);
+    }
+
+    return coredata::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
 } // application

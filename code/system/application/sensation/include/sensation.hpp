@@ -19,7 +19,7 @@
 #ifndef SENSATION_HPP_
 #define SENSATION_HPP_
 
-#include "core/base/module/DataTriggeredConferenceClientModule.h"
+#include "core/base/module/TimeTriggeredConferenceClientModule.h"
 
 namespace opendlv {
 namespace system {
@@ -28,13 +28,13 @@ namespace application {
 /**
  * This class provides...
  */
-class Sensation : public core::base::module::DataTriggeredConferenceClientModule {
+class Sensation : public core::base::module::TimeTriggeredConferenceClientModule {
   public:
     Sensation(int32_t const &, char **);
     Sensation(Sensation const &) = delete;
     Sensation &operator=(Sensation const &) = delete;
     virtual ~Sensation();
-    virtual void nextContainer(core::data::Container &);
+    coredata::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
   private:
     virtual void setUp();
