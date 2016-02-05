@@ -1,4 +1,4 @@
-# OpenDLV - Encapsulated Deployment
+# OpenDLV - Encapsulated Deployment with Docker
 
 This example was realized with OpenDaVINCI, OpenDLV, and Docker to
 demonstrate how to create a Docker image with the most recent OpenDLV
