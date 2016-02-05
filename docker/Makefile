@@ -21,10 +21,11 @@ REPOSITORY=seresearch
 
 BUILDLOG=build.log
 
-all: clean docker
-
-build-opendlv:
+build:
 	rm -fr build opendlv && mkdir opendlv && mkdir build && cd build && PATH=/opt/od/bin:$$PATH cmake -D OPENDAVINCI_DIR=/opt/od -D CMAKE_INSTALL_PREFIX=../opendlv ../.. && make
+
+build-incremental:
+	cd build && find . -name "*-build" -type f -exec rm -f {} \; && make && cd ..
 
 clean:
 	rm -f $(BUILDLOG)

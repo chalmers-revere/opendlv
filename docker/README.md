@@ -11,11 +11,12 @@ First, change to docker and run make build to build OpenDLV from sources.
 The binaries will be installed at opendlv.
 
     $ cd docker
-    $ make build-opendlv
+    $ make build
 
 Next, create a Docker image containing the most recent binaries.
 
     $ make docker
+    $ make docker-tag-latest
 
 Finally, you can run a software distribution using docker-compose.
 
