@@ -56,24 +56,3 @@ void Diagnostics::nextContainer(core::data::Container &)
 } // system
 } // opendlv
 
-
-/*
-  std::cout << "[diagnostics] received container of type " << a_c.getDataType()
-      << " sent at " << a_c.getSentTimeStamp().getYYYYMMDD_HHMMSSms()
-      << " received at " << a_c.getReceivedTimeStamp().getYYYYMMDD_HHMMSSms() 
-      << std::endl;
-
-  if (a_c.getDataType() == Container::USER_DATA_0) {
-    opendlv::generic::ExampleMessageForDiagnostics payload = 
-        a_c.getData<opendlv::generic::ExampleMessageForDiagnostics>();
-    
-    std::cout << "[diagnostics]: " << payload.toString() << std::endl;
-
-    // Example: Create message opendlv.generic.ExampleMessageForSafety.
-    opendlv::generic::ExampleMessageForSafety nextMessage;
-    nextMessage.setData1(1.2345);
-
-    Container c2(Container::USER_DATA_1, nextMessage);
-    getConference().send(c2);
-  }
- */

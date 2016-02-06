@@ -1,7 +1,9 @@
 odsupercomponent:
   image: seresearch/opendlv:latest
   net: "host"
-  working_dir: "/opt/opendlv"
+  volumes:
+  - .:/opt/data
+  working_dir: "/opt/data"
   command: "odsupercomponent --cid=111"
 
 opendlv-system-core-proxy:

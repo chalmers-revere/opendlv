@@ -16,23 +16,31 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 PRODUCT=opendlv
-VERSION=$(shell cat VERSION)
+VERSION=$(shell git rev-parse --short HEAD)
 REPOSITORY=seresearch
 
 BUILDLOG=build.log
 
-build:
+all: build-incremental docker-tag-latest
+
+build/Makefile:
 	rm -fr build opendlv && mkdir opendlv && mkdir build && cd build && PATH=/opt/od/bin:$$PATH cmake -D OPENDAVINCI_DIR=/opt/od -D CMAKE_INSTALL_PREFIX=../opendlv ../.. && make
 
-build-incremental:
-	cd build && find . -name "*-build" -type f -exec rm -f {} \; && make && cd ..
+build-incremental: build/Makefile
+	cd build && find . -name "system*-build" -type f -exec rm -f {} \; && find . -name "tools*-build" -type f -exec rm -f {} \; && make && cd ..
 
 clean:
 	rm -f $(BUILDLOG)
 	rm -fr build opendlv
 
-docker:
+docker: build-incremental
 	docker build -t $(REPOSITORY)/$(PRODUCT):$(VERSION) . | tee $(BUILDLOG) || exit 1
 
-docker-tag-latest:
+docker-tag-latest: docker
 	docker tag -f $(shell tail -1 $(BUILDLOG) | cut -f3 -d" ") $(REPOSITORY)/$(PRODUCT):latest
+
+docker-cleanup:
+	docker rm $$(docker ps -a -q)
+
+run-example1: docker-tag-latest
+	cd example1 && docker-compose up

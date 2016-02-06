@@ -58,16 +58,3 @@ void Action::nextContainer(core::data::Container &)
 } // system
 } // opendlv
 
-
-/*
-        cout << "[autonomy] received container of type " << c.getDataType() <<
-                                             " sent at " << c.getSentTimeStamp().getYYYYMMDD_HHMMSSms() <<
-                                         " received at " << c.getReceivedTimeStamp().getYYYYMMDD_HHMMSSms() << endl;
-
-        if (c.getDataType() == Container::USER_DATA_3) {
-            revere::generic::ExampleMessageForDecision payload = c.getData<revere::generic::ExampleMessageForDecision>();
-            cout << "[autonomy]: " << payload.toString() << endl;
-        }
- 
-
- */

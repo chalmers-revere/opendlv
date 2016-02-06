@@ -56,21 +56,3 @@ void Safety::nextContainer(core::data::Container &)
 } // system
 } // opendlv
 
-/*
-        cout << "[safety] received container of type " << c.getDataType() <<
-                                           " sent at " << c.getSentTimeStamp().getYYYYMMDD_HHMMSSms() <<
-                                       " received at " << c.getReceivedTimeStamp().getYYYYMMDD_HHMMSSms() << endl;
-
-        if (c.getDataType() == Container::USER_DATA_1) {
-            revere::generic::ExampleMessageForSafety payload = c.getData<revere::generic::ExampleMessageForSafety>();
-            cout << "[safety]: " << payload.toString() << endl;
-
-            // Example: Create message revere.generic.ExampleMessageForPerception.
-            revere::generic::ExampleMessageForPerception nextMessage;
-            nextMessage.setData1(-42);
-
-            Container c2(Container::USER_DATA_2, nextMessage);
-            getConference().send(c2);
-        }
-    }
-*/
