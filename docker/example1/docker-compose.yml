@@ -11,19 +11,3 @@ opendlv-system-core-proxy:
   net: "host"
   working_dir: "/opt/opendlv/bin"
   command: "./opendlv-system-core-proxy --cid=111"
-
-opendlv-system-application-sensation:
-  image: seresearch/opendlv:latest
-  net: "host"
-  working_dir: "/opt/opendlv/bin"
-  environment:
-  - LD_LIBRARY_PATH=/opt/opendlv/lib
-  command: "./opendlv-system-application-sensation --cid=111 --freq=5"
-
-opendlv-system-application-perception:
-  image: seresearch/opendlv:latest
-  net: "host"
-  working_dir: "/opt/opendlv/bin"
-  environment:
-  - LD_LIBRARY_PATH=/opt/opendlv/lib
-  command: "./opendlv-system-application-perception --cid=111"
