@@ -36,8 +36,11 @@ clean:
 	rm -f $(BUILDLOG)
 	rm -fr build opendlv
 
-docker: build-incremental
+docker: build-incremental docker-update-image
 	docker build -t $(REPOSITORY)/$(PRODUCT):$(VERSION) . | tee $(BUILDLOG) || exit 1
+
+docker-update-image:
+	docker pull $(shell awk '/^FROM/ { print $$2; exit }' Dockerfile)
 
 docker-tag-latest: docker
 	docker tag -f $(shell tail -1 $(BUILDLOG) | cut -f3 -d" ") $(REPOSITORY)/$(PRODUCT):latest
