@@ -16,7 +16,10 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 PRODUCT=opendlv
-VERSION=$(shell git rev-parse --short HEAD)
+GITVERSION=$(shell git describe --abbrev=0 --tags | head -n1)
+GITHASH=$(shell git rev-parse --short HEAD)
+GITUNCOMMITTEDCHANGES=$(shell if [ "`git ls-files -m`" != "" ]; then echo "-modified"; else echo ""; fi)
+VERSION="$(GITVERSION)-$(GITHASH)$(GITUNCOMMITTEDCHANGES)"
 REPOSITORY=seresearch
 
 BUILDLOG=build.log
