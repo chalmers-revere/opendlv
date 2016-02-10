@@ -1,286 +1,405 @@
-###########################################################
-#                  Find OpenCV Library
-# See http://sourceforge.net/projects/opencvlibrary/
-#----------------------------------------------------------
+# Module for locating OpenCV.
 #
-## 1: Setup:
-# The following variables are optionally searched for defaults
-#  OpenCV_DIR:            Base directory of OpenCv tree to use.
+# Customizable variables:
+#   OPENCV_ROOT_DIR
+#     Specifies the OpenCV root directory.
 #
-## 2: Variable
-# The following are set after configuration is done: 
-#  
-#  OpenCV_FOUND
-#  OpenCV_LIBS
-#  OpenCV_INCLUDE_DIR
-#  OpenCV_VERSION (OpenCV_VERSION_MAJOR, OpenCV_VERSION_MINOR, OpenCV_VERSION_PATCH)
+#   OPENCV_USE_GPU_LIBS
+#     Indicates whether GPU enabled libraries should be located.
 #
+#   OPENCV_USE_STATIC_LIBS
+#     Indicates whether static instead of shared libraries should be located.
 #
-# Deprecated variable are used to maintain backward compatibility with
-# the script of Jan Woetzel (2006/09): www.mip.informatik.uni-kiel.de/~jw
-#  OpenCV_INCLUDE_DIRS
-#  OpenCV_LIBRARIES
-#  OpenCV_LINK_DIRECTORIES
-# 
-## 3: Version
+#   OPENCV_COMPILER
+#     The compiler name used to locate the libraries. Setting this variable is
+#     useful only if the OpenCV superpack is being used with its default
+#     directory layout.
 #
-# 2010/04/07 Benoit Rat, Correct a bug when OpenCVConfig.cmake is not found.
-# 2010/03/24 Benoit Rat, Add compatibility for when OpenCVConfig.cmake is not found.
-# 2010/03/22 Benoit Rat, Creation of the script.
+# Read-only variables:
+#   OPENCV_FOUND
+#     Indicates whether the library has been found.
 #
+#   OPENCV_INCLUDE_DIRS
+#     Specifies to the OpenCV include directory.
 #
-# tested with:
-# - OpenCV 2.1:  MinGW, MSVC2008
-# - OpenCV 2.0:  MinGW, MSVC2008, GCC4
+#   OPENCV_<COMPONENT>_FOUND
+#     Indicates whether the specified <COMPONENT> was found.
+#
+#   OPENCV_LIBRARIES
+#     Specifies the OpenCV libraries that should be passed to
+#     target_link_libararies.
 #
 #
-## 4: Licence:
+# Copyright (c) 2014 Sergiu Dotenco
 #
-# LGPL 2.1 : GNU Lesser General Public License Usage
-# Alternatively, this file may be used under the terms of the GNU Lesser
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTOPENCVLAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
-# General Public License version 2.1 as published by the Free Software
-# Foundation and appearing in the file LICENSE.LGPL included in the
-# packaging of this file.  Please review the following information to
-# ensure the GNU Lesser General Public License version 2.1 requirements
-# will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
-# 
-#----------------------------------------------------------
+INCLUDE (FindPackageHandleStandardArgs)
 
+IF (CMAKE_VERSION VERSION_GREATER 2.8.7)
+  SET (_OPENCV_CHECK_COMPONENTS FALSE)
+ELSE (CMAKE_VERSION VERSION_GREATER 2.8.7)
+  SET (_OPENCV_CHECK_COMPONENTS TRUE)
+ENDIF (CMAKE_VERSION VERSION_GREATER 2.8.7)
 
-find_path(OpenCV_DIR "OpenCVConfig.cmake" DOC "Root directory of OpenCV")
+FIND_PATH (OPENCV_ROOT_DIR
+  NAMES OpenCVConfig.cmake
+        build/include/opencv/cv.h
+        build/include/cv/cv.h
+        build/include/opencv2/opencv.hpp
+        include/opencv/cv.h
+        include/cv/cv.h
+        include/opencv2/opencv.hpp
+  PATHS ENV OPENCVROOT
+  DOC "OpenCV root directory")
 
-set(OpenCV_configScript "${OpenCV_DIR}/OpenCVConfig.cmake")
+IF (OPENCV_USE_STATIC_LIBS)
+  SET (_OPENCV_LIB_DIR staticlib)
+  SET (_OPENCV_FALLBACK_LIB_DIR bin)
+ELSE (OPENCV_USE_STATIC_LIBS)
+  SET (_OPENCV_LIB_DIR lib)
+  SET (_OPENCV_FALLBACK_LIB_DIR staticlib)
+ENDIF (OPENCV_USE_STATIC_LIBS)
 
-if(NOT EXISTS "${OpenCV_DIR}")
-    if(NOT WIN32)
-        include(FindPkgConfig)
-        if(PKG_CONFIG_FOUND)
-            pkg_check_modules(OPENCV_PKGCONF opencv)
-            set(OpenCV_DIR ${OPENCV_PKGCONF_PREFIX})
-            if(EXISTS "${OpenCV_DIR}")
-                set(OpenCV_configScript_DIR "${OpenCV_DIR}/share/opencv")
-                if(EXISTS "${OpenCV_configScript_DIR}")
-                    set(OpenCV_configScript "${OpenCV_configScript_DIR}/OpenCVConfig.cmake")
-                endif(EXISTS "${OpenCV_configScript_DIR}")
-            endif(EXISTS "${OpenCV_DIR}")
-        endif(PKG_CONFIG_FOUND)
-    endif(NOT WIN32)
-endif(NOT EXISTS "${OpenCV_DIR}")
+SET (_OPENCV_POSSIBLE_LIB_SUFFIXES ${_OPENCV_LIB_DIR})
 
+IF (DEFINED OPENCV_COMPILER)
+  SET (_OPENCV_COMPILER ${OPENCV_COMPILER})
+ELSEIF (MSVC12)
+  SET (_OPENCV_COMPILER vc12)
+ELSEIF (MSVC11)
+  SET (_OPENCV_COMPILER vc11)
+ELSEIF (MSVC10)
+  SET (_OPENCV_COMPILER vc10)
+ELSEIF (MSVC90)
+  SET (_OPENCV_COMPILER vc9)
+ELSEIF (MSVC80)
+  SET (_OPENCV_COMPILER vc8)
+ELSEIF (MSVC71)
+  SET (_OPENCV_COMPILER vc71)
+ELSEIF (MSVC70)
+  SET (_OPENCV_COMPILER vc7)
+ELSEIF (MSVC60)
+  SET (_OPENCV_COMPILER vc6)
+ELSEIF (MINGW)
+  SET (_OPENCV_COMPILER mingw)
+ENDIF (DEFINED OPENCV_COMPILER)
 
-##====================================================
-## Find OpenCV libraries
-##----------------------------------------------------
-if(EXISTS "${OpenCV_DIR}")
-    set(CONTINUE_SEARCHING true)
+IF (OPENCV_USE_GPU_LIBS)
+  SET (_OPENCV_BUILD_DIR build/gpu)
+ELSE (OPENCV_USE_GPU_LIBS)
+  SET (_OPENCV_BUILD_DIR build)
+ENDIF (OPENCV_USE_GPU_LIBS)
 
-    #When its possible to use the Config script use it.
-    if(EXISTS "${OpenCV_configScript}")
-        ## Include the standard CMake script
-        include("${OpenCV_configScript}")
-        ## Search for a specific version
-        if(WIN32 OR NOT PKG_CONFIG_FOUND)
-              set(CVLIB_SUFFIX "${OpenCV_VERSION_MAJOR}${OpenCV_VERSION_MINOR}${OpenCV_VERSION_PATCH}")
-        endif(WIN32 OR NOT PKG_CONFIG_FOUND)
-        ##Boris:TODO: check for correct OpenCV version in pkg-config case !!!
-        #Otherwise it try to guess it.
-    else(EXISTS "${OpenCV_configScript}")
-        find_path(OpenCV_INCLUDE_DIR "cv.h" PATHS "${OpenCV_DIR}" PATH_SUFFIXES "include" "include/opencv" DOC "")
-        if(EXISTS  ${OpenCV_INCLUDE_DIR})
-            include_directories(${OpenCV_INCLUDE_DIR})
-        endif(EXISTS  ${OpenCV_INCLUDE_DIR})
+IF (DEFINED _OPENCV_COMPILER)
+  IF (CMAKE_SIZEOF_VOID_P EQUAL 8)
+    SET (_OPENCV_ARCHITECTURE x64)
+  ELSEIF (CMAKE_SIZEOF_VOID_P EQUAL 4)
+    SET (_OPENCV_ARCHITECTURE x86)
+  ENDIF (CMAKE_SIZEOF_VOID_P EQUAL 8)
 
-        if(NOT EXISTS ${VERSION_FILE_DIR}) #may alreay be in cache
-            #Find OpenCV version by looking at cvver.h or core/version.hpp
-            find_path(VERSION_FILE_DIR "version.hpp" PATHS "${OpenCV_DIR}" PATH_SUFFIXES "include" "include/opencv" "include/opencv2" "include/opencv2/core" DOC "")
-            if(NOT EXISTS ${VERSION_FILE_DIR})
-                find_path(VERSION_FILE_DIR "cvver.h" PATHS "${OpenCV_DIR}" PATH_SUFFIXES "include" "include/opencv" DOC "")
-                if(NOT EXISTS ${VERSION_FILE_DIR})
-                    message(STATUS "OpenCV version file not found")
-                    set(CONTINUE_SEARCHING false)
-                    set(OpenCV_FOUND false CACHE BOOL "" FORCE)
-                else(NOT EXISTS ${VERSION_FILE_DIR})
-                    set(VERSION_FILE ${VERSION_FILE_DIR}/cvver.h)  
-                endif(NOT EXISTS ${VERSION_FILE_DIR})
-            else(NOT EXISTS ${VERSION_FILE_DIR})
-                set(VERSION_FILE ${VERSION_FILE_DIR}/version.hpp)
-            endif(NOT EXISTS ${VERSION_FILE_DIR})
+  IF (OPENCV_USE_GPU_LIBS)
+    LIST (APPEND _OPENCV_LIB_HINTS
+      ${OPENCV_ROOT_DIR}/${_OPENCV_BUILD_DIR}/${_OPENCV_ARCHITECTURE}/${_OPENCV_LIB_DIR})
+    LIST (APPEND _OPENCV_LIB_HINTS
+      ${OPENCV_ROOT_DIR}/${_OPENCV_BUILD_DIR}/${_OPENCV_ARCHITECTURE}/${_OPENCV_FALLBACK_LIB_DIR})
+  ELSE (OPENCV_USE_GPU_LIBS)
+    LIST (APPEND _OPENCV_LIB_HINTS
+      ${OPENCV_ROOT_DIR}/${_OPENCV_BUILD_DIR}/${_OPENCV_ARCHITECTURE}/${_OPENCV_COMPILER}/${_OPENCV_LIB_DIR})
+    LIST (APPEND _OPENCV_LIB_HINTS
+      ${OPENCV_ROOT_DIR}/${_OPENCV_BUILD_DIR}/${_OPENCV_ARCHITECTURE}/${_OPENCV_COMPILER}/${_OPENCV_FALLBACK_LIB_DIR})
+  ENDIF (OPENCV_USE_GPU_LIBS)
 
-            if (CONTINUE_SEARCHING)
-                #file(STRINGS ${OpenCV_INCLUDE_DIR}/cvver.h OpenCV_VERSIONS_TMP REGEX "^#define CV_[A-Z]+_VERSION[ \t]+[0-9]+$")
-                file(STRINGS ${VERSION_FILE} OpenCV_VERSIONS_TMP REGEX "^#define CV_VERSION_[A-Z]+[ \t]+[0-9]+$")
-                if(NOT("${OpenCV_VERSIONS_TMP}" STREQUAL ""))
-                    # Version >= 2.4.0
-                    string(REGEX REPLACE ".*#define CV_VERSION_EPOCH[ \t]+([0-9]+).*" "\\1" OpenCV_VERSION_MAJOR ${OpenCV_VERSIONS_TMP})
-                    string(REGEX REPLACE ".*#define CV_VERSION_MAJOR[ \t]+([0-9]+).*" "\\1" OpenCV_VERSION_MINOR ${OpenCV_VERSIONS_TMP})
-                    string(REGEX REPLACE ".*#define CV_VERSION_MINOR[ \t]+([0-9]+).*" "\\1" OpenCV_VERSION_PATCH ${OpenCV_VERSIONS_TMP})
-                else()
-                    # Version < 2.4.0
-                    file(STRINGS ${VERSION_FILE} OpenCV_VERSIONS_TMP REGEX "^#define CV_[A-Z]+_VERSION[ \t]+[0-9]+$")
-                    string(REGEX REPLACE ".*#define CV_MAJOR_VERSION[ \t]+([0-9]+).*" "\\1" OpenCV_VERSION_MAJOR ${OpenCV_VERSIONS_TMP})
-                    string(REGEX REPLACE ".*#define CV_MINOR_VERSION[ \t]+([0-9]+).*" "\\1" OpenCV_VERSION_MINOR ${OpenCV_VERSIONS_TMP})
-                    string(REGEX REPLACE ".*#define CV_SUBMINOR_VERSION[ \t]+([0-9]+).*" "\\1" OpenCV_VERSION_PATCH ${OpenCV_VERSIONS_TMP})
-                endif()
+  LIST (APPEND _OPENCV_LIB_HINTS
+    ${OPENCV_ROOT_DIR}/${_OPENCV_ARCHITECTURE}/${_OPENCV_COMPILER})
+ENDIF (DEFINED _OPENCV_COMPILER)
 
-                set(OpenCV_VERSION ${OpenCV_VERSION_MAJOR}.${OpenCV_VERSION_MINOR}.${OpenCV_VERSION_PATCH} CACHE STRING "" FORCE)
-                if(WIN32 OR NOT PKG_CONFIG_FOUND)
-                    set(CVLIB_SUFFIX "${OpenCV_VERSION_MAJOR}${OpenCV_VERSION_MINOR}${OpenCV_VERSION_PATCH}")
-                endif(WIN32 OR NOT PKG_CONFIG_FOUND)
+LIST (APPEND _OPENCV_LIB_HINTS ${OPENCV_ROOT_DIR})
 
-                ##Boris:TODO: check for correct OpenCV version in pklg-config case !!!
-            endif (CONTINUE_SEARCHING)
-        endif(NOT EXISTS ${VERSION_FILE_DIR})
+FIND_PATH (OPENCV_INCLUDE_DIR
+  NAMES opencv/cv.h opencv2/opencv.hpp
+  HINTS ${OPENCV_ROOT_DIR}
+  PATH_SUFFIXES build/include include
+  DOC "OpenCV include directory" NO_DEFAULT_PATH)
 
-        if (CONTINUE_SEARCHING)
-            if(${OpenCV_VERSION} VERSION_GREATER 2.1.0)
-                set(OPENCV_LIB_COMPONENTS calib3d contrib core features2d flann gpu highgui imgproc legacy ml objdetect video)
+IF (OPENCV_ROOT_DIR)
+  FIND_PACKAGE (OpenCV NO_MODULE QUIET COMPONENTS ${OpenCV_FIND_COMPONENTS}
+    HINTS ${OPENCV_ROOT_DIR}/build ${OPENCV_ROOT_DIR}
+    NO_CMAKE_BUILDS_PATH)
 
-                #Add parent directory of ${OpenCV_INCLUDE_DIR} to ${OpenCV_INCLUDE_DIR} itself
-                #to be able to do both
-                #include <cv.h> and #include <opencv2/core/core.hpp>
-                get_filename_component(PARENT_DIR ${OpenCV_INCLUDE_DIR} PATH)
-                set(OpenCV_INCLUDE_DIR "${OpenCV_INCLUDE_DIR};${PARENT_DIR}")
-            else(${OpenCV_VERSION} VERSION_GREATER 2.1.0)
-                set(OPENCV_LIB_COMPONENTS cxcore cv ml highgui cvaux)
-            endif(${OpenCV_VERSION} VERSION_GREATER 2.1.0)
-        endif (CONTINUE_SEARCHING)
-    endif(EXISTS "${OpenCV_configScript}")
+  UNSET (OPENCV_FOUND CACHE)
 
-    if (CONTINUE_SEARCHING)
-        if(${OpenCV_VERSION} VERSION_GREATER 2.1.0)
-            set(CVLIB_SUFFIX ".${OpenCV_VERSION}")
+  MARK_AS_ADVANCED (OpenCV_DIR OpenCV_FOUND)
 
-            ## Initiate the variable before the loop
-            set(OpenCV_LIBS "")
+  IF (OpenCV_FOUND)
+    SET (OPENCV_VERSION_MAJOR ${OpenCV_VERSION_MAJOR})
+    SET (OPENCV_VERSION_MINOR ${OpenCV_VERSION_MINOR})
+    SET (OPENCV_VERSION_PATCH ${OpenCV_VERSION_PATCH})
+    SET (OPENCV_VERSION ${OpenCV_VERSION})
 
-            ## Loop over each components
-            foreach(__CVLIB ${OPENCV_LIB_COMPONENTS})
-                find_library(OpenCV_${__CVLIB}_LIBRARY_DEBUG
-                        NAMES "${__CVLIB}${CVLIB_SUFFIX}d"
-                              "lib${__CVLIB}${CVLIB_SUFFIX}d"
-                        PATHS ${OpenCV_DIR}/lib/
-                              ${OpenCV_DIR}/lib/x86_64-linux-gnu/
-                        NO_DEFAULT_PATH)
+    IF (OpenCV_VERSION MATCHES "[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+")
+      SET (OPENCV_VERSION_COUNT 4)
+    ELSE (OpenCV_VERSION MATCHES "[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+")
+      SET (OPENCV_VERSION_COUNT 3)
+    ENDIF (OpenCV_VERSION MATCHES "[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+")
 
-                find_library(OpenCV_${__CVLIB}_LIBRARY_RELEASE
-                        NAMES "${__CVLIB}${CVLIB_SUFFIX}"
-                              "lib${__CVLIB}${CVLIB_SUFFIX}"
-                              "opencv_${__CVLIB}${CVLIB_SUFFIX}"
-                              "opencv_${__CVLIB}" "${__CVLIB}"
-                        PATHS ${OpenCV_DIR}/lib/
-                              ${OpenCV_DIR}/lib/x86_64-linux-gnu/
-                        NO_DEFAULT_PATH)
+    # Search for a specific version
+    SET (_OPENCV_PREFERRED_SUFFIX
+      ${OPENCV_VERSION_MAJOR}${OPENCV_VERSION_MINOR}${OPENCV_VERSION_PATCH})
+    # Otherwise try to guess it.
 
-                #On MacOSX libraries are named:  libopencv_${__CVLIB}${CVLIB_SUFFIX}.dylib
-                #On Linux libraries are named:  libopencv_${__CVLIB}.so${CVLIB_SUFFIX}
-                # but with pkg-config ${OPENCV_LIB_COMPONENTS} are already prefixed with opencv_ ?
+    IF (OpenCV_LIB_DIR)
+      LIST (APPEND _OPENCV_LIB_HINTS ${OpenCV_LIB_DIR})
+    ENDIF (OpenCV_LIB_DIR)
+  ELSE (OpenCV_FOUND)
+    FIND_FILE (OPENCV_VERSION_HEADER NAMES cvver.h version.hpp HINTS
+      ${OPENCV_INCLUDE_DIR} PATH_SUFFIXES opencv opencv2/core)
 
-                #we add: "opencv_${__CVLIB}${CVLIB_SUFFIX}" for MacOSX
-                #we add: "${__CVLIB}" for linux (but version is not checked !)
+    SET (OPENCV_VERSION_HEADER "${OPENCV_VERSION_HEADER}" CACHE INTERNAL
+        "OpenCV version header" FORCE)
 
-                #Remove the cache value
-                set(OpenCV_${__CVLIB}_LIBRARY "" CACHE STRING "" FORCE)
+    IF (OPENCV_VERSION_HEADER)
+      # Find OpenCV version by looking at cvver.h or version.hpp
+      FILE (STRINGS ${OPENCV_VERSION_HEADER}
+        _OPENCV_VERSION_STRING REGEX "^#define[ \t]+CV_(([A-Z]+_VERSION)|VERSION_[A-Z]+)[ \t]+[0-9]+$")
 
-                #both debug/release
-                if(OpenCV_${__CVLIB}_LIBRARY_DEBUG AND OpenCV_${__CVLIB}_LIBRARY_RELEASE)
-                    set(OpenCV_${__CVLIB}_LIBRARY debug ${OpenCV_${__CVLIB}_LIBRARY_DEBUG} optimized ${OpenCV_${__CVLIB}_LIBRARY_RELEASE}  CACHE STRING "" FORCE)
-                #only debug
-                elseif(OpenCV_${__CVLIB}_LIBRARY_DEBUG)
-                    set(OpenCV_${__CVLIB}_LIBRARY ${OpenCV_${__CVLIB}_LIBRARY_DEBUG}  CACHE STRING "" FORCE)
-                #only release
-                elseif(OpenCV_${__CVLIB}_LIBRARY_RELEASE)
-                    set(OpenCV_${__CVLIB}_LIBRARY ${OpenCV_${__CVLIB}_LIBRARY_RELEASE}  CACHE STRING "" FORCE)
-                #no library found
-                else()
-                    set(OpenCV_FOUND_TMP false)
-                endif()
+      STRING (REGEX REPLACE ".*#define[ \t]+(CV_VERSION_EPOCH|CV_MAJOR_VERSION)[ \t]+([0-9]+).*" "\\2"
+        OPENCV_VERSION_MAJOR ${_OPENCV_VERSION_STRING})
+      STRING (REGEX REPLACE ".*#define[ \t]+(CV_VERSION_MAJOR|CV_MINOR_VERSION)[ \t]+([0-9]+).*" "\\2"
+        OPENCV_VERSION_MINOR ${_OPENCV_VERSION_STRING})
+      STRING (REGEX REPLACE ".*#define[ \t]+(CV_VERSION_MINOR|CV_SUBMINOR_VERSION)[ \t]+([0-9]+).*"
+        "\\2" OPENCV_VERSION_PATCH ${_OPENCV_VERSION_STRING})
+      STRING (REGEX REPLACE ".*#define[ \t]+(CV_VERSION_REVISION)[ \t]+([0-9]+).*"
+        "\\2" OPENCV_VERSION_TWEAK ${_OPENCV_VERSION_STRING})
 
-                #Add to the general list
-                if(OpenCV_${__CVLIB}_LIBRARY)
-                    set(OpenCV_LIBS ${OpenCV_LIBS} ${OpenCV_${__CVLIB}_LIBRARY})
-                endif(OpenCV_${__CVLIB}_LIBRARY)
-            endforeach(__CVLIB)
+      SET (_OPENCV_PREFERRED_SUFFIX
+        ${OPENCV_VERSION_MAJOR}${OPENCV_VERSION_MINOR}${OPENCV_VERSION_PATCH})
 
-            if("${OpenCV_LIBS}" STREQUAL "")
-                set(OpenCV_FOUND false CACHE BOOL "" FORCE)
-            else()
-                set(OpenCV_FOUND true CACHE BOOL "" FORCE)
-            endif()
-        else(${OpenCV_VERSION} VERSION_GREATER 2.1.0)
-            ## Initiate the variable before the loop
-            set(OpenCV_LIBS "")
-            set(OpenCV_FOUND_TMP true)
+      SET (OPENCV_VERSION
+        ${OPENCV_VERSION_MAJOR}.${OPENCV_VERSION_MINOR})
 
-            ## Loop over each components
-            foreach(__CVLIB ${OPENCV_LIB_COMPONENTS})
-                find_library(OpenCV_${__CVLIB}_LIBRARY_DEBUG NAMES "${__CVLIB}${CVLIB_SUFFIX}d" "lib${__CVLIB}${CVLIB_SUFFIX}d" PATHS "${OpenCV_DIR}/lib" NO_DEFAULT_PATH)
-                find_library(OpenCV_${__CVLIB}_LIBRARY_RELEASE NAMES "${__CVLIB}${CVLIB_SUFFIX}" "lib${__CVLIB}${CVLIB_SUFFIX}" PATHS "${OpenCV_DIR}/lib" NO_DEFAULT_PATH)
+      IF (OPENCV_VERSION_TWEAK STREQUAL "")
+        SET (OPENCV_VERSION_TWEAK 0)
+      ENDIF (OPENCV_VERSION_TWEAK STREQUAL "")
 
-                #Remove the cache value
-                set(OpenCV_${__CVLIB}_LIBRARY "" CACHE STRING "" FORCE)
+      IF (OPENCV_VERSION_PATCH GREATER 0 OR OPENCV_VERSION_TWEAK GREATER 0)
+        SET (OPENCV_VERSION ${OPENCV_VERSION}.${OPENCV_VERSION_PATCH})
+      ENDIF (OPENCV_VERSION_PATCH GREATER 0 OR OPENCV_VERSION_TWEAK GREATER 0)
 
-                #both debug/release
-                if(OpenCV_${__CVLIB}_LIBRARY_DEBUG AND OpenCV_${__CVLIB}_LIBRARY_RELEASE)
-                    set(OpenCV_${__CVLIB}_LIBRARY debug ${OpenCV_${__CVLIB}_LIBRARY_DEBUG} optimized ${OpenCV_${__CVLIB}_LIBRARY_RELEASE}  CACHE STRING "" FORCE)
-                #only debug
-                elseif(OpenCV_${__CVLIB}_LIBRARY_DEBUG)
-                    set(OpenCV_${__CVLIB}_LIBRARY ${OpenCV_${__CVLIB}_LIBRARY_DEBUG}  CACHE STRING "" FORCE)
-                #only release
-                elseif(OpenCV_${__CVLIB}_LIBRARY_RELEASE)
-                    set(OpenCV_${__CVLIB}_LIBRARY ${OpenCV_${__CVLIB}_LIBRARY_RELEASE}  CACHE STRING "" FORCE)
-                #no library found
-                else()
-                    set(OpenCV_FOUND_TMP false)
-                endif()
+      IF (OPENCV_VERSION_TWEAK GREATER 0)
+        SET (OPENCV_VERSION ${OPENCV_VERSION}.${OPENCV_VERSION_TWEAK})
+      ENDIF (OPENCV_VERSION_TWEAK GREATER 0)
 
-                #Add to the general list
-                if(OpenCV_${__CVLIB}_LIBRARY)
-                    set(OpenCV_LIBS ${OpenCV_LIBS} ${OpenCV_${__CVLIB}_LIBRARY})
-                endif(OpenCV_${__CVLIB}_LIBRARY)
-            endforeach(__CVLIB)
+      SET (OPENCV_VERSION_COUNT 4)
+    ENDIF (OPENCV_VERSION_HEADER)
+  ENDIF (OpenCV_FOUND)
 
-            if("${OpenCV_LIBS}" STREQUAL "")
-                set(OpenCV_FOUND false CACHE BOOL "" FORCE)
-            else()
-                set(OpenCV_FOUND true CACHE BOOL "" FORCE)
-            endif()
-        endif(${OpenCV_VERSION} VERSION_GREATER 2.1.0)
-    endif(CONTINUE_SEARCHING)
-else(EXISTS "${OpenCV_DIR}")
-      set(ERR_MSG "Please specify OpenCV directory using OpenCV_DIR env. variable")
-endif(EXISTS "${OpenCV_DIR}")
-##====================================================
+  SET (_OPENCV_DETECTED_SUFFIX
+    ${OPENCV_VERSION_MAJOR}${OPENCV_VERSION_MINOR}${OPENCV_VERSION_PATCH})
 
-##====================================================
-## Print message
-##----------------------------------------------------
-if(NOT OpenCV_FOUND)
-    # make FIND_PACKAGE friendly
-    if(NOT OpenCV_FIND_QUIETLY)
-        if(OpenCV_FIND_REQUIRED)
-            message(FATAL_ERROR "OpenCV required but some headers or libs not found. ${ERR_MSG}")
-        else(OpenCV_FIND_REQUIRED)
-            message(STATUS "WARNING: OpenCV was not found. ${ERR_MSG}")
-        endif(OpenCV_FIND_REQUIRED)
-    endif(NOT OpenCV_FIND_QUIETLY)
-endif(NOT OpenCV_FOUND)
-##====================================================
+  IF (NOT OpenCV_FIND_COMPONENTS)
+    IF (OPENCV_VERSION VERSION_GREATER 2.1)
+      SET (OpenCV_FIND_COMPONENTS calib3d contrib core features2d flann highgui
+        imgproc legacy ml objdetect video)
+    ELSE (OPENCV_VERSION VERSION_GREATER 2.1)
+      SET (OpenCV_FIND_COMPONENTS cxcore cv ml highgui cvaux)
+    ENDIF (OPENCV_VERSION VERSION_GREATER 2.1)
+  ENDIF (NOT OpenCV_FIND_COMPONENTS)
 
+  # Loop over each components
+  FOREACH (_OPENCV_COMPONENT ${OpenCV_FIND_COMPONENTS})
+    SET (_OPENCV_COMPONENT_BASE opencv_${_OPENCV_COMPONENT})
 
-##====================================================
-## Backward compatibility
-##----------------------------------------------------
-if(OpenCV_FOUND)
-    option(OpenCV_BACKWARD_COMPA "Add some variable to make this script compatible with the other version of FindOpenCV.cmake" false)
-    if(OpenCV_BACKWARD_COMPA)
-        find_path(OpenCV_INCLUDE_DIRS "cv.h" PATHS "${OpenCV_DIR}" PATH_SUFFIXES "include" "include/opencv" DOC "Include directory") 
-        find_path(OpenCV_INCLUDE_DIR "cv.h" PATHS "${OpenCV_DIR}" PATH_SUFFIXES "include" "include/opencv" DOC "Include directory")
-        set(OpenCV_LIBRARIES "${OpenCV_LIBS}" CACHE STRING "" FORCE)
-    endif(OpenCV_BACKWARD_COMPA)
+    SET (_OPENCV_COMPONENT_POSSIBLE_DEBUG_NAMES
+         ${_OPENCV_COMPONENT_BASE}d
+         ${_OPENCV_COMPONENT_BASE}${_OPENCV_DETECTED_SUFFIX}d
+         ${_OPENCV_COMPONENT_BASE}d
+         ${_OPENCV_COMPONENT_BASE}${_OPENCV_DETECTED_SUFFIX}d)
+    SET (_OPENCV_COMPONENT_POSSIBLE_RELEASE_NAMES
+         ${_OPENCV_COMPONENT_BASE}
+         ${_OPENCV_COMPONENT_BASE}${_OPENCV_DETECTED_SUFFIX}
+         ${_OPENCV_COMPONENT_BASE}
+         ${_OPENCV_COMPONENT_BASE}${_OPENCV_DETECTED_SUFFIX})
 
-    MESSAGE(STATUS "Found OpenCV headers:   ${OpenCV_INCLUDE_DIR}")
-    MESSAGE(STATUS "Found OpenCV libraries: ${OpenCV_LIBS}")
-endif(OpenCV_FOUND)
-##====================================================
+    STRING (TOUPPER ${_OPENCV_COMPONENT} _OPENCV_COMPONENT_UPPER)
+    SET (_OPENCV_LIBRARY_BASE OPENCV_${_OPENCV_COMPONENT_UPPER}_LIBRARY)
 
+    FIND_LIBRARY (${_OPENCV_LIBRARY_BASE}_DEBUG
+      NAMES ${_OPENCV_COMPONENT_POSSIBLE_DEBUG_NAMES}
+      HINTS ${_OPENCV_LIB_HINTS}
+      PATH_SUFFIXES ${_OPENCV_POSSIBLE_LIB_SUFFIXES}
+      DOC "OpenCV ${_OPENCV_COMPONENT} debug library")
+
+    FIND_LIBRARY (${_OPENCV_LIBRARY_BASE}_RELEASE
+      NAMES ${_OPENCV_COMPONENT_POSSIBLE_RELEASE_NAMES}
+      HINTS ${_OPENCV_LIB_HINTS}
+      PATH_SUFFIXES ${_OPENCV_POSSIBLE_LIB_SUFFIXES}
+      DOC "OpenCV ${_OPENCV_COMPONENT} release library")
+
+    IF (${_OPENCV_LIBRARY_BASE}_DEBUG)
+      LIST (APPEND _OPENCV_ALL_LIBS ${${_OPENCV_LIBRARY_BASE}_DEBUG})
+    ENDIF (${_OPENCV_LIBRARY_BASE}_DEBUG)
+
+    IF (${_OPENCV_LIBRARY_BASE}_RELEASE)
+      LIST (APPEND _OPENCV_ALL_LIBS ${${_OPENCV_LIBRARY_BASE}_RELEASE})
+    ENDIF (${_OPENCV_LIBRARY_BASE}_RELEASE)
+
+    SET (OPENCV_${_OPENCV_COMPONENT_UPPER}_FOUND TRUE)
+
+    # Debug and release
+    IF (${_OPENCV_LIBRARY_BASE}_DEBUG AND ${_OPENCV_LIBRARY_BASE}_RELEASE)
+      SET (${_OPENCV_LIBRARY_BASE}
+        debug ${${_OPENCV_LIBRARY_BASE}_DEBUG}
+        optimized ${${_OPENCV_LIBRARY_BASE}_RELEASE} CACHE DOC
+        "OpenCV ${_OPENCV_COMPONENT} library")
+      # Debug only
+    ELSEIF (${_OPENCV_LIBRARY_BASE}_DEBUG)
+      SET (${_OPENCV_LIBRARY_BASE} ${${_OPENCV_LIBRARY_BASE}_DEBUG} CACHE DOC
+        "OpenCV ${_OPENCV_COMPONENT} library")
+      # Release only
+    ELSEIF (${_OPENCV_LIBRARY_BASE}_RELEASE)
+      SET (${_OPENCV_LIBRARY_BASE} ${${_OPENCV_LIBRARY_BASE}_RELEASE} CACHE DOC
+        "OpenCV ${_OPENCV_COMPONENT} library")
+    ELSE (${_OPENCV_LIBRARY_BASE}_DEBUG AND ${_OPENCV_LIBRARY_BASE}_RELEASE)
+      # Component missing: record it for a later report
+      LIST (APPEND _OPENCV_MISSING_COMPONENTS ${_OPENCV_COMPONENT})
+
+      IF (_OPENCV_CHECK_COMPONENTS)
+        # Report unset variables only if components are not handled by FPHSA
+        LIST (APPEND _OPENCV_MISSING_LIBRARIES ${_OPENCV_LIBRARY_BASE})
+      ENDIF (_OPENCV_CHECK_COMPONENTS)
+
+      SET (OPENCV_${_OPENCV_COMPONENT_UPPER}_FOUND FALSE)
+    ENDIF (${_OPENCV_LIBRARY_BASE}_DEBUG AND ${_OPENCV_LIBRARY_BASE}_RELEASE)
+
+    MARK_AS_ADVANCED (${_OPENCV_LIBRARY_BASE} ${_OPENCV_LIBRARY_BASE}_DEBUG
+      ${_OPENCV_LIBRARY_BASE}_RELEASE)
+
+    SET (OpenCV_${_OPENCV_COMPONENT}_FOUND
+      ${OPENCV_${_OPENCV_COMPONENT_UPPER}_FOUND})
+
+    # Make sure only libraries that have been actually found are registered
+    IF (${_OPENCV_LIBRARY_BASE})
+      LIST (APPEND _OPENCV_LIBRARIES ${${_OPENCV_LIBRARY_BASE}})
+    ENDIF (${_OPENCV_LIBRARY_BASE})
+  ENDFOREACH (_OPENCV_COMPONENT)
+
+  IF (NOT DEFINED _OPENCV_MISSING_COMPONENTS)
+    # Success: all components were found
+    LIST (APPEND OPENCV_LIBRARIES ${_OPENCV_LIBRARIES})
+  ELSEIF (NOT DEFINED _OPENCV_MISSING_COMPONENTS AND _OPENCV_CHECK_COMPONENTS)
+    IF (NOT OpenCV_FIND_QUIETLY)
+      MESSAGE (STATUS "One or more OpenCV components were not found:")
+      # Display missing components indented, each on a separate line
+      FOREACH (_OPENCV_MISSING_COMPONENT ${_OPENCV_MISSING_COMPONENTS})
+        MESSAGE (STATUS "  " ${_OPENCV_MISSING_COMPONENT})
+      ENDFOREACH (_OPENCV_MISSING_COMPONENT ${_OPENCV_MISSING_COMPONENTS})
+    ENDIF (NOT OpenCV_FIND_QUIETLY)
+  ENDIF (NOT DEFINED _OPENCV_MISSING_COMPONENTS)
+
+  SET (OPENCV_INCLUDE_DIRS ${OPENCV_INCLUDE_DIR})
+ENDIF (OPENCV_ROOT_DIR)
+
+IF (WIN32)
+  FIND_PROGRAM (LIB_EXECUTABLE NAMES lib
+    HINTS "$ENV{VS120COMNTOOLS}/../../VC/bin"
+          "$ENV{VS110COMNTOOLS}/../../VC/bin"
+          "$ENV{VS100COMNTOOLS}/../../VC/bin"
+          "$ENV{VS90COMNTOOLS}/../../VC/bin"
+          "$ENV{VS71COMNTOOLS}/../../VC/bin"
+          "$ENV{VS80COMNTOOLS}/../../VC/bin"
+    DOC "Library manager")
+
+  MARK_AS_ADVANCED (LIB_EXECUTABLE)
+ENDIF (WIN32)
+
+MACRO (GET_LIB_REQUISITES LIB REQUISITES)
+  IF (LIB_EXECUTABLE)
+    GET_FILENAME_COMPONENT (_LIB_PATH ${LIB_EXECUTABLE} PATH)
+
+    IF (MSVC)
+      # Do not redirect the output
+      UNSET (ENV{VS_UNICODE_OUTPUT})
+    ENDIF (MSVC)
+
+    EXECUTE_PROCESS (COMMAND ${LIB_EXECUTABLE} /nologo /list ${LIB}
+      WORKING_DIRECTORY ${_LIB_PATH}/../../Common7/IDE
+      OUTPUT_VARIABLE _LIB_OUTPUT ERROR_QUIET)
+
+    STRING (REPLACE "\n" ";" "${REQUISITES}" "${_LIB_OUTPUT}")
+    LIST (REMOVE_DUPLICATES ${REQUISITES})
+  ENDIF (LIB_EXECUTABLE)
+ENDMACRO (GET_LIB_REQUISITES)
+
+IF (_OPENCV_ALL_LIBS)
+  # collect lib requisites using the lib tool
+  FOREACH (_OPENCV_COMPONENT ${_OPENCV_ALL_LIBS})
+    GET_LIB_REQUISITES (${_OPENCV_COMPONENT} _OPENCV_REQUISITES)
+  ENDFOREACH (_OPENCV_COMPONENT)
+ENDIF (_OPENCV_ALL_LIBS)
+
+IF (NOT OPENCV_BINARY_DIR)
+  SET (_OPENCV_UPDATE_BINARY_DIR TRUE)
+ELSE (NOT OPENCV_BINARY_DIR)
+  SET (_OPENCV_UPDATE_BINARY_DIR FALSE)
+ENDIF (NOT OPENCV_BINARY_DIR)
+
+SET (_OPENCV_BINARY_DIR_HINTS ${OPENCV_ROOT_DIR}/bin)
+
+IF (_OPENCV_ALL_LIBS)
+  LIST (GET _OPENCV_ALL_LIBS 0 _OPENCV_LIB)
+  # extract the path to the lib directory
+  GET_FILENAME_COMPONENT (_OPENCV_LIB ${_OPENCV_LIB} PATH)
+  # extract the path to lib's parent directory
+  GET_FILENAME_COMPONENT (_OPENCV_COMMON_DIR ${_OPENCV_LIB}/.. ABSOLUTE)
+
+  LIST (APPEND _OPENCV_BINARY_DIR_HINTS ${_OPENCV_COMMON_DIR}/bin)
+ENDIF (_OPENCV_ALL_LIBS)
+
+FIND_PROGRAM (OPENCV_BINARY_DIR
+  NAMES opencv_haartraining opencv_performance opencv_stitching
+        opencv_createsamples
+  HINTS ${_OPENCV_BINARY_DIR_HINTS} NO_DEFAULT_PATH)
+
+IF (_OPENCV_REQUISITES)
+  FIND_FILE (OPENCV_BINARY_DIR NAMES ${_OPENCV_REQUISITES}
+    HINTS ${_OPENCV_BINARY_DIR_HINTS} NO_DEFAULT_PATH)
+ENDIF (_OPENCV_REQUISITES)
+
+IF (OPENCV_BINARY_DIR AND _OPENCV_UPDATE_BINARY_DIR)
+  SET (_OPENCV_BINARY_DIR ${OPENCV_BINARY_DIR})
+  UNSET (OPENCV_BINARY_DIR CACHE)
+
+  GET_FILENAME_COMPONENT (OPENCV_BINARY_DIR ${_OPENCV_BINARY_DIR} PATH)
+
+  IF (OPENCV_BINARY_DIR)
+    SET (OPENCV_BINARY_DIR ${OPENCV_BINARY_DIR} CACHE PATH
+      "OpenCV binary directory")
+  ENDIF (OPENCV_BINARY_DIR)
+ENDIF (OPENCV_BINARY_DIR AND _OPENCV_UPDATE_BINARY_DIR)
+
+MARK_AS_ADVANCED (OPENCV_BINARY_DIR OPENCV_INCLUDE_DIR)
+
+IF (NOT _OPENCV_CHECK_COMPONENTS)
+  SET (_OPENCV_FPHSA_ADDITIONAL_ARGS HANDLE_COMPONENTS)
+ENDIF (NOT _OPENCV_CHECK_COMPONENTS)
+
+FIND_PACKAGE_HANDLE_STANDARD_ARGS (OpenCV REQUIRED_VARS OPENCV_ROOT_DIR
+  OPENCV_INCLUDE_DIR ${_OPENCV_MISSING_LIBRARIES} VERSION_VAR OPENCV_VERSION
+  ${_OPENCV_FPHSA_ADDITIONAL_ARGS})
