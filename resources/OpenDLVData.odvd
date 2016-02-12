@@ -83,3 +83,9 @@ message sensor.Radar [id = 61] {
   sensor.Reading reading [id = 1]; 
   double distance [id = 2];
 }
+
+// Example for further messages, you have the message ID range from 150-169.
+// TODO: Define good names for the messages.
+message opendlv.gcdc.Message00 [id = 150] {
+}
+

@@ -60,6 +60,14 @@ void Perception::nextContainer(core::data::Container &c)
         sensor::Radar radar = c.getData<sensor::Radar>();
         std::cout << "[perception]: " << radar.toString() << ", " << radar.getDistance() << std::endl;
     }
+
+    // Example for how to use the new enums in core::data::Container for receiving.
+    if (c.getDataType() == core::data::Container::OPENDLV_GCDC_MSG00) {
+        // Example for the Message 00.
+        opendlv::gcdc::Message00 msg00 = c.getData<opendlv::gcdc::Message00>();
+        std::cout << "[perception]: " << msg00.toString() << std::endl;
+    }
+
 }
 
 } // application
