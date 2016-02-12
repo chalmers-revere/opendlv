@@ -63,6 +63,12 @@ coredata::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
 
         core::data::Container c(core::data::Container::USER_DATA_6, radar);
         getConference().send(c);
+
+
+        // Example for how to use the new enums in core::data::Container for sending.
+        opendlv::gcdc::Message00 msg00;
+        core::data::Container c2(core::data::Container::OPENDLV_GCDC_MSG00, msg00);
+        getConference().send(c2);
     }
 
     return coredata::dmcp::ModuleExitCodeMessage::OKAY;
