@@ -52,7 +52,7 @@ void Sensation::tearDown()
 }
 
 coredata::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
-    double d = 1.234;
+   /* double d = 1.234;
     std::cout << "Hello OpenDaVINCI World!" << std::endl;
     while (getModuleStateAndWaitForRemainingTimeInTimeslice() == coredata::dmcp::ModuleStateMessage::RUNNING) {
         std::cout << "Inside the main processing loop." << std::endl;
@@ -64,7 +64,7 @@ coredata::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
         core::data::Container c(core::data::Container::USER_DATA_6, radar);
         getConference().send(c);
     }
-
+*/
     return coredata::dmcp::ModuleExitCodeMessage::OKAY;
 }
 

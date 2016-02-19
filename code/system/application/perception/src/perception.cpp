@@ -56,10 +56,10 @@ void Perception::nextContainer(core::data::Container &c)
                                                 " sent at " << c.getSentTimeStamp().getYYYYMMDD_HHMMSSms() <<
                                             " received at " << c.getReceivedTimeStamp().getYYYYMMDD_HHMMSSms() << std::endl;
 
-    if (c.getDataType() == core::data::Container::USER_DATA_6) {
-        sensor::Radar radar = c.getData<sensor::Radar>();
-        std::cout << "[perception]: " << radar.toString() << ", " << radar.getDistance() << std::endl;
-    }
+  //  if (c.getDataType() == core::data::Container::USER_DATA_6) {
+  //      sensor::Radar radar = c.getData<sensor::Radar>();
+  //      std::cout << "[perception]: " << radar.toString() << ", " << radar.getDistance() << std::endl;
+  //  }
 }
 
 } // application

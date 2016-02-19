@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
 #include <iostream>
@@ -21,21 +22,23 @@
 #include "core/base/Lock.h"
 #include "core/wrapper/SharedMemoryFactory.h"
 
-#include "camera.hpp"
+#include "sensor/camera/device.hpp"
 
 namespace opendlv {
-namespace system {
+namespace proxy {
+namespace sensor {
+namespace camera {
 
 /**
  * Constructor.
  *
  * @param name Name of the shared memory segment.
- * @param id Camera identifier.
+ * @param id Device identifier.
  * @param width
  * @param height
  * @param bpp
  */
-Camera::Camera(std::string const &a_name, uint32_t const &a_id,
+Device::Device(std::string const &a_name, uint32_t const &a_id,
     uint32_t const &a_width, uint32_t const &a_height, uint32_t const &a_bpp):
     m_name(a_name),
     m_id(a_id),
@@ -56,36 +59,36 @@ Camera::Camera(std::string const &a_name, uint32_t const &a_id,
   m_sharedImage.setSize(m_size);
 }
 
-Camera::~Camera()
+Device::~Device()
 {
 }
 
-std::string const Camera::GetName() const
+std::string const Device::GetName() const
 {
     return m_name;
 }
 
-uint32_t Camera::GetId() const
+uint32_t Device::GetId() const
 {
     return m_id;
 }
 
-uint32_t Camera::GetWidth() const
+uint32_t Device::GetWidth() const
 {
     return m_width;
 }
 
-uint32_t Camera::GetHeight() const
+uint32_t Device::GetHeight() const
 {
     return m_height;
 }
 
-uint32_t Camera::GetBpp() const
+uint32_t Device::GetBpp() const
 {
     return m_bpp;
 }
 
-uint32_t Camera::GetSize() const
+uint32_t Device::GetSize() const
 {
     return m_size;
 }
@@ -93,7 +96,7 @@ uint32_t Camera::GetSize() const
 /**
  * @return Meta information about the image.
  */
-coredata::image::SharedImage Camera::Capture()
+coredata::image::SharedImage Device::Capture()
 {
   if (IsValid()) {
     if (CaptureFrame()) {
@@ -106,5 +109,7 @@ coredata::image::SharedImage Camera::Capture()
   return m_sharedImage;
 }
 
-} // system
+} // camera
+} // sensor
+} // proxy
 } // opendlv

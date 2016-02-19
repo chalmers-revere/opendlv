@@ -13,30 +13,33 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
-#ifndef OPENCVCAMERA_H_
-#define OPENCVCAMERA_H_
+#ifndef SENSOR_CAMERA_OPENCVCAMERA_H_
+#define SENSOR_CAMERA_OPENCVCAMERA_H_
 
 #include "opencv2/highgui/highgui.hpp"
 
-#include "camera.hpp"
+#include "sensor/camera/device.hpp"
 
 namespace opendlv {
-namespace system {
+namespace proxy {
+namespace sensor {
+namespace camera {
 
 /**
  * This class wraps an OpenCV camera and captures its data into a shared memory 
  * segment.
  */
-class OpenCvCamera : public Camera {
+class OpenCvDevice : public Device {
   public:
-    OpenCvCamera(std::string const &, uint32_t const &, uint32_t const &, 
+    OpenCvDevice(std::string const &, uint32_t const &, uint32_t const &, 
         uint32_t const &, uint32_t const &);
-    OpenCvCamera(OpenCvCamera const &) = delete;
-    OpenCvCamera &operator=(OpenCvCamera const &) = delete;
-    virtual ~OpenCvCamera();
+    OpenCvDevice(OpenCvDevice const &) = delete;
+    OpenCvDevice &operator=(OpenCvDevice const &) = delete;
+    virtual ~OpenCvDevice();
 
   private:
     virtual bool CopyImageTo(char *, uint32_t const &);
@@ -48,7 +51,9 @@ class OpenCvCamera : public Camera {
     IplImage *m_image;
 };
 
-} // system
+} // camera
+} // sensor
+} // proxy
 } // opendlv
 
 #endif

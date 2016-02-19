@@ -13,12 +13,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
-#include "proxy.hpp"
+#include "actuator/propulsion/propulsion.hpp"
 
 int32_t main(int32_t a_argc, char **a_argv) {
-  opendlv::system::Proxy p(a_argc, a_argv);
-  return p.runModule();
+  opendlv::proxy::actuator::propulsion::Propulsion propulsion(a_argc, a_argv);
+  return propulsion.runModule();
 }

@@ -13,43 +13,46 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
-#ifndef PROXY_HPP_
-#define PROXY_HPP_
+#ifndef COMMUNICATOR_V2V_V2V_HPP_
+#define COMMUNICATOR_V2V_V2V_HPP_
+
+#include <memory>
 
 #include "core/base/module/DataTriggeredConferenceClientModule.h"
 #include "core/data/Container.h"
-#include "tools/recorder/Recorder.h"
 
 namespace opendlv {
-namespace system {
+namespace proxy {
+namespace communicator {
+namespace v2v {
 
-class Camera;
+class Device;
 
 /**
  * This class provides...
  */
-class Proxy : public core::base::module::DataTriggeredConferenceClientModule {
+class V2v : public core::base::module::DataTriggeredConferenceClientModule {
   public:
-    Proxy(int32_t const &, char **);
-    Proxy(Proxy const &) = delete;
-    Proxy &operator=(Proxy const &) = delete;
-    virtual ~Proxy();
-    coredata::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
-    void nextContainer(core::data::Container &);
+    V2v(int32_t const &, char **);
+    V2v(V2v const &) = delete;
+    V2v &operator=(V2v const &) = delete;
+    virtual ~V2v();
+    virtual void nextContainer(core::data::Container &);
 
   private:
-    void distribute(core::data::Container c);
     void setUp();
     void tearDown();
 
-    std::unique_ptr<tools::recorder::Recorder> m_recorder;
-    std::unique_ptr<Camera> m_camera;
+    std::unique_ptr<Device> m_device;
 };
 
-} // system
+} // v2v
+} // communicator
+} // proxy
 } // opendlv
 
 #endif
