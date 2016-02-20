@@ -1,4 +1,4 @@
-find_package(PythonInterp REQUIRED)
+find_package(PythonInterp 2.7 REQUIRED)
 
 if(PYTHONINTERP_FOUND)
     set(CXXTEST_USE_PYTHON true)

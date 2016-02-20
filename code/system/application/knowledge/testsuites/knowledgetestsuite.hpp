@@ -13,50 +13,50 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
-#ifndef SENSORCAMERATESTSUITE_HPP_
-#define SENSORCAMERATESTSUITE_HPP_
+#ifndef KNOWLEDGETESTSUITE_HPP_
+#define KNOWLEDGETESTSUITE_HPP_
 
 #include "cxxtest/TestSuite.h"
 
 // Include local header files.
-#include "../include/sensor/camera/camera.hpp"
+#include "../include/gcdc16/gcdc16.hpp"
 
 /**
- * This class derives from sensor::camera::Camera to allow access to protected 
- * methods.
+ * This class derives from Knowledge to allow access to protected methods.
  */
-class SensorCameraTestling : public opendlv::proxy::sensor::camera::Camera {
+class Gcdc16Testling : public opendlv::knowledge::gcdc16::Gcdc16 {
   private:
-    SensorCameraTestling();
+    Gcdc16Testling();
     
   public:
-    SensorCameraTestling(const int32_t &a_argc, char **a_argv) :
-      Camera(a_argc, a_argv) {}
+    Gcdc16Testling(const int32_t &a_argc, char **a_argv) :
+      Gcdc16(a_argc, a_argv) {}
 
-    // Here, you need to add all methods which are protected in 
-    // sensor::camera::Camera and which are needed for the test cases.
+    // Here, you need to add all methods which are protected in Knowledge and
+    // which are needed for the test cases.
 };
 
 /**
  * The actual testsuite starts here.
  */
-class SensorCameraTest : public CxxTest::TestSuite {
+class Gcdc2016Test : public CxxTest::TestSuite {
   private:
-    SensorCameraTestling *m_pt;
+    Gcdc16Testling *m_st;
 
   public:
-    SensorCameraTest() : m_pt(nullptr) {}
-    SensorCameraTest(SensorCameraTest const &) = delete;
-    SensorCameraTest& operator=(SensorCameraTest const &) = delete;
+    Gcdc2016Test() : m_st(nullptr) {}
+    Gcdc2016Test(Gcdc2016Test const &) = delete;
+    Gcdc2016Test& operator=(Gcdc2016Test const &) = delete;
 
     /**
      * This method will be called before each testXYZ-method.
      */
     void setUp() {
-      std::string argv0("proxy-sensor-camera");
+      std::string argv0("knowledge-gcdc16");
       std::string argv1("--cid=100");
       int32_t argc = 2;
       char **argv;
@@ -64,24 +64,24 @@ class SensorCameraTest : public CxxTest::TestSuite {
       argv[0] = const_cast<char*>(argv0.c_str());
       argv[1] = const_cast<char*>(argv1.c_str());
 
-      // Create an instance of Camera through SensorCameraTestling which 
+      // Create an instance of Knowledge through KnowledgeTestling which 
       // will be deleted in tearDown().
-      m_pt = new SensorCameraTestling(argc, argv);
+      m_st = new Gcdc16Testling(argc, argv);
     }
 
     /**
      * This method will be called after each testXYZ-method.
      */
     void tearDown() {
-      delete m_pt;
-      m_pt = nullptr;
+      delete m_st;
+      m_st = nullptr;
     }
 
     //////////////////////////////////////////////////////////////////////////
     // Below this line the actual testcases are defined.
     //////////////////////////////////////////////////////////////////////////
-    void testSensorCameraSuccessfullyCreated() {
-      TS_ASSERT(m_pt != nullptr);
+    void testKnowledgeSuccessfullyCreated() {
+      TS_ASSERT(m_st != nullptr);
     }
 };
 

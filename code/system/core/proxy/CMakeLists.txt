@@ -29,13 +29,74 @@ include_directories(${OpenCV_INCLUDE_DIR})
 set(LIBRARIES ${LIBRARIES} ${OpenCV_LIBS})
 
 # Build
-file(GLOB_RECURSE thisproject-sources "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+file(GLOB_RECURSE thisproject-sources 
+  #  "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/actuator/propulsion/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/actuator/brake/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/actuator/steering/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/communicator/ledstrip/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/communicator/toggeler/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/communicator/v2v/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/sensor/camera/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/sensor/gps/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/sensor/imu/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/sensor/lidar/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/sensor/sonararray/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/sensor/v2v/*.cpp"
+  )
+
+
 add_library(${PROJECT_NAME}lib-static STATIC ${thisproject-sources})
-add_executable(${PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
-target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+
+add_executable(${PROJECT_NAME}-actuator-propulsion "${CMAKE_CURRENT_SOURCE_DIR}/src/actuator/propulsion/main.cpp")
+target_link_libraries(${PROJECT_NAME}-actuator-propulsion ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+
+add_executable(${PROJECT_NAME}-actuator-brake "${CMAKE_CURRENT_SOURCE_DIR}/src/actuator/brake/main.cpp")
+target_link_libraries(${PROJECT_NAME}-actuator-brake ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+
+add_executable(${PROJECT_NAME}-actuator-steering "${CMAKE_CURRENT_SOURCE_DIR}/src/actuator/steering/main.cpp")
+target_link_libraries(${PROJECT_NAME}-actuator-steering ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+
+add_executable(${PROJECT_NAME}-communicator-ledstrip "${CMAKE_CURRENT_SOURCE_DIR}/src/communicator/ledstrip/main.cpp")
+target_link_libraries(${PROJECT_NAME}-communicator-ledstrip ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+
+add_executable(${PROJECT_NAME}-communicator-toggeler "${CMAKE_CURRENT_SOURCE_DIR}/src/communicator/toggeler/main.cpp")
+target_link_libraries(${PROJECT_NAME}-communicator-toggeler ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+
+add_executable(${PROJECT_NAME}-communicator-v2v "${CMAKE_CURRENT_SOURCE_DIR}/src/communicator/v2v/main.cpp")
+target_link_libraries(${PROJECT_NAME}-communicator-v2v ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+
+add_executable(${PROJECT_NAME}-sensor-camera "${CMAKE_CURRENT_SOURCE_DIR}/src/sensor/camera/main.cpp")
+target_link_libraries(${PROJECT_NAME}-sensor-camera ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+
+add_executable(${PROJECT_NAME}-sensor-gps "${CMAKE_CURRENT_SOURCE_DIR}/src/sensor/gps/main.cpp")
+target_link_libraries(${PROJECT_NAME}-sensor-gps ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+
+add_executable(${PROJECT_NAME}-sensor-imu "${CMAKE_CURRENT_SOURCE_DIR}/src/sensor/imu/main.cpp")
+target_link_libraries(${PROJECT_NAME}-sensor-imu ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+
+add_executable(${PROJECT_NAME}-sensor-lidar "${CMAKE_CURRENT_SOURCE_DIR}/src/sensor/lidar/main.cpp")
+target_link_libraries(${PROJECT_NAME}-sensor-lidar ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+
+add_executable(${PROJECT_NAME}-sensor-sonararray "${CMAKE_CURRENT_SOURCE_DIR}/src/sensor/sonararray/main.cpp")
+target_link_libraries(${PROJECT_NAME}-sensor-sonararray ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+
+add_executable(${PROJECT_NAME}-sensor-v2v "${CMAKE_CURRENT_SOURCE_DIR}/src/sensor/v2v/main.cpp")
+target_link_libraries(${PROJECT_NAME}-sensor-v2v ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
 # Test
 include(RunTests)
 
 # Install
-install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin COMPONENT system-core)
+install(TARGETS ${PROJECT_NAME}-actuator-propulsion RUNTIME DESTINATION bin COMPONENT system-core)
+install(TARGETS ${PROJECT_NAME}-actuator-brake RUNTIME DESTINATION bin COMPONENT system-core)
+install(TARGETS ${PROJECT_NAME}-actuator-steering RUNTIME DESTINATION bin COMPONENT system-core)
+install(TARGETS ${PROJECT_NAME}-communicator-ledstrip RUNTIME DESTINATION bin COMPONENT system-core)
+install(TARGETS ${PROJECT_NAME}-communicator-toggeler RUNTIME DESTINATION bin COMPONENT system-core)
+install(TARGETS ${PROJECT_NAME}-communicator-v2v RUNTIME DESTINATION bin COMPONENT system-core)
+install(TARGETS ${PROJECT_NAME}-sensor-camera RUNTIME DESTINATION bin COMPONENT system-core)
+install(TARGETS ${PROJECT_NAME}-sensor-gps RUNTIME DESTINATION bin COMPONENT system-core)
+install(TARGETS ${PROJECT_NAME}-sensor-imu RUNTIME DESTINATION bin COMPONENT system-core)
+install(TARGETS ${PROJECT_NAME}-sensor-lidar RUNTIME DESTINATION bin COMPONENT system-core)
+install(TARGETS ${PROJECT_NAME}-sensor-sonararray RUNTIME DESTINATION bin COMPONENT system-core)
+install(TARGETS ${PROJECT_NAME}-sensor-v2v RUNTIME DESTINATION bin COMPONENT system-core)

@@ -18,31 +18,31 @@
 
 // Cartesian messages
 
-message cartesian.Constants [id = 50] {
+message opendlv.Constants [id = 150] {
   const double PI = 3.141592653589793;
   const double DEG2RAD = 0.017453292522222;  // PI/180.0
   const double RAD2DEG = 57.295779513082325; // 1.0 / DEG2RAD;
 }
 
-message cartesian.Point2 [id = 51] {
+message opendlv.cartesian.Point2 [id = 151] {
   float p[2] [id = 1];
 }
 
-message cartesian.Point3 [id = 52] {
+message opendlv.cartesian.Point3 [id = 152] {
   float p[3] [id = 1];
 }
 
-message cartesian.Position2d [id = 53] {
-  cartesian.Point2 position [id = 1];
-  cartesian.Point2 rotation [id = 2];
+message opendlv.cartesian.Position2d [id = 153] {
+  opendlv.cartesian.Point2 position [id = 1];
+  opendlv.cartesian.Point2 rotation [id = 2];
 }
 
-message cartesian.Position3d [id = 54] {
-  cartesian.Point3 position [id = 1];
-  cartesian.Point3 rotation [id = 2];
+message opendlv.cartesian.Position3d [id = 154] {
+  opendlv.cartesian.Point3 position [id = 1];
+  opendlv.cartesian.Point3 rotation [id = 2];
 }
 
-message cartesian.Matrix3x3 [id = 55] {
+message opendlv.cartesian.Matrix3x3 [id = 155] {
   double a11 [id = 1];
   double a12 [id = 2];
   double a13 [id = 3];
@@ -54,7 +54,7 @@ message cartesian.Matrix3x3 [id = 55] {
   double a33 [id = 9];
 }
 
-message cartesian.Matrix4x4 [id = 56] {
+message opendlv.cartesian.Matrix4x4 [id = 156] {
   double a11 [id = 1];
   double a12 [id = 2];
   double a13 [id = 3];
@@ -73,13 +73,45 @@ message cartesian.Matrix4x4 [id = 56] {
   double a44 [id = 16];
 }
 
-// Sensor messages
-message sensor.Reading [id = 60] {
-  core::data::TimeStamp timestamp [id = 1];
-  string sensorName;
+// State messages
+message opendlv.system.Orientation [id = 159] {
+  opendlv.cartesian.Matrix4x4 orientation;
 }
 
-message sensor.Radar [id = 61] {
-  sensor.Reading reading [id = 1]; 
-  double distance [id = 2];
+// Sensor messages
+message opendlv.system.sensor.PointCloud [id = 160] {
+  uint32 numberOfPoints;
+ // list<opendlv.cartesian.Point3> points;
+}
+
+message opendlv.system.sensor.AltImu10Dof [id = 161] {
+  float acceleration[3];
+  float orientation[3];
+  float heading[3];
+  float altitude;
+}
+
+message opendlv.system.sensor.VehicleCommunicationMessage [id = 162] {
+  string type;
+  uint32 size;
+  list<uint8> data;
+}
+
+message opendlv.system.sensor.GeoLocation [id = 163] {
+  float longitude;
+  float latitude;
+  float altitude;
+}
+
+// Actuation messages
+message opendlv.system.actuator.Steering [id = 164] {
+  float deltaAngle;
+}
+
+message opendlv.system.actuator.Brake [id = 165] {
+  float deltaPosition;
+}
+
+message opendlv.system.actuator.Throttle [id = 166] {
+  float deltaPosition;
 }

@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
 #include <iostream>
@@ -21,23 +22,25 @@
 #include "opencv2/imgproc/imgproc_c.h"
 #include "opencv2/imgproc/imgproc.hpp"
 
-#include "opencvcamera.hpp"
+#include "sensor/camera/opencvdevice.hpp"
 
 namespace opendlv {
-namespace system {
+namespace proxy {
+namespace sensor {
+namespace camera {
 
 /**
  * Constructor.
  *
  * @param name Name of the shared memory segment.
- * @param id OpenCVCamera identifier.
+ * @param id OpenCVDevice identifier.
  * @param width
  * @param height
  * @param bpp
  */
-OpenCvCamera::OpenCvCamera(std::string const &a_name, uint32_t const &a_id,
+OpenCvDevice::OpenCvDevice(std::string const &a_name, uint32_t const &a_id,
     uint32_t const &a_width, uint32_t const &a_height, uint32_t const &a_bpp):
-    Camera(a_name, a_id, a_width, a_height, a_bpp),
+    Device(a_name, a_id, a_width, a_height, a_bpp),
     m_capture(nullptr),
     m_image(nullptr)
 {
@@ -47,12 +50,12 @@ OpenCvCamera::OpenCvCamera(std::string const &a_name, uint32_t const &a_id,
     cvSetCaptureProperty(m_capture, CV_CAP_PROP_FRAME_WIDTH, a_width);
     cvSetCaptureProperty(m_capture, CV_CAP_PROP_FRAME_HEIGHT, a_height);
   } else {
-    std::cerr << "[proxy] Could not open camera '" << a_name << "' with ID: " 
-        << a_id << std::endl;
+    std::cerr << "[proxy-sensor-camera] Could not open camera '" << a_name 
+        << "' with ID: " << a_id << std::endl;
   }
 }
 
-OpenCvCamera::~OpenCvCamera()
+OpenCvDevice::~OpenCvDevice()
 {
   if (m_capture) {
     cvReleaseCapture(&m_capture);
@@ -60,12 +63,12 @@ OpenCvCamera::~OpenCvCamera()
   }
 }
 
-bool OpenCvCamera::IsValid() const
+bool OpenCvDevice::IsValid() const
 {
   return (m_capture != nullptr);
 }
 
-bool OpenCvCamera::CaptureFrame()
+bool OpenCvDevice::CaptureFrame()
 {
   bool retVal = false;
   if (m_capture != nullptr) {
@@ -88,7 +91,7 @@ bool OpenCvCamera::CaptureFrame()
   return retVal;
 }
 
-bool OpenCvCamera::CopyImageTo(char *a_destination, const uint32_t &a_size)
+bool OpenCvDevice::CopyImageTo(char *a_destination, const uint32_t &a_size)
 {
   bool retVal = false;
 
@@ -104,6 +107,8 @@ bool OpenCvCamera::CopyImageTo(char *a_destination, const uint32_t &a_size)
   return retVal;
 }
 
-} // system
+} // camera
+} // sensor
+} // proxy
 } // opendlv
 

@@ -13,11 +13,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
-#ifndef CAMERA_HPP_
-#define CAMERA_HPP_
+#ifndef SENSOR_CAMERA_DEVICE_HPP_
+#define SENSOR_CAMERA_DEVICE_HPP_
 
 #include <stdint.h>
 #include <string>
@@ -27,18 +28,20 @@
 #include "GeneratedHeaders_CoreData.h"
 
 namespace opendlv {
-namespace system {
+namespace proxy {
+namespace sensor {
+namespace camera {
 
 /**
  * This class wraps a camera and captures its data into a shared memory segment.
  */
-class Camera {
+class Device {
   public:
-    Camera(std::string const &, uint32_t const &, uint32_t const &, 
+    Device(std::string const &, uint32_t const &, uint32_t const &, 
         uint32_t const &, uint32_t const &);
-    Camera(Camera const &) = delete;
-    Camera &operator=(Camera const &) = delete;
-    virtual ~Camera();
+    Device(Device const &) = delete;
+    Device &operator=(Device const &) = delete;
+    virtual ~Device();
     coredata::image::SharedImage Capture();
 
   protected:
@@ -72,7 +75,9 @@ class Camera {
     core::SharedPointer<core::wrapper::SharedMemory> m_sharedMemory;
 };
 
-} // system
+} // camera
+} // sensor
+} // proxy
 } // opendlv
 
 #endif
