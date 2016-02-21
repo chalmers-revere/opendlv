@@ -22,8 +22,8 @@
 
 #include <memory>
 
-#include "core/base/module/TimeTriggeredConferenceClientModule.h"
-#include "core/data/Container.h"
+#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/data/Container.h"
 
 namespace opendlv {
 namespace proxy {
@@ -35,13 +35,13 @@ class Device;
 /**
  * This class provides...
  */
-class SonarArray : public core::base::module::TimeTriggeredConferenceClientModule {
+class SonarArray : public odcore::base::module::TimeTriggeredConferenceClientModule {
   public:
     SonarArray(int32_t const &, char **);
     SonarArray(SonarArray const &) = delete;
     SonarArray &operator=(SonarArray const &) = delete;
     virtual ~SonarArray();
-    coredata::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+    odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
   private:
     void setUp();

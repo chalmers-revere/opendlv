@@ -22,8 +22,8 @@
 
 #include <memory>
 
-#include "core/base/module/DataTriggeredConferenceClientModule.h"
-#include "core/data/Container.h"
+#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/data/Container.h"
 
 namespace opendlv {
 namespace proxy {
@@ -36,13 +36,13 @@ class Device;
  * This class provides...
  */
 class Brake : 
-    public core::base::module::DataTriggeredConferenceClientModule {
+    public odcore::base::module::DataTriggeredConferenceClientModule {
   public:
     Brake(int32_t const &, char **);
     Brake(Brake const &) = delete;
     Brake &operator=(Brake const &) = delete;
     virtual ~Brake();
-    virtual void nextContainer(core::data::Container &);
+    virtual void nextContainer(odcore::data::Container &);
 
   private:
     void setUp();

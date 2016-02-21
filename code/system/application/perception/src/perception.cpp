@@ -17,7 +17,7 @@
  */
 
 #include <iostream>
-#include "GeneratedHeaders_OpenDLVData.h"
+#include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
 
 #include "perception.hpp"
 
@@ -50,7 +50,7 @@ void Perception::tearDown()
   // This method will be call automatically _after_ return from body().
 }
 
-void Perception::nextContainer(core::data::Container &c) 
+void Perception::nextContainer(odcore::data::Container &c) 
 {
     std::cout << "[perception] received container of type " << c.getDataType() <<
                                                 " sent at " << c.getSentTimeStamp().getYYYYMMDD_HHMMSSms() <<

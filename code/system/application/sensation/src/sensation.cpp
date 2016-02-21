@@ -17,8 +17,8 @@
  */
 
 #include <iostream>
-#include <core/data/Container.h>
-#include "GeneratedHeaders_OpenDLVData.h"
+#include <opendavinci/odcore/data/Container.h>
+#include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
 
 #include "sensation.hpp"
 
@@ -51,21 +51,21 @@ void Sensation::tearDown()
   // This method will be call automatically _after_ return from body().
 }
 
-coredata::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
+odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
    /* double d = 1.234;
     std::cout << "Hello OpenDaVINCI World!" << std::endl;
-    while (getModuleStateAndWaitForRemainingTimeInTimeslice() == coredata::dmcp::ModuleStateMessage::RUNNING) {
+    while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
         std::cout << "Inside the main processing loop." << std::endl;
 
         sensor::Reading reading;
         reading.setSensorName("Example Sensor");
         sensor::Radar radar(reading, d+=1.12345);
 
-        core::data::Container c(core::data::Container::USER_DATA_6, radar);
+        odcore::data::Container c(radar);
         getConference().send(c);
     }
 */
-    return coredata::dmcp::ModuleExitCodeMessage::OKAY;
+    return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
 } // application

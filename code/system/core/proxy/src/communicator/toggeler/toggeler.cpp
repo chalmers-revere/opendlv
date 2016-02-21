@@ -22,10 +22,10 @@
 #include <cmath>
 #include <iostream>
 
-#include "core/base/KeyValueConfiguration.h"
-#include "core/data/Container.h"
+#include "opendavinci/odcore/base/KeyValueConfiguration.h"
+#include "opendavinci/odcore/data/Container.h"
 
-#include "GeneratedHeaders_OpenDLVData.h"
+#include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
 
 #include "communicator/toggeler/toggeler.hpp"
 #include "communicator/toggeler/device.hpp"
@@ -52,13 +52,13 @@ Toggeler::~Toggeler()
 {
 }
 
-void Toggeler::nextContainer(core::data::Container &) 
+void Toggeler::nextContainer(odcore::data::Container &) 
 {
 }
 
 void Toggeler::setUp() 
 {
-  core::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
   std::string const type = kv.getValue<std::string>(
       "proxy-communicator-toggeler.type");

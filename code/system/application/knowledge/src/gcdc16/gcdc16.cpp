@@ -22,11 +22,11 @@
 #include <cmath>
 #include <iostream>
 
-#include "core/base/KeyValueConfiguration.h"
-#include "core/data/Container.h"
-#include "core/data/TimeStamp.h"
+#include "opendavinci/odcore/base/KeyValueConfiguration.h"
+#include "opendavinci/odcore/data/Container.h"
+#include "opendavinci/odcore/data/TimeStamp.h"
 
-#include "GeneratedHeaders_OpenDLVData.h"
+#include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
 
 #include "gcdc16/gcdc16.hpp"
 
@@ -49,7 +49,7 @@ Gcdc16::~Gcdc16()
 {
 }
 
-void Gcdc16::nextContainer(core::data::Container &) 
+void Gcdc16::nextContainer(odcore::data::Container &) 
 {
 }
 

@@ -77,7 +77,7 @@ bool OpenCvDevice::CaptureFrame()
         IplImage *tmpFrame = cvRetrieveFrame(m_capture);
 
         if (m_image == nullptr) {
-          m_image = cvCreateImage(cvGetSize(tmpFrame), IPL_DEPTH_8U, 1);                    
+          m_image = cvCreateImage(cvGetSize(tmpFrame), IPL_DEPTH_8U, 1);
         }
 
         cvCvtColor(tmpFrame, m_image, CV_BGR2GRAY);

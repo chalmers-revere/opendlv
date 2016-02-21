@@ -22,8 +22,8 @@
 
 #include <memory>
 
-#include "core/base/module/DataTriggeredConferenceClientModule.h"
-#include "core/data/Container.h"
+#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/data/Container.h"
 
 namespace opendlv {
 namespace proxy {
@@ -36,13 +36,13 @@ class Device;
  * This class provides...
  */
 class Steering : 
-    public core::base::module::DataTriggeredConferenceClientModule {
+    public odcore::base::module::DataTriggeredConferenceClientModule {
   public:
     Steering(int32_t const &, char **);
     Steering(Steering const &) = delete;
     Steering &operator=(Steering const &) = delete;
     virtual ~Steering();
-    virtual void nextContainer(core::data::Container &);
+    virtual void nextContainer(odcore::data::Container &);
 
   private:
     void setUp();

@@ -19,7 +19,7 @@
 #ifndef ACTION_HPP_
 #define ACTION_HPP_
 
-#include "core/base/module/DataTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 
 namespace opendlv {
 namespace system {
@@ -28,13 +28,13 @@ namespace application {
 /**
  * This class provides...
  */
-class Action : public core::base::module::DataTriggeredConferenceClientModule {
+class Action : public odcore::base::module::DataTriggeredConferenceClientModule {
   public:
     Action(int32_t const &, char **);
     Action(Action const &) = delete;
     Action &operator=(Action const &) = delete;
     virtual ~Action();
-    virtual void nextContainer(core::data::Container &);
+    virtual void nextContainer(odcore::data::Container &);
 
   private:
     virtual void setUp();
