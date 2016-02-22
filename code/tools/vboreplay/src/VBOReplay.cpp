@@ -20,23 +20,23 @@
 #include <iomanip>
 #include <iostream>
 
-#include <core/data/Container.h>
-#include <core/strings/StringToolbox.h>
-#include <GeneratedHeaders_AutomotiveData.h>
+#include <opendavinci/odcore/data/Container.h>
+#include <opendavinci/odcore/strings/StringToolbox.h>
+#include <automotivedata/GeneratedHeaders_AutomotiveData.h>
 
-#include <hesperia/data/environment/Point3.h>
-#include <hesperia/data/environment/EgoState.h>
+#include <opendlv/data/environment/Point3.h>
+#include <opendlv/data/environment/EgoState.h>
 
 #include "VBOReplay.h"
 
 namespace revere {
 
     using namespace std;
-    using namespace core::base;
-    using namespace core::data;
-    using namespace core::strings;
+    using namespace odcore::base;
+    using namespace odcore::data;
+    using namespace odcore::strings;
     using namespace automotive;
-    using namespace hesperia::data::environment;
+    using namespace opendlv::data::environment;
 
     VBOReplay::VBOReplay(const int32_t &argc, char **argv) :
         TimeTriggeredConferenceClientModule(argc, argv, "vboreplay"),
@@ -76,13 +76,13 @@ namespace revere {
 
     void VBOReplay::tearDown() {}
 
-    coredata::dmcp::ModuleExitCodeMessage::ModuleExitCode VBOReplay::body() {
+    odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VBOReplay::body() {
         // Structure of a VBO recording: sats time lat long velocity heading height vert-vel Longacc Latacc VB3i_AD1 Glonass_Sats GPS_Sats IMU_Kalman_Filter_Status Solution_Type Velocity_Quality event-1 RMS_HPOS RMS_VPOS RMS_HVEL RMS_VVEL _lat _long _velocity _heading _height _vert-vel POSCov_xx POSCov_yy POSCov_zz VELCov_xx VELCov_yy VELCov_zz T1 True_Head Slip_Angle  Pitch_Ang.  Lat._Vel. Yaw_Rate Roll_Angle  Lng._Vel. Slip_COG Slip_FL Slip_FR Slip_RL Slip_RR True_Head2  YawRate X_Accel Y_Accel Temp PitchRate RollRate Z_Accel Head_imu Pitch_imu Roll_imu
         // Example:
         // 008 120043.630 +3461.26475058 -0718.93197917 005.324 327.16 +0091.88 +0000.41 +0000.13 +0000.06 +4.773634E+00 000 008 +00309 +00001 000.393 0.000000 +2.824536E+00 +3.817176E+00 +6.489671E-02 +8.770368E-02 +3461.26475058 -0718.93197917 005.324 327.16 +0091.88 +0000.41 +0.000000E+00 +0.000000E+00 +0.000000E+00 +0.000000E+00 +0.000000E+00 +0.000000E+00        -0.0002998672 +3.268784E+02 -2.857361E-01 -4.464000E+00 -2.625371E-02 +4.602051E+00 +0.000000E+00 +5.264349E+00 -2.857361E-01 -2.857361E-01 -2.857361E-01 -2.857361E-01 -2.857361E-01 +3.267798E+02 -1.155747E+01 +1.000893E-01 +9.715526E-02 +2.075000E+01 +3.347323E-01 +7.384524E-02 +9.896591E-01 +0.000000E+00 +0.000000E+00 +0.000000E+00
         const uint32_t MAX_LINE_LENGTH = 2000;
         char buffer[MAX_LINE_LENGTH];
-        while (getModuleStateAndWaitForRemainingTimeInTimeslice() == coredata::dmcp::ModuleStateMessage::RUNNING) {
+        while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
             // Skip some lines to fasten playback.
             for(int i = 0; i < 10; i++) {
                 // Read next line from STDIN.
@@ -137,7 +137,7 @@ namespace revere {
                 }
 
                 // Distribute data.
-                Container c(Container::WGS84COORDINATE, coordinate);
+                Container c(coordinate);
                 getConference().send(c);
 
                 // Calculate cartesian coordinate from WGS84 coordinate using specified reference frame.
@@ -173,12 +173,12 @@ namespace revere {
                 es.setRotation(orientation);
 
                 // Distribute data.
-                Container c2(Container::EGOSTATE, es);
+                Container c2(es);
                 getConference().send(c2);
             }
         }
 
-        return coredata::dmcp::ModuleExitCodeMessage::OKAY;
+        return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
     }
 
 } // revere

@@ -19,7 +19,7 @@
 #ifndef DIAGNOSTICS_HPP_
 #define DIAGNOSTICS_HPP_
 
-#include "core/base/module/DataTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 
 namespace opendlv {
 namespace system {
@@ -27,13 +27,13 @@ namespace system {
 /**
  * This class provides...
  */
-class Diagnostics : public core::base::module::DataTriggeredConferenceClientModule {
+class Diagnostics : public odcore::base::module::DataTriggeredConferenceClientModule {
   public:
     Diagnostics(int32_t const &, char **);
     Diagnostics(Diagnostics const &) = delete;
     Diagnostics &operator=(Diagnostics const &) = delete;
     virtual ~Diagnostics();
-    virtual void nextContainer(core::data::Container &);
+    virtual void nextContainer(odcore::data::Container &);
 
   private:
     virtual void setUp();

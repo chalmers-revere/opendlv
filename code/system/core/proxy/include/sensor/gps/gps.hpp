@@ -22,8 +22,8 @@
 
 #include <memory>
 
-#include "core/base/module/TimeTriggeredConferenceClientModule.h"
-#include "core/data/Container.h"
+#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/data/Container.h"
 
 namespace opendlv {
 namespace proxy {
@@ -35,13 +35,13 @@ class Device;
 /**
  * This class provides...
  */
-class Gps : public core::base::module::TimeTriggeredConferenceClientModule {
+class Gps : public odcore::base::module::TimeTriggeredConferenceClientModule {
   public:
     Gps(int32_t const &, char **);
     Gps(Gps const &) = delete;
     Gps &operator=(Gps const &) = delete;
     virtual ~Gps();
-    coredata::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+    odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
   private:
     void setUp();

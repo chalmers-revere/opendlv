@@ -43,9 +43,9 @@ SET(AUTOMOTIVEDATA_DIR "${OPENDAVINCI_DIR}")
 FIND_PACKAGE (AutomotiveData REQUIRED)
 
 ###########################################################################
-# Find odSimulation.
-SET(ODSIMULATION_DIR "${OPENDAVINCI_DIR}")
-FIND_PACKAGE (odSimulation REQUIRED)
+# Find OpenDLV.
+SET(OPENDLV_DIR "${OPENDAVINCI_DIR}")
+FIND_PACKAGE (OpenDLV REQUIRED)
 
 ###########################################################################
 # Find OpenDLV data structures.
@@ -54,14 +54,14 @@ find_package(OpenDLVData REQUIRED)
 
 ###########################################################################
 # Set common include directories.
-include_directories(${OPENDAVINCI_INCLUDE_DIRS}/opendavinci)
-include_directories(${ODSIMULATION_INCLUDE_DIRS}/odsimulation)
-include_directories(${AUTOMOTIVEDATA_INCLUDE_DIRS}/automotivedata)
-include_directories(${OPENDLVDATA_INCLUDE_DIRS}/opendlvdata)
+include_directories(${OPENDAVINCI_INCLUDE_DIRS})
+include_directories(${OPENDLV_INCLUDE_DIRS})
+include_directories(${AUTOMOTIVEDATA_INCLUDE_DIRS})
+include_directories(${OPENDLVDATA_INCLUDE_DIRS})
 
 ###########################################################################
 # Set libraries to link against.
-set(LIBRARIES ${OPENDAVINCI_LIBRARIES} ${ODSIMULATION_LIBRARIES} ${AUTOMOTIVEDATA_LIBRARIES} ${OPENDLVDATA_LIBRARIES})
+set(LIBRARIES ${OPENDAVINCI_LIBRARIES} ${OPENDLV_LIBRARIES} ${AUTOMOTIVEDATA_LIBRARIES} ${OPENDLVDATA_LIBRARIES})
 
 
 add_subdirectory(vboreplay)

@@ -19,7 +19,7 @@
 #ifndef PERCEPTION_HPP_
 #define PERCEPTION_HPP_
 
-#include "core/base/module/DataTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 
 namespace opendlv {
 namespace system {
@@ -28,13 +28,13 @@ namespace application {
 /**
  * This class provides...
  */
-class Perception : public core::base::module::DataTriggeredConferenceClientModule {
+class Perception : public odcore::base::module::DataTriggeredConferenceClientModule {
   public:
     Perception(int32_t const &, char **);
     Perception(Perception const &) = delete;
     Perception &operator=(Perception const &) = delete;
     virtual ~Perception();
-    virtual void nextContainer(core::data::Container &);
+    virtual void nextContainer(odcore::data::Container &);
 
   private:
     virtual void setUp();

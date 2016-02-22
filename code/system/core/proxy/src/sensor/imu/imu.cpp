@@ -22,11 +22,11 @@
 #include <cmath>
 #include <iostream>
 
-#include "core/base/KeyValueConfiguration.h"
-#include "core/data/Container.h"
-#include "core/data/TimeStamp.h"
+#include "opendavinci/odcore/base/KeyValueConfiguration.h"
+#include "opendavinci/odcore/data/Container.h"
+#include "opendavinci/odcore/data/TimeStamp.h"
 
-#include "GeneratedHeaders_OpenDLVData.h"
+#include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
 
 #include "sensor/imu/imu.hpp"
 #include "sensor/imu/device.hpp"
@@ -53,14 +53,14 @@ Imu::~Imu()
 }
 
 // This method will do the main data processing job.
-coredata::dmcp::ModuleExitCodeMessage::ModuleExitCode Imu::body()
+odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Imu::body()
 {
-  return coredata::dmcp::ModuleExitCodeMessage::OKAY;
+  return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
 void Imu::setUp() 
 {
-  core::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
   std::string const type = kv.getValue<std::string>("proxy-sensor-imu.type");
 /*  std::string const port = kv.getValue<std::string>("proxy-sensor-imu.port");

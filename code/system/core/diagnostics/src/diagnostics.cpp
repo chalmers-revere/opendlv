@@ -17,7 +17,7 @@
  */
 
 #include <iostream>
-#include "GeneratedHeaders_OpenDLVData.h"
+#include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
 
 #include "diagnostics.hpp"
 
@@ -49,7 +49,7 @@ void Diagnostics::tearDown()
   // This method will be call automatically _after_ return from body().
 }
 
-void Diagnostics::nextContainer(core::data::Container &) 
+void Diagnostics::nextContainer(odcore::data::Container &) 
 {
 }
 

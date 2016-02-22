@@ -26,7 +26,6 @@
 #include "../include/VBOReplay.h"
 
 using namespace std;
-using namespace core::data;
 using namespace revere;
 
 /**

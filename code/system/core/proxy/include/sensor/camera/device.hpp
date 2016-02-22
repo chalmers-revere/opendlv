@@ -23,9 +23,9 @@
 #include <stdint.h>
 #include <string>
 
-#include "core/SharedPointer.h"
-#include "core/wrapper/SharedMemory.h"
-#include "GeneratedHeaders_CoreData.h"
+#include "opendavinci/odcore/SharedPointer.h"
+#include "opendavinci/odcore/wrapper/SharedMemory.h"
+#include "opendavinci/GeneratedHeaders_OpenDaVINCI.h"
 
 namespace opendlv {
 namespace proxy {
@@ -42,7 +42,7 @@ class Device {
     Device(Device const &) = delete;
     Device &operator=(Device const &) = delete;
     virtual ~Device();
-    coredata::image::SharedImage Capture();
+    odcore::data::image::SharedImage Capture();
 
   protected:
     /**
@@ -71,8 +71,8 @@ class Device {
     uint32_t m_size;
 
   private:
-    coredata::image::SharedImage m_sharedImage;
-    core::SharedPointer<core::wrapper::SharedMemory> m_sharedMemory;
+    odcore::data::image::SharedImage m_sharedImage;
+    odcore::SharedPointer<odcore::wrapper::SharedMemory> m_sharedMemory;
 };
 
 } // camera

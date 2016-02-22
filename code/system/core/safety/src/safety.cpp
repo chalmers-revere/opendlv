@@ -17,7 +17,7 @@
  */
 
 #include <iostream>
-#include "GeneratedHeaders_OpenDLVData.h"
+#include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
 
 #include "safety.hpp"
 
@@ -49,7 +49,7 @@ void Safety::tearDown()
   // This method will be call automatically _after_ return from body().
 }
 
-void Safety::nextContainer(core::data::Container &) 
+void Safety::nextContainer(odcore::data::Container &) 
 {
 }
 

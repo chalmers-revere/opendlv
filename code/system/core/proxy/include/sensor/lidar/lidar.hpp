@@ -22,8 +22,8 @@
 
 #include <memory>
 
-#include "core/base/module/TimeTriggeredConferenceClientModule.h"
-#include "core/data/Container.h"
+#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/data/Container.h"
 
 namespace opendlv {
 namespace proxy {
@@ -35,13 +35,13 @@ class Device;
 /**
  * This class provides...
  */
-class Lidar : public core::base::module::TimeTriggeredConferenceClientModule {
+class Lidar : public odcore::base::module::TimeTriggeredConferenceClientModule {
   public:
     Lidar(int32_t const &, char **);
     Lidar(Lidar const &) = delete;
     Lidar &operator=(Lidar const &) = delete;
     virtual ~Lidar();
-    coredata::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+    odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
   private:
     void setUp();

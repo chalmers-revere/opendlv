@@ -44,8 +44,8 @@ find_package(OpenDLVData REQUIRED)
 
 ###########################################################################
 # Set common include directories.
-include_directories(SYSTEM ${OPENDAVINCI_INCLUDE_DIRS}/opendavinci)
-include_directories(SYSTEM ${OPENDLVDATA_INCLUDE_DIRS}/opendlvdata)
+include_directories(SYSTEM ${OPENDAVINCI_INCLUDE_DIRS})
+include_directories(SYSTEM ${OPENDLVDATA_INCLUDE_DIRS})
 
 ###########################################################################
 # Set libraries to link against.

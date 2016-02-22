@@ -22,11 +22,11 @@
 #include <cmath>
 #include <iostream>
 
-#include "core/base/KeyValueConfiguration.h"
-#include "core/data/Container.h"
-#include "core/data/TimeStamp.h"
+#include "opendavinci/odcore/base/KeyValueConfiguration.h"
+#include "opendavinci/odcore/data/Container.h"
+#include "opendavinci/odcore/data/TimeStamp.h"
 
-#include "GeneratedHeaders_OpenDLVData.h"
+#include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
 
 #include "actuator/steering/steering.hpp"
 #include "actuator/steering/device.hpp"
@@ -53,13 +53,13 @@ Steering::~Steering()
 {
 }
 
-void Steering::nextContainer(core::data::Container &) 
+void Steering::nextContainer(odcore::data::Container &) 
 {
 }
 
 void Steering::setUp() 
 {
-  core::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
   std::string const type = 
     kv.getValue<std::string>("proxy-actuator-steering.type");

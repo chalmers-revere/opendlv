@@ -17,7 +17,7 @@
  */
 
 #include <iostream>
-#include "GeneratedHeaders_OpenDLVData.h"
+#include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
 
 #include "action.hpp"
 
@@ -50,7 +50,7 @@ void Action::tearDown()
   // This method will be call automatically _after_ return from body().
 }
 
-void Action::nextContainer(core::data::Container &) 
+void Action::nextContainer(odcore::data::Container &) 
 {
 }
 

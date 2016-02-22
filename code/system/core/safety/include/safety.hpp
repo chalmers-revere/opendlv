@@ -19,7 +19,7 @@
 #ifndef SAFETY_HPP_
 #define SAFETY_HPP_
 
-#include "core/base/module/DataTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 
 namespace opendlv {
 namespace system {
@@ -27,13 +27,13 @@ namespace system {
 /**
  * This class provides...
  */
-class Safety : public core::base::module::DataTriggeredConferenceClientModule {
+class Safety : public odcore::base::module::DataTriggeredConferenceClientModule {
   public:
     Safety(int32_t const &, char **);
     Safety(Safety const &) = delete;
     Safety &operator=(Safety const &) = delete;
     virtual ~Safety();
-    virtual void nextContainer(core::data::Container &);
+    virtual void nextContainer(odcore::data::Container &);
 
   private:
     virtual void setUp();

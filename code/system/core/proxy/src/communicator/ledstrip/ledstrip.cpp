@@ -22,11 +22,11 @@
 #include <cmath>
 #include <iostream>
 
-#include "core/base/KeyValueConfiguration.h"
-#include "core/data/Container.h"
-#include "core/data/TimeStamp.h"
+#include "opendavinci/odcore/base/KeyValueConfiguration.h"
+#include "opendavinci/odcore/data/Container.h"
+#include "opendavinci/odcore/data/TimeStamp.h"
 
-#include "GeneratedHeaders_OpenDLVData.h"
+#include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
 
 #include "communicator/ledstrip/ledstrip.hpp"
 #include "communicator/ledstrip/device.hpp"
@@ -53,13 +53,13 @@ Ledstrip::~Ledstrip()
 {
 }
 
-void Ledstrip::nextContainer(core::data::Container &) 
+void Ledstrip::nextContainer(odcore::data::Container &) 
 {
 }
 
 void Ledstrip::setUp() 
 {
-  core::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
   std::string const type = kv.getValue<std::string>(
       "proxy-communicator-ledstrip.type");

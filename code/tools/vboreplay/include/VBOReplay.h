@@ -20,8 +20,8 @@
 #ifndef VBOREPLAY_H_
 #define VBOREPLAY_H_
 
-#include "core/base/module/TimeTriggeredConferenceClientModule.h"
-#include "hesperia/data/environment/WGS84Coordinate.h"
+#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
+#include "opendlv/data/environment/WGS84Coordinate.h"
 
 namespace revere {
 
@@ -30,7 +30,7 @@ namespace revere {
     /**
      * This class plays back data from a VBO file.
      */
-    class VBOReplay : public core::base::module::TimeTriggeredConferenceClientModule {
+    class VBOReplay : public odcore::base::module::TimeTriggeredConferenceClientModule {
         private:
             /**
              * "Forbidden" copy constructor. Goal: The compiler should warn
@@ -62,7 +62,7 @@ namespace revere {
 
             virtual ~VBOReplay();
 
-            coredata::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+            odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
         private:
             virtual void setUp();
@@ -70,7 +70,7 @@ namespace revere {
             virtual void tearDown();
 
         private:
-            hesperia::data::environment::WGS84Coordinate m_reference;
+            opendlv::data::environment::WGS84Coordinate m_reference;
     };
 
 } // revere

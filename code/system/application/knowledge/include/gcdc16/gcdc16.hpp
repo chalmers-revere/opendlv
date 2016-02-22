@@ -22,8 +22,8 @@
 
 #include <memory>
 
-#include "core/base/module/DataTriggeredConferenceClientModule.h"
-#include "core/data/Container.h"
+#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/data/Container.h"
 
 namespace opendlv {
 namespace knowledge {
@@ -33,13 +33,13 @@ namespace gcdc16 {
  * This class provides...
  */
 class Gcdc16 : 
-    public core::base::module::DataTriggeredConferenceClientModule {
+    public odcore::base::module::DataTriggeredConferenceClientModule {
   public:
     Gcdc16(int32_t const &, char **);
     Gcdc16(Gcdc16 const &) = delete;
     Gcdc16 &operator=(Gcdc16 const &) = delete;
     virtual ~Gcdc16();
-    virtual void nextContainer(core::data::Container &);
+    virtual void nextContainer(odcore::data::Container &);
 
   private:
     void setUp();

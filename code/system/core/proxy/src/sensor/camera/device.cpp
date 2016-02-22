@@ -19,8 +19,8 @@
 
 #include <iostream>
 
-#include "core/base/Lock.h"
-#include "core/wrapper/SharedMemoryFactory.h"
+#include "opendavinci/odcore/base/Lock.h"
+#include "opendavinci/odcore/wrapper/SharedMemoryFactory.h"
 
 #include "sensor/camera/device.hpp"
 
@@ -49,7 +49,7 @@ Device::Device(std::string const &a_name, uint32_t const &a_id,
     m_sharedImage(),
     m_sharedMemory()
 {
-  m_sharedMemory = core::wrapper::SharedMemoryFactory::createSharedMemory(
+  m_sharedMemory = odcore::wrapper::SharedMemoryFactory::createSharedMemory(
       a_name, m_size);
 
   m_sharedImage.setName(a_name);
@@ -96,12 +96,12 @@ uint32_t Device::GetSize() const
 /**
  * @return Meta information about the image.
  */
-coredata::image::SharedImage Device::Capture()
+odcore::data::image::SharedImage Device::Capture()
 {
   if (IsValid()) {
     if (CaptureFrame()) {
       if (m_sharedMemory.isValid() && m_sharedMemory->isValid()) {
-        core::base::Lock l(m_sharedMemory);
+        odcore::base::Lock l(m_sharedMemory);
         CopyImageTo((char*)m_sharedMemory->getSharedMemory(), m_size);
       }
     }
