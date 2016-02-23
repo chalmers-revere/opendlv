@@ -28,7 +28,7 @@
 #include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
 
 #include "sensor/camera/camera.hpp"
-#include "sensor/camera/device.hpp"
+#include "sensor/camera/opencvdevice.hpp"
 
 namespace opendlv {
 namespace proxy {
@@ -62,18 +62,30 @@ void Camera::setUp()
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
   std::string const type = kv.getValue<std::string>("proxy-sensor-camera.type");
-/*  std::string const port = kv.getValue<std::string>("proxy-sensor-camera.port");
-  std::string const resolution = kv.getValue<std::string>("proxy-sensor-camera.resolution");
-  float const mountX = kv.getValue<float>("proxy-sensor-camera.mount.x");
+  //std::string const port = kv.getValue<std::string>("proxy-sensor-camera.port");
+  int32_t const port = kv.getValue<int32_t>("proxy-sensor-camera.port");
+  std::string const resolution = kv.getValue<std::string>(
+      "proxy-sensor-camera.resolution");
+  int32_t const bpp = kv.getValue<int32_t>("proxy-sensor-camera.bpp");
+  /*float const mountX = kv.getValue<float>("proxy-sensor-camera.mount.x");
   float const mountY = kv.getValue<float>("proxy-sensor-camera.mount.y");
   float const mountZ = kv.getValue<float>("proxy-sensor-camera.mount.z");
   float const mountRoll = kv.getValue<float>("proxy-sensor-camera.mount.roll");
-  float const mountPitch = kv.getValue<float>("proxy-sensor-camera.mount.pitch");
+  float const mountPitch = kv.getValue<float>(
+      "proxy-sensor-camera.mount.pitch");
   float const mountYaw = kv.getValue<float>("proxy-sensor-camera.mount.yaw");
 */
-  if (type.compare("axis-opencv") == 0) {
-//      m_device = std::unique_ptr<Device>(
-//          new OpenCvDevice(NAME, ID, WIDTH, HEIGHT, BPP));
+
+  std::string const name = type + " (" + std::to_string(port) + ")";
+
+  std::size_t const pos = resolution.find("x");
+  std::size_t const len = resolution.length();
+  int const width = stoi(resolution.substr(0, pos));
+  int const height = stoi(resolution.substr(pos + 1, len - pos - 1));
+
+  if (type.compare("opencv-usb") == 0) {
+    m_device = std::unique_ptr<Device>(
+        new OpenCvDevice(name, port, width, height, bpp));
   }
 
   if (m_device.get() == nullptr) {
