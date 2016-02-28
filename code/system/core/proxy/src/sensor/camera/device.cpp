@@ -100,7 +100,7 @@ odcore::data::image::SharedImage Device::Capture()
 {
   if (IsValid()) {
     if (CaptureFrame()) {
-      if (m_sharedMemory.isValid() && m_sharedMemory->isValid()) {
+      if (m_sharedMemory.get() && m_sharedMemory->isValid()) {
         odcore::base::Lock l(m_sharedMemory);
         CopyImageTo((char*)m_sharedMemory->getSharedMemory(), m_size);
       }

@@ -21,9 +21,9 @@
 #define SENSOR_CAMERA_DEVICE_HPP_
 
 #include <stdint.h>
+#include <memory>
 #include <string>
 
-#include "opendavinci/odcore/SharedPointer.h"
 #include "opendavinci/odcore/wrapper/SharedMemory.h"
 #include "opendavinci/GeneratedHeaders_OpenDaVINCI.h"
 
@@ -72,7 +72,7 @@ class Device {
 
   private:
     odcore::data::image::SharedImage m_sharedImage;
-    odcore::SharedPointer<odcore::wrapper::SharedMemory> m_sharedMemory;
+    std::shared_ptr<odcore::wrapper::SharedMemory> m_sharedMemory;
 };
 
 } // camera
