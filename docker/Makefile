@@ -18,7 +18,7 @@
 PRODUCT=opendlv
 GITVERSION=$(shell git describe --abbrev=0 --tags | head -n1)
 GITHASH=$(shell git rev-parse --short HEAD)
-GITUNCOMMITTEDCHANGES=$(shell if [ "`git ls-files -m`" != "" ]; then echo "-modified"; else echo ""; fi)
+GITUNCOMMITTEDCHANGES=$(shell if [ "`git ls-files -m ..`" != "" ]; then echo "-modified"; else echo ""; fi)
 VERSION="$(GITVERSION)-$(GITHASH)$(GITUNCOMMITTEDCHANGES)"
 REPOSITORY=seresearch
 
