@@ -36,8 +36,6 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 #endif ( ENABLE_verbose )
 
 
-#link_directories(${-----} )
-
 # necessary to allow the *.cpp to find headers 
 include_directories(${lib_SOURCE_DIR}/include)
 
@@ -53,7 +51,7 @@ add_library(${PROJECT_NAME}  STATIC ${LIB_SOURCES} ${LIB_HEADERS} )  #static for
 set_target_properties(${PROJECT_NAME}  PROPERTIES DEBUG_POSTFIX "_d")
 
 
-#add_definitions(-DEKF_LIB) useful only in the case of shared
+#add_definitions(-DEKF_LIB) 
 	
 #target_link_libraries(${PROJECT_NAME}  ${----} )
 

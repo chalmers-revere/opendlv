@@ -19,6 +19,7 @@
 #include <iostream>
 #include <opendavinci/odcore/data/Container.h>
 #include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
+#include "/home/mauro_veas/code/Odlv_MB_fork/code/system/libs/EKF/include/EKF.h"
 
 #include "sensation.hpp"
 
@@ -37,16 +38,16 @@ Sensation::Sensation(int32_t const &a_argc, char **a_argv) :
 {
 }
 
-Sensation::~Sensation() 
+Sensation::~Sensation()
 {
 }
 
-void Sensation::setUp() 
+void Sensation::setUp()
 {
   // This method will be call automatically _before_ running body().
 }
 
-void Sensation::tearDown() 
+void Sensation::tearDown()
 {
   // This method will be call automatically _after_ return from body().
 }
@@ -65,6 +66,16 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
         getConference().send(c);
     }
 */
+   std::cout << "Hello world - I am the sensation module" << std::endl;
+
+
+//   opendlv::system::libs::EKF my_ekf;
+
+//   my_ekf.set_something(52.5);
+
+//   std::cout << "Hello this is the first try of the new EKF libs " << my_ekf.get_something() << std::endl;
+
+
     return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
