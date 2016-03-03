@@ -19,7 +19,7 @@
 #include <iostream>
 #include <opendavinci/odcore/data/Container.h>
 #include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
-#include "/home/mauro_veas/code/Odlv_MB_fork/code/system/libs/EKF/include/EKF.h"
+#include "EKF.hpp"
 
 #include "sensation.hpp"
 
@@ -69,7 +69,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
    std::cout << "Hello world - I am the sensation module" << std::endl;
 
 
-//   opendlv::system::libs::EKF my_ekf;
+//   opendlv::system::libs::kalman::EKF my_ekf;   // ---> linking error here !
 
 //   my_ekf.set_something(52.5);
 

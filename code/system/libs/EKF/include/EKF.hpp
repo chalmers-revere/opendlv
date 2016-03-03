@@ -16,8 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef EFK_H
-#define EKF_H
+#ifndef EFK_HPP
+#define EKF_HPP
 
 // standard libraries
 #include <iostream>
@@ -27,7 +27,7 @@
 
 using namespace std;
 
-/**  Simple class for EKF
+/**  Simple class for EKF - Extended Kalman Filter
   *
   *  <b>Usage:</b><br>
   *		- Write me
@@ -43,6 +43,7 @@ using namespace std;
 namespace opendlv {
 namespace system {
 namespace libs {
+namespace kalman{
 class EKF
 {
 public:
@@ -64,8 +65,9 @@ public:
 //private :
 
 };
-} //opendlv
-} //system
+} //kalman
 } //libs
+} //system
+} //opendlv
 
-#endif /*EKF_H */
+#endif /*EKF_HPP */

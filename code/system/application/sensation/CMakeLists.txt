@@ -19,7 +19,7 @@ project(opendlv-system-application-sensation)
 
 # Set include directories
 include_directories(include)
-include_directories(EKF_lib_INCLUDE_DIR)
+include_directories(${EKF_lib_INCLUDE_DIR})
 
 
 # Build
@@ -27,7 +27,7 @@ file(GLOB_RECURSE thisproject-sources "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 add_library(${PROJECT_NAME}lib-static STATIC ${thisproject-sources})
 add_dependencies(${PROJECT_NAME}lib-static EKF_lib)# --- all the libs should be built before the application
 
-set (ekf_lib "/home/mauro_veas/code/Odlv_MB_fork/build/system-prefix/src/system-build/libs/EKF/libEKF_lib.a")
+
 
 add_executable(${PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
 target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}lib-static ${LIBRARIES} ) 

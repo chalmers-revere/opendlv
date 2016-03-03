@@ -16,9 +16,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#include "EKF.h"
+#include "EKF.hpp"
 
-using namespace opendlv::system::libs;
+using namespace opendlv::system::libs::kalman;
 
 	EKF::EKF():_something(0.0)
 	{

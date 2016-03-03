@@ -17,7 +17,7 @@
 
 # Note: This CMake file is not standalone, it defines the library EKF
 
-project(EKF_lib)   #define the project --- tracking_lib is for 
+project(EKF_lib)   #define the project 
 
 set (lib_SOURCE_DIR ${PROJECT_SOURCE_DIR} )
 set (EKF_lib_INCLUDE_DIR ${lib_SOURCE_DIR}/include CACHE PATH "Path to the headers of EKF_lib")
@@ -40,20 +40,25 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 include_directories(${lib_SOURCE_DIR}/include)
 
 #select all headers in the include dir
-FILE(GLOB LIB_HEADERS "${lib_SOURCE_DIR}/include/*.h")   
+FILE(GLOB LIB_HEADERS "${lib_SOURCE_DIR}/include/*.hpp")
 #select all sources in the include dir
 FILE(GLOB LIB_SOURCES "${lib_SOURCE_DIR}/src/*.cpp")  
 
 # add library 
 add_library(${PROJECT_NAME}  STATIC ${LIB_SOURCES} ${LIB_HEADERS} )  #static for now, think about shared
 
+#add_definitions(-DEKF_LIB) 
+#target_link_libraries(${PROJECT_NAME}  ${----} )
+
 # set the postfix _d for debug libraries 
 set_target_properties(${PROJECT_NAME}  PROPERTIES DEBUG_POSTFIX "_d")
 
+# Test
+include(RunTests)
 
-#add_definitions(-DEKF_LIB) 
-	
-#target_link_libraries(${PROJECT_NAME}  ${----} )
+# Install
+#install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin COMPONENT system-libs)
+
 
 # allows folders for MSVC
 #if (MSVC AND ENABLE_SOLUTION_FOLDERS) 
