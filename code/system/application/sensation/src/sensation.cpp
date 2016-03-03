@@ -42,6 +42,28 @@ Sensation::Sensation(int32_t const &a_argc, char **a_argv) :
 
 }
 
+void Sensation::initializeEKF()
+{
+       std::cout << "Hello world - I am the sensation module" << std::endl;
+
+
+   opendlv::system::application::truckKinematicModel::State<float> x;
+   x.setZero();
+
+   opendlv::system::application::truckKinematicModel::Control<float> u;
+
+
+    opendlv::system::application::truckKinematicModel::SystemModel<float> sys;
+
+    std::cout << " x " << x << " u " << u << std::endl;
+
+
+   opendlv::system::libs::kalman::ExtendedKalmanFilter< opendlv::system::application::truckKinematicModel::State<float> > m_ekf;
+
+
+
+}
+
 Sensation::~Sensation()
 {
 }
@@ -70,13 +92,6 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
         getConference().send(c);
     }
 */
-   std::cout << "Hello world - I am the sensation module" << std::endl;
-
-
-   opendlv::system::application::truckKinematicModel::State<float> x;
-   x.setZero();
-
-   opendlv::system::libs::kalman::ExtendedKalmanFilter< opendlv::system::application::truckKinematicModel::State<float> > m_ekf;
 
 
     return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;

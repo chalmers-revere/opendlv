@@ -58,6 +58,9 @@ class Sensation : public odcore::base::module::TimeTriggeredConferenceClientModu
     virtual ~Sensation();
     odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
+    void initializeEKF();
+
+
   private:
     virtual void setUp();
     virtual void tearDown();
