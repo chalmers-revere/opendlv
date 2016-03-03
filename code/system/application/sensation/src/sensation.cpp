@@ -21,7 +21,7 @@
 #include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
 
 #include "sensation.hpp"
-
+#include <chrono>
 
 namespace opendlv {
 namespace system {
@@ -40,7 +40,11 @@ Sensation::Sensation(int32_t const &a_argc, char **a_argv) :
     TimeTriggeredConferenceClientModule(a_argc, a_argv, "sensation"),
     x(),
     u(),
-    sys()
+    sys(),
+    PositionMeasurement(),
+    OrientationMeasurement(),
+    PositionModel(0.0, 0.0, 0.0, 0.0),
+    OrientationModel()
 {
 
 }
@@ -53,8 +57,11 @@ void Sensation::initializeEKF()
     x.setZero();  // initialize the state vector
 
 
+    // Random number generation (for noise simulation)
+    std::default_random_engine generator;
+    generator.seed( std::chrono::system_clock::now().time_since_epoch().count() );
+    std::normal_distribution<double> noise(0, 1);
 
-   opendlv::system::application::sensation::observationModel::PositionMeasurement<double>PositionMeasurement;
 
 
     std::cout << " x " << x << " u " << u << std::endl;

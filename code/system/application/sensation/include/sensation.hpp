@@ -70,7 +70,10 @@ class Sensation : public odcore::base::module::TimeTriggeredConferenceClientModu
    opendlv::system::application::sensation::truckKinematicModel::Control<float> u;  //--> input vector for the truck
    opendlv::system::application::sensation::truckKinematicModel::SystemModel<float> sys;  //--> system model
 
-
+   opendlv::system::application::sensation::observationModel::PositionMeasurement<double> PositionMeasurement;       //--> x,y position vector
+   opendlv::system::application::sensation::observationModel::OrientationMeasurement<double> OrientationMeasurement; //--> theta orientation
+   opendlv::system::application::sensation::observationModel::PositionMeasurementModel<double> PositionModel;
+   opendlv::system::application::sensation::observationModel::OrientationMeasurementModel<double> OrientationModel;
 
 };
 } // sensation

@@ -19,7 +19,6 @@
 #ifndef OBSERVATIONMODEL_HPP_
 #define OBSERVATIONMODEL_HPP_
 
-#include "LinearizedSystemModel.hpp"
 #include "LinearizedMeasurementModel.hpp"
 
 namespace opendlv {
