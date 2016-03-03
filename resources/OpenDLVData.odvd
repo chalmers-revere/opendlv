@@ -22,6 +22,8 @@ message opendlv.Constants [id = 150] {
   const double PI = 3.141592653589793;
   const double DEG2RAD = 0.017453292522222;  // PI/180.0
   const double RAD2DEG = 57.295779513082325; // 1.0 / DEG2RAD;
+  const double MS2KMH = 3.6;
+  const double KMH2MS = 0.277777777777778; // 1.0 / MS2KMH;
 }
 
 message opendlv.cartesian.Point2 [id = 151] {
@@ -115,3 +117,17 @@ message opendlv.system.actuator.Brake [id = 165] {
 message opendlv.system.actuator.Throttle [id = 166] {
   float deltaPosition;
 }
+
+// Message for testing the Kalman filter.
+message opendlv.system.actuator.Commands [id = 167] {
+  double longitudinalVelocity;
+  double steeringAngle;
+}
+
+message opendlv.system.sensor.TruckLocation [id = 168] {
+  double x;
+  double y;
+  double yaw;
+  double yawRate;
+}
+
