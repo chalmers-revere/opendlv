@@ -57,7 +57,7 @@ set_target_properties(${PROJECT_NAME}  PROPERTIES DEBUG_POSTFIX "_d")
 include(RunTests)
 
 # Install
-#install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin COMPONENT system-libs)
+#install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin COMPONENT system-libs)    #this does not work !
 
 
 # allows folders for MSVC
