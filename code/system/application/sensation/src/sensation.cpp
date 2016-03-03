@@ -88,20 +88,15 @@ void Sensation::tearDown()
 }
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
-   /* double d = 1.234;
-    std::cout << "Hello OpenDaVINCI World!" << std::endl;
     while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
-        std::cout << "Inside the main processing loop." << std::endl;
+        odcore::data::Container c1 = getKeyValueDataStore().get(opendlv::system::actuator::Commands::ID());
+        opendlv::system::actuator::Commands commands = c1.getData<opendlv::system::actuator::Commands>();
 
-        sensor::Reading reading;
-        reading.setSensorName("Example Sensor");
-        sensor::Radar radar(reading, d+=1.12345);
+        odcore::data::Container c2 = getKeyValueDataStore().get(opendlv::system::sensor::TruckLocation::ID());
+        opendlv::system::sensor::TruckLocation truckLocation = c2.getData<opendlv::system::sensor::TruckLocation>();
 
-        odcore::data::Container c(radar);
-        getConference().send(c);
+        cout << getName() << ": " << commands.toString() << ", " << truckLocation.toString() << endl;
     }
-*/
-
 
     return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }

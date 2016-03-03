@@ -63,6 +63,7 @@ include_directories(${OPENDLVDATA_INCLUDE_DIRS})
 # Set libraries to link against.
 set(LIBRARIES ${OPENDAVINCI_LIBRARIES} ${OPENDLV_LIBRARIES} ${AUTOMOTIVEDATA_LIBRARIES} ${OPENDLVDATA_LIBRARIES})
 
-
+add_subdirectory(dataspy)
+add_subdirectory(truckreplay)
 add_subdirectory(vboreplay)
 
