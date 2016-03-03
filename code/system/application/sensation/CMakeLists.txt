@@ -25,7 +25,7 @@ include_directories(${EKF_lib_INCLUDE_DIR})
 # Build
 file(GLOB_RECURSE thisproject-sources "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 add_library(${PROJECT_NAME}lib-static STATIC ${thisproject-sources})
-add_dependencies(${PROJECT_NAME}lib-static EKF_lib)# --- all the libs should be built before the application
+#add_dependencies(${PROJECT_NAME}lib-static EKF_lib)# --- all the libs should be built before the application
 
 
 

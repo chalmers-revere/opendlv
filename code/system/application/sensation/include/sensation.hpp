@@ -21,9 +21,31 @@
 
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 
+//include headers for the EKF
+
+#ifndef WIN32
+# if !defined(__OpenBSD__) && !defined(__NetBSD__)
+#  pragma GCC diagnostic push
+# endif
+# pragma GCC diagnostic ignored "-Weffc++"
+# pragma GCC diagnostic ignored "-Wshadow"
+#endif
+    #include "ExtendedKalmanFilter.hpp"
+    #include "Types.hpp"
+    #include "truckModel.hpp"
+#ifndef WIN32
+# if !defined(__OpenBSD__) && !defined(__NetBSD__)
+#  pragma GCC diagnostic pop
+# endif
+#endif
+
+
 namespace opendlv {
 namespace system {
 namespace application {
+
+
+
 
 /**
  * This class provides...
@@ -39,6 +61,9 @@ class Sensation : public odcore::base::module::TimeTriggeredConferenceClientModu
   private:
     virtual void setUp();
     virtual void tearDown();
+
+
+
 };
 
 } // application

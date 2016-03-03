@@ -24,10 +24,13 @@
 #include "Matrix.hpp"
 #include "StandardBase.hpp"
 
+
 namespace opendlv {
 namespace system {
 namespace libs {
 namespace kalman{
+
+
     /**
      * @brief Abstract base class of all system models
      *

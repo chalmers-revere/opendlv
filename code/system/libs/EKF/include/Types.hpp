@@ -23,10 +23,13 @@
 
 #include "Matrix.hpp"
 
+
 namespace opendlv {
 namespace system {
 namespace libs {
 namespace kalman{
+
+
     /**
      * @class Kalman::SquareMatrix
      * @brief Template type representing a square matrix

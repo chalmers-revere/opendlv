@@ -19,13 +19,16 @@
 #include <iostream>
 #include <opendavinci/odcore/data/Container.h>
 #include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
-#include "EKF.hpp"
 
 #include "sensation.hpp"
+
 
 namespace opendlv {
 namespace system {
 namespace application {
+
+
+
 
 /**
   * Constructor.
@@ -36,6 +39,7 @@ namespace application {
 Sensation::Sensation(int32_t const &a_argc, char **a_argv) :
     TimeTriggeredConferenceClientModule(a_argc, a_argv, "sensation")
 {
+
 }
 
 Sensation::~Sensation()
@@ -69,11 +73,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
    std::cout << "Hello world - I am the sensation module" << std::endl;
 
 
-//   opendlv::system::libs::kalman::EKF my_ekf;   // ---> linking error here !
+   opendlv::system::application::truckKinematicModel::State<float> x;
+   x.setZero();
 
-//   my_ekf.set_something(52.5);
-
-//   std::cout << "Hello this is the first try of the new EKF libs " << my_ekf.get_something() << std::endl;
+   opendlv::system::libs::kalman::ExtendedKalmanFilter< opendlv::system::application::truckKinematicModel::State<float> > m_ekf;
 
 
     return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;

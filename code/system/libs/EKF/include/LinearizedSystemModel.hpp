@@ -21,10 +21,13 @@
 
 #include "SystemModel.hpp"
 
+
 namespace opendlv {
 namespace system {
 namespace libs {
 namespace kalman{
+
+
     template<class StateType>
     class ExtendedKalmanFilter;
     template<class StateType>

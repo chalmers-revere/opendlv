@@ -24,6 +24,7 @@
 #include "Matrix.hpp"
 #include "Types.hpp"
 
+
 namespace opendlv {
 namespace system {
 namespace libs {

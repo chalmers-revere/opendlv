@@ -56,7 +56,7 @@ namespace kalman{
   *
   *
   * <b>Changes history</b>
-  *		- MAR/2016: Creation (MB).
+  *		- MAR/2016: Creation (-).
   *  \ingroup __
   */
     template<class StateType>
@@ -86,7 +86,7 @@ namespace kalman{
     protected:
         //! Kalman Gain Matrix Type
         template<class Measurement>
-        using KalmanGain = Kalman::KalmanGain<State, Measurement>;
+        using KalmanGain = kalman::KalmanGain<State, Measurement>;
 
     protected:
         //! State Estimate

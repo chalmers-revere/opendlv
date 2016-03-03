@@ -22,36 +22,20 @@ project(EKF_lib)   #define the project
 set (lib_SOURCE_DIR ${PROJECT_SOURCE_DIR} )
 set (EKF_lib_INCLUDE_DIR ${lib_SOURCE_DIR}/include CACHE PATH "Path to the headers of EKF_lib")
 
-#find_package (Eigen3 REQUIRED)
-
-# --------------------------------------
-#  including external libraries
-# -------------------------------------- 
-#include_directories(SYSTEM ${EIGEN3_INCLUDE_DIRS})
-#include_directories(${EIGEN3_INCLUDE_DIR})
-
-#ENABLE_verbose still not defined in this project ! 
-#if ( ENABLE_verbose )
-#   message (STATUS eigen_iclude_lib ::::: ${EIGEN3_INCLUDE_DIR})
-#endif ( ENABLE_verbose )
-
-
-# necessary to allow the *.cpp to find headers 
-include_directories(${lib_SOURCE_DIR}/include)
 
 #select all headers in the include dir
 FILE(GLOB LIB_HEADERS "${lib_SOURCE_DIR}/include/*.hpp")
-#select all sources in the include dir
-FILE(GLOB LIB_SOURCES "${lib_SOURCE_DIR}/src/*.cpp")  
+
 
 # add library 
-add_library(${PROJECT_NAME}  STATIC ${LIB_SOURCES} ${LIB_HEADERS} )  #static for now, think about shared
+#add_library(${PROJECT_NAME}  STATIC ${LIB_SOURCES} ${LIB_HEADERS} )  #static for now, think about shared
+# not necessary for header only
 
 #add_definitions(-DEKF_LIB) 
 #target_link_libraries(${PROJECT_NAME}  ${----} )
 
 # set the postfix _d for debug libraries 
-set_target_properties(${PROJECT_NAME}  PROPERTIES DEBUG_POSTFIX "_d")
+#set_target_properties(${PROJECT_NAME}  PROPERTIES DEBUG_POSTFIX "_d")
 
 # Test
 include(RunTests)

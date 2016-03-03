@@ -26,14 +26,16 @@
 
 #include <opendavinci/Eigen/Dense>
 
+
+
 #define KALMAN_VECTOR(NAME, T, N)                                                       \
     static constexpr int length = N;                                                    \
-    typedef Kalman::Vector<T, N> Base;                                                  \
+    typedef opendlv::system::libs::kalman::Vector<T, N> Base;                           \
                                                                                         \
-    NAME(void) : Kalman::Vector<T, N>() {}                                              \
+    NAME(void) : opendlv::system::libs::kalman::Vector<T, N>() {}                       \
                                                                                         \
     template<typename OtherDerived>                                                     \
-    NAME(const Eigen::MatrixBase<OtherDerived>& other) : Kalman::Vector<T, N>(other) {} \
+    NAME(const Eigen::MatrixBase<OtherDerived>& other) : opendlv::system::libs::kalman::Vector<T, N>(other) {} \
                                                                                         \
     template<typename OtherDerived>                                                     \
     NAME& operator= (const Eigen::MatrixBase <OtherDerived>& other)                     \
@@ -42,10 +44,15 @@
         return *this;                                                                   \
     }
 
+
+
+
 namespace opendlv {
 namespace system {
 namespace libs {
 namespace kalman {
+
+
     /**
      * @class Kalman::Matrix
      * @brief Template type for matrices
@@ -72,6 +79,7 @@ namespace kalman {
         typedef Matrix<T, N, 1> Base;
 
         Vector(void) : Matrix<T, N, 1>() {}
+
 
         /**
          * @brief Copy constructor
