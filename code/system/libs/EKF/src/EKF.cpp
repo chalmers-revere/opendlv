@@ -18,15 +18,5 @@
 
 #include "EKF.hpp"
 
-using namespace opendlv::system::libs::kalman;
 
-	EKF::EKF():_something(0.0)
-	{
-	    //useful initializations should go here !
-	}
-
-void EKF::set_something(double something)
-{
-	_something = something;
-}
 

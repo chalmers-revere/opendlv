@@ -16,58 +16,35 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef EFK_HPP
-#define EKF_HPP
 
-// standard libraries
-#include <iostream>
-#include <cmath>
-//#include <Eigen/Geometry>
+#ifndef OPENDLV_SYSTEM_LIBS_KALMAN_STANDARDFILTERBASE_HPP_
+#define OPENDLV_SYSTEM_LIBS_KALMAN_STANDARDFILTERBASE_HPP_
 
+#include "StandardBase.hpp"
 
-using namespace std;
-
-/**  Simple class for EKF - Extended Kalman Filter
-  *
-  *  <b>Usage:</b><br>
-  *		- Write me
-  *
-  *  <b>About the algorithm:</b><br>
-  *		- Write me
-  *
-  *
-  * <b>Changes history</b>
-  *		- MAR/2016: Creation (MB).
-  *  \ingroup __
-  */
 namespace opendlv {
 namespace system {
 namespace libs {
 namespace kalman{
-class EKF
-{
-public:
 
-	EKF(); //!< Constructor
+    /**
+     * @brief Abstract base class for standard (non-square root) filters
+     *
+     * @param StateType The vector-type of the system state (usually some type derived from Kalman::Vector)
+     */
+    template<class StateType>
+    class StandardFilterBase : public StandardBase<StateType>
+    {
+    protected:
+        //! Standard Base Type
+        typedef StandardBase<StateType> Base;
 
-//~EKF(); //!< Destructor ---- maybe not necessary for now, let the compiler to do it
-
-
-
-	void set_something(double something);
-
-	//matrix compute_covariamce_P(vector X_hat, vector U_k);
-
-	double get_something() { return _something; };
-
-	double _something;
-
-//private :
-
-};
+        //! Covariance matrix
+        using Base::P;
+    };
 } //kalman
 } //libs
 } //system
 } //opendlv
 
-#endif /*EKF_HPP */
+#endif
