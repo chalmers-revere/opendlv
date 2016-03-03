@@ -22,13 +22,13 @@ project(EKF_lib)   #define the project
 set (lib_SOURCE_DIR ${PROJECT_SOURCE_DIR} )
 set (EKF_lib_INCLUDE_DIR ${lib_SOURCE_DIR}/include CACHE PATH "Path to the headers of EKF_lib")
 
-find_package (Eigen3 REQUIRED)
+#find_package (Eigen3 REQUIRED)
 
 # --------------------------------------
 #  including external libraries
 # -------------------------------------- 
-include_directories(SYSTEM ${EIGEN3_INCLUDE_DIRS})
-include_directories(${EIGEN3_INCLUDE_DIR})
+#include_directories(SYSTEM ${EIGEN3_INCLUDE_DIRS})
+#include_directories(${EIGEN3_INCLUDE_DIR})
 
 #ENABLE_verbose still not defined in this project ! 
 #if ( ENABLE_verbose )
