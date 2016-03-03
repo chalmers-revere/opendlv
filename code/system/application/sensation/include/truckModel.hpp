@@ -25,6 +25,7 @@
 namespace opendlv {
 namespace system {
 namespace application {
+namespace sensation{
 namespace truckKinematicModel
 {
 
@@ -202,6 +203,7 @@ protected:
     }
 };
 } // truckKinematicModel
+} // Sensation
 } // application
 } // system
 } // opendlv

@@ -33,6 +33,7 @@
     #include "ExtendedKalmanFilter.hpp"
     #include "Types.hpp"
     #include "truckModel.hpp"
+    #include "observationModel.hpp"
 #ifndef WIN32
 # if !defined(__OpenBSD__) && !defined(__NetBSD__)
 #  pragma GCC diagnostic pop
@@ -43,7 +44,7 @@
 namespace opendlv {
 namespace system {
 namespace application {
-
+namespace sensation{
 
 
 
@@ -65,10 +66,14 @@ class Sensation : public odcore::base::module::TimeTriggeredConferenceClientModu
     virtual void setUp();
     virtual void tearDown();
 
+   opendlv::system::application::sensation::truckKinematicModel::State<double> x;   //--> state vector for our model
+   opendlv::system::application::sensation::truckKinematicModel::Control<float> u;  //--> input vector for the truck
+   opendlv::system::application::sensation::truckKinematicModel::SystemModel<float> sys;  //--> system model
+
 
 
 };
-
+} // sensation
 } // application
 } // system
 } // opendlv

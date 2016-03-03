@@ -26,7 +26,7 @@
 namespace opendlv {
 namespace system {
 namespace application {
-
+namespace sensation {
 
 
 
@@ -37,28 +37,30 @@ namespace application {
   * @param a_argv Command line arguments.
   */
 Sensation::Sensation(int32_t const &a_argc, char **a_argv) :
-    TimeTriggeredConferenceClientModule(a_argc, a_argv, "sensation")
+    TimeTriggeredConferenceClientModule(a_argc, a_argv, "sensation"),
+    x(),
+    u(),
+    sys()
 {
 
 }
 
 void Sensation::initializeEKF()
 {
-       std::cout << "Hello world - I am the sensation module" << std::endl;
+
+    std::cout << "Sensation::initializeEKF  << message >> initialize the kalman filter " << std::endl;
+
+    x.setZero();  // initialize the state vector
 
 
-   opendlv::system::application::truckKinematicModel::State<float> x;
-   x.setZero();
 
-   opendlv::system::application::truckKinematicModel::Control<float> u;
+   opendlv::system::application::sensation::observationModel::PositionMeasurement<double>PositionMeasurement;
 
-
-    opendlv::system::application::truckKinematicModel::SystemModel<float> sys;
 
     std::cout << " x " << x << " u " << u << std::endl;
 
 
-   opendlv::system::libs::kalman::ExtendedKalmanFilter< opendlv::system::application::truckKinematicModel::State<float> > m_ekf;
+   opendlv::system::libs::kalman::ExtendedKalmanFilter< opendlv::system::application::sensation::truckKinematicModel::State<float> > m_ekf;
 
 
 
@@ -97,6 +99,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
     return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
+} // sensation
 } // application
 } // system
 } // opendlv
