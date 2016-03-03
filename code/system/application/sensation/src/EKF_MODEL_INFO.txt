@@ -1,0 +1,280 @@
+
+
+
+% Input:
+%     Z_m: measures as a vector 5-by-1:
+%            Z_m(1) = position along x in [m] 
+%            Z_m(2) = position along y in [m]  
+%            Z_m(3) = yaw, i.e. heading of the vehicle in [rad]
+%            Z_m(4) = yaw rate [rad/s]   
+%            Z_m(5) = orientation of the trailer in [rad]
+%
+%     U_k:  (v_k, phi_k) Input commands Commands:
+%            U_k(1) = longitudinal velocity in [m/s] 
+%            U_k(2) = steering angle in [rad] 
+%
+%
+% Output:
+%     X_o: "a posteriori" state estimate, N-by-1
+%     X_o = [x, x_dot, y, y_dot, theta, theta_dot, alpha, alpha_dot] 
+%            is the "a posteriori" state estimate at the current time k
+%            where (x, y, theta) is the pose of the vehicle with heading (theta)
+%            and alpha is the angle between tractor and trailer, N-by-1%
+%            Units: m, m/s, rad, rad/s
+%
+%     P_o: "a posteriori" estimated state covariance, N-by-N
+%
+
+
+
+
+% Implementation of an Extended Kalman Filtering for a vehicle position 
+% estimation. The implementated equation follow the classical equations 
+% which can be found everywhere on the web.
+%
+% State Equation:
+%     X(k+1) = f(X(k),u(k)) + w(k)
+%            the state X has the dimension N-by-1 
+%            the input U has the dimension N-by-1
+%            w ~ N(0,Q) is gaussian noise with covariance Q
+%
+% Observation Equation:
+%     Z(k) = h(X(k)) + v(k)
+%            the observation Z has the dimension M-by-1
+%            v ~ N(0,R) is gaussian noise with covariance R
+%     
+% Input:
+%     f: state transition function, it takes a state variable X(k) 
+%        and the input U(k) and returns:
+%            1) X_p = f(X(k),u(k)) 
+%            2) its Jacobian df/dx in X(k). 
+%
+%     h: observation function, it takes the state variable X(k) and
+%        returns:
+%            1) Z(k) = h(X(k)) 
+%            2) its Jacobian dh/dx in X(k).
+%
+%     X_k: "a priori" state estimate, N-by-1
+%     P_k: "a priori" estimated state covariance, N-by-N
+%
+%     Q_init: process noise covariance matrix, N-by-N
+%     R_init: measurement noise covariance matrix, M-by-M
+%     
+%     Z_m: current measurement, M-by-1
+%    
+%
+% Output:
+%     X_o: "a posteriori" state estimate, N-by-1
+%     P_o: "a posteriori" estimated state covariance, N-by-N
+%
+% Algorithm for Extended Kalman Filter:
+% Linearize input functions f and h to get J_f (linear state transition matrix)
+% and J_h(linear observation matrix) for an ordinary Kalman Filter:
+%
+% Linearized State Equation:
+%     X(k+1) = J_f * X(k) + w(k)
+% Linearized Observation Equation:
+%     Z(k) = J_h * X(k) + v(k)
+%
+% 1. One step projection, also provides linearization point
+%    X_p = f(X_k,U_k)                     
+%   
+%    and linearization state equation, 
+%              d f    |
+%    J_f = -----------|       :J_f is the Jacobian of the process model
+%              d X    |X=Xp               
+% 
+% 2. One step projection of next measurement using the linearization point 
+%    from the previous step
+%    Z_k = h(X(k))            :Z_k is the prediction of the measure in k
+%
+%    and linearize observation equation, 
+%               d g    |
+%    J_h  = -----------|      : J_h is the Jacobian of the measurement model
+%               d X    |X=Xp        
+%             
+% 3. Covariance of Xp: 
+%    P_p = J_f * Pi * J_f' + Q              
+% 
+% 4. Kalman Gain at the time k:
+%    K_k = P_p * J_h' * inv(J_h * P_p * J_h' + R)  
+% 
+% 5. Output state estimation:
+%    X_o = X_p + K * (Z - g(X_p))          
+% 
+% 6. Covariance of Xo: 
+%    P_o = [I - K * J_h] * P_p            
+%
+% 7. Update the covariance of measurement noise : 
+%    v_k = Z_m - Z_k
+%    R_k = diag(var(v_k)) 
+% 
+% 8. Update the covariance of model noise : 
+%    w_k = x_o - J_f*X_p
+%    Q_k = diag(var(w_k)) 
+
+
+
+% This fucntion provides the process model (in this particular case a
+% vehicle model for the state estimation and also its jacobian using a
+% linearized matrix. 
+% Please refer to step 1 in the general notes
+%
+%
+% INPUT:
+%      X_k = [x, x_dot, y, y_dot, theta, theta_dot, alpha, alpha_dot] is the state at the current time k
+%            where (x, y, theta) is the pose of the vehicle with heading (theta)
+%            and alpha is the angle between tractor and trailer, N-by-1
+%
+%      U_k = (v_k, phi_k) 
+%            where v_k is the velocity at the time k in [m/s]  
+%            and phi_k is the steering angle of the wheels at the time k in [rad]
+%
+%      now = time
+%
+%      model_params => it is a 3-dimentional vector, where :
+%                     (1) b = 3.8; % distance between the front axle and the center of the tractor in [m]
+%                     (2) l = 15;  % lenght of the trailer in [m]
+%                     (3) b_ = 1;  % distance between the rear axle and the rotation joint of the trailer in [m]
+% OUTPUT:
+%      X_p is the one step projection on the linearized model
+%      J_f is the jacobian on the process equations
+
+
+
+
+% AT this stage this is almost completely missing since we know nothing
+% about the real sensors 
+%
+% INPUT:  
+%      X_p = prediction of the state vector
+%            [x, x_dot, y, y_dot, theta, theta_dot, alpha, alpha_dot] is the state at the current time k
+%            where (x, y, theta) is the pose of the vehicle with heading (theta)
+%            and alpha is the angle between tractor and trailer, N-by-1
+%
+% OUTPUT
+%     Z_k: prediction of the next measures as a vector 5-by-1:
+%            Z_k(1) = position along x in [m] 
+%            Z_k(2) = position along y in [m]  
+%            Z_k(3) = yaw, i.e. heading of the vehicle in [rad]
+%            Z_k(4) = yaw rate [rad/s]   
+%            Z_k(5) = orientation of the trailer in [rad]
+% TODO: add  Z_k(6) = yaw_rate of the trailer -------- NOT YET IMPLEMENTED
+%
+%     J_h: jacobian of the meadurement model
+
+
+
+
+
+
+% calculate the covariance of the predicted state
+% please refer to the step 3 in the notes
+%
+% INPUT:
+%      Q   process noise covariance matrix, N-by-N
+%
+%      P_k is the state covariance at the time k, N-by-N
+%
+%      J_f is the jacobian on the process equations, N-by-N
+%
+% OUTPUT:
+%      P_p is the one step prediction of the state covariance, N-by-N
+
+
+
+
+
+% Calculate the kalman gain
+% please refer to the step 4 in the notes
+%
+% INPUT:
+%      R   observation noise covariance matrix, M-by-M
+%
+%      P_p is the one step prediction of the state covariance, , N-by-N
+%
+%      J_h is the jacobian on the observation model, M-by-N
+%
+% OUTPUT:
+%      K_k is the Kalman gain at the time k
+
+
+% K_k = P_p * J_h' * (pinv(J_h * P_p * J_h' + R)); % see step 4 in the notes
+
+% in literature there are different ways of computing the Kalman gain 
+% according to the inverse properties of the matrix (J_h * P_p * J_h' + R)
+% 
+% pinv compute the pseudoinverse (using matlab algorithm)
+
+
+% output state
+% please refer to the step 5 in the notes
+%
+% INPUT:
+%      Z_m   current measurement, M-by-1
+%
+%      X_p   one-step prediction of the state, N-by-1
+%
+%      Z_k   one-step prediction of the measures, M-by-1
+%
+%      K_k   Kalman gain at the time k, N-by-M
+%
+% OUTPUT:
+%      X_o   "a-posteriori" estimate on the state, N-by-1
+
+
+
+% calculate the covariance of the estimated state
+% please refer to the step 6 in the notes
+%
+% INPUT:
+%      K_k   Kalman gain at the time k, N-by-M
+%
+%      J_h is the jacobian on the observation model, M-by-N
+%
+%      P_p is the one step prediction of the state covariance, N-by-N
+%
+% OUTPUT:
+%      P_o   "a-posteriori" estimate on the state covariance matrix, N-by-N
+
+
+
+
+% This function implements a measurement noise estimation that use
+% the standard covariance estimation. It uses the real measurements (Z_m)
+% and the filtered measures (Z_k) to compute the noise estimation as the
+% error between true measures and filtered measures v_k = Z_m - Z_k. 
+% The calculation of the noise covariance takes into account a specific
+% number of elements from its V_buffer
+%
+%             v_k is a history_size-by-M matrix
+%
+% Then the covariance matrix is calculated as the covariance of v_k
+% 
+% please refer to the step 7 in the notes
+%
+% INPUT:
+%      Z_m   current measurement, M-by-1
+%
+%      Z_k   one-step prediction of the measures, M-by-1
+%
+%      sigma_r_vec  variance of noise, M-by-1
+%
+%      V_buffer  is a buffer to set the history for the calculation of R_k
+%                 
+%
+% OUTPUT:
+%      v_k   "a-posteriori" estimate of the measurement noise
+%            v ~ N(0,R) is gaussian noise with covariance R
+%
+%      R_k   "a-posteriori" estimation of the measurement noise 
+%            covariance matrix, M-by-M
+%
+%      V_buffer_k  the V_buffer is saved for the next operations
+%
+
+
+
+
+
+
