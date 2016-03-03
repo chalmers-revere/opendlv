@@ -16,8 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#pragma once
-
+#ifndef EFK_H
+#define EKF_H
 
 // standard libraries
 #include <iostream>
@@ -67,3 +67,5 @@ public:
 } //opendlv
 } //system
 } //libs
+
+#endif /*EKF_H */
