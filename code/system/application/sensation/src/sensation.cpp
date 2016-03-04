@@ -85,10 +85,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
 
 
 
+//all this part should be moved into the vehicle state estimator function
 
-
-         u.v() = commands.getLongitudinalVelocity()/3.6;   /// from km/h to m/s
-         u.dtheta() = commands.getSteeringAngle()*180/M_PI;
+         u.v() = commands.getLongitudinalVelocity();//3.6;   /// from km/h to m/s
+         u.dtheta() = commands.getSteeringAngle();//*180/M_PI;
 
          // Simulate system
          x = sys.f(x, u);

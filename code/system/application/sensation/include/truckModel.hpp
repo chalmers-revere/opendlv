@@ -29,37 +29,15 @@ namespace sensation{
 namespace truckKinematicModel
 {
 
-
 /**
- * @brief System state vector-type for a 3DOF planar robot - including position and velocity
+ * @brief System state vector-type for a 3DOF Ackermann steering truck - including position and velocity
  *
- * This is a system state for a very simple planar robot that
+ * This is a system state for a simple kinematic Ackermann steering single-truck vehicle that
  * is characterized by its (x,y)-Position and angular orientation.
  *
  * @param T Numeric scalar type
  */
-template<typename T>
-class State : public opendlv::system::libs::kalman::Vector<T, 3>
-{
-public:
-    KALMAN_VECTOR(State, T, 3)
-
-    //! X-position
-    static constexpr size_t X = 0;
-    //! Y-Position
-    static constexpr size_t Y = 1;
-    //! Orientation
-    static constexpr size_t THETA = 2;
-
-    T x()       const { return (*this)[ X ]; }
-    T y()       const { return (*this)[ Y ]; }
-    T theta()   const { return (*this)[ THETA ]; }
-
-    T& x()      { return (*this)[ X ]; }
-    T& y()      { return (*this)[ Y ]; }
-    T& theta()  { return (*this)[ THETA ]; }
-};
-/*class State : public opendlv::system::libs::kalman::Vector<T, 6>
+class State : public opendlv::system::libs::kalman::Vector<T, 6>
 {
 public:
     KALMAN_VECTOR(State, T, 6)    //the kalman vector for our state will be 6 (x, x_dot, y, y_dot, theta, theta_dot)
@@ -94,14 +72,20 @@ public:
     T& y_dot()      { return (*this)[ Y_dot ]; }
     T& theta()  { return (*this)[ THETA ]; }
     T& theta_dot()  { return (*this)[ THETA_dot ]; }
-};*/
+};
+
+
+
 
 /**
- * @brief System control-input vector-type for a 3DOF planar robot
+ * @brief System control-input vector-type for a 3DOF Ackermann steering truck
  *
- * This is the system control-input of a very simple planar robot that
- * can control the velocity in its current direction as well as the
+ * This is the system control-input of a very simple kinematic Ackermann steering single-truck
+ * vehicle that can control the velocity in its current direction as well as the steering angle
  * change in direction.
+ *
+ * v is the longitudinal velocity
+ * phi is considered to be as the steering angle of the wheels
  *
  * @param T Numeric scalar type
  */
@@ -111,22 +95,22 @@ class Control : public opendlv::system::libs::kalman::Vector<T, 2>
 public:
     KALMAN_VECTOR(Control, T, 2)
 
-    //! Velocity
+    //! Longitudinal Velocity
     static constexpr size_t V = 0;
-    //! Angular Rate (Orientation-change)
-    static constexpr size_t DTHETA = 1;
+    //! Steering angle
+    static constexpr size_t PHI = 1;
 
     T v()       const { return (*this)[ V ]; }
-    T dtheta()  const { return (*this)[ DTHETA ]; }
+    T phi()  const { return (*this)[ PHI ]; }
 
     T& v()      { return (*this)[ V ]; }
-    T& dtheta() { return (*this)[ DTHETA ]; }
+    T& phi() { return (*this)[ PHI ]; }
 };
 
 /**
- * @brief System model for a simple planar 3DOF robot
+ * @brief System model for a simple 3DOF Ackermann steering truck
  *
- * This is the system model defining how our robot moves from one
+ * This is the system model defining how our vehicle moves from one
  * time-step to the next, i.e. how the system state evolves over time.
  *
  * @param T Numeric scalar type
@@ -162,7 +146,8 @@ public:
         S x_;
 
         // New orientation given by old orientation plus orientation change
-        auto newOrientation = x.theta() + u.dtheta();
+        auto newOrientation = x.theta() + (u.v/3.8)*sdt::tan(u.phi());
+        // TODO: 3.8 is the wheelbase to be define as a vehicle parameter
         // Re-scale orientation to [-pi/2 to +pi/2]
 
         x_.theta() = newOrientation;
