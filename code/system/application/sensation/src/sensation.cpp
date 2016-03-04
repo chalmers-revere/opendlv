@@ -177,7 +177,8 @@ void Sensation::vehicleStateEstimator( opendlv::system::application::sensation::
                                        opendlv::system::application::sensation::truckKinematicModel::State<double> _x )
 {
 
-
+  _x.setZero();   // just to avoid unused error
+  _u.setZero();
 
 }
 
