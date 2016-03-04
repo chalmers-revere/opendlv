@@ -56,9 +56,9 @@ namespace kalman{
         using typename Base::Control;
 
     protected:
-        //! System model jacobian
+        //! System model Jacobian
         Jacobian<State, State> F;
-        //! System model noise jacobian
+        //! System model noise Jacobian
         Jacobian<State, State> W;
 
         /**

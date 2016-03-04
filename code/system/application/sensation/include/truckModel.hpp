@@ -30,7 +30,6 @@ namespace truckKinematicModel
 {
 
 
-
 /**
  * @brief System state vector-type for a 3DOF planar robot - including position and velocity
  *
@@ -40,7 +39,27 @@ namespace truckKinematicModel
  * @param T Numeric scalar type
  */
 template<typename T>
-class State : public opendlv::system::libs::kalman::Vector<T, 6>
+class State : public opendlv::system::libs::kalman::Vector<T, 3>
+{
+public:
+    KALMAN_VECTOR(State, T, 3)
+
+    //! X-position
+    static constexpr size_t X = 0;
+    //! Y-Position
+    static constexpr size_t Y = 1;
+    //! Orientation
+    static constexpr size_t THETA = 2;
+
+    T x()       const { return (*this)[ X ]; }
+    T y()       const { return (*this)[ Y ]; }
+    T theta()   const { return (*this)[ THETA ]; }
+
+    T& x()      { return (*this)[ X ]; }
+    T& y()      { return (*this)[ Y ]; }
+    T& theta()  { return (*this)[ THETA ]; }
+};
+/*class State : public opendlv::system::libs::kalman::Vector<T, 6>
 {
 public:
     KALMAN_VECTOR(State, T, 6)    //the kalman vector for our state will be 6 (x, x_dot, y, y_dot, theta, theta_dot)
@@ -75,7 +94,7 @@ public:
     T& y_dot()      { return (*this)[ Y_dot ]; }
     T& theta()  { return (*this)[ THETA ]; }
     T& theta_dot()  { return (*this)[ THETA_dot ]; }
-};
+};*/
 
 /**
  * @brief System control-input vector-type for a 3DOF planar robot
