@@ -63,12 +63,12 @@ public:
     static constexpr size_t THETA_dot = 5;
 
 
-    T x()       const { return (*this)[ X ]; }
-    T x_dot()       const { return (*this)[ X_dot ]; }
-    T y()       const { return (*this)[ Y ]; }
-    T y_dot()       const { return (*this)[ Y_dot ]; }
-    T theta()   const { return (*this)[ THETA ]; }
-    T theta_dot()   const { return (*this)[ THETA_dot ]; }
+    T x()          const { return (*this)[ X ]; }
+    T x_dot()      const { return (*this)[ X_dot ]; }
+    T y()          const { return (*this)[ Y ]; }
+    T y_dot()      const { return (*this)[ Y_dot ]; }
+    T theta()      const { return (*this)[ THETA ]; }
+    T theta_dot()  const { return (*this)[ THETA_dot ]; }
 
 
     T& x()      { return (*this)[ X ]; }
