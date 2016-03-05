@@ -42,6 +42,7 @@ namespace truckKinematicModel
  *
  * @param T Numeric scalar type
  */
+template<typename T>
 class State : public opendlv::system::libs::kalman::Vector<T, 6>
 {
 public:
@@ -50,34 +51,35 @@ public:
     //! X-position
     static constexpr size_t X = 0;
     //! X-Velocity
-    static constexpr size_t X_dot = 1;
+    static constexpr size_t X_DOT = 1;
 
     //! Y-Position
     static constexpr size_t Y = 2;
     //! Y-Velocity
-    static constexpr size_t Y_dot = 3;
+    static constexpr size_t Y_DOT = 3;
 
     //! Orientation
     static constexpr size_t THETA = 4;
     //! Angular Velocity
-    static constexpr size_t THETA_dot = 5;
+    static constexpr size_t THETA_DOT = 5;
 
 
     T x()          const { return (*this)[ X ]; }
-    T x_dot()      const { return (*this)[ X_dot ]; }
+    T x_dot()      const { return (*this)[ X_DOT ]; }
     T y()          const { return (*this)[ Y ]; }
-    T y_dot()      const { return (*this)[ Y_dot ]; }
+    T y_dot()      const { return (*this)[ Y_DOT ]; }
     T theta()      const { return (*this)[ THETA ]; }
-    T theta_dot()  const { return (*this)[ THETA_dot ]; }
+    T theta_dot()  const { return (*this)[ THETA_DOT ]; }
 
 
-    T& x()      { return (*this)[ X ]; }
-    T& x_dot()      { return (*this)[ X_dot ]; }
-    T& y()      { return (*this)[ Y ]; }
-    T& y_dot()      { return (*this)[ Y_dot ]; }
-    T& theta()  { return (*this)[ THETA ]; }
-    T& theta_dot()  { return (*this)[ THETA_dot ]; }
-};
+    T& x()          { return (*this)[ X ]; }
+    T& x_dot()      { return (*this)[ X_DOT ]; }
+    T& y()          { return (*this)[ Y ]; }
+    T& y_dot()      { return (*this)[ Y_DOT ]; }
+    T& theta()      { return (*this)[ THETA ]; }
+    T& theta_dot()  { return (*this)[ THETA_DOT ]; }
+
+}; // end - class State
 
 
 
@@ -91,7 +93,7 @@ public:
  * 
  * U_k:  (v_k, phi_k) Input commands 
  * Commands:
- *          U_k(1) = longitudinal velocity in (m/s) 
+ *           U_k(1) = longitudinal velocity in (m/s)
  *           U_k(2) = steering angle of the wheels in (rad) 
  *
  * @param T Numeric scalar type
@@ -108,11 +110,12 @@ public:
     static constexpr size_t PHI = 1;
 
     T v()       const { return (*this)[ V ]; }
-    T phi()  const { return (*this)[ PHI ]; }
+    T phi()     const { return (*this)[ PHI ]; }
 
     T& v()      { return (*this)[ V ]; }
-    T& phi() { return (*this)[ PHI ]; }
-};
+    T& phi()    { return (*this)[ PHI ]; }
+
+}; // end - class Control
 
 /**
  * @brief System model for a simple 3DOF Ackermann steering truck
@@ -158,20 +161,29 @@ public:
     S f(const S& x, const C& u) const
     {
         //! Predicted state vector after transition
-        S x_;
+        S x_p;
 
         // New orientation given by old orientation plus orientation change
-        auto newOrientation = x.theta() + (u.v/3.8)*sdt::tan(u.phi());
+        //auto newOrientation = x.theta() + (u.v/3.8)*sdt::tan(u.phi());
         // TODO: 3.8 is the wheelbase to be define as a vehicle parameter
         // Re-scale orientation to [-pi/2 to +pi/2]
 
-        x_.theta() = newOrientation;
+        //x_.theta() = newOrientation;
 
         // New x-position given by old x-position plus change in x-direction
         // Change in x-direction is given by the cosine of the (new) orientation
         // times the velocity
-        x_.x() = x.x() + std::cos( newOrientation ) * u.v();
-        x_.y() = x.y() + std::sin( newOrientation ) * u.v();
+        //x_.x() = x.x() + std::cos( newOrientation ) * u.v();
+        //x_.y() = x.y() + std::sin( newOrientation ) * u.v();
+
+        double delta_t = 0.05;
+        double wheelbase = 3.8; // TODO: this must be set by the user
+        x_p.x() = x.x() + delta_t * x.x_dot();
+        x_p.x_dot() = u.v() * std::cos(x.theta());
+        x_p.y() = x.y() + delta_t * x.y_dot();
+        x_p.y_dot() = u.v() * std::sin (x.theta());
+        x_p.theta() = x.theta() + delta_t * x.theta_dot();
+        x_p.theta_dot() = (u.v() / wheelbase) * std::tan(u.phi());
         //TODO adapt the equations as follow:
 // X_p(1) = X_k(1) + X_k(2) * delta_t;
 // X_p(2) = U_k(1) * cos(X_k(5)); 
@@ -179,10 +191,9 @@ public:
 // X_p(4) = U_k(1) * sin(X_k(5)); 
 // X_p(5) = X_k(5) + X_k(6) * delta_t  ;
 // X_p(6) = ((U_k(1) / b) * tan (U_k(2)));
-// X_p(7) = X_k(7) + X_k(8) * delta_t;
-// X_p(8) = -(U_k(1)/l) * sin (X_k(7)) - (b_/l) * X_k(6) * cos (X_k(7)) - X_k(6);
+
         // Return transitioned state vector
-        return x_;
+        return x_p;
     }
 
 
@@ -212,27 +223,34 @@ protected:
 //           d f    |
 // J_f = -----------|                 : Linearize state equation, J_f is the
 //           d X    |X=Xp               Jacobian of the process model
-//J_f = [1     delta_t    0     0          0                     0                          0                                                              0; ...
-//       0     0          0     0         -U_k(1)*sin(X_k(5))    0                          0                                                              0; ...
-//       0     0          1     delta_t    0                     0                          0                                                              0; ...
-//       0     0          0     0          U_k(1)*cos(X_k(5))    0                          0                                                              0; ...
-//       0     0          0     0          1                     delta_t                    0                                                              0; ...
-//       0     0          0     0          0                     0                          0                                                              0; ...
-//       0     0          0     0          0                     0                          1                                                              delta_t;
-//       0     0          0     0          0                     -(b_/l)*cos(X_k(7)) - 1    -(U_k(1)/l)*cos(X_k(7)) + (b_/l) * X_k(6) * sin(X_k(7))        0];
-
+//
+//      dx     dx_dot     dy   dydot      dtheta                 dthetadot
+//
+//J_f = [1     delta_t    0     0          0                     0                  dx
+//       0     0          0     0         -U_k(1)*sin(X_k(5))    0                  dxdot
+//       0     0          1     delta_t    0                     0                  dy
+//       0     0          0     0          U_k(1)*cos(X_k(5))    0                  dydot
+//       0     0          0     0          1                     delta_t            dtheta
+//       0     0          0     0          0                     0              ];  dthetadot
+double delta_t = 0.05;   //TODO set automatically
         // partial derivative of x.x() w.r.t. x.x()
         this->F( S::X, S::X ) = 1;
+        // partial derivative of x.x() w.r.t. x.x_dot()
+        this->F( S::X, S::X_DOT ) = delta_t;
         // partial derivative of x.x() w.r.t. x.theta()
-        this->F( S::X, S::THETA ) = -std::sin( x.theta() + u.dtheta() ) * u.v();
+        this->F( S::X_DOT, S::THETA ) = -std::sin( x.theta() ) * u.v();
 
         // partial derivative of x.y() w.r.t. x.y()
         this->F( S::Y, S::Y ) = 1;
+        // partial derivative of x.y() w.r.t. x.y_dot()
+        this->F( S::Y, S::Y_DOT ) = delta_t;
         // partial derivative of x.y() w.r.t. x.theta()
-        this->F( S::Y, S::THETA ) = std::cos( x.theta() + u.dtheta() ) * u.v();
+        this->F( S::Y, S::THETA ) = std::cos( x.theta() ) * u.v();
 
         // partial derivative of x.theta() w.r.t. x.theta()
         this->F( S::THETA, S::THETA ) = 1;
+        // partial derivative of x.theta() w.r.t. x.theta()
+ //       this->F( S::THETA, S::THETA_DOT ) = 1;
 
         // W = df/dw (Jacobian of state transition w.r.t. the noise)
         this->W.setIdentity();

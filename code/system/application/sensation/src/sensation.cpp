@@ -103,7 +103,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
 //all this part should be moved into the vehicle state estimator function
 
          u.v() = commands.getLongitudinalVelocity();//3.6;   /// from km/h to m/s
-         u.dtheta() = commands.getSteeringAngle();//*180/M_PI;
+         u.phi() = commands.getSteeringAngle();//*180/M_PI;
 
          // Simulate system
          x = sys.f(x, u);
@@ -116,6 +116,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
          x.x() = truckLocation.getX();
          x.y() = truckLocation.getY();
          x.theta() = truckLocation.getYaw();
+         x.theta_dot() = truckLocation.getYawRate();
 
         // Predict state for current time-step using the filters
         auto x_ekf = m_ekf.predict(sys, u);
