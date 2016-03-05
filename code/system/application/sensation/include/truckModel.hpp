@@ -35,6 +35,11 @@ namespace truckKinematicModel
  * This is a system state for a simple kinematic Ackermann steering single-truck vehicle that
  * is characterized by its (x,y)-Position and angular orientation.
  *
+ * State vector descriptiom :  
+ *     X  =  state vector at the current time k
+ *           where (x, y, theta) is the pose of the vehicle with heading (theta)
+ *           [x, x_dot, y, y_dot, theta, theta_dot ], 6-by-1
+ *
  * @param T Numeric scalar type
  */
 class State : public opendlv::system::libs::kalman::Vector<T, 6>
@@ -83,9 +88,11 @@ public:
  * This is the system control-input of a very simple kinematic Ackermann steering single-truck
  * vehicle that can control the velocity in its current direction as well as the steering angle
  * change in direction.
- *
- * v is the longitudinal velocity
- * phi is considered to be as the steering angle of the wheels
+ * 
+ * U_k:  (v_k, phi_k) Input commands 
+ * Commands:
+ *          U_k(1) = longitudinal velocity in (m/s) 
+ *           U_k(2) = steering angle of the wheels in (rad) 
  *
  * @param T Numeric scalar type
  */
@@ -136,6 +143,14 @@ public:
      * be in time-step \f$k+1\f$ given the current state \f$x_k\f$ in step \f$k\f$ and
      * the system control input \f$u\f$.
      *
+     * 
+     * For an Ackermann Steering vehicle the kinematic equations are:
+     *     x_dot = v * cos (theta)
+     *     y_dot = v * sin (theta)
+     *     theta_dot = (v / b) * tan (phi)
+     * 
+     * Where b = vehicle wheelbase and phi=steering angle
+     * 
      * @param [in] x The system state in current time-step
      * @param [in] u The control vector input
      * @returns The (predicted) system state in the next time-step
@@ -157,14 +172,22 @@ public:
         // times the velocity
         x_.x() = x.x() + std::cos( newOrientation ) * u.v();
         x_.y() = x.y() + std::sin( newOrientation ) * u.v();
-
+        //TODO adapt the equations as follow:
+// X_p(1) = X_k(1) + X_k(2) * delta_t;
+// X_p(2) = U_k(1) * cos(X_k(5)); 
+// X_p(3) = X_k(3) + X_k(4) * delta_t;
+// X_p(4) = U_k(1) * sin(X_k(5)); 
+// X_p(5) = X_k(5) + X_k(6) * delta_t  ;
+// X_p(6) = ((U_k(1) / b) * tan (U_k(2)));
+// X_p(7) = X_k(7) + X_k(8) * delta_t;
+// X_p(8) = -(U_k(1)/l) * sin (X_k(7)) - (b_/l) * X_k(6) * cos (X_k(7)) - X_k(6);
         // Return transitioned state vector
         return x_;
     }
 
 
 protected:
-//TODO change the description of the truck model according to the real physic of the system
+
 
     /**
      * @brief Update jacobian matrices for the system state transition function using current state
@@ -185,6 +208,18 @@ protected:
     {
         // F = df/dx (Jacobian of state transition w.r.t. the state)
         this->F.setZero();
+
+//           d f    |
+// J_f = -----------|                 : Linearize state equation, J_f is the
+//           d X    |X=Xp               Jacobian of the process model
+//J_f = [1     delta_t    0     0          0                     0                          0                                                              0; ...
+//       0     0          0     0         -U_k(1)*sin(X_k(5))    0                          0                                                              0; ...
+//       0     0          1     delta_t    0                     0                          0                                                              0; ...
+//       0     0          0     0          U_k(1)*cos(X_k(5))    0                          0                                                              0; ...
+//       0     0          0     0          1                     delta_t                    0                                                              0; ...
+//       0     0          0     0          0                     0                          0                                                              0; ...
+//       0     0          0     0          0                     0                          1                                                              delta_t;
+//       0     0          0     0          0                     -(b_/l)*cos(X_k(7)) - 1    -(U_k(1)/l)*cos(X_k(7)) + (b_/l) * X_k(6) * sin(X_k(7))        0];
 
         // partial derivative of x.x() w.r.t. x.x()
         this->F( S::X, S::X ) = 1;
