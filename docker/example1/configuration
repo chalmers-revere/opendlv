@@ -54,16 +54,118 @@ odsupercomponent.pulsetimeack.timeout = 5000 # (in milliseconds)
 odsupercomponent.pulsetimeack.yield = 5000 # (in microseconds)
 
 
-#
-# CONFIGURATION FOR PROXY
-#
-proxy.debug = 0
-proxy.useRecorder = 0 # 1 = record all captured data directly, 0 otherwise. 
-proxy.recorder.output = file://recs/
-proxy.camera.name = WebCam
-proxy.camera.type = NULL # OpenCV or UEYE
-proxy.camera.id = 0 # Select here the proper ID for OpenCV
-proxy.camera.width = 752 #752-UEYE, 640-OpenCV 
-proxy.camera.height = 480
-proxy.camera.bpp = 1 #3- openCV, 1-UEYE
+### Proxy
+proxy-actuator-brake.type = gw-volvo
+
+proxy-actuator-propulation.type = gw-volvo
+
+proxy-actuator-steering.type = gw-volvo
+
+proxy-communicator-toggeler.type = serial
+proxy-communicator-toggeler.port = /dev/ttryUSB4
+proxy-communicator-toggeler.states = On,Off
+proxy-communicator-toggeler.default = Off
+
+proxy-communicator-toggeler:1.type = serial
+proxy-communicator-toggeler:1.port = /dev/ttryUSB5
+proxy-communicator-toggeler:1.states = On,Off
+proxy-communicator-toggeler:1.default = Off
+
+proxy-communicator-ledstrip.type = victor
+proxy-communicator-ledstrip.port = /dev/ttyUSB6
+
+proxy-communicator-v2v.type = geonetworking
+proxy-communicator-v2v.port = ip://192.168.0.110
+
+proxy-sensor-camera.type = opencv-usb
+proxy-sensor-camera.port = 0
+proxy-sensor-camera.resolution = 1280x720
+proxy-sensor-camera.bpp = 3
+proxy-sensor-camera.mount.x = 3.1
+proxy-sensor-camera.mount.y = 0.5
+proxy-sensor-camera.mount.z = 1.0
+proxy-sensor-camera.mount.roll = 0.0
+proxy-sensor-camera.mount.pitch = -0.1
+proxy-sensor-camera.mount.yaw = 0.2
+
+proxy-sensor-camera:1.type = opencv-ip-axis
+proxy-sensor-camera:1.port = ip://192.168.0.121
+proxy-sensor-camera:1.resolution = 1280x720
+proxy-sensor-camera:1.bpp = 3
+proxy-sensor-camera:1.mount.x = 3.1
+proxy-sensor-camera:1.mount.y = -0.5
+proxy-sensor-camera:1.mount.z = 1.0
+proxy-sensor-camera:1.mount.roll = 0.0
+proxy-sensor-camera:1.mount.pitch = -0.1
+proxy-sensor-camera:1.mount.yaw = -0.2
+
+proxy-sensor-camera:2.type = opencv-ip-axis
+proxy-sensor-camera:2.port = ip://192.168.0.122
+proxy-sensor-camera:2.resolution = 1280x720
+proxy-sensor-camera:2.bpp = 3
+proxy-sensor-camera:2.mount.x = 1.0
+proxy-sensor-camera:2.mount.y = 0.5
+proxy-sensor-camera:2.mount.z = 1.0
+proxy-sensor-camera:2.mount.roll = 0.0
+proxy-sensor-camera:2.mount.pitch = -0.1
+proxy-sensor-camera:2.mount.yaw = -3.0
+
+proxy-sensor-camera:3.type = opencv-ip-axis
+proxy-sensor-camera:3.port = ip://192.168.0.124
+proxy-sensor-camera:3.resolution = 1280x720
+proxy-sensor-camera:3.bpp = 3
+proxy-sensor-camera:3.mount.x = 1.0
+proxy-sensor-camera:3.mount.y = -0.5
+proxy-sensor-camera:3.mount.z = 1.0
+proxy-sensor-camera:3.mount.roll = 0.0
+proxy-sensor-camera:3.mount.pitch = -0.1
+proxy-sensor-camera:3.mount.yaw = 3.0
+
+proxy-sensor-gps.type = trimble
+proxy-sensor-gps.port = ip://192.168.0.140
+proxy-sensor-gps.mount.x = 4.0
+proxy-sensor-gps.mount.y = -0.7
+proxy-sensor-gps.mount.z = 3.5
+
+proxy-sensor-imu.type = pololu
+proxy-sensor-imu.port = /dev/ttyUSB2
+proxy-sensor-imu.mount.x = 0.0
+proxy-sensor-imu.mount.y = 0.0
+proxy-sensor-imu.mount.z = 0.3
+proxy-sensor-imu.mount.roll = 0.0
+proxy-sensor-imu.mount.pitch = 0.0
+proxy-sensor-imu.mount.yaw = 0.0
+
+proxy-sensor-imu:1.type = pololu
+proxy-sensor-imu:1.port = /dev/ttyUSB3
+proxy-sensor-imu:1.mount.x = 2.0
+proxy-sensor-imu:1.mount.y = 0.0
+proxy-sensor-imu:1.mount.z = 0.3
+proxy-sensor-imu:1.mount.roll = 0.0
+proxy-sensor-imu:1.mount.pitch = 0.0
+proxy-sensor-imu:1.mount.yaw = 0.0
+
+proxy-sensor-lidar.type = sick
+proxy-sensor-lidar.port = /dev/ttyUSB1
+proxy-sensor-lidar.mount.x = 4.0
+proxy-sensor-lidar.mount.y = 0.0
+proxy-sensor-lidar.mount.z = 0.3
+proxy-sensor-lidar.mount.roll = 0.0
+proxy-sensor-lidar.mount.pitch = 0.0
+proxy-sensor-lidar.mount.yaw = 0.0
+
+proxy-sensor-sonararray.type = maxsonar
+proxy-sensor-sonararray.port = /dev/ttyUSB0
+proxy-sensor-sonararray.size = 8
+proxy-sensor-sonararray.mount.x = 3.0,3.0,2.0,2.0,1.0,1.0,0.8,0.8
+proxy-sensor-sonararray.mount.y = 1.2,-1.2,1.2,-1.2,1.2,-1.2,1.2,-1.2
+proxy-sensor-sonararray.mount.z = 0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3
+proxy-sensor-sonararray.mount.pitch = 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+proxy-sensor-sonararray.mount.yaw = 1.57,-1.57,1.57,-1.57,1.57,-1.57,2.36,-2.36
+
+proxy-sensor-v2v.type = geonetworking-dual
+proxy-sensor-v2v.port = ip://192.168.0.110
+proxy-sensor-v2v.mount.x = 3.8,3.8
+proxy-sensor-v2v.mount.y = -1.2,1.2
+proxy-sensor-v2v.mount.z = 3.5,3.5
 
