@@ -17,4 +17,4 @@ This value adapts steering angle from the steering wheel to wheels angle
 
 Z_k contains the output measures, x, y, heading and heading_dot
 the data are in Z_k:
-x[m] y[m] theta[rad] theta_dot[rad/s]
+time[sec] x[m] y[m] theta[rad] theta_dot[rad/s]
