@@ -69,7 +69,6 @@ class Sensation : public odcore::base::module::TimeTriggeredConferenceClientModu
     */
     inline void runVSEtest (bool _run_vse_test) {run_vse_test = _run_vse_test; };
 
-
   private:
       // This method will be call automatically _before_ running body().
     // add details !

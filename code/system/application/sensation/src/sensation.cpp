@@ -16,12 +16,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+#include <chrono>
+#include <fstream>
 #include <iostream>
+
 #include <opendavinci/odcore/data/Container.h>
 #include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
+#include "opendavinci/odcore/reflection/CSVFromVisitableVisitor.h"
 
 #include "sensation.hpp"
-#include <chrono>
 
 namespace opendlv {
 namespace system {
@@ -74,6 +77,15 @@ void Sensation::tearDown()
 }
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
+    // To dump data structures into a CSV file, you create an output file first.
+    std::ofstream fout("output.csv");
+    // You can optionally dump a header (i.e. first line with information).
+    const bool WITH_HEADER = true;
+    // You can choose the delimiter character between the fields.
+    const char DELIMITER = ',';
+    // For every data structure that you want to export in a CSV file, you need to create a new CSVFromVisitableVisitor.
+    odcore::reflection::CSVFromVisitableVisitor csvExporter1(fout, WITH_HEADER, DELIMITER);
+
     while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
         odcore::data::Container c1 = getKeyValueDataStore().get(opendlv::system::actuator::Commands::ID());
         opendlv::system::actuator::Commands commands = c1.getData<opendlv::system::actuator::Commands>();
@@ -84,6 +96,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
         cout << getName() << ": " << commands.toString() << ", " << truckLocation.toString() << endl;
 
 
+        // The csvExporter1 will "visit" the data structure "commands" and iterate
+        // through its fields that will be stored in the output file fout.
+        commands.accept(csvExporter1);
 
 
 
