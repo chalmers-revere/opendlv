@@ -17,47 +17,48 @@
  * USA.
  */
 
-#ifndef SENSORCAMERATESTSUITE_HPP_
-#define SENSORCAMERATESTSUITE_HPP_
+#ifndef REMOVELOOMINGFRONTTESTSUITE_HPP_
+#define REMOVELOOMINGFRONTTESTSUITE_HPP_
 
 #include "cxxtest/TestSuite.h"
 
 // Include local header files.
-#include "../include/sensor/camera/camera.hpp"
+#include "../include/removeloomingfront/removeloomingfront.hpp"
 
 /**
- * This class derives from sensor::camera::Camera to allow access to protected 
+ * This class derives from RemoveLoomingFront to allow access to protected 
  * methods.
  */
-class SensorCameraTestling : public opendlv::proxy::sensor::camera::Camera {
+class RemoveLoomingFrontTestling : 
+    public opendlv::action::removeloomingfront::RemoveLoomingFront {
   private:
-    SensorCameraTestling();
+    RemoveLoomingFrontTestling();
     
   public:
-    SensorCameraTestling(const int32_t &a_argc, char **a_argv) :
-      Camera(a_argc, a_argv) {}
+    RemoveLoomingFrontTestling(const int32_t &a_argc, char **a_argv) :
+        RemoveLoomingFront(a_argc, a_argv) {}
 
     // Here, you need to add all methods which are protected in 
-    // sensor::camera::Camera and which are needed for the test cases.
+    // RemoveLoomingFront and which are needed for the test cases.
 };
 
 /**
  * The actual testsuite starts here.
  */
-class SensorCameraTest : public CxxTest::TestSuite {
+class RemoveLoomingFrontTest : public CxxTest::TestSuite {
   private:
-    SensorCameraTestling *m_pt;
+    RemoveLoomingFrontTestling *m_testling;
 
   public:
-    SensorCameraTest() : m_pt(nullptr) {}
-    SensorCameraTest(SensorCameraTest const &) = delete;
-    SensorCameraTest& operator=(SensorCameraTest const &) = delete;
+    RemoveLoomingFrontTest() : m_testling(nullptr) {}
+    RemoveLoomingFrontTest(RemoveLoomingFrontTest const &) = delete;
+    RemoveLoomingFrontTest& operator=(RemoveLoomingFrontTest const &) = delete;
 
     /**
      * This method will be called before each testXYZ-method.
      */
     void setUp() {
-      std::string argv0("proxy-sensor-camera");
+      std::string argv0("action-removeloomingfront");
       std::string argv1("--cid=100");
       int32_t argc = 2;
       char **argv;
@@ -65,24 +66,24 @@ class SensorCameraTest : public CxxTest::TestSuite {
       argv[0] = const_cast<char*>(argv0.c_str());
       argv[1] = const_cast<char*>(argv1.c_str());
 
-      // Create an instance of Camera through SensorCameraTestling which 
-      // will be deleted in tearDown().
-      m_pt = new SensorCameraTestling(argc, argv);
+      // Create an instance of RemoveLoomingFront through 
+      // RemoveLoomingFrontTestling which will be deleted in tearDown().
+      m_testling = new RemoveLoomingFrontTestling(argc, argv);
     }
 
     /**
      * This method will be called after each testXYZ-method.
      */
     void tearDown() {
-      delete m_pt;
-      m_pt = nullptr;
+      delete m_testling;
+      m_testling = nullptr;
     }
 
     //////////////////////////////////////////////////////////////////////////
     // Below this line the actual testcases are defined.
     //////////////////////////////////////////////////////////////////////////
-    void testSensorCameraSuccessfullyCreated() {
-      TS_ASSERT(m_pt != nullptr);
+    void testRemoveLoomingFrontSuccessfullyCreated() {
+      TS_ASSERT(m_testling != nullptr);
     }
 };
 

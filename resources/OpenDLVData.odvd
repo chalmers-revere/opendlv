@@ -78,7 +78,7 @@ message opendlv.system.Orientation [id = 159] {
   opendlv.cartesian.Matrix4x4 orientation;
 }
 
-// Sensor messages
+// Proxy messages
 message opendlv.system.sensor.PointCloud [id = 160] {
   uint32 numberOfPoints;
  // list<opendlv.cartesian.Point3> points;
@@ -97,13 +97,12 @@ message opendlv.system.sensor.VehicleCommunicationMessage [id = 162] {
   list<uint8> data;
 }
 
-message opendlv.system.sensor.GeoLocation [id = 163] {
+message opendlv.system.sensor.Geolocation [id = 163] {
   float longitude;
   float latitude;
   float altitude;
 }
 
-// Actuation messages
 message opendlv.system.actuator.Steering [id = 164] {
   float deltaAngle;
 }
@@ -115,3 +114,71 @@ message opendlv.system.actuator.Brake [id = 165] {
 message opendlv.system.actuator.Throttle [id = 166] {
   float deltaPosition;
 }
+
+
+/*
+// Action messages
+message opendlv.action.Correction [id = X] {
+  TimeStamp startTime;
+  std::string type;
+  bool isInhibitory;
+  float amplitude;
+}
+
+// Perception messages
+message opendlv.perception.DesiredOpticalFlow [id = X] {
+  float opticalFlow;
+  float desiredOpticalFlow;
+}
+
+message opendlv.perception.DesiredDirectionOfMovement [id = X] {
+  float directionOfMovement;
+  float desiredDirectionOfMovement;
+}
+
+message opendlv.perception.Object [id = X] {
+  list<opendlv::perception::ObjectProperty> properties;
+  TimeStamp lastSeen;
+  std::string type;
+  float angle;
+  float size;
+  uint32 id;
+}
+
+message opendlv.perception.ObjectDesiredAngle [id = X] {
+  float desiredAngle;
+  uint32 id;
+}
+
+message opendlv.perception.ObjectDesiredSize [id = X] {
+  float desiredSize;
+  uint32 id;
+}
+
+message opendlv.perception.ObjectLooming [id = X] {
+  TimeStamp identified;
+  opendlv::sensation::Looming looming;
+  uint32 id;
+}
+
+message opendlv.perception.ObjectProperty [id = X] {
+  TimeStamp identified;
+  std::string name;
+  std::string value;
+  uint32 id;
+}
+
+message opendlv.perception.ObjectMetricDistance [id = X] {
+  float distance;
+  float angle;
+  float size;
+  uint32 id;
+}
+
+// Sensation
+message opendlv.sensation.Looming [id = X] {
+  float angle;
+  float looming;
+  float size;
+}
+*/
