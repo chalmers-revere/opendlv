@@ -35,7 +35,7 @@
     #include "ExtendedKalmanFilter.hpp"
     #include "Types.hpp"
     #include "truckModel.hpp"
-    #include "observationModel.hpp"
+    #include "truckObservationModel.hpp"
 #ifndef WIN32
 # if !defined(__OpenBSD__) && !defined(__NetBSD__)
 #  pragma GCC diagnostic pop
@@ -93,10 +93,10 @@ class Sensation : public odcore::base::module::TimeTriggeredConferenceClientModu
    opendlv::system::application::sensation::truckKinematicModel::Control<double> u;  ///--> input vector for the truck
    opendlv::system::application::sensation::truckKinematicModel::SystemModel<double> sys;  ///--> system model
 
-   opendlv::system::application::sensation::observationModel::PositionMeasurement<double> PositionMeasurement;       ///--> x,y position vector
-   opendlv::system::application::sensation::observationModel::OrientationMeasurement<double> OrientationMeasurement; ///--> theta orientation
-   opendlv::system::application::sensation::observationModel::PositionMeasurementModel<double> PositionModel;
-   opendlv::system::application::sensation::observationModel::OrientationMeasurementModel<double> OrientationModel;
+   opendlv::system::application::sensation::truckObservationModel::PositionMeasurement<double> PositionMeasurement;       ///--> x,y position vector
+   opendlv::system::application::sensation::truckObservationModel::OrientationMeasurement<double> OrientationMeasurement; ///--> theta orientation
+   opendlv::system::application::sensation::truckObservationModel::PositionMeasurementModel<double> PositionModel;
+   opendlv::system::application::sensation::truckObservationModel::OrientationMeasurementModel<double> OrientationModel;
 
    opendlv::system::libs::kalman::ExtendedKalmanFilter< opendlv::system::application::sensation::truckKinematicModel::State<double> > m_ekf;   // extended kalman filter
 

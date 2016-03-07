@@ -31,6 +31,71 @@ namespace truckObservationModel
 
 using namespace opendlv::system::libs;
 
+
+
+
+/**
+ * @brief Observation model measuring the truck position, orientation and rotational velocity
+ *        all the measures must be in SI unit system.
+ *        according to the notation in the Kalman filter theory and notes :TODO file !!!
+ *
+ *        Observation Equation:
+ *           Z(k) = h(X(k)) + v(k)
+ *                the observation Z has the dimension M-by-1
+ *                v ~ N(0,R) is gaussian noise with covariance R
+ *
+ *        h: observation function, it takes the state variable x(k) (at the time k) and
+ *        returns:
+ *           1) Z(k) = h(X(k))
+ *           2) its Jacobian dh/dx in X(k).
+ *
+ *  Input:
+ *    Z_m: measures as a vector m-by-1 -- where m is 4 in our truck:
+ *           Z_m(1) = position along x in (m)
+ *           Z_m(2) = position along y in (m)
+ *           Z_m(3) = yaw, i.e. heading of the vehicle in (rad)
+ *           Z_m(4) = yaw rate (rad/s)
+ *
+ * @param T Numeric scalar type
+ */
+template<typename T>
+class truckObservationModel : public opendlv::system::libs::kalman::Vector<T, 4>
+{
+public:
+    KALMAN_VECTOR(truckObservationModel, T, 4)
+
+    //! position along x axis
+    static constexpr size_t Z_X = 0;
+
+    //! position along y axis
+    static constexpr size_t Z_Y = 1;
+
+    //! heading of the vehicle yaw
+    static constexpr size_t Z_YAW = 2;
+
+    //! yaw rate of the vehicle
+    static constexpr size_t Z_YAW_DOT = 3;
+
+    T Z_x()        const { return (*this)[ Z_X ]; }
+    T Z_y()        const { return (*this)[ Z_Y ]; }
+    T Z_yaw()      const { return (*this)[ Z_YAW ]; }
+    T Z_yaw_dot()  const { return (*this)[ Z_YAW_DOT ]; }
+
+    T& Z_x()          { return (*this)[ Z_X ]; }
+    T& Z_y()          { return (*this)[ Z_Y ]; }
+    T& Z_yaw()        { return (*this)[ Z_YAW ]; }
+    T& Z_yaw_dot()    { return (*this)[ Z_YAW_DOT ]; }
+}; // end - class truckObservationModel
+
+
+
+
+
+
+
+
+
+
 /**
  * @brief Measurement vector measuring the robot position
  *

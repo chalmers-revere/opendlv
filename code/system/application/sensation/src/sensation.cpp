@@ -126,7 +126,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
         {
             // We can measure the orientation every 5th step
             //OrientationMeasurement orientation = OrientationModel.h(x);
-            opendlv::system::application::sensation::observationModel::OrientationMeasurement<double> orientation = OrientationModel.h(x);
+            opendlv::system::application::sensation::truckObservationModel::OrientationMeasurement<double> orientation = OrientationModel.h(x);
 
 
             // Measurement is affected by noise as well
@@ -141,7 +141,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
         {
             // We can measure the position every 10th step
             //PositionMeasurement position = PositionModel.h(x);
-            opendlv::system::application::sensation::observationModel::PositionMeasurement<double>  position;
+            opendlv::system::application::sensation::truckObservationModel::PositionMeasurement<double>  position;
             position = PositionModel.h(x);
 
             // Measurement is affected by noise as well
