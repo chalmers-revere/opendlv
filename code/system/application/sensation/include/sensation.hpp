@@ -69,7 +69,7 @@ class Sensation : public odcore::base::module::TimeTriggeredConferenceClientModu
   /**
     * use this to run the VSE in test, _run_vse_test = true -- add noise generator,   _run_vse_test = no noise generator
     */
-    inline void runVSEtest (bool _run_vse_test) {run_vse_test = _run_vse_test; };
+    inline void runVSEtest (bool _run_vse_test) {run_vse_test = _run_vse_test; }
 
   private:
       // This method will be call automatically _before_ running body().

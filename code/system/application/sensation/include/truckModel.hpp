@@ -176,7 +176,7 @@ public:
         //x_.x() = x.x() + std::cos( newOrientation ) * u.v();
         //x_.y() = x.y() + std::sin( newOrientation ) * u.v();
 
-        double delta_t = 0.05;
+        double delta_t = 0.05;  // TODO: calculate via timestamp
         double wheelbase = 3.8; // TODO: this must be set by the user
         x_p.x() = x.x() + delta_t * x.x_dot();
         x_p.x_dot() = u.v() * std::cos(x.theta());
