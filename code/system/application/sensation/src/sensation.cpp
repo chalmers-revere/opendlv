@@ -113,20 +113,21 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
         //x.y() += systemNoise*noise(generator);
         //x.theta() += systemNoise*noise(generator);
 
+         // wrong here ! the measurements should go into the observation model
          x.x() = truckLocation.getX();
          x.y() = truckLocation.getY();
          x.theta() = truckLocation.getYaw();
          x.theta_dot() = truckLocation.getYawRate();
 
         // Predict state for current time-step using the filters
-        auto x_ekf = m_ekf.predict(sys, u);
+        auto x_ekf = m_ekf.predict(sys, u);  // TODO: change auto type for compatibility !
 
-                // Orientation measurement
+        // Orientation measurement
         {
             // We can measure the orientation every 5th step
             //OrientationMeasurement orientation = OrientationModel.h(x);
-            opendlv::system::application::sensation::observationModel::OrientationMeasurement<double> orientation;
-            orientation = OrientationModel.h(x);
+            opendlv::system::application::sensation::observationModel::OrientationMeasurement<double> orientation = OrientationModel.h(x);
+
 
             // Measurement is affected by noise as well
             //orientation.theta() += orientationNoise * noise(generator);
