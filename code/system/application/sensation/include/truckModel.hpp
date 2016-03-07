@@ -232,18 +232,18 @@ protected:
 //       0     0          0     0          U_k(1)*cos(X_k(5))    0                  dydot
 //       0     0          0     0          1                     delta_t            dtheta
 //       0     0          0     0          0                     0              ];  dthetadot
-double delta_t = 0.05;   //TODO set automatically
+//double delta_t = 0.05;   //TODO set automatically
         // partial derivative of x.x() w.r.t. x.x()
         this->F( S::X, S::X ) = 1;
         // partial derivative of x.x() w.r.t. x.x_dot()
-        this->F( S::X, S::X_DOT ) = delta_t;
+        //this->F( S::X, S::X_DOT ) = delta_t;
         // partial derivative of x.x() w.r.t. x.theta()
         this->F( S::X_DOT, S::THETA ) = -std::sin( x.theta() ) * u.v();
 
         // partial derivative of x.y() w.r.t. x.y()
         this->F( S::Y, S::Y ) = 1;
         // partial derivative of x.y() w.r.t. x.y_dot()
-        this->F( S::Y, S::Y_DOT ) = delta_t;
+        //this->F( S::Y, S::Y_DOT ) = delta_t;
         // partial derivative of x.y() w.r.t. x.theta()
         this->F( S::Y, S::THETA ) = std::cos( x.theta() ) * u.v();
 
@@ -253,7 +253,7 @@ double delta_t = 0.05;   //TODO set automatically
  //       this->F( S::THETA, S::THETA_DOT ) = 1;
 
         // W = df/dw (Jacobian of state transition w.r.t. the noise)
-        this->W.setIdentity()*0.01;
+        this->W.setIdentity();
         // TODO: more sophisticated noise modelling
         //       i.e. The noise affects the the direction in which we move as
         //       well as the velocity (i.e. the distance we move)
