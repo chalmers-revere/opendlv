@@ -47,22 +47,6 @@ opendlv-system-core-proxy-actuator-steering:
   - LD_LIBRARY_PATH=/opt/opendlv/lib
   command: "./opendlv-system-core-proxy-actuator-steering --cid=111"
 
-opendlv-system-core-proxy-communicator-ledstrip:
-  image: seresearch/opendlv:latest
-  net: "host"
-  working_dir: "/opt/opendlv/bin"
-  environment:
-  - LD_LIBRARY_PATH=/opt/opendlv/lib
-  command: "./opendlv-system-core-proxy-communicator-ledstrip --cid=111"
-
-opendlv-system-core-proxy-communicator-toggeler:
-  image: seresearch/opendlv:latest
-  net: "host"
-  working_dir: "/opt/opendlv/bin"
-  environment:
-  - LD_LIBRARY_PATH=/opt/opendlv/lib
-  command: "./opendlv-system-core-proxy-communicator-toggeler --cid=111"
-
 
 ###############################################################################
 ##
@@ -130,40 +114,263 @@ opendlv-system-core-proxy-communicator-v2v:
   command: "./opendlv-system-core-proxy-communicator-v2v --cid=111"
 
 
+opendlv-system-core-proxy-communicator-ledstrip:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+  - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-core-proxy-communicator-ledstrip --cid=111"
+
+opendlv-system-core-proxy-communicator-toggeler:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+  - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-core-proxy-communicator-toggeler --cid=111"
+
 ###############################################################################
 ##
 ## OpenDLV/System/Application/...
 ##
-
-opendlv-system-application-action:
+opendlv-system-application-action-act:
   image: seresearch/opendlv:latest
   net: "host"
   working_dir: "/opt/opendlv/bin"
   environment:
-  - LD_LIBRARY_PATH=/opt/opendlv/lib
-  command: "./opendlv-system-application-action --cid=111"
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-action-act --cid=111"
 
-opendlv-system-application-knowledge-gcdc16:
+opendlv-system-application-action-communicate:
   image: seresearch/opendlv:latest
   net: "host"
   working_dir: "/opt/opendlv/bin"
   environment:
-  - LD_LIBRARY_PATH=/opt/opendlv/lib
-  command: "./opendlv-system-application-knowledge-gcdc16 --cid=111"
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-action-communicate --cid=111"
 
-opendlv-system-application-sensation:
+opendlv-system-application-action-increaseobjectmargin:
   image: seresearch/opendlv:latest
   net: "host"
   working_dir: "/opt/opendlv/bin"
   environment:
-  - LD_LIBRARY_PATH=/opt/opendlv/lib
-  command: "./opendlv-system-application-sensation --cid=111 --freq=5"
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-action-increaseobjectmargin --cid=111"
 
-opendlv-system-application-perception:
+opendlv-system-application-action-keepobjectalignment:
   image: seresearch/opendlv:latest
   net: "host"
   working_dir: "/opt/opendlv/bin"
   environment:
-  - LD_LIBRARY_PATH=/opt/opendlv/lib
-  command: "./opendlv-system-application-perception --cid=111"
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-action-keepobjectalignment --cid=111"
+
+opendlv-system-application-action-keepobjectsize:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-action-keepobjectsize --cid=111"
+
+opendlv-system-application-action-removeloomingfront:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-action-removeloomingfront --cid=111"
+
+opendlv-system-application-action-removeloomingrear:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-action-removeloomingrear --cid=111"
+
+opendlv-system-application-action-setopticalflow:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-action-setopticalflow --cid=111"
+
+opendlv-system-application-action-setopticalrotation:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-action-setopticalrotation --cid=111"
+
+opendlv-system-application-knowledge-gcdc16-rule:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-knowledge-gcdc16-rule --cid=111"
+
+opendlv-system-application-knowledge-gcdc16-v2viclcm:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-knowledge-gcdc16-v2viclcm --cid=111"
+
+opendlv-system-application-knowledge-identity:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-knowledge-identity --cid=111"
+
+opendlv-system-application-knowledge-linguistics-v2vcam:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-knowledge-linguistics-v2vcam --cid=111"
+
+opendlv-system-application-knowledge-linguistics-v2vdenm:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-knowledge-linguistics-v2vdenm --cid=111"
+
+opendlv-system-application-knowledge-scene:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-knowledge-scene --cid=111"
+
+opendlv-system-application-perception-detectlane:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-perception-detectlane --cid=111"
+
+opendlv-system-application-perception-detectvehicle:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-perception-detectvehicle --cid=111"
+
+opendlv-system-application-perception-findsafeway:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-perception-findsafeway --cid=111"
+
+opendlv-system-application-sensation-audition:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-sensation-audition --cid=111"
+
+opendlv-system-application-sensation-echolocation:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-sensation-echolocation --cid=111"
+
+opendlv-system-application-sensation-geolocation:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-sensation-geolocation --cid=111"
+
+opendlv-system-application-sensation-proprioception-orientation:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-sensation-proprioception-orientation --cid=111"
+
+opendlv-system-application-sensation-proprioception-wheel:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-sensation-proprioception-wheel --cid=111"
+
+opendlv-system-application-sensation-vision-color:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-sensation-vision-color --cid=111"
+
+opendlv-system-application-sensation-vision-depth:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-sensation-vision-depth --cid=111"
+
+opendlv-system-application-sensation-vision-directionofmovement:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-sensation-vision-directionofmovement --cid=111"
+
+opendlv-system-application-sensation-vision-edge:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-sensation-vision-edge --cid=111"
+
+opendlv-system-application-sensation-vision-looming:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-sensation-vision-looming --cid=111"
+
+opendlv-system-application-sensation-vision-monochrome:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-sensation-vision-monochrome --cid=111"
+
+opendlv-system-application-sensation-vision-opticalflow:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+   - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-sensation-vision-opticalflow --cid=111"
 
