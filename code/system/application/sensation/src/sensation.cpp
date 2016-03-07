@@ -80,7 +80,7 @@ void Sensation::tearDown()
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
     // To dump data structures into a CSV file, you create an output file first.
-    std::ofstream fout("output.csv");
+    std::ofstream fout("../Exp_data/output.csv");
     // You can optionally dump a header (i.e. first line with information).
     const bool WITH_HEADER = true;
     // You can choose the delimiter character between the fields.
@@ -101,6 +101,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
         // The csvExporter1 will "visit" the data structure "commands" and iterate
         // through its fields that will be stored in the output file fout.
         commands.accept(csvExporter1);
+        truckLocation.accept(csvExporter1);
+
+
 
 //all this part should be moved into the vehicle state estimator function
 
@@ -161,6 +164,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
             //x_ekf = m_ekf.update(PositionModel, position);
 
         }
+
+
 
         // Print to stdout as csv format
         std::cout   << "Sensation::body << message >> x " << x.x() << ", y " << x.y() << ", yaw " << x.theta() << ", x_ekf "
