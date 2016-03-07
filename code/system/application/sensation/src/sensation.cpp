@@ -44,10 +44,12 @@ Sensation::Sensation(int32_t const &a_argc, char **a_argv) :
     x(),
     u(),
     sys(),
-    PositionMeasurement(),
-    OrientationMeasurement(),
-    PositionModel(-10, -10, 30, 75),//(0.0, 0.0, 0.0, 0.0),
-    OrientationModel(),
+    Measurement(),
+    observationModel(0.0, 0.0, 0.0, 0.0 ), // clarify the numbers !
+    //PositionMeasurement(),
+    //OrientationMeasurement(),
+    //PositionModel(-10, -10, 30, 75),//(0.0, 0.0, 0.0, 0.0),
+    //OrientationModel(),
     m_ekf(),
     generator(),
     noise(0, 1),
@@ -114,10 +116,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
         //x.theta() += systemNoise*noise(generator);
 
          // wrong here ! the measurements should go into the observation model
-         x.x() = truckLocation.getX();
-         x.y() = truckLocation.getY();
-         x.theta() = truckLocation.getYaw();
-         x.theta_dot() = truckLocation.getYawRate();
+         //x.x() = truckLocation.getX();
+         //x.y() = truckLocation.getY();
+         //x.theta() = truckLocation.getYaw();
+         //x.theta_dot() = truckLocation.getYawRate();
 
         // Predict state for current time-step using the filters
         auto x_ekf = m_ekf.predict(sys, u);  // TODO: change auto type for compatibility !
@@ -126,14 +128,20 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
         {
             // We can measure the orientation every 5th step
             //OrientationMeasurement orientation = OrientationModel.h(x);
-            opendlv::system::application::sensation::truckObservationModel::OrientationMeasurement<double> orientation = OrientationModel.h(x);
+            //opendlv::system::application::sensation::truckObservationModel::OrientationMeasurement<double> orientation = OrientationModel.h(x);
+            opendlv::system::application::sensation::truckObservationModel::truckObservationVector<double> measurement = observationModel.h(x);
 
 
             // Measurement is affected by noise as well
             //orientation.theta() += orientationNoise * noise(generator);
 
+            measurement.Z_x()=truckLocation.getX();
+            measurement.Z_y()=truckLocation.getY();
+            measurement.Z_theta()=truckLocation.getYaw();
+            measurement.Z_theta_dot()=truckLocation.getYawRate();
             // Update EKF
-            x_ekf = m_ekf.update(OrientationModel, orientation);
+            //x_ekf = m_ekf.update(OrientationModel, orientation);
+            x_ekf = m_ekf.update(observationModel, measurement);
 
         }
 
@@ -141,8 +149,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
         {
             // We can measure the position every 10th step
             //PositionMeasurement position = PositionModel.h(x);
-            opendlv::system::application::sensation::truckObservationModel::PositionMeasurement<double>  position;
-            position = PositionModel.h(x);
+            //opendlv::system::application::sensation::truckObservationModel::PositionMeasurement<double>  position;
+            //position = PositionModel.h(x);
 
             // Measurement is affected by noise as well
             //position.d1() += distanceNoise * noise(generator);
@@ -150,7 +158,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
 
 
             // Update EKF
-            x_ekf = m_ekf.update(PositionModel, position);
+            //x_ekf = m_ekf.update(PositionModel, position);
 
         }
 

@@ -93,10 +93,13 @@ class Sensation : public odcore::base::module::TimeTriggeredConferenceClientModu
    opendlv::system::application::sensation::truckKinematicModel::Control<double> u;  ///--> input vector for the truck
    opendlv::system::application::sensation::truckKinematicModel::SystemModel<double> sys;  ///--> system model
 
-   opendlv::system::application::sensation::truckObservationModel::PositionMeasurement<double> PositionMeasurement;       ///--> x,y position vector
-   opendlv::system::application::sensation::truckObservationModel::OrientationMeasurement<double> OrientationMeasurement; ///--> theta orientation
-   opendlv::system::application::sensation::truckObservationModel::PositionMeasurementModel<double> PositionModel;
-   opendlv::system::application::sensation::truckObservationModel::OrientationMeasurementModel<double> OrientationModel;
+   opendlv::system::application::sensation::truckObservationModel::truckObservationVector<double> Measurement;         ///--> measurements vector
+   opendlv::system::application::sensation::truckObservationModel::truckObservationModel<double> observationModel;  ///--> observation model
+
+   //opendlv::system::application::sensation::truckObservationModel::PositionMeasurement<double> PositionMeasurement;       ///--> x,y position vector
+   //opendlv::system::application::sensation::truckObservationModel::OrientationMeasurement<double> OrientationMeasurement; ///--> theta orientation
+   //opendlv::system::application::sensation::truckObservationModel::PositionMeasurementModel<double> PositionModel;
+   //opendlv::system::application::sensation::truckObservationModel::OrientationMeasurementModel<double> OrientationModel;
 
    opendlv::system::libs::kalman::ExtendedKalmanFilter< opendlv::system::application::sensation::truckKinematicModel::State<double> > m_ekf;   // extended kalman filter
 

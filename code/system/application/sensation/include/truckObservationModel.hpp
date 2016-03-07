@@ -35,6 +35,48 @@ using namespace opendlv::system::libs;
 
 
 /**
+ * @brief Measurement vector
+ *
+ *  Vector:
+ *    Z_m: measures as a vector m-by-1 -- where m is 4 in our truck:
+ *           Z_m(1) = position along x in (m)
+ *           Z_m(2) = position along y in (m)
+ *           Z_m(3) = yaw, i.e. heading of the vehicle in (rad)
+ *           Z_m(4) = yaw rate (rad/s)
+ *
+ * @param T Numeric scalar type
+ */
+template<typename T>
+class truckObservationVector : public opendlv::system::libs::kalman::Vector<T, 4>
+{
+public:
+    KALMAN_VECTOR(truckObservationVector, T, 4)
+
+    //! position along x axis
+    static constexpr size_t Z_X = 0;
+
+    //! position along y axis
+    static constexpr size_t Z_Y = 1;
+
+    //! heading of the vehicle yaw
+    static constexpr size_t Z_THETA = 2;
+
+    //! yaw rate of the vehicle
+    static constexpr size_t Z_THETA_DOT = 3;
+
+    T Z_x()          const { return (*this)[ Z_X ]; }
+    T Z_y()          const { return (*this)[ Z_Y ]; }
+    T Z_theta()      const { return (*this)[ Z_THETA ]; }
+    T Z_theta_dot()  const { return (*this)[ Z_THETA_DOT ]; }
+
+    T& Z_x()          { return (*this)[ Z_X ]; }
+    T& Z_y()          { return (*this)[ Z_Y ]; }
+    T& Z_theta()        { return (*this)[ Z_THETA ]; }
+    T& Z_theta_dot()    { return (*this)[ Z_THETA_DOT ]; }
+}; // end - class truckObservationModel
+
+
+/**
  * @brief Observation model measuring the truck position, orientation and rotational velocity
  *        all the measures must be in SI unit system.
  *        according to the notation in the Kalman filter theory and notes :TODO file !!!
@@ -49,85 +91,6 @@ using namespace opendlv::system::libs;
  *           1) Z(k) = h(X(k))
  *           2) its Jacobian dh/dx in X(k).
  *
- *  Input:
- *    Z_m: measures as a vector m-by-1 -- where m is 4 in our truck:
- *           Z_m(1) = position along x in (m)
- *           Z_m(2) = position along y in (m)
- *           Z_m(3) = yaw, i.e. heading of the vehicle in (rad)
- *           Z_m(4) = yaw rate (rad/s)
- *
- * @param T Numeric scalar type
- */
-template<typename T>
-class truckObservationModel : public opendlv::system::libs::kalman::Vector<T, 4>
-{
-public:
-    KALMAN_VECTOR(truckObservationModel, T, 4)
-
-    //! position along x axis
-    static constexpr size_t Z_X = 0;
-
-    //! position along y axis
-    static constexpr size_t Z_Y = 1;
-
-    //! heading of the vehicle yaw
-    static constexpr size_t Z_YAW = 2;
-
-    //! yaw rate of the vehicle
-    static constexpr size_t Z_YAW_DOT = 3;
-
-    T Z_x()        const { return (*this)[ Z_X ]; }
-    T Z_y()        const { return (*this)[ Z_Y ]; }
-    T Z_yaw()      const { return (*this)[ Z_YAW ]; }
-    T Z_yaw_dot()  const { return (*this)[ Z_YAW_DOT ]; }
-
-    T& Z_x()          { return (*this)[ Z_X ]; }
-    T& Z_y()          { return (*this)[ Z_Y ]; }
-    T& Z_yaw()        { return (*this)[ Z_YAW ]; }
-    T& Z_yaw_dot()    { return (*this)[ Z_YAW_DOT ]; }
-}; // end - class truckObservationModel
-
-
-
-
-
-
-
-
-
-
-/**
- * @brief Measurement vector measuring the robot position
- *
- * @param T Numeric scalar type
- */
-template<typename T>
-class PositionMeasurement : public opendlv::system::libs::kalman::Vector<T, 2>
-{
-public:
-    KALMAN_VECTOR(PositionMeasurement, T, 2)
-
-    //! Distance to landmark 1
-    static constexpr size_t D1 = 0;
-
-    //! Distance to landmark 2
-    static constexpr size_t D2 = 1;
-
-    T d1()       const { return (*this)[ D1 ]; }
-    T d2()       const { return (*this)[ D2 ]; }
-
-    T& d1()      { return (*this)[ D1 ]; }
-    T& d2()      { return (*this)[ D2 ]; }
-}; // end - class PositionMeasurement
-
-/**
- * @brief Measurement model for measuring the position of the robot
- *        using two beacon-landmarks
- *
- * This is the measurement model for measuring the position of the robot.
- * The measurement is given by two landmarks in the space, whose positions are known.
- * The robot can measure the direct distance to both the landmarks, for instance
- * through visual localization techniques.
  *
  * @param T Numeric scalar type
  * @param CovarianceBase Class template to determine the covariance representation
@@ -135,14 +98,17 @@ public:
  *                       coveriace square root (SquareRootBase))
  */
 template<typename T, template<class> class CovarianceBase = opendlv::system::libs::kalman::StandardBase>
-class PositionMeasurementModel : public opendlv::system::libs::kalman::LinearizedMeasurementModel<opendlv::system::application::sensation::truckKinematicModel::State<T>, PositionMeasurement<T>, CovarianceBase>
+class truckObservationModel :
+        public opendlv::system::libs::kalman::LinearizedMeasurementModel<opendlv::system::application::sensation::truckKinematicModel::State<T>,
+               truckObservationVector<T>,
+               CovarianceBase>
 {
-public:
+public :
     //! State type shortcut definition
     typedef opendlv::system::application::sensation::truckKinematicModel::State<T> S;
 
     //! Measurement type shortcut definition
-    typedef PositionMeasurement<T> M;
+    typedef truckObservationVector<T> M;
 
     /**
      * @brief Constructor
@@ -152,11 +118,10 @@ public:
      * @param landmark2x The x-position of landmark 2
      * @param landmark2y The y-position of landmark 2
      */
-    PositionMeasurementModel(T landmark1x, T landmark1y, T landmark2x, T landmark2y)
+    truckObservationModel(T _x, T _y, T _theta, T _theta_rate)
     {
         // Save landmark positions
-        landmark1 << landmark1x, landmark1y;
-        landmark2 << landmark2x, landmark2y;
+        Z_k << _x, _y, _theta, _theta_rate;
 
         // Setup noise jacobian. As this one is static, we can define it once
         // and do not need to update it dynamically
@@ -177,27 +142,24 @@ public:
     {
         M measurement;
 
-        // Robot position as (x,y)-vector
-        // This uses the Eigen template method to get the first 2 elements of the vector
-        opendlv::system::libs::kalman::Vector<T, 2> position = x.template head<2>();
+        // Vehicle measurement vector (x,y, theta, theta_dot)-vector
+        // This uses the Eigen template method to get the first 4 elements of the vector
+        opendlv::system::libs::kalman::Vector<T, 4> measures = x.template head<4>();
 
-        // Distance of robot to landmark 1
-        opendlv::system::libs::kalman::Vector<T, 2> delta1 = position - landmark1;
-        measurement.d1() = std::sqrt( delta1.dot(delta1) );
 
-        // Distance of robot to landmark 2
-        opendlv::system::libs::kalman::Vector<T, 2> delta2 = position - landmark2;
-        measurement.d2() = std::sqrt( delta2.dot(delta2) );
+        // for now we are considering a linear observation model
+        // moreover, we already get our measures as we expect to be
+        measurement.Z_x() = measures(0);//Z_k(0);//measures(0);       // position along the x axis
+        measurement.Z_y() = measures(1);//Z_k(1);//measures(1);       // position along the y axis
+        measurement.Z_theta() = measures(2);//Z_k(2);//measures(2);     // heading of the vehicle
+        measurement.Z_theta_dot() = measures(3);//Z_k(3);//measures(3); // yaw rate, i.e. rotational velocity of the vehicle
 
         return measurement;
     }
 
 protected:
-    //! Position of landmark 1 given as (x,y)-measurement
-    opendlv::system::libs::kalman::Vector<T, 2> landmark1;
-
-    //! Position of landmark 2 given as (x,y)-measurement
-    opendlv::system::libs::kalman::Vector<T, 2> landmark2;
+    //! Measurement vector (x,y,theta,theta_dot)-measurement
+    opendlv::system::libs::kalman::Vector<T, 4> Z_k;
 
 protected:
 
@@ -223,103 +185,26 @@ protected:
 
         // Robot position as (x,y)-vector
         // This uses the Eigen template method to get the first 2 elements of the vector
-        opendlv::system::libs::kalman::Vector<T, 2> position = x.template head<2>();
-
-        // Distance of robot to landmark 1
-        opendlv::system::libs::kalman::Vector<T, 2> delta1 = position - landmark1;
-
-        // Distance of robot to landmark 2
-        opendlv::system::libs::kalman::Vector<T, 2> delta2 = position - landmark2;
+        opendlv::system::libs::kalman::Vector<T, 6> _x = x.template head<6>();
 
         // Distances
-        T d1 = std::sqrt( delta1.dot(delta1) );
-        T d2 = std::sqrt( delta2.dot(delta2) );
+        //T d1 = std::sqrt( delta1.dot(delta1) );
+        //T d2 = std::sqrt( delta2.dot(delta2) );
+
 
         // partial derivative of meas.d1() w.r.t. x.x()
-        this->H( M::D1, S::X ) = delta1[0] / d1;
+        this->H( M::Z_X, S::X ) = _x(0);//1;//delta1[0] / d1;
         // partial derivative of meas.d1() w.r.t. x.y()
-        this->H( M::D1, S::Y ) = delta1[1] / d1;
+        this->H( M::Z_Y, S::Y ) = _x(2);//1;//delta1[1] / d1;
 
         // partial derivative of meas.d1() w.r.t. x.x()
-        this->H( M::D2, S::X ) = delta2[0] / d2;
+        this->H( M::Z_THETA, S::THETA ) = _x(4);//1;//delta2[0] / d2;
         // partial derivative of meas.d1() w.r.t. x.y()
-        this->H( M::D2, S::Y ) = delta2[1] / d2;
-    }
-}; // end - class PositionMeasurementModel
-
-
-
-
-
-
-
-/**
- * @brief Measurement vector measuring an orientation (i.e. by using a compass)
- *
- * @param T Numeric scalar type
- */
-template<typename T>
-class OrientationMeasurement : public opendlv::system::libs::kalman::Vector<T, 1>
-{
-public:
-    KALMAN_VECTOR(OrientationMeasurement, T, 1)
-
-    //! Orientation
-    static constexpr size_t THETA = 0;
-
-    T theta()  const { return (*this)[ THETA ]; }
-    T& theta() { return (*this)[ THETA ]; }
-}; // end - class OrientationMeasurement
-
-/**
- * @brief Measurement model for measuring orientation of a 3DOF robot
- *
- * This is the measurement model for measuring the orientation of our
- * planar robot. This could be realized by a compass / magnetometer-sensor.
- *
- * @param T Numeric scalar type
- * @param CovarianceBase Class template to determine the covariance representation
- *                       (as covariance matrix (StandardBase) or as lower-triangular
- *                       coveriace square root (SquareRootBase))
- */
-template<typename T, template<class> class CovarianceBase = opendlv::system::libs::kalman::StandardBase>
-class OrientationMeasurementModel : public opendlv::system::libs::kalman::LinearizedMeasurementModel<opendlv::system::application::sensation::truckKinematicModel::State<T>, OrientationMeasurement<T>, CovarianceBase>
-{
-public:
-    //! State type shortcut definition
-    typedef opendlv::system::application::sensation::truckKinematicModel::State<T> S;
-
-    //! Measurement type shortcut definition
-    typedef OrientationMeasurement<T> M;
-
-    OrientationMeasurementModel()
-    {
-        // Setup jacobians. As these are static, we can define them once
-        // and do not need to update them dynamically
-        this->H.setIdentity();
-        this->V.setIdentity();
+        this->H( M::Z_THETA_DOT, S::THETA_DOT ) = _x(5);//1;//delta2[1] / d2;
     }
 
-    /**
-     * @brief Definition of (possibly non-linear) measurement function
-     *
-     * This function maps the system state to the measurement that is expected
-     * to be received from the sensor assuming the system is currently in the
-     * estimated state.
-     *
-     * @param [in] x The system state in current time-step
-     * @returns The (predicted) sensor measurement for the system state
-     */
-    M h(const S& x) const
-    {
-        M measurement;
 
-        // Measurement is given by the actual robot orientation
-        measurement.theta() = x.theta();
-
-        return measurement;
-    }
-};  // end - class OrientationMeasurementModel
+};
 
 
 } // observationModel
