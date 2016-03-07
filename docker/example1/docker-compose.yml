@@ -1,3 +1,4 @@
+# Please note that docker-compose does not prescribe a startup order
 odsupercomponent:
   image: seresearch/opendlv:latest
   net: "host"
