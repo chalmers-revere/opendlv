@@ -25,7 +25,7 @@ namespace opendlv {
 namespace system {
 namespace application {
 namespace sensation {
-namespace observationModel
+namespace truckObservationModel
 {
 
 
