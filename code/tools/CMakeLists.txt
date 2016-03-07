@@ -64,5 +64,6 @@ include_directories(${OPENDLVDATA_INCLUDE_DIRS})
 set(LIBRARIES ${OPENDAVINCI_LIBRARIES} ${OPENDLV_LIBRARIES} ${AUTOMOTIVEDATA_LIBRARIES} ${OPENDLVDATA_LIBRARIES})
 
 
+add_subdirectory(csvreplay)
 add_subdirectory(vboreplay)
 
