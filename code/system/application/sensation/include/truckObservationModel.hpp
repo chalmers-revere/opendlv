@@ -125,7 +125,7 @@ public :
 
         // Setup noise jacobian. As this one is static, we can define it once
         // and do not need to update it dynamically
-        this->V.setIdentity();
+        this->V.setIdentity()*0.01;
     }
 
     /**
@@ -146,13 +146,13 @@ public :
         // This uses the Eigen template method to get the first 4 elements of the vector
         opendlv::system::libs::kalman::Vector<T, 4> measures = x.template head<4>();
 
-
+measurement.Z_x() = measures(0); //just to avoid the compiler to complain
         // for now we are considering a linear observation model
         // moreover, we already get our measures as we expect to be
-        measurement.Z_x() = measures(0);//Z_k(0);//measures(0);       // position along the x axis
-        measurement.Z_y() = measures(1);//Z_k(1);//measures(1);       // position along the y axis
-        measurement.Z_theta() = measures(2);//Z_k(2);//measures(2);     // heading of the vehicle
-        measurement.Z_theta_dot() = measures(3);//Z_k(3);//measures(3); // yaw rate, i.e. rotational velocity of the vehicle
+        measurement.Z_x() = Z_k(0);//measures(0);       // position along the x axis
+        measurement.Z_y() = Z_k(1);//measures(1);       // position along the y axis
+        measurement.Z_theta() = Z_k(2);//measures(2);     // heading of the vehicle
+        measurement.Z_theta_dot() = Z_k(3);//measures(3); // yaw rate, i.e. rotational velocity of the vehicle
 
         return measurement;
     }

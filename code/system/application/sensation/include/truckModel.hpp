@@ -253,7 +253,7 @@ double delta_t = 0.05;   //TODO set automatically
  //       this->F( S::THETA, S::THETA_DOT ) = 1;
 
         // W = df/dw (Jacobian of state transition w.r.t. the noise)
-        this->W.setIdentity();
+        this->W.setIdentity()*0.01;
         // TODO: more sophisticated noise modelling
         //       i.e. The noise affects the the direction in which we move as
         //       well as the velocity (i.e. the distance we move)

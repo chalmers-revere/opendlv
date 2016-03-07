@@ -45,7 +45,7 @@ Sensation::Sensation(int32_t const &a_argc, char **a_argv) :
     u(),
     sys(),
     Measurement(),
-    observationModel(0.0, 0.0, 0.0, 0.0 ), // clarify the numbers !
+    observationModel(0.0, 0.0,  0.0, 0.0 ), // clarify the numbers !
     //PositionMeasurement(),
     //OrientationMeasurement(),
     //PositionModel(-10, -10, 30, 75),//(0.0, 0.0, 0.0, 0.0),
@@ -101,7 +101,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
         // The csvExporter1 will "visit" the data structure "commands" and iterate
         // through its fields that will be stored in the output file fout.
         commands.accept(csvExporter1);
-        truckLocation.accept(csvExporter1);
+        //truckLocation.accept(csvExporter1);
 
 
 
@@ -169,7 +169,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
 
         // Print to stdout as csv format
         std::cout   << "Sensation::body << message >> x " << x.x() << ", y " << x.y() << ", yaw " << x.theta() << ", x_ekf "
-                    << x_ekf.x() << ", y_ekf " << x_ekf.y() << ", theta_ekf " << x_ekf.theta()  << ","
+                    << x_ekf.x() << ", y_ekf " << x_ekf.y() << ", theta_ekf " << x_ekf.theta()  << "\n"
                     << std::endl;
 
 
