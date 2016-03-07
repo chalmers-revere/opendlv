@@ -1,3 +1,156 @@
+###############################################################################
+##
+## OpenDLV/System/Core/...
+##
+opendlv-system-core-safety:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+  - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-core-safety --cid=111"
+
+opendlv-system-core-diagnostics:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+  - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-core-diagnostics --cid=111"
+
+
+###############################################################################
+##
+## OpenDLV/System/Core/Proxy/Actuator/...
+##
+opendlv-system-core-proxy-actuator-brake:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+  - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-core-proxy-actuator-brake --cid=111"
+
+opendlv-system-core-proxy-actuator-propulsion:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+  - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-core-proxy-actuator-propulsion --cid=111"
+
+opendlv-system-core-proxy-actuator-steering:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+  - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-core-proxy-actuator-steering --cid=111"
+
+opendlv-system-core-proxy-communicator-ledstrip:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+  - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-core-proxy-communicator-ledstrip --cid=111"
+
+opendlv-system-core-proxy-communicator-toggeler:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+  - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-core-proxy-communicator-toggeler --cid=111"
+
+
+###############################################################################
+##
+## OpenDLV/System/Core/Proxy/Sensor/...
+##
+opendlv-system-core-proxy-sensor-sonararray:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+  - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-core-proxy-sensor-sonararray --cid=111"
+
+opendlv-system-core-proxy-sensor-v2v:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+  - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-core-proxy-sensor-v2v --cid=111"
+
+opendlv-system-core-proxy-sensor-camera:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+  - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-core-proxy-sensor-camera --cid=111"
+
+opendlv-system-core-proxy-sensor-gps:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+  - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-core-proxy-sensor-gps --cid=111"
+
+opendlv-system-core-proxy-sensor-imu:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+  - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-core-proxy-sensor-imu --cid=111"
+
+opendlv-system-core-proxy-sensor-lidar:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+  - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-core-proxy-sensor-lidar --cid=111"
+
+
+###############################################################################
+##
+## OpenDLV/System/Core/Proxy/Communicator/...
+##
+opendlv-system-core-proxy-communicator-v2v:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+  - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-core-proxy-communicator-v2v --cid=111"
+
+
+###############################################################################
+##
+## OpenDLV/System/Application/...
+##
+
+opendlv-system-application-action:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+  - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-action --cid=111"
+
+opendlv-system-application-knowledge-gcdc16:
+  image: seresearch/opendlv:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  environment:
+  - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "./opendlv-system-application-knowledge-gcdc16 --cid=111"
+
 opendlv-system-application-sensation:
   image: seresearch/opendlv:latest
   net: "host"
@@ -13,3 +166,4 @@ opendlv-system-application-perception:
   environment:
   - LD_LIBRARY_PATH=/opt/opendlv/lib
   command: "./opendlv-system-application-perception --cid=111"
+
