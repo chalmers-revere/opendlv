@@ -81,6 +81,9 @@ void Sensation::tearDown()
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
     // To dump data structures into a CSV file, you create an output file first.
     std::ofstream fout("../Exp_data/output.csv");
+    std::ofstream fout_command("../Exp_data/output_commands.csv");
+    std::ofstream fout_measures("../Exp_data/output_measures.csv");
+    std::ofstream fout_ekfState("../Exp_data/output_ekf.csv");
     // You can optionally dump a header (i.e. first line with information).
     const bool WITH_HEADER = true;
     // You can choose the delimiter character between the fields.
@@ -100,7 +103,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
 
         // The csvExporter1 will "visit" the data structure "commands" and iterate
         // through its fields that will be stored in the output file fout.
+//        std::cerr << __FILE__ << " " << __LINE__ << std::endl;
         commands.accept(csvExporter1);
+//        std::cerr << __FILE__ << " " << __LINE__ << std::endl;
         //truckLocation.accept(csvExporter1);
 
 
@@ -109,6 +114,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
 
          u.v() = commands.getLongitudinalVelocity();//3.6;   /// from km/h to m/s
          u.phi() = commands.getSteeringAngle();//*180/M_PI;
+
+         fout_command << u.v() << " " << u.phi() << endl;
+         fout_measures <<truckLocation.getX() << " " << truckLocation.getY() << " " << truckLocation.getYaw() << " " << truckLocation.getYawRate() << endl;
 
          // Simulate system
          x = sys.f(x, u);
@@ -172,7 +180,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
                     << x_ekf.x() << ", y_ekf " << x_ekf.y() << ", theta_ekf " << x_ekf.theta()  << "\n"
                     << std::endl;
 
-
+fout_ekfState << x_ekf.x() << " " << x_ekf.y() << " " << x_ekf.theta()<<endl;
 
 
     }
