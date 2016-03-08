@@ -136,6 +136,7 @@ namespace kalman{
 
             // predict covariance
             P  = ( s.F * P * s.F.transpose() ) + ( s.W * s.getCovariance() * s.W.transpose() );
+            //TODO: MB - add a support to set the noise covariance matrixes Q and R 
 
             // return state prediction
             return this->getState();
