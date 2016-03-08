@@ -257,6 +257,20 @@ protected:
         // TODO: more sophisticated noise modelling
         //       i.e. The noise affects the the direction in which we move as
         //       well as the velocity (i.e. the distance we move)
+        // Set Q,
+        // Q = eye(8)*0.1;                    % process model noise variance
+        // Q = [ (1/3)*delta_t^3 (1/2)*delta_t^2
+        //       (1/2)*delta_t^2 delta_t]; 
+        //delta_t = 0.005;        % simulation discrete time 
+        //%sigma=0.01;%5;         % state transition variance
+        //sigma_q = [0.1 0.01];
+        //Qxyz = sigma_q(1)^2 * [delta_t^3/3 delta_t^2/2;
+        //                       delta_t^2/2 delta_t];
+                    
+        //Qtheta = sigma_q(2)^2 * [delta_t^3/3 delta_t^2/2;
+        //                         delta_t^2/2 delta_t];
+        //Q_init = blkdiag(Qxyz, Qxyz, Qtheta, Qtheta);
+        
     }
 };
 } // truckKinematicModel
