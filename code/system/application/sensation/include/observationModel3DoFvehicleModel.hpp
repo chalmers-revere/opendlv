@@ -16,6 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+ //--->   DEPRECATED 
+
 #ifndef OBSERVATIONMODEL_HPP_
 #define OBSERVATIONMODEL_HPP_
 
@@ -53,7 +55,7 @@ public:
 
     T& d1()      { return (*this)[ D1 ]; }
     T& d2()      { return (*this)[ D2 ]; }
-};
+}; // end - class PositionMeasurement
 
 /**
  * @brief Measurement model for measuring the position of the robot
@@ -180,7 +182,7 @@ protected:
         // partial derivative of meas.d1() w.r.t. x.y()
         this->H( M::D2, S::Y ) = delta2[1] / d2;
     }
-};
+}; // end - class PositionMeasurementModel
 
 
 
@@ -204,7 +206,7 @@ public:
 
     T theta()  const { return (*this)[ THETA ]; }
     T& theta() { return (*this)[ THETA ]; }
-};
+}; // end - class OrientationMeasurement
 
 /**
  * @brief Measurement model for measuring orientation of a 3DOF robot
@@ -254,12 +256,9 @@ public:
 
         return measurement;
     }
+};  // end - class OrientationMeasurementModel
 
 
-
-
-
-};
 } // observationModel
 } // sensation
 } // application

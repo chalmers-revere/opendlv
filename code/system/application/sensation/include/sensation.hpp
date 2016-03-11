@@ -23,6 +23,8 @@
 
 //include headers for the EKF
 
+
+// disable the maximum warning level for some headers
 #ifndef WIN32
 # if !defined(__OpenBSD__) && !defined(__NetBSD__)
 #  pragma GCC diagnostic push
@@ -33,7 +35,7 @@
     #include "ExtendedKalmanFilter.hpp"
     #include "Types.hpp"
     #include "truckModel.hpp"
-    #include "observationModel.hpp"
+    #include "truckObservationModel.hpp"
 #ifndef WIN32
 # if !defined(__OpenBSD__) && !defined(__NetBSD__)
 #  pragma GCC diagnostic pop
@@ -67,7 +69,7 @@ class Sensation : public odcore::base::module::TimeTriggeredConferenceClientModu
   /**
     * use this to run the VSE in test, _run_vse_test = true -- add noise generator,   _run_vse_test = no noise generator
     */
-    inline void runVSEtest (bool _run_vse_test) {run_vse_test = _run_vse_test; };
+    inline void runVSEtest (bool _run_vse_test) {run_vse_test = _run_vse_test; }
 
   private:
       // This method will be call automatically _before_ running body().
@@ -91,10 +93,13 @@ class Sensation : public odcore::base::module::TimeTriggeredConferenceClientModu
    opendlv::system::application::sensation::truckKinematicModel::Control<double> u;  ///--> input vector for the truck
    opendlv::system::application::sensation::truckKinematicModel::SystemModel<double> sys;  ///--> system model
 
-   opendlv::system::application::sensation::observationModel::PositionMeasurement<double> PositionMeasurement;       ///--> x,y position vector
-   opendlv::system::application::sensation::observationModel::OrientationMeasurement<double> OrientationMeasurement; ///--> theta orientation
-   opendlv::system::application::sensation::observationModel::PositionMeasurementModel<double> PositionModel;
-   opendlv::system::application::sensation::observationModel::OrientationMeasurementModel<double> OrientationModel;
+   opendlv::system::application::sensation::truckObservationModel::truckObservationVector<double> Measurement;         ///--> measurements vector
+   opendlv::system::application::sensation::truckObservationModel::truckObservationModel<double> observationModel;  ///--> observation model
+
+   //opendlv::system::application::sensation::truckObservationModel::PositionMeasurement<double> PositionMeasurement;       ///--> x,y position vector
+   //opendlv::system::application::sensation::truckObservationModel::OrientationMeasurement<double> OrientationMeasurement; ///--> theta orientation
+   //opendlv::system::application::sensation::truckObservationModel::PositionMeasurementModel<double> PositionModel;
+   //opendlv::system::application::sensation::truckObservationModel::OrientationMeasurementModel<double> OrientationModel;
 
    opendlv::system::libs::kalman::ExtendedKalmanFilter< opendlv::system::application::sensation::truckKinematicModel::State<double> > m_ekf;   // extended kalman filter
 

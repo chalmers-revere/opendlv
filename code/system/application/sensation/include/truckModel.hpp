@@ -29,37 +29,21 @@ namespace sensation{
 namespace truckKinematicModel
 {
 
-
 /**
- * @brief System state vector-type for a 3DOF planar robot - including position and velocity
+ * @brief System state vector-type for a 3DOF Ackermann steering truck - including position and velocity
  *
- * This is a system state for a very simple planar robot that
+ * This is a system state for a simple kinematic Ackermann steering single-truck vehicle that
  * is characterized by its (x,y)-Position and angular orientation.
+ *
+ * State vector descriptiom :  
+ *     X  =  state vector at the current time k
+ *           where (x, y, theta) is the pose of the vehicle with heading (theta)
+ *           [x, x_dot, y, y_dot, theta, theta_dot ], 6-by-1
  *
  * @param T Numeric scalar type
  */
 template<typename T>
-class State : public opendlv::system::libs::kalman::Vector<T, 3>
-{
-public:
-    KALMAN_VECTOR(State, T, 3)
-
-    //! X-position
-    static constexpr size_t X = 0;
-    //! Y-Position
-    static constexpr size_t Y = 1;
-    //! Orientation
-    static constexpr size_t THETA = 2;
-
-    T x()       const { return (*this)[ X ]; }
-    T y()       const { return (*this)[ Y ]; }
-    T theta()   const { return (*this)[ THETA ]; }
-
-    T& x()      { return (*this)[ X ]; }
-    T& y()      { return (*this)[ Y ]; }
-    T& theta()  { return (*this)[ THETA ]; }
-};
-/*class State : public opendlv::system::libs::kalman::Vector<T, 6>
+class State : public opendlv::system::libs::kalman::Vector<T, 6>
 {
 public:
     KALMAN_VECTOR(State, T, 6)    //the kalman vector for our state will be 6 (x, x_dot, y, y_dot, theta, theta_dot)
@@ -67,41 +51,50 @@ public:
     //! X-position
     static constexpr size_t X = 0;
     //! X-Velocity
-    static constexpr size_t X_dot = 1;
+    static constexpr size_t X_DOT = 1;
 
     //! Y-Position
     static constexpr size_t Y = 2;
     //! Y-Velocity
-    static constexpr size_t Y_dot = 3;
+    static constexpr size_t Y_DOT = 3;
 
     //! Orientation
     static constexpr size_t THETA = 4;
     //! Angular Velocity
-    static constexpr size_t THETA_dot = 5;
+    static constexpr size_t THETA_DOT = 5;
 
 
-    T x()       const { return (*this)[ X ]; }
-    T x_dot()       const { return (*this)[ X_dot ]; }
-    T y()       const { return (*this)[ Y ]; }
-    T y_dot()       const { return (*this)[ Y_dot ]; }
-    T theta()   const { return (*this)[ THETA ]; }
-    T theta_dot()   const { return (*this)[ THETA_dot ]; }
+    T x()          const { return (*this)[ X ]; }
+    T x_dot()      const { return (*this)[ X_DOT ]; }
+    T y()          const { return (*this)[ Y ]; }
+    T y_dot()      const { return (*this)[ Y_DOT ]; }
+    T theta()      const { return (*this)[ THETA ]; }
+    T theta_dot()  const { return (*this)[ THETA_DOT ]; }
 
 
-    T& x()      { return (*this)[ X ]; }
-    T& x_dot()      { return (*this)[ X_dot ]; }
-    T& y()      { return (*this)[ Y ]; }
-    T& y_dot()      { return (*this)[ Y_dot ]; }
-    T& theta()  { return (*this)[ THETA ]; }
-    T& theta_dot()  { return (*this)[ THETA_dot ]; }
-};*/
+    T& x()          { return (*this)[ X ]; }
+    T& x_dot()      { return (*this)[ X_DOT ]; }
+    T& y()          { return (*this)[ Y ]; }
+    T& y_dot()      { return (*this)[ Y_DOT ]; }
+    T& theta()      { return (*this)[ THETA ]; }
+    T& theta_dot()  { return (*this)[ THETA_DOT ]; }
+
+}; // end - class State
+
+
+
 
 /**
- * @brief System control-input vector-type for a 3DOF planar robot
+ * @brief System control-input vector-type for a 3DOF Ackermann steering truck
  *
- * This is the system control-input of a very simple planar robot that
- * can control the velocity in its current direction as well as the
+ * This is the system control-input of a very simple kinematic Ackermann steering single-truck
+ * vehicle that can control the velocity in its current direction as well as the steering angle
  * change in direction.
+ * 
+ * U_k:  (v_k, phi_k) Input commands 
+ * Commands:
+ *           U_k(1) = longitudinal velocity in (m/s)
+ *           U_k(2) = steering angle of the wheels in (rad) 
  *
  * @param T Numeric scalar type
  */
@@ -111,22 +104,23 @@ class Control : public opendlv::system::libs::kalman::Vector<T, 2>
 public:
     KALMAN_VECTOR(Control, T, 2)
 
-    //! Velocity
+    //! Longitudinal Velocity
     static constexpr size_t V = 0;
-    //! Angular Rate (Orientation-change)
-    static constexpr size_t DTHETA = 1;
+    //! Steering angle
+    static constexpr size_t PHI = 1;
 
     T v()       const { return (*this)[ V ]; }
-    T dtheta()  const { return (*this)[ DTHETA ]; }
+    T phi()     const { return (*this)[ PHI ]; }
 
     T& v()      { return (*this)[ V ]; }
-    T& dtheta() { return (*this)[ DTHETA ]; }
-};
+    T& phi()    { return (*this)[ PHI ]; }
+
+}; // end - class Control
 
 /**
- * @brief System model for a simple planar 3DOF robot
+ * @brief System model for a simple 3DOF Ackermann steering truck
  *
- * This is the system model defining how our robot moves from one
+ * This is the system model defining how our vehicle moves from one
  * time-step to the next, i.e. how the system state evolves over time.
  *
  * @param T Numeric scalar type
@@ -152,6 +146,14 @@ public:
      * be in time-step \f$k+1\f$ given the current state \f$x_k\f$ in step \f$k\f$ and
      * the system control input \f$u\f$.
      *
+     * 
+     * For an Ackermann Steering vehicle the kinematic equations are:
+     *     x_dot = v * cos (theta)
+     *     y_dot = v * sin (theta)
+     *     theta_dot = (v / b) * tan (phi)
+     * 
+     * Where b = vehicle wheelbase and phi=steering angle
+     * 
      * @param [in] x The system state in current time-step
      * @param [in] u The control vector input
      * @returns The (predicted) system state in the next time-step
@@ -159,27 +161,44 @@ public:
     S f(const S& x, const C& u) const
     {
         //! Predicted state vector after transition
-        S x_;
+        S x_p;
 
         // New orientation given by old orientation plus orientation change
-        auto newOrientation = x.theta() + u.dtheta();
+        //auto newOrientation = x.theta() + (u.v/3.8)*sdt::tan(u.phi());
+        // TODO: 3.8 is the wheelbase to be define as a vehicle parameter
         // Re-scale orientation to [-pi/2 to +pi/2]
 
-        x_.theta() = newOrientation;
+        //x_.theta() = newOrientation;
 
         // New x-position given by old x-position plus change in x-direction
         // Change in x-direction is given by the cosine of the (new) orientation
         // times the velocity
-        x_.x() = x.x() + std::cos( newOrientation ) * u.v();
-        x_.y() = x.y() + std::sin( newOrientation ) * u.v();
+        //x_.x() = x.x() + std::cos( newOrientation ) * u.v();
+        //x_.y() = x.y() + std::sin( newOrientation ) * u.v();
+
+        double delta_t = 0.05;  // TODO: calculate via timestamp
+        double wheelbase = 3.8; // TODO: this must be set by the user
+        x_p.x() = x.x() + delta_t * x.x_dot();
+        x_p.x_dot() = u.v() * std::cos(x.theta());
+        x_p.y() = x.y() + delta_t * x.y_dot();
+        x_p.y_dot() = u.v() * std::sin (x.theta());
+        x_p.theta() = x.theta() + delta_t * x.theta_dot();
+        x_p.theta_dot() = (u.v() / wheelbase) * std::tan(u.phi());
+        //TODO adapt the equations as follow:
+// X_p(1) = X_k(1) + X_k(2) * delta_t;
+// X_p(2) = U_k(1) * cos(X_k(5)); 
+// X_p(3) = X_k(3) + X_k(4) * delta_t;
+// X_p(4) = U_k(1) * sin(X_k(5)); 
+// X_p(5) = X_k(5) + X_k(6) * delta_t  ;
+// X_p(6) = ((U_k(1) / b) * tan (U_k(2)));
 
         // Return transitioned state vector
-        return x_;
+        return x_p;
     }
 
 
 protected:
-//TODO change the description of the truck model according to the real physic of the system
+
 
     /**
      * @brief Update jacobian matrices for the system state transition function using current state
@@ -201,24 +220,57 @@ protected:
         // F = df/dx (Jacobian of state transition w.r.t. the state)
         this->F.setZero();
 
+//           d f    |
+// J_f = -----------|                 : Linearize state equation, J_f is the
+//           d X    |X=Xp               Jacobian of the process model
+//
+//      dx     dx_dot     dy   dydot      dtheta                 dthetadot
+//
+//J_f = [1     delta_t    0     0          0                     0                  dx
+//       0     0          0     0         -U_k(1)*sin(X_k(5))    0                  dxdot
+//       0     0          1     delta_t    0                     0                  dy
+//       0     0          0     0          U_k(1)*cos(X_k(5))    0                  dydot
+//       0     0          0     0          1                     delta_t            dtheta
+//       0     0          0     0          0                     0              ];  dthetadot
+//double delta_t = 0.05;   //TODO set automatically
         // partial derivative of x.x() w.r.t. x.x()
         this->F( S::X, S::X ) = 1;
+        // partial derivative of x.x() w.r.t. x.x_dot()
+        //this->F( S::X, S::X_DOT ) = delta_t;
         // partial derivative of x.x() w.r.t. x.theta()
-        this->F( S::X, S::THETA ) = -std::sin( x.theta() + u.dtheta() ) * u.v();
+        this->F( S::X_DOT, S::THETA ) = -std::sin( x.theta() ) * u.v();
 
         // partial derivative of x.y() w.r.t. x.y()
         this->F( S::Y, S::Y ) = 1;
+        // partial derivative of x.y() w.r.t. x.y_dot()
+        //this->F( S::Y, S::Y_DOT ) = delta_t;
         // partial derivative of x.y() w.r.t. x.theta()
-        this->F( S::Y, S::THETA ) = std::cos( x.theta() + u.dtheta() ) * u.v();
+        this->F( S::Y, S::THETA ) = std::cos( x.theta() ) * u.v();
 
         // partial derivative of x.theta() w.r.t. x.theta()
         this->F( S::THETA, S::THETA ) = 1;
+        // partial derivative of x.theta() w.r.t. x.theta()
+ //       this->F( S::THETA, S::THETA_DOT ) = 1;
 
         // W = df/dw (Jacobian of state transition w.r.t. the noise)
         this->W.setIdentity();
         // TODO: more sophisticated noise modelling
         //       i.e. The noise affects the the direction in which we move as
         //       well as the velocity (i.e. the distance we move)
+        // Set Q,
+        // Q = eye(8)*0.1;                    % process model noise variance
+        // Q = [ (1/3)*delta_t^3 (1/2)*delta_t^2
+        //       (1/2)*delta_t^2 delta_t]; 
+        //delta_t = 0.005;        % simulation discrete time 
+        //%sigma=0.01;%5;         % state transition variance
+        //sigma_q = [0.1 0.01];
+        //Qxyz = sigma_q(1)^2 * [delta_t^3/3 delta_t^2/2;
+        //                       delta_t^2/2 delta_t];
+                    
+        //Qtheta = sigma_q(2)^2 * [delta_t^3/3 delta_t^2/2;
+        //                         delta_t^2/2 delta_t];
+        //Q_init = blkdiag(Qxyz, Qxyz, Qtheta, Qtheta);
+        
     }
 };
 } // truckKinematicModel

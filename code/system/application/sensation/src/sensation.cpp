@@ -44,10 +44,12 @@ Sensation::Sensation(int32_t const &a_argc, char **a_argv) :
     x(),
     u(),
     sys(),
-    PositionMeasurement(),
-    OrientationMeasurement(),
-    PositionModel(-10, -10, 30, 75),//(0.0, 0.0, 0.0, 0.0),
-    OrientationModel(),
+    Measurement(),
+    observationModel(0.0, 0.0,  0.0, 0.0 ), // clarify the numbers !
+    //PositionMeasurement(),
+    //OrientationMeasurement(),
+    //PositionModel(-10, -10, 30, 75),//(0.0, 0.0, 0.0, 0.0),
+    //OrientationModel(),
     m_ekf(),
     generator(),
     noise(0, 1),
@@ -78,7 +80,10 @@ void Sensation::tearDown()
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
     // To dump data structures into a CSV file, you create an output file first.
-    std::ofstream fout("output.csv");
+    std::ofstream fout("../Exp_data/output.csv");
+    std::ofstream fout_command("../Exp_data/output_commands.csv");
+    std::ofstream fout_measures("../Exp_data/output_measures.csv");
+    std::ofstream fout_ekfState("../Exp_data/output_ekf.csv");
     // You can optionally dump a header (i.e. first line with information).
     const bool WITH_HEADER = true;
     // You can choose the delimiter character between the fields.
@@ -98,12 +103,20 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
 
         // The csvExporter1 will "visit" the data structure "commands" and iterate
         // through its fields that will be stored in the output file fout.
+//        std::cerr << __FILE__ << " " << __LINE__ << std::endl;
         commands.accept(csvExporter1);
+//        std::cerr << __FILE__ << " " << __LINE__ << std::endl;
+        //truckLocation.accept(csvExporter1);
 
 
 
-         u.v() = commands.getLongitudinalVelocity()/3.6;   /// from km/h to m/s
-         u.dtheta() = commands.getSteeringAngle()*180/M_PI;
+//all this part should be moved into the vehicle state estimator function
+
+         u.v() = commands.getLongitudinalVelocity();//3.6;   /// from km/h to m/s
+         u.phi() = commands.getSteeringAngle();//*180/M_PI;
+
+         fout_command << u.v() << " " << u.phi() << endl;
+         fout_measures <<truckLocation.getX() << " " << truckLocation.getY() << " " << truckLocation.getYaw() << " " << truckLocation.getYawRate() << endl;
 
          // Simulate system
          x = sys.f(x, u);
@@ -113,25 +126,33 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
         //x.y() += systemNoise*noise(generator);
         //x.theta() += systemNoise*noise(generator);
 
-         x.x() = truckLocation.getX();
-         x.y() = truckLocation.getY();
-         x.theta() = truckLocation.getYaw();
+         // wrong here ! the measurements should go into the observation model
+         //x.x() = truckLocation.getX();
+         //x.y() = truckLocation.getY();
+         //x.theta() = truckLocation.getYaw();
+         //x.theta_dot() = truckLocation.getYawRate();
 
         // Predict state for current time-step using the filters
-        auto x_ekf = m_ekf.predict(sys, u);
+        auto x_ekf = m_ekf.predict(sys, u);  // TODO: change auto type for compatibility !
 
-                // Orientation measurement
+        // Orientation measurement
         {
             // We can measure the orientation every 5th step
             //OrientationMeasurement orientation = OrientationModel.h(x);
-            opendlv::system::application::sensation::observationModel::OrientationMeasurement<double> orientation;
-            orientation = OrientationModel.h(x);
+            //opendlv::system::application::sensation::truckObservationModel::OrientationMeasurement<double> orientation = OrientationModel.h(x);
+            opendlv::system::application::sensation::truckObservationModel::truckObservationVector<double> measurement = observationModel.h(x);
+
 
             // Measurement is affected by noise as well
             //orientation.theta() += orientationNoise * noise(generator);
 
+            measurement.Z_x()=truckLocation.getX();
+            measurement.Z_y()=truckLocation.getY();
+            measurement.Z_theta()=truckLocation.getYaw();
+            measurement.Z_theta_dot()=truckLocation.getYawRate();
             // Update EKF
-            x_ekf = m_ekf.update(OrientationModel, orientation);
+            //x_ekf = m_ekf.update(OrientationModel, orientation);
+            x_ekf = m_ekf.update(observationModel, measurement);
 
         }
 
@@ -139,8 +160,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
         {
             // We can measure the position every 10th step
             //PositionMeasurement position = PositionModel.h(x);
-            opendlv::system::application::sensation::observationModel::PositionMeasurement<double>  position;
-            position = PositionModel.h(x);
+            //opendlv::system::application::sensation::truckObservationModel::PositionMeasurement<double>  position;
+            //position = PositionModel.h(x);
 
             // Measurement is affected by noise as well
             //position.d1() += distanceNoise * noise(generator);
@@ -148,16 +169,18 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
 
 
             // Update EKF
-            x_ekf = m_ekf.update(PositionModel, position);
+            //x_ekf = m_ekf.update(PositionModel, position);
 
         }
 
+
+
         // Print to stdout as csv format
         std::cout   << "Sensation::body << message >> x " << x.x() << ", y " << x.y() << ", yaw " << x.theta() << ", x_ekf "
-                    << x_ekf.x() << ", y_ekf " << x_ekf.y() << ", theta_ekf " << x_ekf.theta()  << ","
+                    << x_ekf.x() << ", y_ekf " << x_ekf.y() << ", theta_ekf " << x_ekf.theta()  << "\n"
                     << std::endl;
 
-
+fout_ekfState << x_ekf.x() << " " << x_ekf.y() << " " << x_ekf.theta()<<endl;
 
 
     }
