@@ -1,3 +1,4 @@
+# Please note that docker-compose does not prescribe a startup order
 odsupercomponent:
   image: seresearch/opendlv:latest
   net: "host"
@@ -6,8 +7,12 @@ odsupercomponent:
   working_dir: "/opt/data"
   command: "odsupercomponent --cid=111"
 
-opendlv-system-core-proxy:
-  image: seresearch/opendlv:latest
-  net: "host"
-  working_dir: "/opt/opendlv/bin"
-  command: "./opendlv-system-core-proxy --cid=111"
+# Needs to be merged from Mauro's branch
+#dataspy:
+#  image: seresearch/opendlv:latest
+#  net: "host"
+#  working_dir: "/opt/opendlv/bin"
+#  environment:
+#  - LD_LIBRARY_PATH=/opt/opendlv/lib
+#  command: "./dataspy --cid=111"
+

@@ -20,14 +20,31 @@ project(opendlv-system-application-perception)
 # Set include directories
 include_directories(include)
 
+# Set libraries
+set(LIBRARIES ${LIBRARIES})
+
 # Build
-file(GLOB_RECURSE thisproject-sources "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+file(GLOB_RECURSE thisproject-sources
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/detectlane/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/detectvehicle/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/findsafeway/*.cpp"
+  )
+
 add_library(${PROJECT_NAME}lib-static STATIC ${thisproject-sources})
-add_executable(${PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
-target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+
+add_executable(${PROJECT_NAME}-detectlane "${CMAKE_CURRENT_SOURCE_DIR}/src/detectlane/main.cpp")
+target_link_libraries(${PROJECT_NAME}-detectlane ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+
+add_executable(${PROJECT_NAME}-detectvehicle "${CMAKE_CURRENT_SOURCE_DIR}/src/detectvehicle/main.cpp")
+target_link_libraries(${PROJECT_NAME}-detectvehicle ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+
+add_executable(${PROJECT_NAME}-findsafeway "${CMAKE_CURRENT_SOURCE_DIR}/src/findsafeway/main.cpp")
+target_link_libraries(${PROJECT_NAME}-findsafeway ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
 # Test
 include(RunTests)
 
 # Install
-install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin COMPONENT system-application)
+install(TARGETS ${PROJECT_NAME}-detectlane RUNTIME DESTINATION bin COMPONENT system-application)
+install(TARGETS ${PROJECT_NAME}-detectvehicle RUNTIME DESTINATION bin COMPONENT system-application)
+install(TARGETS ${PROJECT_NAME}-findsafeway RUNTIME DESTINATION bin COMPONENT system-application)

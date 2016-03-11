@@ -13,13 +13,17 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
-#ifndef SENSATION_HPP_
-#define SENSATION_HPP_
+#ifndef SENSATION_SENSATION_HPP_
+#define SENSATION_SENSATION_HPP_
+
+#include <memory>
 
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/data/Container.h"
 
 //include headers for the EKF
 
@@ -46,9 +50,7 @@
 namespace opendlv {
 namespace system {
 namespace application {
-namespace sensation{
-
-
+namespace sensation {
 
 /**
  * This class provides...
@@ -59,11 +61,6 @@ class Sensation : public odcore::base::module::TimeTriggeredConferenceClientModu
     Sensation(Sensation const &) = delete;
     Sensation &operator=(Sensation const &) = delete;
     virtual ~Sensation();
-
-  /**
-    * Body of the sensation function, all sensing function will be run from here
-    * TODO: Add description !
-    */
     odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
   /**
