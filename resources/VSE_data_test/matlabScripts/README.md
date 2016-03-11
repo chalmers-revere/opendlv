@@ -1,4 +1,6 @@
-Plot
+Plot of the first validation of the filter. 
+The ground truth (green line) has been used to generate noisy data (blue cross)
+and generate the filtered version (red dots).
 
 
 
