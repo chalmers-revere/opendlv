@@ -111,12 +111,13 @@ public :
     typedef truckObservationVector<T> M;
 
     /**
-     * @brief Constructor
+     * @brief Constructor of the observation model -
+     *        For now it is considered that we directly access all the quantities.
      *
-     * @param landmark1x The x-position of landmark 1   /TODO change this
-     * @param landmark1y The y-position of landmark 1
-     * @param landmark2x The x-position of landmark 2
-     * @param landmark2y The y-position of landmark 2
+     * @param _x The x-position of the truck along x direction in meters
+     * @param _y The y-position of the truck along y direction in meters
+     * @param _theta The heading of the truck in rad
+     * @param _theta_dot The rotational velocity of the truck in rad/sec
      */
     truckObservationModel(T _x, T _y, T _theta, T _theta_rate)
     {
@@ -145,15 +146,13 @@ public :
 
         // Vehicle measurement vector (x,y, theta, theta_dot)-vector
         // This uses the Eigen template method to get the first 4 elements of the vector
-//        opendlv::system::libs::kalman::Vector<T, 4> measures = _x.template head<4>();
 
-//measurement.Z_x() = measures(0); //just to avoid the compiler to complain
         // for now we are considering a linear observation model
         // moreover, we already get our measures as we expect to be
-        measurement.Z_x() = _x(0);//Z_k(0);//measures(0);       // position along the x axis
-        measurement.Z_y() = _x(2);//measures(1);       // position along the y axis
-        measurement.Z_theta() = _x(4);//measures(2);     // heading of the vehicle
-        measurement.Z_theta_dot() = _x(5);//measures(3); // yaw rate, i.e. rotational velocity of the vehicle
+        measurement.Z_x() = _x(0);         // position along the x axis
+        measurement.Z_y() = _x(2);         // position along the y axis
+        measurement.Z_theta() = _x(4);     // heading of the vehicle
+        measurement.Z_theta_dot() = _x(5); // yaw rate, i.e. rotational velocity of the vehicle
 
         return measurement;
     }
@@ -183,15 +182,15 @@ protected:
     {
         // H = dh/dx (Jacobian of measurement function w.r.t. the state)
         this->H.setZero();
-cout << "updateJacobians  <<message>>" << x << endl;
+
+        ///TODO: this function must have the state as argument but for this case it is not
+        ///      necessary, to avoid the compiler to complain I just set the argument to 0
+        S _x = x; //this will be valid only inside the function and it will not affect the real variable
+        _x=_x;
+
         // Robot position as (x,y)-vector
         // This uses the Eigen template method to get the first 2 elements of the vector
         //opendlv::system::libs::kalman::Vector<T, 6> _x = x.template head<6>();
-
-        // Distances
-        //T d1 = std::sqrt( delta1.dot(delta1) );
-        //T d2 = std::sqrt( delta2.dot(delta2) );
-
 
         // partial derivative of meas.d1() w.r.t. x.x()
         this->H( M::Z_X, S::X ) = 1;//_x(0);//1;//delta1[0] / d1;

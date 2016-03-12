@@ -163,18 +163,12 @@ public:
         //! Predicted state vector after transition
         S x_p;
 
-        // New orientation given by old orientation plus orientation change
-        //auto newOrientation = x.theta() + (u.v/3.8)*sdt::tan(u.phi());
-        // TODO: 3.8 is the wheelbase to be define as a vehicle parameter
-        // Re-scale orientation to [-pi/2 to +pi/2]
 
-        //x_.theta() = newOrientation;
-
-        // New x-position given by old x-position plus change in x-direction
-        // Change in x-direction is given by the cosine of the (new) orientation
-        // times the velocity
-        //x_.x() = x.x() + std::cos( newOrientation ) * u.v();
-        //x_.y() = x.y() + std::sin( newOrientation ) * u.v();
+        ///  TODO: describe the vehicle model
+        ///
+        //x_.x() = x.x() + std::cos( x.theta ) * u.v();
+        //x_.y() = x.y() + std::sin( x.theta ) * u.v();
+        //x_.theta = x.theta() + delta_t * (u.v() / wheelbase) * std::tan(u.phi())
 
         double delta_t = 0.05;  // TODO: calculate via timestamp
         double wheelbase = 3.8; // TODO: this must be set by the user

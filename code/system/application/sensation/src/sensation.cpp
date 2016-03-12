@@ -112,26 +112,17 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
          fout_command << u.v() << " " << u.phi() << endl;
          ///fout_measures <<truckLocation.getX() << " " << truckLocation.getY() << " " << truckLocation.getYaw() << " " << truckLocation.getYawRate() << endl;
 
-         // Simulate system
-         x = sys.f(x, u);
 
         // Add noise: Our robot move is affected by noise (due to actuator failures)
         //x.x() += systemNoise*noise(generator);
         //x.y() += systemNoise*noise(generator);
         //x.theta() += systemNoise*noise(generator);
 
-         // wrong here ! the measurements should go into the observation model
-         //x.x() = truckLocation.getX();
-         //x.y() = truckLocation.getY();
-         //x.theta() = truckLocation.getYaw();
-         //x.theta_dot() = truckLocation.getYawRate();
 
         // Predict state for current time-step using the filters
         opendlv::system::application::sensation::truckKinematicModel::State<double>  x_ekf_pred = m_ekf.predict(sys, u);  // TODO: change auto type for compatibility !
 
         // Orientation measurement
-            // We can measure the orientation every 5th step
-            //OrientationMeasurement orientation = OrientationModel.h(x);
             //opendlv::system::application::sensation::truckObservationModel::OrientationMeasurement<double> orientation = OrientationModel.h(x);
             opendlv::system::application::sensation::truckObservationModel::truckObservationVector<double> measurement = observationModel.h(x);
 
@@ -152,11 +143,11 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
 
 
         // Print to stdout as csv format
-        std::cout   << "Sensation::body << message >> x " << x.x() << ", y " << x.y() << ", yaw " << x.theta() << "\n"
+        std::cout   << "Sensation::body << message >> \n"
                     << "      x_ekf_pred " << x_ekf_pred.x() << ", y_ekf_pred " << x_ekf_pred.y() << ", theta_ekf_pred " << x_ekf_pred.theta()  << "\n"
                     << "      x_ekf      " << x_ekf.x() << ", y_ekf " << x_ekf.y() << ", theta_ekf " << x_ekf.theta()  << "\n"
                     << std::endl;
-
+//save data to file
 fout_ekfState << truckLocation.getX() << " " << truckLocation.getY() << " " << truckLocation.getYaw() << " "
               << measurement.Z_x() << " " << measurement.Z_y() << " " << measurement.Z_theta() << " "
               << x_ekf.x() << " " << x_ekf.y() << " " << x_ekf.theta() << " "
