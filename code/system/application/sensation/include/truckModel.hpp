@@ -184,13 +184,6 @@ public:
         x_p.y_dot() = u.v() * std::sin (x.theta());
         x_p.theta() = x.theta() + delta_t * x.theta_dot();
         x_p.theta_dot() = (u.v() / wheelbase) * std::tan(u.phi());
-        //TODO adapt the equations as follow:
-// X_p(1) = X_k(1) + X_k(2) * delta_t;
-// X_p(2) = U_k(1) * cos(X_k(5)); 
-// X_p(3) = X_k(3) + X_k(4) * delta_t;
-// X_p(4) = U_k(1) * sin(X_k(5)); 
-// X_p(5) = X_k(5) + X_k(6) * delta_t  ;
-// X_p(6) = ((U_k(1) / b) * tan (U_k(2)));
 
         // Return transitioned state vector
         return x_p;
@@ -220,37 +213,37 @@ protected:
         // F = df/dx (Jacobian of state transition w.r.t. the state)
         this->F.setZero();
 
-//           d f    |
-// J_f = -----------|                 : Linearize state equation, J_f is the
-//           d X    |X=Xp               Jacobian of the process model
-//
-//      dx     dx_dot     dy   dydot      dtheta                 dthetadot
-//
-//J_f = [1     delta_t    0     0          0                     0                  dx
-//       0     0          0     0         -U_k(1)*sin(X_k(5))    0                  dxdot
-//       0     0          1     delta_t    0                     0                  dy
-//       0     0          0     0          U_k(1)*cos(X_k(5))    0                  dydot
-//       0     0          0     0          1                     delta_t            dtheta
-//       0     0          0     0          0                     0              ];  dthetadot
-//double delta_t = 0.05;   //TODO set automatically
+        //           d f    |
+        // J_f = -----------|                 : Linearize state equation, J_f is the
+        //           d X    |X=Xp               Jacobian of the process model
+        //
+        //      dx     dx_dot     dy   dydot      dtheta                 dthetadot
+        //
+        //J_f = [1     delta_t    0     0          0                     0                  dx
+        //       0     0          0     0         -U_k(1)*sin(X_k(5))    0                  dxdot
+        //       0     0          1     delta_t    0                     0                  dy
+        //       0     0          0     0          U_k(1)*cos(X_k(5))    0                  dydot
+        //       0     0          0     0          1                     delta_t            dtheta
+        //       0     0          0     0          0                     0              ];  dthetadot
+        double delta_t = 0.05;   //TODO set automatically
         // partial derivative of x.x() w.r.t. x.x()
         this->F( S::X, S::X ) = 1;
         // partial derivative of x.x() w.r.t. x.x_dot()
-        //this->F( S::X, S::X_DOT ) = delta_t;
+        this->F( S::X, S::X_DOT ) = delta_t;
         // partial derivative of x.x() w.r.t. x.theta()
         this->F( S::X_DOT, S::THETA ) = -std::sin( x.theta() ) * u.v();
 
         // partial derivative of x.y() w.r.t. x.y()
         this->F( S::Y, S::Y ) = 1;
         // partial derivative of x.y() w.r.t. x.y_dot()
-        //this->F( S::Y, S::Y_DOT ) = delta_t;
+        this->F( S::Y, S::Y_DOT ) = delta_t;
         // partial derivative of x.y() w.r.t. x.theta()
-        this->F( S::Y, S::THETA ) = std::cos( x.theta() ) * u.v();
+        this->F( S::Y_DOT, S::THETA ) = std::cos( x.theta() ) * u.v();
 
         // partial derivative of x.theta() w.r.t. x.theta()
         this->F( S::THETA, S::THETA ) = 1;
         // partial derivative of x.theta() w.r.t. x.theta()
- //       this->F( S::THETA, S::THETA_DOT ) = 1;
+        this->F( S::THETA, S::THETA_DOT ) = delta_t;
 
         // W = df/dw (Jacobian of state transition w.r.t. the noise)
         this->W.setIdentity();
@@ -270,7 +263,24 @@ protected:
         //Qtheta = sigma_q(2)^2 * [delta_t^3/3 delta_t^2/2;
         //                         delta_t^2/2 delta_t];
         //Q_init = blkdiag(Qxyz, Qxyz, Qtheta, Qtheta);
-        
+
+        this->W( S::X, S::X ) = std::pow(delta_t,3) / 3;
+        this->W( S::X, S::X_DOT ) = std::pow(delta_t,2) / 2;
+        this->W( S::X_DOT, S::X ) = std::pow(delta_t,2) / 2;
+        this->W( S::X_DOT, S::X_DOT ) = delta_t;
+
+        this->W( S::Y, S::Y ) = std::pow(delta_t,3) / 3;
+        this->W( S::Y, S::Y_DOT ) = std::pow(delta_t,2) / 2;
+        this->W( S::Y_DOT, S::Y ) = std::pow(delta_t,2) / 2;
+        this->W( S::Y_DOT, S::Y_DOT ) = delta_t;
+
+        this->W( S::THETA, S::THETA ) = std::pow(delta_t,3) / 3;
+        this->W( S::THETA, S::THETA_DOT ) = std::pow(delta_t,2) / 2;
+        this->W( S::THETA_DOT, S::THETA ) = std::pow(delta_t,2) / 2;
+        this->W( S::THETA_DOT, S::THETA_DOT ) = delta_t;
+
+        //double sigma_q = 0.1;   /// variance of the model noise
+        //this->W = this->W * sigma_q;
     }
 };
 } // truckKinematicModel
