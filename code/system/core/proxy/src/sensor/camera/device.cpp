@@ -102,7 +102,7 @@ odcore::data::image::SharedImage Device::Capture()
     if (CaptureFrame()) {
       if (m_sharedMemory.get() && m_sharedMemory->isValid()) {
         odcore::base::Lock l(m_sharedMemory);
-        CopyImageTo((char*)m_sharedMemory->getSharedMemory(), m_size);
+        CopyImageTo(static_cast<char*>(m_sharedMemory->getSharedMemory()), m_size);
       }
     }
   }
