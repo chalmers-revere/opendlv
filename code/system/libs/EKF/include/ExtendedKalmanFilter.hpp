@@ -132,6 +132,7 @@ namespace kalman{
             s.updateJacobians( x, u );
 
             // predict state
+
             x = s.f(x, u);
 
             // predict covariance
@@ -163,7 +164,7 @@ namespace kalman{
 
             // UPDATE STATE ESTIMATE AND COVARIANCE
             // Update state using computed kalman gain and innovation
-            x += K * ( z - m.h( x ) );
+             x += K * ( z - m.h( x ) );
 
             // Update covariance
             P -= K * m.H * P;

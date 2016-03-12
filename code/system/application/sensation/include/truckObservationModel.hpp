@@ -113,7 +113,7 @@ public :
     /**
      * @brief Constructor
      *
-     * @param landmark1x The x-position of landmark 1
+     * @param landmark1x The x-position of landmark 1   /TODO change this
      * @param landmark1y The y-position of landmark 1
      * @param landmark2x The x-position of landmark 2
      * @param landmark2y The y-position of landmark 2
@@ -126,6 +126,7 @@ public :
         // Setup noise jacobian. As this one is static, we can define it once
         // and do not need to update it dynamically
         this->V.setIdentity();
+        this->V = this->V *0.01;
     }
 
     /**
@@ -138,21 +139,21 @@ public :
      * @param [in] x The system state in current time-step
      * @returns The (predicted) sensor measurement for the system state
      */
-    M h(const S& x) const
+    M h(const S& _x) const
     {
         M measurement;
 
         // Vehicle measurement vector (x,y, theta, theta_dot)-vector
         // This uses the Eigen template method to get the first 4 elements of the vector
-        opendlv::system::libs::kalman::Vector<T, 4> measures = x.template head<4>();
+//        opendlv::system::libs::kalman::Vector<T, 4> measures = _x.template head<4>();
 
-measurement.Z_x() = measures(0); //just to avoid the compiler to complain
+//measurement.Z_x() = measures(0); //just to avoid the compiler to complain
         // for now we are considering a linear observation model
         // moreover, we already get our measures as we expect to be
-        measurement.Z_x() = Z_k(0);//measures(0);       // position along the x axis
-        measurement.Z_y() = Z_k(1);//measures(1);       // position along the y axis
-        measurement.Z_theta() = Z_k(2);//measures(2);     // heading of the vehicle
-        measurement.Z_theta_dot() = Z_k(3);//measures(3); // yaw rate, i.e. rotational velocity of the vehicle
+        measurement.Z_x() = _x(0);//Z_k(0);//measures(0);       // position along the x axis
+        measurement.Z_y() = _x(2);//measures(1);       // position along the y axis
+        measurement.Z_theta() = _x(4);//measures(2);     // heading of the vehicle
+        measurement.Z_theta_dot() = _x(5);//measures(3); // yaw rate, i.e. rotational velocity of the vehicle
 
         return measurement;
     }
@@ -182,10 +183,10 @@ protected:
     {
         // H = dh/dx (Jacobian of measurement function w.r.t. the state)
         this->H.setZero();
-
+cout << "updateJacobians  <<message>>" << x << endl;
         // Robot position as (x,y)-vector
         // This uses the Eigen template method to get the first 2 elements of the vector
-        opendlv::system::libs::kalman::Vector<T, 6> _x = x.template head<6>();
+        //opendlv::system::libs::kalman::Vector<T, 6> _x = x.template head<6>();
 
         // Distances
         //T d1 = std::sqrt( delta1.dot(delta1) );
@@ -193,14 +194,14 @@ protected:
 
 
         // partial derivative of meas.d1() w.r.t. x.x()
-        this->H( M::Z_X, S::X ) = _x(0);//1;//delta1[0] / d1;
+        this->H( M::Z_X, S::X ) = 1;//_x(0);//1;//delta1[0] / d1;
         // partial derivative of meas.d1() w.r.t. x.y()
-        this->H( M::Z_Y, S::Y ) = _x(2);//1;//delta1[1] / d1;
+        this->H( M::Z_Y, S::Y ) = 1;//_x(2);//1;//delta1[1] / d1;
 
         // partial derivative of meas.d1() w.r.t. x.x()
-        this->H( M::Z_THETA, S::THETA ) = _x(4);//1;//delta2[0] / d2;
+        this->H( M::Z_THETA, S::THETA ) = 1;//_x(4);//1;//delta2[0] / d2;
         // partial derivative of meas.d1() w.r.t. x.y()
-        this->H( M::Z_THETA_DOT, S::THETA_DOT ) = _x(5);//1;//delta2[1] / d2;
+        this->H( M::Z_THETA_DOT, S::THETA_DOT ) = 1;//_x(5);//1;//delta2[1] / d2;
     }
 
 
