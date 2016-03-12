@@ -78,6 +78,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
     std::ofstream fout("../Exp_data/output.csv");
     std::ofstream fout_command("../Exp_data/output_commands.csv");
     std::ofstream fout_ekfState("../Exp_data/output_ekf.csv");
+
+    fout_ekfState << "% HEADER: Output of the Extended Kalman Filter, data format : \n"
+                  << "% ground truth x (m)  ground truth y (m) ground truth theta (rad) noisy x (m)  noisy y (m) noisy theta (rad)  ekf x (m) ekf y (m) ekf theta (rad) " << endl;
+
     // You can optionally dump a header (i.e. first line with information).
     const bool WITH_HEADER = true;
     // You can choose the delimiter character between the fields.
@@ -135,9 +139,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
             // Measurement is affected by noise as well
             //orientation.theta() += orientationNoise * noise(generator);
 
-            measurement.Z_x()         =   truckLocation.getX();
-            measurement.Z_y()         =   truckLocation.getY();
-            measurement.Z_theta()     =   truckLocation.getYaw();
+            measurement.Z_x()         =   truckLocation.getX()+0.05*noise(generator);
+            measurement.Z_y()         =   truckLocation.getY()+0.5*noise(generator);
+            measurement.Z_theta()     =   truckLocation.getYaw()+0.001*noise(generator);
             measurement.Z_theta_dot( )=   truckLocation.getYawRate();
             // Update EKF
             //x_ekf = m_ekf.update(OrientationModel, orientation);
@@ -153,8 +157,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
                     << "      x_ekf      " << x_ekf.x() << ", y_ekf " << x_ekf.y() << ", theta_ekf " << x_ekf.theta()  << "\n"
                     << std::endl;
 
-fout_ekfState << x.x() << " " << x.y() << " " << x.theta() << " "
-              << x_ekf_pred.x() << " " << x_ekf_pred.y() << " " << x_ekf_pred.theta() << " "
+fout_ekfState << truckLocation.getX() << " " << truckLocation.getY() << " " << truckLocation.getYaw() << " "
+              << measurement.Z_x() << " " << measurement.Z_y() << " " << measurement.Z_theta() << " "
               << x_ekf.x() << " " << x_ekf.y() << " " << x_ekf.theta() << " "
               <<endl;
 

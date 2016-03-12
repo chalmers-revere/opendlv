@@ -126,7 +126,7 @@ public :
         // Setup noise jacobian. As this one is static, we can define it once
         // and do not need to update it dynamically
         this->V.setIdentity();
-        this->V = this->V *0.01;
+
     }
 
     /**
