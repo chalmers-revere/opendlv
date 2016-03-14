@@ -39,13 +39,13 @@ namespace increaseobjectmargin {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-IncreaseObjectMargin::IncreaseObjectMargin(int32_t const &a_argc, 
-    char **a_argv) : DataTriggeredConferenceClientModule(a_argc, a_argv, 
-        "action-increaseobjectmargin")
+IncreaseObjectMargin::IncreaseObjectMargin(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "action-increaseobjectmargin")
 {
 }
 
-IncreaseObjectMargin::~IncreaseObjectMargin() 
+IncreaseObjectMargin::~IncreaseObjectMargin()
 {
 }
 
@@ -58,11 +58,11 @@ void IncreaseObjectMargin::nextContainer(odcore::data::Container &)
 {
 }
 
-void IncreaseObjectMargin::setUp() 
+void IncreaseObjectMargin::setUp()
 {
 }
 
-void IncreaseObjectMargin::tearDown() 
+void IncreaseObjectMargin::tearDown()
 {
 }
 

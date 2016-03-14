@@ -42,41 +42,41 @@ namespace ledstrip {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-Ledstrip::Ledstrip(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, 
-        "proxy-communicator-ledstrip"),
-    m_device()
+Ledstrip::Ledstrip(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "proxy-communicator-ledstrip")
+    , m_device()
 {
 }
 
-Ledstrip::~Ledstrip() 
+Ledstrip::~Ledstrip()
 {
 }
 
-void Ledstrip::nextContainer(odcore::data::Container &) 
+void Ledstrip::nextContainer(odcore::data::Container &)
 {
 }
 
-void Ledstrip::setUp() 
+void Ledstrip::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
-  std::string const type = kv.getValue<std::string>(
-      "proxy-communicator-ledstrip.type");
-/*  std::string const port = kv.getValue<std::string>(
- *      "proxy-communicator-ledstrip.port");
-*/
+  std::string const type =
+  kv.getValue<std::string>("proxy-communicator-ledstrip.type");
+  /*  std::string const port = kv.getValue<std::string>(
+   *      "proxy-communicator-ledstrip.port");
+  */
   if (type.compare("victor") == 0) {
-//      m_device = std::unique_ptr<Device>(new VictorDevice());
+    //      m_device = std::unique_ptr<Device>(new VictorDevice());
   }
 
   if (m_device.get() == nullptr) {
-    std::cerr << "[proxy-communicator-ledstrip] No valid device driver defined." 
-        << std::endl;
+    std::cerr << "[proxy-communicator-ledstrip] No valid device driver defined."
+              << std::endl;
   }
 }
 
-void Ledstrip::tearDown() 
+void Ledstrip::tearDown()
 {
 }
 

@@ -40,13 +40,13 @@ namespace monochrome {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-Monochrome::Monochrome(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, 
-        "sensation-vision-monochrome")
+Monochrome::Monochrome(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "sensation-vision-monochrome")
 {
 }
 
-Monochrome::~Monochrome() 
+Monochrome::~Monochrome()
 {
 }
 
@@ -58,11 +58,11 @@ void Monochrome::nextContainer(odcore::data::Container &)
 {
 }
 
-void Monochrome::setUp() 
+void Monochrome::setUp()
 {
 }
 
-void Monochrome::tearDown() 
+void Monochrome::tearDown()
 {
 }
 

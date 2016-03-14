@@ -19,7 +19,8 @@
 
 #include "communicator/toggeler/toggeler.hpp"
 
-int32_t main(int32_t a_argc, char **a_argv) {
+int32_t main(int32_t a_argc, char **a_argv)
+{
   opendlv::proxy::communicator::toggeler::Toggeler toggeler(a_argc, a_argv);
   return toggeler.runModule();
 }

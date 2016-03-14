@@ -30,25 +30,25 @@ namespace sensor {
 namespace camera {
 
 /**
- * This class wraps an OpenCV camera and captures its data into a shared memory 
+ * This class wraps an OpenCV camera and captures its data into a shared memory
  * segment.
  */
 class OpenCvDevice : public Device {
-  public:
-    OpenCvDevice(std::string const &, uint32_t const &, uint32_t const &, 
-        uint32_t const &, uint32_t const &);
-    OpenCvDevice(OpenCvDevice const &) = delete;
-    OpenCvDevice &operator=(OpenCvDevice const &) = delete;
-    virtual ~OpenCvDevice();
+ public:
+  OpenCvDevice(std::string const &, uint32_t const &, uint32_t const &,
+  uint32_t const &, uint32_t const &);
+  OpenCvDevice(OpenCvDevice const &) = delete;
+  OpenCvDevice &operator=(OpenCvDevice const &) = delete;
+  virtual ~OpenCvDevice();
 
-  private:
-    virtual bool CopyImageTo(char *, uint32_t const &);
-    virtual bool IsValid() const;
-    virtual bool CaptureFrame();
+ private:
+  virtual bool CopyImageTo(char *, uint32_t const &);
+  virtual bool IsValid() const;
+  virtual bool CaptureFrame();
 
-  private:
-    CvCapture *m_capture;
-    IplImage *m_image;
+ private:
+  CvCapture *m_capture;
+  IplImage *m_image;
 };
 
 } // camera

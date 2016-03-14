@@ -39,12 +39,12 @@ namespace communicate {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-Communicate::Communicate(int32_t const &a_argc, char **a_argv) :
-    TimeTriggeredConferenceClientModule(a_argc, a_argv, "action-communicate")
+Communicate::Communicate(int32_t const &a_argc, char **a_argv)
+    : TimeTriggeredConferenceClientModule(a_argc, a_argv, "action-communicate")
 {
 }
 
-Communicate::~Communicate() 
+Communicate::~Communicate()
 {
 }
 
@@ -57,11 +57,11 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Communicate::body()
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
-void Communicate::setUp() 
+void Communicate::setUp()
 {
 }
 
-void Communicate::tearDown() 
+void Communicate::tearDown()
 {
 }
 

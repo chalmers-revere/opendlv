@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
 #ifndef DIAGNOSTICS_HPP_
@@ -27,17 +28,18 @@ namespace system {
 /**
  * This class provides...
  */
-class Diagnostics : public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    Diagnostics(int32_t const &, char **);
-    Diagnostics(Diagnostics const &) = delete;
-    Diagnostics &operator=(Diagnostics const &) = delete;
-    virtual ~Diagnostics();
-    virtual void nextContainer(odcore::data::Container &);
+class Diagnostics
+: public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  Diagnostics(int32_t const &, char **);
+  Diagnostics(Diagnostics const &) = delete;
+  Diagnostics &operator=(Diagnostics const &) = delete;
+  virtual ~Diagnostics();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    virtual void setUp();
-    virtual void tearDown();
+ private:
+  virtual void setUp();
+  virtual void tearDown();
 };
 
 } // system

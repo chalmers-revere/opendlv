@@ -36,18 +36,18 @@ class Device;
  * This class provides...
  */
 class Lidar : public odcore::base::module::TimeTriggeredConferenceClientModule {
-  public:
-    Lidar(int32_t const &, char **);
-    Lidar(Lidar const &) = delete;
-    Lidar &operator=(Lidar const &) = delete;
-    virtual ~Lidar();
-    odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+ public:
+  Lidar(int32_t const &, char **);
+  Lidar(Lidar const &) = delete;
+  Lidar &operator=(Lidar const &) = delete;
+  virtual ~Lidar();
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 
-    std::unique_ptr<Device> m_device;
+  std::unique_ptr<Device> m_device;
 };
 
 } // lidar

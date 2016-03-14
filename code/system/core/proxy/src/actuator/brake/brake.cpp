@@ -42,38 +42,38 @@ namespace brake {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-Brake::Brake(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, 
-        "proxy-actuator-brake"),
-    m_device()
+Brake::Brake(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "proxy-actuator-brake")
+    , m_device()
 {
 }
 
-Brake::~Brake() 
+Brake::~Brake()
 {
 }
 
-void Brake::nextContainer(odcore::data::Container &) 
+void Brake::nextContainer(odcore::data::Container &)
 {
 }
 
-void Brake::setUp() 
+void Brake::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
-  std::string const type = 
-    kv.getValue<std::string>("proxy-actuator-brake.type");
+  std::string const type =
+  kv.getValue<std::string>("proxy-actuator-brake.type");
   if (type.compare("gw-volvo") == 0) {
-//      m_device = std::unique_ptr<Device>(new GatewayVolvoDevice());
+    //      m_device = std::unique_ptr<Device>(new GatewayVolvoDevice());
   }
 
   if (m_device.get() == nullptr) {
-    std::cerr << "[proxy-actuator-brake] No valid device driver defined." 
-        << std::endl;
+    std::cerr << "[proxy-actuator-brake] No valid device driver defined."
+              << std::endl;
   }
 }
 
-void Brake::tearDown() 
+void Brake::tearDown()
 {
 }
 

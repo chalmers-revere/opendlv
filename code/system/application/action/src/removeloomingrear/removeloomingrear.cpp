@@ -39,9 +39,9 @@ namespace removeloomingrear {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-RemoveLoomingRear::RemoveLoomingRear(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, 
-        "action-removeloomingrear")
+RemoveLoomingRear::RemoveLoomingRear(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "action-removeloomingrear")
 {
 }
 
@@ -51,7 +51,7 @@ RemoveLoomingRear::RemoveLoomingRear(int32_t const &a_argc, char **a_argv) :
  * Sends increse speed command (throttle) or in rare cases a world rotation
  * (steer) command to Act.
  */
-RemoveLoomingRear::~RemoveLoomingRear() 
+RemoveLoomingRear::~RemoveLoomingRear()
 {
 }
 
@@ -59,11 +59,11 @@ void RemoveLoomingRear::nextContainer(odcore::data::Container &)
 {
 }
 
-void RemoveLoomingRear::setUp() 
+void RemoveLoomingRear::setUp()
 {
 }
 
-void RemoveLoomingRear::tearDown() 
+void RemoveLoomingRear::tearDown()
 {
 }
 

@@ -40,13 +40,13 @@ namespace looming {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-Looming::Looming(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, 
-        "sensation-vision-looming")
+Looming::Looming(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "sensation-vision-looming")
 {
 }
 
-Looming::~Looming() 
+Looming::~Looming()
 {
 }
 
@@ -58,11 +58,11 @@ void Looming::nextContainer(odcore::data::Container &)
 {
 }
 
-void Looming::setUp() 
+void Looming::setUp()
 {
 }
 
-void Looming::tearDown() 
+void Looming::tearDown()
 {
 }
 

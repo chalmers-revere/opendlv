@@ -33,18 +33,18 @@ namespace v2vdenm {
 /**
  * This class provides...
  */
-class V2vDenm : 
-    public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    V2vDenm(int32_t const &, char **);
-    V2vDenm(V2vDenm const &) = delete;
-    V2vDenm &operator=(V2vDenm const &) = delete;
-    virtual ~V2vDenm();
-    virtual void nextContainer(odcore::data::Container &);
+class V2vDenm
+: public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  V2vDenm(int32_t const &, char **);
+  V2vDenm(V2vDenm const &) = delete;
+  V2vDenm &operator=(V2vDenm const &) = delete;
+  virtual ~V2vDenm();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 };
 
 } // v2vdenm

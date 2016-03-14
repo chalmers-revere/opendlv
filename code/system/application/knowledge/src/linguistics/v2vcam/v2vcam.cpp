@@ -40,13 +40,13 @@ namespace v2vcam {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-V2vCam::V2vCam(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, 
-        "knowledge-linguistics-v2vcam")
+V2vCam::V2vCam(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "knowledge-linguistics-v2vcam")
 {
 }
 
-V2vCam::~V2vCam() 
+V2vCam::~V2vCam()
 {
 }
 
@@ -58,11 +58,11 @@ void V2vCam::nextContainer(odcore::data::Container &)
 {
 }
 
-void V2vCam::setUp() 
+void V2vCam::setUp()
 {
 }
 
-void V2vCam::tearDown() 
+void V2vCam::tearDown()
 {
 }
 

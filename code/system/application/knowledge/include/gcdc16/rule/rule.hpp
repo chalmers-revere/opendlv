@@ -33,18 +33,17 @@ namespace rule {
 /**
  * This class provides...
  */
-class Rule : 
-    public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    Rule(int32_t const &, char **);
-    Rule(Rule const &) = delete;
-    Rule &operator=(Rule const &) = delete;
-    virtual ~Rule();
-    virtual void nextContainer(odcore::data::Container &);
+class Rule : public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  Rule(int32_t const &, char **);
+  Rule(Rule const &) = delete;
+  Rule &operator=(Rule const &) = delete;
+  virtual ~Rule();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 };
 
 } // rule

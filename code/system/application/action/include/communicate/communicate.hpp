@@ -32,18 +32,18 @@ namespace communicate {
 /**
  * This class provides...
  */
-class Communicate : 
-    public odcore::base::module::TimeTriggeredConferenceClientModule {
-  public:
-    Communicate(int32_t const &, char **);
-    Communicate(Communicate const &) = delete;
-    Communicate &operator=(Communicate const &) = delete;
-    virtual ~Communicate();
-    odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+class Communicate
+: public odcore::base::module::TimeTriggeredConferenceClientModule {
+ public:
+  Communicate(int32_t const &, char **);
+  Communicate(Communicate const &) = delete;
+  Communicate &operator=(Communicate const &) = delete;
+  virtual ~Communicate();
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 };
 
 } // communicate

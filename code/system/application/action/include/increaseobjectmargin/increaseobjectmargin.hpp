@@ -32,18 +32,18 @@ namespace increaseobjectmargin {
 /**
  * This class provides...
  */
-class IncreaseObjectMargin : 
-    public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    IncreaseObjectMargin(int32_t const &, char **);
-    IncreaseObjectMargin(IncreaseObjectMargin const &) = delete;
-    IncreaseObjectMargin &operator=(IncreaseObjectMargin const &) = delete;
-    virtual ~IncreaseObjectMargin();
-    virtual void nextContainer(odcore::data::Container &);
+class IncreaseObjectMargin
+: public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  IncreaseObjectMargin(int32_t const &, char **);
+  IncreaseObjectMargin(IncreaseObjectMargin const &) = delete;
+  IncreaseObjectMargin &operator=(IncreaseObjectMargin const &) = delete;
+  virtual ~IncreaseObjectMargin();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 };
 
 } // increaseobjectmargin

@@ -35,20 +35,20 @@ class Device;
 /**
  * This class provides...
  */
-class Steering : 
-    public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    Steering(int32_t const &, char **);
-    Steering(Steering const &) = delete;
-    Steering &operator=(Steering const &) = delete;
-    virtual ~Steering();
-    virtual void nextContainer(odcore::data::Container &);
+class Steering
+: public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  Steering(int32_t const &, char **);
+  Steering(Steering const &) = delete;
+  Steering &operator=(Steering const &) = delete;
+  virtual ~Steering();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 
-    std::unique_ptr<Device> m_device;
+  std::unique_ptr<Device> m_device;
 };
 
 } // steering

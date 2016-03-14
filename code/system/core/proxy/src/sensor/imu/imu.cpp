@@ -42,13 +42,13 @@ namespace imu {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-Imu::Imu(int32_t const &a_argc, char **a_argv) :
-    TimeTriggeredConferenceClientModule(a_argc, a_argv, "proxy-sensor-imu"),
-    m_device()
+Imu::Imu(int32_t const &a_argc, char **a_argv)
+    : TimeTriggeredConferenceClientModule(a_argc, a_argv, "proxy-sensor-imu")
+    , m_device()
 {
 }
 
-Imu::~Imu() 
+Imu::~Imu()
 {
 }
 
@@ -58,27 +58,28 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Imu::body()
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
-void Imu::setUp() 
+void Imu::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
   std::string const type = kv.getValue<std::string>("proxy-sensor-imu.type");
-/*  std::string const port = kv.getValue<std::string>("proxy-sensor-imu.port");
-  float const mountX = kv.getValue<float>("proxy-sensor-imu.mount.x");
-  float const mountY = kv.getValue<float>("proxy-sensor-imu.mount.y");
-  float const mountZ = kv.getValue<float>("proxy-sensor-imu.mount.z");
-*/
+  /*  std::string const port =
+    kv.getValue<std::string>("proxy-sensor-imu.port");
+    float const mountX = kv.getValue<float>("proxy-sensor-imu.mount.x");
+    float const mountY = kv.getValue<float>("proxy-sensor-imu.mount.y");
+    float const mountZ = kv.getValue<float>("proxy-sensor-imu.mount.z");
+  */
   if (type.compare("pololu-10") == 0) {
-//      m_device = std::unique_ptr<Device>(new Pololu10Device());
+    //      m_device = std::unique_ptr<Device>(new Pololu10Device());
   }
 
   if (m_device.get() == nullptr) {
-    std::cerr << "[proxy-sensor-imu] No valid device driver defined." 
-        << std::endl;
+    std::cerr << "[proxy-sensor-imu] No valid device driver defined."
+              << std::endl;
   }
 }
 
-void Imu::tearDown() 
+void Imu::tearDown()
 {
 }
 

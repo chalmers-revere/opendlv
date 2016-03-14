@@ -19,7 +19,8 @@
 
 #include "gcdc16/v2viclcm/v2viclcm.hpp"
 
-int32_t main(int32_t a_argc, char **a_argv) {
+int32_t main(int32_t a_argc, char **a_argv)
+{
   opendlv::knowledge::gcdc16::v2viclcm::V2vIclcm main(a_argc, a_argv);
   return main.runModule();
 }

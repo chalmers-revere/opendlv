@@ -35,19 +35,20 @@ class Device;
 /**
  * This class provides...
  */
-class Camera : public odcore::base::module::TimeTriggeredConferenceClientModule {
-  public:
-    Camera(int32_t const &, char **);
-    Camera(Camera const &) = delete;
-    Camera &operator=(Camera const &) = delete;
-    virtual ~Camera();
-    odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+class Camera
+: public odcore::base::module::TimeTriggeredConferenceClientModule {
+ public:
+  Camera(int32_t const &, char **);
+  Camera(Camera const &) = delete;
+  Camera &operator=(Camera const &) = delete;
+  virtual ~Camera();
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 
-    std::unique_ptr<Device> m_device;
+  std::unique_ptr<Device> m_device;
 };
 
 } // camera

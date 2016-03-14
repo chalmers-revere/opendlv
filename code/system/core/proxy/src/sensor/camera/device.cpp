@@ -39,18 +39,18 @@ namespace camera {
  * @param bpp
  */
 Device::Device(std::string const &a_name, uint32_t const &a_id,
-    uint32_t const &a_width, uint32_t const &a_height, uint32_t const &a_bpp):
-    m_name(a_name),
-    m_id(a_id),
-    m_width(a_width),
-    m_height(a_height),
-    m_bpp(a_bpp),
-    m_size(a_width * a_height * a_bpp),
-    m_sharedImage(),
-    m_sharedMemory()
+uint32_t const &a_width, uint32_t const &a_height, uint32_t const &a_bpp)
+    : m_name(a_name)
+    , m_id(a_id)
+    , m_width(a_width)
+    , m_height(a_height)
+    , m_bpp(a_bpp)
+    , m_size(a_width * a_height * a_bpp)
+    , m_sharedImage()
+    , m_sharedMemory()
 {
-  m_sharedMemory = odcore::wrapper::SharedMemoryFactory::createSharedMemory(
-      a_name, m_size);
+  m_sharedMemory =
+  odcore::wrapper::SharedMemoryFactory::createSharedMemory(a_name, m_size);
 
   m_sharedImage.setName(a_name);
   m_sharedImage.setWidth(a_width);
@@ -65,32 +65,32 @@ Device::~Device()
 
 std::string const Device::GetName() const
 {
-    return m_name;
+  return m_name;
 }
 
 uint32_t Device::GetId() const
 {
-    return m_id;
+  return m_id;
 }
 
 uint32_t Device::GetWidth() const
 {
-    return m_width;
+  return m_width;
 }
 
 uint32_t Device::GetHeight() const
 {
-    return m_height;
+  return m_height;
 }
 
 uint32_t Device::GetBpp() const
 {
-    return m_bpp;
+  return m_bpp;
 }
 
 uint32_t Device::GetSize() const
 {
-    return m_size;
+  return m_size;
 }
 
 /**
@@ -102,7 +102,8 @@ odcore::data::image::SharedImage Device::Capture()
     if (CaptureFrame()) {
       if (m_sharedMemory.get() && m_sharedMemory->isValid()) {
         odcore::base::Lock l(m_sharedMemory);
-        CopyImageTo(static_cast<char*>(m_sharedMemory->getSharedMemory()), m_size);
+        CopyImageTo(
+        static_cast<char *>(m_sharedMemory->getSharedMemory()), m_size);
       }
     }
   }

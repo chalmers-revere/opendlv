@@ -40,13 +40,13 @@ namespace opticalflow {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-OpticalFlow::OpticalFlow(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, 
-        "sensation-vision-opticalflow")
+OpticalFlow::OpticalFlow(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "sensation-vision-opticalflow")
 {
 }
 
-OpticalFlow::~OpticalFlow() 
+OpticalFlow::~OpticalFlow()
 {
 }
 
@@ -58,11 +58,11 @@ void OpticalFlow::nextContainer(odcore::data::Container &)
 {
 }
 
-void OpticalFlow::setUp() 
+void OpticalFlow::setUp()
 {
 }
 
-void OpticalFlow::tearDown() 
+void OpticalFlow::tearDown()
 {
 }
 

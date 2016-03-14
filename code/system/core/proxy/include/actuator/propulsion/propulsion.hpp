@@ -35,20 +35,20 @@ class Device;
 /**
  * This class provides...
  */
-class Propulsion : 
-    public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    Propulsion(int32_t const &, char **);
-    Propulsion(Propulsion const &) = delete;
-    Propulsion &operator=(Propulsion const &) = delete;
-    virtual ~Propulsion();
-    virtual void nextContainer(odcore::data::Container &);
+class Propulsion
+: public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  Propulsion(int32_t const &, char **);
+  Propulsion(Propulsion const &) = delete;
+  Propulsion &operator=(Propulsion const &) = delete;
+  virtual ~Propulsion();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 
-    std::unique_ptr<Device> m_device;
+  std::unique_ptr<Device> m_device;
 };
 
 } // propulsion

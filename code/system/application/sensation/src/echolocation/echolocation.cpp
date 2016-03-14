@@ -39,13 +39,13 @@ namespace echolocation {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-Echolocation::Echolocation(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, 
-        "sensation-echolocation")
+Echolocation::Echolocation(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "sensation-echolocation")
 {
 }
 
-Echolocation::~Echolocation() 
+Echolocation::~Echolocation()
 {
 }
 
@@ -57,11 +57,11 @@ void Echolocation::nextContainer(odcore::data::Container &)
 {
 }
 
-void Echolocation::setUp() 
+void Echolocation::setUp()
 {
 }
 
-void Echolocation::tearDown() 
+void Echolocation::tearDown()
 {
 }
 

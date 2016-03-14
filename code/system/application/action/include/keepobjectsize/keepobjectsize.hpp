@@ -32,18 +32,18 @@ namespace keepobjectsize {
 /**
  * This class provides...
  */
-class KeepObjectSize : 
-    public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    KeepObjectSize(int32_t const &, char **);
-    KeepObjectSize(KeepObjectSize const &) = delete;
-    KeepObjectSize &operator=(KeepObjectSize const &) = delete;
-    virtual ~KeepObjectSize();
-    virtual void nextContainer(odcore::data::Container &);
+class KeepObjectSize
+: public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  KeepObjectSize(int32_t const &, char **);
+  KeepObjectSize(KeepObjectSize const &) = delete;
+  KeepObjectSize &operator=(KeepObjectSize const &) = delete;
+  virtual ~KeepObjectSize();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 };
 
 } // keepobjectsize

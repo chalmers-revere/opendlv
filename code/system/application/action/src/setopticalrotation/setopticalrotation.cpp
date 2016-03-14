@@ -39,13 +39,13 @@ namespace setopticalrotation {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-SetOpticalRotation::SetOpticalRotation(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, 
-        "action-setopticalrotation")
+SetOpticalRotation::SetOpticalRotation(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "action-setopticalrotation")
 {
 }
 
-SetOpticalRotation::~SetOpticalRotation() 
+SetOpticalRotation::~SetOpticalRotation()
 {
 }
 
@@ -57,11 +57,11 @@ void SetOpticalRotation::nextContainer(odcore::data::Container &)
 {
 }
 
-void SetOpticalRotation::setUp() 
+void SetOpticalRotation::setUp()
 {
 }
 
-void SetOpticalRotation::tearDown() 
+void SetOpticalRotation::tearDown()
 {
 }
 

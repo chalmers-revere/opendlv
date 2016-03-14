@@ -35,19 +35,20 @@ class Device;
 /**
  * This class provides...
  */
-class Ledstrip : public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    Ledstrip(int32_t const &, char **);
-    Ledstrip(Ledstrip const &) = delete;
-    Ledstrip &operator=(Ledstrip const &) = delete;
-    virtual ~Ledstrip();
-    virtual void nextContainer(odcore::data::Container &);
+class Ledstrip
+: public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  Ledstrip(int32_t const &, char **);
+  Ledstrip(Ledstrip const &) = delete;
+  Ledstrip &operator=(Ledstrip const &) = delete;
+  virtual ~Ledstrip();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 
-    std::unique_ptr<Device> m_device;
+  std::unique_ptr<Device> m_device;
 };
 
 } // ledstrip

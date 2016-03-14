@@ -40,13 +40,13 @@ namespace v2vdenm {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-V2vDenm::V2vDenm(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, 
-        "knowledge-linguistics-v2vdenm")
+V2vDenm::V2vDenm(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "knowledge-linguistics-v2vdenm")
 {
 }
 
-V2vDenm::~V2vDenm() 
+V2vDenm::~V2vDenm()
 {
 }
 
@@ -58,11 +58,11 @@ void V2vDenm::nextContainer(odcore::data::Container &)
 {
 }
 
-void V2vDenm::setUp() 
+void V2vDenm::setUp()
 {
 }
 
-void V2vDenm::tearDown() 
+void V2vDenm::tearDown()
 {
 }
 

@@ -39,19 +39,20 @@ namespace camera {
  * @param bpp
  */
 OpenCvDevice::OpenCvDevice(std::string const &a_name, uint32_t const &a_id,
-    uint32_t const &a_width, uint32_t const &a_height, uint32_t const &a_bpp):
-    Device(a_name, a_id, a_width, a_height, a_bpp),
-    m_capture(nullptr),
-    m_image(nullptr)
+uint32_t const &a_width, uint32_t const &a_height, uint32_t const &a_bpp)
+    : Device(a_name, a_id, a_width, a_height, a_bpp)
+    , m_capture(nullptr)
+    , m_image(nullptr)
 {
   m_capture = cvCaptureFromCAM(a_id);
 
   if (m_capture) {
     cvSetCaptureProperty(m_capture, CV_CAP_PROP_FRAME_WIDTH, a_width);
     cvSetCaptureProperty(m_capture, CV_CAP_PROP_FRAME_HEIGHT, a_height);
-  } else {
-    std::cerr << "[proxy-sensor-camera] Could not open camera '" << a_name 
-        << "' with ID: " << a_id << std::endl;
+  }
+  else {
+    std::cerr << "[proxy-sensor-camera] Could not open camera '" << a_name
+              << "' with ID: " << a_id << std::endl;
   }
 }
 
@@ -81,7 +82,8 @@ bool OpenCvDevice::CaptureFrame()
         }
 
         cvCvtColor(tmpFrame, m_image, CV_BGR2GRAY);
-      } else {
+      }
+      else {
         m_image = cvRetrieveFrame(m_capture);
       }
 
@@ -111,4 +113,3 @@ bool OpenCvDevice::CopyImageTo(char *a_destination, const uint32_t &a_size)
 } // sensor
 } // proxy
 } // opendlv
-

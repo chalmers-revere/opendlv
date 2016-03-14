@@ -34,16 +34,16 @@ namespace edge {
  * This class provides...
  */
 class Edge : public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    Edge(int32_t const &, char **);
-    Edge(Edge const &) = delete;
-    Edge &operator=(Edge const &) = delete;
-    virtual ~Edge();
-    virtual void nextContainer(odcore::data::Container &);
+ public:
+  Edge(int32_t const &, char **);
+  Edge(Edge const &) = delete;
+  Edge &operator=(Edge const &) = delete;
+  virtual ~Edge();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 };
 
 } // edge

@@ -13,12 +13,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
 #include "safety.hpp"
 
-int32_t main(int32_t a_argc, char **a_argv) {
+int32_t main(int32_t a_argc, char **a_argv)
+{
   opendlv::system::Safety s(a_argc, a_argv);
   return s.runModule();
 }

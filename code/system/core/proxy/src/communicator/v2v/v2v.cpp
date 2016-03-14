@@ -41,41 +41,41 @@ namespace v2v {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-V2v::V2v(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, 
-        "proxy-communicator-v2v"),
-    m_device()
+V2v::V2v(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "proxy-communicator-v2v")
+    , m_device()
 {
 }
 
-V2v::~V2v() 
+V2v::~V2v()
 {
 }
 
-void V2v::nextContainer(odcore::data::Container &) 
+void V2v::nextContainer(odcore::data::Container &)
 {
 }
 
-void V2v::setUp() 
+void V2v::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
-  std::string const type = kv.getValue<std::string>(
-      "proxy-communicator-v2v.type");
-/*  std::string const port = kv.getValue<std::string>(
- *      "proxy-communicator-v2v.port");
-*/
+  std::string const type =
+  kv.getValue<std::string>("proxy-communicator-v2v.type");
+  /*  std::string const port = kv.getValue<std::string>(
+   *      "proxy-communicator-v2v.port");
+  */
   if (type.compare("geonetworking") == 0) {
-//      m_device = std::unique_ptr<Device>(new GeonetworkingDevice());
+    //      m_device = std::unique_ptr<Device>(new GeonetworkingDevice());
   }
 
   if (m_device.get() == nullptr) {
-    std::cerr << "[proxy-communicator-v2v] No valid device driver defined." 
-        << std::endl;
+    std::cerr << "[proxy-communicator-v2v] No valid device driver defined."
+              << std::endl;
   }
 }
 
-void V2v::tearDown() 
+void V2v::tearDown()
 {
 }
 

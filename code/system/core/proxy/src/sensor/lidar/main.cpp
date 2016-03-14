@@ -19,7 +19,8 @@
 
 #include "sensor/lidar/lidar.hpp"
 
-int32_t main(int32_t a_argc, char **a_argv) {
+int32_t main(int32_t a_argc, char **a_argv)
+{
   opendlv::proxy::sensor::lidar::Lidar lidar(a_argc, a_argv);
   return lidar.runModule();
 }

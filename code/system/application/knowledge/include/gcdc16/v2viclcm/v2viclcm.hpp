@@ -33,18 +33,18 @@ namespace v2viclcm {
 /**
  * This class provides...
  */
-class V2vIclcm : 
-    public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    V2vIclcm(int32_t const &, char **);
-    V2vIclcm(V2vIclcm const &) = delete;
-    V2vIclcm &operator=(V2vIclcm const &) = delete;
-    virtual ~V2vIclcm();
-    virtual void nextContainer(odcore::data::Container &);
+class V2vIclcm
+: public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  V2vIclcm(int32_t const &, char **);
+  V2vIclcm(V2vIclcm const &) = delete;
+  V2vIclcm &operator=(V2vIclcm const &) = delete;
+  virtual ~V2vIclcm();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 };
 
 } // v2viclcm

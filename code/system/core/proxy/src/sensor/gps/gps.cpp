@@ -42,13 +42,13 @@ namespace gps {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-Gps::Gps(int32_t const &a_argc, char **a_argv) :
-    TimeTriggeredConferenceClientModule(a_argc, a_argv, "proxy-sensor-gps"),
-    m_device()
+Gps::Gps(int32_t const &a_argc, char **a_argv)
+    : TimeTriggeredConferenceClientModule(a_argc, a_argv, "proxy-sensor-gps")
+    , m_device()
 {
 }
 
-Gps::~Gps() 
+Gps::~Gps()
 {
 }
 
@@ -58,27 +58,28 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Gps::body()
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
-void Gps::setUp() 
+void Gps::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
   std::string const type = kv.getValue<std::string>("proxy-sensor-gps.type");
-/*  std::string const port = kv.getValue<std::string>("proxy-sensor-gps.port");
-  float const mountX = kv.getValue<float>("proxy-sensor-gps.mount.x");
-  float const mountY = kv.getValue<float>("proxy-sensor-gps.mount.y");
-  float const mountZ = kv.getValue<float>("proxy-sensor-gps.mount.z");
-*/
+  /*  std::string const port =
+    kv.getValue<std::string>("proxy-sensor-gps.port");
+    float const mountX = kv.getValue<float>("proxy-sensor-gps.mount.x");
+    float const mountY = kv.getValue<float>("proxy-sensor-gps.mount.y");
+    float const mountZ = kv.getValue<float>("proxy-sensor-gps.mount.z");
+  */
   if (type.compare("trimble") == 0) {
-//      m_device = std::unique_ptr<Device>(new TrimbleDevice());
+    //      m_device = std::unique_ptr<Device>(new TrimbleDevice());
   }
 
   if (m_device.get() == nullptr) {
-    std::cerr << "[proxy-sensor-gps] No valid device driver defined." 
-        << std::endl;
+    std::cerr << "[proxy-sensor-gps] No valid device driver defined."
+              << std::endl;
   }
 }
 
-void Gps::tearDown() 
+void Gps::tearDown()
 {
 }
 

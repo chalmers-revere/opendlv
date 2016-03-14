@@ -19,7 +19,8 @@
 
 #include "vision/monochrome/monochrome.hpp"
 
-int32_t main(int32_t a_argc, char **a_argv) {
+int32_t main(int32_t a_argc, char **a_argv)
+{
   opendlv::sensation::vision::monochrome::Monochrome main(a_argc, a_argv);
   return main.runModule();
 }

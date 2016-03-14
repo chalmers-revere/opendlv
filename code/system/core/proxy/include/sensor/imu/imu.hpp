@@ -36,18 +36,18 @@ class Device;
  * This class provides...
  */
 class Imu : public odcore::base::module::TimeTriggeredConferenceClientModule {
-  public:
-    Imu(int32_t const &, char **);
-    Imu(Imu const &) = delete;
-    Imu &operator=(Imu const &) = delete;
-    virtual ~Imu();
-    odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+ public:
+  Imu(int32_t const &, char **);
+  Imu(Imu const &) = delete;
+  Imu &operator=(Imu const &) = delete;
+  virtual ~Imu();
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 
-    std::unique_ptr<Device> m_device;
+  std::unique_ptr<Device> m_device;
 };
 
 } // imu

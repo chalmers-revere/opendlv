@@ -39,12 +39,13 @@ namespace setopticalflow {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-SetOpticalFlow::SetOpticalFlow(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, "action-setopticalflow")
+SetOpticalFlow::SetOpticalFlow(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "action-setopticalflow")
 {
 }
 
-SetOpticalFlow::~SetOpticalFlow() 
+SetOpticalFlow::~SetOpticalFlow()
 {
 }
 
@@ -57,11 +58,11 @@ void SetOpticalFlow::nextContainer(odcore::data::Container &)
 {
 }
 
-void SetOpticalFlow::setUp() 
+void SetOpticalFlow::setUp()
 {
 }
 
-void SetOpticalFlow::tearDown() 
+void SetOpticalFlow::tearDown()
 {
 }
 

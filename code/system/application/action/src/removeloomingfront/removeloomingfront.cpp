@@ -39,18 +39,18 @@ namespace removeloomingfront {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-RemoveLoomingFront::RemoveLoomingFront(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, 
-        "action-removeloomingfront")
+RemoveLoomingFront::RemoveLoomingFront(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "action-removeloomingfront")
 {
 }
 
-RemoveLoomingFront::~RemoveLoomingFront() 
+RemoveLoomingFront::~RemoveLoomingFront()
 {
 }
 
 /**
- * Receives looming front with related angle and size 
+ * Receives looming front with related angle and size
  * (from Perception or Sensation).
  * Sends halt command (brake) or in rare cases a world rotation (steer) command
  * to Act.
@@ -59,11 +59,11 @@ void RemoveLoomingFront::nextContainer(odcore::data::Container &)
 {
 }
 
-void RemoveLoomingFront::setUp() 
+void RemoveLoomingFront::setUp()
 {
 }
 
-void RemoveLoomingFront::tearDown() 
+void RemoveLoomingFront::tearDown()
 {
 }
 

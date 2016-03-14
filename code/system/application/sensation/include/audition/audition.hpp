@@ -32,18 +32,18 @@ namespace audition {
 /**
  * This class provides...
  */
-class Audition : 
-    public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    Audition(int32_t const &, char **);
-    Audition(Audition const &) = delete;
-    Audition &operator=(Audition const &) = delete;
-    virtual ~Audition();
-    virtual void nextContainer(odcore::data::Container &);
+class Audition
+: public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  Audition(int32_t const &, char **);
+  Audition(Audition const &) = delete;
+  Audition &operator=(Audition const &) = delete;
+  virtual ~Audition();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 };
 
 } // audition

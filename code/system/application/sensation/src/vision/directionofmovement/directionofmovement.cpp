@@ -40,13 +40,13 @@ namespace directionofmovement {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-DirectionOfMovement::DirectionOfMovement(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, 
-        "sensation-vision-directionofmovement")
+DirectionOfMovement::DirectionOfMovement(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "sensation-vision-directionofmovement")
 {
 }
 
-DirectionOfMovement::~DirectionOfMovement() 
+DirectionOfMovement::~DirectionOfMovement()
 {
 }
 
@@ -58,11 +58,11 @@ void DirectionOfMovement::nextContainer(odcore::data::Container &)
 {
 }
 
-void DirectionOfMovement::setUp() 
+void DirectionOfMovement::setUp()
 {
 }
 
-void DirectionOfMovement::tearDown() 
+void DirectionOfMovement::tearDown()
 {
 }
 

@@ -35,19 +35,20 @@ class Device;
 /**
  * This class provides...
  */
-class Toggeler : public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    Toggeler(int32_t const &, char **);
-    Toggeler(Toggeler const &) = delete;
-    Toggeler &operator=(Toggeler const &) = delete;
-    virtual ~Toggeler();
-    virtual void nextContainer(odcore::data::Container &);
+class Toggeler
+: public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  Toggeler(int32_t const &, char **);
+  Toggeler(Toggeler const &) = delete;
+  Toggeler &operator=(Toggeler const &) = delete;
+  virtual ~Toggeler();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 
-    std::unique_ptr<Device> m_device;
+  std::unique_ptr<Device> m_device;
 };
 
 } // toggeler

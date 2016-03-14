@@ -40,13 +40,13 @@ namespace depth {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-Depth::Depth(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, 
-        "sensation-vision-depth")
+Depth::Depth(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "sensation-vision-depth")
 {
 }
 
-Depth::~Depth() 
+Depth::~Depth()
 {
 }
 
@@ -58,11 +58,11 @@ void Depth::nextContainer(odcore::data::Container &)
 {
 }
 
-void Depth::setUp() 
+void Depth::setUp()
 {
 }
 
-void Depth::tearDown() 
+void Depth::tearDown()
 {
 }
 

@@ -19,7 +19,8 @@
 
 #include "vision/edge/edge.hpp"
 
-int32_t main(int32_t a_argc, char **a_argv) {
+int32_t main(int32_t a_argc, char **a_argv)
+{
   opendlv::sensation::vision::edge::Edge main(a_argc, a_argv);
   return main.runModule();
 }

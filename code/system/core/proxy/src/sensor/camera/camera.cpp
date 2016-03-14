@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
 #include <ctype.h>
@@ -41,13 +42,13 @@ namespace camera {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-Camera::Camera(int32_t const &a_argc, char **a_argv) :
-    TimeTriggeredConferenceClientModule(a_argc, a_argv, "proxy-sensor-camera"),
-    m_device()
+Camera::Camera(int32_t const &a_argc, char **a_argv)
+    : TimeTriggeredConferenceClientModule(a_argc, a_argv, "proxy-sensor-camera")
+    , m_device()
 {
 }
 
-Camera::~Camera() 
+Camera::~Camera()
 {
 }
 
@@ -57,15 +58,16 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Camera::body()
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
-void Camera::setUp() 
+void Camera::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
   std::string const type = kv.getValue<std::string>("proxy-sensor-camera.type");
-  //std::string const port = kv.getValue<std::string>("proxy-sensor-camera.port");
+  // std::string const port =
+  // kv.getValue<std::string>("proxy-sensor-camera.port");
   int32_t const port = kv.getValue<int32_t>("proxy-sensor-camera.port");
-  std::string const resolution = kv.getValue<std::string>(
-      "proxy-sensor-camera.resolution");
+  std::string const resolution =
+  kv.getValue<std::string>("proxy-sensor-camera.resolution");
   int32_t const bpp = kv.getValue<int32_t>("proxy-sensor-camera.bpp");
   /*float const mountX = kv.getValue<float>("proxy-sensor-camera.mount.x");
   float const mountY = kv.getValue<float>("proxy-sensor-camera.mount.y");
@@ -84,17 +86,17 @@ void Camera::setUp()
   int const height = stoi(resolution.substr(pos + 1, len - pos - 1));
 
   if (type.compare("opencv-usb") == 0) {
-    m_device = std::unique_ptr<Device>(
-        new OpenCvDevice(name, port, width, height, bpp));
+    m_device =
+    std::unique_ptr<Device>(new OpenCvDevice(name, port, width, height, bpp));
   }
 
   if (m_device.get() == nullptr) {
-    std::cerr << "[proxy-sensor-camera] No valid device driver defined." 
-        << std::endl;
+    std::cerr << "[proxy-sensor-camera] No valid device driver defined."
+              << std::endl;
   }
 }
 
-void Camera::tearDown() 
+void Camera::tearDown()
 {
 }
 
