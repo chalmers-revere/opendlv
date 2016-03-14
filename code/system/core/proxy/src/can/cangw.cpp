@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 Chalmers REVERE
+ * Copyright (C) 2016 Chalmers REVERE
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,82 +17,133 @@
  * USA.
  */
 
-#include <ctype.h>
-#include <cstring>
-#include <cmath>
 #include <iostream>
 
-#include "opendavinci/odcore/base/KeyValueConfiguration.h"
-#include "opendavinci/odcore/data/Container.h"
-#include "opendavinci/odcore/data/TimeStamp.h"
-#include "odcantools/MessageToCANDataStore.h"
-
+#include <opendavinci/odcore/data/Container.h>
+#include <opendavinci/odcore/data/TimeStamp.h>
+#include <opendavinci/odtools/recorder/Recorder.h>
+#include <odcantools/MessageToCANDataStore.h>
+#include <odcantools/CANDevice.h>
+#include <automotivedata/generated/automotive/GenericCANMessage.h>
 
 #include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
 
 #include "can/cangw.hpp"
+#include "can/canmessagedatastore.hpp"
 
 namespace opendlv {
 namespace proxy {
 namespace can {
 
-/**
-  * Constructor.
-  *
-  * @param a_argc Number of command line arguments.
-  * @param a_argv Command line arguments.
-  */
-CANGW::CANGW(int32_t const &a_argc, char **a_argv) :
-    TimeTriggeredConferenceClientModule(a_argc, a_argv, "proxy-cangw"),
-    m_device()
+CANGW::CANGW(int32_t const &a_argc, char **a_argv)
+    : odcore::base::module::TimeTriggeredConferenceClientModule(
+      a_argc, a_argv, "proxy-cangw")
+    , automotive::odcantools::GenericCANMessageListener()
+    , m_fifo()
+    , m_recorder()
+    , m_device()
+    , m_canMessageDataStore()
 {
 }
 
-CANGW::~CANGW() 
+CANGW::~CANGW()
 {
 }
 
-void CANGW::nextGenericCANMessage(const automotive::GenericCANMessage &gcm) {
-    std::cout << "Received CAN message " << gcm.toString() << std::endl;
-    // TODO: Glue this method to the CAN mapping function.
+void CANGW::setUp()
+{
+  using namespace std;
+  using namespace odcore::base;
+  using namespace odcore::data;
+  using namespace odtools::recorder;
+  using namespace automotive::odcantools;
+
+  string const DEVICE_NODE =
+  getKeyValueConfiguration().getValue<string>("proxy-cangw.devicenode");
+
+  // Try to open CAN device and register this instance as receiver for
+  // GenericCANMessages.
+  m_device = shared_ptr<CANDevice>(new CANDevice(DEVICE_NODE, *this));
+
+  // If the device could be successfully opened, create a recording file with a
+  // dump of the data.
+  if (m_device->isOpen()) {
+    cout << "Successfully opened CAN device '" << DEVICE_NODE << "'." << endl;
+
+    // Automatically record all received CAN messages.
+    {
+      // URL for storing containers containing GenericCANMessages.
+      stringstream recordingURL;
+      recordingURL << "file://"
+                   << "cangw_" << TimeStamp().getYYYYMMDD_HHMMSS() << ".rec";
+      // Size of memory segments (not needed for recording GenericCANMessages).
+      const uint32_t MEMORY_SEGMENT_SIZE = 0;
+      // Number of memory segments (not needed for recording
+      // GenericCANMessages).
+      const uint32_t NUMBER_OF_SEGMENTS = 0;
+      // Run recorder in asynchronous mode to allow real-time recording in
+      // background.
+      const bool THREADING = true;
+      // Dump shared images and shared data (not needed for recording
+      // GenericCANMessages)?
+      const bool DUMP_SHARED_DATA = false;
+
+      // Create a recorder instance.
+      m_recorder = unique_ptr<Recorder>(new Recorder(recordingURL.str(),
+      MEMORY_SEGMENT_SIZE, NUMBER_OF_SEGMENTS, THREADING, DUMP_SHARED_DATA));
+    }
+
+    // Create a data sink that automatically receives all Containers and
+    // selectively relays them based on the Container type to the CAN device.
+    m_canMessageDataStore =
+    unique_ptr<CANMessageDataStore>(new CANMessageDataStore(m_device));
+    addDataStoreFor(*m_canMessageDataStore);
+
+    // Start the wrapped CAN device to receive CAN messages concurrently.
+    m_device->start();
+  }
+}
+
+void CANGW::tearDown()
+{
+  // Stop the wrapper CAN device.
+  m_device->stop();
+}
+
+void CANGW::nextGenericCANMessage(const automotive::GenericCANMessage &gcm)
+{
+  std::cout << "Received CAN message " << gcm.toString() << std::endl;
+
+  // Map CAN message to high-level data structure.
+  {
+    // TODO: Glue this method to the CAN mapping function using
+    // odCANDataStructureGenerator.
     // TODO: Transform the received CAN message to high-level data structure.
     // TODO: Emit high-level messages therefrom afterwards.
+  }
+
+  // Enqueue CAN message wrapped as Container to be recorded if we have a valid
+  // recorder.
+  if (m_recorder.get() != NULL) {
+    odcore::data::Container c(gcm);
+    m_fifo.add(c);
+  }
 }
 
-void CANGW::setUp() 
+odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode CANGW::body()
 {
-    using namespace std;
-    using namespace odcore::base;
-    using namespace automotive::odcantools;
+  while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
+  odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+    if (m_recorder.get() != NULL) {
+      const uint32_t ENTRIES = m_fifo.getSize();
+      for (uint32_t i = 0; i < ENTRIES; i++) {
+        odcore::data::Container c = m_fifo.leave();
 
-    string const deviceNode = getKeyValueConfiguration().getValue<string>("proxy-cangw.devicenode");
-
-    // Try to open CAN device and register this instance as receiver for GenericCANMessages.
-    m_device = unique_ptr<CANDevice>(new CANDevice(deviceNode, *this));
-
-    // If the device could be successfully opened, create a recording file with a dump of the data.
-    if (m_device->isOpen()) {
-        cout << "Successfully opened " << deviceNode << endl;
-
-        // Register the CAN device as receiver for all Containers to be
-        // potentially written to the CAN bus.
-        addDataStoreFor(m_device->getMessageToCANDataStore());
-
-        // Start the wrapped CAN device to receive CAN messages concurrently.
-        m_device->start();
+        // Store container to dump file.
+        m_recorder->store(c);
+      }
     }
-}
-
-void CANGW::tearDown() 
-{
-    m_device->stop();
-}
-
-odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode CANGW::body() {
-    while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
-        // TODO: Add recorder functionality.
-    }
-
+  }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 

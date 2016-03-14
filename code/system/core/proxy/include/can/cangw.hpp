@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 Chalmers REVERE
+ * Copyright (C) 2016 Chalmers REVERE
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,38 +22,54 @@
 
 #include <memory>
 
+#include "opendavinci/odcore/base/FIFOQueue.h"
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
-#include "opendavinci/odcore/data/Container.h"
-#include "odcantools/CANDevice.h"
 #include "odcantools/GenericCANMessageListener.h"
-#include "automotivedata/generated/automotive/GenericCANMessage.h"
+
+namespace automotive {
+class GenericCANMessage;
+}
+namespace automotive {
+namespace odcantools {
+class CANDevice;
+}
+}
+namespace odtools {
+namespace recorder {
+class Recorder;
+}
+}
 
 namespace opendlv {
 namespace proxy {
 namespace can {
 
+class CANMessageDataStore;
+
 /**
- * This class provides...
+ * This class opens a PEAK CAN device to record CAN messages and transform
+ * them to high-level messages.
  */
+class CANGW : public odcore::base::module::TimeTriggeredConferenceClientModule,
+              public automotive::odcantools::GenericCANMessageListener {
+ public:
+  CANGW(int32_t const &, char **);
+  CANGW(CANGW const &) = delete;
+  CANGW &operator=(CANGW const &) = delete;
+  virtual ~CANGW();
 
-class CANGW : 
-    public odcore::base::module::TimeTriggeredConferenceClientModule,
-    public automotive::odcantools::GenericCANMessageListener {
-  public:
-    CANGW(int32_t const &, char **);
-    CANGW(CANGW const &) = delete;
-    CANGW &operator=(CANGW const &) = delete;
-    virtual ~CANGW();
+  virtual void nextGenericCANMessage(const automotive::GenericCANMessage &gcm);
 
-    virtual void nextGenericCANMessage(const automotive::GenericCANMessage &gcm);
+ private:
+  void setUp();
+  void tearDown();
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
-  private:
-    void setUp();
-    void tearDown();
-    odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
-
-  private:
-    std::unique_ptr<automotive::odcantools::CANDevice> m_device;
+ private:
+  odcore::base::FIFOQueue m_fifo;
+  std::unique_ptr<odtools::recorder::Recorder> m_recorder;
+  std::shared_ptr<automotive::odcantools::CANDevice> m_device;
+  std::unique_ptr<CANMessageDataStore> m_canMessageDataStore;
 };
 
 } // can
