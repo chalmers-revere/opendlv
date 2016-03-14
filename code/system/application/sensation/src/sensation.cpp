@@ -82,16 +82,17 @@ void Sensation::tearDown()
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
     // Example on how to use the type WGS84Coordinate:
-    {
+    //{
         using namespace opendlv::data::environment;
 
         // First, you need to declare a lat/lon coordinate to be used
         // as reference (i.e. origin (0, 0) of a Cartesian coordinate
         // frame); in our example, we use one located at AstaZero.
-        WGS84Coordinate reference(57.77284043, WGS84Coordinate::NORTH, 12.76996356, WGS84Coordinate::EAST);
+        //WGS84Coordinate reference(57.77284043, WGS84Coordinate::NORTH, 12.76996356, WGS84Coordinate::EAST);
+          WGS84Coordinate reference(57.71278000, WGS84Coordinate::NORTH, 11.94581583, WGS84Coordinate::EAST);
 
         // Let's assume you have another lat/lon coordinate at hand.
-        WGS84Coordinate WGS84_p2(57.7730612, WGS84Coordinate::NORTH, 12.77008208, WGS84Coordinate::EAST);
+        WGS84Coordinate WGS84_p2(57.71278000, WGS84Coordinate::NORTH, 11.94581583, WGS84Coordinate::EAST);
 
         // Now, you can transform this new lat/lon coordinate to the
         // previously specified Cartesian reference frame.
@@ -104,7 +105,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
         double p2_x = cartesian_p2.getX();
         double p2_y = cartesian_p2.getY();
         std::cout << "X = " << p2_x << ", Y = " << p2_y << std::endl;
-    }
+    //}
 
     // To dump data structures into a CSV file, you create an output file first.
     std::ofstream fout("../Exp_data/output.csv");
@@ -119,6 +120,11 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
     // For every data structure that you want to export in a CSV file, you need to create a new CSVFromVisitableVisitor.
     odcore::reflection::CSVFromVisitableVisitor csvExporter1(fout, WITH_HEADER, DELIMITER);
 
+
+
+    double time_stamp = 0;
+
+
     while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
         odcore::data::Container c1 = getKeyValueDataStore().get(opendlv::system::actuator::Commands::ID());
         opendlv::system::actuator::Commands commands = c1.getData<opendlv::system::actuator::Commands>();
@@ -126,8 +132,17 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
         odcore::data::Container c2 = getKeyValueDataStore().get(opendlv::system::sensor::TruckLocation::ID());
         opendlv::system::sensor::TruckLocation truckLocation = c2.getData<opendlv::system::sensor::TruckLocation>();
 
+
+        if (truckLocation.getX()*truckLocation.getX() > 0.0001)
+        {//if we are actually getting data !
+
+
         cout << getName() << ": " << commands.toString() << ", " << truckLocation.toString() << endl;
 
+
+        // Try to convert coordinates
+        WGS84Coordinate WGS84_ptruck(truckLocation.getX(), WGS84Coordinate::NORTH, truckLocation.getY(), WGS84Coordinate::EAST);
+        Point3 _p2 = reference.transform(WGS84_ptruck);
 
         // The csvExporter1 will "visit" the data structure "commands" and iterate
         // through its fields that will be stored in the output file fout.
@@ -142,14 +157,14 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
          m_tkmObservationVector Z = observationModel.h(X);
 
          // set the commands from the opendavinci to the ekf state space
-         Z.Z_x()         =   truckLocation.getX();
-         Z.Z_y()         =   truckLocation.getY();
+         Z.Z_x()         =   _p2.getX();//truckLocation.getX();
+         Z.Z_y()         =   _p2.getX();//truckLocation.getY();
          Z.Z_theta()     =   truckLocation.getYaw();
          Z.Z_theta_dot( )=   truckLocation.getYawRate();
          //cout << getName() << " << message >> \n   MEASURES : " << " Z.Z_x()  = " << Z.Z_x() << " Z.Z_y()  = " << Z.Z_y()
          //                  << " Z.Z_theta()  = " << Z.Z_theta() << " Z.Z_theta_dot()  = " << Z.Z_theta_dot()  << endl;
 
-run_vse_test = true;
+run_vse_test = false;
          if (run_vse_test) // if run test is true we are running a test and it will add noise to the measures
          {
              Z.Z_x() += measurementNoise_x * noise(generator);
@@ -171,9 +186,10 @@ run_vse_test = true;
 
             // Print to stdout as csv format
             std::cout   << getName() << " << message >> STATE \n"
+                        << "timestamp = " << time_stamp << "\n"
                         << "           x " << X.x() << ", y " << X.y() << ", theta " << X.theta()  << "\n"
                         << std::endl;
-
+time_stamp +=0.05;
             //save data to file
 m_saveToFile = true;
             if (m_saveToFile){
@@ -190,8 +206,8 @@ m_saveToFile = true;
               std::cout << "Sensation::initializeEKF  << message >> Filter initialized " << std::endl;
          }
 
-    }
-
+      }// end if we are getting data
+    }// end while
     return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
