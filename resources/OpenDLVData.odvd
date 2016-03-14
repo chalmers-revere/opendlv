@@ -182,3 +182,53 @@ message opendlv.sensation.Looming [id = X] {
   float size;
 }
 */
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Vehicle messages for GCDC16'FH16 truck.
+message opendlv.gcdc.fh16.AccelerationRequest [id = 192] {
+    bool enable_accrequest [id = 1];
+    double accelerationrequest [id = 2];
+}
+
+message opendlv.gcdc.fh16.BrakeRequest [id = 193] {
+    bool enable_brakerequest [id = 1];
+    double brakerequest [id = 2];
+}
+
+message opendlv.gcdc.fh16.SteerRequest [id = 194] {
+    bool enable_steerreq [id = 1];
+    double steerreq_rwa [id = 2];
+    double steerreq_deltatrq [id = 3];
+}
+
+message opendlv.gcdc.fh16.AxleLoads [id = 195] {
+    double frontaxle1load [id = 1];
+    double driveaxle1load [id = 2];
+    double driveaxle2load [id = 3];
+}
+
+message opendlv.gcdc.fh16.VehicleSpeed [id = 196] {
+    double vehiclespeedpropshaft [id = 1];
+}
+
+message opendlv.gcdc.fh16.VehicleDynamics [id = 197] {
+    double acceleration_x [id = 1];
+    double acceleration_y [id = 2];
+    double yawrate [id = 3];
+}
+
+message opendlv.gcdc.fh16.WheelSpeeds [id = 198] {
+    double frontaxle1wheelspeedleft [id = 1];
+    double frontaxle1wheelspeedright [id = 2];
+    double driveaxle1wheelspeedleft [id = 3];
+    double driveaxle1wheelspeedright [id = 4];
+    double driveaxle2wheelspeedright [id = 5];
+    double driveaxle2wheelspeedleft [id = 6];
+}
+
+message opendlv.gcdc.fh16.Steering [id = 199] {
+    double roadwheelangle [id = 1];
+    double steeringwheelangle [id = 2];
+}
+
