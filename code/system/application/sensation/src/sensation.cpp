@@ -44,18 +44,22 @@ namespace sensation {
   */
 Sensation::Sensation(int32_t const &a_argc, char **a_argv) :
     TimeTriggeredConferenceClientModule(a_argc, a_argv, "sensation"),
-    x(),
-    u(),
+    X(),
+    U(),
     sys(),
     observationModel(0.0, 0.0,  0.0, 0.0 ), // clarify the numbers !
     m_ekf(),
     generator(),
     noise(0, 1),
     systemNoise(0),
-    orientationNoise(0),
-    distanceNoise(0),
+    measurementNoise_x(0.05),
+    measurementNoise_y(0.5),
+    measurementNoise_yaw(0.001),
+    measurementNoise_yawRate(0.0001),
     run_vse_test(false),
+    m_saveToFile (false),
     EKF_initialized(false)
+
 {
 
     initializeEKF();
@@ -104,11 +108,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
 
     // To dump data structures into a CSV file, you create an output file first.
     std::ofstream fout("../Exp_data/output.csv");
-    std::ofstream fout_command("../Exp_data/output_commands.csv");
     std::ofstream fout_ekfState("../Exp_data/output_ekf.csv");
-
     fout_ekfState << "% HEADER: Output of the Extended Kalman Filter, data format : \n"
-                  << "% ground truth x (m)  ground truth y (m) ground truth theta (rad) noisy x (m)  noisy y (m) noisy theta (rad)  ekf x (m) ekf y (m) ekf theta (rad) " << endl;
+                  << "% ground truth: x (m),  y (m), theta (rad), theta_dot(rad/s), commands : velocity (m/s) steering angle (rad), noisy data: x (m), y (m), theta (rad), theta_dot (rad/s), ekf estimation vector: x (m), x_dot (m/s), y (m), y_dot (ms), theta (rad), theta_dot(rad/s)  " << endl;
 
     // You can optionally dump a header (i.e. first line with information).
     const bool WITH_HEADER = true;
@@ -131,56 +133,62 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
         // through its fields that will be stored in the output file fout.
         commands.accept(csvExporter1);
 
+         // set the commands from the opendavinci to the ekf state space
+         // cout << getName() << " << message >> \n   CONTROL SIGNALS : u.v = " << U.v() << "  u.phi  = " << U.phi() << endl;
+         U.v() = commands.getLongitudinalVelocity();
+         U.phi() = commands.getSteeringAngle();
 
-//all this part should be moved into the vehicle state estimator function
+         // System measurements
+         m_tkmObservationVector Z = observationModel.h(X);
 
-         u.v() = commands.getLongitudinalVelocity();//3.6;   /// from km/h to m/s
-         u.phi() = commands.getSteeringAngle();//*180/M_PI;
+         // set the commands from the opendavinci to the ekf state space
+         Z.Z_x()         =   truckLocation.getX();
+         Z.Z_y()         =   truckLocation.getY();
+         Z.Z_theta()     =   truckLocation.getYaw();
+         Z.Z_theta_dot( )=   truckLocation.getYawRate();
+         //cout << getName() << " << message >> \n   MEASURES : " << " Z.Z_x()  = " << Z.Z_x() << " Z.Z_y()  = " << Z.Z_y()
+         //                  << " Z.Z_theta()  = " << Z.Z_theta() << " Z.Z_theta_dot()  = " << Z.Z_theta_dot()  << endl;
 
-         fout_command << u.v() << " " << u.phi() << endl;
-         ///fout_measures <<truckLocation.getX() << " " << truckLocation.getY() << " " << truckLocation.getYaw() << " " << truckLocation.getYawRate() << endl;
-
-
-        // Add noise: Our robot move is affected by noise (due to actuator failures)
-        //x.x() += systemNoise*noise(generator);
-        //x.y() += systemNoise*noise(generator);
-        //x.theta() += systemNoise*noise(generator);
-
-
-        // Predict state for current time-step using the filters
-        opendlv::system::application::sensation::truckKinematicModel::State<double>  x_ekf_pred = m_ekf.predict(sys, u);  // TODO: change auto type for compatibility !
-
-        // Orientation measurement
-            //opendlv::system::application::sensation::truckObservationModel::OrientationMeasurement<double> orientation = OrientationModel.h(x);
-            opendlv::system::application::sensation::truckObservationModel::truckObservationVector<double> measurement = observationModel.h(x);
-
-
-            // Measurement is affected by noise as well
-            //orientation.theta() += orientationNoise * noise(generator);
-
-            measurement.Z_x()         =   truckLocation.getX()+0.05*noise(generator);
-            measurement.Z_y()         =   truckLocation.getY()+0.5*noise(generator);
-            measurement.Z_theta()     =   truckLocation.getYaw()+0.001*noise(generator);
-            measurement.Z_theta_dot( )=   truckLocation.getYawRate();
-            // Update EKF
-            //x_ekf = m_ekf.update(OrientationModel, orientation);
-            opendlv::system::application::sensation::truckKinematicModel::State<double> x_ekf = m_ekf.update(observationModel, measurement);
+run_vse_test = true;
+         if (run_vse_test) // if run test is true we are running a test and it will add noise to the measures
+         {
+             Z.Z_x() += measurementNoise_x * noise(generator);
+             Z.Z_y() += measurementNoise_y * noise(generator);
+             Z.Z_theta() += measurementNoise_yaw * noise(generator);
+             Z.Z_theta_dot() += measurementNoise_yawRate * noise(generator);
+         }
 
 
+         if (EKF_initialized) // if the filter is not initialze - initialize it first
+         {
+             std::cout << "Sensation::initializeEKF  << message >> Filter initialized " << std::endl;
 
+             // Predict state for current time-step using the filters
+             X = m_ekf.predict(sys, U);  // TODO: change auto type for compatibility !
 
+             // update stage of the EKF
+             X = m_ekf.update(observationModel, Z);
 
-        // Print to stdout as csv format
-        std::cout   << "Sensation::body << message >> \n"
-                    << "      x_ekf_pred " << x_ekf_pred.x() << ", y_ekf_pred " << x_ekf_pred.y() << ", theta_ekf_pred " << x_ekf_pred.theta()  << "\n"
-                    << "      x_ekf      " << x_ekf.x() << ", y_ekf " << x_ekf.y() << ", theta_ekf " << x_ekf.theta()  << "\n"
-                    << std::endl;
-//save data to file
-fout_ekfState << truckLocation.getX() << " " << truckLocation.getY() << " " << truckLocation.getYaw() << " "
-              << measurement.Z_x() << " " << measurement.Z_y() << " " << measurement.Z_theta() << " "
-              << x_ekf.x() << " " << x_ekf.y() << " " << x_ekf.theta() << " "
-              <<endl;
+            // Print to stdout as csv format
+            std::cout   << getName() << " << message >> STATE \n"
+                        << "           x " << X.x() << ", y " << X.y() << ", theta " << X.theta()  << "\n"
+                        << std::endl;
 
+            //save data to file
+m_saveToFile = true;
+            if (m_saveToFile){
+            fout_ekfState << truckLocation.getX() << " " << truckLocation.getY() << " " << truckLocation.getYaw() << " " << truckLocation.getYawRate() << " "
+                          << U.v() << " " << U.phi() << " "
+                          << Z.Z_x() << " " << Z.Z_y() << " " << Z.Z_theta() << " " << Z.Z_theta_dot() << " "
+                          << X.x() << " " << X.x_dot() << " "  << X.y() << " " << X.y_dot() << " " << X.theta() << " " << X.theta_dot() << " "
+                          << endl;
+            }
+
+         }
+         else
+         {
+              std::cout << "Sensation::initializeEKF  << message >> Filter initialized " << std::endl;
+         }
 
     }
 
@@ -192,9 +200,9 @@ void Sensation::initializeEKF()
 
 if (!EKF_initialized)
 {
-     std::cout << "Sensation::initializeEKF  << message >> initialize the kalman filter " << std::endl;
+    std::cout << "Sensation::initializeEKF  << message >> initialize the kalman filter " << std::endl;
 
-    x.setZero();  // initialize the state vector
+    X.setZero();  // initialize the state vector
     generator.seed( std::chrono::system_clock::now().time_since_epoch().count() );
 
 
@@ -210,14 +218,6 @@ else
 
 }
 
-void Sensation::vehicleStateEstimator( opendlv::system::application::sensation::truckKinematicModel::Control<double> _u,
-                                       opendlv::system::application::sensation::truckKinematicModel::State<double> _x )
-{
-
-  _x.setZero();   // just to avoid unused error
-  _u.setZero();
-
-}
 
 
 
