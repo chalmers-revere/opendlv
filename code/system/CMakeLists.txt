@@ -38,7 +38,7 @@ include(CheckCxxTestEnvironment)
 find_package(OpenDaVINCI REQUIRED)
 
 ###########################################################################
-# Find OpenDaVINCI.
+# Find OpenDLV.
 SET(OPENDLV_DIR "${OPENDAVINCI_DIR}")
 find_package(OpenDLV REQUIRED)
 
