@@ -111,7 +111,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
     std::ofstream fout("../Exp_data/output.csv");
     std::ofstream fout_ekfState("../Exp_data/output_ekf.csv");
     fout_ekfState << "% HEADER: Output of the Extended Kalman Filter, data format : \n"
-                  << "% ground truth: x (m),  y (m), theta (rad), theta_dot(rad/s), commands : velocity (m/s) steering angle (rad), noisy data: x (m), y (m), theta (rad), theta_dot (rad/s), ekf estimation vector: x (m), x_dot (m/s), y (m), y_dot (ms), theta (rad), theta_dot(rad/s)  " << endl;
+                  << "% timestamp (s), ground truth: x (m),  y (m), theta (rad), theta_dot(rad/s), commands : velocity (m/s) steering angle (rad), noisy data: x (m), y (m), theta (rad), theta_dot (rad/s), ekf estimation vector: x (m), x_dot (m/s), y (m), y_dot (ms), theta (rad), theta_dot(rad/s)  " << endl;
 
     // You can optionally dump a header (i.e. first line with information).
     const bool WITH_HEADER = true;
@@ -193,7 +193,8 @@ time_stamp +=0.05;
             //save data to file
 m_saveToFile = true;
             if (m_saveToFile){
-            fout_ekfState << truckLocation.getX() << " " << truckLocation.getY() << " " << truckLocation.getYaw() << " " << truckLocation.getYawRate() << " "
+            fout_ekfState << time_stamp << " "
+                          << truckLocation.getX() << " " << truckLocation.getY() << " " << truckLocation.getYaw() << " " << truckLocation.getYawRate() << " "
                           << U.v() << " " << U.phi() << " "
                           << Z.Z_x() << " " << Z.Z_y() << " " << Z.Z_theta() << " " << Z.Z_theta_dot() << " "
                           << X.x() << " " << X.x_dot() << " "  << X.y() << " " << X.y_dot() << " " << X.theta() << " " << X.theta_dot() << " "
