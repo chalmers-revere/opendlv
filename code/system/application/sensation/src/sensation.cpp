@@ -133,7 +133,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
         opendlv::system::sensor::TruckLocation truckLocation = c2.getData<opendlv::system::sensor::TruckLocation>();
 
 
-        if (truckLocation.getX()*truckLocation.getX() > 0.0001)
+        if (truckLocation.getX()*truckLocation.getX() > 0.0001)//c1.getReceivedTimeStamp().getSeconds() > 0
         {//if we are actually getting data !
 
 
@@ -158,7 +158,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
 
          // set the commands from the opendavinci to the ekf state space
          Z.Z_x()         =   _p2.getX();//truckLocation.getX();
-         Z.Z_y()         =   _p2.getX();//truckLocation.getY();
+         Z.Z_y()         =   _p2.getY();//truckLocation.getY();
          Z.Z_theta()     =   truckLocation.getYaw();
          Z.Z_theta_dot( )=   truckLocation.getYawRate();
          //cout << getName() << " << message >> \n   MEASURES : " << " Z.Z_x()  = " << Z.Z_x() << " Z.Z_y()  = " << Z.Z_y()
