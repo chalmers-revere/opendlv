@@ -19,7 +19,8 @@
 
 #include "linguistics/v2vdenm/v2vdenm.hpp"
 
-int32_t main(int32_t a_argc, char **a_argv) {
+int32_t main(int32_t a_argc, char **a_argv)
+{
   opendlv::knowledge::linguistics::v2vdenm::V2vDenm main(a_argc, a_argv);
   return main.runModule();
 }

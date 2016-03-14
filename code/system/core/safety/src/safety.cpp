@@ -13,7 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
 #include <iostream>
@@ -30,29 +31,28 @@ namespace system {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-Safety::Safety(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, "safety")
+Safety::Safety(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(a_argc, a_argv, "safety")
 {
 }
 
-Safety::~Safety() 
+Safety::~Safety()
 {
 }
 
-void Safety::setUp() 
+void Safety::setUp()
 {
   // This method will be call automatically _before_ running body().
 }
 
-void Safety::tearDown() 
+void Safety::tearDown()
 {
   // This method will be call automatically _after_ return from body().
 }
 
-void Safety::nextContainer(odcore::data::Container &) 
+void Safety::nextContainer(odcore::data::Container &)
 {
 }
 
 } // system
 } // opendlv
-

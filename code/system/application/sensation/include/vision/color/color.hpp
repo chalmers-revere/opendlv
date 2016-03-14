@@ -34,16 +34,16 @@ namespace color {
  * This class provides...
  */
 class Color : public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    Color(int32_t const &, char **);
-    Color(Color const &) = delete;
-    Color &operator=(Color const &) = delete;
-    virtual ~Color();
-    virtual void nextContainer(odcore::data::Container &);
+ public:
+  Color(int32_t const &, char **);
+  Color(Color const &) = delete;
+  Color &operator=(Color const &) = delete;
+  virtual ~Color();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 };
 
 } // color

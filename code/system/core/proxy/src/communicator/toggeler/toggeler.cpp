@@ -41,41 +41,41 @@ namespace toggeler {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-Toggeler::Toggeler(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, 
-        "proxy-communicator-toggeler"),
-    m_device()
+Toggeler::Toggeler(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "proxy-communicator-toggeler")
+    , m_device()
 {
 }
 
-Toggeler::~Toggeler() 
+Toggeler::~Toggeler()
 {
 }
 
-void Toggeler::nextContainer(odcore::data::Container &) 
+void Toggeler::nextContainer(odcore::data::Container &)
 {
 }
 
-void Toggeler::setUp() 
+void Toggeler::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
-  std::string const type = kv.getValue<std::string>(
-      "proxy-communicator-toggeler.type");
-/*  std::string const port = kv.getValue<std::string>(
- *      "proxy-communicator-toggeler.port");
-*/
+  std::string const type =
+  kv.getValue<std::string>("proxy-communicator-toggeler.type");
+  /*  std::string const port = kv.getValue<std::string>(
+   *      "proxy-communicator-toggeler.port");
+  */
   if (type.compare("serial") == 0) {
-//      m_device = std::unique_ptr<Device>(new SerialDevice());
+    //      m_device = std::unique_ptr<Device>(new SerialDevice());
   }
 
   if (m_device.get() == nullptr) {
-    std::cerr << "[proxy-communicator-toggeler] No valid device driver defined." 
-        << std::endl;
+    std::cerr << "[proxy-communicator-toggeler] No valid device driver defined."
+              << std::endl;
   }
 }
 
-void Toggeler::tearDown() 
+void Toggeler::tearDown()
 {
 }
 

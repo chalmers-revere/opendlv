@@ -36,43 +36,43 @@ namespace camera {
  * This class wraps a camera and captures its data into a shared memory segment.
  */
 class Device {
-  public:
-    Device(std::string const &, uint32_t const &, uint32_t const &, 
-        uint32_t const &, uint32_t const &);
-    Device(Device const &) = delete;
-    Device &operator=(Device const &) = delete;
-    virtual ~Device();
-    odcore::data::image::SharedImage Capture();
+ public:
+  Device(std::string const &, uint32_t const &, uint32_t const &,
+  uint32_t const &, uint32_t const &);
+  Device(Device const &) = delete;
+  Device &operator=(Device const &) = delete;
+  virtual ~Device();
+  odcore::data::image::SharedImage Capture();
 
-  protected:
-    /**
-     * This method is responsible to copy the image from the
-     * specific camera driver to the shared memory.
-     *
-     * @param dest Pointer where to copy the data.
-     * @param size Number of bytes to copy.
-     * @return true if the data was successfully copied.
-     */
-    virtual bool CopyImageTo(char *, uint32_t const &) = 0;
-    virtual bool CaptureFrame() = 0;
-    virtual bool IsValid() const = 0;
-    std::string const GetName() const;
-    uint32_t GetId() const;
-    uint32_t GetWidth() const;
-    uint32_t GetHeight() const;
-    uint32_t GetBpp() const;
-    uint32_t GetSize() const;
+ protected:
+  /**
+   * This method is responsible to copy the image from the
+   * specific camera driver to the shared memory.
+   *
+   * @param dest Pointer where to copy the data.
+   * @param size Number of bytes to copy.
+   * @return true if the data was successfully copied.
+   */
+  virtual bool CopyImageTo(char *, uint32_t const &) = 0;
+  virtual bool CaptureFrame() = 0;
+  virtual bool IsValid() const = 0;
+  std::string const GetName() const;
+  uint32_t GetId() const;
+  uint32_t GetWidth() const;
+  uint32_t GetHeight() const;
+  uint32_t GetBpp() const;
+  uint32_t GetSize() const;
 
-    std::string m_name;
-    uint32_t m_id;
-    uint32_t m_width;
-    uint32_t m_height;
-    uint32_t m_bpp;
-    uint32_t m_size;
+  std::string m_name;
+  uint32_t m_id;
+  uint32_t m_width;
+  uint32_t m_height;
+  uint32_t m_bpp;
+  uint32_t m_size;
 
-  private:
-    odcore::data::image::SharedImage m_sharedImage;
-    std::shared_ptr<odcore::wrapper::SharedMemory> m_sharedMemory;
+ private:
+  odcore::data::image::SharedImage m_sharedImage;
+  std::shared_ptr<odcore::wrapper::SharedMemory> m_sharedMemory;
 };
 
 } // camera

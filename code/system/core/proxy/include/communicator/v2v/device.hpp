@@ -26,11 +26,11 @@ namespace communicator {
 namespace v2v {
 
 class Device {
-  public:
-    Device();
-    Device(Device const &) = delete;
-    Device &operator=(Device const &) = delete;
-    virtual ~Device();
+ public:
+  Device();
+  Device(Device const &) = delete;
+  Device &operator=(Device const &) = delete;
+  virtual ~Device();
 };
 
 } // v2v

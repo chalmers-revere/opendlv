@@ -32,18 +32,18 @@ namespace setopticalrotation {
 /**
  * This class provides...
  */
-class SetOpticalRotation : 
-    public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    SetOpticalRotation(int32_t const &, char **);
-    SetOpticalRotation(SetOpticalRotation const &) = delete;
-    SetOpticalRotation &operator=(SetOpticalRotation const &) = delete;
-    virtual ~SetOpticalRotation();
-    virtual void nextContainer(odcore::data::Container &);
+class SetOpticalRotation
+: public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  SetOpticalRotation(int32_t const &, char **);
+  SetOpticalRotation(SetOpticalRotation const &) = delete;
+  SetOpticalRotation &operator=(SetOpticalRotation const &) = delete;
+  virtual ~SetOpticalRotation();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 };
 
 } // setopticalrotation

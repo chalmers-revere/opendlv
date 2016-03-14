@@ -32,18 +32,18 @@ namespace keepobjectalignment {
 /**
  * This class provides...
  */
-class KeepObjectAlignment : 
-    public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    KeepObjectAlignment(int32_t const &, char **);
-    KeepObjectAlignment(KeepObjectAlignment const &) = delete;
-    KeepObjectAlignment &operator=(KeepObjectAlignment const &) = delete;
-    virtual ~KeepObjectAlignment();
-    virtual void nextContainer(odcore::data::Container &);
+class KeepObjectAlignment
+: public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  KeepObjectAlignment(int32_t const &, char **);
+  KeepObjectAlignment(KeepObjectAlignment const &) = delete;
+  KeepObjectAlignment &operator=(KeepObjectAlignment const &) = delete;
+  virtual ~KeepObjectAlignment();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 };
 
 } // keepobjectalignment

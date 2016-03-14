@@ -1,9 +1,9 @@
 Language:        Cpp
-# BasedOnStyle:  LLVM
+#BasedOnStyle:  LLVM
 AccessModifierOffset: -1
-AlignAfterOpenBracket: true
+AlignAfterOpenBracket: false
 AlignEscapedNewlinesLeft: false
-AlignOperands:   true
+AlignOperands: false
 AlignTrailingComments: true
 AllowAllParametersOfDeclarationOnNextLine: false
 AllowShortBlocksOnASingleLine: false
@@ -22,10 +22,11 @@ BinPackArguments: true
 ColumnLimit:     80
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
 ConstructorInitializerIndentWidth: 4
+ContinuationIndentWidth: 4
 DerivePointerAlignment: false
 ExperimentalAutoDetectBinPacking: false
 IndentCaseLabels: true
-IndentWrappedFunctionNames: false
+IndentWrappedFunctionNames: true
 IndentFunctionDeclarationAfterType: false
 MaxEmptyLinesToKeep: 2
 KeepEmptyLinesAtTheStartOfBlocks: true

@@ -26,11 +26,11 @@ namespace sensor {
 namespace imu {
 
 class Device {
-  public:
-    Device();
-    Device(Device const &) = delete;
-    Device &operator=(Device const &) = delete;
-    virtual ~Device();
+ public:
+  Device();
+  Device(Device const &) = delete;
+  Device &operator=(Device const &) = delete;
+  virtual ~Device();
 };
 
 } // imu

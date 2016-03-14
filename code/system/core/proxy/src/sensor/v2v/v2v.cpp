@@ -42,13 +42,13 @@ namespace v2v {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-V2v::V2v(int32_t const &a_argc, char **a_argv) :
-    TimeTriggeredConferenceClientModule(a_argc, a_argv, "proxy-sensor-v2v"),
-    m_device()
+V2v::V2v(int32_t const &a_argc, char **a_argv)
+    : TimeTriggeredConferenceClientModule(a_argc, a_argv, "proxy-sensor-v2v")
+    , m_device()
 {
 }
 
-V2v::~V2v() 
+V2v::~V2v()
 {
 }
 
@@ -58,27 +58,28 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2v::body()
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
-void V2v::setUp() 
+void V2v::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
   std::string const type = kv.getValue<std::string>("proxy-sensor-v2v.type");
-/*  std::string const port = kv.getValue<std::string>("proxy-sensor-v2v.port");
-  float const mountX = kv.getValue<float>("proxy-sensor-v2v.mount.x");
-  float const mountY = kv.getValue<float>("proxy-sensor-v2v.mount.y");
-  float const mountZ = kv.getValue<float>("proxy-sensor-v2v.mount.z");
-*/
+  /*  std::string const port =
+    kv.getValue<std::string>("proxy-sensor-v2v.port");
+    float const mountX = kv.getValue<float>("proxy-sensor-v2v.mount.x");
+    float const mountY = kv.getValue<float>("proxy-sensor-v2v.mount.y");
+    float const mountZ = kv.getValue<float>("proxy-sensor-v2v.mount.z");
+  */
   if (type.compare("geonetworking-dual") == 0) {
-//      m_device = std::unique_ptr<Device>(new GeonetworkingDualDevice());
+    //      m_device = std::unique_ptr<Device>(new GeonetworkingDualDevice());
   }
 
   if (m_device.get() == nullptr) {
-    std::cerr << "[proxy-sensor-v2v] No valid device driver defined." 
-        << std::endl;
+    std::cerr << "[proxy-sensor-v2v] No valid device driver defined."
+              << std::endl;
   }
 }
 
-void V2v::tearDown() 
+void V2v::tearDown()
 {
 }
 

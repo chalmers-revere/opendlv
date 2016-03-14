@@ -40,13 +40,13 @@ namespace v2viclcm {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-V2vIclcm::V2vIclcm(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, 
-        "knowledge-gcdc16-v2viclcm")
+V2vIclcm::V2vIclcm(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "knowledge-gcdc16-v2viclcm")
 {
 }
 
-V2vIclcm::~V2vIclcm() 
+V2vIclcm::~V2vIclcm()
 {
 }
 
@@ -58,11 +58,11 @@ void V2vIclcm::nextContainer(odcore::data::Container &)
 {
 }
 
-void V2vIclcm::setUp() 
+void V2vIclcm::setUp()
 {
 }
 
-void V2vIclcm::tearDown() 
+void V2vIclcm::tearDown()
 {
 }
 

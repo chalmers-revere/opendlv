@@ -32,18 +32,18 @@ namespace detectvehicle {
 /**
  * This class provides...
  */
-class DetectVehicle : 
-    public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    DetectVehicle(int32_t const &, char **);
-    DetectVehicle(DetectVehicle const &) = delete;
-    DetectVehicle &operator=(DetectVehicle const &) = delete;
-    virtual ~DetectVehicle();
-    virtual void nextContainer(odcore::data::Container &);
+class DetectVehicle
+: public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  DetectVehicle(int32_t const &, char **);
+  DetectVehicle(DetectVehicle const &) = delete;
+  DetectVehicle &operator=(DetectVehicle const &) = delete;
+  virtual ~DetectVehicle();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 };
 
 } // detectvehicle

@@ -35,20 +35,19 @@ class Device;
 /**
  * This class provides...
  */
-class Brake : 
-    public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    Brake(int32_t const &, char **);
-    Brake(Brake const &) = delete;
-    Brake &operator=(Brake const &) = delete;
-    virtual ~Brake();
-    virtual void nextContainer(odcore::data::Container &);
+class Brake : public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  Brake(int32_t const &, char **);
+  Brake(Brake const &) = delete;
+  Brake &operator=(Brake const &) = delete;
+  virtual ~Brake();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 
-    std::unique_ptr<Device> m_device;
+  std::unique_ptr<Device> m_device;
 };
 
 } // brake

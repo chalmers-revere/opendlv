@@ -33,18 +33,18 @@ namespace v2vcam {
 /**
  * This class provides...
  */
-class V2vCam : 
-    public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    V2vCam(int32_t const &, char **);
-    V2vCam(V2vCam const &) = delete;
-    V2vCam &operator=(V2vCam const &) = delete;
-    virtual ~V2vCam();
-    virtual void nextContainer(odcore::data::Container &);
+class V2vCam
+: public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  V2vCam(int32_t const &, char **);
+  V2vCam(V2vCam const &) = delete;
+  V2vCam &operator=(V2vCam const &) = delete;
+  virtual ~V2vCam();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 };
 
 } // v2vcam

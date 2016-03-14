@@ -19,7 +19,8 @@
 
 #include "communicator/ledstrip/ledstrip.hpp"
 
-int32_t main(int32_t a_argc, char **a_argv) {
+int32_t main(int32_t a_argc, char **a_argv)
+{
   opendlv::proxy::communicator::ledstrip::Ledstrip ledstrip(a_argc, a_argv);
   return ledstrip.runModule();
 }

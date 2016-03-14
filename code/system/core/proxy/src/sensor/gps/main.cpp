@@ -19,7 +19,8 @@
 
 #include "sensor/gps/gps.hpp"
 
-int32_t main(int32_t a_argc, char **a_argv) {
+int32_t main(int32_t a_argc, char **a_argv)
+{
   opendlv::proxy::sensor::gps::Gps gps(a_argc, a_argv);
   return gps.runModule();
 }

@@ -33,18 +33,18 @@ namespace looming {
 /**
  * This class provides...
  */
-class Looming : 
-    public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    Looming(int32_t const &, char **);
-    Looming(Looming const &) = delete;
-    Looming &operator=(Looming const &) = delete;
-    virtual ~Looming();
-    virtual void nextContainer(odcore::data::Container &);
+class Looming
+: public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  Looming(int32_t const &, char **);
+  Looming(Looming const &) = delete;
+  Looming &operator=(Looming const &) = delete;
+  virtual ~Looming();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 };
 
 } // looming

@@ -32,18 +32,18 @@ namespace setopticalflow {
 /**
  * This class provides...
  */
-class SetOpticalFlow : 
-    public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    SetOpticalFlow(int32_t const &, char **);
-    SetOpticalFlow(SetOpticalFlow const &) = delete;
-    SetOpticalFlow &operator=(SetOpticalFlow const &) = delete;
-    virtual ~SetOpticalFlow();
-    virtual void nextContainer(odcore::data::Container &);
+class SetOpticalFlow
+: public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  SetOpticalFlow(int32_t const &, char **);
+  SetOpticalFlow(SetOpticalFlow const &) = delete;
+  SetOpticalFlow &operator=(SetOpticalFlow const &) = delete;
+  virtual ~SetOpticalFlow();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 };
 
 } // setopticalflow

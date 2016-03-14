@@ -39,12 +39,13 @@ namespace detectlane {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-DetectLane::DetectLane(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, "perception-detectlane")
+DetectLane::DetectLane(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "perception-detectlane")
 {
 }
 
-DetectLane::~DetectLane() 
+DetectLane::~DetectLane()
 {
 }
 
@@ -56,11 +57,11 @@ void DetectLane::nextContainer(odcore::data::Container &)
 {
 }
 
-void DetectLane::setUp() 
+void DetectLane::setUp()
 {
 }
 
-void DetectLane::tearDown() 
+void DetectLane::tearDown()
 {
 }
 

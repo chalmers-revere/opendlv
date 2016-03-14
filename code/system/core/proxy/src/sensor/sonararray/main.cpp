@@ -19,7 +19,8 @@
 
 #include "sensor/sonararray/sonararray.hpp"
 
-int32_t main(int32_t a_argc, char **a_argv) {
+int32_t main(int32_t a_argc, char **a_argv)
+{
   opendlv::proxy::sensor::sonararray::SonarArray sonararray(a_argc, a_argv);
   return sonararray.runModule();
 }

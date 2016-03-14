@@ -42,13 +42,14 @@ namespace sonararray {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-SonarArray::SonarArray(int32_t const &a_argc, char **a_argv) :
-    TimeTriggeredConferenceClientModule(a_argc, a_argv, "proxy-sensor-sonararray"),
-    m_device()
+SonarArray::SonarArray(int32_t const &a_argc, char **a_argv)
+    : TimeTriggeredConferenceClientModule(
+      a_argc, a_argv, "proxy-sensor-sonararray")
+    , m_device()
 {
 }
 
-SonarArray::~SonarArray() 
+SonarArray::~SonarArray()
 {
 }
 
@@ -58,23 +59,24 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SonarArray::body()
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
-void SonarArray::setUp() 
+void SonarArray::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
-  std::string const type = kv.getValue<std::string>("proxy-sensor-sonararray.type");
+  std::string const type =
+  kv.getValue<std::string>("proxy-sensor-sonararray.type");
 
   if (type.compare("maxsonar") == 0) {
-//      m_device = std::unique_ptr<Device>(new MaxSonarDevice());
+    //      m_device = std::unique_ptr<Device>(new MaxSonarDevice());
   }
 
   if (m_device.get() == nullptr) {
-    std::cerr << "[proxy-sensor-sonararray] No valid device driver defined." 
-        << std::endl;
+    std::cerr << "[proxy-sensor-sonararray] No valid device driver defined."
+              << std::endl;
   }
 }
 
-void SonarArray::tearDown() 
+void SonarArray::tearDown()
 {
 }
 

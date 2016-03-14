@@ -39,13 +39,13 @@ namespace detectvehicle {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-DetectVehicle::DetectVehicle(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, 
-        "perception-detectvehicle")
+DetectVehicle::DetectVehicle(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "perception-detectvehicle")
 {
 }
 
-DetectVehicle::~DetectVehicle() 
+DetectVehicle::~DetectVehicle()
 {
 }
 
@@ -57,11 +57,11 @@ void DetectVehicle::nextContainer(odcore::data::Container &)
 {
 }
 
-void DetectVehicle::setUp() 
+void DetectVehicle::setUp()
 {
 }
 
-void DetectVehicle::tearDown() 
+void DetectVehicle::tearDown()
 {
 }
 

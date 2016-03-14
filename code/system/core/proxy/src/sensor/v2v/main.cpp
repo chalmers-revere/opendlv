@@ -19,7 +19,8 @@
 
 #include "sensor/v2v/v2v.hpp"
 
-int32_t main(int32_t a_argc, char **a_argv) {
+int32_t main(int32_t a_argc, char **a_argv)
+{
   opendlv::proxy::sensor::v2v::V2v v2v(a_argc, a_argv);
   return v2v.runModule();
 }

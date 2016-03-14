@@ -39,12 +39,12 @@ namespace act {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-Act::Act(int32_t const &a_argc, char **a_argv) :
-    TimeTriggeredConferenceClientModule(a_argc, a_argv, "action-act")
+Act::Act(int32_t const &a_argc, char **a_argv)
+    : TimeTriggeredConferenceClientModule(a_argc, a_argv, "action-act")
 {
 }
 
-Act::~Act() 
+Act::~Act()
 {
 }
 
@@ -59,11 +59,11 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
-void Act::setUp() 
+void Act::setUp()
 {
 }
 
-void Act::tearDown() 
+void Act::tearDown()
 {
 }
 

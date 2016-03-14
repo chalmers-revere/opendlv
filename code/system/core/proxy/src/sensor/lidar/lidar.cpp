@@ -42,13 +42,13 @@ namespace lidar {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-Lidar::Lidar(int32_t const &a_argc, char **a_argv) :
-    TimeTriggeredConferenceClientModule(a_argc, a_argv, "proxy-sensor-lidar"),
-    m_device()
+Lidar::Lidar(int32_t const &a_argc, char **a_argv)
+    : TimeTriggeredConferenceClientModule(a_argc, a_argv, "proxy-sensor-lidar")
+    , m_device()
 {
 }
 
-Lidar::~Lidar() 
+Lidar::~Lidar()
 {
 }
 
@@ -58,27 +58,28 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Lidar::body()
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
-void Lidar::setUp() 
+void Lidar::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
   std::string const type = kv.getValue<std::string>("proxy-sensor-lidar.type");
-/*  std::string const port = kv.getValue<std::string>("proxy-sensor-lidar.port");
-  float const mountX = kv.getValue<float>("proxy-sensor-lidar.mount.x");
-  float const mountY = kv.getValue<float>("proxy-sensor-lidar.mount.y");
-  float const mountZ = kv.getValue<float>("proxy-sensor-lidar.mount.z");
-*/
+  /*  std::string const port =
+    kv.getValue<std::string>("proxy-sensor-lidar.port");
+    float const mountX = kv.getValue<float>("proxy-sensor-lidar.mount.x");
+    float const mountY = kv.getValue<float>("proxy-sensor-lidar.mount.y");
+    float const mountZ = kv.getValue<float>("proxy-sensor-lidar.mount.z");
+  */
   if (type.compare("sick") == 0) {
-//      m_device = std::unique_ptr<Device>(new SickDevice());
+    //      m_device = std::unique_ptr<Device>(new SickDevice());
   }
 
   if (m_device.get() == nullptr) {
-    std::cerr << "[proxy-sensor-lidar] No valid device driver defined." 
-        << std::endl;
+    std::cerr << "[proxy-sensor-lidar] No valid device driver defined."
+              << std::endl;
   }
 }
 
-void Lidar::tearDown() 
+void Lidar::tearDown()
 {
 }
 

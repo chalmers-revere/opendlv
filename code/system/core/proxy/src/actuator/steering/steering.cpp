@@ -42,38 +42,38 @@ namespace steering {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-Steering::Steering(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, 
-        "proxy-actuator-steering"),
-    m_device()
+Steering::Steering(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "proxy-actuator-steering")
+    , m_device()
 {
 }
 
-Steering::~Steering() 
+Steering::~Steering()
 {
 }
 
-void Steering::nextContainer(odcore::data::Container &) 
+void Steering::nextContainer(odcore::data::Container &)
 {
 }
 
-void Steering::setUp() 
+void Steering::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
-  std::string const type = 
-    kv.getValue<std::string>("proxy-actuator-steering.type");
+  std::string const type =
+  kv.getValue<std::string>("proxy-actuator-steering.type");
   if (type.compare("gw-volvo") == 0) {
-//      m_device = std::unique_ptr<Device>(new GatewayVolvoDevice());
+    //      m_device = std::unique_ptr<Device>(new GatewayVolvoDevice());
   }
 
   if (m_device.get() == nullptr) {
-    std::cerr << "[proxy-actuator-steering] No valid device driver defined." 
-        << std::endl;
+    std::cerr << "[proxy-actuator-steering] No valid device driver defined."
+              << std::endl;
   }
 }
 
-void Steering::tearDown() 
+void Steering::tearDown()
 {
 }
 

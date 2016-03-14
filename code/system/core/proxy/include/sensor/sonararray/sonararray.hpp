@@ -35,19 +35,20 @@ class Device;
 /**
  * This class provides...
  */
-class SonarArray : public odcore::base::module::TimeTriggeredConferenceClientModule {
-  public:
-    SonarArray(int32_t const &, char **);
-    SonarArray(SonarArray const &) = delete;
-    SonarArray &operator=(SonarArray const &) = delete;
-    virtual ~SonarArray();
-    odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+class SonarArray
+: public odcore::base::module::TimeTriggeredConferenceClientModule {
+ public:
+  SonarArray(int32_t const &, char **);
+  SonarArray(SonarArray const &) = delete;
+  SonarArray &operator=(SonarArray const &) = delete;
+  virtual ~SonarArray();
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 
-    std::unique_ptr<Device> m_device;
+  std::unique_ptr<Device> m_device;
 };
 
 } // sonararray

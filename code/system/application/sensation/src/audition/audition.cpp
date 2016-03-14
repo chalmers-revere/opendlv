@@ -39,12 +39,12 @@ namespace audition {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-Audition::Audition(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, "sensation-audition")
+Audition::Audition(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(a_argc, a_argv, "sensation-audition")
 {
 }
 
-Audition::~Audition() 
+Audition::~Audition()
 {
 }
 
@@ -56,11 +56,11 @@ void Audition::nextContainer(odcore::data::Container &)
 {
 }
 
-void Audition::setUp() 
+void Audition::setUp()
 {
 }
 
-void Audition::tearDown() 
+void Audition::tearDown()
 {
 }
 

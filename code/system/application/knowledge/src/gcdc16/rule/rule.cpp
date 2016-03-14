@@ -40,13 +40,13 @@ namespace rule {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-Rule::Rule(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, 
-        "knowledge-gcdc16-rule")
+Rule::Rule(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "knowledge-gcdc16-rule")
 {
 }
 
-Rule::~Rule() 
+Rule::~Rule()
 {
 }
 
@@ -58,11 +58,11 @@ void Rule::nextContainer(odcore::data::Container &)
 {
 }
 
-void Rule::setUp() 
+void Rule::setUp()
 {
 }
 
-void Rule::tearDown() 
+void Rule::tearDown()
 {
 }
 

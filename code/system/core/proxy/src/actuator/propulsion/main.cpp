@@ -19,7 +19,8 @@
 
 #include "actuator/propulsion/propulsion.hpp"
 
-int32_t main(int32_t a_argc, char **a_argv) {
+int32_t main(int32_t a_argc, char **a_argv)
+{
   opendlv::proxy::actuator::propulsion::Propulsion propulsion(a_argc, a_argv);
   return propulsion.runModule();
 }

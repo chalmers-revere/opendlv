@@ -33,18 +33,18 @@ namespace orientation {
 /**
  * This class provides...
  */
-class Orientation : 
-    public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    Orientation(int32_t const &, char **);
-    Orientation(Orientation const &) = delete;
-    Orientation &operator=(Orientation const &) = delete;
-    virtual ~Orientation();
-    virtual void nextContainer(odcore::data::Container &);
+class Orientation
+: public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  Orientation(int32_t const &, char **);
+  Orientation(Orientation const &) = delete;
+  Orientation &operator=(Orientation const &) = delete;
+  virtual ~Orientation();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 };
 
 } // orientation

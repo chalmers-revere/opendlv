@@ -36,18 +36,18 @@ class Device;
  * This class provides...
  */
 class V2v : public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    V2v(int32_t const &, char **);
-    V2v(V2v const &) = delete;
-    V2v &operator=(V2v const &) = delete;
-    virtual ~V2v();
-    virtual void nextContainer(odcore::data::Container &);
+ public:
+  V2v(int32_t const &, char **);
+  V2v(V2v const &) = delete;
+  V2v &operator=(V2v const &) = delete;
+  virtual ~V2v();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 
-    std::unique_ptr<Device> m_device;
+  std::unique_ptr<Device> m_device;
 };
 
 } // v2v

@@ -19,7 +19,8 @@
 
 #include "actuator/steering/steering.hpp"
 
-int32_t main(int32_t a_argc, char **a_argv) {
+int32_t main(int32_t a_argc, char **a_argv)
+{
   opendlv::proxy::actuator::steering::Steering steering(a_argc, a_argv);
   return steering.runModule();
 }

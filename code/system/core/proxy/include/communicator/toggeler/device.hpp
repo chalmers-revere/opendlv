@@ -26,11 +26,11 @@ namespace communicator {
 namespace toggeler {
 
 class Device {
-  public:
-    Device();
-    Device(Device const &) = delete;
-    Device &operator=(Device const &) = delete;
-    virtual ~Device();
+ public:
+  Device();
+  Device(Device const &) = delete;
+  Device &operator=(Device const &) = delete;
+  virtual ~Device();
 };
 
 } // toggeler

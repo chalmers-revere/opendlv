@@ -42,38 +42,38 @@ namespace propulsion {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-Propulsion::Propulsion(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, 
-        "proxy-actuator-propulsion"),
-    m_device()
+Propulsion::Propulsion(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "proxy-actuator-propulsion")
+    , m_device()
 {
 }
 
-Propulsion::~Propulsion() 
+Propulsion::~Propulsion()
 {
 }
 
-void Propulsion::nextContainer(odcore::data::Container &) 
+void Propulsion::nextContainer(odcore::data::Container &)
 {
 }
 
-void Propulsion::setUp() 
+void Propulsion::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
-  std::string const type = 
-    kv.getValue<std::string>("proxy-actuator-propulsion.type");
+  std::string const type =
+  kv.getValue<std::string>("proxy-actuator-propulsion.type");
   if (type.compare("gw-volvo") == 0) {
-//      m_device = std::unique_ptr<Device>(new GatewayVolvoDevice());
+    //      m_device = std::unique_ptr<Device>(new GatewayVolvoDevice());
   }
 
   if (m_device.get() == nullptr) {
-    std::cerr << "[proxy-actuator-propulsion] No valid device driver defined." 
-        << std::endl;
+    std::cerr << "[proxy-actuator-propulsion] No valid device driver defined."
+              << std::endl;
   }
 }
 
-void Propulsion::tearDown() 
+void Propulsion::tearDown()
 {
 }
 

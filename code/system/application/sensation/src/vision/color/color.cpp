@@ -40,13 +40,13 @@ namespace color {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-Color::Color(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, 
-        "sensation-vision-color")
+Color::Color(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "sensation-vision-color")
 {
 }
 
-Color::~Color() 
+Color::~Color()
 {
 }
 
@@ -58,11 +58,11 @@ void Color::nextContainer(odcore::data::Container &)
 {
 }
 
-void Color::setUp() 
+void Color::setUp()
 {
 }
 
-void Color::tearDown() 
+void Color::tearDown()
 {
 }
 

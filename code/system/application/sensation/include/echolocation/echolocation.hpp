@@ -32,18 +32,18 @@ namespace echolocation {
 /**
  * This class provides...
  */
-class Echolocation : 
-    public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    Echolocation(int32_t const &, char **);
-    Echolocation(Echolocation const &) = delete;
-    Echolocation &operator=(Echolocation const &) = delete;
-    virtual ~Echolocation();
-    virtual void nextContainer(odcore::data::Container &);
+class Echolocation
+: public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  Echolocation(int32_t const &, char **);
+  Echolocation(Echolocation const &) = delete;
+  Echolocation &operator=(Echolocation const &) = delete;
+  virtual ~Echolocation();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 };
 
 } // echolocation

@@ -36,18 +36,18 @@ class Device;
  * This class provides...
  */
 class Gps : public odcore::base::module::TimeTriggeredConferenceClientModule {
-  public:
-    Gps(int32_t const &, char **);
-    Gps(Gps const &) = delete;
-    Gps &operator=(Gps const &) = delete;
-    virtual ~Gps();
-    odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+ public:
+  Gps(int32_t const &, char **);
+  Gps(Gps const &) = delete;
+  Gps &operator=(Gps const &) = delete;
+  virtual ~Gps();
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 
-    std::unique_ptr<Device> m_device;
+  std::unique_ptr<Device> m_device;
 };
 
 } // gps
