@@ -21,6 +21,9 @@
 #include <iostream>
 
 #include <opendavinci/odcore/data/Container.h>
+#include <opendlv/data/environment/Point3.h>
+#include <opendlv/data/environment/WGS84Coordinate.h>
+
 #include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
 #include "opendavinci/odcore/reflection/CSVFromVisitableVisitor.h"
 
@@ -74,6 +77,31 @@ void Sensation::tearDown()
 }
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
+    // Example on how to use the type WGS84Coordinate:
+    {
+        using namespace opendlv::data::environment;
+
+        // First, you need to declare a lat/lon coordinate to be used
+        // as reference (i.e. origin (0, 0) of a Cartesian coordinate
+        // frame); in our example, we use one located at AstaZero.
+        WGS84Coordinate reference(57.77284043, WGS84Coordinate::NORTH, 12.76996356, WGS84Coordinate::EAST);
+
+        // Let's assume you have another lat/lon coordinate at hand.
+        WGS84Coordinate WGS84_p2(57.7730612, WGS84Coordinate::NORTH, 12.77008208, WGS84Coordinate::EAST);
+
+        // Now, you can transform this new lat/lon coordinate to the
+        // previously specified Cartesian reference frame.
+        Point3 cartesian_p2 = reference.transform(WGS84_p2);
+        std::cout << "WGS84 reference: " << reference.toString()
+                  << ", other WGS84 coordinate: " << WGS84_p2.toString()
+                  << ", transformed cartesian coordinate: " << cartesian_p2.toString()
+                  << std::endl;
+        // You can access the X, Y coordinates (Z==0) as follows:
+        double p2_x = cartesian_p2.getX();
+        double p2_y = cartesian_p2.getY();
+        std::cout << "X = " << p2_x << ", Y = " << p2_y << std::endl;
+    }
+
     // To dump data structures into a CSV file, you create an output file first.
     std::ofstream fout("../Exp_data/output.csv");
     std::ofstream fout_command("../Exp_data/output_commands.csv");
