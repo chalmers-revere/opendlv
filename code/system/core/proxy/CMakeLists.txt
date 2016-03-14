@@ -31,6 +31,7 @@ set(LIBRARIES ${LIBRARIES} ${OpenCV_LIBS})
 # Build
 file(GLOB_RECURSE thisproject-sources 
   #  "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/can/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/actuator/propulsion/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/actuator/brake/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/actuator/steering/*.cpp"
@@ -47,6 +48,9 @@ file(GLOB_RECURSE thisproject-sources
 
 
 add_library(${PROJECT_NAME}lib-static STATIC ${thisproject-sources})
+
+add_executable(${PROJECT_NAME}-cangw "${CMAKE_CURRENT_SOURCE_DIR}/src/can/main.cpp")
+target_link_libraries(${PROJECT_NAME}-cangw ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
 add_executable(${PROJECT_NAME}-actuator-propulsion "${CMAKE_CURRENT_SOURCE_DIR}/src/actuator/propulsion/main.cpp")
 target_link_libraries(${PROJECT_NAME}-actuator-propulsion ${PROJECT_NAME}lib-static ${LIBRARIES}) 
@@ -88,6 +92,7 @@ target_link_libraries(${PROJECT_NAME}-sensor-v2v ${PROJECT_NAME}lib-static ${LIB
 include(RunTests)
 
 # Install
+install(TARGETS ${PROJECT_NAME}-cangw RUNTIME DESTINATION bin COMPONENT system-core)
 install(TARGETS ${PROJECT_NAME}-actuator-propulsion RUNTIME DESTINATION bin COMPONENT system-core)
 install(TARGETS ${PROJECT_NAME}-actuator-brake RUNTIME DESTINATION bin COMPONENT system-core)
 install(TARGETS ${PROJECT_NAME}-actuator-steering RUNTIME DESTINATION bin COMPONENT system-core)
