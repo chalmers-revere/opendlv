@@ -73,7 +73,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2v::body()
     udpreceiver->setPacketListener(&handler);
     udpreceiver->start();
     //For continuous listening
-    for(;;) pause();
+    while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+      // Do nothing
+    }
     udpreceiver->stop();
     udpreceiver->setPacketListener(NULL);
   }
