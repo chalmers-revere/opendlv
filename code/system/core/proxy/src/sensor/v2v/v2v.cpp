@@ -23,13 +23,18 @@
 #include <iostream>
 
 #include "opendavinci/odcore/base/KeyValueConfiguration.h"
+#include "opendavinci/odcore/base/Thread.h"
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
+#include "opendavinci/odcore/io/Packet.h"
+#include "opendavinci/odcore/io/udp/UDPReceiver.h"
+#include "opendavinci/odcore/io/udp/UDPFactory.h"
 
 #include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
 
 #include "sensor/v2v/v2v.hpp"
 #include "sensor/v2v/device.hpp"
+#include "sensor/v2v/UDPReceivePackets.hpp"
 
 namespace opendlv {
 namespace proxy {
@@ -52,31 +57,54 @@ V2v::~V2v()
 {
 }
 
+
 // This method will do the main data processing job.
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2v::body()
 {
+  const std::string RECEIVER = "0.0.0.0";
+  const uint32_t PORT = 1234;
+  std::cout << "Trying to receive UDP on port " << PORT << "." << std::endl;
+  try
+  {
+    std::shared_ptr<odcore::io::udp::UDPReceiver>
+            udpreceiver(odcore::io::udp::UDPFactory::createUDPReceiver(RECEIVER, PORT));
+
+    UDPReceivePackets handler;
+    udpreceiver->setPacketListener(&handler);
+    udpreceiver->start();
+    //For continuous listening
+    for(;;) pause();
+    udpreceiver->stop();
+    udpreceiver->setPacketListener(NULL);
+  }
+  catch(std::string &exception)
+  {
+    std::cerr << "Error while creating UDP receiver:  " << exception 
+        << std::endl;
+  }
+
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
 void V2v::setUp()
 {
-  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+  // odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
-  std::string const type = kv.getValue<std::string>("proxy-sensor-v2v.type");
+  // std::string const type = kv.getValue<std::string>("proxy-sensor-v2v.type");
   /*  std::string const port =
     kv.getValue<std::string>("proxy-sensor-v2v.port");
     float const mountX = kv.getValue<float>("proxy-sensor-v2v.mount.x");
     float const mountY = kv.getValue<float>("proxy-sensor-v2v.mount.y");
     float const mountZ = kv.getValue<float>("proxy-sensor-v2v.mount.z");
   */
-  if (type.compare("geonetworking-dual") == 0) {
-    //      m_device = std::unique_ptr<Device>(new GeonetworkingDualDevice());
-  }
+  // if (type.compare("geonetworking-dual") == 0) {
+  //   //      m_device = std::unique_ptr<Device>(new GeonetworkingDualDevice());
+  // }
 
-  if (m_device.get() == nullptr) {
-    std::cerr << "[proxy-sensor-v2v] No valid device driver defined."
-              << std::endl;
-  }
+  // if (m_device.get() == nullptr) {
+  //   std::cerr << "[proxy-sensor-v2v] No valid device driver defined."
+  //             << std::endl;
+  // }
 }
 
 void V2v::tearDown()
