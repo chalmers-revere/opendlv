@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include <opendavinci/odcore/data/Container.h>
 #include <opendavinci/odcore/data/TimeStamp.h>
@@ -26,8 +27,6 @@
 #include <odcantools/MessageToCANDataStore.h>
 #include <odcantools/CANDevice.h>
 #include <automotivedata/generated/automotive/GenericCANMessage.h>
-
-#include <fh16mapping/GeneratedHeaders_FH16Mapping.h>
 
 #include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
 
@@ -46,7 +45,8 @@ CANGW::CANGW(int32_t const &a_argc, char **a_argv)
     , m_fifo()
     , m_recorder()
     , m_device()
-    , m_canMessageDataStore()
+    , m_canMessageDataStore(),
+m_fh16CANMessageMapping()
 {
 }
 
@@ -121,12 +121,24 @@ void CANGW::nextGenericCANMessage(const automotive::GenericCANMessage &gcm)
   std::cout << "Received CAN message " << gcm.toString() << std::endl;
 
   // Map CAN message to high-level data structure.
-  {
-    // TODO: Glue this method to the CAN mapping function using
-    // odCANDataStructureGenerator.
-    // TODO: Transform the received CAN message to high-level data structure.
-    // TODO: Emit high-level messages therefrom afterwards.
-  }
+    vector<odcore::data::Container> result = m_fh16CANMessageMapping.mapNext(gcm);
+
+    std::cout << gcm.toString() << ", decoded: " << result.size() << std::endl;
+    if (result.size() > 0) {
+        auto it = result.begin();
+        while (it != result.end()) {
+            odcore::data::Container c = (*it);
+            if (c.getDataType() == opendlv::gcdc::fh16::Steering::ID()) {
+                opendlv::gcdc::fh16::Steering s = c.getData<opendlv::gcdc::fh16::Steering>();
+                std::cout << s.toString() << std::endl;
+            }
+            if (c.getDataType() == opendlv::gcdc::fh16::VehicleDynamics::ID()) {
+                opendlv::gcdc::fh16::VehicleDynamics v = c.getData<opendlv::gcdc::fh16::VehicleDynamics>();
+                std::cout << v.toString() << std::endl;
+            }
+            it++;
+        }
+    }
 
   // Enqueue CAN message wrapped as Container to be recorded if we have a valid
   // recorder.

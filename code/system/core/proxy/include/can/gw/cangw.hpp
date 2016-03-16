@@ -22,9 +22,10 @@
 
 #include <memory>
 
-#include "opendavinci/odcore/base/FIFOQueue.h"
-#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
-#include "odcantools/GenericCANMessageListener.h"
+#include <opendavinci/odcore/base/FIFOQueue.h>
+#include <opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h>
+#include <odcantools/GenericCANMessageListener.h>
+#include <fh16mapping/GeneratedHeaders_FH16Mapping.h>
 
 namespace automotive {
 class GenericCANMessage;
@@ -71,6 +72,7 @@ class CANGW : public odcore::base::module::TimeTriggeredConferenceClientModule,
   std::unique_ptr<odtools::recorder::Recorder> m_recorder;
   std::shared_ptr<automotive::odcantools::CANDevice> m_device;
   std::unique_ptr<CANMessageDataStore> m_canMessageDataStore;
+  canmapping::CanMapping m_fh16CANMessageMapping;
 };
 
 } // gw

@@ -126,7 +126,7 @@ ExternalProject_Add(libfh16mapping-cleanup
 ###########################################################################
 # This "external project" generates the data structures in libopendlvdata.
 ExternalProject_Add(libfh16mapping
-    DEPENDS libopendlvdata
+    DEPENDS libfh16mapping-cleanup libopendlvdata
     DOWNLOAD_COMMAND ""
     UPDATE_COMMAND cd ${CMAKE_SOURCE_DIR}/code/generated && ${Java_JAVA_EXECUTABLE} -jar ${ODCANDATASTRUCTUREGENERATOR_EXECUTABLE} --withCMake ${CMAKE_SOURCE_DIR}/resources/FH16Mapping.can
     PATCH_COMMAND ""

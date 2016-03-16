@@ -23,7 +23,6 @@
 #include <opendavinci/odcore/data/Container.h>
 #include <opendavinci/odcore/strings/StringToolbox.h>
 #include <automotivedata/generated/automotive/GenericCANMessage.h>
-
 #include <fh16mapping/GeneratedHeaders_FH16Mapping.h>
 
 #include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
@@ -109,7 +108,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode CANASCReplay::body()
 
             vector<odcore::data::Container> result = cm.mapNext(gcm);
 
-//            cout << gcm.toString() << ", decoded: " << result.size() << endl;
+            cout << gcm.toString() << ", decoded: " << result.size() << endl;
             if (result.size() > 0) {
                 auto it = result.begin();
                 while (it != result.end()) {
@@ -125,7 +124,6 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode CANASCReplay::body()
                     it++;
                 }
             }
-
 
             // Distribute data.
 //            Container c(gcm);
