@@ -38,10 +38,10 @@
 
     split(INPUT, SIGNAL, " ")
     if (SIGNAL[5] == "1") {
-        ENDIAN="little"
+        ENDIAN="big"
     }
     else {
-        ENDIAN="big"
+        ENDIAN="little"
     }
 
     print tolower(NAME) "." tolower(SIGNAL[2]) " in 0x" HEX " at bit " SIGNAL[3] " for " SIGNAL[4] " bit is " ENDIAN " endian multiply by " SIGNAL[6] " add " SIGNAL[7] " with range " "[" SIGNAL[8] ", " SIGNAL[9] "]" ";"

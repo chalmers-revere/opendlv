@@ -97,7 +97,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode CANASCReplay::body()
                 // Read next data byte.
                 uint16_t value = 0;
                 _data >> hex >> value;
-                data |= (static_cast<uint64_t>(value) << (i*8));
+                data |= (static_cast<uint64_t>(value) << ((length-1-i)*8));
             }
 
 
@@ -109,7 +109,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode CANASCReplay::body()
 
             vector<odcore::data::Container> result = cm.mapNext(gcm);
 
-            cout << gcm.toString() << ", decoded: " << result.size() << endl;
+//            cout << gcm.toString() << ", decoded: " << result.size() << endl;
             if (result.size() > 0) {
                 auto it = result.begin();
                 while (it != result.end()) {
