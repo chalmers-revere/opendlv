@@ -43,6 +43,7 @@ class Recorder;
 namespace opendlv {
 namespace proxy {
 namespace can {
+namespace gw {
 
 class CANMessageDataStore;
 
@@ -72,6 +73,7 @@ class CANGW : public odcore::base::module::TimeTriggeredConferenceClientModule,
   std::unique_ptr<CANMessageDataStore> m_canMessageDataStore;
 };
 
+} // gw
 } // can
 } // proxy
 } // opendlv

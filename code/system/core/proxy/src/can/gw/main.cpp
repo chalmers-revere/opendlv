@@ -17,42 +17,10 @@
  * USA.
  */
 
-#ifndef PROXY_CANMESSAGEDATASTORE_HPP_
-#define PROXY_CANMESSAGEDATASTORE_HPP_
+#include "can/gw/cangw.hpp"
 
-#include <memory>
-
-#include "odcantools/MessageToCANDataStore.h"
-
-namespace automotive {
-namespace odcantools {
-class CANDevice;
+int32_t main(int32_t a_argc, char **a_argv)
+{
+  opendlv::proxy::can::gw::CANGW cangw(a_argc, a_argv);
+  return cangw.runModule();
 }
-}
-
-namespace odcore {
-namespace data {
-class Container;
-}
-}
-
-namespace opendlv {
-namespace proxy {
-namespace can {
-
-/**
- * This class maps selected messages to CAN messages.
- */
-class CANMessageDataStore
-: public automotive::odcantools::MessageToCANDataStore {
- public:
-  CANMessageDataStore(
-  std::shared_ptr<automotive::odcantools::CANDevice> canDevice);
-  virtual void add(const odcore::data::Container &container);
-};
-
-} // can
-} // proxy
-} // opendlv
-
-#endif

@@ -46,7 +46,7 @@ find_package(odcantools REQUIRED)
 ###########################################################################
 # Find fh16mapping.
 set(FH16MAPPING_DIR "${CMAKE_INSTALL_PREFIX}")
-find_package(FH16mapping REQUIRED)
+find_package(FH16Mapping REQUIRED)
 
 ###########################################################################
 # Find OpenDLV data structures.

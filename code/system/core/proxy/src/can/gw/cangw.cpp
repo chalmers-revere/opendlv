@@ -31,16 +31,17 @@
 
 #include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
 
-#include "can/cangw.hpp"
-#include "can/canmessagedatastore.hpp"
+#include "can/gw/cangw.hpp"
+#include "can/gw/canmessagedatastore.hpp"
 
 namespace opendlv {
 namespace proxy {
 namespace can {
+namespace gw {
 
 CANGW::CANGW(int32_t const &a_argc, char **a_argv)
     : odcore::base::module::TimeTriggeredConferenceClientModule(
-      a_argc, a_argv, "proxy-cangw")
+      a_argc, a_argv, "proxy-can-gw")
     , automotive::odcantools::GenericCANMessageListener()
     , m_fifo()
     , m_recorder()
@@ -62,7 +63,7 @@ void CANGW::setUp()
   using namespace automotive::odcantools;
 
   string const DEVICE_NODE =
-  getKeyValueConfiguration().getValue<string>("proxy-cangw.devicenode");
+  getKeyValueConfiguration().getValue<string>("proxy-can-gw.devicenode");
 
   // Try to open CAN device and register this instance as receiver for
   // GenericCANMessages.
@@ -78,7 +79,7 @@ void CANGW::setUp()
       // URL for storing containers containing GenericCANMessages.
       stringstream recordingURL;
       recordingURL << "file://"
-                   << "cangw_" << TimeStamp().getYYYYMMDD_HHMMSS() << ".rec";
+                   << "can-gw_" << TimeStamp().getYYYYMMDD_HHMMSS() << ".rec";
       // Size of memory segments (not needed for recording GenericCANMessages).
       const uint32_t MEMORY_SEGMENT_SIZE = 0;
       // Number of memory segments (not needed for recording
@@ -152,6 +153,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode CANGW::body()
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
+} // gw
 } // can
 } // proxy
 } // opendlv

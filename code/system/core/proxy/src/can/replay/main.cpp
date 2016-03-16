@@ -17,35 +17,10 @@
  * USA.
  */
 
-#ifndef PROXY_CANASCREPLAY_HPP_
-#define PROXY_CANASCREPLAY_HPP_
+#include "can/replay/canascreplay.hpp"
 
-#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
-
-namespace opendlv {
-namespace proxy {
-namespace can {
-
-class CANMessageDataStore;
-
-/**
- * This class replays CAN messages from a .ASC recording.
- */
-class CANASCReplay : public odcore::base::module::TimeTriggeredConferenceClientModule {
- public:
-  CANASCReplay(int32_t const &, char **);
-  CANASCReplay(CANASCReplay const &) = delete;
-  CANASCReplay &operator=(CANASCReplay const &) = delete;
-  virtual ~CANASCReplay();
-
- private:
-  void setUp();
-  void tearDown();
-  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
-};
-
-} // can
-} // proxy
-} // opendlv
-
-#endif
+int32_t main(int32_t a_argc, char **a_argv)
+{
+  opendlv::proxy::can::replay::CANASCReplay canar(a_argc, a_argv);
+  return canar.runModule();
+}

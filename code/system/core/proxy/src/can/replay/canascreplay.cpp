@@ -28,15 +28,16 @@
 
 #include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
 
-#include "can/canascreplay.hpp"
+#include "can/replay/canascreplay.hpp"
 
 namespace opendlv {
 namespace proxy {
 namespace can {
+namespace replay {
 
 CANASCReplay::CANASCReplay(int32_t const &a_argc, char **a_argv)
     : odcore::base::module::TimeTriggeredConferenceClientModule(
-      a_argc, a_argv, "proxy-canascreplay")
+      a_argc, a_argv, "proxy-can-ascreplay")
 {
 }
 
@@ -58,9 +59,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode CANASCReplay::body()
     using namespace odcore::base;
     using namespace odcore::data;
     using namespace odcore::strings;
-    using namespace odtools::recorder;
     using namespace automotive;
-    using namespace automotive::odcantools;
 
     canmapping::CanMapping cm;
 
@@ -137,6 +136,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode CANASCReplay::body()
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
+} // replay
 } // can
 } // proxy
 } // opendlv

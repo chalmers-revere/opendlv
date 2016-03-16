@@ -22,11 +22,12 @@
 #include <odcantools/CANDevice.h>
 #include <fh16mapping/GeneratedHeaders_FH16Mapping.h>
 
-#include "can/canmessagedatastore.hpp"
+#include "can/gw/canmessagedatastore.hpp"
 
 namespace opendlv {
 namespace proxy {
 namespace can {
+namespace gw {
 
 CANMessageDataStore::CANMessageDataStore(
 std::shared_ptr<automotive::odcantools::CANDevice> canDevice)
@@ -47,6 +48,7 @@ void CANMessageDataStore::add(const odcore::data::Container &container)
   }
 }
 
+} // gw
 } // can
 } // proxy
 } // opendlv
