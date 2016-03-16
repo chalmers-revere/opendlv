@@ -20,7 +20,8 @@
 #ifndef SENSOR_CAMERA_OPENCVCAMERA_H_
 #define SENSOR_CAMERA_OPENCVCAMERA_H_
 
-#include "opencv2/highgui/highgui.hpp"
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 #include "sensor/camera/device.hpp"
 
@@ -35,8 +36,9 @@ namespace camera {
  */
 class OpenCvDevice : public Device {
  public:
-  OpenCvDevice(std::string const &, uint32_t const &, uint32_t const &,
-  uint32_t const &, uint32_t const &);
+  OpenCvDevice(std::string const &, std::string const &, std::string const &, 
+      std::string const &, uint32_t const &, uint32_t const &, 
+      uint32_t const &);
   OpenCvDevice(OpenCvDevice const &) = delete;
   OpenCvDevice &operator=(OpenCvDevice const &) = delete;
   virtual ~OpenCvDevice();
@@ -47,8 +49,8 @@ class OpenCvDevice : public Device {
   virtual bool CaptureFrame();
 
  private:
-  CvCapture *m_capture;
-  IplImage *m_image;
+  std::shared_ptr<cv::VideoCapture> m_capture;
+  std::shared_ptr<cv::Mat> m_image;
 };
 
 } // camera
