@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+#include <string>
 
 #include <opendavinci/odcore/data/Container.h>
 #include <opendavinci/odcore/data/TimeStamp.h>
@@ -25,6 +26,8 @@
 #include <odcantools/MessageToCANDataStore.h>
 #include <odcantools/CANDevice.h>
 #include <automotivedata/generated/automotive/GenericCANMessage.h>
+
+#include <fh16mapping/GeneratedHeaders_FH16Mapping.h>
 
 #include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
 
@@ -67,7 +70,7 @@ void CANGW::setUp()
 
   // If the device could be successfully opened, create a recording file with a
   // dump of the data.
-  if (m_device->isOpen()) {
+  if (m_device.get() && m_device->isOpen()) {
     cout << "Successfully opened CAN device '" << DEVICE_NODE << "'." << endl;
 
     // Automatically record all received CAN messages.
@@ -106,8 +109,10 @@ void CANGW::setUp()
 
 void CANGW::tearDown()
 {
-  // Stop the wrapper CAN device.
-  m_device->stop();
+  if (m_device.get()) {
+    // Stop the wrapper CAN device.
+    m_device->stop();
+  }
 }
 
 void CANGW::nextGenericCANMessage(const automotive::GenericCANMessage &gcm)

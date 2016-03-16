@@ -20,6 +20,7 @@
 #include <opendavinci/odcore/data/Container.h>
 #include <automotivedata/generated/automotive/GenericCANMessage.h>
 #include <odcantools/CANDevice.h>
+#include <fh16mapping/GeneratedHeaders_FH16Mapping.h>
 
 #include "can/canmessagedatastore.hpp"
 

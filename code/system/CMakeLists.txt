@@ -44,6 +44,11 @@ set(ODCANTOOLS_DIR "${OPENDAVINCI_DIR}")
 find_package(odcantools REQUIRED)
 
 ###########################################################################
+# Find fh16mapping.
+set(FH16MAPPING_DIR "${CMAKE_INSTALL_PREFIX}")
+find_package(FH16mapping REQUIRED)
+
+###########################################################################
 # Find OpenDLV data structures.
 set(OPENDLVDATA_DIR "${CMAKE_INSTALL_PREFIX}")
 find_package(OpenDLVData REQUIRED)
@@ -53,10 +58,14 @@ find_package(OpenDLVData REQUIRED)
 include_directories(SYSTEM ${OPENDAVINCI_INCLUDE_DIRS})
 include_directories(SYSTEM ${ODCANTOOLS_INCLUDE_DIRS})
 include_directories(SYSTEM ${OPENDLVDATA_INCLUDE_DIRS})
+include_directories(SYSTEM ${FH16MAPPING_INCLUDE_DIRS})
 
 ###########################################################################
 # Set libraries to link against.
-set(LIBRARIES ${OPENDAVINCI_LIBRARIES} ${ODCANTOOLS_LIBRARIES} ${OPENDLVDATA_LIBRARIES})
+set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
+              ${ODCANTOOLS_LIBRARIES}
+              ${OPENDLVDATA_LIBRARIES}
+              ${FH16MAPPING_LIBRARIES})
 
 ###########################################################################
 # Add subfolders with sources.
