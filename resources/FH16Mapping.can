@@ -123,12 +123,11 @@ unordered mapping opendlv.gcdc.fh16.Steering {
 ///////////////////////////////////////////////////////////////////////////////
 // In the following, test data to be embedded into test cases is specified.
 ///////////////////////////////////////////////////////////////////////////////
+test opendlv.gcdc.fh16.VehicleDynamics {
+  0x104: 0x7F7DA77D877D
 
-// Example for the opendlv.gcdc.fh16.VehicleSpeed message.
-/*
-test opendlv.gcdc.fh16.VehicleSpeed {
-  0x103: 0x223C2217220D2207
-  
-  id 1 = 87.64
+  id 1 = 0.000012
+  id 2 = 0.019543
+  id 3 = 0.00047
 }
-*/
+

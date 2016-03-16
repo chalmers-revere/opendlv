@@ -20,7 +20,12 @@
 #ifndef PROXY_CANASCREPLAY_HPP_
 #define PROXY_CANASCREPLAY_HPP_
 
-#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
+#include <string>
+#include <vector>
+
+#include <opendavinci/odcore/data/Container.h>
+#include <opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h>
+#include <fh16mapping/GeneratedHeaders_FH16Mapping.h>
 
 namespace opendlv {
 namespace proxy {
@@ -43,6 +48,12 @@ class CANASCReplay : public odcore::base::module::TimeTriggeredConferenceClientM
   void setUp();
   void tearDown();
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+
+  vector<odcore::data::Container> getMessages(const std::string &nextLineFromASC);
+
+ private:
+  canmapping::CanMapping m_fh16CANMessageMapping;
+
 };
 
 } // replay

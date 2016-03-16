@@ -20,10 +20,8 @@
 #include <iostream>
 #include <string>
 
-#include <opendavinci/odcore/data/Container.h>
 #include <opendavinci/odcore/strings/StringToolbox.h>
 #include <automotivedata/generated/automotive/GenericCANMessage.h>
-#include <fh16mapping/GeneratedHeaders_FH16Mapping.h>
 
 #include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
 
@@ -36,7 +34,8 @@ namespace replay {
 
 CANASCReplay::CANASCReplay(int32_t const &a_argc, char **a_argv)
     : odcore::base::module::TimeTriggeredConferenceClientModule(
-      a_argc, a_argv, "proxy-can-ascreplay")
+      a_argc, a_argv, "proxy-can-ascreplay"),
+m_fh16CANMessageMapping()
 {
 }
 
@@ -52,82 +51,92 @@ void CANASCReplay::tearDown()
 {
 }
 
-odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode CANASCReplay::body()
-{
+vector<odcore::data::Container> CANASCReplay::getMessages(const std::string &nextLineFromASC) {
     using namespace std;
     using namespace odcore::base;
     using namespace odcore::data;
     using namespace odcore::strings;
     using namespace automotive;
 
-    canmapping::CanMapping cm;
+    vector<odcore::data::Container> result;
 
     // Structure of an ASC entry: 'Timestamp Channel  ID             Rx   d Length 00 11 22 33 44 55 66 77'
+
+    // Tokenize the read line.
+    vector<string> tokens = StringToolbox::split(string(nextLineFromASC), ' ');
+
+    // Do we have a valid line?
+    if ( (tokens.size() >= 7) &&
+         (StringToolbox::equalsIgnoreCase(tokens[3], "rx")) ) {
+        // Read CAN identifier.
+        stringstream _identifier;
+        uint64_t identifier = 0;
+        _identifier << tokens[2]; _identifier >> hex >> identifier;
+
+        // Read payload length (1-8).
+        stringstream _length;
+        uint16_t length = 0;
+        _length << tokens[5]; _length >> dec >> length;
+
+        // Read payload.
+        uint64_t data = 0;
+        uint32_t i = 0;
+        // Read bytes into data.
+        for (; i < length; i++) {
+            // Put next data byte into stringstream.
+            stringstream _data;
+            _data << tokens[6 + i];
+
+            // Read next data byte.
+            uint16_t value = 0;
+            _data >> hex >> value;
+            data |= (static_cast<uint64_t>(value) << ((length-1-i)*8));
+        }
+
+
+        // Create GenericCANMessage from parsed data.
+        GenericCANMessage gcm;
+        gcm.setIdentifier(identifier);
+        gcm.setLength(length);
+        gcm.setData(data);
+
+        cout << gcm.toString() << ", decoded: " << result.size() << endl;
+
+        result = m_fh16CANMessageMapping.mapNext(gcm);
+    }
+    return result;
+}
+
+odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode CANASCReplay::body()
+{
+    using namespace std;
+
     char buffer[100];
     while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
         // Read next line from STDIN.
         cin.getline(buffer, 100);
 
-        // Tokenize the read line.
-        vector<string> tokens = StringToolbox::split(string(buffer), ' ');
+        vector<odcore::data::Container> result = getMessages(buffer);
 
-        // Do we have a valid line?
-        if ( (tokens.size() >= 7) &&
-             (StringToolbox::equalsIgnoreCase(tokens[3], "rx")) ) {
-            // Read CAN identifier.
-            stringstream _identifier;
-            uint64_t identifier = 0;
-            _identifier << tokens[2]; _identifier >> hex >> identifier;
+        if (result.size() > 0) {
+            auto it = result.begin();
+            while (it != result.end()) {
+                odcore::data::Container c = (*it);
 
-            // Read payload length (1-8).
-            stringstream _length;
-            uint16_t length = 0;
-            _length << tokens[5]; _length >> dec >> length;
-
-            // Read payload.
-            uint64_t data = 0;
-            uint32_t i = 0;
-            // Read bytes into data.
-            for (; i < length; i++) {
-                // Put next data byte into stringstream.
-                stringstream _data;
-                _data << tokens[6 + i];
-
-                // Read next data byte.
-                uint16_t value = 0;
-                _data >> hex >> value;
-                data |= (static_cast<uint64_t>(value) << ((length-1-i)*8));
-            }
-
-
-            // Create GenericCANMessage from parsed data.
-            GenericCANMessage gcm;
-            gcm.setIdentifier(identifier);
-            gcm.setLength(length);
-            gcm.setData(data);
-
-            vector<odcore::data::Container> result = cm.mapNext(gcm);
-
-            cout << gcm.toString() << ", decoded: " << result.size() << endl;
-            if (result.size() > 0) {
-                auto it = result.begin();
-                while (it != result.end()) {
-                    odcore::data::Container c = (*it);
-                    if (c.getDataType() == opendlv::gcdc::fh16::Steering::ID()) {
-                        opendlv::gcdc::fh16::Steering s = c.getData<opendlv::gcdc::fh16::Steering>();
-                        cout << s.toString() << endl;
-                    }
-                    if (c.getDataType() == opendlv::gcdc::fh16::VehicleDynamics::ID()) {
-                        opendlv::gcdc::fh16::VehicleDynamics v = c.getData<opendlv::gcdc::fh16::VehicleDynamics>();
-                        cout << v.toString() << endl;
-                    }
-                    it++;
+                if (c.getDataType() == opendlv::gcdc::fh16::Steering::ID()) {
+                    opendlv::gcdc::fh16::Steering s = c.getData<opendlv::gcdc::fh16::Steering>();
+                    cout << s.toString() << endl;
                 }
-            }
+                if (c.getDataType() == opendlv::gcdc::fh16::VehicleDynamics::ID()) {
+                    opendlv::gcdc::fh16::VehicleDynamics v = c.getData<opendlv::gcdc::fh16::VehicleDynamics>();
+                    cout << v.toString() << endl;
+                }
 
-            // Distribute data.
-//            Container c(gcm);
-//            getConference().send(c);
+                // Distribute data.
+                getConference().send(c);
+
+                it++;
+            }
         }
     }
 
