@@ -44,12 +44,12 @@ class CANASCReplay : public odcore::base::module::TimeTriggeredConferenceClientM
   CANASCReplay &operator=(CANASCReplay const &) = delete;
   virtual ~CANASCReplay();
 
+  vector<odcore::data::Container> getMessages(const std::string &nextLineFromASC);
+
  private:
   void setUp();
   void tearDown();
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
-
-  vector<odcore::data::Container> getMessages(const std::string &nextLineFromASC);
 
  private:
   canmapping::CanMapping m_fh16CANMessageMapping;
