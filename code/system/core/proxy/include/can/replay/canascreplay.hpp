@@ -35,16 +35,19 @@ namespace replay {
 class CANMessageDataStore;
 
 /**
- * This class replays CAN messages from a .ASC recording piped to this tool over commandline.
+ * This class replays CAN messages from a .ASC recording piped to this tool over
+ * commandline.
  */
-class CANASCReplay : public odcore::base::module::TimeTriggeredConferenceClientModule {
+class CANASCReplay
+: public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
   CANASCReplay(int32_t const &, char **);
   CANASCReplay(CANASCReplay const &) = delete;
   CANASCReplay &operator=(CANASCReplay const &) = delete;
   virtual ~CANASCReplay();
 
-  vector<odcore::data::Container> getMessages(const std::string &nextLineFromASC);
+  vector<odcore::data::Container> getMessages(
+  const std::string &nextLineFromASC);
 
  private:
   void setUp();
@@ -53,7 +56,6 @@ class CANASCReplay : public odcore::base::module::TimeTriggeredConferenceClientM
 
  private:
   canmapping::CanMapping m_fh16CANMessageMapping;
-
 };
 
 } // replay

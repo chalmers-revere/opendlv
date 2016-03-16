@@ -100,18 +100,22 @@ class CANASCReplayTest : public CxxTest::TestSuite {
 
   void testDecodeInvalidPayload()
   {
-    std::vector<odcore::data::Container> result = m_pt->getMessages("Hello World");
+    std::vector<odcore::data::Container> result =
+    m_pt->getMessages("Hello World");
     TS_ASSERT(result.size() == 0);
   }
 
   void testDecodeValidPayload()
   {
-    std::string payload(" 279.733972 1  104             Rx   d 6 7F 7D A7 7D 87 7D  Length = 388000 BitCount = 101");
+    std::string payload(" 279.733972 1  104             Rx   d 6 7F 7D A7 7D "
+                        "87 7D  Length = 388000 BitCount = 101");
     std::vector<odcore::data::Container> result = m_pt->getMessages(payload);
     TS_ASSERT(result.size() == 1);
-    TS_ASSERT(result.at(0).getDataType() == opendlv::gcdc::fh16::VehicleDynamics::ID());
+    TS_ASSERT(
+    result.at(0).getDataType() == opendlv::gcdc::fh16::VehicleDynamics::ID());
 
-    opendlv::gcdc::fh16::VehicleDynamics vd = result.at(0).getData<opendlv::gcdc::fh16::VehicleDynamics>();
+    opendlv::gcdc::fh16::VehicleDynamics vd =
+    result.at(0).getData<opendlv::gcdc::fh16::VehicleDynamics>();
     TS_ASSERT_DELTA(vd.getAcceleration_x(), 1.17188e-05, 1e-5);
     TS_ASSERT_DELTA(vd.getAcceleration_y(), 0.019543, 1e-5);
     TS_ASSERT_DELTA(vd.getYawrate(), 0.00047, 1e-5);
