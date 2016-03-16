@@ -24,6 +24,7 @@
 
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
+#include <opendlv/data/environment/WGS84Coordinate.h>
 
 //include headers for the EKF
 
@@ -104,6 +105,9 @@ class Sensation : public odcore::base::module::TimeTriggeredConferenceClientModu
     // add details !
     virtual void tearDown();
 
+    //
+//    void GPSreferenceReset(opendlv::data::environment::WGS84Coordinate _newGPSreference){ m_GPSreference = _newGPSreference;}
+
     // define some shourtcut to be used in the file --- tkm = Truck Kinematic Model
     typedef opendlv::system::application::sensation::truckKinematicModel::State<double> m_tkmState;     ///--> def truck kinematic model state space
     typedef opendlv::system::application::sensation::truckKinematicModel::Control<double> m_tkmControl; ///--> def truck kinematic model control space
@@ -137,6 +141,11 @@ class Sensation : public odcore::base::module::TimeTriggeredConferenceClientModu
     bool run_vse_test;        ///--> false by default, if true it enables the noise generator to add noise on measurements to test the VSE
     bool m_saveToFile;        ///--> false by default, set to true save logs to file
     bool EKF_initialized;     ///--> false by default, it is set to true after the initialization
+    odcore::data::TimeStamp   m_timeBefore;  ///--> contains the time in microsecons between two consecutive steps of EKF, default value = 0.05s -- 20 Hz
+    odcore::data::TimeStamp   m_timeNow;     ///--> contains the time in microsecons between two consecutive steps of EKF, default value = 0.05s -- 20 Hz
+
+    opendlv::data::environment::WGS84Coordinate m_GPSreference;
+    bool GPSreferenceSET;      ///--> false by default, set to true when the variable m_GPSreference is set to a new reference poit considered as origin of the axis
 
 };
 } // sensation

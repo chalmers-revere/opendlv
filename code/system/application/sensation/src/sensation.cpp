@@ -22,7 +22,7 @@
 
 #include <opendavinci/odcore/data/Container.h>
 #include <opendlv/data/environment/Point3.h>
-#include <opendlv/data/environment/WGS84Coordinate.h>
+
 
 #include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
 #include "opendavinci/odcore/reflection/CSVFromVisitableVisitor.h"
@@ -58,7 +58,11 @@ Sensation::Sensation(int32_t const &a_argc, char **a_argv) :
     measurementNoise_yawRate(0.0001),
     run_vse_test(false),
     m_saveToFile (false),
-    EKF_initialized(false)
+    EKF_initialized(false),
+    m_timeBefore(),
+    m_timeNow(),
+    m_GPSreference(57.71278000, opendlv::data::environment::WGS84Coordinate::NORTH, 11.94581583, opendlv::data::environment::WGS84Coordinate::EAST), // initialize to some coordinate in Sweden
+    GPSreferenceSET(false)
 
 {
 
@@ -73,6 +77,8 @@ Sensation::~Sensation()
 void Sensation::setUp()
 {
   // This method will be call automatically _before_ running body().
+    // TODO should all the initializations go here ?? including ekf
+    // initializeEKF();
 }
 
 void Sensation::tearDown()
@@ -90,7 +96,6 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
         // frame); in our example, we use one located at AstaZero.
         //WGS84Coordinate reference(57.77284043, WGS84Coordinate::NORTH, 12.76996356, WGS84Coordinate::EAST);
           WGS84Coordinate reference(57.71278000, WGS84Coordinate::NORTH, 11.94581583, WGS84Coordinate::EAST);
-
         // Let's assume you have another lat/lon coordinate at hand.
         WGS84Coordinate WGS84_p2(57.71278000, WGS84Coordinate::NORTH, 11.94581583, WGS84Coordinate::EAST);
 
@@ -133,16 +138,27 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
         opendlv::system::sensor::TruckLocation truckLocation = c2.getData<opendlv::system::sensor::TruckLocation>();
 
 
-        if (truckLocation.getX()*truckLocation.getX() > 0.0001)//c1.getReceivedTimeStamp().getSeconds() > 0
-        {//if we are actually getting data !
+        if (c1.getReceivedTimeStamp().getSeconds() > 0)//if we are actually getting data !
+        {
+            if ( !GPSreferenceSET )// the GPS reference is not set, set the GPSreference to the current position
+            {
+            m_GPSreference = opendlv::data::environment::WGS84Coordinate(truckLocation.getX(), WGS84Coordinate::NORTH, truckLocation.getY(), WGS84Coordinate::EAST);
+            GPSreferenceSET = true;
+            m_timeBefore = c1.getReceivedTimeStamp();
+            // TODO: now this variable is set only ones using the first data,
+            //       it is necessary to write a function able to reset this value to a new reference frame
+            }
 
-
+        cout << getName() << ": <<message>> : timestamp seconds = " << c1.getReceivedTimeStamp().getSeconds() << " microseconds  " <<c1.getReceivedTimeStamp().getFractionalMicroseconds() << endl;
+        m_timeNow = c1.getReceivedTimeStamp();
+        odcore::data::TimeStamp duration = m_timeNow - m_timeBefore;
+        cout << getName() << ": <<message>> : time step in microseconds = " << duration.toMicroseconds() << endl;
+        m_timeBefore = c1.getReceivedTimeStamp();
         cout << getName() << ": " << commands.toString() << ", " << truckLocation.toString() << endl;
-
 
         // Try to convert coordinates
         WGS84Coordinate WGS84_ptruck(truckLocation.getX(), WGS84Coordinate::NORTH, truckLocation.getY(), WGS84Coordinate::EAST);
-        Point3 _p2 = reference.transform(WGS84_ptruck);
+        Point3 _p2 = m_GPSreference.transform(WGS84_ptruck);
 
         // The csvExporter1 will "visit" the data structure "commands" and iterate
         // through its fields that will be stored in the output file fout.
