@@ -27,8 +27,10 @@
 
 void UDPReceivePackets::nextPacket(const odcore::io::Packet &p) {
     std::cout << "Received a packet from " << p.getSender() << ", "
-         << "with " << p.getData().length() << " bytes containing '"
-         << p.getData() << "'" << std::endl;
+         << "with " << p.getData().length() 
+         // << " bytes containing '"
+         // << p.getData() << "'" 
+         << std::endl;
     // TODO: Forward the packet to other layer alternatively packing up data.
     const std::string packetString = p.getData();
     std::vector<unsigned char> data(packetString.begin(), packetString.end());
@@ -38,8 +40,33 @@ void UDPReceivePackets::nextPacket(const odcore::io::Packet &p) {
     iterator->ItReversed();
 
     char receivedMessageID = iterator->ReadByte();
-    signed int receivedStationID = iterator->ReadInteger();
-    std::cout << "MessageID: "<< std::to_string(receivedMessageID) << " StationId: " << receivedStationID  <<std::endl;
+    // signed int receivedStationID = iterator->ReadInteger();
+    std::cout << "MessageID: "<< std::to_string(receivedMessageID) 
+        // << " StationId: " << receivedStationID  
+        <<std::endl;
 
+    std::string messageType;
+    switch(receivedMessageID){
+      case 1:
+        messageType = "denm";
+      break;
+      case 2:
+        messageType = "cam";
+      break;
+      case 10:
+        messageType = "iclcm";
+      break;
+      default:
+        std::cout << "Received unknown  message identifier"
+            << std::to_string(receivedMessageID)
+            // << " from " << receivedStationID
+            << std::endl;
+    }
+    if(!messageType.empty()){
+      opendlv::system::sensor::VehicleCommunicationMessage nextMessage;
+      nextMessage.setType(messageType);
+      nextMessage.setSize(p.getData().length());
+      nextMessage.setData(p.getData());
+    }
 }
 
