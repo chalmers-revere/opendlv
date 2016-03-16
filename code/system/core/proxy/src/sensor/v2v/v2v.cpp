@@ -62,7 +62,7 @@ V2v::~V2v()
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2v::body()
 {
   const std::string RECEIVER = "0.0.0.0";
-  const uint32_t PORT = 1234;
+  const uint32_t PORT = 5000;
   std::cout << "Trying to receive UDP on port " << PORT << "." << std::endl;
   try
   {

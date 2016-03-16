@@ -23,10 +23,23 @@
 #include <opendavinci/odcore/io/Packet.h>
 
 #include "sensor/v2v/UDPReceivePackets.hpp"
+#include "sensor/v2v/buffer.hpp"
 
 void UDPReceivePackets::nextPacket(const odcore::io::Packet &p) {
     std::cout << "Received a packet from " << p.getSender() << ", "
          << "with " << p.getData().length() << " bytes containing '"
          << p.getData() << "'" << std::endl;
+    // TODO: Forward the packet to other layer alternatively packing up data.
+    const std::string packetString = p.getData();
+    std::vector<unsigned char> data(packetString.begin(), packetString.end());
+    std::shared_ptr<Buffer const> buffer(new Buffer(data));
+    std::shared_ptr<Buffer::Iterator> iterator = buffer->GetIterator();
+    //Long and little endian reverser
+    iterator->ItReversed();
+
+    char receivedMessageID = iterator->ReadByte();
+    signed int receivedStationID = iterator->ReadInteger();
+    std::cout << "MessageID: "<< std::to_string(receivedMessageID) << " StationId: " << receivedStationID  <<std::endl;
+
 }
 
