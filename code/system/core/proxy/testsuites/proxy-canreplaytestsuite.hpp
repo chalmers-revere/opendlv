@@ -22,11 +22,15 @@
 
 #include "cxxtest/TestSuite.h"
 
+#include <iostream>
 #include <string>
+#include <sstream>
 #include <vector>
 
 #include <opendavinci/odcore/data/Container.h>
+#include <automotivedata/generated/automotive/GenericCANMessage.h>
 
+#include "fh16mapping/generated/opendlv/gcdc/fh16/VehicleDynamics.h"
 #include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
 
 // Include local header files.
@@ -119,6 +123,43 @@ class CANASCReplayTest : public CxxTest::TestSuite {
     TS_ASSERT_DELTA(vd.getAcceleration_x(), 1.17188e-05, 1e-5);
     TS_ASSERT_DELTA(vd.getAcceleration_y(), 0.019543, 1e-5);
     TS_ASSERT_DELTA(vd.getYawrate(), 0.00047, 1e-5);
+  }
+
+  void testEncodeHighLevelMessage()
+  {
+    // Create a high-level message.
+    opendlv::gcdc::fh16::VehicleDynamics vd;
+    vd.setAcceleration_x(1.17188e-05);
+    vd.setAcceleration_y(0.019543);
+    vd.setYawrate(0.00047);
+
+    // Check values therein.
+    TS_ASSERT_DELTA(vd.getAcceleration_x(), 1.17188e-05, 1e-5);
+    TS_ASSERT_DELTA(vd.getAcceleration_y(), 0.019543, 1e-5);
+    TS_ASSERT_DELTA(vd.getYawrate(), 0.00047, 1e-5);
+
+    // Create the message mapping.
+    canmapping::opendlv::gcdc::fh16::VehicleDynamics vd_mapping;
+    // The high-level message needs to be put into a Container.
+    odcore::data::Container c(vd);
+    automotive::GenericCANMessage gcm = vd_mapping.encode(c);
+    TS_ASSERT(gcm.getData() == 0x7F7DA77D877D);
+
+    // Test how the CAN device driver would write the data:
+    const uint8_t LENGTH = gcm.getLength();
+    uint64_t data = gcm.getData();
+    char *da = new char[LENGTH+1];
+    for (uint8_t i = 0; i < LENGTH; i++) {
+        da[LENGTH-1-i] = (data & 0xFF);
+        data = data >> 8;
+    }
+    da[LENGTH]='\0';
+    std::stringstream sstr;
+    for(uint8_t i = 0; i < LENGTH; i++) {
+      sstr << std::hex << (int)(uint8_t)da[i];
+    }
+    TS_ASSERT(sstr.str() == "7f7da77d877d");
+    delete [] da;
   }
 };
 
