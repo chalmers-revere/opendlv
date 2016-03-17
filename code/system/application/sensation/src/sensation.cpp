@@ -21,6 +21,9 @@
 #include <iostream>
 
 #include <opendavinci/odcore/data/Container.h>
+#include <opendlv/data/environment/Point3.h>
+
+
 #include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
 #include "opendavinci/odcore/reflection/CSVFromVisitableVisitor.h"
 
@@ -41,19 +44,33 @@ namespace sensation {
   */
 Sensation::Sensation(int32_t const &a_argc, char **a_argv) :
     TimeTriggeredConferenceClientModule(a_argc, a_argv, "sensation"),
-    x(),
-    u(),
+    X(),
+    U(),
     sys(),
     observationModel(0.0, 0.0,  0.0, 0.0 ), // clarify the numbers !
     m_ekf(),
     generator(),
     noise(0, 1),
     systemNoise(0),
-    orientationNoise(0),
-    distanceNoise(0),
+    measurementNoise_x(0.05),
+    measurementNoise_y(0.5),
+    measurementNoise_yaw(0.001),
+    measurementNoise_yawRate(0.0001),
     run_vse_test(false),
-    EKF_initialized(false)
+    m_saveToFile (false),
+    EKF_initialized(false),
+    m_timeBefore(),
+    m_timeNow(),
+    m_GPSreference(57.71278000, opendlv::data::environment::WGS84Coordinate::NORTH, 11.94581583, opendlv::data::environment::WGS84Coordinate::EAST), // initialize to some coordinate in Sweden
+    GPSreferenceSET(false)
+
 {
+    // Exit if the supercomponent is not running  --- should this statement be in all constructors (ACT-PERCEPTION ect.) to prevent possible errors ??
+    //if (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::NOT_RUNNING)
+    //{
+    //    std::cout << getName() << " odSupercomponent is not running - run first " << std::endl;
+    //    return ;
+    //}
 
     initializeEKF();
 
@@ -66,6 +83,8 @@ Sensation::~Sensation()
 void Sensation::setUp()
 {
   // This method will be call automatically _before_ running body().
+    // TODO should all the initializations go here ?? including ekf
+    // initializeEKF();
 }
 
 void Sensation::tearDown()
@@ -74,13 +93,41 @@ void Sensation::tearDown()
 }
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
+    // Example on how to use the type WGS84Coordinate:
+
+        using namespace opendlv::data::environment;
+
+
+
+
+
+
+        // First, you need to declare a lat/lon coordinate to be used
+        // as reference (i.e. origin (0, 0) of a Cartesian coordinate
+        // frame); in our example, we use one located at AstaZero.
+        //WGS84Coordinate reference(57.77284043, WGS84Coordinate::NORTH, 12.76996356, WGS84Coordinate::EAST);
+          WGS84Coordinate reference(57.71278000, WGS84Coordinate::NORTH, 11.94581583, WGS84Coordinate::EAST);
+        // Let's assume you have another lat/lon coordinate at hand.
+        WGS84Coordinate WGS84_p2(57.71278000, WGS84Coordinate::NORTH, 11.94581583, WGS84Coordinate::EAST);
+
+        // Now, you can transform this new lat/lon coordinate to the
+        // previously specified Cartesian reference frame.
+        Point3 cartesian_p2 = reference.transform(WGS84_p2);
+        std::cout << "WGS84 reference: " << reference.toString()
+                  << ", other WGS84 coordinate: " << WGS84_p2.toString()
+                  << ", transformed cartesian coordinate: " << cartesian_p2.toString()
+                  << std::endl;
+        // You can access the X, Y coordinates (Z==0) as follows:
+        double p2_x = cartesian_p2.getX();
+        double p2_y = cartesian_p2.getY();
+        std::cout << "X = " << p2_x << ", Y = " << p2_y << std::endl;
+
+
     // To dump data structures into a CSV file, you create an output file first.
     std::ofstream fout("../Exp_data/output.csv");
-    std::ofstream fout_command("../Exp_data/output_commands.csv");
     std::ofstream fout_ekfState("../Exp_data/output_ekf.csv");
-
     fout_ekfState << "% HEADER: Output of the Extended Kalman Filter, data format : \n"
-                  << "% ground truth x (m)  ground truth y (m) ground truth theta (rad) noisy x (m)  noisy y (m) noisy theta (rad)  ekf x (m) ekf y (m) ekf theta (rad) " << endl;
+                  << "% timestamp (s), ground truth: x (m),  y (m), theta (rad), theta_dot(rad/s), commands : velocity (m/s) steering angle (rad), noisy data: x (m), y (m), theta (rad), theta_dot (rad/s), ekf estimation vector: x (m), x_dot (m/s), y (m), y_dot (ms), theta (rad), theta_dot(rad/s)  " << endl;
 
     // You can optionally dump a header (i.e. first line with information).
     const bool WITH_HEADER = true;
@@ -89,6 +136,11 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
     // For every data structure that you want to export in a CSV file, you need to create a new CSVFromVisitableVisitor.
     odcore::reflection::CSVFromVisitableVisitor csvExporter1(fout, WITH_HEADER, DELIMITER);
 
+
+
+    double time_stamp = 0;
+
+
     while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
         odcore::data::Container c1 = getKeyValueDataStore().get(opendlv::system::actuator::Commands::ID());
         opendlv::system::actuator::Commands commands = c1.getData<opendlv::system::actuator::Commands>();
@@ -96,66 +148,95 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
         odcore::data::Container c2 = getKeyValueDataStore().get(opendlv::system::sensor::TruckLocation::ID());
         opendlv::system::sensor::TruckLocation truckLocation = c2.getData<opendlv::system::sensor::TruckLocation>();
 
+
+        if (c1.getReceivedTimeStamp().getSeconds() > 0)//if we are actually getting data !
+        {
+            if ( !GPSreferenceSET )// the GPS reference is not set, set the GPSreference to the current position
+            {
+            m_GPSreference = opendlv::data::environment::WGS84Coordinate(truckLocation.getX(), WGS84Coordinate::NORTH, truckLocation.getY(), WGS84Coordinate::EAST);
+            GPSreferenceSET = true;
+            m_timeBefore = c1.getReceivedTimeStamp();
+            // TODO: now this variable is set only ones using the first data,
+            //       it is necessary to write a function able to reset this value to a new reference frame
+            }
+
+        m_timeNow = c1.getReceivedTimeStamp();
+        odcore::data::TimeStamp duration = m_timeNow - m_timeBefore;
+        cout << getName() << ": <<message>> : time step in microseconds = " << duration.toMicroseconds() << endl;
+        m_timeBefore = c1.getReceivedTimeStamp();
+
+        // let me out our signal for now to check if we are doing the right processing
         cout << getName() << ": " << commands.toString() << ", " << truckLocation.toString() << endl;
 
+        // Try to convert coordinates
+        WGS84Coordinate WGS84_ptruck(truckLocation.getX(), WGS84Coordinate::NORTH, truckLocation.getY(), WGS84Coordinate::EAST);
+        Point3 _p2 = m_GPSreference.transform(WGS84_ptruck);
 
         // The csvExporter1 will "visit" the data structure "commands" and iterate
         // through its fields that will be stored in the output file fout.
         commands.accept(csvExporter1);
 
+         // set the commands from the opendavinci to the ekf state space
+         // cout << getName() << " << message >> \n   CONTROL SIGNALS : u.v = " << U.v() << "  u.phi  = " << U.phi() << endl;
+         U.v() = commands.getLongitudinalVelocity();
+         U.phi() = commands.getSteeringAngle();
 
-//all this part should be moved into the vehicle state estimator function
+         // System measurements
+         m_tkmObservationVector Z = observationModel.h(X);
 
-         u.v() = commands.getLongitudinalVelocity();//3.6;   /// from km/h to m/s
-         u.phi() = commands.getSteeringAngle();//*180/M_PI;
+         // set the commands from the opendavinci to the ekf state space
+         Z.Z_x()         =   _p2.getX();//truckLocation.getX();
+         Z.Z_y()         =   _p2.getY();//truckLocation.getY();
+         Z.Z_theta()     =   truckLocation.getYaw();
+         Z.Z_theta_dot( )=   truckLocation.getYawRate();
+         //cout << getName() << " << message >> \n   MEASURES : " << " Z.Z_x()  = " << Z.Z_x() << " Z.Z_y()  = " << Z.Z_y()
+         //                  << " Z.Z_theta()  = " << Z.Z_theta() << " Z.Z_theta_dot()  = " << Z.Z_theta_dot()  << endl;
 
-         fout_command << u.v() << " " << u.phi() << endl;
-         ///fout_measures <<truckLocation.getX() << " " << truckLocation.getY() << " " << truckLocation.getYaw() << " " << truckLocation.getYawRate() << endl;
-
-
-        // Add noise: Our robot move is affected by noise (due to actuator failures)
-        //x.x() += systemNoise*noise(generator);
-        //x.y() += systemNoise*noise(generator);
-        //x.theta() += systemNoise*noise(generator);
-
-
-        // Predict state for current time-step using the filters
-        opendlv::system::application::sensation::truckKinematicModel::State<double>  x_ekf_pred = m_ekf.predict(sys, u);  // TODO: change auto type for compatibility !
-
-        // Orientation measurement
-            //opendlv::system::application::sensation::truckObservationModel::OrientationMeasurement<double> orientation = OrientationModel.h(x);
-            opendlv::system::application::sensation::truckObservationModel::truckObservationVector<double> measurement = observationModel.h(x);
-
-
-            // Measurement is affected by noise as well
-            //orientation.theta() += orientationNoise * noise(generator);
-
-            measurement.Z_x()         =   truckLocation.getX()+0.05*noise(generator);
-            measurement.Z_y()         =   truckLocation.getY()+0.5*noise(generator);
-            measurement.Z_theta()     =   truckLocation.getYaw()+0.001*noise(generator);
-            measurement.Z_theta_dot( )=   truckLocation.getYawRate();
-            // Update EKF
-            //x_ekf = m_ekf.update(OrientationModel, orientation);
-            opendlv::system::application::sensation::truckKinematicModel::State<double> x_ekf = m_ekf.update(observationModel, measurement);
+run_vse_test = false;
+         if (run_vse_test) // if run test is true we are running a test and it will add noise to the measures
+         {
+             Z.Z_x() += measurementNoise_x * noise(generator);
+             Z.Z_y() += measurementNoise_y * noise(generator);
+             Z.Z_theta() += measurementNoise_yaw * noise(generator);
+             Z.Z_theta_dot() += measurementNoise_yawRate * noise(generator);
+         }
 
 
+         if (EKF_initialized) // if the filter is not initialze - initialize it first
+         {
+             std::cout << "Sensation::initializeEKF  << message >> Filter initialized " << std::endl;
 
+             // Predict state for current time-step using the filters
+             X = m_ekf.predict(sys, U);  // TODO: change auto type for compatibility !
 
+             // update stage of the EKF
+             X = m_ekf.update(observationModel, Z);
 
-        // Print to stdout as csv format
-        std::cout   << "Sensation::body << message >> \n"
-                    << "      x_ekf_pred " << x_ekf_pred.x() << ", y_ekf_pred " << x_ekf_pred.y() << ", theta_ekf_pred " << x_ekf_pred.theta()  << "\n"
-                    << "      x_ekf      " << x_ekf.x() << ", y_ekf " << x_ekf.y() << ", theta_ekf " << x_ekf.theta()  << "\n"
-                    << std::endl;
-//save data to file
-fout_ekfState << truckLocation.getX() << " " << truckLocation.getY() << " " << truckLocation.getYaw() << " "
-              << measurement.Z_x() << " " << measurement.Z_y() << " " << measurement.Z_theta() << " "
-              << x_ekf.x() << " " << x_ekf.y() << " " << x_ekf.theta() << " "
-              <<endl;
+            // Print to stdout as csv format
+            std::cout   << getName() << " << message >> STATE \n"
+                        << "timestamp = " << time_stamp << "\n"
+                        << "           x " << X.x() << ", y " << X.y() << ", theta " << X.theta()  << "\n"
+                        << std::endl;
+time_stamp +=0.05;
+            //save data to file
+m_saveToFile = true;
+            if (m_saveToFile){
+            fout_ekfState << time_stamp << " "
+                          << truckLocation.getX() << " " << truckLocation.getY() << " " << truckLocation.getYaw() << " " << truckLocation.getYawRate() << " "
+                          << U.v() << " " << U.phi() << " "
+                          << Z.Z_x() << " " << Z.Z_y() << " " << Z.Z_theta() << " " << Z.Z_theta_dot() << " "
+                          << X.x() << " " << X.x_dot() << " "  << X.y() << " " << X.y_dot() << " " << X.theta() << " " << X.theta_dot() << " "
+                          << endl;
+            }
 
+         }
+         else
+         {
+              std::cout << getName() << "  << message >> Filter NOT initialized " << std::endl;
+         }
 
-    }
-
+      }// end if we are getting data
+    }// end while
     return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
@@ -164,9 +245,9 @@ void Sensation::initializeEKF()
 
 if (!EKF_initialized)
 {
-     std::cout << "Sensation::initializeEKF  << message >> initialize the kalman filter " << std::endl;
+    std::cout << "Sensation::initializeEKF  << message >> initialize the kalman filter " << std::endl;
 
-    x.setZero();  // initialize the state vector
+    X.setZero();  // initialize the state vector
     generator.seed( std::chrono::system_clock::now().time_since_epoch().count() );
 
 
@@ -177,19 +258,11 @@ if (!EKF_initialized)
 }
 else
 {
-     std::cout << "Sensation::initializeEKF  << message >> Filter initialized " << std::endl;
+     std::cout << getName() << " << message >> Filter initialized " << std::endl;
 }
 
 }
 
-void Sensation::vehicleStateEstimator( opendlv::system::application::sensation::truckKinematicModel::Control<double> _u,
-                                       opendlv::system::application::sensation::truckKinematicModel::State<double> _x )
-{
-
-  _x.setZero();   // just to avoid unused error
-  _u.setZero();
-
-}
 
 
 

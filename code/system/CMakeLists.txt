@@ -38,6 +38,11 @@ include(CheckCxxTestEnvironment)
 find_package(OpenDaVINCI REQUIRED)
 
 ###########################################################################
+# Find OpenDLV.
+SET(OPENDLV_DIR "${OPENDAVINCI_DIR}")
+find_package(OpenDLV REQUIRED)
+
+###########################################################################
 # Find OpenDLV data structures.
 set(OPENDLVDATA_DIR "${CMAKE_INSTALL_PREFIX}")
 find_package(OpenDLVData REQUIRED)
@@ -45,11 +50,12 @@ find_package(OpenDLVData REQUIRED)
 ###########################################################################
 # Set common include directories.
 include_directories(SYSTEM ${OPENDAVINCI_INCLUDE_DIRS})
+include_directories(SYSTEM ${OPENDLV_INCLUDE_DIRS})
 include_directories(SYSTEM ${OPENDLVDATA_INCLUDE_DIRS})
 
 ###########################################################################
 # Set libraries to link against.
-set(LIBRARIES ${OPENDAVINCI_LIBRARIES} ${OPENDLVDATA_LIBRARIES})
+set(LIBRARIES ${OPENDAVINCI_LIBRARIES} ${OPENDLV_LIBRARIES} ${OPENDLVDATA_LIBRARIES})
 
 ###########################################################################
 # Add subfolders with sources.
