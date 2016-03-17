@@ -65,6 +65,12 @@ Sensation::Sensation(int32_t const &a_argc, char **a_argv) :
     GPSreferenceSET(false)
 
 {
+    // Exit if the supercomponent is not running  --- should this statement be in all constructors (ACT-PERCEPTION ect.) to prevent possible errors ??
+    //if (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::NOT_RUNNING)
+    //{
+    //    std::cout << getName() << " odSupercomponent is not running - run first " << std::endl;
+    //    return ;
+    //}
 
     initializeEKF();
 
@@ -88,8 +94,13 @@ void Sensation::tearDown()
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
     // Example on how to use the type WGS84Coordinate:
-    //{
+
         using namespace opendlv::data::environment;
+
+
+
+
+
 
         // First, you need to declare a lat/lon coordinate to be used
         // as reference (i.e. origin (0, 0) of a Cartesian coordinate
@@ -110,7 +121,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
         double p2_x = cartesian_p2.getX();
         double p2_y = cartesian_p2.getY();
         std::cout << "X = " << p2_x << ", Y = " << p2_y << std::endl;
-    //}
+
 
     // To dump data structures into a CSV file, you create an output file first.
     std::ofstream fout("../Exp_data/output.csv");
@@ -149,11 +160,12 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
             //       it is necessary to write a function able to reset this value to a new reference frame
             }
 
-        cout << getName() << ": <<message>> : timestamp seconds = " << c1.getReceivedTimeStamp().getSeconds() << " microseconds  " <<c1.getReceivedTimeStamp().getFractionalMicroseconds() << endl;
         m_timeNow = c1.getReceivedTimeStamp();
         odcore::data::TimeStamp duration = m_timeNow - m_timeBefore;
         cout << getName() << ": <<message>> : time step in microseconds = " << duration.toMicroseconds() << endl;
         m_timeBefore = c1.getReceivedTimeStamp();
+
+        // let me out our signal for now to check if we are doing the right processing
         cout << getName() << ": " << commands.toString() << ", " << truckLocation.toString() << endl;
 
         // Try to convert coordinates
@@ -220,7 +232,7 @@ m_saveToFile = true;
          }
          else
          {
-              std::cout << "Sensation::initializeEKF  << message >> Filter initialized " << std::endl;
+              std::cout << getName() << "  << message >> Filter NOT initialized " << std::endl;
          }
 
       }// end if we are getting data
@@ -246,7 +258,7 @@ if (!EKF_initialized)
 }
 else
 {
-     std::cout << "Sensation::initializeEKF  << message >> Filter initialized " << std::endl;
+     std::cout << getName() << " << message >> Filter initialized " << std::endl;
 }
 
 }
