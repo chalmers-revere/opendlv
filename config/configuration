@@ -22,7 +22,8 @@ odsupercomponent.pulsetimeack.yield = 5000 # (in microseconds)
 
 
 ### Proxy
-proxy-can-gw.devicenode = /dev/pcan0   # PEAK CAN device.
+proxy-can-gw.devicenode = /dev/pcan32   # PEAK CAN device.
+proxy-can-keyboard.devicenode = /dev/pcan32   # PEAK CAN device.
 
 proxy-actuator-brake.type = gw-volvo
 
