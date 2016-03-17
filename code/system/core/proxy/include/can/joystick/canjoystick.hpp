@@ -17,8 +17,8 @@
  * USA.
  */
 
-#ifndef PROXY_CANKEYBOARD_HPP_
-#define PROXY_CANKEYBOARD_HPP_
+#ifndef PROXY_CANJOYSTICK_HPP_
+#define PROXY_CANJOYSTICK_HPP_
 
 #include <memory>
 
@@ -54,19 +54,20 @@ class CANMessageDataStore;
 namespace opendlv {
 namespace proxy {
 namespace can {
-namespace keyboard {
+namespace joystick {
 
 /**
- * This class opens a PEAK CAN device to send control commands to the vehicle.
+ * This class opens a PEAK CAN device to send control commands read from a
+ * joystick or gamepad to the vehicle.
  */
-class CANKeyboard
+class CANJoystick
 : public odcore::base::module::TimeTriggeredConferenceClientModule,
   public automotive::odcantools::GenericCANMessageListener {
  public:
-  CANKeyboard(int32_t const &, char **);
-  CANKeyboard(CANKeyboard const &) = delete;
-  CANKeyboard &operator=(CANKeyboard const &) = delete;
-  virtual ~CANKeyboard();
+  CANJoystick(int32_t const &, char **);
+  CANJoystick(CANJoystick const &) = delete;
+  CANJoystick &operator=(CANJoystick const &) = delete;
+  virtual ~CANJoystick();
 
   virtual void nextGenericCANMessage(const automotive::GenericCANMessage &gcm);
 
@@ -83,13 +84,13 @@ class CANKeyboard
   canmapping::CanMapping m_fh16CANMessageMapping;
 
  private:
-  char m_keyAcc;
-  char m_keyBrake;
-  char m_keyLeft;
-  char m_keyRight;
+  int m_joystickFD;
+  int *m_axes;
+  double m_lastAxis0;
+  double m_lastAxis1;
 };
 
-} // keyboard
+} // joystick
 } // can
 } // proxy
 } // opendlv

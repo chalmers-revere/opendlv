@@ -31,6 +31,7 @@ set(LIBRARIES ${LIBRARIES} ${OpenCV_LIBS})
 # Build
 file(GLOB_RECURSE thisproject-sources 
   "${CMAKE_CURRENT_SOURCE_DIR}/src/can/gw/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/can/joystick/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/can/keyboard/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/can/replay/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/actuator/propulsion/*.cpp"
@@ -52,6 +53,9 @@ add_library(${PROJECT_NAME}lib-static STATIC ${thisproject-sources})
 
 add_executable(${PROJECT_NAME}-can-gw "${CMAKE_CURRENT_SOURCE_DIR}/src/can/gw/main.cpp")
 target_link_libraries(${PROJECT_NAME}-can-gw ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+
+add_executable(${PROJECT_NAME}-can-joystick "${CMAKE_CURRENT_SOURCE_DIR}/src/can/joystick/main.cpp")
+target_link_libraries(${PROJECT_NAME}-can-joystick ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
 add_executable(${PROJECT_NAME}-can-keyboard "${CMAKE_CURRENT_SOURCE_DIR}/src/can/keyboard/main.cpp")
 target_link_libraries(${PROJECT_NAME}-can-keyboard ${PROJECT_NAME}lib-static ${LIBRARIES}) 
@@ -101,6 +105,7 @@ include(RunTests)
 # Install
 install(TARGETS ${PROJECT_NAME}-can-gw RUNTIME DESTINATION bin COMPONENT system-core)
 install(TARGETS ${PROJECT_NAME}-can-keyboard RUNTIME DESTINATION bin COMPONENT system-core)
+install(TARGETS ${PROJECT_NAME}-can-joystick RUNTIME DESTINATION bin COMPONENT system-core)
 install(TARGETS ${PROJECT_NAME}-can-replay RUNTIME DESTINATION bin COMPONENT system-core)
 install(TARGETS ${PROJECT_NAME}-actuator-propulsion RUNTIME DESTINATION bin COMPONENT system-core)
 install(TARGETS ${PROJECT_NAME}-actuator-brake RUNTIME DESTINATION bin COMPONENT system-core)

@@ -21,10 +21,12 @@
 #include <string>
 #include <vector>
 
-#include <termios.h>
-#include <unistd.h>
-#include <sys/select.h>
-#include <sys/time.h>
+#if !defined(WIN32) && !defined(__gnu_hurd__) && !defined(__APPLE__)
+#include <cstdlib>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <linux/joystick.h>
+#endif
 
 #include <opendavinci/odcore/data/Container.h>
 #include <opendavinci/odcore/data/TimeStamp.h>
@@ -35,33 +37,33 @@
 #include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
 
 #include "can/gw/canmessagedatastore.hpp"
-#include "can/keyboard/cankeyboard.hpp"
+#include "can/joystick/canjoystick.hpp"
 
 namespace opendlv {
 namespace proxy {
 namespace can {
-namespace keyboard {
+namespace joystick {
 
-CANKeyboard::CANKeyboard(int32_t const &a_argc, char **a_argv)
+CANJoystick::CANJoystick(int32_t const &a_argc, char **a_argv)
     : odcore::base::module::TimeTriggeredConferenceClientModule(
-      a_argc, a_argv, "proxy-can-keyboard")
+      a_argc, a_argv, "proxy-can-joystick")
     , automotive::odcantools::GenericCANMessageListener()
     , m_fifo()
     , m_device()
     , m_canMessageDataStore()
     , m_fh16CANMessageMapping()
-    , m_keyAcc('w')
-    , m_keyBrake('s')
-    , m_keyLeft('a')
-    , m_keyRight('d')
+    , m_joystickFD(0)
+    , m_axes(0)
+    , m_lastAxis0(0)
+    , m_lastAxis1(0)
 {
 }
 
-CANKeyboard::~CANKeyboard()
+CANJoystick::~CANJoystick()
 {
 }
 
-void CANKeyboard::setUp()
+void CANJoystick::setUp()
 {
   using namespace std;
   using namespace odcore::base;
@@ -69,8 +71,12 @@ void CANKeyboard::setUp()
   using namespace odtools::recorder;
   using namespace automotive::odcantools;
 
+  string const JOYSTICK_DEVICE_NODE =
+  getKeyValueConfiguration().getValue<string>(
+  "proxy-can-joystick.joystickdevicenode");
+
   string const DEVICE_NODE =
-  getKeyValueConfiguration().getValue<string>("proxy-can-keyboard.devicenode");
+  getKeyValueConfiguration().getValue<string>("proxy-can-joystick.devicenode");
 
   // Try to open CAN device and register this instance as receiver for
   // GenericCANMessages.
@@ -85,48 +91,49 @@ void CANKeyboard::setUp()
     m_device->start();
   }
 
-  // Setup keyboard control.
+  // Setup joystick control.
   {
-    struct termios ttystate;
+    cout << "Trying to open joystick " << JOYSTICK_DEVICE_NODE << endl;
+#if !defined(WIN32) && !defined(__gnu_hurd__) && !defined(__APPLE__)
+    int num_of_axes = 0;
+    int num_of_buttons = 0;
 
-    // get the terminal state
-    tcgetattr(STDIN_FILENO, &ttystate);
+    int name_of_joystick[80];
 
-    // turn off canonical mode
-    ttystate.c_lflag &= ~ICANON;
-    // minimum of number input read.
-    ttystate.c_cc[VMIN] = 1;
-    tcsetattr(STDIN_FILENO, TCSANOW, &ttystate);
+    if ((m_joystickFD = open(JOYSTICK_DEVICE_NODE.c_str(), O_RDONLY)) == -1) {
+      cerr << "Could not open joystick " << JOYSTICK_DEVICE_NODE << endl;
+      return;
+    }
 
-    cout << "KeyboardController: " << endl;
-    cout << "'" << m_keyAcc << "': Accelerate" << endl;
-    cout << "'" << m_keyBrake << "': Brake" << endl;
-    cout << "'" << m_keyLeft << "': Turn left" << endl;
-    cout << "'" << m_keyRight << "': Turn right" << endl;
+    ioctl(m_joystickFD, JSIOCGAXES, &num_of_axes);
+    ioctl(m_joystickFD, JSIOCGBUTTONS, &num_of_buttons);
+    ioctl(m_joystickFD, JSIOCGNAME(80), &name_of_joystick);
+
+    m_axes = (int *)calloc(num_of_axes, sizeof(int));
+    cerr << "Joystick found " << name_of_joystick
+         << ", number of axes: " << num_of_axes
+         << ", number of buttons: " << num_of_buttons << endl;
+
+    // Use non blocking reading.
+    fcntl(m_joystickFD, F_SETFL, O_NONBLOCK);
+#endif
   }
 }
 
-void CANKeyboard::tearDown()
+void CANJoystick::tearDown()
 {
   if (m_device.get()) {
     // Stop the wrapper CAN device.
     m_device->stop();
   }
 
-  // Deactivate keyboard control.
+  // Deactivate joystick control.
   {
-    struct termios ttystate;
-    // get the terminal state
-    tcgetattr(STDIN_FILENO, &ttystate);
-
-    // turn on canonical mode
-    ttystate.c_lflag |= ICANON;
-    // set the terminal attributes.
-    tcsetattr(STDIN_FILENO, TCSANOW, &ttystate);
+    close(m_joystickFD);
   }
 }
 
-void CANKeyboard::nextGenericCANMessage(
+void CANJoystick::nextGenericCANMessage(
 const automotive::GenericCANMessage &gcm)
 {
   std::cout << "Received CAN message " << gcm.toString() << std::endl;
@@ -156,36 +163,47 @@ const automotive::GenericCANMessage &gcm)
   //  }
 }
 
-odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode CANKeyboard::body()
+odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode CANJoystick::body()
 {
+  const double MAX_RANGE = 32768.0;
+  const double FACTOR_ACCELERATION = 80;
+  const double FACTOR_ROTATION = 30;
+
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
   odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+
     {
-      struct timeval tv;
-      fd_set fds;
-      tv.tv_sec = 0;
-      tv.tv_usec = 0;
-      FD_ZERO(&fds);
-      FD_SET(STDIN_FILENO, &fds); // STDOUT_FILENO is 0
-      select(STDIN_FILENO + 1, &fds, NULL, NULL, &tv);
+#if !defined(WIN32) && !defined(__gnu_hurd__) && !defined(__APPLE__)
+      struct js_event js;
+      read(m_joystickFD, &js, sizeof(struct js_event));
 
-      if (FD_ISSET(STDIN_FILENO, &fds) != 0) {
-        char c = fgetc(stdin);
-
-        // Check pressed key.
-        if (c == m_keyAcc) {
-          cout << "Accelerate" << endl;
-        }
-        else if (c == m_keyBrake) {
-          cout << "Decelerate" << endl;
-        }
-        else if (c == m_keyLeft) {
-          cout << "Left" << endl;
-        }
-        else if (c == m_keyRight) {
-          cout << "Right" << endl;
-        }
+      // Check event.
+      switch (js.type & ~JS_EVENT_INIT) {
+        case JS_EVENT_AXIS:
+          m_axes[js.number] = js.value;
+          break;
+        default:
+          break;
       }
+#endif
+
+      double acceleration = 0;
+      double deceleration = 0;
+      double rotation = 0;
+      if (m_axes[1] > 0) {
+        // Braking.
+        deceleration = (m_axes[1] / MAX_RANGE) * FACTOR_ACCELERATION;
+      }
+      else {
+        // Accelerating.
+        acceleration = ((-m_axes[1]) / MAX_RANGE) * FACTOR_ACCELERATION;
+      }
+
+      // Steering.
+      rotation = (m_axes[0] / MAX_RANGE) * FACTOR_ROTATION;
+
+      cout << "Values: A: " << acceleration << ", B: " << deceleration
+           << ", R: " << rotation << endl;
     }
 
 
@@ -203,7 +221,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode CANKeyboard::body()
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
-} // keyboard
+} // joystick
 } // can
 } // proxy
 } // opendlv

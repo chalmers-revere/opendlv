@@ -42,9 +42,10 @@ void CANMessageDataStore::add(const odcore::data::Container &container)
     // TODO: Use CAN mapping to transform a high-level message to a low-level
     // message.
 
-//    GenericCANMessage gcm = const_cast<odcore::data::Container &>(container)
-//                            .getData<GenericCANMessage>();
-//    m_canDevice->write(gcm);
+    //    GenericCANMessage gcm = const_cast<odcore::data::Container
+    //    &>(container)
+    //                            .getData<GenericCANMessage>();
+    //    m_canDevice->write(gcm);
   }
 }
 
