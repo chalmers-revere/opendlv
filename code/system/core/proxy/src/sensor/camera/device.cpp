@@ -38,10 +38,9 @@ namespace camera {
  * @param height
  * @param bpp
  */
-Device::Device(std::string const &a_name, uint32_t const &a_id,
+Device::Device(std::string const &a_name,
 uint32_t const &a_width, uint32_t const &a_height, uint32_t const &a_bpp)
     : m_name(a_name)
-    , m_id(a_id)
     , m_width(a_width)
     , m_height(a_height)
     , m_bpp(a_bpp)
@@ -66,11 +65,6 @@ Device::~Device()
 std::string const Device::GetName() const
 {
   return m_name;
-}
-
-uint32_t Device::GetId() const
-{
-  return m_id;
 }
 
 uint32_t Device::GetWidth() const

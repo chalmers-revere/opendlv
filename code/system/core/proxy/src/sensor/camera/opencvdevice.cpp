@@ -38,55 +38,49 @@ namespace camera {
  * @param height
  * @param bpp
  */
-OpenCvDevice::OpenCvDevice(std::string const &a_name, uint32_t const &a_id,
-uint32_t const &a_width, uint32_t const &a_height, uint32_t const &a_bpp)
-    : Device(a_name, a_id, a_width, a_height, a_bpp)
+OpenCvDevice::OpenCvDevice(std::string const &a_name, 
+    std::string const &a_port, std::string const &a_username, 
+    std::string const &a_password, uint32_t const &a_width, 
+    uint32_t const &a_height, uint32_t const &a_bpp)
+    : Device(a_name, a_width, a_height, a_bpp)
     , m_capture(nullptr)
-    , m_image(nullptr)
+    , m_image(new cv::Mat)
 {
-  m_capture = cvCaptureFromCAM(a_id);
+  std::string const videoStreamAddress = std::string("http://") + a_username 
+    + ":" + a_password + "@" + a_port + "/axis-cgi/mjpg/video.cgi?user=" 
+    + a_username + "&password=" + a_password + "&channel=0&.mjpg";
 
-  if (m_capture) {
-    cvSetCaptureProperty(m_capture, CV_CAP_PROP_FRAME_WIDTH, a_width);
-    cvSetCaptureProperty(m_capture, CV_CAP_PROP_FRAME_HEIGHT, a_height);
+  m_capture.reset(new cv::VideoCapture(videoStreamAddress));
+
+  if (m_capture->isOpened()) {
+    std::cout << "w: " << a_width << " h: " << a_height << std::endl;
+    m_capture->set(CV_CAP_PROP_FRAME_WIDTH, a_width);
+    m_capture->set(CV_CAP_PROP_FRAME_HEIGHT, a_height);
   }
   else {
     std::cerr << "[proxy-sensor-camera] Could not open camera '" << a_name
-              << "' with ID: " << a_id << std::endl;
+              << std::endl;
   }
 }
 
 OpenCvDevice::~OpenCvDevice()
 {
   if (m_capture) {
-    cvReleaseCapture(&m_capture);
+    m_capture->release();
     m_capture = nullptr;
   }
 }
 
 bool OpenCvDevice::IsValid() const
 {
-  return (m_capture != nullptr);
+  return m_capture->isOpened();
 }
 
 bool OpenCvDevice::CaptureFrame()
 {
   bool retVal = false;
   if (m_capture != nullptr) {
-    if (cvGrabFrame(m_capture)) {
-      if (GetBpp() == 1) {
-        IplImage *tmpFrame = cvRetrieveFrame(m_capture);
-
-        if (m_image == nullptr) {
-          m_image = cvCreateImage(cvGetSize(tmpFrame), IPL_DEPTH_8U, 1);
-        }
-
-        cvCvtColor(tmpFrame, m_image, CV_BGR2GRAY);
-      }
-      else {
-        m_image = cvRetrieveFrame(m_capture);
-      }
-
+    if (m_capture->read(*m_image)) {
       retVal = true;
     }
   }
@@ -98,10 +92,10 @@ bool OpenCvDevice::CopyImageTo(char *a_destination, const uint32_t &a_size)
   bool retVal = false;
 
   if ((a_destination != nullptr) && (a_size > 0) && (m_image != nullptr)) {
-    ::memcpy(a_destination, m_image->imageData, a_size);
+    ::memcpy(a_destination, m_image->data, a_size);
 
-    cvShowImage("WindowShowImage", m_image);
-    cvWaitKey(10);
+//    cv::imshow("Window title", *m_image);
+//    cv::waitKey(10);
 
     retVal = true;
   }

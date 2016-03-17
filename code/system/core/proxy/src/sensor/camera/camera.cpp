@@ -55,6 +55,14 @@ Camera::~Camera()
 // This method will do the main data processing job.
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Camera::body()
 {
+
+  while (getModuleStateAndWaitForRemainingTimeInTimeslice() 
+      == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+    auto sharedImage = m_device->Capture();
+    odcore::data::Container c(sharedImage);
+    getConference().send(c);
+  }
+
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
@@ -63,31 +71,37 @@ void Camera::setUp()
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
   std::string const type = kv.getValue<std::string>("proxy-sensor-camera.type");
-  // std::string const port =
-  // kv.getValue<std::string>("proxy-sensor-camera.port");
-  int32_t const port = kv.getValue<int32_t>("proxy-sensor-camera.port");
   std::string const resolution =
   kv.getValue<std::string>("proxy-sensor-camera.resolution");
   int32_t const bpp = kv.getValue<int32_t>("proxy-sensor-camera.bpp");
-  /*float const mountX = kv.getValue<float>("proxy-sensor-camera.mount.x");
+
+  /*
+  float const mountX = kv.getValue<float>("proxy-sensor-camera.mount.x");
   float const mountY = kv.getValue<float>("proxy-sensor-camera.mount.y");
   float const mountZ = kv.getValue<float>("proxy-sensor-camera.mount.z");
   float const mountRoll = kv.getValue<float>("proxy-sensor-camera.mount.roll");
   float const mountPitch = kv.getValue<float>(
       "proxy-sensor-camera.mount.pitch");
   float const mountYaw = kv.getValue<float>("proxy-sensor-camera.mount.yaw");
-*/
-
-  std::string const name = type + " (" + std::to_string(port) + ")";
+  */
 
   std::size_t const pos = resolution.find("x");
   std::size_t const len = resolution.length();
   int const width = stoi(resolution.substr(0, pos));
   int const height = stoi(resolution.substr(pos + 1, len - pos - 1));
 
-  if (type.compare("opencv-usb") == 0) {
+  if (type.compare("opencv-ip-axis") == 0) {
+    std::string port = kv.getValue<std::string>("proxy-sensor-camera.port");
+    std::string username = kv.getValue<std::string>(
+        "proxy-sensor-camera.username");
+    std::string password = kv.getValue<std::string>(
+        "proxy-sensor-camera.password");
+    
+    std::string const name = type + " (" + port + ")";
+    
     m_device =
-    std::unique_ptr<Device>(new OpenCvDevice(name, port, width, height, bpp));
+    std::unique_ptr<Device>(new OpenCvDevice(name, port, username, password, 
+        width, height, bpp));
   }
 
   if (m_device.get() == nullptr) {

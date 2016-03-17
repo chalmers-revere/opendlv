@@ -37,7 +37,7 @@ namespace camera {
  */
 class Device {
  public:
-  Device(std::string const &, uint32_t const &, uint32_t const &,
+  Device(std::string const &, uint32_t const &,
   uint32_t const &, uint32_t const &);
   Device(Device const &) = delete;
   Device &operator=(Device const &) = delete;
@@ -57,14 +57,12 @@ class Device {
   virtual bool CaptureFrame() = 0;
   virtual bool IsValid() const = 0;
   std::string const GetName() const;
-  uint32_t GetId() const;
   uint32_t GetWidth() const;
   uint32_t GetHeight() const;
   uint32_t GetBpp() const;
   uint32_t GetSize() const;
 
   std::string m_name;
-  uint32_t m_id;
   uint32_t m_width;
   uint32_t m_height;
   uint32_t m_bpp;
