@@ -21,6 +21,11 @@
 #include <string>
 #include <vector>
 
+#include <termios.h>
+#include <unistd.h>
+#include <sys/select.h>
+#include <sys/time.h>
+
 #include <opendavinci/odcore/data/Container.h>
 #include <opendavinci/odcore/data/TimeStamp.h>
 #include <odcantools/MessageToCANDataStore.h>
@@ -45,6 +50,10 @@ CANKeyboard::CANKeyboard(int32_t const &a_argc, char **a_argv)
     , m_device()
     , m_canMessageDataStore()
     , m_fh16CANMessageMapping()
+, m_keyAcc('w')
+, m_keyBrake('s')
+, m_keyLeft('a')
+, m_keyRight('d')
 {
 }
 
@@ -75,6 +84,26 @@ void CANKeyboard::setUp()
     // Start the wrapped CAN device to receive CAN messages concurrently.
     m_device->start();
   }
+
+  // Setup keyboard control.
+  {
+    struct termios ttystate;
+
+    //get the terminal state
+    tcgetattr(STDIN_FILENO, &ttystate);
+
+    //turn off canonical mode
+    ttystate.c_lflag &= ~ICANON;
+    //minimum of number input read.
+    ttystate.c_cc[VMIN] = 1;
+    tcsetattr(STDIN_FILENO, TCSANOW, &ttystate);
+
+    cout << "KeyboardController: " << endl;
+    cout << "'" << m_keyAcc <<  "': Accelerate" << endl;
+    cout << "'" << m_keyBrake <<  "': Brake" << endl;
+    cout << "'" << m_keyLeft <<  "': Turn left" << endl;
+    cout << "'" << m_keyRight <<  "': Turn right" << endl;
+  }
 }
 
 void CANKeyboard::tearDown()
@@ -82,6 +111,18 @@ void CANKeyboard::tearDown()
   if (m_device.get()) {
     // Stop the wrapper CAN device.
     m_device->stop();
+  }
+
+  // Deactivate keyboard control.
+  {
+    struct termios ttystate;
+    //get the terminal state
+    tcgetattr(STDIN_FILENO, &ttystate);
+
+    //turn on canonical mode
+    ttystate.c_lflag |= ICANON;
+    //set the terminal attributes.
+    tcsetattr(STDIN_FILENO, TCSANOW, &ttystate);
   }
 }
 
@@ -116,6 +157,35 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode CANKeyboard::body()
 {
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
   odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+  {
+    struct timeval tv;
+    fd_set fds;
+    tv.tv_sec = 0;
+    tv.tv_usec = 0;
+    FD_ZERO(&fds);
+    FD_SET(STDIN_FILENO, &fds); //STDOUT_FILENO is 0
+    select(STDIN_FILENO + 1, &fds, NULL, NULL, &tv);
+
+    if (FD_ISSET(STDIN_FILENO, &fds) != 0) {
+        char c = fgetc(stdin);
+
+        // Check pressed key.
+        if (c == m_keyAcc) {
+            cout << "Accelerate" << endl;
+        }
+        else if (c == m_keyBrake) {
+            cout << "Decelerate" << endl;
+        }
+        else if (c == m_keyLeft) {
+            cout << "Left" << endl;
+        }
+        else if (c == m_keyRight) {
+            cout << "Right" << endl;
+        }
+    }
+  }
+
+
     opendlv::gcdc::fh16::BrakeRequest brakeRequest;
     brakeRequest.setEnable_brakerequest(false);
     brakeRequest.setBrakerequest(0);
@@ -125,7 +195,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode CANKeyboard::body()
     // The high-level message needs to be put into a Container.
     odcore::data::Container c(brakeRequest);
     automotive::GenericCANMessage gcm = brakeRequestMapping.encode(c);
-    m_device->write(gcm);
+//    m_device->write(gcm);
 
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;

@@ -79,6 +79,12 @@ class CANKeyboard : public odcore::base::module::TimeTriggeredConferenceClientMo
   std::shared_ptr<automotive::odcantools::CANDevice> m_device;
   std::unique_ptr<opendlv::proxy::can::gw::CANMessageDataStore> m_canMessageDataStore;
   canmapping::CanMapping m_fh16CANMessageMapping;
+
+ private:
+    char m_keyAcc;
+    char m_keyBrake;
+    char m_keyLeft;
+    char m_keyRight;
 };
 
 } // keyboard
