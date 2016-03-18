@@ -44,6 +44,11 @@ set(ODCANTOOLS_DIR "${OPENDAVINCI_DIR}")
 find_package(odcantools REQUIRED)
 
 ###########################################################################
+# Find OpenDLV.
+set(OPENDLV_DIR "${OPENDAVINCI_DIR}")
+find_package(OpenDLV REQUIRED)
+
+###########################################################################
 # Find fh16mapping.
 set(FH16MAPPING_DIR "${CMAKE_INSTALL_PREFIX}")
 find_package(FH16Mapping REQUIRED)
@@ -56,6 +61,7 @@ find_package(OpenDLVData REQUIRED)
 ###########################################################################
 # Set common include directories.
 include_directories(SYSTEM ${OPENDAVINCI_INCLUDE_DIRS})
+include_directories(SYSTEM ${OPENDLV_INCLUDE_DIRS})
 include_directories(SYSTEM ${ODCANTOOLS_INCLUDE_DIRS})
 include_directories(SYSTEM ${OPENDLVDATA_INCLUDE_DIRS})
 include_directories(SYSTEM ${FH16MAPPING_INCLUDE_DIRS})
@@ -63,6 +69,7 @@ include_directories(SYSTEM ${FH16MAPPING_INCLUDE_DIRS})
 ###########################################################################
 # Set libraries to link against.
 set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
+              ${OPENDLV_LIBRARIES}
               ${ODCANTOOLS_LIBRARIES}
               ${OPENDLVDATA_LIBRARIES}
               ${FH16MAPPING_LIBRARIES})

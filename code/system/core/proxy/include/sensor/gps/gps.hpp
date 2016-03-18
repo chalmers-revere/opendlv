@@ -22,8 +22,9 @@
 
 #include <memory>
 
-#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
-#include "opendavinci/odcore/data/Container.h"
+#include <opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h>
+#include <opendavinci/odcore/data/Container.h>
+#include <opendavinci/odcore/io/tcp/TCPConnection.h>
 
 namespace opendlv {
 namespace proxy {
@@ -35,19 +36,24 @@ class Device;
 /**
  * This class provides...
  */
-class Gps : public odcore::base::module::TimeTriggeredConferenceClientModule {
+class Gps : public odcore::base::module::DataTriggeredConferenceClientModule,
+            public odcore::io::StringListener {
  public:
   Gps(int32_t const &, char **);
   Gps(Gps const &) = delete;
   Gps &operator=(Gps const &) = delete;
   virtual ~Gps();
-  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+
+  virtual void nextContainer(odcore::data::Container &c);
+  virtual void nextString(const std::string &s);
 
  private:
   void setUp();
   void tearDown();
 
+ private:
   std::unique_ptr<Device> m_device;
+  std::shared_ptr<odcore::io::tcp::TCPConnection> m_trimble;
 };
 
 } // gps

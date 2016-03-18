@@ -105,6 +105,9 @@ proxy-sensor-gps.mount.x = 4.0
 proxy-sensor-gps.mount.y = -0.7
 proxy-sensor-gps.mount.z = 3.5
 
+proxy-sensor-gps.trimble.ip = 192.168.0.8
+proxy-sensor-gps.trimble.port = 9999
+
 proxy-sensor-imu.type = pololu
 proxy-sensor-imu.port = /dev/ttyUSB2
 proxy-sensor-imu.mount.x = 0.0

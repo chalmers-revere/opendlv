@@ -17,14 +17,15 @@
  * USA.
  */
 
-#include <ctype.h>
-#include <cstring>
-#include <cmath>
+#include <stdint.h>
+
 #include <iostream>
 
-#include "opendavinci/odcore/base/KeyValueConfiguration.h"
-#include "opendavinci/odcore/data/Container.h"
-#include "opendavinci/odcore/data/TimeStamp.h"
+#include <opendavinci/odcore/base/KeyValueConfiguration.h>
+#include <opendavinci/odcore/data/Container.h>
+#include <opendavinci/odcore/data/TimeStamp.h>
+#include <opendavinci/odcore/io/tcp/TCPFactory.h>
+#include <opendlv/data/sensor/nmea/GPRMC.h>
 
 #include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
 
@@ -43,8 +44,9 @@ namespace gps {
   * @param a_argv Command line arguments.
   */
 Gps::Gps(int32_t const &a_argc, char **a_argv)
-    : TimeTriggeredConferenceClientModule(a_argc, a_argv, "proxy-sensor-gps")
+    : DataTriggeredConferenceClientModule(a_argc, a_argv, "proxy-sensor-gps")
     , m_device()
+    , m_trimble()
 {
 }
 
@@ -52,14 +54,11 @@ Gps::~Gps()
 {
 }
 
-// This method will do the main data processing job.
-odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Gps::body()
-{
-  return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
-}
-
 void Gps::setUp()
 {
+  using namespace std;
+  using namespace odcore::io::tcp;
+
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
   std::string const type = kv.getValue<std::string>("proxy-sensor-gps.type");
@@ -74,13 +73,44 @@ void Gps::setUp()
   }
 
   if (m_device.get() == nullptr) {
-    std::cerr << "[proxy-sensor-gps] No valid device driver defined."
+    std::cerr << "[" << getName() << "] No valid device driver defined."
               << std::endl;
+  }
+
+  {
+    const string RECEIVER = kv.getValue<std::string>("proxy-sensor-gps.trimble.ip");
+    const uint32_t PORT = kv.getValue<uint32_t>("proxy-sensor-gps.trimble.port");
+
+    try {
+        m_trimble = shared_ptr<TCPConnection>(TCPFactory::createTCPConnectionTo(RECEIVER, PORT));
+        m_trimble->setRaw(true);
+        m_trimble->setStringListener(this);
+        m_trimble->start();
+    }
+    catch(string &exception) {
+        cerr << "[" << getName() << "] Could not connect to Trimble: " << exception << endl;
+    }
   }
 }
 
 void Gps::tearDown()
 {
+}
+
+void Gps::nextString(const std::string &s) {
+  using namespace std;
+  using namespace opendlv::data::sensor::nmea;
+  cout << "Received from Trimble: '" << s << "'" << endl;
+
+  // GPRMC is a class that can extract data from a GPRMC string as provided by a GPS receiver.
+  GPRMC gprmc;
+  gprmc.setMessage(s);
+
+  cout << "Decoded via GPRMC: lat = " << gprmc.getCoordinate().getLatitude() << ", lon = " << gprmc.getCoordinate().getLatitude() << std::endl;
+}
+
+void Gps::nextContainer(odcore::data::Container &c) {
+  (void)c;
 }
 
 } // gps
