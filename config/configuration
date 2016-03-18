@@ -22,10 +22,16 @@ odsupercomponent.pulsetimeack.yield = 5000 # (in microseconds)
 
 
 ### Proxy
-proxy-can-gw.devicenode = /dev/pcan32   # PEAK CAN device.
+proxy-can-gw.devicenode = /dev/pcan32         # PEAK CAN device.
+proxy-can-gw.record_gcm = 1                   # Set to 1 to dump received CAN data into a .rec file.
+proxy-can-gw.record_mapped_data = 1           # Set to 1 to dump mapped data from a CAN message into a .rec file.
+
 proxy-can-joystick.devicenode = /dev/pcan32   # PEAK CAN device.
 proxy-can-joystick.joystickdevicenode = /dev/input/js2   # Gamepad.
+
 proxy-can-keyboard.devicenode = /dev/pcan32   # PEAK CAN device.
+
+
 
 proxy-actuator-brake.type = gw-volvo
 

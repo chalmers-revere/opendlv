@@ -68,10 +68,15 @@ class CANGW : public odcore::base::module::TimeTriggeredConferenceClientModule,
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
  private:
-  odcore::base::FIFOQueue m_fifo;
-  std::unique_ptr<odtools::recorder::Recorder> m_recorder;
+  odcore::base::FIFOQueue m_fifoGenericCANMessages;
+  std::unique_ptr<odtools::recorder::Recorder> m_recorderGenericCANMessages;
+
+  odcore::base::FIFOQueue m_fifoMappedCANMessages;
+  std::unique_ptr<odtools::recorder::Recorder> m_recorderMappedCANMessages;
+
   std::shared_ptr<automotive::odcantools::CANDevice> m_device;
   std::unique_ptr<CANMessageDataStore> m_canMessageDataStore;
+
   canmapping::CanMapping m_fh16CANMessageMapping;
 };
 

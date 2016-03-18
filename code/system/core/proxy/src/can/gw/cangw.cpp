@@ -28,8 +28,6 @@
 #include <odcantools/CANDevice.h>
 #include <automotivedata/generated/automotive/GenericCANMessage.h>
 
-#include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
-
 #include "can/gw/cangw.hpp"
 #include "can/gw/canmessagedatastore.hpp"
 
@@ -42,8 +40,10 @@ CANGW::CANGW(int32_t const &a_argc, char **a_argv)
     : odcore::base::module::TimeTriggeredConferenceClientModule(
       a_argc, a_argv, "proxy-can-gw")
     , automotive::odcantools::GenericCANMessageListener()
-    , m_fifo()
-    , m_recorder()
+    , m_fifoGenericCANMessages()
+    , m_recorderGenericCANMessages()
+    , m_fifoMappedCANMessages()
+    , m_recorderMappedCANMessages()
     , m_device()
     , m_canMessageDataStore()
     , m_fh16CANMessageMapping()
@@ -74,12 +74,16 @@ void CANGW::setUp()
   if (m_device.get() && m_device->isOpen()) {
     cout << "Successfully opened CAN device '" << DEVICE_NODE << "'." << endl;
 
-    // Automatically record all received CAN messages.
-    {
+    // Automatically record all received raw CAN messages.
+    TimeStamp ts;
+
+    const bool RECORD_GCM =
+    (getKeyValueConfiguration().getValue<int>("proxy-can-gw.record_gcm") == 1);
+    if (RECORD_GCM) {
       // URL for storing containers containing GenericCANMessages.
       stringstream recordingURL;
       recordingURL << "file://"
-                   << "can-gw_" << TimeStamp().getYYYYMMDD_HHMMSS() << ".rec";
+                   << "can-gw_gcm_" << ts.getYYYYMMDD_HHMMSS() << ".rec";
       // Size of memory segments (not needed for recording GenericCANMessages).
       const uint32_t MEMORY_SEGMENT_SIZE = 0;
       // Number of memory segments (not needed for recording
@@ -93,7 +97,31 @@ void CANGW::setUp()
       const bool DUMP_SHARED_DATA = false;
 
       // Create a recorder instance.
-      m_recorder = unique_ptr<Recorder>(new Recorder(recordingURL.str(),
+      m_recorderGenericCANMessages = unique_ptr<Recorder>(new Recorder(recordingURL.str(),
+      MEMORY_SEGMENT_SIZE, NUMBER_OF_SEGMENTS, THREADING, DUMP_SHARED_DATA));
+    }
+
+    const bool RECORD_MAPPED =
+    (getKeyValueConfiguration().getValue<int>("proxy-can-gw.record_mapped_data") == 1);
+    if (RECORD_MAPPED) {
+      // URL for storing containers containing GenericCANMessages.
+      stringstream recordingURL;
+      recordingURL << "file://"
+                   << "can-gw_mapped_data_" << ts.getYYYYMMDD_HHMMSS() << ".rec";
+      // Size of memory segments (not needed for recording GenericCANMessages).
+      const uint32_t MEMORY_SEGMENT_SIZE = 0;
+      // Number of memory segments (not needed for recording
+      // GenericCANMessages).
+      const uint32_t NUMBER_OF_SEGMENTS = 0;
+      // Run recorder in asynchronous mode to allow real-time recording in
+      // background.
+      const bool THREADING = true;
+      // Dump shared images and shared data (not needed for recording
+      // mapped containers)?
+      const bool DUMP_SHARED_DATA = false;
+
+      // Create a recorder instance.
+      m_recorderMappedCANMessages = unique_ptr<Recorder>(new Recorder(recordingURL.str(),
       MEMORY_SEGMENT_SIZE, NUMBER_OF_SEGMENTS, THREADING, DUMP_SHARED_DATA));
     }
 
@@ -114,39 +142,36 @@ void CANGW::tearDown()
     // Stop the wrapper CAN device.
     m_device->stop();
   }
+
+  // Fix linker error.
+  opendlv::gcdc::fh16::Steering s;
+  (void)s;
 }
 
 void CANGW::nextGenericCANMessage(const automotive::GenericCANMessage &gcm)
 {
-  std::cout << "Received CAN message " << gcm.toString() << std::endl;
-
   // Map CAN message to high-level data structure.
   vector<odcore::data::Container> result = m_fh16CANMessageMapping.mapNext(gcm);
 
-  std::cout << gcm.toString() << ", decoded: " << result.size() << std::endl;
   if (result.size() > 0) {
     auto it = result.begin();
     while (it != result.end()) {
       odcore::data::Container c = (*it);
-      if (c.getDataType() == opendlv::gcdc::fh16::Steering::ID()) {
-        opendlv::gcdc::fh16::Steering s =
-        c.getData<opendlv::gcdc::fh16::Steering>();
-        std::cout << s.toString() << std::endl;
+      // Enqueue mapped container for direct recording.
+      if (m_recorderMappedCANMessages.get()) {
+        m_fifoMappedCANMessages.add(c);
       }
-      if (c.getDataType() == opendlv::gcdc::fh16::VehicleDynamics::ID()) {
-        opendlv::gcdc::fh16::VehicleDynamics v =
-        c.getData<opendlv::gcdc::fh16::VehicleDynamics>();
-        std::cout << v.toString() << std::endl;
-      }
+      // Send container to conference.
+      getConference().send(c);
       it++;
     }
   }
 
   // Enqueue CAN message wrapped as Container to be recorded if we have a valid
   // recorder.
-  if (m_recorder.get() != NULL) {
+  if (m_recorderGenericCANMessages.get()) {
     odcore::data::Container c(gcm);
-    m_fifo.add(c);
+    m_fifoGenericCANMessages.add(c);
   }
 }
 
@@ -154,15 +179,28 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode CANGW::body()
 {
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
   odcore::data::dmcp::ModuleStateMessage::RUNNING) {
-    if (m_recorder.get() != NULL) {
-      const uint32_t ENTRIES = m_fifo.getSize();
+    // Record GenericCANMessages.
+    if (m_recorderGenericCANMessages.get()) {
+      const uint32_t ENTRIES = m_fifoGenericCANMessages.getSize();
       for (uint32_t i = 0; i < ENTRIES; i++) {
-        odcore::data::Container c = m_fifo.leave();
+        odcore::data::Container c = m_fifoGenericCANMessages.leave();
 
         // Store container to dump file.
-        m_recorder->store(c);
+        m_recorderGenericCANMessages->store(c);
       }
     }
+
+    // Record mapped messages from GenericCANMessages.
+    if (m_recorderMappedCANMessages.get()) {
+      const uint32_t ENTRIES = m_fifoMappedCANMessages.getSize();
+      for (uint32_t i = 0; i < ENTRIES; i++) {
+        odcore::data::Container c = m_fifoMappedCANMessages.leave();
+
+        // Store container to dump file.
+        m_recorderMappedCANMessages->store(c);
+      }
+    }
+
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
