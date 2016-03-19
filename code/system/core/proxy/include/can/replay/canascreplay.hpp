@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 Chalmers REVERE
+ * Copyright (C) 2016 Chalmers REVERE
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,47 +17,49 @@
  * USA.
  */
 
-#ifndef SENSOR_GPS_GPS_HPP_
-#define SENSOR_GPS_GPS_HPP_
+#ifndef PROXY_CANASCREPLAY_HPP_
+#define PROXY_CANASCREPLAY_HPP_
 
-#include <memory>
+#include <string>
+#include <vector>
 
-#include <opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h>
 #include <opendavinci/odcore/data/Container.h>
-#include <opendavinci/odcore/io/tcp/TCPConnection.h>
+#include <opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h>
+#include <fh16mapping/GeneratedHeaders_FH16Mapping.h>
 
 namespace opendlv {
 namespace proxy {
-namespace sensor {
-namespace gps {
+namespace can {
+namespace replay {
 
-class Device;
+class CANMessageDataStore;
 
 /**
- * This class provides...
+ * This class replays CAN messages from a .ASC recording piped to this tool over
+ * commandline.
  */
-class Gps : public odcore::base::module::DataTriggeredConferenceClientModule,
-            public odcore::io::StringListener {
+class CANASCReplay
+: public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
-  Gps(int32_t const &, char **);
-  Gps(Gps const &) = delete;
-  Gps &operator=(Gps const &) = delete;
-  virtual ~Gps();
+  CANASCReplay(int32_t const &, char **);
+  CANASCReplay(CANASCReplay const &) = delete;
+  CANASCReplay &operator=(CANASCReplay const &) = delete;
+  virtual ~CANASCReplay();
 
-  virtual void nextContainer(odcore::data::Container &c);
-  virtual void nextString(const std::string &s);
+  vector<odcore::data::Container> getMessages(
+  const std::string &nextLineFromASC);
 
  private:
   void setUp();
   void tearDown();
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
  private:
-  std::unique_ptr<Device> m_device;
-  std::shared_ptr<odcore::io::tcp::TCPConnection> m_trimble;
+  canmapping::CanMapping m_fh16CANMessageMapping;
 };
 
-} // gps
-} // sensor
+} // replay
+} // can
 } // proxy
 } // opendlv
 
