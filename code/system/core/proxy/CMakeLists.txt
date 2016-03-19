@@ -30,92 +30,57 @@ set(LIBRARIES ${LIBRARIES} ${OpenCV_LIBS})
 
 # Build
 file(GLOB_RECURSE thisproject-sources 
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/can/gw/*.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/can/joystick/*.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/can/keyboard/*.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/can/replay/*.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/actuator/propulsion/*.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/actuator/brake/*.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/actuator/steering/*.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/communicator/ledstrip/*.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/communicator/toggeler/*.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/communicator/v2v/*.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/sensor/camera/*.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/sensor/gps/*.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/sensor/imu/*.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/sensor/lidar/*.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/sensor/sonararray/*.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/sensor/v2v/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/can/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/ledstrip/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/toggeler/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/camera/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/gps/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/imu/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/lidar/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/sonararray/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/v2v/*.cpp"
   )
 
 
 add_library(${PROJECT_NAME}lib-static STATIC ${thisproject-sources})
 
-add_executable(${PROJECT_NAME}-can-gw "${CMAKE_CURRENT_SOURCE_DIR}/src/can/gw/main.cpp")
-target_link_libraries(${PROJECT_NAME}-can-gw ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+add_executable(${PROJECT_NAME}-can "${CMAKE_CURRENT_SOURCE_DIR}/src/can/main.cpp")
+target_link_libraries(${PROJECT_NAME}-can ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
-add_executable(${PROJECT_NAME}-can-joystick "${CMAKE_CURRENT_SOURCE_DIR}/src/can/joystick/main.cpp")
-target_link_libraries(${PROJECT_NAME}-can-joystick ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+add_executable(${PROJECT_NAME}-ledstrip "${CMAKE_CURRENT_SOURCE_DIR}/src/ledstrip/main.cpp")
+target_link_libraries(${PROJECT_NAME}-ledstrip ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
-add_executable(${PROJECT_NAME}-can-keyboard "${CMAKE_CURRENT_SOURCE_DIR}/src/can/keyboard/main.cpp")
-target_link_libraries(${PROJECT_NAME}-can-keyboard ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+add_executable(${PROJECT_NAME}-toggeler "${CMAKE_CURRENT_SOURCE_DIR}/src/toggeler/main.cpp")
+target_link_libraries(${PROJECT_NAME}-toggeler ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
-add_executable(${PROJECT_NAME}-can-replay "${CMAKE_CURRENT_SOURCE_DIR}/src/can/replay/main.cpp")
-target_link_libraries(${PROJECT_NAME}-can-replay ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+add_executable(${PROJECT_NAME}-camera "${CMAKE_CURRENT_SOURCE_DIR}/src/camera/main.cpp")
+target_link_libraries(${PROJECT_NAME}-camera ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
-add_executable(${PROJECT_NAME}-actuator-propulsion "${CMAKE_CURRENT_SOURCE_DIR}/src/actuator/propulsion/main.cpp")
-target_link_libraries(${PROJECT_NAME}-actuator-propulsion ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+add_executable(${PROJECT_NAME}-gps "${CMAKE_CURRENT_SOURCE_DIR}/src/gps/main.cpp")
+target_link_libraries(${PROJECT_NAME}-gps ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
-add_executable(${PROJECT_NAME}-actuator-brake "${CMAKE_CURRENT_SOURCE_DIR}/src/actuator/brake/main.cpp")
-target_link_libraries(${PROJECT_NAME}-actuator-brake ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+add_executable(${PROJECT_NAME}-imu "${CMAKE_CURRENT_SOURCE_DIR}/src/imu/main.cpp")
+target_link_libraries(${PROJECT_NAME}-imu ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
-add_executable(${PROJECT_NAME}-actuator-steering "${CMAKE_CURRENT_SOURCE_DIR}/src/actuator/steering/main.cpp")
-target_link_libraries(${PROJECT_NAME}-actuator-steering ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+add_executable(${PROJECT_NAME}-lidar "${CMAKE_CURRENT_SOURCE_DIR}/src/lidar/main.cpp")
+target_link_libraries(${PROJECT_NAME}-lidar ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
-add_executable(${PROJECT_NAME}-communicator-ledstrip "${CMAKE_CURRENT_SOURCE_DIR}/src/communicator/ledstrip/main.cpp")
-target_link_libraries(${PROJECT_NAME}-communicator-ledstrip ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+add_executable(${PROJECT_NAME}-sonararray "${CMAKE_CURRENT_SOURCE_DIR}/src/sonararray/main.cpp")
+target_link_libraries(${PROJECT_NAME}-sonararray ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
-add_executable(${PROJECT_NAME}-communicator-toggeler "${CMAKE_CURRENT_SOURCE_DIR}/src/communicator/toggeler/main.cpp")
-target_link_libraries(${PROJECT_NAME}-communicator-toggeler ${PROJECT_NAME}lib-static ${LIBRARIES}) 
-
-add_executable(${PROJECT_NAME}-communicator-v2v "${CMAKE_CURRENT_SOURCE_DIR}/src/communicator/v2v/main.cpp")
-target_link_libraries(${PROJECT_NAME}-communicator-v2v ${PROJECT_NAME}lib-static ${LIBRARIES}) 
-
-add_executable(${PROJECT_NAME}-sensor-camera "${CMAKE_CURRENT_SOURCE_DIR}/src/sensor/camera/main.cpp")
-target_link_libraries(${PROJECT_NAME}-sensor-camera ${PROJECT_NAME}lib-static ${LIBRARIES}) 
-
-add_executable(${PROJECT_NAME}-sensor-gps "${CMAKE_CURRENT_SOURCE_DIR}/src/sensor/gps/main.cpp")
-target_link_libraries(${PROJECT_NAME}-sensor-gps ${PROJECT_NAME}lib-static ${LIBRARIES}) 
-
-add_executable(${PROJECT_NAME}-sensor-imu "${CMAKE_CURRENT_SOURCE_DIR}/src/sensor/imu/main.cpp")
-target_link_libraries(${PROJECT_NAME}-sensor-imu ${PROJECT_NAME}lib-static ${LIBRARIES}) 
-
-add_executable(${PROJECT_NAME}-sensor-lidar "${CMAKE_CURRENT_SOURCE_DIR}/src/sensor/lidar/main.cpp")
-target_link_libraries(${PROJECT_NAME}-sensor-lidar ${PROJECT_NAME}lib-static ${LIBRARIES}) 
-
-add_executable(${PROJECT_NAME}-sensor-sonararray "${CMAKE_CURRENT_SOURCE_DIR}/src/sensor/sonararray/main.cpp")
-target_link_libraries(${PROJECT_NAME}-sensor-sonararray ${PROJECT_NAME}lib-static ${LIBRARIES}) 
-
-add_executable(${PROJECT_NAME}-sensor-v2v "${CMAKE_CURRENT_SOURCE_DIR}/src/sensor/v2v/main.cpp")
-target_link_libraries(${PROJECT_NAME}-sensor-v2v ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+add_executable(${PROJECT_NAME}-v2v "${CMAKE_CURRENT_SOURCE_DIR}/src/v2v/main.cpp")
+target_link_libraries(${PROJECT_NAME}-v2v ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
 # Test
 include(RunTests)
 
 # Install
-install(TARGETS ${PROJECT_NAME}-can-gw RUNTIME DESTINATION bin COMPONENT system-core)
-install(TARGETS ${PROJECT_NAME}-can-keyboard RUNTIME DESTINATION bin COMPONENT system-core)
-install(TARGETS ${PROJECT_NAME}-can-joystick RUNTIME DESTINATION bin COMPONENT system-core)
-install(TARGETS ${PROJECT_NAME}-can-replay RUNTIME DESTINATION bin COMPONENT system-core)
-install(TARGETS ${PROJECT_NAME}-actuator-propulsion RUNTIME DESTINATION bin COMPONENT system-core)
-install(TARGETS ${PROJECT_NAME}-actuator-brake RUNTIME DESTINATION bin COMPONENT system-core)
-install(TARGETS ${PROJECT_NAME}-actuator-steering RUNTIME DESTINATION bin COMPONENT system-core)
-install(TARGETS ${PROJECT_NAME}-communicator-ledstrip RUNTIME DESTINATION bin COMPONENT system-core)
-install(TARGETS ${PROJECT_NAME}-communicator-toggeler RUNTIME DESTINATION bin COMPONENT system-core)
-install(TARGETS ${PROJECT_NAME}-communicator-v2v RUNTIME DESTINATION bin COMPONENT system-core)
-install(TARGETS ${PROJECT_NAME}-sensor-camera RUNTIME DESTINATION bin COMPONENT system-core)
-install(TARGETS ${PROJECT_NAME}-sensor-gps RUNTIME DESTINATION bin COMPONENT system-core)
-install(TARGETS ${PROJECT_NAME}-sensor-imu RUNTIME DESTINATION bin COMPONENT system-core)
-install(TARGETS ${PROJECT_NAME}-sensor-lidar RUNTIME DESTINATION bin COMPONENT system-core)
-install(TARGETS ${PROJECT_NAME}-sensor-sonararray RUNTIME DESTINATION bin COMPONENT system-core)
-install(TARGETS ${PROJECT_NAME}-sensor-v2v RUNTIME DESTINATION bin COMPONENT system-core)
+install(TARGETS ${PROJECT_NAME}-can RUNTIME DESTINATION bin COMPONENT system-core)
+install(TARGETS ${PROJECT_NAME}-ledstrip RUNTIME DESTINATION bin COMPONENT system-core)
+install(TARGETS ${PROJECT_NAME}-toggeler RUNTIME DESTINATION bin COMPONENT system-core)
+install(TARGETS ${PROJECT_NAME}-camera RUNTIME DESTINATION bin COMPONENT system-core)
+install(TARGETS ${PROJECT_NAME}-gps RUNTIME DESTINATION bin COMPONENT system-core)
+install(TARGETS ${PROJECT_NAME}-imu RUNTIME DESTINATION bin COMPONENT system-core)
+install(TARGETS ${PROJECT_NAME}-lidar RUNTIME DESTINATION bin COMPONENT system-core)
+install(TARGETS ${PROJECT_NAME}-sonararray RUNTIME DESTINATION bin COMPONENT system-core)
+install(TARGETS ${PROJECT_NAME}-v2v RUNTIME DESTINATION bin COMPONENT system-core)

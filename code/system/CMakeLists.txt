@@ -49,14 +49,14 @@ set(OPENDLV_DIR "${OPENDAVINCI_DIR}")
 find_package(OpenDLV REQUIRED)
 
 ###########################################################################
-# Find fh16mapping.
-set(FH16MAPPING_DIR "${CMAKE_INSTALL_PREFIX}")
-find_package(FH16Mapping REQUIRED)
+# Find reverefh16mapping.
+set(REVEREFH16MAPPING_DIR "${CMAKE_INSTALL_PREFIX}")
+find_package(reverefh16mapping REQUIRED)
 
 ###########################################################################
 # Find OpenDLV data structures.
 set(OPENDLVDATA_DIR "${CMAKE_INSTALL_PREFIX}")
-find_package(OpenDLVData REQUIRED)
+find_package(opendlvdata REQUIRED)
 
 ###########################################################################
 # Set common include directories.
@@ -64,7 +64,7 @@ include_directories(SYSTEM ${OPENDAVINCI_INCLUDE_DIRS})
 include_directories(SYSTEM ${OPENDLV_INCLUDE_DIRS})
 include_directories(SYSTEM ${ODCANTOOLS_INCLUDE_DIRS})
 include_directories(SYSTEM ${OPENDLVDATA_INCLUDE_DIRS})
-include_directories(SYSTEM ${FH16MAPPING_INCLUDE_DIRS})
+include_directories(SYSTEM ${REVEREFH16MAPPING_INCLUDE_DIRS})
 
 ###########################################################################
 # Set libraries to link against.
@@ -72,7 +72,7 @@ set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
               ${OPENDLV_LIBRARIES}
               ${ODCANTOOLS_LIBRARIES}
               ${OPENDLVDATA_LIBRARIES}
-              ${FH16MAPPING_LIBRARIES})
+              ${REVEREFH16MAPPING_LIBRARIES})
 
 ###########################################################################
 # Add subfolders with sources.
@@ -80,4 +80,3 @@ add_subdirectory(core)
 add_subdirectory(application)
 
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../config/configuration DESTINATION . COMPONENT system)
-

@@ -102,7 +102,7 @@ ExternalProject_Add(libopendlvdata-cleanup
 ExternalProject_Add(libopendlvdata
     DEPENDS libopendlvdata-cleanup
     DOWNLOAD_COMMAND ""
-    UPDATE_COMMAND cd ${CMAKE_SOURCE_DIR}/code/generated && ${Java_JAVA_EXECUTABLE} -jar ${ODDATASTRUCTUREGENERATOR_EXECUTABLE} --withCMake ${CMAKE_SOURCE_DIR}/resources/OpenDLVData.odvd
+    UPDATE_COMMAND cd ${CMAKE_SOURCE_DIR}/code/generated && ${Java_JAVA_EXECUTABLE} -jar ${ODDATASTRUCTUREGENERATOR_EXECUTABLE} --withCMake ${CMAKE_SOURCE_DIR}/resource/odvd/opendlvdata.odvd
     PATCH_COMMAND ""
     SOURCE_DIR "${CMAKE_SOURCE_DIR}/code/generated/libopendlvdata"
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
@@ -113,9 +113,9 @@ ExternalProject_Add(libopendlvdata
 
 ###########################################################################
 # This "external project" deletes any previously generated data structures libopendlvdata.
-ExternalProject_Add(libfh16mapping-cleanup
+ExternalProject_Add(libreverefh16mapping-cleanup
     DOWNLOAD_COMMAND ""
-    UPDATE_COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_SOURCE_DIR}/code/generated/libfh16mapping
+    UPDATE_COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_SOURCE_DIR}/code/generated/libreverefh16mapping
     PATCH_COMMAND ""
     SOURCE_DIR ""
     CONFIGURE_COMMAND ""
@@ -125,22 +125,22 @@ ExternalProject_Add(libfh16mapping-cleanup
 
 ###########################################################################
 # This "external project" generates the data structures in libopendlvdata.
-ExternalProject_Add(libfh16mapping
-    DEPENDS libfh16mapping-cleanup libopendlvdata
+ExternalProject_Add(libreverefh16mapping
+    DEPENDS libreverefh16mapping-cleanup libopendlvdata
     DOWNLOAD_COMMAND ""
-    UPDATE_COMMAND cd ${CMAKE_SOURCE_DIR}/code/generated && ${Java_JAVA_EXECUTABLE} -jar ${ODCANDATASTRUCTUREGENERATOR_EXECUTABLE} --withCMake ${CMAKE_SOURCE_DIR}/resources/FH16Mapping.can
+    UPDATE_COMMAND cd ${CMAKE_SOURCE_DIR}/code/generated && ${Java_JAVA_EXECUTABLE} -jar ${ODCANDATASTRUCTUREGENERATOR_EXECUTABLE} --withCMake ${CMAKE_SOURCE_DIR}/resource/can/reverefh16/reverefh16mapping.can
     PATCH_COMMAND ""
-    SOURCE_DIR "${CMAKE_SOURCE_DIR}/code/generated/libfh16mapping"
+    SOURCE_DIR "${CMAKE_SOURCE_DIR}/code/generated/libreverefh16mapping"
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
                -DOPENDAVINCI_DIR=${OPENDAVINCI_DIR}
                -DCXXTEST_INCLUDE_DIR=${CXXTEST_INCLUDE_DIR}
     TEST_BEFORE_INSTALL 1
-    INSTALL_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/libfh16mapping-prefix/src/libfh16mapping-build --target install COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/libfh16mapping-prefix/src/libfh16mapping-build --target ${MAKE_PACKAGE})
+    INSTALL_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/libreverefh16mapping-prefix/src/libreverefh16mapping-build --target install COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/libreverefh16mapping-prefix/src/libreverefh16mapping-build --target ${MAKE_PACKAGE})
 
 ###########################################################################
 # This "external project" builds and installs the system software stack.
 ExternalProject_Add(system
-    DEPENDS libopendlvdata libfh16mapping
+    DEPENDS libopendlvdata libreverefh16mapping
     DOWNLOAD_COMMAND ""
     UPDATE_COMMAND ""
     SOURCE_DIR "${CMAKE_SOURCE_DIR}/code/system"
@@ -153,7 +153,7 @@ ExternalProject_Add(system
 ###########################################################################
 # This "external project" builds and installs the tools software stack.
 ExternalProject_Add(tools
-    DEPENDS libopendlvdata libfh16mapping
+    DEPENDS libopendlvdata libreverefh16mapping
     DOWNLOAD_COMMAND ""
     UPDATE_COMMAND ""
     SOURCE_DIR "${CMAKE_SOURCE_DIR}/code/tools"

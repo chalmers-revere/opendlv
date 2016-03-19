@@ -18,7 +18,7 @@
  */
 
 #include <iostream>
-#include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 #include "diagnostics.hpp"
 
