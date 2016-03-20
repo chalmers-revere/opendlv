@@ -106,6 +106,8 @@ void Gps::nextString(const std::string &s) {
   gprmc.setMessage(s);
 
   cout << "Decoded via GPRMC: lat = " << gprmc.getCoordinate().getLatitude() << ", lon = " << gprmc.getCoordinate().getLatitude() << std::endl;
+
+  // Send opendlv::proxy::Wgs84Gps
 }
 
 void Gps::nextContainer(odcore::data::Container &c) {

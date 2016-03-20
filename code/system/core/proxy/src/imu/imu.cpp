@@ -54,6 +54,12 @@ Imu::~Imu()
 // This method will do the main data processing job.
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Imu::body()
 {
+
+  // Send opendlv::proxy::Compass
+  // Send opendlv::proxy::Gyroscope
+  // Send opendlv::proxy::Accelerometer
+  // Send opendlv::proxy::Altimeter
+
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 

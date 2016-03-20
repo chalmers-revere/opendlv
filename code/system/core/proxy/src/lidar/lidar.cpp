@@ -54,6 +54,9 @@ Lidar::~Lidar()
 // This method will do the main data processing job.
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Lidar::body()
 {
+
+  // Send opendlv::proxy::SphericalTimeOfFlight ??
+
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 

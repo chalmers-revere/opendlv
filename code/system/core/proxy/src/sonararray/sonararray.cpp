@@ -55,6 +55,8 @@ SonarArray::~SonarArray()
 // This method will do the main data processing job.
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SonarArray::body()
 {
+  // Send opendlv::proxy::CartesianTimeOfFlight
+
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
