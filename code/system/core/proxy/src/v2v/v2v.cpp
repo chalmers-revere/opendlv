@@ -66,6 +66,13 @@ void V2v::nextPacket(const odcore::io::Packet &p) {
          // << p.getData() << "'" 
          << std::endl;
     // TODO: Forward the packet to other layer alternatively packing up data.
+    // opendlv::knowledge::Message nextMessage;
+    // nextMessage.setSize(p.getData().length());
+    // nextMessage.setData(p.getData());
+    odcore::data::Container c(nextMessage);
+    getConference().send(c);
+
+
     // const std::string packetString = p.getData();
     // std::vector<unsigned char> data(packetString.begin(), packetString.end());
     // std::shared_ptr<Buffer const> buffer(new Buffer(data));
