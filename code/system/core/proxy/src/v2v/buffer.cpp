@@ -4,7 +4,7 @@
 #include <sstream>
 #include <stdexcept>
 
-#include "sensor/v2v/buffer.hpp"
+#include "v2v/buffer.hpp"
 
 
 Buffer::Iterator::Iterator(Buffer const *a_outer_buffer):

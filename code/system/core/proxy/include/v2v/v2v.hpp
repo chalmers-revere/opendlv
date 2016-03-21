@@ -24,6 +24,7 @@
 
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
+#include <opendavinci/odcore/io/PacketListener.h>
 
 namespace opendlv {
 namespace proxy {
@@ -34,12 +35,14 @@ class Device;
 /**
  * This class provides...
  */
-class V2v : public odcore::base::module::TimeTriggeredConferenceClientModule {
+class V2v : public odcore::base::module::TimeTriggeredConferenceClientModule,
+    public odcore::io::PacketListener {
  public:
   V2v(int32_t const &, char **);
   V2v(V2v const &) = delete;
   V2v &operator=(V2v const &) = delete;
   virtual ~V2v();
+  virtual void nextPacket(const odcore::io::Packet &p);
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
  private:

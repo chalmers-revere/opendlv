@@ -51,9 +51,57 @@ V2v::V2v(int32_t const &a_argc, char **a_argv)
     , m_device()
 {
 }
+// V2v::V2v()
+// {
+// }
 
 V2v::~V2v()
 {
+}
+
+void V2v::nextPacket(const odcore::io::Packet &p) {
+    std::cout << "Received a packet from " << p.getSender() << ", "
+         << "with " << p.getData().length() 
+         // << " bytes containing '"
+         // << p.getData() << "'" 
+         << std::endl;
+    // TODO: Forward the packet to other layer alternatively packing up data.
+    // const std::string packetString = p.getData();
+    // std::vector<unsigned char> data(packetString.begin(), packetString.end());
+    // std::shared_ptr<Buffer const> buffer(new Buffer(data));
+    // std::shared_ptr<Buffer::Iterator> iterator = buffer->GetIterator();
+    //Long and little endian reverser
+    // iterator->ItReversed();
+
+    // char receivedMessageID = iterator->ReadByte();
+    // signed int receivedStationID = iterator->ReadInteger();
+    // std::cout << "MessageID: "<< std::to_string(receivedMessageID) 
+        // << " StationId: " << receivedStationID  
+        // <<std::endl;
+
+    // std::string messageType;
+    // switch(receivedMessageID){
+    //   case 1:
+    //     messageType = "denm";
+    //   break;
+    //   case 2:
+    //     messageType = "cam";
+    //   break;
+    //   case 10:
+    //     messageType = "iclcm";
+    //   break;
+    //   default:
+    //     std::cout << "Received unknown  message identifier"
+    //         << std::to_string(receivedMessageID)
+    //         // << " from " << receivedStationID
+    //         << std::endl;
+    // }
+    // if(!messageType.empty()){
+    //   opendlv::system::sensor::VehicleCommunicationMessage nextMessage;
+    //   nextMessage.setType(messageType);
+    //   nextMessage.setSize(p.getData().length());
+    //   nextMessage.setData(p.getData());
+    // }
 }
 
 
@@ -68,8 +116,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2v::body()
     std::shared_ptr<odcore::io::udp::UDPReceiver>
             udpreceiver(odcore::io::udp::UDPFactory::createUDPReceiver(RECEIVER, PORT));
 
-    UDPReceivePackets handler;
-    udpreceiver->setPacketListener(&handler);
+    udpreceiver->setPacketListener(this);
     udpreceiver->start();
     //For continuous listening
     while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
