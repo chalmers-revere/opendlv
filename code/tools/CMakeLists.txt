@@ -38,31 +38,41 @@ include(CheckCxxTestEnvironment)
 find_package(OpenDaVINCI REQUIRED)
 
 ###########################################################################
-# Find AutomotiveData.
-SET(AUTOMOTIVEDATA_DIR "${OPENDAVINCI_DIR}")
-FIND_PACKAGE (AutomotiveData REQUIRED)
+# Find odcantools.
+set(AUTOMOTIVEDATA_DIR "${OPENDAVINCI_DIR}")
+set(ODCANTOOLS_DIR "${OPENDAVINCI_DIR}")
+find_package(odcantools REQUIRED)
 
 ###########################################################################
 # Find OpenDLV.
-SET(OPENDLV_DIR "${OPENDAVINCI_DIR}")
-FIND_PACKAGE (OpenDLV REQUIRED)
+set(OPENDLV_DIR "${OPENDAVINCI_DIR}")
+find_package(OpenDLV REQUIRED)
+
+###########################################################################
+# Find reverefh16mapping.
+set(REVEREFH16MAPPING_DIR "${CMAKE_INSTALL_PREFIX}")
+find_package(reverefh16mapping REQUIRED)
 
 ###########################################################################
 # Find OpenDLV data structures.
 set(OPENDLVDATA_DIR "${CMAKE_INSTALL_PREFIX}")
-find_package(OpenDLVData REQUIRED)
+find_package(opendlvdata REQUIRED)
 
 ###########################################################################
 # Set common include directories.
 include_directories(${OPENDAVINCI_INCLUDE_DIRS})
 include_directories(${OPENDLV_INCLUDE_DIRS})
-include_directories(${AUTOMOTIVEDATA_INCLUDE_DIRS})
+include_directories(${ODCANTOOLS_INCLUDE_DIRS})
 include_directories(${OPENDLVDATA_INCLUDE_DIRS})
+include_directories(${REVEREFH16MAPPING_INCLUDE_DIRS})
 
 ###########################################################################
 # Set libraries to link against.
-set(LIBRARIES ${OPENDAVINCI_LIBRARIES} ${OPENDLV_LIBRARIES} ${AUTOMOTIVEDATA_LIBRARIES} ${OPENDLVDATA_LIBRARIES})
+set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
+              ${OPENDLV_LIBRARIES} 
+              ${ODCANTOOLS_LIBRARIES}
+              ${OPENDLVDATA_LIBRARIES}
+              ${REVEREFH16MAPPING_LIBRARIES})
 
-
+#add_subdirectory(can)
 add_subdirectory(vboreplay)
-
