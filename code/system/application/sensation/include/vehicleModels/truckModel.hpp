@@ -138,6 +138,36 @@ public:
     //! Control type shortcut definition
     typedef Control<T> C;
 
+
+    /**
+     * @brief Definition of the parameters for the truck kinematic model
+     *
+     *
+     * According to the following equations the Ackermann Steering vehicle:
+     *
+     *     x_dot = v * cos (theta)
+     *     y_dot = v * sin (theta)
+     *     theta_dot = (v / b) * tan (phi)
+     *
+     * Where b = vehicle wheelbase and phi=steering angle
+     *
+     * @param [ ] wheelbase = vehiche wheelbase, default value = 3.8 (m)
+     */
+    struct vehicleParams {
+      double wheelbase;   ///--> distance between the front axle and the rear axle of a vechicle
+
+      vehicleParams() : wheelbase(3.8) {}
+
+      /**
+       * @brief Espose the wheelbase to be set by the user
+       *
+       * @param [in] wheelbase = vehiche wheelbase, default value = 3.8 (m)
+       */
+      void setWheelbase (double _wheelbase) { wheelbase = _wheelbase; }
+
+    };
+    vehicleParams m_vehicleParams;
+
     /**
      * @brief Definition of (non-linear) state transition function
      *
@@ -171,18 +201,18 @@ public:
         //x_.theta = x.theta() + delta_t * (u.v() / wheelbase) * std::tan(u.phi())
 
         double delta_t = 0.05;  // TODO: calculate via timestamp
-        double wheelbase = 3.8; // TODO: this must be set by the user
+        //double wheelbase = 3.8; // TODO: this must be set by the user
         x_p.x() = x.x() + delta_t * x.x_dot();
         x_p.x_dot() = u.v() * std::cos(x.theta());
         x_p.y() = x.y() + delta_t * x.y_dot();
         x_p.y_dot() = u.v() * std::sin (x.theta());
         x_p.theta() = x.theta() + delta_t * x.theta_dot();
-        x_p.theta_dot() = (u.v() / wheelbase) * std::tan(u.phi());
+        //x_p.theta_dot() = (u.v() / wheelbase) * std::tan(u.phi());
+        x_p.theta_dot() = (u.v() / m_vehicleParams.wheelbase ) * std::tan(u.phi());
 
         // Return transitioned state vector
         return x_p;
     }
-
 
 protected:
 

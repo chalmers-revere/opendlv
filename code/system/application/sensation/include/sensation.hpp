@@ -39,8 +39,8 @@
 #endif
     #include "ExtendedKalmanFilter.hpp"
     #include "Types.hpp"
-    #include "truckModel.hpp"
-    #include "truckObservationModel.hpp"
+    #include "vehicleModels/truckModel.hpp"
+    #include "vehicleModels/truckObservationModel.hpp"
 #ifndef WIN32
 # if !defined(__OpenBSD__) && !defined(__NetBSD__)
 #  pragma GCC diagnostic pop
