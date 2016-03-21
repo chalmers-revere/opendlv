@@ -21,6 +21,7 @@
 #include <cstring>
 #include <cmath>
 #include <iostream>
+#include <iomanip>
 
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
@@ -52,8 +53,53 @@ Audition::~Audition()
  * Receives raw vehicle message from proxy.
  * Sends raw vehicle message to linguistics handlers.
  */
-void Audition::nextContainer(odcore::data::Container &)
+void Audition::nextContainer(odcore::data::Container &c)
 {
+  // cout << "Received container of type " << c.getDataType() 
+  //     << " sent at " << c.getSentTimeStamp().getYYYYMMDD_HHMMSSms() 
+  //     <<" received at " << c.getReceivedTimeStamp().getYYYYMMDD_HHMMSSms()
+  //     << endl;
+  if(c.getDataType() == opendlv::proxy::V2vInbound::ID()){
+    // std::cout << "Received a message of type ."
+    opendlv::proxy::V2vInbound Message = c.getData<opendlv::proxy::V2vInbound>();
+    std::vector<uint8_t> data = Message.getListOfData();
+
+    // std::cout << std::to_string(static_cast<unsigned char>(*data.begin())) 
+    //     << std::endl;
+    // stringstream ss;
+    // ss << std::hex << std::setfill('0');
+    // vector<uint8_t>::const_iterator it;
+
+    // for (it = data.begin(); it != data.end(); it++) {
+    //     ss << std::to_string(static_cast<unsigned char>(*it));
+    //     ss << "|";
+    // }
+    // std::cout<<ss.str()<<std::endl;
+    unsigned char v2vMsgId = static_cast<unsigned char>(*data.begin());
+    std::string v2vMsgType;
+    switch(v2vMsgId)
+    {
+      case 1:
+        v2vMsgType = "denm";
+      break;
+      case 2:
+        v2vMsgType = "cam";
+      break;
+      case 10:
+        v2vMsgType = "iclcm";
+      break;
+      default:
+        std::cout << "Received invalid message ID.";
+    }
+    if(!v2vMsgType.empty())
+    {
+      std::cout<<"Sorted and sending to next layer.\n";
+      opendlv::sensation::Voice nextMessage(v2vMsgType, Message.getSize_ListOfData(), Message.getListOfData());
+      odcore::data::Container container(nextMessage);
+      getConference().send(container);
+    }
+
+  }
 }
 
 void Audition::setUp()
