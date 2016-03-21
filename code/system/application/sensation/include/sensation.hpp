@@ -41,6 +41,8 @@
     #include "Types.hpp"
     #include "vehicleModels/truckModel.hpp"
     #include "vehicleModels/truckObservationModel.hpp"
+    #include "vehicleModels/combinedTruckModel.hpp"
+    #include "vehicleModels/combinedTruckObservationModel.hpp"
 #ifndef WIN32
 # if !defined(__OpenBSD__) && !defined(__NetBSD__)
 #  pragma GCC diagnostic pop
@@ -115,6 +117,13 @@ class Sensation : public odcore::base::module::TimeTriggeredConferenceClientModu
     typedef opendlv::system::application::sensation::truckObservationModel::truckObservationModel<double> m_tkmObservationModel;
     typedef opendlv::system::application::sensation::truckObservationModel::truckObservationVector<double> m_tkmObservationVector;
 
+    // define some shourtcut to be used in the file --- tdm = Truck dynamic Model
+    typedef opendlv::system::application::sensation::combinedTruckModel::State<double> m_tdmState;     ///--> def truck dynamic model state space
+    typedef opendlv::system::application::sensation::combinedTruckModel::Control<double> m_tdmControl; ///--> def truck dynamic model control space
+    typedef opendlv::system::application::sensation::combinedTruckModel::SystemModel<double> m_tdmSys; ///--> def truck dynamic model system
+    typedef opendlv::system::application::sensation::combinedTruckObservationModel::combinedTruckObservationModel<double> m_tdmObservationModel;
+    typedef opendlv::system::application::sensation::combinedTruckObservationModel::combinedTruckObservationVector<double> m_tdmObservationVector;
+
   /**  Initialize the Extended Kalman filter for the vehicle state estimator,
     *  this method should be called only once, maybe after, or inside, the constructor.
     */
@@ -124,9 +133,20 @@ class Sensation : public odcore::base::module::TimeTriggeredConferenceClientModu
    m_tkmControl U;  ///--> input vector for the truck
    m_tkmSys sys;    ///--> system model
 
+
+
+   m_tdmState Xdyn;    ///--> state vector for our model
+   m_tdmControl Udyn;  ///--> input vector for the truck
+   m_tdmSys sys_dyn;    ///--> system model
+
+
    m_tkmObservationModel observationModel;  ///--> observation model
+   m_tdmObservationModel dynObservationModel; ///--> observation model
+
 
    opendlv::system::libs::kalman::ExtendedKalmanFilter< opendlv::system::application::sensation::truckKinematicModel::State<double> > m_ekf;   // extended kalman filter
+   opendlv::system::libs::kalman::ExtendedKalmanFilter< opendlv::system::application::sensation::combinedTruckModel::State<double> > m_dyn_ekf; // extended kalman filter
+
 
     // Random number generation (for noise simulation)
     std::default_random_engine generator;   ///--> set the random engine to generate noise

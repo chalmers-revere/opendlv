@@ -47,8 +47,13 @@ Sensation::Sensation(int32_t const &a_argc, char **a_argv) :
     X(),
     U(),
     sys(),
+    Xdyn(),
+    Udyn(),
+    sys_dyn(),
     observationModel(0.0, 0.0,  0.0, 0.0 ), // clarify the numbers !
+    dynObservationModel(0.0, 0.0,  0.0, 0.0 ),
     m_ekf(),
+    m_dyn_ekf(),
     generator(),
     noise(0, 1),
     systemNoise(0),
@@ -179,15 +184,22 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
          // cout << getName() << " << message >> \n   CONTROL SIGNALS : u.v = " << U.v() << "  u.phi  = " << U.phi() << endl;
          U.v() = commands.getLongitudinalVelocity();
          U.phi() = commands.getSteeringAngle();
+         Udyn.v() = commands.getLongitudinalVelocity();
+         Udyn.phi() = commands.getSteeringAngle();
 
          // System measurements
          m_tkmObservationVector Z = observationModel.h(X);
+         m_tdmObservationVector Zdyn = dynObservationModel.h(Xdyn);
 
          // set the commands from the opendavinci to the ekf state space
          Z.Z_x()         =   _p2.getX();//truckLocation.getX();
          Z.Z_y()         =   _p2.getY();//truckLocation.getY();
          Z.Z_theta()     =   truckLocation.getYaw();
          Z.Z_theta_dot( )=   truckLocation.getYawRate();
+         Zdyn.Z_x()         =   _p2.getX();//truckLocation.getX();
+         Zdyn.Z_y()         =   _p2.getY();//truckLocation.getY();
+         Zdyn.Z_theta()     =   truckLocation.getYaw();
+         Zdyn.Z_theta_dot( )=   truckLocation.getYawRate();
          //cout << getName() << " << message >> \n   MEASURES : " << " Z.Z_x()  = " << Z.Z_x() << " Z.Z_y()  = " << Z.Z_y()
          //                  << " Z.Z_theta()  = " << Z.Z_theta() << " Z.Z_theta_dot()  = " << Z.Z_theta_dot()  << endl;
 
@@ -206,10 +218,13 @@ run_vse_test = false;
              std::cout << "Sensation::initializeEKF  << message >> Filter initialized " << std::endl;
 
              // Predict state for current time-step using the filters
-             X = m_ekf.predict(sys, U);  // TODO: change auto type for compatibility !
+             X = m_ekf.predict(sys, U);
+             Xdyn = m_dyn_ekf.predict(sys_dyn, Udyn);
+
 
              // update stage of the EKF
              X = m_ekf.update(observationModel, Z);
+            Xdyn = m_dyn_ekf.update(dynObservationModel, Zdyn);
 
             // Print to stdout as csv format
             std::cout   << getName() << " << message >> STATE \n"
@@ -225,6 +240,7 @@ m_saveToFile = true;
                           << U.v() << " " << U.phi() << " "
                           << Z.Z_x() << " " << Z.Z_y() << " " << Z.Z_theta() << " " << Z.Z_theta_dot() << " "
                           << X.x() << " " << X.x_dot() << " "  << X.y() << " " << X.y_dot() << " " << X.theta() << " " << X.theta_dot() << " "
+                          << Xdyn.x() << " " << Xdyn.y() << " "  << Xdyn.uy() << " " << Xdyn.uy_dot() << " " << Xdyn.theta() << " " << Xdyn.r() << " "
                           << endl;
             }
 
@@ -247,6 +263,7 @@ if (!EKF_initialized)
     std::cout << "Sensation::initializeEKF  << message >> initialize the kalman filter " << std::endl;
 
     X.setZero();  // initialize the state vector
+    Xdyn.setZero();
     generator.seed( std::chrono::system_clock::now().time_since_epoch().count() );
 
 
