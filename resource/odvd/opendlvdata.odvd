@@ -90,12 +90,14 @@ message opendlv.proxy.Wgs84Gps [id = 161] {
 */
 message opendlv.proxy.V2vInbound [id = 162] {
   uint32 size;
-  list<uint8> data;
+  string data;
+  //list<uint8> data;
 }
 
 message opendlv.proxy.V2vOutbound [id = 163] {
   uint32 size;
-  list<uint8> data;
+  string data;
+  //list<uint8> data;
 }
 
 message opendlv.proxy.reverefh16.Pedals [id = 191] {
@@ -167,7 +169,8 @@ message opendlv.action.Actuation [id = 165] {
 message opendlv.sensation.Voice [id = 166] {
   string type;
   uint32 size;
-  list<uint8> data;
+  string data;
+  //list<uint8> data;
 }
 /*
 message opendlv.sensation.RoadWheel [id = 167] {
@@ -286,6 +289,7 @@ message opendlv.perception.ObjectMetricDistance [id = 184] {
 // Knowledge
 message opendlv.knowledge.Message [id = 185] {
   uint32 size;
-  list<uint8> data;
+  string data;
+  //list<uint8> data;
 }
 

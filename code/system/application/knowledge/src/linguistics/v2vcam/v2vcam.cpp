@@ -64,21 +64,24 @@ void V2vCam::nextContainer(odcore::data::Container &c)
     // std::cout<<message.getType()<<std::endl;
     if(strcmp(message.getType().c_str(),"cam") == 0)
     {
-      std::vector<unsigned char> v = message.getListOfData();
+      std::string dataString = message.getData();
+      std::vector<unsigned char> data(dataString.begin(), dataString.end());
+    
+      // std::vector<unsigned char> v = message.getListOfData();
       // std::cout<< "Received CAM \n";
-      std::shared_ptr<Buffer const> buffer(new Buffer(v));
+      std::shared_ptr<Buffer const> buffer(new Buffer(data));
       // std::cout<< buffer->GetSize()<<std::endl;
       std::shared_ptr<Buffer::Iterator> inIterator = buffer->GetIterator();
       //Long and little endian reverser
       inIterator->ItReversed();
       
-      std::vector<unsigned char> const bytes = v;
-      std::stringstream ss;
-      for (uint i = 0; i < bytes.size(); i++) {
-          ss << std::to_string(bytes.at(i));
-          ss << "|";
-      }
-      std::cout<<ss.str()<<std::endl;
+      // std::vector<unsigned char> const bytes = v;
+      // std::stringstream ss;
+      // for (uint i = 0; i < bytes.size(); i++) {
+      //     ss << std::to_string(bytes.at(i));
+      //     ss << "|";
+      // }
+      // std::cout<<ss.str()<<std::endl;
 
 
       unsigned char messageId = inIterator->ReadByte();

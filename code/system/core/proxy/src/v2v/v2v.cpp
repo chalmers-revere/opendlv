@@ -69,57 +69,20 @@ void V2v::nextPacket(const odcore::io::Packet &p) {
     opendlv::proxy::V2vInbound nextMessage;
     nextMessage.setSize(p.getData().length());
     const std::string packetString = p.getData();
-    std::vector<unsigned char> data(packetString.begin(), packetString.end());
+    // std::vector<unsigned char> data(packetString.begin(), packetString.end());
     
-    std::vector<unsigned char> const bytes = data;
-    std::stringstream ss;
-    for (uint i = 0; i < bytes.size(); i++) {
-        ss << std::to_string(bytes.at(i));
-        ss << "|";
-    }
-    std::cout<<ss.str()<<std::endl;
+    // std::vector<unsigned char> const bytes = data;
+    // std::stringstream ss;
+    // for (uint i = 0; i < bytes.size(); i++) {
+    //     ss << std::to_string(bytes.at(i));
+    //     ss << "|";
+    // }
+    // std::cout<<ss.str()<<std::endl;
 
-    nextMessage.setListOfData(data);
+    nextMessage.setData(packetString);
     odcore::data::Container c(nextMessage);
     getConference().send(c);
 
-
-    // const std::string packetString = p.getData();
-    // std::vector<unsigned char> data(packetString.begin(), packetString.end());
-    // std::shared_ptr<Buffer const> buffer(new Buffer(data));
-    // std::shared_ptr<Buffer::Iterator> iterator = buffer->GetIterator();
-    //Long and little endian reverser
-    // iterator->ItReversed();
-
-    // char receivedMessageID = iterator->ReadByte();
-    // signed int receivedStationID = iterator->ReadInteger();
-    // std::cout << "MessageID: "<< std::to_string(receivedMessageID) 
-        // << " StationId: " << receivedStationID  
-        // <<std::endl;
-
-    // std::string messageType;
-    // switch(receivedMessageID){
-    //   case 1:
-    //     messageType = "denm";
-    //   break;
-    //   case 2:
-    //     messageType = "cam";
-    //   break;
-    //   case 10:
-    //     messageType = "iclcm";
-    //   break;
-    //   default:
-    //     std::cout << "Received unknown  message identifier"
-    //         << std::to_string(receivedMessageID)
-    //         // << " from " << receivedStationID
-    //         << std::endl;
-    // }
-    // if(!messageType.empty()){
-    //   opendlv::system::sensor::VehicleCommunicationMessage nextMessage;
-    //   nextMessage.setType(messageType);
-    //   nextMessage.setSize(p.getData().length());
-    //   nextMessage.setData(p.getData());
-    // }
 }
 
 
