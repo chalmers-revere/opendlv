@@ -42,7 +42,7 @@ namespace v2viclcm {
   * @param a_argv Command line arguments.
   */
 V2vIclcm::V2vIclcm(int32_t const &a_argc, char **a_argv)
-    : DataTriggeredConferenceClientModule(
+    : TimeTriggeredConferenceClientModule(
       a_argc, a_argv, "knowledge-gcdc16-v2viclcm")
 {
 }
@@ -50,6 +50,87 @@ V2vIclcm::V2vIclcm(int32_t const &a_argc, char **a_argv)
 V2vIclcm::~V2vIclcm()
 {
 }
+
+odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vIclcm::body()
+{  
+  unsigned char m_messageId = 10;
+  unsigned char m_containerMask = 128;
+  unsigned char m_lowFrequencyMask = 128;
+  int32_t m_stationId = 0;
+  int32_t m_rearAxleLocation =100;
+  int32_t m_controllerType = 0;
+  int32_t m_responseTimeConstant = 1001;
+  int32_t m_responseTimeDelay = 1001;
+  int32_t m_targetLongAcc = 10;
+  int32_t m_timeHeadway = 1;
+  int32_t m_cruiseSpeed = 3;
+  int32_t m_participantsReady = 1;
+  int32_t m_startPlatoon = 0;
+  int32_t m_endOfScenario = 0;
+  int32_t m_mioId = 255;
+  int32_t m_mioBearing = 11;
+  int32_t m_mioRange = 10;
+  int32_t m_mioRangeRate = 12;
+  int32_t m_lane = 3;
+  unsigned char m_forwardId = 0;
+  int32_t m_backwardId = 0;
+  int32_t m_mergeRequest = 0;
+  int32_t m_safeToMerge = 0;
+  int32_t m_flag = 1;
+  int32_t m_flagTail = 0;
+  int32_t m_flagHead = 1;
+  int32_t m_platoonId = 254;
+  int32_t m_distanceTravelledCz = 100;
+  int32_t m_intention = 2;
+  int32_t m_counter = 2;
+  while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
+      odcore::data::dmcp::ModuleStateMessage::RUNNING){
+    std::shared_ptr<opendlv::Buffer> outBuffer(new opendlv::Buffer());
+  
+    outBuffer->Reversed();
+    
+    outBuffer->AppendByte(m_messageId); //messageId
+    outBuffer->AppendInteger(m_stationId); //stationId
+    outBuffer->AppendByte(m_containerMask); //containerMask
+    outBuffer->AppendInteger(m_rearAxleLocation); //rearAxleLocation
+    outBuffer->AppendInteger(m_controllerType); //controllerType
+    outBuffer->AppendInteger(m_responseTimeConstant); //responseTimeConstant
+    outBuffer->AppendInteger(m_responseTimeDelay); //responseTimeDelay
+    outBuffer->AppendInteger(m_targetLongAcc); //targetLongAcc
+    outBuffer->AppendInteger(m_timeHeadway); //timeHeadway
+    outBuffer->AppendInteger(m_cruiseSpeed); //cruiseSpeed
+    outBuffer->AppendByte(m_lowFrequencyMask); //lowFrequencyMask
+    outBuffer->AppendInteger(m_participantsReady); //participantsReady
+    outBuffer->AppendInteger(m_startPlatoon); //startPlatoon
+    outBuffer->AppendInteger(m_endOfScenario); //endOfScenario
+    outBuffer->AppendInteger(m_mioId); //mioId
+    outBuffer->AppendInteger(m_mioRange); //mioRange
+    outBuffer->AppendInteger(m_mioBearing); //mioBearing
+    outBuffer->AppendInteger(m_mioRangeRate); //mioRangeRate
+    outBuffer->AppendInteger(m_lane); //lane
+    outBuffer->AppendByte(m_forwardId); //forwardId
+    outBuffer->AppendInteger(m_backwardId); //backwardId
+    outBuffer->AppendInteger(m_mergeRequest); //mergeRequest
+    outBuffer->AppendInteger(m_safeToMerge); //safeToMerge
+    outBuffer->AppendInteger(m_flag); //flag
+    outBuffer->AppendInteger(m_flagTail); //flagTail
+    outBuffer->AppendInteger(m_flagHead); //flagHead
+    outBuffer->AppendInteger(m_platoonId); //platoonId
+    outBuffer->AppendInteger(m_distanceTravelledCz); //distanceTravelledCz
+    outBuffer->AppendInteger(m_intention); //intention
+    outBuffer->AppendInteger(m_counter); //counter
+
+    std::vector<unsigned char> bytes = outBuffer->GetBytes();
+    std::string bytesString(bytes.begin(),bytes.end());
+    // std::cout<< bytesString << std::endl;
+    opendlv::knowledge::Message nextMessage(bytesString.size(),bytesString);
+    odcore::data::Container c(nextMessage);
+    getConference().send(c);
+  }
+  
+  return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
+}
+
 
 /**
  * Receives .

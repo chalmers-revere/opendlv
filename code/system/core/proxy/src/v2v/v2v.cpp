@@ -28,6 +28,7 @@
 #include "opendavinci/odcore/data/TimeStamp.h"
 #include "opendavinci/odcore/io/Packet.h"
 #include "opendavinci/odcore/io/udp/UDPReceiver.h"
+#include "opendavinci/odcore/io/udp/UDPSender.h"
 #include "opendavinci/odcore/io/udp/UDPFactory.h"
 
 #include "opendlvdata/GeneratedHeaders_opendlvdata.h"
@@ -59,7 +60,8 @@ V2v::~V2v()
 {
 }
 
-void V2v::nextPacket(const odcore::io::Packet &p) {
+void V2v::nextPacket(const odcore::io::Packet &p)
+{
     std::cout << "Received a packet from " << p.getSender() << ", "
          << "with " << p.getData().length() 
          // << " bytes containing '"
@@ -82,8 +84,30 @@ void V2v::nextPacket(const odcore::io::Packet &p) {
     nextMessage.setData(packetString);
     odcore::data::Container c(nextMessage);
     getConference().send(c);
-
 }
+
+  void V2v::nextContainer(odcore::data::Container &c)
+  {
+    if(c.getDataType() == opendlv::proxy::V2vOutbound::ID()){
+      // std::cout << "Got an outbound message" << std::endl;
+      opendlv::proxy::V2vOutbound message = 
+      c.getData<opendlv::proxy::V2vOutbound>();
+      std::string data = message.getData();
+
+      const string RECEIVER = "127.0.0.1";
+      const uint32_t PORT = 5003;
+      try {
+        std::shared_ptr<odcore::io::udp::UDPSender> 
+            udpsender(odcore::io::udp::UDPFactory::createUDPSender(RECEIVER,
+                  PORT));
+
+        udpsender->send(data);
+      }
+      catch(string &exception) {
+          cerr << "Data could not be sent: " << exception << endl;
+      }
+    }
+  }
 
 
 // This method will do the main data processing job.

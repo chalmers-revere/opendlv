@@ -43,11 +43,12 @@ class V2v : public odcore::base::module::TimeTriggeredConferenceClientModule,
   V2v &operator=(V2v const &) = delete;
   virtual ~V2v();
   virtual void nextPacket(const odcore::io::Packet &p);
-  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+  virtual void nextContainer(odcore::data::Container &c);
 
  private:
   void setUp();
   void tearDown();
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
   std::unique_ptr<Device> m_device;
 };

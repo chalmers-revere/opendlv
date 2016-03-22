@@ -17,6 +17,7 @@
  * USA.
  */
 
+#include <chrono>
 #include <ctype.h>
 #include <cstring>
 #include <cmath>
@@ -42,13 +43,108 @@ namespace v2vdenm {
   * @param a_argv Command line arguments.
   */
 V2vDenm::V2vDenm(int32_t const &a_argc, char **a_argv)
-    : DataTriggeredConferenceClientModule(
+    : TimeTriggeredConferenceClientModule(
       a_argc, a_argv, "knowledge-linguistics-v2vdenm")
 {
 }
 
 V2vDenm::~V2vDenm()
 {
+}
+
+odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vDenm::body()
+{
+  unsigned long const millisecondsTo2004FromUnixEpoch = 1072915200000;
+
+  unsigned char const m_messageId = 1;
+  int32_t m_stationId = 0;
+  int32_t m_generationDeltaTime = 0; // Generation time of the (Denm) message in milliseconds
+  unsigned char m_containerMask = 160;
+  unsigned char m_managementMask = 248;
+  unsigned char m_situationMask = 8;
+  unsigned char m_alacarteMask = 168;
+
+
+  int32_t m_detectionTime = 1; 
+  int32_t m_referenceTime = 0; 
+  int32_t m_termination = 0;
+  int32_t m_latitude = 900000001;
+  int32_t m_longitude = 1800000001;
+  int32_t m_semiMajorConfidence = 4095;
+  int32_t m_semiMinorConfidence = 4095;
+  int32_t m_semiMajorOrientation = 3601;
+  int32_t m_altitude = 800001;
+  int32_t m_relevanceDistance = 0;
+  int32_t m_relevanceTrafficDirection = 0;
+  int32_t m_validityDuration = 0;
+  int32_t m_transmissionInterval = 1;
+  int32_t m_stationType = 0;
+  int32_t m_informationQuality = 4;
+  int32_t m_causeCode = 0;
+  int32_t m_subCauseCode = 0;
+  int32_t m_linkedCauseCode = 0;
+  int32_t m_linkedSubCauseCode = 0;
+  int32_t m_lanePosition = -1;
+  int32_t m_temperature = 0;
+  int32_t m_positioningSolutionType = 5;
+
+
+  while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
+      odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+    unsigned long millisecondsSince2004Epoch =
+        std::chrono::system_clock::now().time_since_epoch() /
+        std::chrono::milliseconds(1) - millisecondsTo2004FromUnixEpoch;
+    std::shared_ptr<opendlv::Buffer> outBuffer(new opendlv::Buffer());
+    m_generationDeltaTime = millisecondsSince2004Epoch%65536;
+    m_referenceTime = millisecondsSince2004Epoch;
+
+
+    outBuffer->Reversed();
+
+    outBuffer->AppendByte(m_messageId); //messageId
+    outBuffer->AppendInteger(m_stationId); //stationId
+    //Todo fix this - Error in VA
+    outBuffer->AppendInteger(m_generationDeltaTime); //generationDeltaTime
+    
+    outBuffer->AppendByte(m_containerMask); //containerMask
+      
+    outBuffer->AppendByte(m_managementMask); //managementMask
+    outBuffer->AppendInteger(m_detectionTime); //detectionTime
+    //Todo fix this - Error in VA
+    outBuffer->AppendInteger(m_referenceTime  ); //referenceTime
+    outBuffer->AppendInteger(m_termination); //termination
+    outBuffer->AppendInteger(m_latitude); //latitude
+    outBuffer->AppendInteger(m_longitude); //longitude
+    outBuffer->AppendInteger(m_semiMajorConfidence); //semiMajorConfidence
+    outBuffer->AppendInteger(m_semiMinorConfidence); //semiMinorConfidence
+    outBuffer->AppendInteger(m_semiMajorOrientation); //semiMajorOrientation
+    outBuffer->AppendInteger(m_altitude); //altitude
+    outBuffer->AppendInteger(m_relevanceDistance); //relevanceDistance
+    outBuffer->AppendInteger(m_relevanceTrafficDirection); //relevanceTrafficDirection
+    outBuffer->AppendInteger(m_validityDuration); //validityDuration
+    outBuffer->AppendInteger(m_transmissionInterval); //transmissionInterval
+    outBuffer->AppendInteger(m_stationType); //stationType
+    outBuffer->AppendByte(m_situationMask); //situationMask
+    outBuffer->AppendInteger(m_informationQuality); //informationQuality
+    outBuffer->AppendInteger(m_causeCode); //causeCode
+    outBuffer->AppendInteger(m_subCauseCode); //subCauseCode
+    outBuffer->AppendInteger(m_linkedCauseCode); //linkedCauseCode
+    outBuffer->AppendInteger(m_linkedSubCauseCode); //linkedSubCauseCode
+    outBuffer->AppendByte(m_alacarteMask); //alacarteMask
+    outBuffer->AppendInteger(m_lanePosition); //lanePosition
+    outBuffer->AppendInteger(m_temperature); //temperature
+    outBuffer->AppendInteger(m_positioningSolutionType); //positioningSolutionType
+
+    std::vector<unsigned char> bytes = outBuffer->GetBytes();
+    std::string bytesString(bytes.begin(),bytes.end());
+    // std::cout<< bytesString << std::endl;
+    opendlv::knowledge::Message nextMessage(bytesString.size(),bytesString);
+    odcore::data::Container c(nextMessage);
+    getConference().send(c);
+    // std::cout << "Sent." << std::endl;
+  }
+
+  return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
 /**

@@ -22,7 +22,7 @@
 
 #include <memory>
 
-#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
 
 namespace opendlv {
@@ -34,7 +34,7 @@ namespace v2vdenm {
  * This class provides...
  */
 class V2vDenm
-: public odcore::base::module::DataTriggeredConferenceClientModule {
+: public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
   V2vDenm(int32_t const &, char **);
   V2vDenm(V2vDenm const &) = delete;
@@ -45,6 +45,7 @@ class V2vDenm
  private:
   void setUp();
   void tearDown();
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 };
 
 } // v2vdenm
