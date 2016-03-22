@@ -145,6 +145,62 @@ public:
     typedef Control<T> C;
 
     /**
+     * @brief Definition of the parameters for the truck dynamic model
+     *
+     *     For the Planar Bicycle Model of lateral forces the kinematic equations are:
+     *     uy_dot = c1 * uy/ux - (ux + c2/ux) * r + c3 * phi
+     *     r_dot = c4 * uy/ux + c5 * r/ux + c6 * phi
+     *
+     * Where ux = longitudinal velocity and phi = steering angle
+     * And where c1-c6 = constants depending on tire cornering stiffness, moment of inertia, mass and
+     * wheelbase distances
+     *
+     * c1 = (-s1 -s2) /m                s1 = cornering stiffness of front wheel          s += 0.15
+     * c2 = (s2*b -s1*a)/m              s2 = cornering stiffness of rear wheel
+     * c3 = s1/m                        m = mass of truck                                m += 2000
+     * c4 = (s2*b -s1*a)/I              a = distance from front wheel to center of mass  a + b = 3.8
+     * c5 = (-s1*a² - s2*b²)/I          b = distance from rear wheel to center of mass
+     * c6 = s1*a/I                      I = moment of inertia of truck                   I += 4000
+     * 
+     *
+     * @param [ ] wheelbase = vehiche wheelbase, default value = 3.8 (m)
+     */
+    struct vehicleParams {
+      double wheelbase;   ///--> distance between the front axle and the rear axle of a vechicle
+      double s1;
+      double s2;
+      double m;
+      double a;
+      double b;
+      double I;
+      //double s1 = 0.15;  ///--> cornering stiffness of front wheel (default value 0.15) UNIT? N/deg N/rad?
+      //double s2 = 0.15;  ///--> cornering stiffness of rear wheel (default value 0.15) UNIT? N/deg N/rad?
+      //double m = 2000;   ///--> mass of the truck (kg)
+      //double a = 1;      ///--> distance between the front wheel and the center of mass 
+      //double b = 2.8;    ///--> distance between the rear wheel and the center of mass 
+      //double I = 4000;   ///--> moment of inertia of the truck (kg m^2)
+
+        //double c1 = (-s1 -s2) /m ;
+        //double c2 = (s2*b -s1*a)/m ;
+        //double c3 = s1/m ;
+        //double c4 = (s2*b -s1*a)/I ;
+        //double c5 = (-s1*pow(a,2) - s2*pow(b,2))/I;
+        //double c6 = s1*a/I ;
+      vehicleParams() : wheelbase(3.8), s1(0.15), s2(0.15), m(2000), a(1.0), b(2.8), I(4000)  {}
+
+      /**
+       * @brief Espose the wheelbase to be set by the user
+       *
+       * @param [in] wheelbase = vehiche wheelbase, default value = 3.8 (m)
+       */
+      void setWheelbase (double _wheelbase) { wheelbase = _wheelbase; }
+      //TODO all the parameters must be exposed to be set (all together or separately)
+
+    };
+    vehicleParams m_vehicleParams;
+    
+    
+    /**
      * @brief Definition of (non-linear) state transition function
      *
      * This function defines how the system state is propagated through time,
