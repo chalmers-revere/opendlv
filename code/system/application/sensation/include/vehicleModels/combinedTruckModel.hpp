@@ -324,7 +324,10 @@ protected:
         //%sigma=0.01;%5;         % state transition variance
         //sigma_q = [0.1 0.01];
         //Qxyz = sigma_q(1)^2 * [delta_t^3/3 delta_t^2/2;
-        //                       delta_t^2/2 delta_t];
+        //                       delta_t^2/2 delta_t]; --- x - x_dot
+        //Qxyz = sigma_q(1)^2 * [delta_t^5/20  delta_t^4/8   delta_t^3/6;
+        //                       delta_t^4/8   delta_t^3/3   delta_t^2/2
+        //                       delta_t^3/6   delta_t^2/2   delta_t]; --- x - x_dot - x_dotdot
 
         //Qtheta = sigma_q(2)^2 * [delta_t^3/3 delta_t^2/2;
         //                         delta_t^2/2 delta_t];
