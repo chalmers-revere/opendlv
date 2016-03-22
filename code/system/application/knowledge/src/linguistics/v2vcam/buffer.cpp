@@ -4,8 +4,9 @@
 #include <sstream>
 #include <stdexcept>
 
-#include "v2v/buffer.hpp"
+#include "linguistics/v2vcam/buffer.hpp"
 
+namespace opendlv {
 
 Buffer::Iterator::Iterator(Buffer const *a_outer_buffer):
     m_outer_buffer(a_outer_buffer),
@@ -419,3 +420,4 @@ void Buffer::Reversed(){
   }
 }
 
+}

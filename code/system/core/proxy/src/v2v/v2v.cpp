@@ -70,6 +70,15 @@ void V2v::nextPacket(const odcore::io::Packet &p) {
     nextMessage.setSize(p.getData().length());
     const std::string packetString = p.getData();
     std::vector<unsigned char> data(packetString.begin(), packetString.end());
+    
+    std::vector<unsigned char> const bytes = data;
+    std::stringstream ss;
+    for (uint i = 0; i < bytes.size(); i++) {
+        ss << std::to_string(bytes.at(i));
+        ss << "|";
+    }
+    std::cout<<ss.str()<<std::endl;
+
     nextMessage.setListOfData(data);
     odcore::data::Container c(nextMessage);
     getConference().send(c);

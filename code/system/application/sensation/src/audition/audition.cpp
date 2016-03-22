@@ -61,21 +61,20 @@ void Audition::nextContainer(odcore::data::Container &c)
   //     << endl;
   if(c.getDataType() == opendlv::proxy::V2vInbound::ID()){
     // std::cout << "Received a message of type ."
-    opendlv::proxy::V2vInbound Message = c.getData<opendlv::proxy::V2vInbound>();
-    std::vector<uint8_t> data = Message.getListOfData();
+    opendlv::proxy::V2vInbound message = c.getData<opendlv::proxy::V2vInbound>();
+    std::vector<unsigned char> data = message.getListOfData();
 
     // std::cout << std::to_string(static_cast<unsigned char>(*data.begin())) 
     //     << std::endl;
-    // stringstream ss;
-    // ss << std::hex << std::setfill('0');
-    // vector<uint8_t>::const_iterator it;
-
-    // for (it = data.begin(); it != data.end(); it++) {
-    //     ss << std::to_string(static_cast<unsigned char>(*it));
-    //     ss << "|";
-    // }
-    // std::cout<<ss.str()<<std::endl;
-    unsigned char v2vMsgId = static_cast<unsigned char>(*data.begin());
+    std::vector<unsigned char> const bytes = data;
+    std::stringstream ss;
+    for (uint i = 0; i < bytes.size(); i++) {
+        ss << std::to_string(bytes.at(i));
+        ss << "|";
+    }
+    std::cout<<ss.str()<<std::endl;
+    unsigned char v2vMsgId = data.at(0);
+    // std::cout <<  std::to_string(v2vMsgId)<<std::endl;
     std::string v2vMsgType;
     switch(v2vMsgId)
     {
@@ -94,7 +93,7 @@ void Audition::nextContainer(odcore::data::Container &c)
     if(!v2vMsgType.empty())
     {
       std::cout<<"Sorted and sending to next layer.\n";
-      opendlv::sensation::Voice nextMessage(v2vMsgType, Message.getSize_ListOfData(), Message.getListOfData());
+      opendlv::sensation::Voice nextMessage(v2vMsgType, message.getSize_ListOfData(), data);
       odcore::data::Container container(nextMessage);
       getConference().send(container);
     }

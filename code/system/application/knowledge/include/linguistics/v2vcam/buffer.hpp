@@ -1,9 +1,11 @@
-#ifndef OPENDLV_V2V_BUFFER_HPP
-#define OPENDLV_V2V_BUFFER_HPP
+#ifndef LINGUISTICS_V2VCAM_BUFFER_HPP
+#define LINGUISTICS_V2VCAM_BUFFER_HPP
 
 #include <memory>
 #include <string>
 #include <vector>
+
+namespace opendlv {
 
 
 /**
@@ -81,5 +83,6 @@ class Buffer {
 
 };
 
+}
 
 #endif
