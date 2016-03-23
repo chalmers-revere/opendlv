@@ -25,6 +25,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+ 
+#include "opendavinci/odcore/base/KeyValueConfiguration.h"
 
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
@@ -337,6 +339,11 @@ void V2vDenm::nextContainer(odcore::data::Container &c)
 
 void V2vDenm::setUp()
 {
+  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+
+  m_stationId = kv.getValue<int32_t>("knowledge-linguistics-v2vdenm.stationId");
+  m_stationType = kv.getValue<int32_t>("knowledge-linguistics-v2vdenm.stationType");
+
 }
 
 void V2vDenm::tearDown()

@@ -25,6 +25,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+ 
+#include "opendavinci/odcore/base/KeyValueConfiguration.h"
 
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
@@ -338,6 +340,10 @@ void V2vIclcm::nextContainer(odcore::data::Container &c)
 
 void V2vIclcm::setUp()
 {
+  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+
+  m_stationId = kv.getValue<int32_t>("knowledge-gcdc16-v2viclcm.stationId");
+  m_rearAxleLocation = kv.getValue<int32_t>("knowledge-gcdc16-v2viclcm.rearAxleLocation");
 }
 
 void V2vIclcm::tearDown()

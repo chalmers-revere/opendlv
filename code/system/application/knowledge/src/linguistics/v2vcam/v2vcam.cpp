@@ -25,6 +25,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+ 
+#include "opendavinci/odcore/base/KeyValueConfiguration.h"
 
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
@@ -292,6 +294,15 @@ void V2vCam::nextContainer(odcore::data::Container &c)
 
 void V2vCam::setUp()
 {
+  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+
+  // std::string const type = kv.getValue<std::string>("proxy-v2v.type");
+  
+  m_stationId = kv.getValue<int32_t>("knowledge-linguistics-v2vcam.stationId");
+  m_stationType = kv.getValue<int32_t>("knowledge-linguistics-v2vcam.stationType");
+  m_vehicleLength = kv.getValue<int32_t>("knowledge-linguistics-v2vcam.vehicleLength");
+  m_vehicleWidth = kv.getValue<int32_t>("knowledge-linguistics-v2vcam.vehicleWidth");
+  m_vehicleRole = kv.getValue<int32_t>("knowledge-linguistics-v2vcam.vehicleRole");
   
 }
 
