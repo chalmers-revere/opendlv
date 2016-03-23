@@ -17,10 +17,14 @@
  * USA.
  */
 
+#include <chrono>
 #include <ctype.h>
 #include <cstring>
 #include <cmath>
 #include <iostream>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
@@ -43,8 +47,60 @@ namespace v2viclcm {
   */
 V2vIclcm::V2vIclcm(int32_t const &a_argc, char **a_argv)
     : TimeTriggeredConferenceClientModule(
-      a_argc, a_argv, "knowledge-gcdc16-v2viclcm")
+      a_argc, a_argv, "knowledge-gcdc16-v2viclcm"),
+    m_sendLog(),
+    m_receiveLog()
 {
+  struct stat st = {};
+  if (stat("var/application/knowledge/gcdc16/v2viclcm", &st) == -1) {
+    system("mkdir -p ./var/application/knowledge/gcdc16/v2viclcm");
+    // std::cout<<"Created dir"<<std::endl;
+  }
+  odcore::data::TimeStamp nu;
+
+  std::stringstream filenameSend;
+  std::stringstream filenameReceive;
+
+  filenameSend << "/" << nu.getYYYYMMDD_HHMMSS() << " iclcm send.log";
+  filenameReceive << "/" << nu.getYYYYMMDD_HHMMSS() << " iclcm receive.log";
+  m_sendLog.open("var/application/knowledge/gcdc16/v2viclcm" 
+    + filenameSend.str(), std::ios::out | std::ios::app);
+  m_receiveLog.open("var/application/knowledge/gcdc16/v2viclcm" 
+    + filenameReceive.str(), std::ios::out | std::ios::app);
+
+  std::string header = "messageId, \
+      stationId, \
+      containerMask, \
+      rearAxleLocation, \
+      controllerType, \
+      responseTimeConstant, \
+      responseTimeDelay, \
+      targetLongAcc, \
+      timeHeadway, \
+      cruiseSpeed, \
+      lowFrequencyMask, \
+      participantsReady, \
+      startPlatoon, \
+      endOfScenario, \
+      mioId, \
+      mioRange, \
+      mioBearing, \
+      mioRangeRate, \
+      lane, \
+      forwardId, \
+      backwardId, \
+      mergeRequest, \
+      safeToMerge, \
+      flag, \
+      flagTail, \
+      flagHead, \
+      platoonId, \
+      distanceTravelledCz, \
+      intention, \
+      counter";
+
+  m_sendLog << header << std::endl;
+  m_receiveLog << header << std::endl;
 }
 
 V2vIclcm::~V2vIclcm()
@@ -53,36 +109,7 @@ V2vIclcm::~V2vIclcm()
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vIclcm::body()
 {  
-  unsigned char m_messageId = 10;
-  unsigned char m_containerMask = 128;
-  unsigned char m_lowFrequencyMask = 128;
-  int32_t m_stationId = 0;
-  int32_t m_rearAxleLocation =100;
-  int32_t m_controllerType = 0;
-  int32_t m_responseTimeConstant = 1001;
-  int32_t m_responseTimeDelay = 1001;
-  int32_t m_targetLongAcc = 10;
-  int32_t m_timeHeadway = 1;
-  int32_t m_cruiseSpeed = 3;
-  int32_t m_participantsReady = 1;
-  int32_t m_startPlatoon = 0;
-  int32_t m_endOfScenario = 0;
-  int32_t m_mioId = 255;
-  int32_t m_mioBearing = 11;
-  int32_t m_mioRange = 10;
-  int32_t m_mioRangeRate = 12;
-  int32_t m_lane = 3;
-  int32_t m_forwardId = 0;
-  int32_t m_backwardId = 0;
-  int32_t m_mergeRequest = 0;
-  int32_t m_safeToMerge = 0;
-  int32_t m_flag = 1;
-  int32_t m_flagTail = 0;
-  int32_t m_flagHead = 1;
-  int32_t m_platoonId = 254;
-  int32_t m_distanceTravelledCz = 100;
-  int32_t m_intention = 2;
-  int32_t m_counter = 2;
+  
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
       odcore::data::dmcp::ModuleStateMessage::RUNNING){
     std::shared_ptr<opendlv::Buffer> outBuffer(new opendlv::Buffer());
@@ -126,6 +153,41 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vIclcm::body()
     opendlv::knowledge::Message nextMessage(bytesString.size(),bytesString);
     odcore::data::Container c(nextMessage);
     getConference().send(c);
+
+
+
+    m_sendLog << std::to_string(m_messageId)+ //messageId
+        + "," + std::to_string(m_stationId)+ //stationId
+        + "," + std::to_string(m_containerMask)+ //containerMask
+        + "," + std::to_string(m_rearAxleLocation)+ //rearAxleLocation
+        + "," + std::to_string(m_controllerType)+ //controllerType
+        + "," + std::to_string(m_responseTimeConstant)+ //responseTimeConstant
+        + "," + std::to_string(m_responseTimeDelay)+ //responseTimeDelay
+        + "," + std::to_string(m_targetLongAcc)+ //targetLongAcc
+        + "," + std::to_string(m_timeHeadway)+ //timeHeadway
+        + "," + std::to_string(m_cruiseSpeed)+ //cruiseSpeed
+        + "," + std::to_string(m_lowFrequencyMask)+ //lowFrequencyMask
+        + "," + std::to_string(m_participantsReady)+ //participantsReady
+        + "," + std::to_string(m_startPlatoon)+ //startPlatoon
+        + "," + std::to_string(m_endOfScenario)+ //endOfScenario
+        + "," + std::to_string(m_mioId)+ //mioId
+        + "," + std::to_string(m_mioRange)+ //mioRange
+        + "," + std::to_string(m_mioBearing)+ //mioBearing
+        + "," + std::to_string(m_mioRangeRate)+ //mioRangeRate
+        + "," + std::to_string(m_lane)+ //lane
+        + "," + std::to_string(m_forwardId)+ //forwardId
+        + "," + std::to_string(m_backwardId)+ //backwardId
+        + "," + std::to_string(m_mergeRequest)+ //mergeRequest
+        + "," + std::to_string(m_safeToMerge)+ //safeToMerge
+        + "," + std::to_string(m_flag)+ //flag
+        + "," + std::to_string(m_flagTail)+ //flagTail
+        + "," + std::to_string(m_flagHead)+ //flagHead
+        + "," + std::to_string(m_platoonId)+ //platoonId
+        + "," + std::to_string(m_distanceTravelledCz)+ //distanceTravelledCz
+        + "," + std::to_string(m_intention)+ //intention
+        + "," + std::to_string(m_counter); //counter
+
+    m_sendLog << std::endl;
   }
   
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
@@ -203,40 +265,73 @@ void V2vIclcm::nextContainer(odcore::data::Container &c)
       int32_t counter = inIterator->ReadInteger();
 
 
-      std::string output = "*** Iclcm object ***\n";
+      // std::string output = "*** Iclcm object ***\n";
   
-      output += "Message Id: " + std::to_string(messageId) + "\n";
-      output += "Container mask: " + std::to_string(containerMask) + "\n";
-      output += "low frequency mask: " + std::to_string(lowFrequencyMask) + "\n";
-      output += "StationId: " + std::to_string(stationId) + "\n";
-      output += "Rear axle location: " + std::to_string(rearAxleLocation) + "\n";
-      output += "Controller type: " + std::to_string(controllerType) + "\n";
-      output += "Response time constant: " + std::to_string(responseTimeConstant) + "\n";
-      output += "Response time delay: " + std::to_string(responseTimeDelay) + "\n";
-      output += "Target long acc: " + std::to_string(targetLongAcc) + "\n";
-      output += "Time headway: " + std::to_string(timeHeadway) + "\n";
-      output += "Cruise speed: " + std::to_string(cruiseSpeed) + "\n";
-      output += "Participants ready: " + std::to_string(participantsReady) + "\n";
-      output += "Start platoon: " + std::to_string(startPlatoon) + "\n";
-      output += "End of scenario: " + std::to_string(endOfScenario) + "\n";
-      output += "Mio Id: " + std::to_string(mioId) + "\n";
-      output += "Mio range: " + std::to_string(mioRange) + "\n";
-      output += "Mio bearing" + std::to_string(mioBearing) + "\n";
-      output += "Mio range rate: " + std::to_string(mioRangeRate) + "\n";
-      output += "Lane: " + std::to_string(lane) + "\n";
-      output += "Forward Id: " + std::to_string(forwardId) + "\n";
-      output += "Backward Id: " + std::to_string(backwardId) + "\n";
-      output += "Merge request: " + std::to_string(mergeRequest) + "\n";
-      output += "Safe to merge: " + std::to_string(safeToMerge) + "\n";
-      output += "Flag: " + std::to_string(flag) + "\n";
-      output += "Flag tail: " + std::to_string(flagTail) + "\n";
-      output += "Flag head: " + std::to_string(flagHead) + "\n";
-      output += "Platoon Id: " + std::to_string(platoonId) + "\n";
-      output += "Distance travelled cz: " + std::to_string(distanceTravelledCz) + "\n";
-      output += "Intention: " + std::to_string(intention) + "\n";
-      output += "Counter: " + std::to_string(counter) + "\n";
+      // output += "Message Id: " + std::to_string(messageId) + "\n";
+      // output += "Container mask: " + std::to_string(containerMask) + "\n";
+      // output += "low frequency mask: " + std::to_string(lowFrequencyMask) + "\n";
+      // output += "StationId: " + std::to_string(stationId) + "\n";
+      // output += "Rear axle location: " + std::to_string(rearAxleLocation) + "\n";
+      // output += "Controller type: " + std::to_string(controllerType) + "\n";
+      // output += "Response time constant: " + std::to_string(responseTimeConstant) + "\n";
+      // output += "Response time delay: " + std::to_string(responseTimeDelay) + "\n";
+      // output += "Target long acc: " + std::to_string(targetLongAcc) + "\n";
+      // output += "Time headway: " + std::to_string(timeHeadway) + "\n";
+      // output += "Cruise speed: " + std::to_string(cruiseSpeed) + "\n";
+      // output += "Participants ready: " + std::to_string(participantsReady) + "\n";
+      // output += "Start platoon: " + std::to_string(startPlatoon) + "\n";
+      // output += "End of scenario: " + std::to_string(endOfScenario) + "\n";
+      // output += "Mio Id: " + std::to_string(mioId) + "\n";
+      // output += "Mio range: " + std::to_string(mioRange) + "\n";
+      // output += "Mio bearing" + std::to_string(mioBearing) + "\n";
+      // output += "Mio range rate: " + std::to_string(mioRangeRate) + "\n";
+      // output += "Lane: " + std::to_string(lane) + "\n";
+      // output += "Forward Id: " + std::to_string(forwardId) + "\n";
+      // output += "Backward Id: " + std::to_string(backwardId) + "\n";
+      // output += "Merge request: " + std::to_string(mergeRequest) + "\n";
+      // output += "Safe to merge: " + std::to_string(safeToMerge) + "\n";
+      // output += "Flag: " + std::to_string(flag) + "\n";
+      // output += "Flag tail: " + std::to_string(flagTail) + "\n";
+      // output += "Flag head: " + std::to_string(flagHead) + "\n";
+      // output += "Platoon Id: " + std::to_string(platoonId) + "\n";
+      // output += "Distance travelled cz: " + std::to_string(distanceTravelledCz) + "\n";
+      // output += "Intention: " + std::to_string(intention) + "\n";
+      // output += "Counter: " + std::to_string(counter) + "\n";
 
-      std::cout<<output<<std::endl;
+      // std::cout<<output<<std::endl;
+
+      m_receiveLog << std::to_string(messageId)+ //messageId
+          + "," + std::to_string(stationId)+ //stationId
+          + "," + std::to_string(containerMask)+ //containerMask
+          + "," + std::to_string(rearAxleLocation)+ //rearAxleLocation
+          + "," + std::to_string(controllerType)+ //controllerType
+          + "," + std::to_string(responseTimeConstant)+ //responseTimeConstant
+          + "," + std::to_string(responseTimeDelay)+ //responseTimeDelay
+          + "," + std::to_string(targetLongAcc)+ //targetLongAcc
+          + "," + std::to_string(timeHeadway)+ //timeHeadway
+          + "," + std::to_string(cruiseSpeed)+ //cruiseSpeed
+          + "," + std::to_string(lowFrequencyMask)+ //lowFrequencyMask
+          + "," + std::to_string(participantsReady)+ //participantsReady
+          + "," + std::to_string(startPlatoon)+ //startPlatoon
+          + "," + std::to_string(endOfScenario)+ //endOfScenario
+          + "," + std::to_string(mioId)+ //mioId
+          + "," + std::to_string(mioRange)+ //mioRange
+          + "," + std::to_string(mioBearing)+ //mioBearing
+          + "," + std::to_string(mioRangeRate)+ //mioRangeRate
+          + "," + std::to_string(lane)+ //lane
+          + "," + std::to_string(forwardId)+ //forwardId
+          + "," + std::to_string(backwardId)+ //backwardId
+          + "," + std::to_string(mergeRequest)+ //mergeRequest
+          + "," + std::to_string(safeToMerge)+ //safeToMerge
+          + "," + std::to_string(flag)+ //flag
+          + "," + std::to_string(flagTail)+ //flagTail
+          + "," + std::to_string(flagHead)+ //flagHead
+          + "," + std::to_string(platoonId)+ //platoonId
+          + "," + std::to_string(distanceTravelledCz)+ //distanceTravelledCz
+          + "," + std::to_string(intention)+ //intention
+          + "," + std::to_string(counter); //counter
+          
+      m_receiveLog << std::endl;
     }
   }
 }

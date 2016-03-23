@@ -48,18 +48,17 @@ class V2vDenm
   void tearDown();
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
+  std::ofstream m_sendLog;
+  std::ofstream m_receiveLog;
+  unsigned long const millisecondsTo2004FromUnixEpoch = 1072915200000;
+
   unsigned char const m_messageId = 1;
   int32_t m_stationId = 0;
   int32_t m_generationDeltaTime = 0; // Generation time of the (Denm) message in milliseconds
   unsigned char m_containerMask = 160;
   unsigned char m_managementMask = 248;
   unsigned char m_situationMask = 8;
-  unsigned char m_alacarteMask = 168;
-
-  std::ofstream m_sendLog;
-  std::ofstream m_receiveLog;
-  
-  unsigned long const millisecondsTo2004FromUnixEpoch = 1072915200000;
+  unsigned char m_alacarteMask = 168;  
   int32_t m_detectionTime = 0; 
   int32_t m_referenceTime = 1; 
   int32_t m_termination = 0;

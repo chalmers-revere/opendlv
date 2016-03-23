@@ -22,7 +22,6 @@
 #include <cstring>
 #include <cmath>
 #include <iostream>
-#include <fstream>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -56,7 +55,7 @@ V2vCam::V2vCam(int32_t const &a_argc, char **a_argv)
   struct stat st = {};
   if (stat("var/application/knowledge/linguistics/v2vcam", &st) == -1) {
     system("mkdir -p ./var/application/knowledge/linguistics/v2vcam");
-    std::cout<<"Created dir"<<std::endl;
+    // std::cout<<"Created dir"<<std::endl;
   }
   odcore::data::TimeStamp nu;
 
@@ -70,12 +69,27 @@ V2vCam::V2vCam(int32_t const &a_argc, char **a_argv)
   m_receiveLog.open("var/application/knowledge/linguistics/v2vcam" 
     + filenameReceive.str(), std::ios::out | std::ios::app);
 
-  std::string header = "#message id, station id, generation delta time, container mask,\
-      station type, latitude, longitude, semi major confidence,\
-      semi minor confidence, semi major orientation, altitude, heading,\
-      heading confidence, speed, speed confidence, vehicle length,\
-      vehicle width, longitudinal acc, longitudinal acc conf, yaw rate value,\
-      yaw rate conf, vehicle role";
+  std::string header = "#message id, \
+      station id, \
+      generation delta time, \
+      container mask,\
+      station type, \
+      latitude, \
+      longitude, \
+      semi major confidence, \
+      semi minor confidence, \
+      semi major orientation, \
+      altitude, \
+      heading, \
+      heading confidence, \
+      speed, speed confidence, \
+      vehicle length, \
+      vehicle width, \
+      longitudinal acc, \
+      longitudinal acc conf, \
+      yaw rate value,\
+      yaw rate conf, \
+      vehicle role";
 
   m_sendLog << header << std::endl;
   m_receiveLog << header << std::endl;
@@ -123,6 +137,15 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
     outBuffer->AppendInteger(m_yawRateConfidence); //yawRateConfidence        
     outBuffer->AppendInteger(m_vehicleRole); //vehicleRole
 
+  
+
+    std::vector<unsigned char> bytes = outBuffer->GetBytes();
+    std::string bytesString(bytes.begin(),bytes.end());
+    // std::cout<< bytesString << std::endl;
+    opendlv::knowledge::Message nextMessage(bytesString.size(),bytesString);
+    odcore::data::Container c(nextMessage);
+    getConference().send(c);
+
     m_sendLog << std::to_string(m_messageId) +
         + "," + std::to_string(m_stationId) +
         + "," + std::to_string(m_generationDeltaTime) +
@@ -144,14 +167,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
         + "," + std::to_string(m_longitudinalAccConf) +
         + "," + std::to_string(m_yawRateValue) +
         + "," + std::to_string(m_yawRateConfidence) +
-        + "," + std::to_string(m_vehicleRole)<< std::endl;
-
-    std::vector<unsigned char> bytes = outBuffer->GetBytes();
-    std::string bytesString(bytes.begin(),bytes.end());
-    // std::cout<< bytesString << std::endl;
-    opendlv::knowledge::Message nextMessage(bytesString.size(),bytesString);
-    odcore::data::Container c(nextMessage);
-    getConference().send(c);
+        + "," + std::to_string(m_vehicleRole);
+    m_sendLog << std::endl;
 
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
@@ -266,7 +283,8 @@ void V2vCam::nextContainer(odcore::data::Container &c)
         + "," + std::to_string(longitudinalAccConf) +
         + "," + std::to_string(yawRateValue) +
         + "," + std::to_string(yawRateConfidence) +
-        + "," + std::to_string(vehicleRole)<< std::endl;
+        + "," + std::to_string(vehicleRole);
+        m_receiveLog << std::endl;
 
     }
   }

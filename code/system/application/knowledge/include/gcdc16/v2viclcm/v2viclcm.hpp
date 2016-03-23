@@ -20,6 +20,7 @@
 #ifndef GCDC16_V2VICLCM_V2VICLCM_HPP_
 #define GCDC16_V2VICLCM_V2VICLCM_HPP_
 
+#include <fstream>
 #include <memory>
 
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
@@ -46,6 +47,40 @@ class V2vIclcm
   void setUp();
   void tearDown();
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+
+  std::ofstream m_sendLog;
+  std::ofstream m_receiveLog;
+
+  unsigned char m_messageId = 10;
+  unsigned char m_containerMask = 128;
+  unsigned char m_lowFrequencyMask = 128;
+  int32_t m_stationId = 0;
+  int32_t m_rearAxleLocation =100;
+  int32_t m_controllerType = 0;
+  int32_t m_responseTimeConstant = 1001;
+  int32_t m_responseTimeDelay = 1001;
+  int32_t m_targetLongAcc = 10;
+  int32_t m_timeHeadway = 1;
+  int32_t m_cruiseSpeed = 3;
+  int32_t m_participantsReady = 1;
+  int32_t m_startPlatoon = 0;
+  int32_t m_endOfScenario = 0;
+  int32_t m_mioId = 255;
+  int32_t m_mioBearing = 11;
+  int32_t m_mioRange = 10;
+  int32_t m_mioRangeRate = 12;
+  int32_t m_lane = 3;
+  int32_t m_forwardId = 0;
+  int32_t m_backwardId = 0;
+  int32_t m_mergeRequest = 0;
+  int32_t m_safeToMerge = 0;
+  int32_t m_flag = 1;
+  int32_t m_flagTail = 0;
+  int32_t m_flagHead = 1;
+  int32_t m_platoonId = 254;
+  int32_t m_distanceTravelledCz = 100;
+  int32_t m_intention = 2;
+  int32_t m_counter = 2;
 };
 
 } // v2viclcm
