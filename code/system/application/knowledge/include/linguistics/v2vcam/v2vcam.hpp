@@ -20,6 +20,7 @@
 #ifndef LINGUISTICS_V2VCAM_V2VCAM_HPP_
 #define LINGUISTICS_V2VCAM_V2VCAM_HPP_
 
+#include <fstream>
 #include <memory>
 
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
@@ -46,6 +47,34 @@ class V2vCam
   void setUp();
   void tearDown();
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+
+  std::ofstream m_sendLog;
+  std::ofstream m_receiveLog;
+
+  unsigned long const millisecondsTo2004FromUnixEpoch = 1072915200000;
+  unsigned char const m_messageId = 2;
+  int32_t m_stationId = 0;
+  // Generation time of the (CAM) message in milliseconds
+  int32_t m_generationDeltaTime = 0; 
+  unsigned char m_containerMask = 128;
+  int32_t m_stationType = 0;
+  int32_t m_latitude = 900000001;
+  int32_t m_longitude = 1800000001;
+  int32_t m_semiMajorConfidence = 4095;
+  int32_t m_semiMinorConfidence = 4095;
+  int32_t m_semiMajorOrientation = 3601;
+  int32_t m_altitude = 800001;
+  int32_t m_heading = 3601;
+  int32_t m_headingConfidence = 127;
+  int32_t m_speed = 16383; //
+  int32_t m_speedConfidence = 127;
+  int32_t m_vehicleLength = 1023;
+  int32_t m_vehicleWidth = 62;
+  int32_t m_longitudinalAcc = 161;
+  int32_t m_longitudinalAccConf = 102;
+  int32_t m_yawRateValue = 32767;
+  int32_t m_yawRateConfidence = 8;
+  int32_t m_vehicleRole = 0;
 };
 
 } // v2vcam

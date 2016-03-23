@@ -22,6 +22,10 @@
 #include <cstring>
 #include <cmath>
 #include <iostream>
+#include <fstream>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
@@ -45,40 +49,46 @@ namespace v2vcam {
   */
 V2vCam::V2vCam(int32_t const &a_argc, char **a_argv)
     : TimeTriggeredConferenceClientModule(
-      a_argc, a_argv, "knowledge-linguistics-v2vcam")
+      a_argc, a_argv, "knowledge-linguistics-v2vcam"),
+    m_sendLog(),
+    m_receiveLog()
 {
+  struct stat st = {};
+  if (stat("var/application/knowledge/linguistics/v2vcam", &st) == -1) {
+    system("mkdir -p ./var/application/knowledge/linguistics/v2vcam");
+    std::cout<<"Created dir"<<std::endl;
+  }
+  odcore::data::TimeStamp nu;
+
+  std::stringstream filenameSend;
+  std::stringstream filenameReceive;
+
+  filenameSend << "/" << nu.getYYYYMMDD_HHMMSS() << " cam send.log";
+  filenameReceive << "/" << nu.getYYYYMMDD_HHMMSS() << " cam receive.log";
+  m_sendLog.open("var/application/knowledge/linguistics/v2vcam" 
+    + filenameSend.str(), std::ios::out | std::ios::app);
+  m_receiveLog.open("var/application/knowledge/linguistics/v2vcam" 
+    + filenameReceive.str(), std::ios::out | std::ios::app);
+
+  std::string header = "#message id, station id, generation delta time, container mask,\
+      station type, latitude, longitude, semi major confidence,\
+      semi minor confidence, semi major orientation, altitude, heading,\
+      heading confidence, speed, speed confidence, vehicle length,\
+      vehicle width, longitudinal acc, longitudinal acc conf, yaw rate value,\
+      yaw rate conf, vehicle role";
+
+  m_sendLog << header << std::endl;
+  m_receiveLog << header << std::endl;
 }
 
 V2vCam::~V2vCam()
 {
+  m_sendLog.close();
+  m_receiveLog.close();
 }
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
 {
-  unsigned long const millisecondsTo2004FromUnixEpoch = 1072915200000;
-  unsigned char const m_messageId = 2;
-  int32_t m_stationId = 0;
-  // Generation time of the (CAM) message in milliseconds
-  int32_t m_generationDeltaTime = 0; 
-  unsigned char m_containerMask = 128;
-  int32_t m_stationType = 0;
-  int32_t m_latitude = 900000001;
-  int32_t m_longitude = 1800000001;
-  int32_t m_semiMajorConfidence = 4095;
-  int32_t m_semiMinorConfidence = 4095;
-  int32_t m_semiMajorOrientation = 3601;
-  int32_t m_altitude = 800001;
-  int32_t m_heading = 3601;
-  int32_t m_headingConfidence = 127;
-  int32_t m_speed = 16383; //
-  int32_t m_speedConfidence = 127;
-  int32_t m_vehicleLength = 1023;
-  int32_t m_vehicleWidth = 62;
-  int32_t m_longitudinalAcc = 161;
-  int32_t m_longitudinalAccConf = 102;
-  int32_t m_yawRateValue = 32767;
-  int32_t m_yawRateConfidence = 8;
-  int32_t m_vehicleRole = 0;
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
       odcore::data::dmcp::ModuleStateMessage::RUNNING) {
@@ -112,6 +122,29 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
     outBuffer->AppendInteger(m_yawRateValue); //yawRateValue
     outBuffer->AppendInteger(m_yawRateConfidence); //yawRateConfidence        
     outBuffer->AppendInteger(m_vehicleRole); //vehicleRole
+
+    m_sendLog << std::to_string(m_messageId) +
+        + "," + std::to_string(m_stationId) +
+        + "," + std::to_string(m_generationDeltaTime) +
+        + "," + std::to_string(m_containerMask) +
+        + "," + std::to_string(m_stationType) +
+        + "," + std::to_string(m_latitude) +
+        + "," + std::to_string(m_longitude) +
+        + "," + std::to_string(m_semiMajorConfidence) +
+        + "," + std::to_string(m_semiMinorConfidence) +
+        + "," + std::to_string(m_semiMajorOrientation) +
+        + "," + std::to_string(m_altitude) +
+        + "," + std::to_string(m_heading) +
+        + "," + std::to_string(m_headingConfidence) +
+        + "," + std::to_string(m_speed)
+        + "," + std::to_string(m_speedConfidence) +
+        + "," + std::to_string(m_vehicleLength) +
+        + "," + std::to_string(m_vehicleWidth) +
+        + "," + std::to_string(m_longitudinalAcc) +
+        + "," + std::to_string(m_longitudinalAccConf) +
+        + "," + std::to_string(m_yawRateValue) +
+        + "," + std::to_string(m_yawRateConfidence) +
+        + "," + std::to_string(m_vehicleRole)<< std::endl;
 
     std::vector<unsigned char> bytes = outBuffer->GetBytes();
     std::string bytesString(bytes.begin(),bytes.end());
@@ -179,38 +212,61 @@ void V2vCam::nextContainer(odcore::data::Container &c)
       int32_t yawRateConfidence = inIterator->ReadInteger();
       int32_t vehicleRole = inIterator->ReadInteger();
 
-      std::string output = "*** Cam object ***\n";
+      // std::string output = "*** Cam object ***\n";
 
-      output += "Message Id: " + std::to_string(messageId) + "\n";
-      output += "Station Id: " + std::to_string(stationId) + "\n";
-      output += "Generation delta time: " 
-          + std::to_string(generationDeltaTime) + "\n";
-      output += "Container mask: " + std::to_string(containerMask) + "\n";
-      output += "Station type: " + std::to_string(stationType) + "\n";
-      output += "Latitude: " + std::to_string(latitude) + "\n";
-      output += "Longitude: " + std::to_string(longitude) + "\n";
-      output += "Semi major confidence: " 
-          + std::to_string(semiMajorConfidence) + "\n";
-      output += "Semi minor confidence: " 
-          + std::to_string(semiMinorConfidence) + "\n";
-      output += "Semi major orientation: " 
-          + std::to_string(semiMajorOrientation) + "\n";
-      output += "Altitude: " + std::to_string(altitude) + "\n";
-      output += "Heading: " + std::to_string(heading) + "\n";
-      output += "Heading confidence: " 
-          + std::to_string(headingConfidence) + "\n";
-      output += "Speed: " + std::to_string(speed) + "\n";
-      output += "Speed confidence: " + std::to_string(speedConfidence) + "\n";
-      output += "Vehicle length: " + std::to_string(vehicleLength) + "\n";
-      output += "Vehicle width: " + std::to_string(vehicleWidth) + "\n";
-      output += "Longitudinal acc: " + std::to_string(longitudinalAcc) + "\n";
-      output += "Longitudinal acc conf: " 
-          + std::to_string(longitudinalAccConf) + "\n";
-      output += "Yaw rate value: " + std::to_string(yawRateValue) + "\n";
-      output += "Yaw rate confidence: " 
-          + std::to_string(yawRateConfidence) + "\n";
-      output += "Vehicle role: " + std::to_string(vehicleRole) + "\n";
-      std::cout << output;
+      // output += "Message Id: " + std::to_string(messageId) + "\n";
+      // output += "Station Id: " + std::to_string(stationId) + "\n";
+      // output += "Generation delta time: " 
+      //     + std::to_string(generationDeltaTime) + "\n";
+      // output += "Container mask: " + std::to_string(containerMask) + "\n";
+      // output += "Station type: " + std::to_string(stationType) + "\n";
+      // output += "Latitude: " + std::to_string(latitude) + "\n";
+      // output += "Longitude: " + std::to_string(longitude) + "\n";
+      // output += "Semi major confidence: " 
+      //     + std::to_string(semiMajorConfidence) + "\n";
+      // output += "Semi minor confidence: " 
+      //     + std::to_string(semiMinorConfidence) + "\n";
+      // output += "Semi major orientation: " 
+      //     + std::to_string(semiMajorOrientation) + "\n";
+      // output += "Altitude: " + std::to_string(altitude) + "\n";
+      // output += "Heading: " + std::to_string(heading) + "\n";
+      // output += "Heading confidence: " 
+      //     + std::to_string(headingConfidence) + "\n";
+      // output += "Speed: " + std::to_string(speed) + "\n";
+      // output += "Speed confidence: " + std::to_string(speedConfidence) + "\n";
+      // output += "Vehicle length: " + std::to_string(vehicleLength) + "\n";
+      // output += "Vehicle width: " + std::to_string(vehicleWidth) + "\n";
+      // output += "Longitudinal acc: " + std::to_string(longitudinalAcc) + "\n";
+      // output += "Longitudinal acc conf: " 
+      //     + std::to_string(longitudinalAccConf) + "\n";
+      // output += "Yaw rate value: " + std::to_string(yawRateValue) + "\n";
+      // output += "Yaw rate confidence: " 
+      //     + std::to_string(yawRateConfidence) + "\n";
+      // output += "Vehicle role: " + std::to_string(vehicleRole) + "\n";
+      // std::cout << output;
+
+      m_receiveLog << std::to_string(messageId) +
+        + "," + std::to_string(stationId) +
+        + "," + std::to_string(generationDeltaTime) +
+        + "," + std::to_string(containerMask) +
+        + "," + std::to_string(stationType) +
+        + "," + std::to_string(latitude) +
+        + "," + std::to_string(longitude) +
+        + "," + std::to_string(semiMajorConfidence) +
+        + "," + std::to_string(semiMinorConfidence) +
+        + "," + std::to_string(semiMajorOrientation) +
+        + "," + std::to_string(altitude) +
+        + "," + std::to_string(heading) +
+        + "," + std::to_string(headingConfidence) +
+        + "," + std::to_string(speed)
+        + "," + std::to_string(speedConfidence) +
+        + "," + std::to_string(vehicleLength) +
+        + "," + std::to_string(vehicleWidth) +
+        + "," + std::to_string(longitudinalAcc) +
+        + "," + std::to_string(longitudinalAccConf) +
+        + "," + std::to_string(yawRateValue) +
+        + "," + std::to_string(yawRateConfidence) +
+        + "," + std::to_string(vehicleRole)<< std::endl;
 
     }
   }

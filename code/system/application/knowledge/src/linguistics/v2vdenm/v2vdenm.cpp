@@ -44,7 +44,9 @@ namespace v2vdenm {
   */
 V2vDenm::V2vDenm(int32_t const &a_argc, char **a_argv)
     : TimeTriggeredConferenceClientModule(
-      a_argc, a_argv, "knowledge-linguistics-v2vdenm")
+      a_argc, a_argv, "knowledge-linguistics-v2vdenm"),
+    m_sendLog(),
+    m_receiveLog()
 {
 }
 
@@ -54,39 +56,6 @@ V2vDenm::~V2vDenm()
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vDenm::body()
 {
-  // unsigned long const millisecondsTo2004FromUnixEpoch = 1072915200000;
-
-  unsigned char const m_messageId = 1;
-  int32_t m_stationId = 0;
-  int32_t m_generationDeltaTime = 0; // Generation time of the (Denm) message in milliseconds
-  unsigned char m_containerMask = 160;
-  unsigned char m_managementMask = 248;
-  unsigned char m_situationMask = 8;
-  unsigned char m_alacarteMask = 168;
-
-
-  int32_t m_detectionTime = 0; 
-  int32_t m_referenceTime = 1; 
-  int32_t m_termination = 0;
-  int32_t m_latitude = 900000001;
-  int32_t m_longitude = 1800000001;
-  int32_t m_semiMajorConfidence = 4095;
-  int32_t m_semiMinorConfidence = 4095;
-  int32_t m_semiMajorOrientation = 3601;
-  int32_t m_altitude = 800001;
-  int32_t m_relevanceDistance = 0;
-  int32_t m_relevanceTrafficDirection = 0;
-  int32_t m_validityDuration = 0;
-  int32_t m_transmissionInterval = 1;
-  int32_t m_stationType = 0;
-  int32_t m_informationQuality = 4;
-  int32_t m_causeCode = 0;
-  int32_t m_subCauseCode = 0;
-  int32_t m_linkedCauseCode = 0;
-  int32_t m_linkedSubCauseCode = 0;
-  int32_t m_lanePosition = -1;
-  int32_t m_temperature = 0;
-  int32_t m_positioningSolutionType = 5;
 
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
