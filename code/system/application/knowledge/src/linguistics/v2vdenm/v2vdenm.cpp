@@ -54,7 +54,7 @@ V2vDenm::~V2vDenm()
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vDenm::body()
 {
-  unsigned long const millisecondsTo2004FromUnixEpoch = 1072915200000;
+  // unsigned long const millisecondsTo2004FromUnixEpoch = 1072915200000;
 
   unsigned char const m_messageId = 1;
   int32_t m_stationId = 0;
@@ -65,8 +65,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vDenm::body()
   unsigned char m_alacarteMask = 168;
 
 
-  int32_t m_detectionTime = 1; 
-  int32_t m_referenceTime = 0; 
+  int32_t m_detectionTime = 0; 
+  int32_t m_referenceTime = 1; 
   int32_t m_termination = 0;
   int32_t m_latitude = 900000001;
   int32_t m_longitude = 1800000001;
@@ -91,19 +91,21 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vDenm::body()
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
       odcore::data::dmcp::ModuleStateMessage::RUNNING) {
-    unsigned long millisecondsSince2004Epoch =
-        std::chrono::system_clock::now().time_since_epoch() /
-        std::chrono::milliseconds(1) - millisecondsTo2004FromUnixEpoch;
+    // unsigned long millisecondsSince2004Epoch =
+    //     std::chrono::system_clock::now().time_since_epoch() /
+    //     std::chrono::milliseconds(1) - millisecondsTo2004FromUnixEpoch;
     std::shared_ptr<opendlv::Buffer> outBuffer(new opendlv::Buffer());
-    m_generationDeltaTime = millisecondsSince2004Epoch%65536;
-    m_referenceTime = millisecondsSince2004Epoch;
-
+    // m_generationDeltaTime = millisecondsSince2004Epoch%65536;
+    // m_referenceTime = millisecondsSince2004Epoch;
+    
+    // std::cout<< std::chrono::system_clock::now().time_since_epoch() /
+    //     std::chrono::milliseconds(1) << "\n" << millisecondsTo2004FromUnixEpoch<< std::endl;
+    // std::cout<< "reference: " << m_referenceTime << std::endl;
 
     outBuffer->Reversed();
 
     outBuffer->AppendByte(m_messageId); //messageId
     outBuffer->AppendInteger(m_stationId); //stationId
-    //Todo fix this - Error in VA
     outBuffer->AppendInteger(m_generationDeltaTime); //generationDeltaTime
     
     outBuffer->AppendByte(m_containerMask); //containerMask
@@ -111,7 +113,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vDenm::body()
     outBuffer->AppendByte(m_managementMask); //managementMask
     outBuffer->AppendInteger(m_detectionTime); //detectionTime
     //Todo fix this - Error in VA
-    outBuffer->AppendInteger(m_referenceTime  ); //referenceTime
+    outBuffer->AppendInteger(m_referenceTime); //referenceTime
     outBuffer->AppendInteger(m_termination); //termination
     outBuffer->AppendInteger(m_latitude); //latitude
     outBuffer->AppendInteger(m_longitude); //longitude
@@ -136,6 +138,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vDenm::body()
     outBuffer->AppendInteger(m_positioningSolutionType); //positioningSolutionType
 
     std::vector<unsigned char> bytes = outBuffer->GetBytes();
+    std::cout<< outBuffer->GetSize() << std::endl;
     std::string bytesString(bytes.begin(),bytes.end());
     // std::cout<< bytesString << std::endl;
     opendlv::knowledge::Message nextMessage(bytesString.size(),bytesString);

@@ -72,7 +72,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vIclcm::body()
   int32_t m_mioRange = 10;
   int32_t m_mioRangeRate = 12;
   int32_t m_lane = 3;
-  unsigned char m_forwardId = 0;
+  int32_t m_forwardId = 0;
   int32_t m_backwardId = 0;
   int32_t m_mergeRequest = 0;
   int32_t m_safeToMerge = 0;
@@ -108,7 +108,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vIclcm::body()
     outBuffer->AppendInteger(m_mioBearing); //mioBearing
     outBuffer->AppendInteger(m_mioRangeRate); //mioRangeRate
     outBuffer->AppendInteger(m_lane); //lane
-    outBuffer->AppendByte(m_forwardId); //forwardId
+    outBuffer->AppendInteger(m_forwardId); //forwardId
     outBuffer->AppendInteger(m_backwardId); //backwardId
     outBuffer->AppendInteger(m_mergeRequest); //mergeRequest
     outBuffer->AppendInteger(m_safeToMerge); //safeToMerge
@@ -187,7 +187,7 @@ void V2vIclcm::nextContainer(odcore::data::Container &c)
       int32_t mioBearing = inIterator->ReadInteger();
       int32_t mioRangeRate = inIterator->ReadInteger();
       int32_t lane = inIterator->ReadInteger();
-      unsigned char forwardId = inIterator->ReadByte();
+      int32_t forwardId = inIterator->ReadInteger();
 
       int32_t backwardId = inIterator->ReadInteger();
       int32_t mergeRequest = inIterator->ReadInteger();
