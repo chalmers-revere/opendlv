@@ -17,50 +17,38 @@
  * USA.
  */
 
-#ifndef DETECTVEHICLE_DETECTVEHICLE_HPP_
-#define DETECTVEHICLE_DETECTVEHICLE_HPP_
-
-#include <memory>
-#include <vector>
-
-#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
-#include "opendavinci/odcore/data/Container.h"
-
-#include "detectvehicle/vehicledetectionsystem.hpp"
 #include "detectvehicle/detectedvehicle.hpp"
-#include "detectvehicle/vehiclememorysystem.hpp"
-
-
 
 // TODO add documentation
+
 
 namespace opendlv {
 namespace perception {
 namespace detectvehicle {
 
-/**
- * This class provides...
- */
-class DetectVehicle
-: public odcore::base::module::DataTriggeredConferenceClientModule {
- public:
-  DetectVehicle(int32_t const &, char **);
-  DetectVehicle(DetectVehicle const &) = delete;
-  DetectVehicle &operator=(DetectVehicle const &) = delete;
-  virtual ~DetectVehicle();
-  virtual void nextContainer(odcore::data::Container &);
+DetectedVehicle::DetectedVehicle(cv::Rect a_detectionRectangle, double a_timeStamp)
+{
+  m_detectionRectangle = a_detectionRectangle;
+  m_timeStamp = a_timeStamp;
+}
 
- private:
-  void setUp();
-  void tearDown();
+DetectedVehicle::~DetectedVehicle()
+{
+	
+}
 
-  VehicleDetectionSystem m_vehicleDetectionSystem;
-  std::vector<std::shared_ptr<DetectedVehicle>> m_verifiedVehicles;
-  VehicleMemorySystem m_vehicleMemorySystem;
-};
+
+
+cv::Rect DetectedVehicle::GetDetectionRectangle()
+{
+  return m_detectionRectangle;
+}
+
+double DetectedVehicle::GetTimeStamp()
+{
+  return m_timeStamp;
+}
 
 } // detectvehicle
 } // perception
 } // opendlv
-
-#endif

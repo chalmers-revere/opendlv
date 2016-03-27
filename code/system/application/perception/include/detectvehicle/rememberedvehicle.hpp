@@ -16,20 +16,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  */
+ 
+#ifndef REMEMBEREDVEHICLE_HPP
+#define REMEMBEREDVEHICLE_HPP
 
-#ifndef DETECTVEHICLE_DETECTVEHICLE_HPP_
-#define DETECTVEHICLE_DETECTVEHICLE_HPP_
 
-#include <memory>
+#include <iostream>
 #include <vector>
+#include <memory>
 
-#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
-#include "opendavinci/odcore/data/Container.h"
-
-#include "detectvehicle/vehicledetectionsystem.hpp"
 #include "detectvehicle/detectedvehicle.hpp"
-#include "detectvehicle/vehiclememorysystem.hpp"
-
 
 
 // TODO add documentation
@@ -38,29 +34,43 @@ namespace opendlv {
 namespace perception {
 namespace detectvehicle {
 
-/**
- * This class provides...
+
+
+ /**
+ * @brief Class for handling vehicle detection.
  */
-class DetectVehicle
-: public odcore::base::module::DataTriggeredConferenceClientModule {
- public:
-  DetectVehicle(int32_t const &, char **);
-  DetectVehicle(DetectVehicle const &) = delete;
-  DetectVehicle &operator=(DetectVehicle const &) = delete;
-  virtual ~DetectVehicle();
-  virtual void nextContainer(odcore::data::Container &);
+class RememberedVehicle {
+public:
+  RememberedVehicle();
+  virtual ~RememberedVehicle();
 
- private:
-  void setUp();
-  void tearDown();
+/* Public methods */
+public:
+  void AddMemory(std::shared_ptr<DetectedVehicle> a_detectedVehiclePtr);
+  void GetMemoryOverTime(std::vector<std::shared_ptr<DetectedVehicle>>* containerVector);
+  std::shared_ptr<DetectedVehicle> GetLatestDetection();
+  int32_t GetNrMemories();
+  void CleanMemory(double timeStamp);
+  cv::Scalar GetDummyColor();
 
-  VehicleDetectionSystem m_vehicleDetectionSystem;
-  std::vector<std::shared_ptr<DetectedVehicle>> m_verifiedVehicles;
-  VehicleMemorySystem m_vehicleMemorySystem;
+
+/* Public fields */
+public:
+
+/* Private methods */
+private:
+
+
+/* Private fields */
+private:
+  std::vector<std::shared_ptr<DetectedVehicle>> m_memoryOverTime;
+  cv::Scalar m_dummyColor;
+
 };
 
 } // detectvehicle
 } // perception
 } // opendlv
+
 
 #endif
