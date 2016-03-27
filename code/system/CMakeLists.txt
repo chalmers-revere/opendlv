@@ -65,6 +65,7 @@ include_directories(SYSTEM ${OPENDLV_INCLUDE_DIRS})
 include_directories(SYSTEM ${ODCANTOOLS_INCLUDE_DIRS})
 include_directories(SYSTEM ${OPENDLVDATA_INCLUDE_DIRS})
 include_directories(SYSTEM ${REVEREFH16MAPPING_INCLUDE_DIRS})
+include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 
 ###########################################################################
 # Set libraries to link against.
