@@ -40,7 +40,7 @@ namespace communicate {
   * @param a_argv Command line arguments.
   */
 Communicate::Communicate(int32_t const &a_argc, char **a_argv)
-    : TimeTriggeredConferenceClientModule(a_argc, a_argv, "action-communicate")
+    : DataTriggeredConferenceClientModule(a_argc, a_argv, "action-communicate")
 {
 }
 
@@ -52,9 +52,18 @@ Communicate::~Communicate()
  * Receives messages to communicate.
  * Sends message via V2V or HMI.
  */
-odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Communicate::body()
+void Communicate::nextContainer(odcore::data::Container &c)
 {
-  return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
+  if(c.getDataType() == opendlv::knowledge::Message::ID()){
+    // std::cout << "Got message!" << std::endl;
+    opendlv::knowledge::Message message = 
+        c.getData<opendlv::knowledge::Message>();
+
+    opendlv::proxy::V2vOutbound nextMessage(message.getSize(),message.getData());
+
+    odcore::data::Container nextContainer(nextMessage);
+    getConference().send(nextContainer);
+  }
 }
 
 void Communicate::setUp()

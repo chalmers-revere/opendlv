@@ -137,11 +137,26 @@ proxy-sonararray.mount.pitch = 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
 proxy-sonararray.mount.yaw = 1.57,-1.57,1.57,-1.57,1.57,-1.57,2.36,-2.36
 
 proxy-v2v.type = geonetworking-dual
-proxy-v2v.port = ip://192.168.0.110
+proxy-v2v.comboxIp = 10.42.0.239
+proxy-v2v.comboxPort = 5003
 proxy-v2v.mount.x = 3.8,3.8
 proxy-v2v.mount.y = -1.2,1.2
 proxy-v2v.mount.z = 3.5,3.5
+proxy-v2v.listenPort = 5000
 
+# V2V temp
+knowledge-linguistics-v2vcam.stationId = 122
+knowledge-linguistics-v2vcam.stationType = 8 #heavy truck
+knowledge-linguistics-v2vcam.vehicleLength = 22
+knowledge-linguistics-v2vcam.vehicleWidth = 11 
+knowledge-linguistics-v2vcam.vehicleRole = 3 #dangerous goods
+knowledge-linguistics-v2vcam.rearAxleLocation = 1
+
+knowledge-linguistics-v2vdenm.stationId = 122
+knowledge-linguistics-v2vdenm.stationType = 8 #heavy truck
+
+knowledge-gcdc16-v2viclcm.stationId = 122
+knowledge-gcdc16-v2viclcm.rearAxleLocation = 1
 
 # Tools
 tools-can-joystick.devicenode = /dev/pcan32   # PEAK CAN device.
