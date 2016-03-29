@@ -151,6 +151,7 @@ message opendlv.proxy.reverefh16.Steering [id = 199] {
     double steeringwheelangle [id = 2];
     double torsionBarTorque [id = 3];
 }
+
 /*
 // Action messages
 message opendlv.action.Correction [id = 164] {
@@ -165,6 +166,7 @@ message opendlv.action.Actuation [id = 165] {
   float value;
 }
 */
+
 // Sensation
 message opendlv.sensation.Voice [id = 166] {
   string type;
@@ -285,6 +287,15 @@ message opendlv.perception.ObjectMetricDistance [id = 184] {
   uint32 objId;
 }
 */
+
+message opendlv.perception.LanePosition [id = 183] {
+  float offset;
+  float heading;
+}
+
+message opendlv.perception.LeadVehicleSize [id = 184] {
+  float size;
+}
 
 // Knowledge
 message opendlv.knowledge.Message [id = 185] {

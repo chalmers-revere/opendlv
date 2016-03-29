@@ -130,6 +130,8 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   }
   */
   
+  int largestVehicleSizePixels = 0;
+
   cv::resize(outputImg, outputImg, cv::Size(windowWidth, windowHeight), 0, 0, cv::INTER_CUBIC);
 
   std::vector<RememberedVehicle> memorized;
@@ -141,6 +143,10 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
       memorized.at(i).GetMemoryOverTime(&memOverTime);
       std::shared_ptr<DetectedVehicle> vehRect = memOverTime.at(j);
       cv::rectangle(outputImg, vehRect->GetDetectionRectangle(), memorized.at(i).GetDummyColor());
+
+      if (vehRect->GetDetectionRectangle().width > largestVehicleSizePixels) {
+        largestVehicleSizePixels = vehRect->GetDetectionRectangle().width;
+      }
     }
   }
   for (uint32_t i=0; i<m_verifiedVehicles.size(); i++) {
@@ -153,6 +159,12 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   cv::imshow("VehicleDetection", outputImg);
   cv::moveWindow("VehicleDetection", 100, 100);
   cv::waitKey(10);
+
+
+  float largestVehicleSize = static_cast<float>(largestVehicleSizePixels);
+  opendlv::perception::LeadVehicleSize leadVehicleSize(largestVehicleSize);
+  odcore::data::Container container(leadVehicleSize);
+  getConference().send(container);
 
   // end of plot stuff
 

@@ -297,13 +297,13 @@ void DetectLane::nextContainer(odcore::data::Container &c)
       double theta = atan((d2-d1) / (double)15);
       
       // DEBUG PRINT
-      std::cout<<"Heading angle "<<theta<<std::endl;
-      std::cout<<"Offset "<<laneOffset<<std::endl;
+   //   std::cout<<"Heading angle "<<theta<<std::endl;
+   //   std::cout<<"Offset "<<laneOffset<<std::endl;
       
       // Send the message
- //     ObjectLaneDetection laneDetectionObject(laneOffset,theta);
-//			odcore::data::Container msg(laneDetectionObject);  
-//			getConference().send(msg);
+      opendlv::perception::LanePosition lanePosition(laneOffset,theta);
+			odcore::data::Container msg(lanePosition);  
+			getConference().send(msg);
 //		  std::cout << "Message sent"<< std::endl;
 			
     }
