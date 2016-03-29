@@ -174,6 +174,16 @@ void Can::nextGenericCANMessage(const automotive::GenericCANMessage &gcm)
   }
 }
 
+/**
+ * Receives control commands from the action layer.
+ * Prepares data for the CAN gateway.
+ */
+//void Can::nextContainer(odcore::data::Container &c)
+//{
+//  m_canMessageDataStore.Add(c);
+//}
+
+
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Can::body()
 {
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==

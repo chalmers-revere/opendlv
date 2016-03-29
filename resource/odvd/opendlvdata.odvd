@@ -152,19 +152,24 @@ message opendlv.proxy.reverefh16.Steering [id = 199] {
     double torsionBarTorque [id = 3];
 }
 
+message opendlv.proxy.Actuation [id = 164] {
+  float acceleration;
+  float steering;
+}
+
+message opendlv.proxy.ControlState [id = 165] {
+  bool allowAutonomous;
+}
+
 /*
 // Action messages
-message opendlv.action.Correction [id = 164] {
+message opendlv.action.Correction [id = X] {
   TimeStamp startTime;
   string type;
   bool isInhibitory;
   float amplitude;
 }
 
-message opendlv.action.Actuation [id = 165] {
-  string type;
-  float value;
-}
 */
 
 // Sensation
