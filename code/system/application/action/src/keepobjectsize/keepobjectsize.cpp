@@ -54,8 +54,42 @@ KeepObjectSize::~KeepObjectSize()
  * current size, and desired size.
  * Sends speed correction commands (throttle) to Act.
  */
-void KeepObjectSize::nextContainer(odcore::data::Container &)
+void KeepObjectSize::nextContainer(odcore::data::Container &c)
 {
+  if(c.getDataType() == opendlv::perception::LeadVehicleSize::ID()){
+    opendlv::perception::LeadVehicleSize leadVehicleSize = 
+        c.getData<opendlv::perception::LeadVehicleSize>();
+    float size = leadVehicleSize.getSize();
+  
+    std::cout << "REC OBJECT SIZE " << size << std::endl;
+
+    // TODO: Quick way.
+    float desiredSize = 100.0f;
+    float error = (desiredSize - size) / desiredSize;
+ 
+    std::cout << "ERROR " << error << std::endl;
+
+    if (error < -0.25f) {
+      // We are to to close, try to decrease acceleration.
+      float amplitude = 0.5f * error;
+      odcore::data::TimeStamp t0;
+      opendlv::action::Correction correction(t0, "accelerate", false, 
+          amplitude);
+      odcore::data::Container container(correction);
+      getConference().send(container);
+    
+      std::cout << "SEND ACCELERATE " << amplitude << std::endl;
+    } else if (error < -0.75f) {
+      // We are way to close, start braking!
+      float amplitude = 1.5f * error;
+      odcore::data::TimeStamp t0;
+      opendlv::action::Correction correction(t0, "brake", false, amplitude);
+      odcore::data::Container container(correction);
+      getConference().send(container);
+      
+      std::cout << "SEND BRAKE " << amplitude << std::endl;
+    }
+  }
 }
 
 void KeepObjectSize::setUp()

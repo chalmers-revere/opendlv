@@ -41,7 +41,7 @@ class V2vCam
   V2vCam(V2vCam const &) = delete;
   V2vCam &operator=(V2vCam const &) = delete;
   virtual ~V2vCam();
-  virtual void nextContainer(odcore::data::Container &c);
+  virtual void nextContainer(odcore::data::Container &);
 
  private:
   void setUp();

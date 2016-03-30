@@ -100,9 +100,11 @@ message opendlv.proxy.V2vOutbound [id = 163] {
   //list<uint8> data;
 }
 
+// TODO: Change name to ManualControl
 message opendlv.proxy.reverefh16.Pedals [id = 191] {
     double accelerationPedalPosition [id = 1];
     double brakePedalPosition [id = 2];
+    double torsionBarTorque [id = 3];
 }
 
 message opendlv.proxy.reverefh16.AccelerationRequest [id = 192] {
@@ -149,7 +151,6 @@ message opendlv.proxy.reverefh16.Wheels [id = 198] {
 message opendlv.proxy.reverefh16.Steering [id = 199] {
     double roadwheelangle [id = 1];
     double steeringwheelangle [id = 2];
-    double torsionBarTorque [id = 3];
 }
 
 message opendlv.proxy.Actuation [id = 164] {
@@ -161,16 +162,13 @@ message opendlv.proxy.ControlState [id = 165] {
   bool allowAutonomous;
 }
 
-/*
 // Action messages
-message opendlv.action.Correction [id = X] {
-  TimeStamp startTime;
+message opendlv.action.Correction [id = 190] {
+  odcore::data::TimeStamp startTime;
   string type;
   bool isInhibitory;
   float amplitude;
 }
-
-*/
 
 // Sensation
 message opendlv.sensation.Voice [id = 166] {
@@ -255,7 +253,7 @@ message opendlv.perception.DesiredDirectionOfMovement [id = 178] {
 
 message opendlv.perception.Object [id = 179] {
   list<opendlv.perception.ObjectProperty> properties;
-  TimeStamp lastSeen;
+  odcore::data::TimeStamp lastSeen;
   string type;
   float angle;
   float size;
@@ -273,13 +271,13 @@ message opendlv.perception.ObjectDesiredSize [id = 181] {
 }
 
 message opendlv.perception.ObjectLooming [id = 182] {
-  TimeStamp identified;
+  odcore::data::TimeStamp identified;
   opendlv.sensation.Looming looming;
   uint16 objectIndex;
 }
 
 message opendlv.perception.ObjectProperty [id = 183] {
-  TimeStamp identified;
+  odcore::data::TimeStamp identified;
   string name;
   string value;
   uint16 objectIndex;

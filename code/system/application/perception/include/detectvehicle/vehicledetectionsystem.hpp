@@ -75,7 +75,7 @@ private:
   uint32_t m_imgCounter = 0;
 
   const std::string m_pathHaarClassOwn = "haar_classifiers/own_201512.xml";
-  const std::string m_pathHaarClassCars3 = "/opt/opendlv/share/opendlv/system/application/perception/detectvehicle/haar_cars3.xml";
+  const std::string m_pathHaarClassCars3 = "share/opendlv/system/application/perception/detectvehicle/haar_cars3.xml";
 
   cv::Rect m_regionOfInterest;
   int32_t m_windowWidth;

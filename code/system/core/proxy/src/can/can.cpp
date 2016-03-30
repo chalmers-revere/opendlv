@@ -152,18 +152,15 @@ void Can::nextGenericCANMessage(const automotive::GenericCANMessage &gcm)
   // Map CAN message to high-level data structure.
   vector<odcore::data::Container> result = m_revereFh16CanMessageMapping.mapNext(gcm);
 
-  if (result.size() > 0) {
-    auto it = result.begin();
-    while (it != result.end()) {
-      odcore::data::Container c = (*it);
-      // Enqueue mapped container for direct recording.
-      if (m_recorderMappedCanMessages.get()) {
-        m_fifoMappedCanMessages.add(c);
-      }
-      // Send container to conference.
-      getConference().send(c);
-      it++;
+  for (auto c : result) {
+    // Enqueue mapped container for direct recording.
+    if (m_recorderMappedCanMessages.get()) {
+      m_fifoMappedCanMessages.add(c);
     }
+    // Send container to conference.
+    getConference().send(c);
+
+    m_canMessageDataStore->add(c);
   }
 
   // Enqueue CAN message wrapped as Container to be recorded if we have a valid

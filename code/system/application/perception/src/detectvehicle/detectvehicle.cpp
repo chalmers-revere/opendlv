@@ -165,6 +165,8 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   opendlv::perception::LeadVehicleSize leadVehicleSize(largestVehicleSize);
   odcore::data::Container container(leadVehicleSize);
   getConference().send(container);
+  
+  std::cout << "SENDING OBJECT SIZE " << largestVehicleSize << std::endl;
 
   // end of plot stuff
 

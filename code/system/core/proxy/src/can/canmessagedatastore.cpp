@@ -17,6 +17,8 @@
  * USA.
  */
 
+#include <iostream>
+
 #include <opendavinci/odcore/data/Container.h>
 #include <automotivedata/generated/automotive/GenericCANMessage.h>
 #include <odcantools/CANDevice.h>
@@ -31,21 +33,46 @@ namespace can {
 CanMessageDataStore::CanMessageDataStore(
 std::shared_ptr<automotive::odcantools::CANDevice> canDevice)
     : automotive::odcantools::MessageToCANDataStore(canDevice),
-    m_enabled(false),
-    m_acceleration(0.0f),
-    m_deceleration(0.0f),
-    m_steering(0.0f)
+    m_enabled(false)
 {
 }
 
-void CanMessageDataStore::Add(odcore::data::Container &container)
+void CanMessageDataStore::add(odcore::data::Container const &a_container)
 {
+  // TODO: Kids, do not try this at home.
+  odcore::data::Container &container = const_cast<odcore::data::Container &>(
+      a_container);
+ 
   if (container.getDataType() == opendlv::proxy::ControlState::ID()){
     opendlv::proxy::ControlState controlState 
       = container.getData<opendlv::proxy::ControlState>();
 
     m_enabled = controlState.getAllowAutonomous();
 
+  } else if (container.getDataType() == 
+      opendlv::proxy::reverefh16::Pedals::ID()) {
+    
+    auto manualControl = 
+        container.getData<opendlv::proxy::reverefh16::Pedals>();
+    double accelerationPedalPosition = manualControl.getAccelerationPedalPosition();
+    double brakePedalPosition = manualControl.getBrakePedalPosition();
+    double torsionBarTorque = manualControl.getTorsionBarTorque();
+   
+    // TODO: Hard-hacked constants.
+    std::cout << "Override: " << accelerationPedalPosition << " (acc.ped.) " <<
+        brakePedalPosition << " (brake ped.) " << torsionBarTorque <<
+        " (torsion bar)." << std::endl;
+
+    if (std::abs(accelerationPedalPosition) > 0.1) {
+      m_enabled = false;
+    }
+    if (std::abs(brakePedalPosition) > 0.1) {
+      m_enabled = false;
+    }
+    if (std::abs(torsionBarTorque) > 2.0) {
+      m_enabled = false;
+    }
+   
   } else if (container.getDataType() == opendlv::proxy::Actuation::ID()){
     opendlv::proxy::Actuation actuation 
       = container.getData<opendlv::proxy::Actuation>();

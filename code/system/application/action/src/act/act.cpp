@@ -56,7 +56,37 @@ Act::~Act()
  */
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
 {
+  while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
+      odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+
+    float acceleration = 0.0f;
+    float steering = 0.0f;
+  
+    opendlv::proxy::Actuation actuation(acceleration, steering);
+    odcore::data::Container c(actuation);
+    getConference().send(c);
+  }
+
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
+}
+
+void Act::nextContainer(odcore::data::Container &c)
+{
+  if(c.getDataType() == opendlv::action::Correction::ID()) {
+    opendlv::action::Correction correction = 
+      c.getData<opendlv::action::Correction>();
+
+    odcore::data::TimeStamp t0 = correction.getStartTime();
+    std::string type = correction.getType();
+    //bool isInhibitory = correction.getIsInhibitory();
+    float amplitude = correction.getAmplitude();
+
+    if (type == "accelerate") {
+      std::cout << "accelerate: " << amplitude << std::endl;
+    } else if (type == "brake") {
+      std::cout << "brake: " << amplitude << std::endl;
+    }
+  }
 }
 
 void Act::setUp()

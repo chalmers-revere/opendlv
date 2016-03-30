@@ -45,9 +45,12 @@ OpenCvDevice::OpenCvDevice(std::string const &a_name,
     , m_capture(nullptr)
     , m_image(new cv::Mat)
 {
-  std::string const videoStreamAddress = std::string("http://") + a_username 
+  std::string videoStreamAddress = std::string("http://") + a_username 
     + ":" + a_password + "@" + a_port + "/axis-cgi/mjpg/video.cgi?user=" 
     + a_username + "&password=" + a_password + "&channel=0&.mjpg";
+
+
+  videoStreamAddress = "rostock.avi";
 
   m_capture.reset(new cv::VideoCapture(videoStreamAddress));
 

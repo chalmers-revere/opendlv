@@ -38,9 +38,10 @@ class Act : public odcore::base::module::TimeTriggeredConferenceClientModule {
   Act(Act const &) = delete;
   Act &operator=(Act const &) = delete;
   virtual ~Act();
-  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+  virtual void nextContainer(odcore::data::Container &);
 
  private:
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
   void setUp();
   void tearDown();
 };
