@@ -117,16 +117,14 @@ void DetectLane::nextContainer(odcore::data::Container &c)
 		//region = col1,row1, col2,row2
 
 		// CHANGE HERE OLA FOR THE REGIONS
-		regions = *new Eigen::MatrixXd(9,4);
-		regions <<  211,  274,  4,    316,
-							309,  279,  8,    425,
-							335,  278,  44,   446,
-							375,  281,  249,  449,
-							399,	278, 	374, 	451,
-							419,  281,  463,  452,
-							465,  280,  613,  388,
-							489,  278,  634,  339,
-							579,  279,  636,  297;
+    
+regions = *new Eigen::MatrixXd(5,4);
+regions << 
+243, 288, 167, 478,
+277, 283, 278, 477,
+297, 280, 360, 477,
+327, 282, 475, 477,
+366, 278, 638, 479;    
 
 		// CHANGE HERE OLA FOR THE REGIONS ^
   }

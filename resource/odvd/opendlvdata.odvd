@@ -177,6 +177,15 @@ message opendlv.sensation.Voice [id = 166] {
   string data;
   //list<uint8> data;
 }
+
+message opendlv.sensation.OpticalFlow [id = 174] {
+  float flow;
+}
+
+message opendlv.perception.DesiredOpticalFlow [id = 177] {
+  float flow;
+}
+
 /*
 message opendlv.sensation.RoadWheel [id = 167] {
   float angle;
@@ -228,10 +237,6 @@ message opendlv.sensation.Looming [id = 173] {
   float size;
 }
 
-message opendlv.sensation.OpticalFlow [id = 174] {
-  float flow;
-}
-
 message opendlv.sensation.DirectionOfMovement [id = 175] {
   opendlv.coordinate.Spherical3 directionOfMovement;
 }
@@ -243,9 +248,7 @@ message opendlv.perception.ObjectDistanceToBody [id = 176] {
 }
 
 
-message opendlv.perception.DesiredOpticalFlow [id = 177] {
-  float flow;
-}
+
 
 message opendlv.perception.DesiredDirectionOfMovement [id = 178] {
   opendlv.coordinate.Spherical3 directionOfMovement;

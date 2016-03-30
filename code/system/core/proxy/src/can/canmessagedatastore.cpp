@@ -51,12 +51,14 @@ void CanMessageDataStore::add(odcore::data::Container const &a_container)
 
   } else if (container.getDataType() == 
       opendlv::proxy::reverefh16::Pedals::ID()) {
-    
+
     auto manualControl = 
         container.getData<opendlv::proxy::reverefh16::Pedals>();
     double accelerationPedalPosition = manualControl.getAccelerationPedalPosition();
     double brakePedalPosition = manualControl.getBrakePedalPosition();
     double torsionBarTorque = manualControl.getTorsionBarTorque();
+    
+    std::cout << "Brake pedal position: " << brakePedalPosition << " Acc. pedal: " << accelerationPedalPosition << std::endl;
    
     // TODO: Hard-hacked constants.
     std::cout << "Override: " << accelerationPedalPosition << " (acc.ped.) " <<
