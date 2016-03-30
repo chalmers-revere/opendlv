@@ -30,6 +30,9 @@ namespace detectvehicle {
 VehicleMemorySystem::VehicleMemorySystem()
     : m_rememberedVehicles()
 {
+  m_rememberedVehicles = 
+      std::shared_ptr<std::vector<std::shared_ptr<RememberedVehicle>>>
+      (new std::vector<std::shared_ptr<RememberedVehicle>>);
 }
   
 VehicleMemorySystem::~VehicleMemorySystem()
@@ -39,7 +42,7 @@ VehicleMemorySystem::~VehicleMemorySystem()
 
 
 void VehicleMemorySystem::UpdateMemory(
-    std::vector<std::shared_ptr<DetectedVehicle>> a_verifiedVehicles,
+    std::shared_ptr<std::vector<std::shared_ptr<DetectedVehicle>>> a_verifiedVehicles,
     double timeStamp)
 {
   std::cout << "\n";
@@ -47,21 +50,21 @@ void VehicleMemorySystem::UpdateMemory(
   this->CleanMemory(timeStamp);
   
   
-  std::vector<int32_t> indexHolder(a_verifiedVehicles.size()); // Should be size of candidat points..
+  std::vector<int32_t> indexHolder(a_verifiedVehicles->size()); // Should be size of candidat points..
   std::vector<double> newPoints;
-  //std::cout << "a_verifiedVehicles.size(): " << a_verifiedVehicles.size() << "\n";
-  //std::cout << "m_rememberedVehicles.size(): " << m_rememberedVehicles.size() << "\n";
+  //std::cout << "a_verifiedVehicles->size(): " << a_verifiedVehicles->size() << "\n";
+  //std::cout << "m_rememberedVehicles->size(): " << m_rememberedVehicles.size() << "\n";
 
-  for (uint32_t i=0; i<a_verifiedVehicles.size(); i++) {
-    cv::Rect detRect = a_verifiedVehicles.at(i)->GetDetectionRectangle();
+  for (uint32_t i=0; i<a_verifiedVehicles->size(); i++) {
+    cv::Rect detRect = a_verifiedVehicles->at(i)->GetDetectionRectangle();
     newPoints.push_back(detRect.x + detRect.width/2);
     newPoints.push_back(detRect.y + detRect.height/2);
   }
                                     
   std::vector<double> origPoints;
 
-  for (uint32_t i=0; i<m_rememberedVehicles.size(); i++) {
-    cv::Rect detRect = m_rememberedVehicles.at(i)->GetLatestDetection()->GetDetectionRectangle();
+  for (uint32_t i=0; i<m_rememberedVehicles->size(); i++) {
+    cv::Rect detRect = m_rememberedVehicles->at(i)->GetLatestDetection()->GetDetectionRectangle();
     origPoints.push_back(detRect.x + detRect.width/2);
     origPoints.push_back(detRect.y + detRect.height/2);
   }
@@ -74,33 +77,33 @@ void VehicleMemorySystem::UpdateMemory(
       // new detection, not associated with an old memory
       // TODO Is this really correct? not just placed on the stack and removed?
       std::shared_ptr<RememberedVehicle> tmp(new RememberedVehicle);
-      tmp->AddMemory(a_verifiedVehicles.at(i));
-      m_rememberedVehicles.push_back(tmp);
+      tmp->AddMemory(a_verifiedVehicles->at(i));
+      m_rememberedVehicles->push_back(tmp);
     }
     else {
-      m_rememberedVehicles.at(currentIndex)->AddMemory(a_verifiedVehicles.at(i));
+      m_rememberedVehicles->at(currentIndex)->AddMemory(a_verifiedVehicles->at(i));
     }
   }
 }
 
-void VehicleMemorySystem::GetMemorizedVehicles(std::vector<std::shared_ptr<RememberedVehicle>> a_returnContainer)
+void VehicleMemorySystem::GetMemorizedVehicles(std::vector<std::shared_ptr<RememberedVehicle>>* a_returnContainer)
 {
-  a_returnContainer.clear();
-  for (uint32_t i = 0; i < m_rememberedVehicles.size(); i++) {
-    a_returnContainer.push_back(m_rememberedVehicles.at(i));
+  a_returnContainer->clear();
+  for (uint32_t i=0; i<m_rememberedVehicles->size(); i++) {
+    a_returnContainer->push_back(m_rememberedVehicles->at(i));
   }
 }
 
 int32_t VehicleMemorySystem::GetNrMemorizedVehicles()
 {
-  return m_rememberedVehicles.size();
+  return m_rememberedVehicles->size();
 }
 
 int32_t VehicleMemorySystem::GetTotalNrVehicleRects()
 {
   int32_t sum = 0;
-  for (uint32_t i=0; i<m_rememberedVehicles.size(); i++) {
-    sum += m_rememberedVehicles.at(i)->GetNrMemories();
+  for (uint32_t i=0; i<m_rememberedVehicles->size(); i++) {
+    sum += m_rememberedVehicles->at(i)->GetNrMemories();
   }
   return sum;
 }
@@ -108,12 +111,12 @@ int32_t VehicleMemorySystem::GetTotalNrVehicleRects()
 void VehicleMemorySystem::CleanMemory(double timeStamp)
 {
   //std::cout << " Cleaning memory \n";
-  for (uint32_t i=0; i<m_rememberedVehicles.size(); i++) {
-    std::shared_ptr<RememberedVehicle> vehicle = m_rememberedVehicles.at(i);
+  for (uint32_t i=0; i<m_rememberedVehicles->size(); i++) {
+    std::shared_ptr<RememberedVehicle> vehicle = m_rememberedVehicles->at(i);
     vehicle->CleanMemory(timeStamp);
     //std::cout << "  #memories in vehicle: " << vehicle->GetNrMemories() << "\n";
     if (vehicle->GetNrMemories() == 0) {
-      m_rememberedVehicles.erase(m_rememberedVehicles.begin() + i);
+      m_rememberedVehicles->erase(m_rememberedVehicles->begin() + i);
       i--;
       //std::cout << "  Removed vehicle mem... \n";
     }

@@ -52,10 +52,13 @@ namespace detectvehicle {
 DetectVehicle::DetectVehicle(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(
       a_argc, a_argv, "perception-detectvehicle")
-    , m_vehicleDetectionSystem(new VehicleDetectionSystem)
-    , m_vehicleMemorySystem(new VehicleMemorySystem)
+    , m_vehicleDetectionSystem()
     , m_verifiedVehicles()
+    , m_vehicleMemorySystem()
 {
+  m_vehicleDetectionSystem = std::shared_ptr<VehicleDetectionSystem>(new VehicleDetectionSystem);
+  m_verifiedVehicles = std::shared_ptr<std::vector<std::shared_ptr<DetectedVehicle>>>(new std::vector<std::shared_ptr<DetectedVehicle>>);
+  m_vehicleMemorySystem = std::shared_ptr<VehicleMemorySystem>(new VehicleMemorySystem);
 }
 
 DetectVehicle::~DetectVehicle()
@@ -118,7 +121,7 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   double timeStamp = ((double)c.getSentTimeStamp().toMicroseconds())/1000000;
   std::cout << "timeStamp: " << timeStamp << std::endl;
   
-  m_verifiedVehicles.clear();
+  m_verifiedVehicles->clear();
   m_vehicleDetectionSystem->update(&myImage, m_verifiedVehicles, timeStamp);
 
 
@@ -143,7 +146,7 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   cv::resize(outputImg, outputImg, cv::Size(windowWidth, windowHeight), 0, 0, cv::INTER_CUBIC);
 
   std::vector<std::shared_ptr<RememberedVehicle>> memorized;
-  m_vehicleMemorySystem->GetMemorizedVehicles(memorized);
+  m_vehicleMemorySystem->GetMemorizedVehicles(&memorized);
   for (uint32_t i=0; i<memorized.size(); i++) {
     // Show memory of vehicles
     for (int32_t j=0; j<memorized.at(i)->GetNrMemories(); j++) {
@@ -153,7 +156,7 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
       cv::rectangle(outputImg, vehRect->GetDetectionRectangle(), memorized.at(i)->GetDummyColor());
     }
   }
-  for (uint32_t i=0; i<m_verifiedVehicles.size(); i++) {
+  for (uint32_t i=0; i<m_verifiedVehicles->size(); i++) {
     // Show vehicles that were verified this frame (green)
     //cv::rectangle(outputImg, m_verifiedVehicles.at(i)->GetDetectionRectangle(), cv::Scalar(0,255,0));
   }

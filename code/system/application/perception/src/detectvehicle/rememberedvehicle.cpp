@@ -30,6 +30,8 @@ RememberedVehicle::RememberedVehicle()
     : m_memoryOverTime()
     , m_dummyColor()
 {
+  m_memoryOverTime = std::shared_ptr<std::vector<std::shared_ptr<DetectedVehicle>>>(new std::vector<std::shared_ptr<DetectedVehicle>>);
+
   int32_t b = rand() % 256;
   int32_t g = rand() % 256;
   int32_t r = rand() % 256;
@@ -43,38 +45,38 @@ RememberedVehicle::~RememberedVehicle()
 
 void RememberedVehicle::AddMemory(std::shared_ptr<DetectedVehicle> a_detectedVehiclePtr)
 {
-  m_memoryOverTime.push_back(a_detectedVehiclePtr);
+  m_memoryOverTime->push_back(a_detectedVehiclePtr);
 }
 
 void RememberedVehicle::GetMemoryOverTime(std::vector<std::shared_ptr<DetectedVehicle>>* containerVector)
 {
   containerVector->clear();
-  for (uint32_t i=0; i<m_memoryOverTime.size(); i++) {
-    containerVector->push_back(m_memoryOverTime.at(i));
+  for (uint32_t i=0; i<m_memoryOverTime->size(); i++) {
+    containerVector->push_back(m_memoryOverTime->at(i));
   }
 }
 
 int32_t RememberedVehicle::GetNrMemories()
 {
-  return m_memoryOverTime.size();
+  return m_memoryOverTime->size();
 }
 
 std::shared_ptr<DetectedVehicle> RememberedVehicle::GetLatestDetection()
 {
-  return m_memoryOverTime.back();
+  return m_memoryOverTime->back();
 }
 
 void RememberedVehicle::CleanMemory(double timeStamp)
 {
-  for (uint32_t i=0; i<m_memoryOverTime.size(); i++) {
+  for (uint32_t i=0; i<m_memoryOverTime->size(); i++) {
     // TODO memory duration is hardcoded here
-    if (m_memoryOverTime.at(i)->GetTimeStamp() < timeStamp - 3) {
+    if (m_memoryOverTime->at(i)->GetTimeStamp() < timeStamp - 3) {
       //std::cout << "    timeStamp: " << timeStamp << "\n";
       //std::cout << "    age      : " << m_memoryOverTime.at(i)->GetTimeStamp() << "\n";
       // this memory is old, remove it
       //std::cout << "    m_memoryOverTime.size(): " << m_memoryOverTime.size() << "\n";
       //std::cout << "    i: " << i << "\n";
-      m_memoryOverTime.erase(m_memoryOverTime.begin() + i);
+      m_memoryOverTime->erase(m_memoryOverTime->begin() + i);
       i--; // TODO will this cause a possible "underflow" since unsigned???
       //std::cout << "    m_memoryOverTime.size(): " << m_memoryOverTime.size() << "\n";
       //std::cout << "    i: " << i << "\n";

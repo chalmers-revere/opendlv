@@ -69,7 +69,7 @@ void VehicleDetectionSystem::tearDown()
 }
 
 void VehicleDetectionSystem::update(const cv::Mat* a_imageFrame, 
-    std::vector<std::shared_ptr<DetectedVehicle>> verifiedVehicles, 
+    std::shared_ptr<std::vector<std::shared_ptr<DetectedVehicle>>> verifiedVehicles, 
     double timeStamp)
 {
   //clock_t timeBegin = clock();
@@ -126,7 +126,7 @@ void VehicleDetectionSystem::update(const cv::Mat* a_imageFrame,
       cv::rectangle(outputImg, r, cv::Scalar(0,255,0));
       std::shared_ptr<DetectedVehicle> detectedVehicle(
           new DetectedVehicle(r, timeStamp));
-      verifiedVehicles.push_back(detectedVehicle);
+      verifiedVehicles->push_back(detectedVehicle);
       if (saveImages) {
         std::string imgFileName = saveImgPath + "pos" + 
             std::to_string(m_imgCounter) + ".jpg";
