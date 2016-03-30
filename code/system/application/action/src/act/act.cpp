@@ -85,6 +85,8 @@ void Act::nextContainer(odcore::data::Container &c)
       std::cout << "accelerate: " << amplitude << std::endl;
     } else if (type == "brake") {
       std::cout << "brake: " << amplitude << std::endl;
+    } else if (type == "steering") {
+      std::cout << "steering: " << amplitude << std::endl;
     }
   }
 }

@@ -269,8 +269,8 @@ void DetectLane::nextContainer(odcore::data::Container &c)
       //-----------------------------
       // Draw boarders/lines - VISUALIZATION
       //-----------------------------
-      /*
       DrawBorders(&src,MINROW,MAXROW,K(p1,0),K(p2,0),M(p1,0),M(p2,0));
+      /*
       DrawTracks(&src, &K, &M,MINROW,MAXROW,Scalar(0,0,255));
       DrawTracks(&src, &k,&m,MINROW,Scalar(255,255,255));
       */
@@ -297,8 +297,8 @@ void DetectLane::nextContainer(odcore::data::Container &c)
       double theta = atan((d2-d1) / (double)15);
       
       // DEBUG PRINT
-   //   std::cout<<"Heading angle "<<theta<<std::endl;
-   //   std::cout<<"Offset "<<laneOffset<<std::endl;
+      std::cout<<"Heading angle "<<theta<<std::endl;
+      std::cout<<"Offset "<<laneOffset<<std::endl;
       
       // Send the message
       opendlv::perception::LanePosition lanePosition(laneOffset,theta);
@@ -311,10 +311,8 @@ void DetectLane::nextContainer(odcore::data::Container &c)
   //-----------------------------
   // Show image
   //-----------------------------
-  /*
   imshow("1", src);
   waitKey(10);
-	*/
   }
 
 void DetectLane::setUp()
