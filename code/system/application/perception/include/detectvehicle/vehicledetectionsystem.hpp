@@ -55,7 +55,7 @@ public:
   void setUp();
   void tearDown();
   void update(const cv::Mat* a_imageFrame,
-      std::vector<std::shared_ptr<DetectedVehicle>>* verifiedVehicles,
+      std::vector<std::shared_ptr<DetectedVehicle>> verifiedVehicles,
       double timeStamp);
 
   void setShowImage(bool a_showImage);

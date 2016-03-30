@@ -52,14 +52,15 @@ namespace detectvehicle {
 DetectVehicle::DetectVehicle(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(
       a_argc, a_argv, "perception-detectvehicle")
-    , m_vehicleDetectionSystem()
+    , m_vehicleDetectionSystem(new VehicleDetectionSystem)
+    , m_vehicleMemorySystem(new VehicleMemorySystem)
     , m_verifiedVehicles()
-    , m_vehicleMemorySystem()
 {
 }
 
 DetectVehicle::~DetectVehicle()
 {
+  std::cout << "DetectVehicle::~DetectVehicle()" << std::endl;
 }
 
 /**
@@ -94,17 +95,22 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   const uint32_t imgWidth = mySharedImg.getWidth();
   const uint32_t imgHeight = mySharedImg.getHeight();
 
-  cv::Mat myImage;
-  myImage = cvCreateImage(cvSize(imgWidth, imgHeight), IPL_DEPTH_8U, nrChannels);
+  //std::shared_ptr<cv::Mat> myImage = std::shared_ptr<cv::Mat>(cvCreateImage(cvSize(imgWidth, imgHeight), IPL_DEPTH_8U, nrChannels));
+  IplImage* myIplImage;
+  myIplImage = cvCreateImage(cvSize(imgWidth, imgHeight), IPL_DEPTH_8U, nrChannels);
+  cv::Mat myImage(myIplImage);
 
   if (!sharedMem->isValid()) {
     return;
   }
+  
   sharedMem->lock();
   {
     memcpy(myImage.data, sharedMem->getSharedMemory(), imgWidth*imgHeight*nrChannels);
   }
   sharedMem->unlock();
+  
+
   // end of slow / bad-performing block
 
   // Nr of seconds
@@ -113,13 +119,17 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   std::cout << "timeStamp: " << timeStamp << std::endl;
   
   m_verifiedVehicles.clear();
-  m_vehicleDetectionSystem.update(&myImage, &m_verifiedVehicles, timeStamp);
-
-  m_vehicleMemorySystem.UpdateMemory(&m_verifiedVehicles, timeStamp);
+  m_vehicleDetectionSystem->update(&myImage, m_verifiedVehicles, timeStamp);
 
 
+  m_vehicleMemorySystem->UpdateMemory(m_verifiedVehicles, timeStamp);
+
+
+  
   //  ***   plot stuff ***
-  cv::Mat outputImg = myImage.clone();
+  cv::Mat outputImg(myImage.size(),myImage.type());
+  myImage.copyTo(outputImg);
+  //cv::Mat outputImg = myImage.clone();
 
   int32_t windowWidth = 640;
   int32_t windowHeight = 480;
@@ -129,24 +139,18 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
     outputImg = cv::Scalar(0, 0, 0); //set image black
   }
   */
-  
-  int largestVehicleSizePixels = 0;
 
   cv::resize(outputImg, outputImg, cv::Size(windowWidth, windowHeight), 0, 0, cv::INTER_CUBIC);
 
-  std::vector<RememberedVehicle> memorized;
-  m_vehicleMemorySystem.GetMemorizedVehicles(&memorized);
+  std::vector<std::shared_ptr<RememberedVehicle>> memorized;
+  m_vehicleMemorySystem->GetMemorizedVehicles(memorized);
   for (uint32_t i=0; i<memorized.size(); i++) {
     // Show memory of vehicles
-    for (int32_t j=0; j<memorized.at(i).GetNrMemories(); j++) {
+    for (int32_t j=0; j<memorized.at(i)->GetNrMemories(); j++) {
       std::vector<std::shared_ptr<DetectedVehicle>> memOverTime;
-      memorized.at(i).GetMemoryOverTime(&memOverTime);
+      memorized.at(i)->GetMemoryOverTime(&memOverTime);
       std::shared_ptr<DetectedVehicle> vehRect = memOverTime.at(j);
-      cv::rectangle(outputImg, vehRect->GetDetectionRectangle(), memorized.at(i).GetDummyColor());
-
-      if (vehRect->GetDetectionRectangle().width > largestVehicleSizePixels) {
-        largestVehicleSizePixels = vehRect->GetDetectionRectangle().width;
-      }
+      cv::rectangle(outputImg, vehRect->GetDetectionRectangle(), memorized.at(i)->GetDummyColor());
     }
   }
   for (uint32_t i=0; i<m_verifiedVehicles.size(); i++) {
@@ -154,34 +158,30 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
     //cv::rectangle(outputImg, m_verifiedVehicles.at(i)->GetDetectionRectangle(), cv::Scalar(0,255,0));
   }
 
-  std::cout << "Nr of memorized vehicles: " << m_vehicleMemorySystem.GetNrMemorizedVehicles() << std::endl;
-  std::cout << "Total nr of vehicle rectangles: " << m_vehicleMemorySystem.GetTotalNrVehicleRects() << std::endl;
+  std::cout << "Nr of memorized vehicles: " << m_vehicleMemorySystem->GetNrMemorizedVehicles() << std::endl;
+  std::cout << "Total nr of vehicle rectangles: " << m_vehicleMemorySystem->GetTotalNrVehicleRects() << std::endl;
   cv::imshow("VehicleDetection", outputImg);
   cv::moveWindow("VehicleDetection", 100, 100);
   cv::waitKey(10);
 
+  outputImg.release();
 
-  float largestVehicleSize = static_cast<float>(largestVehicleSizePixels);
-  opendlv::perception::LeadVehicleSize leadVehicleSize(largestVehicleSize);
-  odcore::data::Container container(leadVehicleSize);
-  getConference().send(container);
   
-  std::cout << "SENDING OBJECT SIZE " << largestVehicleSize << std::endl;
-
   // end of plot stuff
-
+  //myImage->release();
+  cvReleaseImage(&myIplImage);
 }
 
 void DetectVehicle::setUp()
 {
   std::cout << "DetectVehicle::setUp()" << std::endl;
-  m_vehicleDetectionSystem.setUp();
+  m_vehicleDetectionSystem->setUp();
 }
 
 void DetectVehicle::tearDown()
 {
   std::cout << "DetectVehicle::tearDown()" << std::endl;
-  m_vehicleDetectionSystem.tearDown();
+  m_vehicleDetectionSystem->tearDown();
 }
 
 } // detectvehicle

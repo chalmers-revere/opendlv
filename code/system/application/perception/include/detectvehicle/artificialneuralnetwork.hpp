@@ -21,6 +21,7 @@
 #define ARTIFICIALNEURALNETWORK_HPP
 
 
+#include <memory>
 #include <iostream>
 #include <opencv2/core/core.hpp>
 #include <opencv2/ml/ml.hpp>
@@ -58,10 +59,10 @@ private:
 
 /* Private fields */
 private:
-  cv::Mat m_layers;
-  CvANN_MLP m_mlp;
-  CvANN_MLP_TrainParams m_params;
-  CvTermCriteria m_criteria;
+  std::shared_ptr<cv::Mat> m_layers;
+  std::shared_ptr<CvANN_MLP> m_mlp;
+  std::shared_ptr<CvANN_MLP_TrainParams> m_params;
+  std::shared_ptr<CvTermCriteria> m_criteria;
 
 };
 

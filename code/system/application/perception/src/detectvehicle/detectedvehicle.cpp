@@ -26,15 +26,15 @@ namespace opendlv {
 namespace perception {
 namespace detectvehicle {
 
-DetectedVehicle::DetectedVehicle(cv::Rect a_detectionRectangle, double a_timeStamp)
+DetectedVehicle::DetectedVehicle(cv::Rect a_detectionRectangle, double a_timeStamp) :
+  m_detectionRectangle(a_detectionRectangle),
+  m_timeStamp(a_timeStamp)
 {
-  m_detectionRectangle = a_detectionRectangle;
-  m_timeStamp = a_timeStamp;
 }
 
 DetectedVehicle::~DetectedVehicle()
 {
-	
+  //std::cout << "DetectedVehicle::~DetectedVehicle()" << std::endl;
 }
 
 

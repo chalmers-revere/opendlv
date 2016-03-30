@@ -38,7 +38,7 @@ RememberedVehicle::RememberedVehicle()
 
 RememberedVehicle::~RememberedVehicle()
 {
-  
+  //std::cout << "RememberedVehicle::~RememberedVehicle()" << std::endl;
 }
 
 void RememberedVehicle::AddMemory(std::shared_ptr<DetectedVehicle> a_detectedVehiclePtr)
