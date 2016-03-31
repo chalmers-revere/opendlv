@@ -33,7 +33,7 @@ namespace can {
 CanMessageDataStore::CanMessageDataStore(
 std::shared_ptr<automotive::odcantools::CANDevice> canDevice)
     : automotive::odcantools::MessageToCANDataStore(canDevice),
-    m_enabled(false)
+    m_enabled(true)
 {
 }
 
@@ -54,11 +54,11 @@ void CanMessageDataStore::add(odcore::data::Container const &a_container)
 
     auto manualControl = 
         container.getData<opendlv::proxy::reverefh16::Pedals>();
-    double accelerationPedalPosition = manualControl.getAccelerationPedalPosition();
-    double brakePedalPosition = manualControl.getBrakePedalPosition();
-    double torsionBarTorque = manualControl.getTorsionBarTorque();
+ //   double accelerationPedalPosition = manualControl.getAccelerationPedalPosition();
+//    double brakePedalPosition = manualControl.getBrakePedalPosition();
+ //   double torsionBarTorque = manualControl.getTorsionBarTorque();
     
-    std::cout << "Brake pedal position: " << brakePedalPosition << " Acc. pedal: " << accelerationPedalPosition <<  " torsion bar: " << torsionBarTorque << std::endl;
+//    std::cout << "Brake pedal position: " << brakePedalPosition << " Acc. pedal: " << accelerationPedalPosition <<  " torsion bar: " << torsionBarTorque << std::endl;
  
   /*  
     // TODO: Hard-hacked constants.
@@ -80,9 +80,9 @@ void CanMessageDataStore::add(odcore::data::Container const &a_container)
   } else if (container.getDataType() == opendlv::proxy::Actuation::ID()){
     opendlv::proxy::Actuation actuation 
       = container.getData<opendlv::proxy::Actuation>();
-    float acceleration = actuation.getAcceleration();
-    float steering = actuation.getSteering();
-    
+  //  float acceleration = actuation.getAcceleration();
+    //float steering = actuation.getSteering();
+   /* 
     float deceleration;
     if (acceleration < 0.0f) {
       deceleration = acceleration;
@@ -90,7 +90,8 @@ void CanMessageDataStore::add(odcore::data::Container const &a_container)
     } else {
       deceleration = 0.0f;
     }
-
+    */
+/*
     opendlv::proxy::reverefh16::AccelerationRequest accelerationRequest;
     accelerationRequest.setEnableRequest(m_enabled);
     accelerationRequest.setAcceleration(acceleration);
@@ -100,16 +101,19 @@ void CanMessageDataStore::add(odcore::data::Container const &a_container)
     brakeRequest.setEnableRequest(m_enabled);
     brakeRequest.setBrake(deceleration);
     odcore::data::Container brakeRequestContainer(brakeRequest);
-
+*/
     opendlv::proxy::reverefh16::SteeringRequest steeringRequest;
     steeringRequest.setEnableRequest(m_enabled);
-    steeringRequest.setSteeringRoadWheelAngle(steering);
+    steeringRequest.setSteeringRoadWheelAngle(0.1f);
     steeringRequest.setSteeringDeltaTorque(-32); // Must be -32 to disable deltatorque.
     odcore::data::Container steeringRequestContainer(steeringRequest);
 
+   // std::cout << "Deceleration: " << deceleration << "  " << m_enabled << std::endl;
+
+
     automotive::GenericCANMessage genericCanMessage;
 
-    canmapping::opendlv::proxy::reverefh16::AccelerationRequest 
+ /*   canmapping::opendlv::proxy::reverefh16::AccelerationRequest 
         accelerationRequestMapping;
     genericCanMessage = 
         accelerationRequestMapping.encode(accelerationRequestContainer);
@@ -119,11 +123,14 @@ void CanMessageDataStore::add(odcore::data::Container const &a_container)
         brakeRequestMapping;
     genericCanMessage = brakeRequestMapping.encode(brakeRequestContainer);
     m_canDevice->write(genericCanMessage);
+*/
 
     canmapping::opendlv::proxy::reverefh16::SteeringRequest 
         steeringRequestMapping;
     genericCanMessage = steeringRequestMapping.encode(steeringRequestContainer);
     m_canDevice->write(genericCanMessage);
+   
+    std::cout << "payload " << std::hex << genericCanMessage.getData() << std::endl;
   }
 }
 

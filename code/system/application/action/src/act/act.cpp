@@ -59,8 +59,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
       odcore::data::dmcp::ModuleStateMessage::RUNNING) {
 
-    float acceleration = 0.0f;
+    float acceleration = -2.0f;
     float steering = 0.0f;
+
+  //  std::cout << "Send acc. " << acceleration << " Steering: " << steering << std::endl;
   
     opendlv::proxy::Actuation actuation(acceleration, steering);
     odcore::data::Container c(actuation);
