@@ -58,8 +58,9 @@ void CanMessageDataStore::add(odcore::data::Container const &a_container)
     double brakePedalPosition = manualControl.getBrakePedalPosition();
     double torsionBarTorque = manualControl.getTorsionBarTorque();
     
-    std::cout << "Brake pedal position: " << brakePedalPosition << " Acc. pedal: " << accelerationPedalPosition << std::endl;
-   
+    std::cout << "Brake pedal position: " << brakePedalPosition << " Acc. pedal: " << accelerationPedalPosition <<  " torsion bar: " << torsionBarTorque << std::endl;
+ 
+  /*  
     // TODO: Hard-hacked constants.
     std::cout << "Override: " << accelerationPedalPosition << " (acc.ped.) " <<
         brakePedalPosition << " (brake ped.) " << torsionBarTorque <<
@@ -74,7 +75,8 @@ void CanMessageDataStore::add(odcore::data::Container const &a_container)
     if (std::abs(torsionBarTorque) > 2.0) {
       m_enabled = false;
     }
-   
+   */
+
   } else if (container.getDataType() == opendlv::proxy::Actuation::ID()){
     opendlv::proxy::Actuation actuation 
       = container.getData<opendlv::proxy::Actuation>();

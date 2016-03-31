@@ -110,7 +110,7 @@ V2vDenm::~V2vDenm()
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vDenm::body()
 {
-
+/*
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
       odcore::data::dmcp::ModuleStateMessage::RUNNING) {
@@ -203,6 +203,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vDenm::body()
 
 
   }
+*/
 
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }

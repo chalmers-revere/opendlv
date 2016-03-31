@@ -57,9 +57,11 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Camera::body()
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() 
       == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+
     auto sharedImage = m_device->Capture();
     odcore::data::Container c(sharedImage);
     getConference().send(c);
+    
   }
 
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;

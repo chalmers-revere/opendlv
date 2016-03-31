@@ -261,6 +261,7 @@ void V2vIclcm::nextContainer(odcore::data::Container &c)
       int32_t flagTail = inIterator->ReadInteger();
       int32_t flagHead = inIterator->ReadInteger();
       int32_t platoonId = inIterator->ReadInteger();
+
       int32_t distanceTravelledCz = inIterator->ReadInteger();
       
       int32_t intention = inIterator->ReadInteger();

@@ -19,6 +19,8 @@
 
 #include <iostream>
 
+#include "opendavinci/odcore/base/Thread.h"
+
 #include "opencv2/imgproc/imgproc_c.h"
 #include "opencv2/imgproc/imgproc.hpp"
 
@@ -50,12 +52,17 @@ OpenCvDevice::OpenCvDevice(std::string const &a_name,
     + a_username + "&password=" + a_password + "&channel=0&.mjpg";
 
 
-  videoStreamAddress = "rostock.avi";
+  std::cout << videoStreamAddress << std::endl;
+
+
+//  videoStreamAddress = "rostock.avi";
 
   m_capture.reset(new cv::VideoCapture(videoStreamAddress));
 
+  //odcore::base::Thread::usleepFor(2000);
+
   if (m_capture->isOpened()) {
-    std::cout << "w: " << a_width << " h: " << a_height << std::endl;
+    std::cout << "Open. width: " << a_width << " height: " << a_height << std::endl;
     m_capture->set(CV_CAP_PROP_FRAME_WIDTH, a_width);
     m_capture->set(CV_CAP_PROP_FRAME_HEIGHT, a_height);
   }
@@ -96,8 +103,8 @@ bool OpenCvDevice::CopyImageTo(char *a_destination, const uint32_t &a_size)
   if ((a_destination != nullptr) && (a_size > 0) && (m_image != nullptr)) {
     ::memcpy(a_destination, m_image->data, a_size);
 
-//    cv::imshow("Window title", *m_image);
-//    cv::waitKey(10);
+    cv::imshow("Camera feed", *m_image);
+    cv::waitKey(10);
 
     retVal = true;
   }
