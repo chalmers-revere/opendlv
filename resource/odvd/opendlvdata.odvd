@@ -71,23 +71,22 @@ message opendlv.proxy.Accelerometer [id = 159] {
 message opendlv.proxy.Altimeter [id = 160] {
   float altitude;
 }
+*/
 
-message opendlv.proxy.Wgs84Gps [id = 161] {
+message opendlv.proxy.GpsReading [id = 161] {
+  double timestamp;
   double latitude;
   double longitude;
-  double altitude;
-  double ecefX;
-  double ecefY;
-  double ecefZ;
-  float speedHorizontal;
-  float speedVertical;
+  float altitude;
   float northHeading;
-  uint16 gpsWeek;
-  uint32 gpsWeekMillisecond;
-  uint16 utcOffset;
+  float speed;
+  uint8 latitudeDirection;
+  uint8 longitudeDirection;
   uint8 satelliteCount;
+  bool hasHeading;
+  bool hasRtk;
 }
-*/
+
 message opendlv.proxy.V2vInbound [id = 162] {
   uint32 size;
   string data;
