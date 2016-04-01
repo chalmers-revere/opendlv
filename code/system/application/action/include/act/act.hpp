@@ -44,6 +44,9 @@ class Act : public odcore::base::module::TimeTriggeredConferenceClientModule {
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
   void setUp();
   void tearDown();
+
+  float m_acceleration;
+  float m_steering;
 };
 
 } // act

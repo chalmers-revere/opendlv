@@ -49,7 +49,7 @@ class Gps : public odcore::base::module::DataTriggeredConferenceClientModule,
  private:
   void setUp();
   void tearDown();
-
+  
  private:
   std::unique_ptr<Device> m_device;
   std::shared_ptr<odcore::io::tcp::TCPConnection> m_trimble;

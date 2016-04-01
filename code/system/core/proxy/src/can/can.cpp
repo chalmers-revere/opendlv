@@ -137,6 +137,39 @@ void Can::setUp()
 
 void Can::tearDown()
 {
+  opendlv::proxy::reverefh16::BrakeRequest brakeRequest;
+  brakeRequest.setEnableRequest(false);
+  brakeRequest.setBrake(0.0);
+  odcore::data::Container brakeRequestContainer(brakeRequest);
+
+  canmapping::opendlv::proxy::reverefh16::BrakeRequest 
+      brakeRequestMapping;
+  automotive::GenericCANMessage genericCanMessage = brakeRequestMapping.encode(brakeRequestContainer);
+  m_device->write(genericCanMessage);
+
+
+  opendlv::proxy::reverefh16::AccelerationRequest accelerationRequest;
+  accelerationRequest.setEnableRequest(false);
+  accelerationRequest.setAcceleration(0.0);
+  odcore::data::Container accelerationRequestContainer(accelerationRequest);
+
+  canmapping::opendlv::proxy::reverefh16::AccelerationRequest 
+      accelerationRequestMapping;
+  genericCanMessage = accelerationRequestMapping.encode(accelerationRequestContainer);
+  m_device->write(genericCanMessage);
+
+  opendlv::proxy::reverefh16::SteeringRequest steeringRequest;
+  steeringRequest.setEnableRequest(false);
+  steeringRequest.setSteeringRoadWheelAngle(0.0);
+  steeringRequest.setSteeringDeltaTorque(0.0);
+  odcore::data::Container steeringRequestContainer(steeringRequest);
+
+  canmapping::opendlv::proxy::reverefh16::SteeringRequest 
+      steeringRequestMapping;
+  genericCanMessage = steeringRequestMapping.encode(steeringRequestContainer);
+  m_device->write(genericCanMessage);
+
+
   if (m_device.get()) {
     // Stop the wrapper CAN device.
     m_device->stop();

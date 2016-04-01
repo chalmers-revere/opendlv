@@ -70,19 +70,19 @@ void DetectLane::nextContainer(odcore::data::Container &c)
 	// TODO: Implement a way to see if shared image is from left or right camera.
 	// Algorithm is needed to set the search regions depending on the 
 	if (c.getDataType() != odcore::data::image::SharedImage::ID()) {
-    std::cout << "--- Received unimportant container of type " << 
-        c.getDataType() << std::endl;
-    return;
+//    std::cout << "--- Received unimportant container of type " << 
+//        c.getDataType() << std::endl;
+//    return;
   }
-  std::cout << "Received container of type " << c.getDataType() << 
-      " sent at " <<   c.getSentTimeStamp().getYYYYMMDD_HHMMSSms() << 
-      " received at " << c.getReceivedTimeStamp().getYYYYMMDD_HHMMSSms() << 
-      std::endl;
+//  std::cout << "Received container of type " << c.getDataType() << 
+//      " sent at " <<   c.getSentTimeStamp().getYYYYMMDD_HHMMSSms() << 
+//      " received at " << c.getReceivedTimeStamp().getYYYYMMDD_HHMMSSms() << 
+//      std::endl;
   
   odcore::data::image::SharedImage mySharedImg = 
       c.getData<odcore::data::image::SharedImage>();
-  cout << "Received a SharedImage of size: (" << mySharedImg.getWidth() << 
-      ", " << mySharedImg.getHeight() << ")" << endl;
+//  cout << "Received a SharedImage of size: (" << mySharedImg.getWidth() << 
+//      ", " << mySharedImg.getHeight() << ")" << endl;
 
   std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(mySharedImg.getName()));
   

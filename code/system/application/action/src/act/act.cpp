@@ -40,7 +40,9 @@ namespace act {
   * @param a_argv Command line arguments.
   */
 Act::Act(int32_t const &a_argc, char **a_argv)
-    : TimeTriggeredConferenceClientModule(a_argc, a_argv, "action-act")
+    : TimeTriggeredConferenceClientModule(a_argc, a_argv, "action-act"),
+    m_acceleration(-2.0f),
+    m_steering(0.0f)
 {
 }
 
@@ -59,12 +61,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
       odcore::data::dmcp::ModuleStateMessage::RUNNING) {
 
-    float acceleration = -2.0f;
-    float steering = 0.0f;
-
-  //  std::cout << "Send acc. " << acceleration << " Steering: " << steering << std::endl;
+  //  std::cout << "Send acc. " << m_acceleration << " Steering: " << m_steering << std::endl;
   
-    opendlv::proxy::Actuation actuation(acceleration, steering);
+    opendlv::proxy::Actuation actuation(m_acceleration, m_steering);
     odcore::data::Container c(actuation);
     getConference().send(c);
   }
@@ -84,7 +83,8 @@ void Act::nextContainer(odcore::data::Container &c)
     float amplitude = correction.getAmplitude();
 
     if (type == "accelerate") {
-      std::cout << "accelerate: " << amplitude << std::endl;
+     // std::cout << "accelerate: " << amplitude << std::endl;
+      m_acceleration = amplitude;
     } else if (type == "brake") {
       std::cout << "brake: " << amplitude << std::endl;
     } else if (type == "steering") {

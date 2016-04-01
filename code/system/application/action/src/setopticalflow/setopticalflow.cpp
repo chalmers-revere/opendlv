@@ -55,9 +55,9 @@ SetOpticalFlow::~SetOpticalFlow()
  * Sends speed correction commands (throttle) and in rare cases a halt command
  * (brake) to Act.
  */
-void SetOpticalFlow::nextContainer(odcore::data::Container &c)
+void SetOpticalFlow::nextContainer(odcore::data::Container &)
 {
-  if(c.getDataType() == opendlv::perception::DesiredOpticalFlow::ID()) {
+/*  if(c.getDataType() == opendlv::perception::DesiredOpticalFlow::ID()) {
     auto desiredOpticalFlow = 
         c.getData<opendlv::perception::DesiredOpticalFlow>();
     m_desiredOpticalFlow = desiredOpticalFlow.getFlow();
@@ -69,16 +69,16 @@ void SetOpticalFlow::nextContainer(odcore::data::Container &c)
   
     // TODO: Quick way.
     float error = (m_desiredOpticalFlow - flow) / m_desiredOpticalFlow;
- 
-    if (std::abs(error) > 0.01f) {
-      float amplitude = 1.0f * error;
+ */
+ //   if (std::abs(error) > 0.01f) {
+      float amplitude = 3.0f;
       odcore::data::TimeStamp t0;
       opendlv::action::Correction correction(t0, "accelerate", false, 
           amplitude);
       odcore::data::Container container(correction);
       getConference().send(container);
-    } 
-  }
+ //   } 
+//  }
 }
 
 void SetOpticalFlow::setUp()

@@ -75,22 +75,22 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   std::cout << std::endl;
 
   if (c.getDataType() != odcore::data::image::SharedImage::ID()) {
-    std::cout << "--- Received unimportant container of type " << 
-        c.getDataType() << std::endl;
-    return;
+ //   std::cout << "--- Received unimportant container of type " << 
+ //       c.getDataType() << std::endl;
+ //   return;
   }
-  std::cout << "Received container of type " << c.getDataType() << 
-      " sent at " <<   c.getSentTimeStamp().getYYYYMMDD_HHMMSSms() << 
-      " received at " << c.getReceivedTimeStamp().getYYYYMMDD_HHMMSSms() << 
-      std::endl;
+ // std::cout << "Received container of type " << c.getDataType() << 
+ //     " sent at " <<   c.getSentTimeStamp().getYYYYMMDD_HHMMSSms() << 
+ //     " received at " << c.getReceivedTimeStamp().getYYYYMMDD_HHMMSSms() << 
+ //     std::endl;
 
 
   // TODO Start of pretty bad-performing block that extracts image from memory 
 
   odcore::data::image::SharedImage mySharedImg = 
       c.getData<odcore::data::image::SharedImage>();
-  cout << "Received a SharedImage of size: (" << mySharedImg.getWidth() << 
-      ", " << mySharedImg.getHeight() << ")" << endl;
+//  cout << "Received a SharedImage of size: (" << mySharedImg.getWidth() << 
+//      ", " << mySharedImg.getHeight() << ")" << endl;
 
   std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(mySharedImg.getName()));
   
@@ -119,7 +119,7 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   // Nr of seconds
   // TODO use something else as timestamp?
   double timeStamp = ((double)c.getSentTimeStamp().toMicroseconds())/1000000;
-  std::cout << "timeStamp: " << timeStamp << std::endl;
+ // std::cout << "timeStamp: " << timeStamp << std::endl;
   
   m_verifiedVehicles->clear();
   m_vehicleDetectionSystem->update(&myImage, m_verifiedVehicles, timeStamp);
@@ -161,8 +161,8 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
     //cv::rectangle(outputImg, m_verifiedVehicles.at(i)->GetDetectionRectangle(), cv::Scalar(0,255,0));
   }
 
-  std::cout << "Nr of memorized vehicles: " << m_vehicleMemorySystem->GetNrMemorizedVehicles() << std::endl;
-  std::cout << "Total nr of vehicle rectangles: " << m_vehicleMemorySystem->GetTotalNrVehicleRects() << std::endl;
+//  std::cout << "Nr of memorized vehicles: " << m_vehicleMemorySystem->GetNrMemorizedVehicles() << std::endl;
+ // std::cout << "Total nr of vehicle rectangles: " << m_vehicleMemorySystem->GetTotalNrVehicleRects() << std::endl;
   cv::imshow("VehicleDetection", outputImg);
   cv::moveWindow("VehicleDetection", 100, 100);
   cv::waitKey(10);

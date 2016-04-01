@@ -97,8 +97,8 @@ proxy-gps.mount.x = 4.0
 proxy-gps.mount.y = -0.7
 proxy-gps.mount.z = 3.5
 
-proxy-gps.trimble.ip = 192.168.1.2
-proxy-gps.trimble.port = 20000
+proxy-gps.trimble.ip = 10.42.0.73
+proxy-gps.trimble.port = 9999
 
 proxy-imu.type = pololu
 proxy-imu.port = /dev/ttyUSB2

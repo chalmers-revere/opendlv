@@ -20,12 +20,15 @@
 #include <stdint.h>
 
 #include <iostream>
+#include <fstream>
 
 #include <opendavinci/odcore/base/KeyValueConfiguration.h>
 #include <opendavinci/odcore/data/Container.h>
 #include <opendavinci/odcore/data/TimeStamp.h>
 #include <opendavinci/odcore/io/tcp/TCPFactory.h>
 #include <opendlv/data/sensor/nmea/GPRMC.h>
+#include "opendavinci/odcore/data/Container.h"
+#include "opendavinci/odcore/data/TimeStamp.h"
 
 #include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
@@ -77,8 +80,8 @@ void Gps::setUp()
   }
 
   {
-    const string RECEIVER = kv.getValue<std::string>("proxy-gps.trimble.ip");
-    const uint32_t PORT = kv.getValue<uint32_t>("proxy-gps.trimble.port");
+    string RECEIVER = kv.getValue<std::string>("proxy-gps.trimble.ip");
+    uint32_t PORT = kv.getValue<uint32_t>("proxy-gps.trimble.port");
 
     try {
         m_trimble = shared_ptr<TCPConnection>(TCPFactory::createTCPConnectionTo(RECEIVER, PORT));
@@ -106,6 +109,8 @@ void Gps::nextString(const std::string &s) {
   gprmc.setMessage(s);
 
   cout << "Decoded via GPRMC: lat = " << gprmc.getCoordinate().getLatitude() << ", lon = " << gprmc.getCoordinate().getLatitude() << std::endl;
+
+  odcore::data::TimeStamp nu;
 
   // Send opendlv::proxy::Wgs84Gps
 }

@@ -55,32 +55,43 @@ void CanMessageDataStore::add(odcore::data::Container const &a_container)
     auto manualControl = 
         container.getData<opendlv::proxy::reverefh16::Pedals>();
     double accelerationPedalPosition = manualControl.getAccelerationPedalPosition();
-    double brakePedalPosition = manualControl.getBrakePedalPosition();
+ //   double brakePedalPosition = manualControl.getBrakePedalPosition();
    // double torsionBarTorque = manualControl.getTorsionBarTorque();
     
 //    std::cout << "Torsion bar: " << torsionBarTorque << std::endl;
  
     // TODO: Hard-hacked constants.
-    std::cout << "Pedals: " << accelerationPedalPosition << " (acc.ped.) " <<
-        brakePedalPosition << " (brake ped.) " << std::endl;
+//    std::cout << "Pedals: " << accelerationPedalPosition << " (acc.ped.) " <<
+ //       brakePedalPosition << " (brake ped.) " << std::endl;
 
-    if (std::abs(accelerationPedalPosition) > 0.1) {
-     // std::cout << "ACCELERATION PEDAL OVERRIDE!" << std::endl;
-   //   m_enabled = false;
+    if (std::abs(accelerationPedalPosition) > 10) {
+      std::cout << "ACCELERATION PEDAL OVERRIDE!" << std::endl;
+      m_enabled = false;
     }
-    if (std::abs(brakePedalPosition) > 0.1) {
+   // if (std::abs(brakePedalPosition) > 0.1) {
      // std::cout << "BRAKE PEDAL OVERRIDE!" << std::endl;
    //   m_enabled = false;
-    }
+   // }
    // if (std::abs(torsionBarTorque) > 2.0) {
    //   m_enabled = false;
    // }
+
+  } else if (container.getDataType() == 
+      opendlv::proxy::reverefh16::Steering::ID()) {
+    
+    auto steering = container.getData<opendlv::proxy::reverefh16::Steering>();
+    double swa = steering.getSteeringwheelangle();
+
+    if (std::abs(swa) > 0.6) {
+      std::cout << "STEERING OVERRIDE!" << std::endl;
+      m_enabled = false;
+    }
 
   } else if (container.getDataType() == opendlv::proxy::Actuation::ID()){
     opendlv::proxy::Actuation actuation 
       = container.getData<opendlv::proxy::Actuation>();
     float acceleration = actuation.getAcceleration();
-    //float steering = actuation.getSteering();
+    float steering = actuation.getSteering();
 
     if (acceleration < 0.0f) {
 
@@ -88,9 +99,12 @@ void CanMessageDataStore::add(odcore::data::Container const &a_container)
         acceleration = -3.0f;
       }
 
+
+      std::cout << "!!" << std::endl;
+
       opendlv::proxy::reverefh16::BrakeRequest brakeRequest;
       brakeRequest.setEnableRequest(m_enabled);
-      brakeRequest.setBrake(acceleration);
+      brakeRequest.setBrake(-2.0);
       odcore::data::Container brakeRequestContainer(brakeRequest);
 
 
@@ -117,29 +131,18 @@ void CanMessageDataStore::add(odcore::data::Container const &a_container)
       m_canDevice->write(genericCanMessage);
     }
     
+    std::cout << acceleration << std::endl;
 
-
-
-
-/*    opendlv::proxy::reverefh16::SteeringRequest steeringRequest;
-    steeringRequest.setEnableRequest(false);
-    steeringRequest.setSteeringRoadWheelAngle(0.0f);
-    steeringRequest.setSteeringDeltaTorque(-5.0f); // Must be -32 to disable deltatorque.
+    opendlv::proxy::reverefh16::SteeringRequest steeringRequest;
+    steeringRequest.setEnableRequest(m_enabled);
+    steeringRequest.setSteeringRoadWheelAngle(steering);
+    steeringRequest.setSteeringDeltaTorque(33.535); // Must be -32 to disable deltatorque.
     odcore::data::Container steeringRequestContainer(steeringRequest);
-*/
 
-   // std::cout << "Deceleration: " << deceleration << "  " << m_enabled << std::endl;
-
-
-
-
-
-
-
-//    canmapping::opendlv::proxy::reverefh16::SteeringRequest 
-//        steeringRequestMapping;
-//    genericCanMessage = steeringRequestMapping.encode(steeringRequestContainer);
-//    m_canDevice->write(genericCanMessage);
+    canmapping::opendlv::proxy::reverefh16::SteeringRequest 
+        steeringRequestMapping;
+    automotive::GenericCANMessage genericCanMessage = steeringRequestMapping.encode(steeringRequestContainer);
+    m_canDevice->write(genericCanMessage);
    
 //    std::cout << "payload " << std::hex << genericCanMessage.getData() << std::endl;
   }
