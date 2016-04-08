@@ -34,16 +34,16 @@ namespace wheel {
  * This class provides...
  */
 class Wheel : public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    Wheel(int32_t const &, char **);
-    Wheel(Wheel const &) = delete;
-    Wheel &operator=(Wheel const &) = delete;
-    virtual ~Wheel();
-    virtual void nextContainer(odcore::data::Container &);
+ public:
+  Wheel(int32_t const &, char **);
+  Wheel(Wheel const &) = delete;
+  Wheel &operator=(Wheel const &) = delete;
+  virtual ~Wheel();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 };
 
 } // wheel

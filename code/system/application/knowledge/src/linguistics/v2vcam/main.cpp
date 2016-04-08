@@ -19,7 +19,8 @@
 
 #include "linguistics/v2vcam/v2vcam.hpp"
 
-int32_t main(int32_t a_argc, char **a_argv) {
+int32_t main(int32_t a_argc, char **a_argv)
+{
   opendlv::knowledge::linguistics::v2vcam::V2vCam main(a_argc, a_argv);
   return main.runModule();
 }

@@ -32,18 +32,18 @@ namespace findsafeway {
 /**
  * This class provides...
  */
-class FindSafeWay : 
-    public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    FindSafeWay(int32_t const &, char **);
-    FindSafeWay(FindSafeWay const &) = delete;
-    FindSafeWay &operator=(FindSafeWay const &) = delete;
-    virtual ~FindSafeWay();
-    virtual void nextContainer(odcore::data::Container &);
+class FindSafeWay
+: public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  FindSafeWay(int32_t const &, char **);
+  FindSafeWay(FindSafeWay const &) = delete;
+  FindSafeWay &operator=(FindSafeWay const &) = delete;
+  virtual ~FindSafeWay();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 };
 
 } // findsafeway

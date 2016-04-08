@@ -25,7 +25,7 @@
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
 
-#include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 #include "keepobjectsize/keepobjectsize.hpp"
 
@@ -39,13 +39,13 @@ namespace keepobjectsize {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-KeepObjectSize::KeepObjectSize(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, 
-        "action-keepobjectsize")
+KeepObjectSize::KeepObjectSize(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "action-keepobjectsize")
 {
 }
 
-KeepObjectSize::~KeepObjectSize() 
+KeepObjectSize::~KeepObjectSize()
 {
 }
 
@@ -58,11 +58,11 @@ void KeepObjectSize::nextContainer(odcore::data::Container &)
 {
 }
 
-void KeepObjectSize::setUp() 
+void KeepObjectSize::setUp()
 {
 }
 
-void KeepObjectSize::tearDown() 
+void KeepObjectSize::tearDown()
 {
 }
 

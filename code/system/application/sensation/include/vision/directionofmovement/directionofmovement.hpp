@@ -33,18 +33,18 @@ namespace directionofmovement {
 /**
  * This class provides...
  */
-class DirectionOfMovement : 
-    public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    DirectionOfMovement(int32_t const &, char **);
-    DirectionOfMovement(DirectionOfMovement const &) = delete;
-    DirectionOfMovement &operator=(DirectionOfMovement const &) = delete;
-    virtual ~DirectionOfMovement();
-    virtual void nextContainer(odcore::data::Container &);
+class DirectionOfMovement
+: public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  DirectionOfMovement(int32_t const &, char **);
+  DirectionOfMovement(DirectionOfMovement const &) = delete;
+  DirectionOfMovement &operator=(DirectionOfMovement const &) = delete;
+  virtual ~DirectionOfMovement();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 };
 
 } // directionofmovement

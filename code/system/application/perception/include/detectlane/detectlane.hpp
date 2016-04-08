@@ -32,18 +32,18 @@ namespace detectlane {
 /**
  * This class provides...
  */
-class DetectLane : 
-    public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    DetectLane(int32_t const &, char **);
-    DetectLane(DetectLane const &) = delete;
-    DetectLane &operator=(DetectLane const &) = delete;
-    virtual ~DetectLane();
-    virtual void nextContainer(odcore::data::Container &);
+class DetectLane
+: public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  DetectLane(int32_t const &, char **);
+  DetectLane(DetectLane const &) = delete;
+  DetectLane &operator=(DetectLane const &) = delete;
+  virtual ~DetectLane();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 };
 
 } // detectlane

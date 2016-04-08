@@ -32,18 +32,18 @@ namespace removeloomingfront {
 /**
  * This class provides...
  */
-class RemoveLoomingFront : 
-    public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    RemoveLoomingFront(int32_t const &, char **);
-    RemoveLoomingFront(RemoveLoomingFront const &) = delete;
-    RemoveLoomingFront &operator=(RemoveLoomingFront const &) = delete;
-    virtual ~RemoveLoomingFront();
-    virtual void nextContainer(odcore::data::Container &);
+class RemoveLoomingFront
+: public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  RemoveLoomingFront(int32_t const &, char **);
+  RemoveLoomingFront(RemoveLoomingFront const &) = delete;
+  RemoveLoomingFront &operator=(RemoveLoomingFront const &) = delete;
+  virtual ~RemoveLoomingFront();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 };
 
 } // removeloomingfront

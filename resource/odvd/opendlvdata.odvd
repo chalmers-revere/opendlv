@@ -1,0 +1,295 @@
+/*
+ * Copyright (C) 2015 Chalmers REVERE
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
+// Cartesian messages
+
+message opendlv.Constants [id = 150] {
+  const double PI = 3.141592653589793;
+  const double DEG2RAD = 0.017453292522222;  // PI/180.0
+  const double RAD2DEG = 57.295779513082325; // 1.0 / DEG2RAD;
+}
+
+/*
+message opendlv.coordinate.Cartesian3 [id = 151] {
+  float p[3] [id = 1]; // x, y, z
+}
+
+message opendlv.coordinate.Spherical3 [id = 152] {
+  float p[3] [id = 1]; // radius, zenith, azimuth
+}
+
+message opendlv.coordinate.Quaternion3 [id = 153] {
+  float o[4] [id = 1]; // x, y, z, w
+}
+
+message opendlv.coordinate.Pose [id = 154] {
+  opendlv.coordinate.Cartesian3 position [id = 1];
+  opendlv.coordinate.Quaternion3 orientation [id = 2];
+}
+
+// Proxy messages
+message opendlv.proxy.CartesianTimeOfFlight [id = 155] {
+  uint32 numberOfPoints;
+  opendlv.coordinate.Pose origin;
+  list<opendlv.coordinate.Cartesian3> points;
+}
+
+message opendlv.proxy.SphericalTimeOfFlight [id = 156] {
+  uint32 numberOfPoints;
+  opendlv.coordinate.Pose origin;
+  list<opendlv.coordinate.Spherical3> points;
+}
+
+message opendlv.proxy.Compass [id = 157] {
+  //opendlv.
+  float heading[3];
+}
+
+message opendlv.proxy.Gyroscope [id = 158] {
+  float orientation[3];
+}
+
+message opendlv.proxy.Accelerometer [id = 159] {
+  float acceleration[3];
+}
+
+message opendlv.proxy.Altimeter [id = 160] {
+  float altitude;
+}
+
+message opendlv.proxy.Wgs84Gps [id = 161] {
+  double latitude;
+  double longitude;
+  double altitude;
+  double ecefX;
+  double ecefY;
+  double ecefZ;
+  float speedHorizontal;
+  float speedVertical;
+  float northHeading;
+  uint16 gpsWeek;
+  uint32 gpsWeekMillisecond;
+  uint16 utcOffset;
+  uint8 satelliteCount;
+}
+*/
+message opendlv.proxy.V2vInbound [id = 162] {
+  uint32 size;
+  string data;
+  //list<uint8> data;
+}
+
+message opendlv.proxy.V2vOutbound [id = 163] {
+  uint32 size;
+  string data;
+  //list<uint8> data;
+}
+
+message opendlv.proxy.reverefh16.Pedals [id = 191] {
+    double accelerationPedalPosition [id = 1];
+    double brakePedalPosition [id = 2];
+}
+
+message opendlv.proxy.reverefh16.AccelerationRequest [id = 192] {
+    bool enableRequest [id = 1];
+    double acceleration [id = 2];
+}
+
+message opendlv.proxy.reverefh16.BrakeRequest [id = 193] {
+    bool enableRequest [id = 1];
+    double brake [id = 2];
+}
+
+message opendlv.proxy.reverefh16.SteeringRequest [id = 194] {
+    bool enableRequest [id = 1];
+    double steeringRoadWheelAngle [id = 2];
+    double steeringDeltaTorque [id = 3];
+}
+
+message opendlv.proxy.reverefh16.Axles [id = 195] {
+    double loadAxle11 [id = 1];
+    double loadAxle12 [id = 2];
+    double loadAxle13 [id = 3];
+}
+
+message opendlv.proxy.reverefh16.Propulsion [id = 196] {
+    double propulsionShaftVehicleSpeed [id = 1];
+}
+
+message opendlv.proxy.reverefh16.VehicleState [id = 197] {
+    double accelerationX [id = 1];
+    double accelerationY [id = 2];
+    double yawRate [id = 3];
+}
+
+message opendlv.proxy.reverefh16.Wheels [id = 198] {
+    double speedWheel111 [id = 1];
+    double speedWheel112 [id = 2];
+    double speedWheel121 [id = 3];
+    double speedWheel122 [id = 4];
+    double speedWheel131 [id = 5];
+    double speedWheel132 [id = 6];
+}
+
+message opendlv.proxy.reverefh16.Steering [id = 199] {
+    double roadwheelangle [id = 1];
+    double steeringwheelangle [id = 2];
+    double torsionBarTorque [id = 3];
+}
+/*
+// Action messages
+message opendlv.action.Correction [id = 164] {
+  TimeStamp startTime;
+  string type;
+  bool isInhibitory;
+  float amplitude;
+}
+
+message opendlv.action.Actuation [id = 165] {
+  string type;
+  float value;
+}
+*/
+// Sensation
+message opendlv.sensation.Voice [id = 166] {
+  string type;
+  uint32 size;
+  string data;
+  //list<uint8> data;
+}
+/*
+message opendlv.sensation.RoadWheel [id = 167] {
+  float angle;
+  float angularVelocity;
+  uint8 axleIndex;
+  uint8 unitIndex;
+  uint8 wheelIndex;
+}
+
+message opendlv.sensation.Axle [id = 168] {
+  float load;
+  uint8 axleIndex;
+  uint8 unitIndex;
+}
+
+message opendlv.sensation.Geolocation [id = 169] {
+  float longitude;
+  float latitude;
+  float altitude;
+}
+
+message opendlv.sensation.BodyPart [id = 170] {
+  opendlv.cartesian.Point3 position; // From body origo to body part center of mass
+  string gemoetryPath;
+  float width;
+  float height;
+  float depth;
+  float mass;
+  uint8 partIndex;
+}
+
+message opendlv.sensation.Orientation [id = 171] {
+  float roll;
+  float pitch;
+  float yaw;
+  int partIndex;
+}
+
+message opendlv.sensation.Balance [id = 172] {
+  float rollRate;
+  float pitchRate;
+  float yawRate;
+  int partIndex;
+}
+
+message opendlv.sensation.Looming [id = 173] {
+  float angle;
+  float looming;
+  float size;
+}
+
+message opendlv.sensation.OpticalFlow [id = 174] {
+  float flow;
+}
+
+message opendlv.sensation.DirectionOfMovement [id = 175] {
+  opendlv.coordinate.Spherical3 directionOfMovement;
+}
+
+// Perception messages
+message opendlv.perception.ObjectDistanceToBody [id = 176] {
+  opendlv.coordinate.Cartesian3 bodySkinPosition;
+  opendlv.coordinate.Cartesian3 objectSurfacePosition;
+}
+
+
+message opendlv.perception.DesiredOpticalFlow [id = 177] {
+  float flow;
+}
+
+message opendlv.perception.DesiredDirectionOfMovement [id = 178] {
+  opendlv.coordinate.Spherical3 directionOfMovement;
+}
+
+message opendlv.perception.Object [id = 179] {
+  list<opendlv.perception.ObjectProperty> properties;
+  TimeStamp lastSeen;
+  string type;
+  float angle;
+  float size;
+  uint16 objectIndex;
+}
+
+message opendlv.perception.ObjectDesiredAngle [id = 180] {
+  float desiredAngle;
+  uint16 objectIndex;
+}
+
+message opendlv.perception.ObjectDesiredSize [id = 181] {
+  float desiredSize;
+  uint16 objectIndex;
+}
+
+message opendlv.perception.ObjectLooming [id = 182] {
+  TimeStamp identified;
+  opendlv.sensation.Looming looming;
+  uint16 objectIndex;
+}
+
+message opendlv.perception.ObjectProperty [id = 183] {
+  TimeStamp identified;
+  string name;
+  string value;
+  uint16 objectIndex;
+}
+
+message opendlv.perception.ObjectMetricDistance [id = 184] {
+  float distance;
+  float angle;
+  float size;
+  uint32 objId;
+}
+*/
+
+// Knowledge
+message opendlv.knowledge.Message [id = 185] {
+  uint32 size;
+  string data;
+  //list<uint8> data;
+}
+

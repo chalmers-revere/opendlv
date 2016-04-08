@@ -19,7 +19,8 @@
 
 #include "identity/identity.hpp"
 
-int32_t main(int32_t a_argc, char **a_argv) {
+int32_t main(int32_t a_argc, char **a_argv)
+{
   opendlv::knowledge::identity::Identity main(a_argc, a_argv);
   return main.runModule();
 }

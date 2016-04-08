@@ -19,8 +19,9 @@
 
 #include "increaseobjectmargin/increaseobjectmargin.hpp"
 
-int32_t main(int32_t a_argc, char **a_argv) {
-  opendlv::action::increaseobjectmargin::IncreaseObjectMargin main(a_argc, 
-      a_argv);
+int32_t main(int32_t a_argc, char **a_argv)
+{
+  opendlv::action::increaseobjectmargin::IncreaseObjectMargin main(
+  a_argc, a_argv);
   return main.runModule();
 }

@@ -1,0 +1,123 @@
+VERSION ""
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_: Chalmers VehicleGateWay
+
+
+BO_ 262 ManualDriver: 4 VehicleGateWay
+ SG_ TorsionBarTorque : 23|16@0+ (0.0009765625,-32) [-32|31.9990234375] "Nm" Vector__XXX
+ SG_ BrakePedalPosition : 8|8@1+ (0.4,0) [0|102] "Percent" Vector__XXX
+ SG_ AccelerationPedalPosition : 0|8@1+ (0.4,0) [0|102] "Percent" Vector__XXX
+
+BO_ 515 AccelerationRequest: 3 Chalmers
+ SG_ Enable_AccRequest : 16|1@1+ (1,0) [0|1] "bool" Vector__XXX
+ SG_ AccelerationRequest : 0|16@1+ (0.00048828125,-15.687) [-15.687|16.31251171875] "m/s2" Vector__XXX
+
+BO_ 514 BrakeRequest: 3 Chalmers
+ SG_ Enable_BrakeRequest : 16|1@1+ (1,0) [0|1] "bool" Vector__XXX
+ SG_ BrakeRequest : 0|16@1+ (0.00048828125,-15.687) [-15.687|16.31251171875] "m/s2" Vector__XXX
+
+BO_ 513 SteerRequest: 6 Chalmers
+ SG_ Enable_SteerReq : 0|1@1+ (1,0) [0|1] "bool" Vector__XXX
+ SG_ SteerReq_RWA : 32|16@1+ (0.000192,-3.2) [-3.2|3.2] "rad" Vector__XXX
+ SG_ SteerReq_DeltaTrq : 16|16@1+ (0.001,-32) [-32|33.535] "Nm" Vector__XXX
+
+BO_ 263 Steering: 4 VehicleGateWay
+ SG_ SteeringWheelAngle : 16|16@1+ (0.0009765625,-31.374) [-31.374|32.6250234375] "rad" Vector__XXX
+ SG_ RoadWheelAngle : 0|16@1+ (5.8751E-005,-1.925) [-1.925|1.925246785] "rad" Vector__XXX
+
+BO_ 261 AxleLoads: 6 VehicleGateWay
+ SG_ DriveAxle2Load : 32|16@1+ (0.5,0) [0|32767.5] "kg" Vector__XXX
+ SG_ DriveAxle1Load : 16|16@1+ (0.5,0) [0|32767.5] "kg" Vector__XXX
+ SG_ FrontAxle1Load : 0|16@1+ (0.5,0) [0|32767.5] "kg" Vector__XXX
+
+BO_ 260 VehicleDynamics: 6 VehicleGateWay
+ SG_ YawRate : 32|16@1+ (0.000122,-3.92) [-3.92|4.07527] "rad/s" Vector__XXX
+ SG_ Acceleration_Y : 16|16@1+ (0.00048828125,-15.687) [-15.687|16.31251171875] "m/s2" Vector__XXX
+ SG_ Acceleration_X : 0|16@1+ (0.00048828125,-15.687) [-15.687|16.31251171875] "m/s2" Vector__XXX
+
+BO_ 259 VehicleSpeed: 2 VehicleGateWay
+ SG_ VehicleSpeedPropShaft : 0|16@1+ (0.00390625,0) [0|255.99609375] "kph" Vector__XXX
+
+BO_ 258 WheelSpeeds2: 4 VehicleGateWay
+ SG_ DriveAxle2WheelSpeedRight : 16|16@1+ (0.00390625,0) [0|255.99609375] "kph" Vector__XXX
+ SG_ DriveAxle2WheelSpeedLeft : 0|16@1+ (0.00390625,0) [0|255.99609375] "kph" Vector__XXX
+
+BO_ 257 WheelSpeeds1: 8 VehicleGateWay
+ SG_ DriveAxle1WheelSpeedRight : 48|16@1+ (0.00390625,0) [0|255.99609375] "kph" Vector__XXX
+ SG_ DriveAxle1WheelSpeedLeft : 32|16@1+ (0.00390625,0) [0|255.99609375] "kph" Vector__XXX
+ SG_ FrontAxle1WheelSpeedRight : 16|16@1+ (0.00390625,0) [0|255.99609375] "kph" Vector__XXX
+ SG_ FrontAxle1WheelSpeedLeft : 0|16@1+ (0.00390625,0) [0|255.99609375] "kph" Vector__XXX
+
+
+
+CM_ SG_ 263 SteeringWheelAngle "65024 - 65279 Error ; 65280 - 65535 Not available";
+CM_ SG_ 261 DriveAxle2Load "65024 - 65279 Error ; 65280 - 65535 Not available";
+CM_ SG_ 261 DriveAxle1Load "65024 - 65279 Error ; 65280 - 65535 Not available";
+CM_ SG_ 261 FrontAxle1Load "65024 - 65279 Error ; 65280 - 65535 Not available";
+CM_ SG_ 259 VehicleSpeedPropShaft "65024 - 65279 Error ; 65280 - 65535 Not available";
+CM_ SG_ 258 DriveAxle2WheelSpeedRight "65024 - 65279 Error ; 65280 - 65535 Not available";
+CM_ SG_ 258 DriveAxle2WheelSpeedLeft "65024 - 65279 Error ; 65280 - 65535 Not available";
+CM_ SG_ 257 DriveAxle1WheelSpeedRight "65024 - 65279 Error ; 65280 - 65535 Not available";
+CM_ SG_ 257 DriveAxle1WheelSpeedLeft "65024 - 65279 Error ; 65280 - 65535 Not available";
+CM_ SG_ 257 FrontAxle1WheelSpeedRight "65024 - 65279 Error ; 65280 - 65535 Not available";
+CM_ SG_ 257 FrontAxle1WheelSpeedLeft "65024 - 65279 Error ; 65280 - 65535 Not available";
+BA_DEF_  "Manufacturer" STRING ;
+BA_DEF_  "Baudrate" INT 100000 1000000;
+BA_DEF_ SG_  "GenSigStartValue" FLOAT 0 100000000000;
+BA_DEF_ BO_  "GenMsgSendType" ENUM  "Cyclic","NotUsed","NotUsed","NotUsed","NotUsed","Cyclic","NotUsed","IfActive","NoMsgSendType","NotUsed";
+BA_DEF_ BO_  "GenMsgCycleTime" INT 0 50000;
+BA_DEF_  "BusType" STRING ;
+BA_DEF_DEF_  "Manufacturer" "VolvoTrucks_CVDE";
+BA_DEF_DEF_  "Baudrate" 250000;
+BA_DEF_DEF_  "GenSigStartValue" 0;
+BA_DEF_DEF_  "GenMsgSendType" "Cyclic";
+BA_DEF_DEF_  "GenMsgCycleTime" 0;
+BA_DEF_DEF_  "BusType" "CAN";
+BA_ "GenMsgCycleTime" BO_ 262 10;
+BA_ "GenMsgCycleTime" BO_ 515 10;
+BA_ "GenMsgCycleTime" BO_ 514 10;
+BA_ "GenMsgCycleTime" BO_ 513 10;
+BA_ "GenMsgCycleTime" BO_ 263 10;
+BA_ "GenMsgCycleTime" BO_ 261 250;
+BA_ "GenMsgCycleTime" BO_ 260 10;
+BA_ "GenMsgCycleTime" BO_ 259 100;
+BA_ "GenMsgCycleTime" BO_ 258 10;
+BA_ "GenMsgCycleTime" BO_ 257 20;
+BA_ "GenSigStartValue" SG_ 262 BrakePedalPosition 255;
+BA_ "GenSigStartValue" SG_ 262 AccelerationPedalPosition 255;
+BA_ "GenSigStartValue" SG_ 263 SteeringWheelAngle 65535;
+BA_ "GenSigStartValue" SG_ 263 RoadWheelAngle 32765.3997378768;
+

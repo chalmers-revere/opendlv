@@ -33,21 +33,18 @@ namespace act {
  * This class provides...
  */
 class Act : public odcore::base::module::TimeTriggeredConferenceClientModule {
-  public:
-    Act(int32_t const &, char **);
-    Act(Act const &) = delete;
-    Act &operator=(Act const &) = delete;
-    virtual ~Act();
-    odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
-  private:
-      // This method will be call automatically _before_ running body().
-    // add details !
-    virtual void setUp();
+ public:
+  Act(int32_t const &, char **);
+  Act(Act const &) = delete;
+  Act &operator=(Act const &) = delete;
+  virtual ~Act();
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
-    // This method will be call automatically _after_ return from body().
-    // add details !
-    virtual void tearDown();
+ private:
+  void setUp();
+  void tearDown();
+};
 
 };
 } // act

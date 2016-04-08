@@ -25,7 +25,7 @@
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
 
-#include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 #include "findsafeway/findsafeway.hpp"
 
@@ -39,13 +39,13 @@ namespace findsafeway {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-FindSafeWay::FindSafeWay(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, 
-        "perception-findsafeway")
+FindSafeWay::FindSafeWay(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "perception-findsafeway")
 {
 }
 
-FindSafeWay::~FindSafeWay() 
+FindSafeWay::~FindSafeWay()
 {
 }
 
@@ -57,11 +57,11 @@ void FindSafeWay::nextContainer(odcore::data::Container &)
 {
 }
 
-void FindSafeWay::setUp() 
+void FindSafeWay::setUp()
 {
 }
 
-void FindSafeWay::tearDown() 
+void FindSafeWay::tearDown()
 {
 }
 

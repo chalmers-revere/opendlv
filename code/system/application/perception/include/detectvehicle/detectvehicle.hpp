@@ -21,9 +21,18 @@
 #define DETECTVEHICLE_DETECTVEHICLE_HPP_
 
 #include <memory>
+#include <vector>
 
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
+
+#include "detectvehicle/vehicledetectionsystem.hpp"
+#include "detectvehicle/detectedvehicle.hpp"
+#include "detectvehicle/vehiclememorysystem.hpp"
+
+
+
+// TODO add documentation
 
 namespace opendlv {
 namespace perception {
@@ -32,18 +41,22 @@ namespace detectvehicle {
 /**
  * This class provides...
  */
-class DetectVehicle : 
-    public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    DetectVehicle(int32_t const &, char **);
-    DetectVehicle(DetectVehicle const &) = delete;
-    DetectVehicle &operator=(DetectVehicle const &) = delete;
-    virtual ~DetectVehicle();
-    virtual void nextContainer(odcore::data::Container &);
+class DetectVehicle
+: public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  DetectVehicle(int32_t const &, char **);
+  DetectVehicle(DetectVehicle const &) = delete;
+  DetectVehicle &operator=(DetectVehicle const &) = delete;
+  virtual ~DetectVehicle();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
+
+  VehicleDetectionSystem m_vehicleDetectionSystem;
+  std::vector<std::shared_ptr<DetectedVehicle>> m_verifiedVehicles;
+  VehicleMemorySystem m_vehicleMemorySystem;
 };
 
 } // detectvehicle

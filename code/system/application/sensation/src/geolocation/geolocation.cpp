@@ -25,7 +25,7 @@
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
 
-#include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 #include "geolocation/geolocation.hpp"
 
@@ -39,12 +39,13 @@ namespace geolocation {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-Geolocation::Geolocation(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, "sensation-geolocation")
+Geolocation::Geolocation(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "sensation-geolocation")
 {
 }
 
-Geolocation::~Geolocation() 
+Geolocation::~Geolocation()
 {
 }
 
@@ -56,11 +57,11 @@ void Geolocation::nextContainer(odcore::data::Container &)
 {
 }
 
-void Geolocation::setUp() 
+void Geolocation::setUp()
 {
 }
 
-void Geolocation::tearDown() 
+void Geolocation::tearDown()
 {
 }
 

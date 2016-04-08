@@ -32,18 +32,18 @@ namespace geolocation {
 /**
  * This class provides...
  */
-class Geolocation : 
-    public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    Geolocation(int32_t const &, char **);
-    Geolocation(Geolocation const &) = delete;
-    Geolocation &operator=(Geolocation const &) = delete;
-    virtual ~Geolocation();
-    virtual void nextContainer(odcore::data::Container &);
+class Geolocation
+: public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  Geolocation(int32_t const &, char **);
+  Geolocation(Geolocation const &) = delete;
+  Geolocation &operator=(Geolocation const &) = delete;
+  virtual ~Geolocation();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 };
 
 } // geolocation

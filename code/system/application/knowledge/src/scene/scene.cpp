@@ -25,7 +25,7 @@
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
 
-#include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 #include "scene/scene.hpp"
 
@@ -39,12 +39,12 @@ namespace scene {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-Scene::Scene(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, "knowledge-scene")
+Scene::Scene(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(a_argc, a_argv, "knowledge-scene")
 {
 }
 
-Scene::~Scene() 
+Scene::~Scene()
 {
 }
 
@@ -56,11 +56,11 @@ void Scene::nextContainer(odcore::data::Container &)
 {
 }
 
-void Scene::setUp() 
+void Scene::setUp()
 {
 }
 
-void Scene::tearDown() 
+void Scene::tearDown()
 {
 }
 
