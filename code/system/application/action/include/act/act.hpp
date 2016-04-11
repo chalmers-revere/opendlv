@@ -44,7 +44,7 @@ class Act : public odcore::base::module::TimeTriggeredConferenceClientModule {
  private:
   void setUp();
   void tearDown();
-};
+
 
 };
 } // act
