@@ -15,16 +15,16 @@ manualdriver.brakepedalposition in 0x106 at bit 8 for 8 bit is big endian multip
 manualdriver.accelerationpedalposition in 0x106 at bit 0 for 8 bit is big endian multiply by 0.4 add 0 with range [0, 102];
 
 // CAN message for acceleration.
-accelerationrequest.enable_accrequest in 0x203 at bit 16 for 8 bit is big endian multiply by 1 add 0 with range [0, 1];
-accelerationrequest.accelerationrequest in 0x203 at bit 0 for 16 bit is big endian multiply by 0.00048828125 add -15.687 with range [-15.687, 16.31251171875];
+accelerationrequest.enable_accrequest in 0x203 at bit 0 for 8 bit is little endian multiply by 1 add 0 with range [0, 1];
+accelerationrequest.accelerationrequest in 0x203 at bit 8 for 16 bit is little endian multiply by 0.00048828125 add -15.687 with range [-15.687, 16.31251171875];
 
 // CAN message for deceleration.
-brakerequest.enable_brakerequest in 0x202 at bit 16 for 8 bit is big endian multiply by 1 add 0 with range [0, 1];
-brakerequest.brakerequest in 0x202 at bit 0 for 16 bit is big endian multiply by 0.00048828125 add -15.687 with range [-15.687, 16.31251171875];
+brakerequest.enable_brakerequest in 0x202 at bit 0 for 8 bit is little endian multiply by 1 add 0 with range [0, 1];
+brakerequest.brakerequest in 0x202 at bit 8 for 16 bit is little endian multiply by 0.00048828125 add -15.687 with range [-15.687, 16.31251171875];
 
 // CAN message for steering.
-steerrequest.enable_steerreq in 0x201 at bit 0 for 16 bit is big endian multiply by 1 add 0 with range [0, 1];
-steerrequest.steerreq_rwa in 0x201 at bit 32 for 16 bit is big endian multiply by 0.000192 add -3.2 with range [-3.2, 3.2];
+steerrequest.enable_steerreq in 0x201 at bit 32 for 16 bit is big endian multiply by 1 add 0 with range [0, 1];
+steerrequest.steerreq_rwa in 0x201 at bit 0 for 16 bit is big endian multiply by 0.000192 add -3.2 with range [-3.2, 3.2];
 steerrequest.steerreq_deltatrq in 0x201 at bit 16 for 16 bit is big endian multiply by 0.001 add -32 with range [-32, 33.535];
 
 // CAN message for reading the steering.
@@ -132,55 +132,28 @@ test opendlv.proxy.reverefh16.VehicleState {
 }
 
 test opendlv.proxy.reverefh16.AccelerationRequest {
-  0x203: 0x7FBD01
+  0x203: 0x01BD7F
   
   id 1 = 1
   id 2 = 8
 }
 
 test opendlv.proxy.reverefh16.BrakeRequest {
-  0x202: 0x7F5D01
-  
+  0x202: 0x018157
   id 1 = 1
-  id 2 = -4
+  id 2 = 0.480480469
 }
 
 test opendlv.proxy.reverefh16.BrakeRequest {
-  0x202: 0x7F5501
-  
+  0x202: 0x012D7F
   id 1 = 1
-  id 2 = -5
+  id 2 = -10
 }
 
 test opendlv.proxy.reverefh16.SteeringRequest {
-  0x201: 0x01000000E142
-  
-  id 1 = 1
-  id 2 = 0.0873
-  id 3 = -32
-}
-
-test opendlv.proxy.reverefh16.SteeringRequest {
-  0x201: 0x0100E8807355
-  
-  id 1 = 1
-  id 2 = 1
-  id 3 = 1
-}
-
-test opendlv.proxy.reverefh16.SteeringRequest {
-  0x201: 0x0100F47E474B
+  0x201: 0x474BFFFF0100
   
   id 1 = 1
   id 2 = 0.5
-  id 3 = 0.5
+  id 3 = 33.535
 }
-
-test opendlv.proxy.reverefh16.SteeringRequest {
-  0x201: 0x0100647D2443
-  
-  id 1 = 1
-  id 2 = 0.1
-  id 3 = 0.1
-}
-
