@@ -17,6 +17,7 @@
  * USA.
  */
 
+#include <cstdlib>
 #include <chrono>
 #include <ctype.h>
 #include <cstring>
@@ -55,7 +56,7 @@ V2vDenm::V2vDenm(int32_t const &a_argc, char **a_argv)
 {
   struct stat st;// = {};
   if (stat("var/application/knowledge/linguistics/v2vdenm", &st) == -1) {
-    system("mkdir -p ./var/application/knowledge/linguistics/v2vdenm");
+    ::system("mkdir -p ./var/application/knowledge/linguistics/v2vdenm");
     // std::cout<<"Created dir"<<std::endl;
   }
   odcore::data::TimeStamp nu;

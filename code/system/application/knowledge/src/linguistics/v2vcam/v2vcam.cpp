@@ -17,6 +17,7 @@
  * USA.
  */
 
+#include <cstdlib>
 #include <chrono>
 #include <ctype.h>
 #include <cstring>
@@ -56,7 +57,7 @@ V2vCam::V2vCam(int32_t const &a_argc, char **a_argv)
 {
   struct stat st;// = {};
   if (stat("var/application/knowledge/linguistics/v2vcam", &st) == -1) {
-    system("mkdir -p ./var/application/knowledge/linguistics/v2vcam");
+    ::system("mkdir -p ./var/application/knowledge/linguistics/v2vcam");
     // std::cout<<"Created dir"<<std::endl;
   }
   odcore::data::TimeStamp nu;
