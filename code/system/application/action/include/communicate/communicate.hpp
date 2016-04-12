@@ -22,7 +22,7 @@
 
 #include <memory>
 
-#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
 
 namespace opendlv {
@@ -32,18 +32,19 @@ namespace communicate {
 /**
  * This class provides...
  */
-class Communicate : 
-    public odcore::base::module::TimeTriggeredConferenceClientModule {
-  public:
-    Communicate(int32_t const &, char **);
-    Communicate(Communicate const &) = delete;
-    Communicate &operator=(Communicate const &) = delete;
-    virtual ~Communicate();
-    odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+class Communicate
+: public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  Communicate(int32_t const &, char **);
+  Communicate(Communicate const &) = delete;
+  Communicate &operator=(Communicate const &) = delete;
+  virtual ~Communicate();
 
-  private:
-    void setUp();
-    void tearDown();
+  virtual void nextContainer(odcore::data::Container &);
+
+ private:
+  void setUp();
+  void tearDown();
 };
 
 } // communicate

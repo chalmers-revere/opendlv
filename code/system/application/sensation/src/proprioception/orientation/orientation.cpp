@@ -25,7 +25,7 @@
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
 
-#include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 #include "proprioception/orientation/orientation.hpp"
 
@@ -40,13 +40,13 @@ namespace orientation {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-Orientation::Orientation(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, 
-        "sensation-proprioception-orientation")
+Orientation::Orientation(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "sensation-proprioception-orientation")
 {
 }
 
-Orientation::~Orientation() 
+Orientation::~Orientation()
 {
 }
 
@@ -58,11 +58,11 @@ void Orientation::nextContainer(odcore::data::Container &)
 {
 }
 
-void Orientation::setUp() 
+void Orientation::setUp()
 {
 }
 
-void Orientation::tearDown() 
+void Orientation::tearDown()
 {
 }
 

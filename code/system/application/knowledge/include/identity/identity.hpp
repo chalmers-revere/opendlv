@@ -32,18 +32,18 @@ namespace identity {
 /**
  * This class provides...
  */
-class Identity : 
-    public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    Identity(int32_t const &, char **);
-    Identity(Identity const &) = delete;
-    Identity &operator=(Identity const &) = delete;
-    virtual ~Identity();
-    virtual void nextContainer(odcore::data::Container &);
+class Identity
+: public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  Identity(int32_t const &, char **);
+  Identity(Identity const &) = delete;
+  Identity &operator=(Identity const &) = delete;
+  virtual ~Identity();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 };
 
 } // identity

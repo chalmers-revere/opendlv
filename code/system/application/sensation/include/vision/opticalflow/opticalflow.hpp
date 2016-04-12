@@ -33,18 +33,18 @@ namespace opticalflow {
 /**
  * This class provides...
  */
-class OpticalFlow : 
-    public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    OpticalFlow(int32_t const &, char **);
-    OpticalFlow(OpticalFlow const &) = delete;
-    OpticalFlow &operator=(OpticalFlow const &) = delete;
-    virtual ~OpticalFlow();
-    virtual void nextContainer(odcore::data::Container &);
+class OpticalFlow
+: public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  OpticalFlow(int32_t const &, char **);
+  OpticalFlow(OpticalFlow const &) = delete;
+  OpticalFlow &operator=(OpticalFlow const &) = delete;
+  virtual ~OpticalFlow();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 };
 
 } // opticalflow

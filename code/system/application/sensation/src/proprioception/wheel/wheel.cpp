@@ -25,7 +25,7 @@
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
 
-#include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 #include "proprioception/wheel/wheel.hpp"
 
@@ -40,12 +40,12 @@ namespace wheel {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-Wheel::Wheel(int32_t const &a_argc, char **a_argv) :
-    DataTriggeredConferenceClientModule(a_argc, a_argv, "sensation-wheel")
+Wheel::Wheel(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(a_argc, a_argv, "sensation-wheel")
 {
 }
 
-Wheel::~Wheel() 
+Wheel::~Wheel()
 {
 }
 
@@ -57,11 +57,11 @@ void Wheel::nextContainer(odcore::data::Container &)
 {
 }
 
-void Wheel::setUp() 
+void Wheel::setUp()
 {
 }
 
-void Wheel::tearDown() 
+void Wheel::tearDown()
 {
 }
 

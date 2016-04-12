@@ -34,16 +34,16 @@ namespace depth {
  * This class provides...
  */
 class Depth : public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    Depth(int32_t const &, char **);
-    Depth(Depth const &) = delete;
-    Depth &operator=(Depth const &) = delete;
-    virtual ~Depth();
-    virtual void nextContainer(odcore::data::Container &);
+ public:
+  Depth(int32_t const &, char **);
+  Depth(Depth const &) = delete;
+  Depth &operator=(Depth const &) = delete;
+  virtual ~Depth();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 };
 
 } // depth

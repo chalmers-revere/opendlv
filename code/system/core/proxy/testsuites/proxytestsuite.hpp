@@ -17,73 +17,81 @@
  * USA.
  */
 
-#ifndef SENSORCAMERATESTSUITE_HPP_
-#define SENSORCAMERATESTSUITE_HPP_
+#ifndef CAMERATESTSUITE_HPP_
+#define CAMERATESTSUITE_HPP_
 
 #include "cxxtest/TestSuite.h"
 
 // Include local header files.
-#include "../include/sensor/camera/camera.hpp"
+#include "../include/camera/camera.hpp"
 
 /**
- * This class derives from sensor::camera::Camera to allow access to protected 
+ * This class derives from camera::Camera to allow access to protected
  * methods.
  */
-class SensorCameraTestling : public opendlv::proxy::sensor::camera::Camera {
-  private:
-    SensorCameraTestling();
-    
-  public:
-    SensorCameraTestling(const int32_t &a_argc, char **a_argv) :
-      Camera(a_argc, a_argv) {}
+class CameraTestling : public opendlv::proxy::camera::Camera {
+ private:
+  CameraTestling();
 
-    // Here, you need to add all methods which are protected in 
-    // sensor::camera::Camera and which are needed for the test cases.
+ public:
+  CameraTestling(const int32_t &a_argc, char **a_argv)
+      : Camera(a_argc, a_argv)
+  {
+  }
+
+  // Here, you need to add all methods which are protected in
+  // camera::Camera and which are needed for the test cases.
 };
 
 /**
  * The actual testsuite starts here.
  */
-class SensorCameraTest : public CxxTest::TestSuite {
-  private:
-    SensorCameraTestling *m_pt;
+class CameraTest : public CxxTest::TestSuite {
+ private:
+  CameraTestling *m_pt;
 
-  public:
-    SensorCameraTest() : m_pt(nullptr) {}
-    SensorCameraTest(SensorCameraTest const &) = delete;
-    SensorCameraTest& operator=(SensorCameraTest const &) = delete;
+ public:
+  CameraTest()
+      : m_pt(nullptr)
+  {
+  }
+  CameraTest(CameraTest const &) = delete;
+  CameraTest &operator=(CameraTest const &) = delete;
 
-    /**
-     * This method will be called before each testXYZ-method.
-     */
-    void setUp() {
-      std::string argv0("proxy-sensor-camera");
-      std::string argv1("--cid=100");
-      int32_t argc = 2;
-      char **argv;
-      argv = new char*[2];
-      argv[0] = const_cast<char*>(argv0.c_str());
-      argv[1] = const_cast<char*>(argv1.c_str());
+  /**
+   * This method will be called before each testXYZ-method.
+   */
+  void setUp()
+  {
+    std::string argv0("proxy-camera");
+    std::string argv1("--cid=100");
+    int32_t argc = 2;
+    char **argv;
+    argv = new char *[2];
+    argv[0] = const_cast<char *>(argv0.c_str());
+    argv[1] = const_cast<char *>(argv1.c_str());
 
-      // Create an instance of Camera through SensorCameraTestling which 
-      // will be deleted in tearDown().
-      m_pt = new SensorCameraTestling(argc, argv);
-    }
+    // Create an instance of Camera through CameraTestling which
+    // will be deleted in tearDown().
+    m_pt = new CameraTestling(argc, argv);
+  }
 
-    /**
-     * This method will be called after each testXYZ-method.
-     */
-    void tearDown() {
-      delete m_pt;
-      m_pt = nullptr;
-    }
+  /**
+   * This method will be called after each testXYZ-method.
+   */
+  void tearDown()
+  {
+    delete m_pt;
+    m_pt = nullptr;
+  }
 
-    //////////////////////////////////////////////////////////////////////////
-    // Below this line the actual testcases are defined.
-    //////////////////////////////////////////////////////////////////////////
-    void testSensorCameraSuccessfullyCreated() {
-      TS_ASSERT(m_pt != nullptr);
-    }
+  //////////////////////////////////////////////////////////////////////////
+  // Below this line the actual testcases are defined.
+  //////////////////////////////////////////////////////////////////////////
+  void testCameraSuccessfullyCreated()
+  {
+    TS_ASSERT(m_pt != nullptr);
+  }
 };
 
 #endif

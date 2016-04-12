@@ -24,7 +24,7 @@
 #include <opendlv/data/environment/Point3.h>
 
 
-#include "opendlvdata/GeneratedHeaders_OpenDLVData.h"
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 #include "opendavinci/odcore/reflection/CSVFromVisitableVisitor.h"
 
 #include "sensation.hpp"

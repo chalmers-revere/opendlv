@@ -33,18 +33,18 @@ namespace monochrome {
 /**
  * This class provides...
  */
-class Monochrome : 
-    public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    Monochrome(int32_t const &, char **);
-    Monochrome(Monochrome const &) = delete;
-    Monochrome &operator=(Monochrome const &) = delete;
-    virtual ~Monochrome();
-    virtual void nextContainer(odcore::data::Container &);
+class Monochrome
+: public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  Monochrome(int32_t const &, char **);
+  Monochrome(Monochrome const &) = delete;
+  Monochrome &operator=(Monochrome const &) = delete;
+  virtual ~Monochrome();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 };
 
 } // monochrome

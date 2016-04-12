@@ -32,18 +32,17 @@ namespace scene {
 /**
  * This class provides...
  */
-class Scene : 
-    public odcore::base::module::DataTriggeredConferenceClientModule {
-  public:
-    Scene(int32_t const &, char **);
-    Scene(Scene const &) = delete;
-    Scene &operator=(Scene const &) = delete;
-    virtual ~Scene();
-    virtual void nextContainer(odcore::data::Container &);
+class Scene : public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  Scene(int32_t const &, char **);
+  Scene(Scene const &) = delete;
+  Scene &operator=(Scene const &) = delete;
+  virtual ~Scene();
+  virtual void nextContainer(odcore::data::Container &);
 
-  private:
-    void setUp();
-    void tearDown();
+ private:
+  void setUp();
+  void tearDown();
 };
 
 } // scene
