@@ -73,7 +73,7 @@ void Camera::setUp()
 
   std::string const type = kv.getValue<std::string>("proxy-camera.type");
   std::string const resolution =
-  kv.getValue<std::string>("proxy-camera.resolution");
+      kv.getValue<std::string>("proxy-camera.resolution");
   int32_t const bpp = kv.getValue<int32_t>("proxy-camera.bpp");
 
   /*

@@ -48,7 +48,7 @@ uint32_t const &a_width, uint32_t const &a_height, uint32_t const &a_bpp)
     , m_sharedMemory()
 {
   m_sharedMemory =
-  odcore::wrapper::SharedMemoryFactory::createSharedMemory(a_name, m_size);
+      odcore::wrapper::SharedMemoryFactory::createSharedMemory(a_name, m_size);
 
   m_sharedImage.setName(a_name);
   m_sharedImage.setWidth(a_width);
@@ -96,7 +96,7 @@ odcore::data::image::SharedImage Device::Capture()
       if (m_sharedMemory.get() && m_sharedMemory->isValid()) {
         odcore::base::Lock l(m_sharedMemory);
         CopyImageTo(
-        static_cast<char *>(m_sharedMemory->getSharedMemory()), m_size);
+            static_cast<char *>(m_sharedMemory->getSharedMemory()), m_size);
       }
     }
   }

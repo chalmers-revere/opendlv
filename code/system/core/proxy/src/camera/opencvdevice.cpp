@@ -45,7 +45,7 @@ OpenCvDevice::OpenCvDevice(std::string const &a_name,
     uint32_t const &a_height, uint32_t const &a_bpp)
     : Device(a_name, a_width, a_height, a_bpp)
     , m_capture(nullptr)
-    , m_image(new cv::Mat)
+    , m_image()
 {
   std::string videoStreamAddress = std::string("http://") + a_username 
     + ":" + a_password + "@" + a_port + "/axis-cgi/mjpg/video.cgi?user=" 
@@ -89,7 +89,7 @@ bool OpenCvDevice::CaptureFrame()
 {
   bool retVal = false;
   if (m_capture != nullptr) {
-    if (m_capture->read(*m_image)) {
+    if (m_capture->read(m_image)) {
       retVal = true;
     }
   }
@@ -100,10 +100,11 @@ bool OpenCvDevice::CopyImageTo(char *a_destination, const uint32_t &a_size)
 {
   bool retVal = false;
 
-  if ((a_destination != nullptr) && (a_size > 0) && (m_image != nullptr)) {
-    ::memcpy(a_destination, m_image->data, a_size);
+  if ((a_destination != nullptr) && (a_size > 0)) {
+    std::cout << "a_size: " << a_size << std::endl;
+    ::memcpy(a_destination, m_image.data, a_size);
 
-    cv::imshow("Camera feed", *m_image);
+    cv::imshow("Camera feed", m_image);
     cv::waitKey(10);
 
     retVal = true;

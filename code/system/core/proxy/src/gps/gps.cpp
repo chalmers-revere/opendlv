@@ -185,7 +185,7 @@ void Gps::nextString(std::string const &s) {
       gotGpvtg = true;
 
       // Convert to m/s.
-      speed = std::stof(fields.at(7)) / 3.6;
+      speed = std::stof(fields.at(7)) / 3.6f;
 
     } else if (type == "GPHDT") {
       gotGphdt = true;

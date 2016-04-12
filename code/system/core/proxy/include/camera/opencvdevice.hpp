@@ -49,7 +49,7 @@ class OpenCvDevice : public Device {
 
  private:
   std::shared_ptr<cv::VideoCapture> m_capture;
-  std::shared_ptr<cv::Mat> m_image;
+  cv::Mat m_image;
 };
 
 } // camera
