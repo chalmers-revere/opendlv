@@ -60,7 +60,7 @@ FIND_PACKAGE (OpenDLV REQUIRED)
 ###########################################################################
 # Find OpenDLV data structures.
 set(OPENDLVDATA_DIR "${CMAKE_INSTALL_PREFIX}")
-find_package(OpenDLVData REQUIRED)
+find_package(opendlvdata REQUIRED)
 
 ###############################################################################
 # Set header files from OpenDaVINCI.
