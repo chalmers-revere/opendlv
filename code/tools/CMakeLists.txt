@@ -76,4 +76,7 @@ set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
               ${REVEREFH16MAPPING_LIBRARIES})
 
 #add_subdirectory(can)
+add_subdirectory(dataspy)
+add_subdirectory(truckreplay)
 add_subdirectory(vboreplay)
+
