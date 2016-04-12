@@ -130,7 +130,7 @@ float ArtificialNeuralNetwork::evaluate(cv::Mat& predicted, cv::Mat& actual) {
   for(int i = 0; i < actual.rows; i++) {
     float p = predicted.at<float>(i,0);
     float a = actual.at<float>(i,0);
-    if((p >= 0.0f && a >= 0.0f) || (p <= 0.0f &&  a <= 0.0f)) {
+    if((p > 0.0f && a > 0.0f) || (p < 0.0f &&  a < 0.0f)) {
       t++;
     } else {
       f++;
