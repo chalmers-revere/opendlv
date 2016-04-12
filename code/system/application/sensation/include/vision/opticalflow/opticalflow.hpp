@@ -20,10 +20,16 @@
 #ifndef VISION_OPTICALFLOW_OPTICALFLOW_HPP_
 #define VISION_OPTICALFLOW_OPTICALFLOW_HPP_
 
+// #include <Eigen/Dense>
 #include <memory>
+
+#include "opencv2/video/tracking.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/highgui/highgui.hpp"
 
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
+
 
 namespace opendlv {
 namespace sensation {
@@ -31,7 +37,8 @@ namespace vision {
 namespace opticalflow {
 
 /**
- * This class provides...
+ * This class provides the optical flow of a series of images, namely by 
+ * comparing the current image to the previous one.
  */
 class OpticalFlow
 : public odcore::base::module::DataTriggeredConferenceClientModule {
@@ -45,6 +52,14 @@ class OpticalFlow
  private:
   void setUp();
   void tearDown();
+
+  cv::TermCriteria m_termcrit;
+  cv::Size searchSize;
+  uint32_t maxLevel;
+  double minEigThreshold;
+  cv::Mat m_grayImage, m_prevGrayImage, m_image, m_frame;
+  std::vector<cv::Point2f> staticImagePoints;
+  std::vector<cv::Point2f> endImagePoints;
 };
 
 } // opticalflow

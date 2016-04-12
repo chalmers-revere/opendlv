@@ -150,6 +150,14 @@ safety-manualoverride.accelerationPedalPositionThreshold = 0.1
 safety-manualoverride.brakePedalPositionThreshold = 0.1
 safety-manualoverride.torsionBarTorqueThreshold = 1.5
 
+# Sensation Optical flow
+
+sensation-vision-opticalflow.termCritMaxCount = 20
+sensation-vision-opticalflow.termCritEpsilon = 0.03
+sensation-vision-opticalflow.lkSearchWindow = 30
+sensation-vision-opticalflow.maxLevel = 3
+sensation-vision-opticalflow.minEigThreshold = 0.001
+
 # V2V temp
 knowledge-linguistics-v2vcam.stationId = 115
 knowledge-linguistics-v2vcam.stationType = 8 #heavy truck
