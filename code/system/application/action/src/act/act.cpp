@@ -63,7 +63,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
 
   //  std::cout << "Send acc. " << m_acceleration << " Steering: " << m_steering << std::endl;
   
-    opendlv::proxy::Actuation actuation(m_acceleration, m_steering);
+    opendlv::proxy::Actuation actuation(m_acceleration, m_steering, false);
     odcore::data::Container c(actuation);
     getConference().send(c);
   }

@@ -144,6 +144,12 @@ proxy-v2v.mount.y = -1.2,1.2
 proxy-v2v.mount.z = 3.5,3.5
 proxy-v2v.listenPort = 5000
 
+safety-checkactuation.maxAllowedDeceleration = 3
+
+safety-manualoverride.accelerationPedalPositionThreshold = 0.1
+safety-manualoverride.brakePedalPositionThreshold = 0.1
+safety-manualoverride.torsionBarTorqueThreshold = 1.5
+
 # V2V temp
 knowledge-linguistics-v2vcam.stationId = 115
 knowledge-linguistics-v2vcam.stationType = 8 #heavy truck

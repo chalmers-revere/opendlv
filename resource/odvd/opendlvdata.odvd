@@ -155,6 +155,7 @@ message opendlv.proxy.reverefh16.Steering [id = 199] {
 message opendlv.proxy.Actuation [id = 164] {
   float acceleration;
   float steering;
+  bool isValid;
 }
 
 message opendlv.proxy.ControlState [id = 165] {
