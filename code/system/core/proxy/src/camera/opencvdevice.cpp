@@ -51,15 +51,7 @@ OpenCvDevice::OpenCvDevice(std::string const &a_name,
     + ":" + a_password + "@" + a_port + "/axis-cgi/mjpg/video.cgi?user=" 
     + a_username + "&password=" + a_password + "&channel=0&.mjpg";
 
-
-  std::cout << videoStreamAddress << std::endl;
-
-
-//  videoStreamAddress = "rostock.avi";
-
   m_capture.reset(new cv::VideoCapture(videoStreamAddress));
-
-  //odcore::base::Thread::usleepFor(2000);
 
   if (m_capture->isOpened()) {
     std::cout << "Open. width: " << a_width << " height: " << a_height << std::endl;
