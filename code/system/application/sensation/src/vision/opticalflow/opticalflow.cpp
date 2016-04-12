@@ -51,8 +51,8 @@ OpticalFlow::~OpticalFlow()
 }
 
 /**
- * Receives .
- * Sends .
+ * Receives raw images from cameras.
+ * Sends an RGB matrix of optical flow.
  */
 void OpticalFlow::nextContainer(odcore::data::Container &)
 {
