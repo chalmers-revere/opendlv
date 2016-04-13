@@ -37,7 +37,7 @@
     INPUT=gensub(/\,/, " ", "g", INPUT)
 
     split(INPUT, SIGNAL, " ")
-    if (SIGNAL[5] == "1") {
+    if (SIGNAL[5] == "0") {
         ENDIAN="big"
     }
     else {
