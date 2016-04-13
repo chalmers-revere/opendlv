@@ -22,8 +22,14 @@
 #include <cmath>
 #include <iostream>
 
+
+#include "opendavinci/odcore/base/KeyValueConfiguration.h"
+
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
+#include "opendavinci/GeneratedHeaders_OpenDaVINCI.h"
+#include "opendavinci/odcore/wrapper/SharedMemoryFactory.h"
+#include "opendavinci/odcore/wrapper/SharedMemory.h"
 
 #include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
@@ -42,7 +48,17 @@ namespace opticalflow {
   */
 OpticalFlow::OpticalFlow(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(
-      a_argc, a_argv, "sensation-vision-opticalflow")
+      a_argc, a_argv, "sensation-vision-opticalflow"),
+      m_termcrit(),
+      m_searchSize(),
+      m_maxLevel(),
+      m_minEigThreshold(),
+      m_grayImage(),
+      m_prevGrayImage(),
+      m_image(),
+      m_frame(),
+      m_staticImagePoints(),
+      m_endImagePoints()
 {
 }
 
@@ -54,12 +70,54 @@ OpticalFlow::~OpticalFlow()
  * Receives raw images from cameras.
  * Sends an RGB matrix of optical flow.
  */
-void OpticalFlow::nextContainer(odcore::data::Container &)
+void OpticalFlow::nextContainer(odcore::data::Container &a_c)
 {
+  if(a_c.getDataType() != odcore::data::image::SharedImage::ID()){
+    return;
+  }
+  odcore::data::image::SharedImage mySharedImg =
+      a_c.getData<odcore::data::image::SharedImage>();
+
+  std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(
+      odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(
+          mySharedImg.getName()));
+  const uint32_t nrChannels = mySharedImg.getBytesPerPixel();
+  const uint32_t imgWidth = mySharedImg.getWidth();
+  const uint32_t imgHeight = mySharedImg.getHeight();
+
+  IplImage* myIplImage = cvCreateImage(cvSize(imgWidth,imgHeight), IPL_DEPTH_8U,
+      nrChannels);
+  m_image = cv::Mat(myIplImage);
+
+  if(!sharedMem->isValid()){
+    return;
+  }
+
+  sharedMem->lock();
+  {
+    memcpy(m_image.data, sharedMem->getSharedMemory(),
+        imgWidth*imgHeight*nrChannels);
+  }
+  sharedMem->unlock();
 }
 
 void OpticalFlow::setUp()
 {
+  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+
+  uint32_t termCritMaxCount = kv.getValue<uint32_t>(
+      "sensation-vision-opticalflow.termCritMaxCount");
+  double termCritEpsilon = kv.getValue<double>(
+      "sensation-vision-opticalflow.termCritEpsilon");
+  m_termcrit = cv::TermCriteria(cv::TermCriteria::COUNT|cv::TermCriteria::EPS,
+        termCritMaxCount,termCritEpsilon);
+  uint32_t lkSearchWindow = kv.getValue<uint32_t>(
+      "sensation-vision-opticalflow.lkSearchWindow");
+  m_searchSize = cv::Size(lkSearchWindow,lkSearchWindow);
+  m_maxLevel = kv.getValue<uint32_t>(
+      "sensation-vision-opticalflow.maxLevel");
+  m_minEigThreshold = kv.getValue<double>(
+      "sensation-vision-opticalflow.minEigThreshold");
 }
 
 void OpticalFlow::tearDown()

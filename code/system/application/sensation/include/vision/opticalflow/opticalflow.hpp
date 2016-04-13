@@ -20,7 +20,7 @@
 #ifndef VISION_OPTICALFLOW_OPTICALFLOW_HPP_
 #define VISION_OPTICALFLOW_OPTICALFLOW_HPP_
 
-// #include <Eigen/Dense>
+#include <Eigen/Dense>
 #include <memory>
 
 #include "opencv2/video/tracking.hpp"
@@ -54,14 +54,16 @@ class OpticalFlow
   void tearDown();
 
   cv::TermCriteria m_termcrit;
-  cv::Size searchSize;
-  uint32_t maxLevel;
-  double minEigThreshold;
-  cv::Mat m_grayImage, m_prevGrayImage, m_image, m_frame;
-  std::vector<cv::Point2f> staticImagePoints;
-  std::vector<cv::Point2f> endImagePoints;
+  cv::Size m_searchSize;
+  uint32_t m_maxLevel;
+  double m_minEigThreshold;
+  cv::Mat m_grayImage;
+  cv::Mat m_prevGrayImage;
+  cv::Mat m_image;
+  cv::Mat m_frame;
+  std::vector<cv::Point2f> m_staticImagePoints;
+  std::vector<cv::Point2f> m_endImagePoints;
 };
-
 } // opticalflow
 } // vision
 } // sensation
