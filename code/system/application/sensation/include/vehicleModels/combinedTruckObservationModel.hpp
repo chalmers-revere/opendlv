@@ -200,7 +200,7 @@ protected:
         // partial derivative of meas.d1() w.r.t. x.x()
         this->H( M::Z_THETA, S::THETA ) = 1;//_x(4);//1;//delta2[0] / d2;
         // partial derivative of meas.d1() w.r.t. x.y()
-        this->H( M::Z_THETA_DOT, S::R ) = 1;//_x(5);//1;//delta2[1] / d2;
+        this->H( M::Z_THETA_DOT, S::THETA_DOT ) = 1;//_x(5);//1;//delta2[1] / d2;
     }
 
 

@@ -240,7 +240,7 @@ m_saveToFile = true;
                           << U.v() << " " << U.phi() << " "
                           << Z.Z_x() << " " << Z.Z_y() << " " << Z.Z_theta() << " " << Z.Z_theta_dot() << " "
                           << X.x() << " " << X.x_dot() << " "  << X.y() << " " << X.y_dot() << " " << X.theta() << " " << X.theta_dot() << " "
-                          << Xdyn.x() << " " << Xdyn.y() << " "  << Xdyn.uy() << " " << Xdyn.uy_dot() << " " << Xdyn.theta() << " " << Xdyn.r() << " "
+                          << Xdyn.x() << " " << Xdyn.x_dot() << " " << Xdyn.y() << " "  << Xdyn.y_dot() << " " <<  Xdyn.theta() << " " << Xdyn.theta_dot()
                           << endl;
             }
 

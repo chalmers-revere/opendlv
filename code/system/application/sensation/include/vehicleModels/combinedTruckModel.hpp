@@ -40,50 +40,75 @@ namespace combinedTruckModel
  *     X  =  state vector at the current time k
  *           where (x, y, uy, theta, r) is the position, lateral velocity, heading and yaw rate of the vehicle
  *           [x, y, uy, uy_dot, theta, r, r_dot ], 7-by-1
- *
+ *TODO: change the notation according to the new code !
  * @param T Numeric scalar type
  */
 template<typename T>
-class State : public opendlv::system::libs::kalman::Vector<T, 7>
+class State : public opendlv::system::libs::kalman::Vector<T, 6>
 {
 public:
-    KALMAN_VECTOR(State, T, 7)    //the kalman vector for our state will be 7 (x, y, uy, uy_dot, theta, r, r_dot)
+    KALMAN_VECTOR(State, T, 6)    //the kalman vector for our state will be 7 (x, y, uy, uy_dot, theta, r, r_dot)
 
     //! Position X
     static constexpr size_t X = 0;
+    //! X-Velocity
+    static constexpr size_t X_DOT = 1;
 
     //! Position Y
-    static constexpr size_t Y = 1;
-
-    //! Lateral velocity
-    static constexpr size_t UY = 2;
-    //! Lateral acceleration
-    static constexpr size_t UY_DOT = 3;
+    static constexpr size_t Y = 2;
+    //! Y-Lateral velocity
+    static constexpr size_t Y_DOT = 3;
+    //! Y-Lateral acceleration
+    //static constexpr size_t Y_DOT_DOT = 4;
 
     //!Heading
-    static constexpr size_t THETA = 4;
+    static constexpr size_t THETA = 5;
     //! Yaw rate
-    static constexpr size_t R = 5;
+    static constexpr size_t THETA_DOT = 6;
     //! Yaw rate change
-    static constexpr size_t R_DOT = 6;
+    //static constexpr size_t YAW_DOT_DOT = 7;
 
+//    static constexpr size_t X = 0;
+//    static constexpr size_t Y = 1;
+//    static constexpr size_t UY = 2;
+//    static constexpr size_t UY_DOT = 3;
+//    static constexpr size_t THETA = 4;
+//    static constexpr size_t R = 5;
+//    static constexpr size_t R_DOT = 6;
 
     T x()          const { return (*this)[ X ]; }
+    T x_dot()          const { return (*this)[ X_DOT ]; }
     T y()          const { return (*this)[ Y ]; }
-    T uy()          const { return (*this)[ UY ]; }
-    T uy_dot()      const { return (*this)[ UY_DOT ]; }
+    T y_dot()      const { return (*this)[ Y_DOT ]; }
+    //T y_dot_dot()      const { return (*this)[ Y_DOT_DOT ]; }
     T theta()          const { return (*this)[ THETA ]; }
-    T r()          const { return (*this)[ R ]; }
-    T r_dot()      const { return (*this)[ R_DOT ]; }
+    T theta_dot()          const { return (*this)[ THETA_DOT ]; }
+    //T yaw_dot_dot()      const { return (*this)[ YAW_DOT_DOT ]; }
 
+    //T x()          const { return (*this)[ X ]; }
+    //T y()          const { return (*this)[ Y ]; }
+    //T uy()          const { return (*this)[ UY ]; }
+    //T uy_dot()      const { return (*this)[ UY_DOT ]; }
+    //T theta()          const { return (*this)[ THETA ]; }
+    //T r()          const { return (*this)[ R ]; }
+    //T r_dot()      const { return (*this)[ R_DOT ]; }
 
     T& x()          { return (*this)[ X ]; }
+    T& x_dot()          { return (*this)[ X_DOT ]; }
     T& y()          { return (*this)[ Y ]; }
-    T& uy()          { return (*this)[ UY ]; }
-    T& uy_dot()      { return (*this)[ UY_DOT ]; }
+    T& y_dot()          { return (*this)[ Y_DOT ]; }
+    //T& y_dot_dot()      { return (*this)[ Y_DOT_DOT ]; }
     T& theta()          { return (*this)[ THETA ]; }
-    T& r()          { return (*this)[ R ]; }
-    T& r_dot()      { return (*this)[ R_DOT ]; }
+    T& theta_dot()          { return (*this)[ THETA_DOT ]; }
+    //T& yaw_dot_dot()      { return (*this)[ YAW_DOT_DOT ]; }
+
+    //T& x()          { return (*this)[ X ]; }
+    //T& y()          { return (*this)[ Y ]; }
+    //T& uy()          { return (*this)[ UY ]; }
+    //T& uy_dot()      { return (*this)[ UY_DOT ]; }
+    //T& theta()          { return (*this)[ THETA ]; }
+    //T& r()          { return (*this)[ R ]; }
+    //T& r_dot()      { return (*this)[ R_DOT ]; }
 
 }; // end - class State
 
@@ -105,21 +130,29 @@ public:
  * @param T Numeric scalar type
  */
 template<typename T>
-class Control : public opendlv::system::libs::kalman::Vector<T, 2>
+class Control : public opendlv::system::libs::kalman::Vector<T, 4>
 {
 public:
-    KALMAN_VECTOR(Control, T, 2)
+    KALMAN_VECTOR(Control, T, 4)
 
     //! Longitudinal Velocity
     static constexpr size_t V = 0;
     //! Steering angle
     static constexpr size_t PHI = 1;
+    //! Velocity along the y axis in the vehicle reference frame
+    static constexpr size_t V_Y = 1;
+    //! angular velocity of the vehicle in its own reference frame
+    static constexpr size_t YAW_RATE = 1;
 
-    T v()       const { return (*this)[ V ]; }
-    T phi()     const { return (*this)[ PHI ]; }
+    T v()        const { return (*this)[ V ]; }
+    T phi()      const { return (*this)[ PHI ]; }
+    T v_y()      const { return (*this)[V_Y]; }
+    T yaw_rate() const { return (*this)[YAW_RATE]; }
 
-    T& v()      { return (*this)[ V ]; }
-    T& phi()    { return (*this)[ PHI ]; }
+    T& v()        { return (*this)[ V ]; }
+    T& phi()      { return (*this)[ PHI ]; }
+    T& v_y()      { return (*this)[ V_Y ]; }
+    T& yaw_rate() { return (*this)[ YAW_RATE ]; }
 
 }; // end - class Control
 
@@ -173,6 +206,12 @@ public:
       double a;
       double b;
       double I;
+      double c1;
+      double c2;
+      double c3;
+      double c4;
+      double c5;
+      double c6;
       //double s1 = 0.15;  ///--> cornering stiffness of front wheel (default value 0.15) UNIT? N/deg N/rad?
       //double s2 = 0.15;  ///--> cornering stiffness of rear wheel (default value 0.15) UNIT? N/deg N/rad?
       //double m = 2000;   ///--> mass of the truck (kg)
@@ -186,7 +225,14 @@ public:
         //double c4 = (s2*b -s1*a)/I ;
         //double c5 = (-s1*pow(a,2) - s2*pow(b,2))/I;
         //double c6 = s1*a/I ;
-      vehicleParams() : wheelbase(3.8), s1(0.15), s2(0.15), m(2000), a(1.0), b(2.8), I(4000)  {}
+      vehicleParams() : wheelbase(3.8), s1(0.15), s2(0.15), m(2000), a(1.0), b(2.8), I(4000)  {
+           c1 = (-s1 -s2) /m ;
+           c2 = (s2*b -s1*a)/m ;
+           c3 = s1/m ;
+           c4 = (s2*b -s1*a)/I ;
+           c5 = (-s1*pow(a,2) - s2*pow(b,2))/I;
+           c6 = s1*a/I ;
+      }
 
       /**
        * @brief Espose the wheelbase to be set by the user
@@ -241,31 +287,58 @@ public:
         // TODO: Find constants and set them somewhere else
         double delta_t = 0.05;
 
-        double s1 = 0.15;
-        double s2 = 0.15;
-        double m = 2000;
-        double a = 1;
-        double b = 2.8;
-        double I = 4000;
+        //double s1 = m_vehicleParams.s1;
+        //double s2 = m_vehicleParams.s2;
+        //double m = m_vehicleParams.m;
+        //double a = m_vehicleParams.a;
+        //double b = m_vehicleParams.b;
+        //double I = m_vehicleParams.I;
 
-        double c1 = (-s1 -s2) /m ;
-        double c2 = (s2*b -s1*a)/m ;
-        double c3 = s1/m ;
-        double c4 = (s2*b -s1*a)/I ;
-        double c5 = (-s1*pow(a,2) - s2*pow(b,2))/I;
-        double c6 = s1*a/I ;
+        //double c_1 = m_vehicleParams.c1;// (-s1 -s2) /m ;
+        //double c_2 = m_vehicleParams.c2;//(s2*b -s1*a)/m ;
+        //double c_3 = m_vehicleParams.c3;//s1/m ;
+        //double c_4 = m_vehicleParams.c4;//(s2*b -s1*a)/I ;
+        //double c_5 = m_vehicleParams.c5;//(-s1*pow(a,2) - s2*pow(b,2))/I;
+        //double c_6 = m_vehicleParams.c6;//s1*a/I ;
         //double ux = sqrt(pow(u.v(),2)-pow(x.uy(),2));
 
-        double v = u.v();
-        if(u.v() < 0.0001) { v = 0.0001; }
+        //double v = u.v();
+        //if(u.v() < 0.0001) { v = 0.0001; }
 
-        x_p.x() = x.x() + std::cos(x.theta())*u.v()*delta_t - std::sin(x.theta())*x.uy()*delta_t;
-        x_p.y() = x.y() + std::sin(x.theta())*u.v()*delta_t + std::cos(x.theta())*x.uy()*delta_t;
-        x_p.uy() = x.uy() + delta_t * x.uy_dot();
-        x_p.uy_dot() = c1 * x.uy()/v - (u.v() + c2/v) * x.r() + c3 * u.phi();
-        x_p.theta() = x.theta() + x.r()*delta_t;
-        x_p.r() = x.r() + delta_t * x.r_dot();
-        x_p.uy_dot() = c4 * x.uy()/v + c5 * x.r()/v + c6 * u.phi();
+ //       x_p.x() = x.x() + std::cos(x.theta())*u.v()*delta_t - std::sin(x.theta())*x.uy()*delta_t;
+ //       x_p.y() = x.y() + std::sin(x.theta())*u.v()*delta_t + std::cos(x.theta())*x.uy()*delta_t;
+ //       x_p.uy() = x.uy() + delta_t * x.uy_dot();
+ //       x_p.uy_dot() = c1 * x.uy()/v - (u.v() + c2/v) * x.r() + c3 * u.phi();
+ //       x_p.theta() = x.theta() + x.r()*delta_t;
+ //       x_p.r() = x.r() + delta_t * x.r_dot();
+ //       x_p.uy_dot() = c4 * x.uy()/v + c5 * x.r()/v + c6 * u.phi();
+
+        double lateral_acceleration;
+        double angular_acceleration;
+        if(u.v() < 0.0001) {
+            lateral_acceleration = 0;
+            angular_acceleration = 0;
+        }  // if we are stopped it is reasonable to consider the acceleration as 0
+        else {
+            //lateral_acceleration = c_1 * x.y_dot()/u.v() + x.theta_dot() * (c_2/u.v() - u.v())  + c_3 * u.phi();
+            lateral_acceleration = 1/m_vehicleParams.m * (2*m_vehicleParams.s1 * (u.phi() - (u.v_y() + m_vehicleParams.a * u.yaw_rate())/u.v() )  + 2 * m_vehicleParams.s2 * (-(u.v_y() - m_vehicleParams.b * u.yaw_rate() )/ u.v()) - u.yaw_rate() * u.v());
+            //angular_acceleration = c_4 * (x.y_dot()/u.v()) + c_5 * (x.yaw_dot()/u.v()) + c_6 * u.phi();
+            angular_acceleration = 1/m_vehicleParams.I * (m_vehicleParams.a * 2 * m_vehicleParams.s1 * (u.phi() - (u.v_y() - m_vehicleParams.s1 * u.yaw_rate())/u.v() ) - m_vehicleParams.b * 2 * m_vehicleParams.s2 * (- (u.v_y() - m_vehicleParams.b * u.yaw_rate())/u.v() ) );
+        }
+
+        // calculate the X - components
+        x_p.x() = x.x() + delta_t * x.x_dot();
+        x_p.x_dot() = u.v()*std::cos(x.theta()) + lateral_acceleration * (-std::sin(x.theta())) * delta_t;
+
+        // calculate the Y - components
+        x_p.y() = x.y() + delta_t * x.x_dot();
+        x_p.y_dot() = u.v()*std::sin(x.theta()) + lateral_acceleration * std::cos(x.theta()) * delta_t;
+
+        // calculate the THETA - components
+        x_p.theta() = x.theta() + x.theta_dot()*delta_t;
+        x_p.theta_dot() = x.theta_dot() + angular_acceleration * delta_t;
+
+
 
         // Return transitioned state vector
         return x_p;
@@ -309,63 +382,84 @@ protected:
 //       0    0    0                    0                    0                        1       delta_t  dr
 //       0    0    c4/ux                0                    0                      c5/ux       0    ] dr_dot
 
+//       dx   dx_dot    dy      dy_dot          dy_dot_dot      dtheta                              dtheta_dot       dtheta_dot_dot
+//
+//J_f = [1    delta_t   0       0               0               0                                  0                0          dx
+//       0    0         0      -cos(theta)      0              -v*sin(theta)-y_dot*cos(theta)      0                0          dx_dot
+//       0    0         1       delta_t         0               0                                  0                0          dy
+//       0    0         0       cos(theta)      delta_t         v*cos(theta)-y_dot*sin(theta)      0                0          dy_dot
+//       0    0         0       c1/v            0               0                                  c2/v -v          0          dy_dot_dot
+//       0    0         0       0               0               1                                  delta_t          0          dtheta
+//       0    0         0       0               0               0                                  1                delta_t    dr
+//       0    0         0       c4/v            0               0                                  c5/v             0      ]   dr_dot
+
         //TODO fix constants
-        double delta_t = 0.05;
-        double s1 = 0.15;
-        double s2 = 0.15;
-        double m = 2000;
-        double a = 1;
-        double b = 2.8;
-        double I = 4000;
+        //double s1 = m_vehicleParams.s1;
+        //double s2 = m_vehicleParams.s2;
+        //double m = m_vehicleParams.m;
+        //double a = m_vehicleParams.a;
+        //double b = m_vehicleParams.b;
+        //double I = m_vehicleParams.I;
 
-        double c1 = (-s1 -s2) /m ;
-        double c2 = (s2*b -s1*a)/m ;
+        //double c_1 = m_vehicleParams.c1;// (-s1 -s2) /m ;
+        //double c_2 = m_vehicleParams.c2;//(s2*b -s1*a)/m ;
+        //double c_3 = m_vehicleParams.c3;//s1/m ;
+        //double c_4 = m_vehicleParams.c4;//(s2*b -s1*a)/I ;
+        //double c_5 = m_vehicleParams.c5;//(-s1*pow(a,2) - s2*pow(b,2))/I;
+        //double c_6 = m_vehicleParams.c6;//s1*a/I ;
 
-        double c4 = (s2*b -s1*a)/I ;
-        double c5 = (-s1*pow(a,2) - s2*pow(b,2))/I;
+
+        double lateral_acceleration;
+        //double angular_acceleration;
+        if(u.v() < 0.0001) {
+            lateral_acceleration = 0;
+            //angular_acceleration = 0;
+        }  // if we are stopped it is reasonable to consider the acceleration as 0
+        else {
+            //lateral_acceleration = c_1 * x.y_dot()/u.v() + x.theta_dot() * (c_2/u.v() - u.v())  + c_3 * u.phi();
+            lateral_acceleration = 1/m_vehicleParams.m * (2*m_vehicleParams.s1 * (u.phi() - (u.v_y() + m_vehicleParams.a * u.yaw_rate())/u.v() )  + 2 * m_vehicleParams.s2 * (-(u.v_y() - m_vehicleParams.b * u.yaw_rate() )/ u.v()) - u.yaw_rate() * u.v());
+            //angular_acceleration = c_4 * (x.y_dot()/u.v()) + c_5 * (x.yaw_dot()/u.v()) + c_6 * u.phi();
+            //angular_acceleration = 1/m_vehicleParams.I * (m_vehicleParams.a * 2 * m_vehicleParams.s1 * (u.phi() - (u.v_y() - m_vehicleParams.s1 * u.yaw_rate())/u.v() ) - m_vehicleParams.b * 2 * m_vehicleParams.s2 * (- (u.v_y() - m_vehicleParams.b * u.yaw_rate())/u.v() ) );
+        }
+        // TODO :
+        // if u.v = 0 ==> y_dot_dot = 0 !!!
 
 
-        double v = u.v();
-        if(u.v() < 0.0001) { v = 0.0001; }
-
+        //           d f    |
+        // J_f = -----------|                 : Linearize state equation, J_f is the
+        //           d X    |X=Xp               Jacobian of the process model
+        //
+        //      dx     dx_dot     dy   dydot      dtheta                 dthetadot
+        //
+        //J_f = [1     delta_t    0     0          0                     0                  dx
+        //       0     0          0     0         -U_k(1)*sin(X_k(5))    0                  dxdot
+        //       0     0          1     delta_t    0                     0                  dy
+        //       0     0          0     0          U_k(1)*cos(X_k(5))    0                  dydot
+        //       0     0          0     0          1                     delta_t            dtheta
+        //       0     0          0     0          0                     0              ];  dthetadot
+        double delta_t = 0.05;   //TODO set automatically
         // partial derivative of x.x() w.r.t. x.x()
         this->F( S::X, S::X ) = 1;
-        // partial derivative of x.x() w.r.t. x.uy()
-        this->F( S::X, S::UY ) = -std::sin(x.theta())*delta_t;
+        // partial derivative of x.x() w.r.t. x.x_dot()
+        this->F( S::X, S::X_DOT ) = delta_t;
         // partial derivative of x.x() w.r.t. x.theta()
-        this->F( S::X, S::THETA ) = (-std::sin(x.theta())*u.v() - std::cos(x.theta())*x.uy())*delta_t;
+        this->F( S::X_DOT, S::THETA ) = -std::sin( x.theta() ) * u.v() - lateral_acceleration * std::cos(x.theta())* delta_t;
 
         // partial derivative of x.y() w.r.t. x.y()
         this->F( S::Y, S::Y ) = 1;
-        // partial derivative of x.y() w.r.t. x.uy()
-        this->F( S::Y, S::UY ) = std::cos(x.theta())*delta_t;
+        // partial derivative of x.y() w.r.t. x.y_dot()
+        this->F( S::Y, S::Y_DOT ) = delta_t;
         // partial derivative of x.y() w.r.t. x.theta()
-        this->F( S::Y, S::THETA ) = (std::cos(x.theta())*u.v() - std::sin(x.theta())*x.uy())*delta_t;
-
-        // partial derivative of x.uy() w.r.t. x.uy()
-        this->F( S::UY, S::UY ) = 1;
-        // partial derivative of x.uy() w.r.t. x.uy_dot()
-        this->F( S::UY, S::UY_DOT ) = delta_t;
-
-        // partial derivative of x.uy_dot() w.r.t. x.uy()
-        this->F( S::UY_DOT, S::UY ) = c1/v;
-        // partial derivative of x.uy_dot() w.r.t. x.uy()
-        this->F( S::UY_DOT, S::R ) = u.v() + c2/v;
+        this->F( S::Y_DOT, S::THETA ) = std::cos( x.theta() ) * u.v() - lateral_acceleration * std::sin(x.theta()) * delta_t;
 
         // partial derivative of x.theta() w.r.t. x.theta()
         this->F( S::THETA, S::THETA ) = 1;
-        // partial derivative of x.theta() w.r.t. x.r()
-        this->F( S::THETA, S::R ) = delta_t;
+        // partial derivative of x.theta() w.r.t. x.theta()
+        this->F( S::THETA, S::THETA_DOT ) = delta_t;
 
-        // partial derivative of x.r() w.r.t. x.r()
-        this->F( S::R, S::R ) = 1;
-        // partial derivative of x.r() w.r.t. x.r_dot()
-        this->F( S::R, S::R_DOT ) = delta_t;
 
-        // partial derivative of x.r_dot() w.r.t. x.uy()
-        this->F( S::R_DOT, S::UY ) = c4/v;
-        // partial derivative of x.r_dot() w.r.t. x.r()
-        this->F( S::R_DOT, S::R ) = c5/v;
+
+
 
         // W = df/dw (Jacobian of state transition w.r.t. the noise)
         this->W.setIdentity();
@@ -388,6 +482,20 @@ protected:
         //Qtheta = sigma_q(2)^2 * [delta_t^3/3 delta_t^2/2;
         //                         delta_t^2/2 delta_t];
         //Q_init = blkdiag(Qxyz, Qxyz, Qtheta, Qtheta);
+        this->W( S::X, S::X ) = std::pow(delta_t,3) / 3;
+        this->W( S::X, S::X_DOT ) = std::pow(delta_t,2) / 2;
+        this->W( S::X_DOT, S::X ) = std::pow(delta_t,2) / 2;
+        this->W( S::X_DOT, S::X_DOT ) = delta_t;
+
+        this->W( S::Y, S::Y ) = std::pow(delta_t,3) / 3;
+        this->W( S::Y, S::Y_DOT ) = std::pow(delta_t,2) / 2;
+        this->W( S::Y_DOT, S::Y ) = std::pow(delta_t,2) / 2;
+        this->W( S::Y_DOT, S::Y_DOT ) = delta_t;
+
+        this->W( S::THETA, S::THETA ) = std::pow(delta_t,3) / 3;
+        this->W( S::THETA, S::THETA_DOT ) = std::pow(delta_t,2) / 2;
+        this->W( S::THETA_DOT, S::THETA ) = std::pow(delta_t,2) / 2;
+        this->W( S::THETA_DOT, S::THETA_DOT ) = delta_t;
 
     }
 };
