@@ -8,8 +8,6 @@ using opendlvdata;
 ///////////////////////////////////////////////////////////////////////////////
 // In the following, all interesting CAN signals are listed.
 ///////////////////////////////////////////////////////////////////////////////
-
-
 // CAN message for manual driver.
 manualdriver.torsionbartorque in 0x262 at bit 23 for 16 bit is big endian multiply by 0.0009765625 add -32 with range [-32, 31.9990234375];
 manualdriver.brakepedalposition in 0x262 at bit 8 for 8 bit is little endian multiply by 0.4 add 0 with range [0, 102];
