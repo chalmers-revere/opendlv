@@ -54,7 +54,9 @@ V2vDenm::V2vDenm(int32_t const &a_argc, char **a_argv)
     m_sendLog(),
     m_receiveLog()
 {
-  struct stat st;// = {};
+
+  struct stat st;
+
   if (stat("var/application/knowledge/linguistics/v2vdenm", &st) == -1) {
     ::system("mkdir -p ./var/application/knowledge/linguistics/v2vdenm");
     // std::cout<<"Created dir"<<std::endl;
@@ -111,7 +113,7 @@ V2vDenm::~V2vDenm()
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vDenm::body()
 {
-
+/*
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
       odcore::data::dmcp::ModuleStateMessage::RUNNING) {
@@ -204,6 +206,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vDenm::body()
 
 
   }
+*/
 
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }

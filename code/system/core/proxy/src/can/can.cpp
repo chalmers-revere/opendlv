@@ -137,6 +137,39 @@ void Can::setUp()
 
 void Can::tearDown()
 {
+  opendlv::proxy::reverefh16::BrakeRequest brakeRequest;
+  brakeRequest.setEnableRequest(false);
+  brakeRequest.setBrake(0.0);
+  odcore::data::Container brakeRequestContainer(brakeRequest);
+
+  canmapping::opendlv::proxy::reverefh16::BrakeRequest 
+      brakeRequestMapping;
+  automotive::GenericCANMessage genericCanMessage = brakeRequestMapping.encode(brakeRequestContainer);
+  m_device->write(genericCanMessage);
+
+
+  opendlv::proxy::reverefh16::AccelerationRequest accelerationRequest;
+  accelerationRequest.setEnableRequest(false);
+  accelerationRequest.setAcceleration(0.0);
+  odcore::data::Container accelerationRequestContainer(accelerationRequest);
+
+  canmapping::opendlv::proxy::reverefh16::AccelerationRequest 
+      accelerationRequestMapping;
+  genericCanMessage = accelerationRequestMapping.encode(accelerationRequestContainer);
+  m_device->write(genericCanMessage);
+
+  opendlv::proxy::reverefh16::SteeringRequest steeringRequest;
+  steeringRequest.setEnableRequest(false);
+  steeringRequest.setSteeringRoadWheelAngle(0.0);
+  steeringRequest.setSteeringDeltaTorque(0.0);
+  odcore::data::Container steeringRequestContainer(steeringRequest);
+
+  canmapping::opendlv::proxy::reverefh16::SteeringRequest 
+      steeringRequestMapping;
+  genericCanMessage = steeringRequestMapping.encode(steeringRequestContainer);
+  m_device->write(genericCanMessage);
+
+
   if (m_device.get()) {
     // Stop the wrapper CAN device.
     m_device->stop();
@@ -152,18 +185,15 @@ void Can::nextGenericCANMessage(const automotive::GenericCANMessage &gcm)
   // Map CAN message to high-level data structure.
   vector<odcore::data::Container> result = m_revereFh16CanMessageMapping.mapNext(gcm);
 
-  if (result.size() > 0) {
-    auto it = result.begin();
-    while (it != result.end()) {
-      odcore::data::Container c = (*it);
-      // Enqueue mapped container for direct recording.
-      if (m_recorderMappedCanMessages.get()) {
-        m_fifoMappedCanMessages.add(c);
-      }
-      // Send container to conference.
-      getConference().send(c);
-      it++;
+  for (auto c : result) {
+    // Enqueue mapped container for direct recording.
+    if (m_recorderMappedCanMessages.get()) {
+      m_fifoMappedCanMessages.add(c);
     }
+    // Send container to conference.
+    getConference().send(c);
+
+    m_canMessageDataStore->add(c);
   }
 
   // Enqueue CAN message wrapped as Container to be recorded if we have a valid
@@ -173,6 +203,16 @@ void Can::nextGenericCANMessage(const automotive::GenericCANMessage &gcm)
     m_fifoGenericCanMessages.add(c);
   }
 }
+
+/**
+ * Receives control commands from the action layer.
+ * Prepares data for the CAN gateway.
+ */
+//void Can::nextContainer(odcore::data::Container &c)
+//{
+//  m_canMessageDataStore.Add(c);
+//}
+
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Can::body()
 {

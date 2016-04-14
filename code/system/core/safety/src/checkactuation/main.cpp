@@ -17,42 +17,11 @@
  * USA.
  */
 
-#include <iostream>
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
+#include "checkactuation/checkactuation.hpp"
 
-#include "safety.hpp"
-
-namespace opendlv {
-namespace system {
-
-/**
-  * Constructor.
-  *
-  * @param a_argc Number of command line arguments.
-  * @param a_argv Command line arguments.
-  */
-Safety::Safety(int32_t const &a_argc, char **a_argv)
-    : DataTriggeredConferenceClientModule(a_argc, a_argv, "safety")
+int32_t main(int32_t a_argc, char **a_argv)
 {
+  opendlv::safety::checkactuation::CheckActuation manualOverride(
+      a_argc, a_argv);
+  return manualOverride.runModule();
 }
-
-Safety::~Safety()
-{
-}
-
-void Safety::setUp()
-{
-  // This method will be call automatically _before_ running body().
-}
-
-void Safety::tearDown()
-{
-  // This method will be call automatically _after_ return from body().
-}
-
-void Safety::nextContainer(odcore::data::Container &)
-{
-}
-
-} // system
-} // opendlv

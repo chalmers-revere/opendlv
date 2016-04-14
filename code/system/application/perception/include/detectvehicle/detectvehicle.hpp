@@ -54,9 +54,9 @@ class DetectVehicle
   void setUp();
   void tearDown();
 
-  VehicleDetectionSystem m_vehicleDetectionSystem;
-  std::vector<std::shared_ptr<DetectedVehicle>> m_verifiedVehicles;
-  VehicleMemorySystem m_vehicleMemorySystem;
+  std::shared_ptr<VehicleDetectionSystem> m_vehicleDetectionSystem;
+  std::shared_ptr<std::vector<std::shared_ptr<DetectedVehicle>>> m_verifiedVehicles;
+  std::shared_ptr<VehicleMemorySystem> m_vehicleMemorySystem;
 };
 
 } // detectvehicle

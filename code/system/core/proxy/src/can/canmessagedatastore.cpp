@@ -17,6 +17,8 @@
  * USA.
  */
 
+#include <iostream>
+
 #include <opendavinci/odcore/data/Container.h>
 #include <automotivedata/generated/automotive/GenericCANMessage.h>
 #include <odcantools/CANDevice.h>
@@ -30,21 +32,72 @@ namespace can {
 
 CanMessageDataStore::CanMessageDataStore(
 std::shared_ptr<automotive::odcantools::CANDevice> canDevice)
-    : automotive::odcantools::MessageToCANDataStore(canDevice)
+    : automotive::odcantools::MessageToCANDataStore(canDevice),
+    m_enabled(false)
 {
 }
 
-void CanMessageDataStore::add(const odcore::data::Container &container)
+void CanMessageDataStore::add(odcore::data::Container const &a_container)
 {
-  using namespace automotive;
-  if (container.getDataType() == GenericCANMessage::ID()) {
-    // TODO: Use CAN mapping to transform a high-level message to a low-level
-    // message.
+  // TODO: Kids, do not try this at home. Issue: #19.
+  odcore::data::Container &container = const_cast<odcore::data::Container &>(
+      a_container);
+ 
+  if (container.getDataType() == opendlv::proxy::ControlState::ID()) {
+    opendlv::proxy::ControlState controlState
+      = container.getData<opendlv::proxy::ControlState>();
 
-    //    GenericCANMessage gcm = const_cast<odcore::data::Container
-    //    &>(container)
-    //                            .getData<GenericCANMessage>();
-    //    m_canDevice->write(gcm);
+    m_enabled = controlState.getAllowAutonomous();
+
+  } else if (container.getDataType() == opendlv::proxy::Actuation::ID()){
+    opendlv::proxy::Actuation actuation 
+      = container.getData<opendlv::proxy::Actuation>();
+
+    bool isValid = actuation.getIsValid();
+    if (!isValid) {
+      return;
+    }
+
+    float acceleration = actuation.getAcceleration();
+    float steering = actuation.getSteering();
+
+    if (acceleration < 0.0f) {
+      opendlv::proxy::reverefh16::BrakeRequest brakeRequest;
+      brakeRequest.setEnableRequest(m_enabled);
+      brakeRequest.setBrake(acceleration);
+      odcore::data::Container brakeRequestContainer(brakeRequest);
+
+      canmapping::opendlv::proxy::reverefh16::BrakeRequest 
+          brakeRequestMapping;
+      automotive::GenericCANMessage genericCanMessage = 
+          brakeRequestMapping.encode(brakeRequestContainer);
+      m_canDevice->write(genericCanMessage);
+
+    } else {
+      opendlv::proxy::reverefh16::AccelerationRequest accelerationRequest;
+      accelerationRequest.setEnableRequest(m_enabled);
+      accelerationRequest.setAcceleration(acceleration);
+      odcore::data::Container accelerationRequestContainer(accelerationRequest);
+
+      canmapping::opendlv::proxy::reverefh16::AccelerationRequest 
+          accelerationRequestMapping;
+      automotive::GenericCANMessage genericCanMessage = 
+          accelerationRequestMapping.encode(accelerationRequestContainer);
+      m_canDevice->write(genericCanMessage);
+    }
+    
+    opendlv::proxy::reverefh16::SteeringRequest steeringRequest;
+    steeringRequest.setEnableRequest(m_enabled);
+    steeringRequest.setSteeringRoadWheelAngle(steering);
+    // Must be -33.535 to disable deltatorque.
+    steeringRequest.setSteeringDeltaTorque(33.535); 
+    odcore::data::Container steeringRequestContainer(steeringRequest);
+
+    canmapping::opendlv::proxy::reverefh16::SteeringRequest 
+        steeringRequestMapping;
+    automotive::GenericCANMessage genericCanMessage 
+        = steeringRequestMapping.encode(steeringRequestContainer);
+    m_canDevice->write(genericCanMessage);
   }
 }
 

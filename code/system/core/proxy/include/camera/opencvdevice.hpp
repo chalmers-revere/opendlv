@@ -48,8 +48,8 @@ class OpenCvDevice : public Device {
   virtual bool CaptureFrame();
 
  private:
-  std::shared_ptr<cv::VideoCapture> m_capture;
-  std::shared_ptr<cv::Mat> m_image;
+  std::unique_ptr<cv::VideoCapture> m_capture;
+  cv::Mat m_image;
 };
 
 } // camera

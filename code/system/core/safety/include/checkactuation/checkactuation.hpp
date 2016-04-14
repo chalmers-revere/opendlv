@@ -17,10 +17,36 @@
  * USA.
  */
 
-#include "safety.hpp"
+#ifndef CHECKACTUATION_CHECKACTUATION_HPP_
+#define CHECKACTUATION_CHECKACTUATION_HPP_
 
-int32_t main(int32_t a_argc, char **a_argv)
-{
-  opendlv::system::Safety s(a_argc, a_argv);
-  return s.runModule();
-}
+#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
+
+namespace opendlv {
+namespace safety {
+namespace checkactuation {
+
+/**
+ * This class provides...
+ */
+class CheckActuation
+: public odcore::base::module::DataTriggeredConferenceClientModule {
+ public:
+  CheckActuation(int32_t const &, char **);
+  CheckActuation(CheckActuation const &) = delete;
+  CheckActuation &operator=(CheckActuation const &) = delete;
+  virtual ~CheckActuation();
+  virtual void nextContainer(odcore::data::Container &);
+
+ private:
+  virtual void setUp();
+  virtual void tearDown();
+
+  float m_maxAllowedDeceleration;
+};
+
+} // checkactuation
+} // safety
+} // opendlv
+
+#endif

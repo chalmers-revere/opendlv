@@ -41,7 +41,7 @@ class V2vCam
   V2vCam(V2vCam const &) = delete;
   V2vCam &operator=(V2vCam const &) = delete;
   virtual ~V2vCam();
-  virtual void nextContainer(odcore::data::Container &c);
+  virtual void nextContainer(odcore::data::Container &);
 
  private:
   void setUp();
@@ -53,11 +53,11 @@ class V2vCam
 
   unsigned long const millisecondsTo2004FromUnixEpoch = 1072915200000;
   unsigned char const m_messageId = 2;
-  int32_t m_stationId = 0;
+  int32_t m_stationId = 115;
   // Generation time of the (CAM) message in milliseconds
   int32_t m_generationDeltaTime = 0; 
   unsigned char m_containerMask = 128;
-  int32_t m_stationType = 0;
+  int32_t m_stationType = 8;
   int32_t m_latitude = 900000001;
   int32_t m_longitude = 1800000001;
   int32_t m_semiMajorConfidence = 4095;
@@ -68,8 +68,8 @@ class V2vCam
   int32_t m_headingConfidence = 127;
   int32_t m_speed = 16383; //
   int32_t m_speedConfidence = 127;
-  int32_t m_vehicleLength = 1023;
-  int32_t m_vehicleWidth = 62;
+  int32_t m_vehicleLength = 73;
+  int32_t m_vehicleWidth = 25;
   int32_t m_longitudinalAcc = 161;
   int32_t m_longitudinalAccConf = 102;
   int32_t m_yawRateValue = 32767;

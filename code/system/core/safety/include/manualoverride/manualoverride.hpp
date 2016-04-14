@@ -17,32 +17,38 @@
  * USA.
  */
 
-#ifndef SAFETY_HPP_
-#define SAFETY_HPP_
+#ifndef MANUALOVERRIDE_MANUALOVERRIDE_HPP_
+#define MANUALOVERRIDE_MANUALOVERRIDE_HPP_
 
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 
 namespace opendlv {
-namespace system {
+namespace safety {
+namespace manualoverride {
 
 /**
  * This class provides...
  */
-class Safety
+class ManualOverride
 : public odcore::base::module::DataTriggeredConferenceClientModule {
  public:
-  Safety(int32_t const &, char **);
-  Safety(Safety const &) = delete;
-  Safety &operator=(Safety const &) = delete;
-  virtual ~Safety();
+  ManualOverride(int32_t const &, char **);
+  ManualOverride(ManualOverride const &) = delete;
+  ManualOverride &operator=(ManualOverride const &) = delete;
+  virtual ~ManualOverride();
   virtual void nextContainer(odcore::data::Container &);
 
  private:
   virtual void setUp();
   virtual void tearDown();
+
+  double m_accelerationPedalPositionThreshold;
+  double m_brakePedalPositionThreshold;
+  double m_torsionBarTorqueThreshold;
 };
 
-} // system
+} // manualoverride
+} // safety
 } // opendlv
 
 #endif

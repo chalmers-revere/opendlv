@@ -55,7 +55,7 @@ public:
   void setUp();
   void tearDown();
   void update(const cv::Mat* a_imageFrame,
-      std::vector<std::shared_ptr<DetectedVehicle>>* verifiedVehicles,
+      std::shared_ptr<std::vector<std::shared_ptr<DetectedVehicle>>> verifiedVehicles,
       double timeStamp);
 
   void setShowImage(bool a_showImage);
@@ -75,7 +75,7 @@ private:
   uint32_t m_imgCounter = 0;
 
   const std::string m_pathHaarClassOwn = "haar_classifiers/own_201512.xml";
-  const std::string m_pathHaarClassCars3 = "/opt/opendlv/share/opendlv/system/application/perception/detectvehicle/haar_cars3.xml";
+  const std::string m_pathHaarClassCars3 = "share/opendlv/system/application/perception/detectvehicle/haar_cars3.xml";
 
   cv::Rect m_regionOfInterest;
   int32_t m_windowWidth;

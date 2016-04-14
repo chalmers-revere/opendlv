@@ -63,7 +63,7 @@ private:
 
 /* Private fields */
 private:
-  std::vector<std::shared_ptr<DetectedVehicle>> m_memoryOverTime;
+  std::shared_ptr<std::vector<std::shared_ptr<DetectedVehicle>>> m_memoryOverTime;
   cv::Scalar m_dummyColor;
 
 };

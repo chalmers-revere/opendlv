@@ -40,7 +40,9 @@ namespace act {
   * @param a_argv Command line arguments.
   */
 Act::Act(int32_t const &a_argc, char **a_argv)
-    : TimeTriggeredConferenceClientModule(a_argc, a_argv, "action-act")
+    : TimeTriggeredConferenceClientModule(a_argc, a_argv, "action-act"),
+    m_acceleration(-2.0f),
+    m_steering(0.0f)
 {
 }
 
@@ -56,7 +58,39 @@ Act::~Act()
  */
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
 {
+  while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
+      odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+
+  //  std::cout << "Send acc. " << m_acceleration << " Steering: " << m_steering << std::endl;
+  
+    opendlv::proxy::Actuation actuation(m_acceleration, m_steering, false);
+    odcore::data::Container c(actuation);
+    getConference().send(c);
+  }
+
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
+}
+
+void Act::nextContainer(odcore::data::Container &c)
+{
+  if(c.getDataType() == opendlv::action::Correction::ID()) {
+    opendlv::action::Correction correction = 
+      c.getData<opendlv::action::Correction>();
+
+    odcore::data::TimeStamp t0 = correction.getStartTime();
+    std::string type = correction.getType();
+    //bool isInhibitory = correction.getIsInhibitory();
+    float amplitude = correction.getAmplitude();
+
+    if (type == "accelerate") {
+     // std::cout << "accelerate: " << amplitude << std::endl;
+      m_acceleration = amplitude;
+    } else if (type == "brake") {
+      std::cout << "brake: " << amplitude << std::endl;
+    } else if (type == "steering") {
+      std::cout << "steering: " << amplitude << std::endl;
+    }
+  }
 }
 
 void Act::setUp()
