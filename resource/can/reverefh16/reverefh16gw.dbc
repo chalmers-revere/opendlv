@@ -49,10 +49,10 @@ BO_ 514 BrakeRequest: 3 Chalmers
  SG_ Enable_BrakeRequest : 16|1@1+ (1,0) [0|1] "bool" Vector__XXX
  SG_ BrakeRequest : 0|16@1+ (0.00048828125,-15.687) [-15.687|16.31251171875] "m/s2" Vector__XXX
 
-BO_ 513 SteerRequest: 6 Chalmers
- SG_ Enable_SteerReq : 0|1@1+ (1,0) [0|1] "bool" Vector__XXX
- SG_ SteerReq_RWA : 32|16@1+ (0.000192,-3.2) [-3.2|3.2] "rad" Vector__XXX
- SG_ SteerReq_DeltaTrq : 16|16@1+ (0.001,-32) [-32|33.535] "Nm" Vector__XXX
+BO_ 513 SteerRequest: 8 Chalmers
+ SG_ Enable_SteerReq : 32|1@1+ (1,0) [0|1] "bool" Vector__XXX
+ SG_ SteerReq_RWA : 16|16@1+ (0.000192,-3.2) [-3.2|3.2] "rad" Vector__XXX
+ SG_ SteerReq_DeltaTrq : 0|16@1+ (0.001,-32) [-32|33.535] "Nm" Vector__XXX
 
 BO_ 263 Steering: 4 VehicleGateWay
  SG_ SteeringWheelAngle : 16|16@1+ (0.0009765625,-31.374) [-31.374|32.6250234375] "rad" Vector__XXX
