@@ -54,8 +54,26 @@ KeepObjectAlignment::~KeepObjectAlignment()
  * current size, and desired angle.
  * Sends speed correction commands (throttle) to Act.
  */
-void KeepObjectAlignment::nextContainer(odcore::data::Container &)
+void KeepObjectAlignment::nextContainer(odcore::data::Container &c)
 {
+  if(c.getDataType() == opendlv::perception::LanePosition::ID()){
+    opendlv::perception::LanePosition lanePosition = 
+        c.getData<opendlv::perception::LanePosition>();
+    //float offset = lanePosition.getOffset();
+    float heading = lanePosition.getHeading();
+  
+    // TODO: Quick way.
+    float error = heading;
+ 
+    if (std::abs(error) > 0.05f) {
+      float amplitude = 0.2f * error;
+      odcore::data::TimeStamp t0;
+      opendlv::action::Correction correction(t0, "steering", false, 
+          amplitude);
+      odcore::data::Container container(correction);
+      getConference().send(container);
+    } 
+  }
 }
 
 void KeepObjectAlignment::setUp()

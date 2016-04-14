@@ -52,9 +52,9 @@ public:
 /* Public methods */
 public:
 	void UpdateMemory(
-      std::vector<std::shared_ptr<DetectedVehicle>>* a_verifiedVehicles,
+      std::shared_ptr<std::vector<std::shared_ptr<DetectedVehicle>>> a_verifiedVehicles,
       double timeStamp);
-  void GetMemorizedVehicles(std::vector<RememberedVehicle>* a_returnContainer);
+  void GetMemorizedVehicles(std::vector<std::shared_ptr<RememberedVehicle>>* a_returnContainer);
   int32_t GetNrMemorizedVehicles();
   int32_t GetTotalNrVehicleRects();
 
@@ -74,7 +74,7 @@ private:
 
 /* Private fields */
 private:
-  std::vector<RememberedVehicle> m_rememberedVehicles;
+  std::shared_ptr<std::vector<std::shared_ptr<RememberedVehicle>>> m_rememberedVehicles;
 
 };
 

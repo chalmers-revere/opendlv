@@ -28,6 +28,8 @@ namespace detectvehicle {
 
 VehicleDetectionSystem::VehicleDetectionSystem() 
     : m_regionOfInterest()
+    , m_windowWidth()
+    , m_windowHeight()
     , m_roiTop()
     , m_haarClassifier()
     , m_potentialVehicles()
@@ -67,17 +69,24 @@ void VehicleDetectionSystem::tearDown()
 }
 
 void VehicleDetectionSystem::update(const cv::Mat* a_imageFrame, 
-    std::vector<std::shared_ptr<DetectedVehicle>>* verifiedVehicles, 
+    std::shared_ptr<std::vector<std::shared_ptr<DetectedVehicle>>> verifiedVehicles, 
     double timeStamp)
 {
   //clock_t timeBegin = clock();
 
 
-  // Save a clone of the source image so that we don't change the original one
-  cv::Mat srcImg = a_imageFrame->clone();
+  // Save a copy of the source image so that we don't change the original one
+  cv::Mat srcImg(a_imageFrame->size(), a_imageFrame->type());
+  a_imageFrame->copyTo(srcImg);
+
+  //cv::Mat srcImg = a_imageFrame->clone();
   cv::resize(srcImg, srcImg, cv::Size(m_windowWidth, m_windowHeight), 
       0, 0, cv::INTER_CUBIC);
-  cv::Mat outputImg = srcImg.clone();
+
+  cv::Mat outputImg(srcImg.size(), srcImg.type());
+  srcImg.copyTo(outputImg);
+
+  //cv::Mat outputImg = srcImg.clone();
   //GaussianBlur(srcImg, srcImg, cv::Size(3,3), 1);
 
   // Extract the sub image of the region of interest
@@ -104,7 +113,9 @@ void VehicleDetectionSystem::update(const cv::Mat* a_imageFrame,
     //cv::imshow("Debug", srcImg(r));
     //cv::waitKey(0);
     //cv::Mat featureMat(nrOfFeatures, 1, CV_32FC1, featureVector);
-    subImage = srcImg(r).clone();
+    subImage = cv::Mat(srcImg(r).size(), srcImg(r).type());
+    srcImg(r).copyTo(subImage);
+    //subImage = srcImg(r).clone();
     float result = m_ann.doClassification(&subImage);
     std::cout << "ann result: " << result << std::endl;
     bool saveImages = false;
@@ -137,6 +148,7 @@ void VehicleDetectionSystem::update(const cv::Mat* a_imageFrame,
     //cv::imshow("Debug", subImage);
     //cv::waitKey(10);
     //cv::rectangle(outputImg, r, cv::Scalar(0,255,0));
+    subImage.release();
   }
   //clock_t timeAnn = clock();
 
@@ -148,6 +160,10 @@ void VehicleDetectionSystem::update(const cv::Mat* a_imageFrame,
   //cv::imshow("VehicleDetectionSystem", outputImg);
   //cv::moveWindow("VehicleDetectionSystem", 100, 100);
   //cv::waitKey(10);
+  subImage.release();
+  imageROI.release();
+  outputImg.release();
+  srcImg.release();
 }
 
 void VehicleDetectionSystem::setShowImage(bool a_showImage)

@@ -44,6 +44,8 @@ class SetOpticalFlow
  private:
   void setUp();
   void tearDown();
+
+  float m_desiredOpticalFlow;
 };
 
 } // setopticalflow

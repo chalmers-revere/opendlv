@@ -19,6 +19,8 @@
 
 #include <iostream>
 
+#include "opendavinci/odcore/base/Thread.h"
+
 #include "opencv2/imgproc/imgproc_c.h"
 #include "opencv2/imgproc/imgproc.hpp"
 
@@ -43,16 +45,16 @@ OpenCvDevice::OpenCvDevice(std::string const &a_name,
     uint32_t const &a_height, uint32_t const &a_bpp)
     : Device(a_name, a_width, a_height, a_bpp)
     , m_capture(nullptr)
-    , m_image(new cv::Mat)
+    , m_image()
 {
-  std::string const videoStreamAddress = std::string("http://") + a_username 
+  std::string videoStreamAddress = std::string("http://") + a_username 
     + ":" + a_password + "@" + a_port + "/axis-cgi/mjpg/video.cgi?user=" 
     + a_username + "&password=" + a_password + "&channel=0&.mjpg";
 
   m_capture.reset(new cv::VideoCapture(videoStreamAddress));
 
   if (m_capture->isOpened()) {
-    std::cout << "w: " << a_width << " h: " << a_height << std::endl;
+    std::cout << "Open. width: " << a_width << " height: " << a_height << std::endl;
     m_capture->set(CV_CAP_PROP_FRAME_WIDTH, a_width);
     m_capture->set(CV_CAP_PROP_FRAME_HEIGHT, a_height);
   }
@@ -79,7 +81,7 @@ bool OpenCvDevice::CaptureFrame()
 {
   bool retVal = false;
   if (m_capture != nullptr) {
-    if (m_capture->read(*m_image)) {
+    if (m_capture->read(m_image)) {
       retVal = true;
     }
   }
@@ -90,11 +92,12 @@ bool OpenCvDevice::CopyImageTo(char *a_destination, const uint32_t &a_size)
 {
   bool retVal = false;
 
-  if ((a_destination != nullptr) && (a_size > 0) && (m_image != nullptr)) {
-    ::memcpy(a_destination, m_image->data, a_size);
+  if ((a_destination != nullptr) && (a_size > 0)) {
+    std::cout << "a_size: " << a_size << std::endl;
+    ::memcpy(a_destination, m_image.data, a_size);
 
-//    cv::imshow("Window title", *m_image);
-//    cv::waitKey(10);
+    cv::imshow("Camera feed", m_image);
+    cv::waitKey(10);
 
     retVal = true;
   }

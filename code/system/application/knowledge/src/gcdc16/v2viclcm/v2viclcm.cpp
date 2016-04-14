@@ -54,7 +54,9 @@ V2vIclcm::V2vIclcm(int32_t const &a_argc, char **a_argv)
     m_sendLog(),
     m_receiveLog()
 {
-  struct stat st;// = {};
+
+  struct stat st;
+
   if (stat("var/application/knowledge/gcdc16/v2viclcm", &st) == -1) {
     ::system("mkdir -p ./var/application/knowledge/gcdc16/v2viclcm");
     // std::cout<<"Created dir"<<std::endl;
@@ -262,6 +264,7 @@ void V2vIclcm::nextContainer(odcore::data::Container &c)
       int32_t flagTail = inIterator->ReadInteger();
       int32_t flagHead = inIterator->ReadInteger();
       int32_t platoonId = inIterator->ReadInteger();
+
       int32_t distanceTravelledCz = inIterator->ReadInteger();
       
       int32_t intention = inIterator->ReadInteger();

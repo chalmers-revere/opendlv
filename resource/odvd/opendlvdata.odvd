@@ -71,23 +71,22 @@ message opendlv.proxy.Accelerometer [id = 159] {
 message opendlv.proxy.Altimeter [id = 160] {
   float altitude;
 }
+*/
 
-message opendlv.proxy.Wgs84Gps [id = 161] {
+message opendlv.proxy.GpsReading [id = 161] {
+  double timestamp;
   double latitude;
   double longitude;
-  double altitude;
-  double ecefX;
-  double ecefY;
-  double ecefZ;
-  float speedHorizontal;
-  float speedVertical;
+  float altitude;
   float northHeading;
-  uint16 gpsWeek;
-  uint32 gpsWeekMillisecond;
-  uint16 utcOffset;
+  float speed;
+  uint8 latitudeDirection;
+  uint8 longitudeDirection;
   uint8 satelliteCount;
+  bool hasHeading;
+  bool hasRtk;
 }
-*/
+
 message opendlv.proxy.V2vInbound [id = 162] {
   uint32 size;
   string data;
@@ -100,9 +99,11 @@ message opendlv.proxy.V2vOutbound [id = 163] {
   //list<uint8> data;
 }
 
+// TODO: Change name to ManualControl
 message opendlv.proxy.reverefh16.Pedals [id = 191] {
     double accelerationPedalPosition [id = 1];
     double brakePedalPosition [id = 2];
+    double torsionBarTorque [id = 3];
 }
 
 message opendlv.proxy.reverefh16.AccelerationRequest [id = 192] {
@@ -149,22 +150,26 @@ message opendlv.proxy.reverefh16.Wheels [id = 198] {
 message opendlv.proxy.reverefh16.Steering [id = 199] {
     double roadwheelangle [id = 1];
     double steeringwheelangle [id = 2];
-    double torsionBarTorque [id = 3];
 }
-/*
+
+message opendlv.proxy.Actuation [id = 164] {
+  float acceleration;
+  float steering;
+  bool isValid;
+}
+
+message opendlv.proxy.ControlState [id = 165] {
+  bool allowAutonomous;
+}
+
 // Action messages
-message opendlv.action.Correction [id = 164] {
-  TimeStamp startTime;
+message opendlv.action.Correction [id = 190] {
+  odcore::data::TimeStamp startTime;
   string type;
   bool isInhibitory;
   float amplitude;
 }
 
-message opendlv.action.Actuation [id = 165] {
-  string type;
-  float value;
-}
-*/
 // Sensation
 message opendlv.sensation.Voice [id = 166] {
   string type;
@@ -172,6 +177,15 @@ message opendlv.sensation.Voice [id = 166] {
   string data;
   //list<uint8> data;
 }
+
+message opendlv.sensation.OpticalFlow [id = 174] {
+  float flow;
+}
+
+message opendlv.perception.DesiredOpticalFlow [id = 177] {
+  float flow;
+}
+
 /*
 message opendlv.sensation.RoadWheel [id = 167] {
   float angle;
@@ -223,10 +237,6 @@ message opendlv.sensation.Looming [id = 173] {
   float size;
 }
 
-message opendlv.sensation.OpticalFlow [id = 174] {
-  float flow;
-}
-
 message opendlv.sensation.DirectionOfMovement [id = 175] {
   opendlv.coordinate.Spherical3 directionOfMovement;
 }
@@ -238,9 +248,7 @@ message opendlv.perception.ObjectDistanceToBody [id = 176] {
 }
 
 
-message opendlv.perception.DesiredOpticalFlow [id = 177] {
-  float flow;
-}
+
 
 message opendlv.perception.DesiredDirectionOfMovement [id = 178] {
   opendlv.coordinate.Spherical3 directionOfMovement;
@@ -248,7 +256,7 @@ message opendlv.perception.DesiredDirectionOfMovement [id = 178] {
 
 message opendlv.perception.Object [id = 179] {
   list<opendlv.perception.ObjectProperty> properties;
-  TimeStamp lastSeen;
+  odcore::data::TimeStamp lastSeen;
   string type;
   float angle;
   float size;
@@ -266,13 +274,13 @@ message opendlv.perception.ObjectDesiredSize [id = 181] {
 }
 
 message opendlv.perception.ObjectLooming [id = 182] {
-  TimeStamp identified;
+  odcore::data::TimeStamp identified;
   opendlv.sensation.Looming looming;
   uint16 objectIndex;
 }
 
 message opendlv.perception.ObjectProperty [id = 183] {
-  TimeStamp identified;
+  odcore::data::TimeStamp identified;
   string name;
   string value;
   uint16 objectIndex;
@@ -285,6 +293,15 @@ message opendlv.perception.ObjectMetricDistance [id = 184] {
   uint32 objId;
 }
 */
+
+message opendlv.perception.LanePosition [id = 183] {
+  float offset;
+  float heading;
+}
+
+message opendlv.perception.LeadVehicleSize [id = 184] {
+  float size;
+}
 
 // Knowledge
 message opendlv.knowledge.Message [id = 185] {

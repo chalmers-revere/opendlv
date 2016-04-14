@@ -31,11 +31,15 @@ ArtificialNeuralNetwork::ArtificialNeuralNetwork()
     , m_criteria()
 {
   std::cout << "ArtificialNeuralNetwork::ArtificialNeuralNetwork()" << "\n";
+  m_layers = std::shared_ptr<cv::Mat>(new cv::Mat);
+  m_mlp = std::shared_ptr<CvANN_MLP>(new CvANN_MLP);
+  m_params = std::shared_ptr<CvANN_MLP_TrainParams>(new CvANN_MLP_TrainParams);
+  m_criteria = std::shared_ptr<CvTermCriteria>(new CvTermCriteria);
 }
 
 ArtificialNeuralNetwork::~ArtificialNeuralNetwork()
 {
-  std::cout << "ArtificialNeuralNetwork::~ArtificialNeuralNetwork()" << "\n";
+  std::cout << "ArtificialNeuralNetwork::~ArtificialNeuralNetwork()" << std::endl;
 }
 
 
@@ -93,11 +97,14 @@ float ArtificialNeuralNetwork::doClassification(const cv::Mat* a_subImage)
   //std::cout << "*(featureVector): " << *(featureVector) << std::endl;
   //std::cout << "featureVectorMat:" << std::endl << featureVectorMat << std::endl;
 
-  m_mlp.predict(featureVectorMat, output);
+  m_mlp->predict(featureVectorMat, output);
   float result = output.at<float>(0);
 
 
   delete[] featureVector;
+  output.release();
+  featureVectorMat.release();
+  grayImage.release();
 
   return result;
 }
@@ -107,13 +114,13 @@ void ArtificialNeuralNetwork::saveNetworkToFile()
 {
   std::cout << "ArtificialNeuralNetwork::saveNetworkToFile()" << "\n";
   cv::FileStorage fs("mlp.xml", cv::FileStorage::WRITE); 
-  m_mlp.write(*fs, "mlp"); 
+  m_mlp->write(*fs, "mlp"); 
 }
 
 void ArtificialNeuralNetwork::loadNetworkFromFile()
 {
   std::cout << "ArtificialNeuralNetwork::loadNetworkFromFile()" << "\n";
-  m_mlp.load("./share/opendlv/system/application/perception/detectvehicle/trainedAnn.xml","mlp");
+  m_mlp->load("./share/opendlv/system/application/perception/detectvehicle/trainedAnn.xml","mlp");
 }
 
 float ArtificialNeuralNetwork::evaluate(cv::Mat& predicted, cv::Mat& actual) {
@@ -123,7 +130,7 @@ float ArtificialNeuralNetwork::evaluate(cv::Mat& predicted, cv::Mat& actual) {
   for(int i = 0; i < actual.rows; i++) {
     float p = predicted.at<float>(i,0);
     float a = actual.at<float>(i,0);
-    if((p >= 0.0f && a >= 0.0f) || (p <= 0.0f &&  a <= 0.0f)) {
+    if((p > 0.0f && a > 0.0f) || (p < 0.0f &&  a < 0.0f)) {
       t++;
     } else {
       f++;

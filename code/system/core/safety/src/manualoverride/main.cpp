@@ -17,38 +17,11 @@
  * USA.
  */
 
-#include "detectvehicle/detectedvehicle.hpp"
+#include "manualoverride/manualoverride.hpp"
 
-// TODO add documentation
-
-
-namespace opendlv {
-namespace perception {
-namespace detectvehicle {
-
-DetectedVehicle::DetectedVehicle(cv::Rect a_detectionRectangle, double a_timeStamp) :
-  m_detectionRectangle(a_detectionRectangle),
-  m_timeStamp(a_timeStamp)
+int32_t main(int32_t a_argc, char **a_argv)
 {
+  opendlv::safety::manualoverride::ManualOverride manualOverride(
+      a_argc, a_argv);
+  return manualOverride.runModule();
 }
-
-DetectedVehicle::~DetectedVehicle()
-{
-  //std::cout << "DetectedVehicle::~DetectedVehicle()" << std::endl;
-}
-
-
-
-cv::Rect DetectedVehicle::GetDetectionRectangle()
-{
-  return m_detectionRectangle;
-}
-
-double DetectedVehicle::GetTimeStamp()
-{
-  return m_timeStamp;
-}
-
-} // detectvehicle
-} // perception
-} // opendlv

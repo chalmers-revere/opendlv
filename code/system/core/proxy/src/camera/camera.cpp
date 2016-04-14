@@ -57,9 +57,11 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Camera::body()
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() 
       == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+
     auto sharedImage = m_device->Capture();
     odcore::data::Container c(sharedImage);
     getConference().send(c);
+    
   }
 
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
@@ -71,7 +73,7 @@ void Camera::setUp()
 
   std::string const type = kv.getValue<std::string>("proxy-camera.type");
   std::string const resolution =
-  kv.getValue<std::string>("proxy-camera.resolution");
+      kv.getValue<std::string>("proxy-camera.resolution");
   int32_t const bpp = kv.getValue<int32_t>("proxy-camera.bpp");
 
   /*
