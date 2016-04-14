@@ -44,6 +44,5 @@
         ENDIAN="little"
     }
 
-    print tolower(NAME) "." tolower(SIGNAL[2]) " in 0x" HEX " at bit " SIGNAL[3] " for " SIGNAL[4] " bit is " ENDIAN " endian multiply by " SIGNAL[6] " add " SIGNAL[7] " with range " "[" SIGNAL[8] ", " SIGNAL[9] "]" ";"
+    printf("%s.%s in 0x%x at bit %s for %s bit is %s endian multiply by %s add %s with range [%s, %s];\n",tolower(NAME),tolower(SIGNAL[2]),HEX,SIGNAL[3],SIGNAL[4],ENDIAN,SIGNAL[6],SIGNAL[7],SIGNAL[8],SIGNAL[9])
 }
-
