@@ -57,6 +57,7 @@ class OpticalFlow
   cv::Size m_searchSize;
   uint32_t m_maxLevel;
   double m_minEigThreshold;
+  uint32_t m_nAxisPoints;
   cv::Mat m_grayImage;
   cv::Mat m_prevGrayImage;
   cv::Mat m_image;
