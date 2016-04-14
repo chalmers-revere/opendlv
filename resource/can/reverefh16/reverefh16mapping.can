@@ -8,50 +8,49 @@ using opendlvdata;
 ///////////////////////////////////////////////////////////////////////////////
 // In the following, all interesting CAN signals are listed.
 ///////////////////////////////////////////////////////////////////////////////
-
 // CAN message for manual driver.
-manualdriver.torsionbartorque in 0x106 at bit 23 for 16 bit is little endian multiply by 0.0009765625 add -32 with range [-32, 31.9990234375];
-manualdriver.brakepedalposition in 0x106 at bit 8 for 8 bit is big endian multiply by 0.4 add 0 with range [0, 102];
-manualdriver.accelerationpedalposition in 0x106 at bit 0 for 8 bit is big endian multiply by 0.4 add 0 with range [0, 102];
+manualdriver.torsionbartorque in 0x106 at bit 23 for 16 bit is big endian multiply by 0.0009765625 add -32 with range [-32, 31.9990234375];
+manualdriver.brakepedalposition in 0x106 at bit 8 for 8 bit is little endian multiply by 0.4 add 0 with range [0, 102];
+manualdriver.accelerationpedalposition in 0x106 at bit 0 for 8 bit is little endian multiply by 0.4 add 0 with range [0, 102];
 
 // CAN message for acceleration.
-accelerationrequest.enable_accrequest in 0x203 at bit 0 for 8 bit is little endian multiply by 1 add 0 with range [0, 1];
-accelerationrequest.accelerationrequest in 0x203 at bit 8 for 16 bit is little endian multiply by 0.00048828125 add -15.687 with range [-15.687, 16.31251171875];
+accelerationrequest.enable_accrequest in 0x203 at bit 16 for 1 bit is little endian multiply by 1 add 0 with range [0, 1];
+accelerationrequest.accelerationrequest in 0x203 at bit 0 for 16 bit is little endian multiply by 0.00048828125 add -15.687 with range [-15.687, 16.31251171875];
 
 // CAN message for deceleration.
-brakerequest.enable_brakerequest in 0x202 at bit 0 for 8 bit is little endian multiply by 1 add 0 with range [0, 1];
-brakerequest.brakerequest in 0x202 at bit 8 for 16 bit is little endian multiply by 0.00048828125 add -15.687 with range [-15.687, 16.31251171875];
+brakerequest.enable_brakerequest in 0x202 at bit 16 for 1 bit is little endian multiply by 1 add 0 with range [0, 1];
+brakerequest.brakerequest in 0x202 at bit 0 for 16 bit is little endian multiply by 0.00048828125 add -15.687 with range [-15.687, 16.31251171875];
 
 // CAN message for steering.
-steerrequest.enable_steerreq in 0x201 at bit 32 for 16 bit is big endian multiply by 1 add 0 with range [0, 1];
-steerrequest.steerreq_rwa in 0x201 at bit 0 for 16 bit is big endian multiply by 0.000192 add -3.2 with range [-3.2, 3.2];
-steerrequest.steerreq_deltatrq in 0x201 at bit 16 for 16 bit is big endian multiply by 0.001 add -32 with range [-32, 33.535];
+steerrequest.enable_steerreq in 0x201 at bit 32 for 1 bit is little endian multiply by 1 add 0 with range [0, 1];
+steerrequest.steerreq_rwa in 0x201 at bit 16 for 16 bit is little endian multiply by 0.000192 add -3.2 with range [-3.2, 3.2];
+steerrequest.steerreq_deltatrq in 0x201 at bit 0 for 16 bit is little endian multiply by 0.001 add -32 with range [-32, 33.535];
 
 // CAN message for reading the steering.
-steering.steeringwheelangle in 0x107 at bit 16 for 16 bit is big endian multiply by 0.0009765625 add -31.374 with range [-31.374, 32.6250234375];
-steering.roadwheelangle in 0x107 at bit 0 for 16 bit is big endian multiply by 0.000058751 add -1.925 with range [-1.925, 1.925246785];
+steering.steeringwheelangle in 0x107 at bit 16 for 16 bit is little endian multiply by 0.0009765625 add -31.374 with range [-31.374, 32.6250234375];
+steering.roadwheelangle in 0x107 at bit 0 for 16 bit is little endian multiply by 0.000058751 add -1.925 with range [-1.925, 1.925246785];
 
 // CAN message for reading the axle loads.
-axleloads.driveaxle2load in 0x105 at bit 32 for 16 bit is big endian multiply by 0.5 add 0 with range [0, 32767.5];
-axleloads.driveaxle1load in 0x105 at bit 16 for 16 bit is big endian multiply by 0.5 add 0 with range [0, 32767.5];
-axleloads.frontaxle1load in 0x105 at bit 0 for 16 bit is big endian multiply by 0.5 add 0 with range [0, 32767.5];
+axleloads.driveaxle2load in 0x105 at bit 32 for 16 bit is little endian multiply by 0.5 add 0 with range [0, 32767.5];
+axleloads.driveaxle1load in 0x105 at bit 16 for 16 bit is little endian multiply by 0.5 add 0 with range [0, 32767.5];
+axleloads.frontaxle1load in 0x105 at bit 0 for 16 bit is little endian multiply by 0.5 add 0 with range [0, 32767.5];
 
 // CAN message for reading the vehicle dynamics.
-vehicledynamics.yawrate in 0x104 at bit 32 for 16 bit is big endian multiply by 0.000122 add -3.92 with range [-3.92, 4.07527];
-vehicledynamics.acceleration_y in 0x104 at bit 16 for 16 bit is big endian multiply by 0.00048828125 add -15.687 with range [-15.687, 16.31251171875];
-vehicledynamics.acceleration_x in 0x104 at bit 0 for 16 bit is big endian multiply by 0.00048828125 add -15.687 with range [-15.687, 16.31251171875];
+vehicledynamics.yawrate in 0x104 at bit 32 for 16 bit is little endian multiply by 0.000122 add -3.92 with range [-3.92, 4.07527];
+vehicledynamics.acceleration_y in 0x104 at bit 16 for 16 bit is little endian multiply by 0.00048828125 add -15.687 with range [-15.687, 16.31251171875];
+vehicledynamics.acceleration_x in 0x104 at bit 0 for 16 bit is little endian multiply by 0.00048828125 add -15.687 with range [-15.687, 16.31251171875];
 
 // CAN message for reading the vehicle speed.
-vehiclespeed.vehiclespeedpropshaft in 0x103 at bit 0 for 16 bit is big endian multiply by 0.00390625 add 0 with range [0, 255.99609375];
+vehiclespeed.vehiclespeedpropshaft in 0x103 at bit 0 for 16 bit is little endian multiply by 0.00390625 add 0 with range [0, 255.99609375];
 
 // CAN message for reading the wheel speed.
-wheelspeeds2.driveaxle2wheelspeedright in 0x102 at bit 16 for 16 bit is big endian multiply by 0.00390625 add 0 with range [0, 255.99609375];
-wheelspeeds2.driveaxle2wheelspeedleft in 0x102 at bit 0 for 16 bit is big endian multiply by 0.00390625 add 0 with range [0, 255.99609375];
+wheelspeeds2.driveaxle2wheelspeedright in 0x102 at bit 16 for 16 bit is little endian multiply by 0.00390625 add 0 with range [0, 255.99609375];
+wheelspeeds2.driveaxle2wheelspeedleft in 0x102 at bit 0 for 16 bit is little endian multiply by 0.00390625 add 0 with range [0, 255.99609375];
 
-wheelspeeds1.driveaxle1wheelspeedright in 0x101 at bit 48 for 16 bit is big endian multiply by 0.00390625 add 0 with range [0, 255.99609375];
-wheelspeeds1.driveaxle1wheelspeedleft in 0x101 at bit 32 for 16 bit is big endian multiply by 0.00390625 add 0 with range [0, 255.99609375];
-wheelspeeds1.frontaxle1wheelspeedright in 0x101 at bit 16 for 16 bit is big endian multiply by 0.00390625 add 0 with range [0, 255.99609375];
-wheelspeeds1.frontaxle1wheelspeedleft in 0x101 at bit 0 for 16 bit is big endian multiply by 0.00390625 add 0 with range [0, 255.99609375];
+wheelspeeds1.driveaxle1wheelspeedright in 0x101 at bit 48 for 16 bit is little endian multiply by 0.00390625 add 0 with range [0, 255.99609375];
+wheelspeeds1.driveaxle1wheelspeedleft in 0x101 at bit 32 for 16 bit is little endian multiply by 0.00390625 add 0 with range [0, 255.99609375];
+wheelspeeds1.frontaxle1wheelspeedright in 0x101 at bit 16 for 16 bit is little endian multiply by 0.00390625 add 0 with range [0, 255.99609375];
+wheelspeeds1.frontaxle1wheelspeedleft in 0x101 at bit 0 for 16 bit is little endian multiply by 0.00390625 add 0 with range [0, 255.99609375];
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -125,35 +124,31 @@ unordered mapping opendlv.proxy.reverefh16.Steering {
 ///////////////////////////////////////////////////////////////////////////////
 test opendlv.proxy.reverefh16.VehicleState {
   0x104: 0x7F7DA77D877D
-
+  
   id 1 = 0.000012
   id 2 = 0.019543
   id 3 = 0.00047
 }
 
-test opendlv.proxy.reverefh16.AccelerationRequest {
-  0x203: 0x01BD7F
-  
+// 0xFFFF358201 read as torque=33.535 rwa=3.2 ena=1 by the gateway
+test opendlv.proxy.reverefh16.SteeringRequest {
+  0x201: 0xFFFF358201
   id 1 = 1
-  id 2 = 8
+  id 2 = 3.2
+  id 3 = 33.535
 }
 
+// 0x7F2D01 read as brake_req=-10 brake_ena=1 by the gateway
 test opendlv.proxy.reverefh16.BrakeRequest {
-  0x202: 0x018157
-  id 1 = 1
-  id 2 = 0.480480469
-}
-
-test opendlv.proxy.reverefh16.BrakeRequest {
-  0x202: 0x012D7F
+  0x202: 0x7F2D01
   id 1 = 1
   id 2 = -10
 }
 
-test opendlv.proxy.reverefh16.SteeringRequest {
-  0x201: 0x474BFFFF0100
+// 0x7FA501 read as acc_req=5 acc_ena=1 by the gateway
+test opendlv.proxy.reverefh16.AccelerationRequest {
+  0x203: 0x7FA501
   
   id 1 = 1
-  id 2 = 0.5
-  id 3 = 33.535
+  id 2 = 5
 }
