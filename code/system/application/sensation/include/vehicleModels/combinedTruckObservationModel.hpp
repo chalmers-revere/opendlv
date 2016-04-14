@@ -150,7 +150,7 @@ public :
         // for now we are considering a linear observation model
         // moreover, we already get our measures as we expect to be
         measurement.Z_x() = _x(0);         // position along the x axis
-        measurement.Z_y() = _x(1);         // position along the y axis
+        measurement.Z_y() = _x(2);         // position along the y axis
         measurement.Z_theta() = _x(4);     // heading of the vehicle
         measurement.Z_theta_dot() = _x(5); // yaw rate, i.e. rotational velocity of the vehicle
 

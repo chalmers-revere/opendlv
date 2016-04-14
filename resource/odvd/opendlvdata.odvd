@@ -304,4 +304,6 @@ message opendlv.system.sensor.TruckLocation [id = 187] {
   double y;
   double yaw;
   double yawRate;
+  double long_acc;
+  double lat_acc;
 }

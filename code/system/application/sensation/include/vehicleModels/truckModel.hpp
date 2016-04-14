@@ -139,6 +139,13 @@ public:
     typedef Control<T> C;
 
 
+    //! expose the time stamp update to the user
+    void updateDeltaT(double _current_time){ delta_t = _current_time; }
+
+    //! get the delta_t for the current iteration
+    double getDeltaT ( ) {return delta_t;}
+
+
     /**
      * @brief Definition of the parameters for the truck kinematic model
      *
@@ -200,7 +207,7 @@ public:
         //x_.y() = x.y() + std::sin( x.theta ) * u.v();
         //x_.theta = x.theta() + delta_t * (u.v() / wheelbase) * std::tan(u.phi())
 
-        double delta_t = 0.05;  // TODO: calculate via timestamp
+
         //double wheelbase = 3.8; // TODO: this must be set by the user
         x_p.x() = x.x() + delta_t * x.x_dot();
         x_p.x_dot() = u.v() * std::cos(x.theta());
@@ -249,7 +256,7 @@ protected:
         //       0     0          0     0          U_k(1)*cos(X_k(5))    0                  dydot
         //       0     0          0     0          1                     delta_t            dtheta
         //       0     0          0     0          0                     0              ];  dthetadot
-        double delta_t = 0.05;   //TODO set automatically
+
         // partial derivative of x.x() w.r.t. x.x()
         this->F( S::X, S::X ) = 1;
         // partial derivative of x.x() w.r.t. x.x_dot()
@@ -306,6 +313,9 @@ protected:
         //double sigma_q = 0.1;   /// variance of the model noise
         //this->W = this->W * sigma_q;
     }
+
+    //! Variables to handle a variable timestamp in the data
+    double delta_t = 0.0;
 };
 } // truckKinematicModel
 } // Sensation

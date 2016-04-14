@@ -89,8 +89,10 @@ namespace revere {
                 double Z_y = 0;
                 double Z_yaw = 0;
                 double Z_yawRate = 0;
-                sstrFromZ >> Z_time >> Z_x >> Z_y >> Z_yaw >> Z_yawRate;
-                truckLocation = opendlv::system::sensor::TruckLocation(Z_x, Z_y, Z_yaw, Z_yawRate);
+                double Z_long_acc = 0;
+                double Z_lat_acc = 0;
+                sstrFromZ >> Z_time >> Z_x >> Z_y >> Z_yaw >> Z_yawRate >> Z_long_acc >> Z_lat_acc;
+                truckLocation = opendlv::system::sensor::TruckLocation(Z_x, Z_y, Z_yaw, Z_yawRate, Z_long_acc, Z_lat_acc);
             }
 
             // Distribute data to other modules.

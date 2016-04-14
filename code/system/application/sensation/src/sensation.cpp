@@ -66,7 +66,7 @@ Sensation::Sensation(int32_t const &a_argc, char **a_argv) :
     EKF_initialized(false),
     m_timeBefore(),
     m_timeNow(),
-    m_GPSreference(57.71278000, opendlv::data::environment::WGS84Coordinate::NORTH, 11.94581583, opendlv::data::environment::WGS84Coordinate::EAST), // initialize to some coordinate in Sweden
+    m_GPSreference(57.71278, opendlv::data::environment::WGS84Coordinate::NORTH, 11.94581583, opendlv::data::environment::WGS84Coordinate::EAST), // initialize to some coordinate in Sweden
     GPSreferenceSET(false)
 
 {
@@ -111,9 +111,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
         // as reference (i.e. origin (0, 0) of a Cartesian coordinate
         // frame); in our example, we use one located at AstaZero.
         //WGS84Coordinate reference(57.77284043, WGS84Coordinate::NORTH, 12.76996356, WGS84Coordinate::EAST);
-          WGS84Coordinate reference(57.71278000, WGS84Coordinate::NORTH, 11.94581583, WGS84Coordinate::EAST);
+          WGS84Coordinate reference(57.71278, WGS84Coordinate::NORTH, 11.94581583, WGS84Coordinate::EAST);
         // Let's assume you have another lat/lon coordinate at hand.
-        WGS84Coordinate WGS84_p2(57.71278000, WGS84Coordinate::NORTH, 11.94581583, WGS84Coordinate::EAST);
+        WGS84Coordinate WGS84_p2(57.71278, WGS84Coordinate::NORTH, 11.94581583, WGS84Coordinate::EAST);
 
         // Now, you can transform this new lat/lon coordinate to the
         // previously specified Cartesian reference frame.
@@ -142,8 +142,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
     odcore::reflection::CSVFromVisitableVisitor csvExporter1(fout, WITH_HEADER, DELIMITER);
 
 
+    double delta_t = 0;
     double time_stamp = 0;
-
 
     while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
         odcore::data::Container c1 = getKeyValueDataStore().get(opendlv::system::actuator::Commands::ID());
@@ -160,6 +160,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
             m_GPSreference = opendlv::data::environment::WGS84Coordinate(truckLocation.getX(), WGS84Coordinate::NORTH, truckLocation.getY(), WGS84Coordinate::EAST);
             GPSreferenceSET = true;
             m_timeBefore = c1.getReceivedTimeStamp();
+             Udyn.v_y() = truckLocation.getLat_acc();
             // TODO: now this variable is set only ones using the first data,
             //       it is necessary to write a function able to reset this value to a new reference frame
             }
@@ -168,6 +169,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
         odcore::data::TimeStamp duration = m_timeNow - m_timeBefore;
         cout << getName() << ": <<message>> : time step in microseconds = " << duration.toMicroseconds() << endl;
         m_timeBefore = c1.getReceivedTimeStamp();
+        delta_t = duration.toMicroseconds()/1000000.0;
 
         // let me out our signal for now to check if we are doing the right processing
         cout << getName() << ": " << commands.toString() << ", " << truckLocation.toString() << endl;
@@ -186,6 +188,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Sensation::body() {
          U.phi() = commands.getSteeringAngle();
          Udyn.v() = commands.getLongitudinalVelocity();
          Udyn.phi() = commands.getSteeringAngle();
+         Udyn.yaw_rate() = truckLocation.getYawRate();
+         Udyn.v_y() = (truckLocation.getLat_acc() - Udyn.v_y())/delta_t;
+
 
          // System measurements
          m_tkmObservationVector Z = observationModel.h(X);
@@ -217,6 +222,10 @@ run_vse_test = false;
          {
              std::cout << "Sensation::initializeEKF  << message >> Filter initialized " << std::endl;
 
+             // update the timestamp - give the time in seconds
+             sys.updateDeltaT(delta_t);
+             sys_dyn.updateDeltaT(delta_t);
+
              // Predict state for current time-step using the filters
              X = m_ekf.predict(sys, U);
              Xdyn = m_dyn_ekf.predict(sys_dyn, Udyn);
@@ -226,12 +235,14 @@ run_vse_test = false;
              X = m_ekf.update(observationModel, Z);
             Xdyn = m_dyn_ekf.update(dynObservationModel, Zdyn);
 
-            // Print to stdout as csv format
+ time_stamp+=sys.getDeltaT();
+         // Print to stdout as csv format
             std::cout   << getName() << " << message >> STATE \n"
                         << "timestamp = " << time_stamp << "\n"
                         << "           x " << X.x() << ", y " << X.y() << ", theta " << X.theta()  << "\n"
+                        << "   dyn     x " << Xdyn.x() << ", y " << Xdyn.y() << ", theta " << Xdyn.theta()  << "\n"
                         << std::endl;
-time_stamp +=0.05;
+
             //save data to file
 m_saveToFile = true;
             if (m_saveToFile){
