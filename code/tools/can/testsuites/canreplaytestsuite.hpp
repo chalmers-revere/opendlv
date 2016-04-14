@@ -111,7 +111,7 @@ class CANASCReplayTest : public CxxTest::TestSuite {
 
   void testDecodeValidPayload()
   {
-    std::string payload(" 279.733972 1  260             Rx   d 6 7F 7D A7 7D "
+    std::string payload(" 279.733972 1  104             Rx   d 6 7F 7D A7 7D "
                         "87 7D  Length = 388000 BitCount = 101");
     std::vector<odcore::data::Container> result = m_pt->getMessages(payload);
     TS_ASSERT(result.size() == 1);
