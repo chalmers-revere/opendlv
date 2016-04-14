@@ -24,6 +24,7 @@
 
 
 #include "opendavinci/odcore/base/KeyValueConfiguration.h"
+#include "opendavinci/odcore/base/Lock.h"
 
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
@@ -49,6 +50,8 @@ namespace opticalflow {
 OpticalFlow::OpticalFlow(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(
       a_argc, a_argv, "sensation-vision-opticalflow"),
+      m_name(),
+      m_size(),
       m_termcrit(),
       m_searchSize(),
       m_maxLevel(),
@@ -57,9 +60,11 @@ OpticalFlow::OpticalFlow(int32_t const &a_argc, char **a_argv)
       m_grayImage(),
       m_prevGrayImage(),
       m_image(),
-      m_frame(),
+      m_flow(),
       m_staticImagePoints(),
-      m_endImagePoints()
+      m_endImagePoints(),
+      m_outputSharedImage(),
+      m_sharedMemory()
 {
 }
 
@@ -78,7 +83,11 @@ void OpticalFlow::nextContainer(odcore::data::Container &a_c)
   }
   odcore::data::image::SharedImage mySharedImg =
       a_c.getData<odcore::data::image::SharedImage>();
+  // std::cout<<mySharedImg.getName()<<std::endl;
 
+  if(mySharedImg.getName() != "opencv-ip-axis (/home/bjornborg/Video/rostock.avi)"){
+    return;
+  }
   std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(
       odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(
           mySharedImg.getName()));
@@ -101,20 +110,21 @@ void OpticalFlow::nextContainer(odcore::data::Container &a_c)
   }
   sharedMem->unlock();
 
-  double x,y;
-  for(uint32_t i = 1; i <= m_nAxisPoints; ++i){
-      for(uint32_t j = 1; j <= m_nAxisPoints; ++j){
-          x = imgWidth*j/(1+m_nAxisPoints);
-          y = imgHeight*i/(1+m_nAxisPoints);
-          m_staticImagePoints.push_back(cv::Point2f(x,y));
-          // constPoints->row(k) << x,y;
-      }
-  }
+
 
   //Converts the image to grayscale and output in "gray"
   cv::cvtColor(m_image, m_grayImage, cv::COLOR_BGR2GRAY);
   if(m_prevGrayImage.empty()){
     m_grayImage.copyTo(m_prevGrayImage);
+    double x,y;
+    for(uint32_t i = 1; i <= m_nAxisPoints; ++i){
+        for(uint32_t j = 1; j <= m_nAxisPoints; ++j){
+            x = imgWidth*j/(1+m_nAxisPoints);
+            y = imgHeight*i/(1+m_nAxisPoints);
+            m_staticImagePoints.push_back(cv::Point2f(x,y));
+            // constPoints->row(k) << x,y;
+        }
+    }
   }
 
 
@@ -132,15 +142,52 @@ void OpticalFlow::nextContainer(odcore::data::Container &a_c)
     cv::circle(m_image, m_endImagePoints[i], 3, cv::Scalar(0,0,255), -1, 8);            
   }
 
+  updateFlow();
+
+  if(m_sharedMemory.get() && m_sharedMemory->isValid()){
+    odcore::base::Lock l(m_sharedMemory);
+    memcpy(static_cast<char *>(m_sharedMemory->getSharedMemory()),m_flow.data,
+        m_size);
+
+  }
+
+
+
+  odcore::data::Container c(m_outputSharedImage);
+  getConference().send(c);
+  
   const int32_t windowWidth = 640;
   const int32_t windowHeight = 480;
-  cv::resize(m_image, m_image, cv::Size(windowWidth, windowHeight), 0, 0,
+  cv::Mat display1, display2;
+  cv::resize(m_image, display1, cv::Size(windowWidth, windowHeight), 0, 0,
       cv::INTER_CUBIC);
-
-  cv::imshow("LK Demo", m_image); 
+  cv::resize(m_flow, display2, cv::Size(windowWidth, windowHeight), 0, 0,
+      cv::INTER_CUBIC);
+  cv::imshow("flow",display2);
+  cv::imshow("LK Demo", display1); 
   cv::waitKey(10);
+  cv::swap(m_prevGrayImage, m_grayImage);
 
-  //TODO Send the information
+}
+
+void OpticalFlow::updateFlow()
+{
+  if(m_staticImagePoints.size() != m_endImagePoints.size()){
+    std::cout<< "Number of points do not match" << std::endl;
+    return;
+  }
+  cv::Mat A(m_staticImagePoints), B(m_endImagePoints);
+  cv::Mat displacement = B-A;
+  // std::cout << displacement.at<float>(0,0)<< ", " << displacement.at<float>(0,1) << std::endl;
+  float blue, green, red;
+  red = 0;
+  for(uint32_t i = 0, k = 0; i < m_nAxisPoints; ++i){
+    for(uint32_t j = 0; j < m_nAxisPoints; ++j, ++k){
+      blue = displacement.at<float>(k,0);
+      green = displacement.at<float>(k,1);
+      cv::Vec3b colour(blue,green,red);
+    }
+  }
 
 }
 
@@ -163,8 +210,25 @@ void OpticalFlow::setUp()
       "sensation-vision-opticalflow.minEigThreshold");
   m_nAxisPoints = kv.getValue<uint32_t>(
       "sensation-vision-opticalflow.nAxisPoints");
+  
+  m_size = m_nAxisPoints*m_nAxisPoints*3;
+  
+  m_sharedMemory =
+      odcore::wrapper::SharedMemoryFactory::createSharedMemory(m_name, m_size);
+
+
+  m_outputSharedImage.setName(m_name);
+  m_outputSharedImage.setWidth(m_nAxisPoints);
+  m_outputSharedImage.setHeight(m_nAxisPoints);
+  m_outputSharedImage.setBytesPerPixel(3);
+  m_outputSharedImage.setSize(m_size);
+
+  m_flow = cv::Mat(m_nAxisPoints,m_nAxisPoints,CV_8UC3, cv::Scalar(0,255,0));
+
 
   cv::namedWindow( "LK Demo", 1 );
+
+  cv::namedWindow( "flow", 1 );
 }
 
 void OpticalFlow::tearDown()

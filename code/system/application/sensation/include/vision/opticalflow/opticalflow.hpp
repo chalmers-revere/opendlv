@@ -29,6 +29,8 @@
 
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
+#include "opendavinci/odcore/wrapper/SharedMemory.h"
+#include "opendavinci/GeneratedHeaders_OpenDaVINCI.h"
 
 
 namespace opendlv {
@@ -49,10 +51,13 @@ class OpticalFlow
   virtual ~OpticalFlow();
   virtual void nextContainer(odcore::data::Container &);
 
+  std::string m_name = "opticalflow";
+  uint32_t m_size;
+
  private:
   void setUp();
   void tearDown();
-
+  void updateFlow();
   cv::TermCriteria m_termcrit;
   cv::Size m_searchSize;
   uint32_t m_maxLevel;
@@ -61,9 +66,12 @@ class OpticalFlow
   cv::Mat m_grayImage;
   cv::Mat m_prevGrayImage;
   cv::Mat m_image;
-  cv::Mat m_frame;
+  cv::Mat m_flow;
   std::vector<cv::Point2f> m_staticImagePoints;
   std::vector<cv::Point2f> m_endImagePoints;
+  odcore::data::image::SharedImage m_outputSharedImage;
+  std::shared_ptr<odcore::wrapper::SharedMemory> m_sharedMemory;
+
 };
 } // opticalflow
 } // vision
