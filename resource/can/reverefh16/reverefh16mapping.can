@@ -42,6 +42,7 @@ vehicledynamics.acceleration_x in 0x104 at bit 0 for 16 bit is little endian mul
 
 // CAN message for reading the vehicle speed.
 vehiclespeed.vehiclespeedpropshaft in 0x103 at bit 0 for 16 bit is little endian multiply by 0.00390625 add 0 with range [0, 255.99609375];
+
 // CAN message for reading the wheel speed.
 wheelspeeds2.driveaxle2wheelspeedright in 0x102 at bit 16 for 16 bit is little endian multiply by 0.00390625 add 0 with range [0, 255.99609375];
 wheelspeeds2.driveaxle2wheelspeedleft in 0x102 at bit 0 for 16 bit is little endian multiply by 0.00390625 add 0 with range [0, 255.99609375];
