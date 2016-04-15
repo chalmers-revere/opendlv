@@ -51,7 +51,7 @@ class OpticalFlow
   virtual ~OpticalFlow();
   virtual void nextContainer(odcore::data::Container &);
 
-  std::string m_name = "opticalflow";
+  std::string m_name;
   uint32_t m_size;
 
  private:

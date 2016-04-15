@@ -22,12 +22,21 @@
 #include <cmath>
 #include <iostream>
 
+#include "opendavinci/odcore/base/Lock.h"
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
 
 #include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
+#include "opendavinci/GeneratedHeaders_OpenDaVINCI.h"
+#include "opendavinci/odcore/wrapper/SharedMemoryFactory.h"
+#include "opendavinci/odcore/wrapper/SharedMemory.h"
 #include "vision/directionofmovement/directionofmovement.hpp"
+
+
+#include "opencv2/video/tracking.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/highgui/highgui.hpp"
 
 namespace opendlv {
 namespace sensation {
@@ -54,12 +63,56 @@ DirectionOfMovement::~DirectionOfMovement()
  * Receives .
  * Sends .
  */
-void DirectionOfMovement::nextContainer(odcore::data::Container &)
+void DirectionOfMovement::nextContainer(odcore::data::Container &a_c)
 {
+  if(a_c.getDataType() != odcore::data::image::SharedImage::ID()){
+    return;
+  }
+  odcore::data::image::SharedImage mySharedImg =
+      a_c.getData<odcore::data::image::SharedImage>();
+  // std::cout<<mySharedImg.getName()<<std::endl;
+
+  if(mySharedImg.getName() != "opticalflow"){
+    return;
+  }
+  // std::cout<<"Got correct data"<<std::endl;
+
+  std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(
+      odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(
+          mySharedImg.getName()));
+  const uint32_t nrChannels = mySharedImg.getBytesPerPixel();
+  const uint32_t imgWidth = mySharedImg.getWidth();
+  const uint32_t imgHeight = mySharedImg.getHeight();
+  const uint32_t imgSize = mySharedImg.getSize();
+
+  IplImage* myIplImage = cvCreateImage(cvSize(imgWidth,imgHeight), IPL_DEPTH_8U,
+      nrChannels);
+  cv::Mat image(myIplImage);
+
+  if(!sharedMem->isValid()){
+    return;
+  }
+
+  sharedMem->lock();
+  {
+    memcpy(image.data, sharedMem->getSharedMemory(), imgSize);
+  }
+  sharedMem->unlock();
+
+  std::cout << image << std::endl;
+
+  const int32_t windowWidth = 640;
+  const int32_t windowHeight = 480;
+  cv::Mat display2;
+  cv::resize(image, display2, cv::Size(windowWidth, windowHeight), 0, 0,
+      cv::INTER_CUBIC);
+  cv::imshow("flow",display2); 
+  cv::waitKey(1);
 }
 
 void DirectionOfMovement::setUp()
 {
+  cv::namedWindow( "flow", 1 );
 }
 
 void DirectionOfMovement::tearDown()

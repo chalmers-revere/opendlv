@@ -40,7 +40,7 @@ proxy-ledstrip.type = victor
 proxy-ledstrip.port = /dev/ttyUSB6
 
 proxy-camera.type = opencv-ip-axis
-proxy-camera.port = /home/bjornborg/Video/rostock.avi
+proxy-camera.port = ip://192.168.0.120
 proxy-camera.username = root
 proxy-camera.password = gcdc
 proxy-camera.resolution = 1280x720
@@ -157,7 +157,7 @@ sensation-vision-opticalflow.termCritEpsilon = 0.03
 sensation-vision-opticalflow.lkSearchWindowWidth = 30
 sensation-vision-opticalflow.maxLevel = 3
 sensation-vision-opticalflow.minEigThreshold = 0.001
-sensation-vision-opticalflow.nAxisPoints = 15
+sensation-vision-opticalflow.nAxisPoints = 2
 
 # V2V temp
 knowledge-linguistics-v2vcam.stationId = 115

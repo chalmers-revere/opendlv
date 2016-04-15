@@ -85,7 +85,7 @@ void OpticalFlow::nextContainer(odcore::data::Container &a_c)
       a_c.getData<odcore::data::image::SharedImage>();
   // std::cout<<mySharedImg.getName()<<std::endl;
 
-  if(mySharedImg.getName() != "opencv-ip-axis (/home/bjornborg/Video/rostock.avi)"){
+  if(mySharedImg.getName() != "opencv-ip-axis (ip://192.168.0.120)"){
     return;
   }
   std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(
@@ -143,16 +143,22 @@ void OpticalFlow::nextContainer(odcore::data::Container &a_c)
   }
 
   updateFlow();
+  std::cout<< m_flow << std::endl;
 
   if(m_sharedMemory.get() && m_sharedMemory->isValid()){
-    odcore::base::Lock l(m_sharedMemory);
-    memcpy(static_cast<char *>(m_sharedMemory->getSharedMemory()),m_flow.data,
-        m_size);
+    {
+      odcore::base::Lock l(m_sharedMemory);
+      memcpy(static_cast<char *>(m_sharedMemory->getSharedMemory()),m_flow.data,
+          m_size);
+    }
+    odcore::data::Container c(m_outputSharedImage);
+    getConference().send(c);
+    // std::cout << "Sent" << std::endl;
 
   }
 
-  odcore::data::Container c(m_outputSharedImage);
-  getConference().send(c);
+  // std::cout<< m_outputSharedImage.getName() << std::endl;
+
 
   cv::swap(m_prevGrayImage, m_grayImage);
   
@@ -211,12 +217,11 @@ void OpticalFlow::setUp()
   m_nAxisPoints = kv.getValue<uint32_t>(
       "sensation-vision-opticalflow.nAxisPoints");
   
-  m_size = m_nAxisPoints*m_nAxisPoints*3;
+  m_name = "opticalflow";
+  m_size = (m_nAxisPoints)*(m_nAxisPoints)*3;
   
   m_sharedMemory =
       odcore::wrapper::SharedMemoryFactory::createSharedMemory(m_name, m_size);
-
-
   m_outputSharedImage.setName(m_name);
   m_outputSharedImage.setWidth(m_nAxisPoints);
   m_outputSharedImage.setHeight(m_nAxisPoints);
