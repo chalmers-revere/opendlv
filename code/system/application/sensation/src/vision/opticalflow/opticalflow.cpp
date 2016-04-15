@@ -151,10 +151,10 @@ void OpticalFlow::nextContainer(odcore::data::Container &a_c)
 
   }
 
-
-
   odcore::data::Container c(m_outputSharedImage);
   getConference().send(c);
+
+  cv::swap(m_prevGrayImage, m_grayImage);
   
   const int32_t windowWidth = 640;
   const int32_t windowHeight = 480;
@@ -165,8 +165,7 @@ void OpticalFlow::nextContainer(odcore::data::Container &a_c)
       cv::INTER_CUBIC);
   cv::imshow("flow",display2);
   cv::imshow("LK Demo", display1); 
-  cv::waitKey(10);
-  cv::swap(m_prevGrayImage, m_grayImage);
+  cv::waitKey(1);
 
 }
 
@@ -183,9 +182,10 @@ void OpticalFlow::updateFlow()
   red = 0;
   for(uint32_t i = 0, k = 0; i < m_nAxisPoints; ++i){
     for(uint32_t j = 0; j < m_nAxisPoints; ++j, ++k){
-      blue = displacement.at<float>(k,0);
-      green = displacement.at<float>(k,1);
-      cv::Vec3b colour(blue,green,red);
+      blue = (displacement.at<float>(k,0)+30)*255/60;
+      green = (displacement.at<float>(k,1)+30)*255/60;
+      cv::Vec3b color(blue,green,red);
+      m_flow.at<cv::Vec3b>(cv::Point(j,i)) = color;
     }
   }
 
@@ -223,7 +223,7 @@ void OpticalFlow::setUp()
   m_outputSharedImage.setBytesPerPixel(3);
   m_outputSharedImage.setSize(m_size);
 
-  m_flow = cv::Mat(m_nAxisPoints,m_nAxisPoints,CV_8UC3, cv::Scalar(0,255,0));
+  m_flow = cv::Mat(m_nAxisPoints,m_nAxisPoints,CV_8UC3, cv::Scalar(0,0,0));
 
 
   cv::namedWindow( "LK Demo", 1 );
