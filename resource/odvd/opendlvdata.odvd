@@ -179,7 +179,12 @@ message opendlv.sensation.Voice [id = 166] {
 }
 
 message opendlv.sensation.OpticalFlow [id = 174] {
-  float flow;
+  uint16 nPoint;
+  list<float> x;
+  list<float> y;
+  list<float> u;
+  list<float> v;
+  //float flow;
 }
 
 message opendlv.perception.DesiredOpticalFlow [id = 177] {

@@ -43,7 +43,7 @@ proxy-camera.type = opencv-ip-axis
 proxy-camera.port = ip://192.168.0.120
 proxy-camera.username = root
 proxy-camera.password = gcdc
-proxy-camera.resolution = 1280x720
+proxy-camera.resolution = 1080x720
 proxy-camera.bpp = 3
 proxy-camera.mount.x = 3.1
 proxy-camera.mount.y = 0.5
@@ -157,7 +157,7 @@ sensation-vision-opticalflow.termCritEpsilon = 0.03
 sensation-vision-opticalflow.lkSearchWindowWidth = 30
 sensation-vision-opticalflow.maxLevel = 3
 sensation-vision-opticalflow.minEigThreshold = 0.001
-sensation-vision-opticalflow.nAxisPoints = 2
+sensation-vision-opticalflow.nAxisPoints = 15
 
 # V2V temp
 knowledge-linguistics-v2vcam.stationId = 115

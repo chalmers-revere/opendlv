@@ -85,9 +85,6 @@ void OpticalFlow::nextContainer(odcore::data::Container &a_c)
       a_c.getData<odcore::data::image::SharedImage>();
   // std::cout<<mySharedImg.getName()<<std::endl;
 
-  if(mySharedImg.getName() != "opencv-ip-axis (ip://192.168.0.120)"){
-    return;
-  }
   std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(
       odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(
           mySharedImg.getName()));
@@ -114,6 +111,8 @@ void OpticalFlow::nextContainer(odcore::data::Container &a_c)
 
   //Converts the image to grayscale and output in "gray"
   cv::cvtColor(m_image, m_grayImage, cv::COLOR_BGR2GRAY);
+
+  //First initialisation of the image
   if(m_prevGrayImage.empty()){
     m_grayImage.copyTo(m_prevGrayImage);
     double x,y;
@@ -141,21 +140,22 @@ void OpticalFlow::nextContainer(odcore::data::Container &a_c)
   for(uint32_t i = 0; i < m_endImagePoints.size(); i++){
     cv::circle(m_image, m_endImagePoints[i], 3, cv::Scalar(0,0,255), -1, 8);            
   }
+  sendContainer();
+  // updateFlow();
+  // std::cout<< m_flow << std::endl;
 
-  updateFlow();
-  std::cout<< m_flow << std::endl;
-
-  if(m_sharedMemory.get() && m_sharedMemory->isValid()){
-    {
-      odcore::base::Lock l(m_sharedMemory);
-      memcpy(static_cast<char *>(m_sharedMemory->getSharedMemory()),m_flow.data,
-          m_size);
-    }
-    odcore::data::Container c(m_outputSharedImage);
-    getConference().send(c);
-    // std::cout << "Sent" << std::endl;
-
-  }
+  // if(m_sharedMemory.get() && m_sharedMemory->isValid()){
+  //   {
+  //     std::cout<< m_size << ", " << m_flow.total() * m_flow.elemSize() << std::endl;
+  //     odcore::base::Lock l(m_sharedMemory);
+  //     memcpy(static_cast<char *>(m_sharedMemory->getSharedMemory()),m_flow.data,
+  //         m_size);
+  //   }
+  //   odcore::data::Container c(m_outputSharedImage);
+  //   getConference().send(c);
+  //   // std::cout << "Sent" << std::endl;
+  // 
+  // }
 
   // std::cout<< m_outputSharedImage.getName() << std::endl;
 
@@ -167,35 +167,51 @@ void OpticalFlow::nextContainer(odcore::data::Container &a_c)
   cv::Mat display1, display2;
   cv::resize(m_image, display1, cv::Size(windowWidth, windowHeight), 0, 0,
       cv::INTER_CUBIC);
-  cv::resize(m_flow, display2, cv::Size(windowWidth, windowHeight), 0, 0,
-      cv::INTER_CUBIC);
-  cv::imshow("flow",display2);
+  // cv::resize(m_flow, display2, cv::Size(windowWidth, windowHeight), 0, 0,
+  //     cv::INTER_CUBIC);
+  // cv::imshow("flow",display2);
   cv::imshow("LK Demo", display1); 
   cv::waitKey(1);
 
 }
 
-void OpticalFlow::updateFlow()
+void OpticalFlow::sendContainer()
 {
-  if(m_staticImagePoints.size() != m_endImagePoints.size()){
-    std::cout<< "Number of points do not match" << std::endl;
-    return;
+  uint16_t nPoints = m_staticImagePoints.size();
+  std::vector<float> x,y,u,v;
+  for(uint8_t i = 0; i < m_staticImagePoints.size(); i++){
+    // std::cout<< m_staticImagePoints[i].x << std::endl;
+    x.push_back(m_staticImagePoints[i].x);
+    y.push_back(m_staticImagePoints[i].y);
+    u.push_back(m_endImagePoints[i].x - m_staticImagePoints[i].x);
+    v.push_back(m_endImagePoints[i].y - m_staticImagePoints[i].y);
   }
-  cv::Mat A(m_staticImagePoints), B(m_endImagePoints);
-  cv::Mat displacement = B-A;
-  // std::cout << displacement.at<float>(0,0)<< ", " << displacement.at<float>(0,1) << std::endl;
-  float blue, green, red;
-  red = 0;
-  for(uint32_t i = 0, k = 0; i < m_nAxisPoints; ++i){
-    for(uint32_t j = 0; j < m_nAxisPoints; ++j, ++k){
-      blue = (displacement.at<float>(k,0)+30)*255/60;
-      green = (displacement.at<float>(k,1)+30)*255/60;
-      cv::Vec3b color(blue,green,red);
-      m_flow.at<cv::Vec3b>(cv::Point(j,i)) = color;
-    }
-  }
-
+  opendlv::sensation::OpticalFlow nextMessage(nPoints,x,y,u,v);
+  odcore::data::Container c(nextMessage);
+  getConference().send(c);
 }
+
+// void OpticalFlow::updateFlow()
+// {
+//   if(m_staticImagePoints.size() != m_endImagePoints.size()){
+//     std::cout<< "Number of points do not match" << std::endl;
+//     return;
+//   }
+//   cv::Mat A(m_staticImagePoints), B(m_endImagePoints);
+//   cv::Mat displacement = B-A;
+//   // std::cout << displacement.at<float>(0,0)<< ", " << displacement.at<float>(0,1) << std::endl;
+//   float blue, green, red;
+//   red = 0;
+//   for(uint32_t i = 0, k = 0; i < m_nAxisPoints; ++i){
+//     for(uint32_t j = 0; j < m_nAxisPoints; ++j, ++k){
+//       blue = (displacement.at<float>(k,0)+30)*255/60;
+//       green = (displacement.at<float>(k,1)+30)*255/60;
+//       cv::Vec3b color(blue,green,red);
+//       m_flow.at<cv::Vec3b>(cv::Point(j,i)) = color;
+//     }
+//   }
+
+// }
 
 void OpticalFlow::setUp()
 {

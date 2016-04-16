@@ -57,7 +57,8 @@ class OpticalFlow
  private:
   void setUp();
   void tearDown();
-  void updateFlow();
+  // void updateFlow();
+  void sendContainer();
   cv::TermCriteria m_termcrit;
   cv::Size m_searchSize;
   uint32_t m_maxLevel;
