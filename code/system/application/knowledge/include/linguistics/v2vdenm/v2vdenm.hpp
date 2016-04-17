@@ -50,7 +50,6 @@ class V2vDenm
 
   std::ofstream m_sendLog;
   std::ofstream m_receiveLog;
-  unsigned long const millisecondsTo2004FromUnixEpoch = 1072915200000;
 
   unsigned char const m_messageId = 1;
   int32_t m_stationId = 0;
