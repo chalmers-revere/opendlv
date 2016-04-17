@@ -44,60 +44,218 @@ message opendlv.coordinate.Pose [id = 154] {
 
 // Proxy messages
 message opendlv.proxy.CartesianTimeOfFlight [id = 155] {
-  uint32 numberOfPoints;
-  opendlv.coordinate.Pose origin;
-  list<opendlv.coordinate.Cartesian3> points;
+  uint32 numberOfPoints [id = 1];
+  opendlv.coordinate.Pose origin [id = 2];
+  list<opendlv.coordinate.Cartesian3> points [id = 3];;
 }
 
 message opendlv.proxy.SphericalTimeOfFlight [id = 156] {
-  uint32 numberOfPoints;
-  opendlv.coordinate.Pose origin;
-  list<opendlv.coordinate.Spherical3> points;
+  uint32 numberOfPoints [id = 1];
+  opendlv.coordinate.Pose origin [id = 2];
+  list<opendlv.coordinate.Spherical3> points [id = 3];
 }
 
 message opendlv.proxy.Compass [id = 157] {
   //opendlv.
-  float heading[3];
+  float heading[3] [id = 1];
 }
 
 message opendlv.proxy.Gyroscope [id = 158] {
-  float orientation[3];
+  float orientation[3] [id = 1];
 }
 
 message opendlv.proxy.Accelerometer [id = 159] {
-  float acceleration[3];
+  float acceleration[3] [id = 1];
 }
 
 message opendlv.proxy.Altimeter [id = 160] {
-  float altitude;
+  float altitude [id = 1];
 }
 */
 
 message opendlv.proxy.GpsReading [id = 161] {
-  double timestamp;
-  double latitude;
-  double longitude;
-  float altitude;
-  float northHeading;
-  float speed;
-  uint8 latitudeDirection;
-  uint8 longitudeDirection;
-  uint8 satelliteCount;
-  bool hasHeading;
-  bool hasRtk;
+  double timestamp [id = 1];
+  double latitude [id = 2];
+  double longitude [id = 3];
+  float altitude [id = 4];
+  float northHeading [id = 5];
+  float speed [id = 6];
+  uint8 latitudeDirection [id = 7];
+  uint8 longitudeDirection [id = 8];
+  uint8 satelliteCount [id = 9];
+  bool hasHeading [id = 10];
+  bool hasRtk [id = 11];
 }
 
 message opendlv.proxy.V2vInbound [id = 162] {
-  uint32 size;
-  string data;
-  //list<uint8> data;
+  uint32 size [id = 1];
+  string data [id = 2];
+  //list<uint8> data [id = 3];
 }
 
 message opendlv.proxy.V2vOutbound [id = 163] {
-  uint32 size;
-  string data;
-  //list<uint8> data;
+  uint32 size [id = 1];
+  string data [id = 2];
+  //list<uint8> data [id = 3];
 }
+
+message opendlv.proxy.Actuation [id = 164] {
+  float acceleration [id = 1];
+  float steering [id = 2];
+  bool isValid [id = 3];
+}
+
+message opendlv.proxy.ControlState [id = 165] {
+  bool allowAutonomous [id = 1];
+}
+
+// Sensation
+message opendlv.sensation.Voice [id = 166] {
+  string type [id = 1];
+  uint32 size [id = 2];
+  string data [id = 3];
+  //list<uint8> data [id = 4];
+}
+
+/*
+message opendlv.sensation.RoadWheel [id = 167] {
+  float angle [id = 1];
+  float angularVelocity [id = 2];
+  uint8 axleIndex [id = 3];
+  uint8 unitIndex [id = 4];
+  uint8 wheelIndex [id = 5];
+}
+
+message opendlv.sensation.Axle [id = 168] {
+  float load [id = 1];
+  uint8 axleIndex [id = 2];
+  uint8 unitIndex [id = 3];
+}
+
+message opendlv.sensation.Geolocation [id = 169] {
+  float longitude [id = 1];
+  float latitude [id = 2];
+  float altitude [id = 3];
+}
+
+message opendlv.sensation.BodyPart [id = 170] {
+  opendlv.cartesian.Point3 position [id = 1]; // From body origo to body part center of mass
+  string gemoetryPath [id = 2];
+  float width [id = 3];
+  float height [id = 4];
+  float depth [id = 5];
+  float mass [id = 6];
+  uint8 partIndex [id = 7];
+}
+
+message opendlv.sensation.Orientation [id = 171] {
+  float roll [id = 1];
+  float pitch [id = 2];
+  float yaw [id = 3];
+  int partIndex [id = 4];
+}
+
+message opendlv.sensation.Balance [id = 172] {
+  float rollRate [id = 1];
+  float pitchRate [id = 2];
+  float yawRate [id = 3];
+  int partIndex [id = 4];
+}
+
+message opendlv.sensation.Looming [id = 173] {
+  float angle [id = 1];
+  float looming [id = 2];
+  float size [id = 3];
+}
+
+message opendlv.sensation.DirectionOfMovement [id = 175] {
+  opendlv.coordinate.Spherical3 directionOfMovement [id = 1];
+}
+
+// Perception messages
+message opendlv.perception.ObjectDistanceToBody [id = 176] {
+  opendlv.coordinate.Cartesian3 bodySkinPosition [id = 1];
+  opendlv.coordinate.Cartesian3 objectSurfacePosition [id = 2];
+}
+
+message opendlv.perception.DesiredDirectionOfMovement [id = 178] {
+  opendlv.coordinate.Spherical3 directionOfMovement [id = 1];
+}
+
+message opendlv.perception.Object [id = 179] {
+  list<opendlv.perception.ObjectProperty> properties [id = 1];
+  odcore::data::TimeStamp lastSeen [id = 2];
+  string type [id = 3];
+  float angle [id = 4];
+  float size [id = 5];
+  uint16 objectIndex [id = 6];
+}
+
+message opendlv.perception.ObjectDesiredAngle [id = 180] {
+  float desiredAngle [id = 1];
+  uint16 objectIndex [id = 2];
+}
+
+message opendlv.perception.ObjectDesiredSize [id = 181] {
+  float desiredSize [id = 1];
+  uint16 objectIndex [id = 2];
+}
+
+message opendlv.perception.ObjectLooming [id = 182] {
+  odcore::data::TimeStamp identified [id = 1];
+  opendlv.sensation.Looming looming [id = 2];
+  uint16 objectIndex [id = 3];
+}
+
+message opendlv.perception.ObjectProperty [id = 183] {
+  odcore::data::TimeStamp identified [id = 1];
+  string name [id = 2];
+  string value [id = 3];
+  uint16 objectIndex [id = 4];
+}
+
+message opendlv.perception.ObjectMetricDistance [id = 184] {
+  float distance [id = 1];
+  float angle [id = 2];
+  float size [id = 3];
+  uint32 objId [id = 4];
+}
+*/
+
+// Unused IDs: 174, 177
+
+// Knowledge
+message opendlv.knowledge.Message [id = 185] {
+  uint32 size [id = 1];
+  string data [id = 2];
+  //list<uint8> data [id = 3];
+}
+
+message opendlv.perception.LanePosition [id = 186] {
+  float offset [id = 1];
+  float heading [id = 2];
+}
+
+message opendlv.perception.LeadVehicleSize [id = 187] {
+  float size [id = 1];
+}
+
+message opendlv.sensation.OpticalFlow [id = 188] {
+  float flow [id = 1];
+}
+
+message opendlv.perception.DesiredOpticalFlow [id = 189] {
+  float flow [id = 1];
+}
+
+// Action messages
+message opendlv.action.Correction [id = 190] {
+  odcore::data::TimeStamp startTime [id = 1];
+  string type [id = 2];
+  bool isInhibitory [id = 3];
+  float amplitude [id = 4];
+}
+
 
 // TODO: Change name to ManualControl
 message opendlv.proxy.reverefh16.Pedals [id = 191] {
@@ -150,163 +308,5 @@ message opendlv.proxy.reverefh16.Wheels [id = 198] {
 message opendlv.proxy.reverefh16.Steering [id = 199] {
     double roadwheelangle [id = 1];
     double steeringwheelangle [id = 2];
-}
-
-message opendlv.proxy.Actuation [id = 164] {
-  float acceleration;
-  float steering;
-  bool isValid;
-}
-
-message opendlv.proxy.ControlState [id = 165] {
-  bool allowAutonomous;
-}
-
-// Action messages
-message opendlv.action.Correction [id = 190] {
-  odcore::data::TimeStamp startTime;
-  string type;
-  bool isInhibitory;
-  float amplitude;
-}
-
-// Sensation
-message opendlv.sensation.Voice [id = 166] {
-  string type;
-  uint32 size;
-  string data;
-  //list<uint8> data;
-}
-
-message opendlv.sensation.OpticalFlow [id = 174] {
-  float flow;
-}
-
-message opendlv.perception.DesiredOpticalFlow [id = 177] {
-  float flow;
-}
-
-/*
-message opendlv.sensation.RoadWheel [id = 167] {
-  float angle;
-  float angularVelocity;
-  uint8 axleIndex;
-  uint8 unitIndex;
-  uint8 wheelIndex;
-}
-
-message opendlv.sensation.Axle [id = 168] {
-  float load;
-  uint8 axleIndex;
-  uint8 unitIndex;
-}
-
-message opendlv.sensation.Geolocation [id = 169] {
-  float longitude;
-  float latitude;
-  float altitude;
-}
-
-message opendlv.sensation.BodyPart [id = 170] {
-  opendlv.cartesian.Point3 position; // From body origo to body part center of mass
-  string gemoetryPath;
-  float width;
-  float height;
-  float depth;
-  float mass;
-  uint8 partIndex;
-}
-
-message opendlv.sensation.Orientation [id = 171] {
-  float roll;
-  float pitch;
-  float yaw;
-  int partIndex;
-}
-
-message opendlv.sensation.Balance [id = 172] {
-  float rollRate;
-  float pitchRate;
-  float yawRate;
-  int partIndex;
-}
-
-message opendlv.sensation.Looming [id = 173] {
-  float angle;
-  float looming;
-  float size;
-}
-
-message opendlv.sensation.DirectionOfMovement [id = 175] {
-  opendlv.coordinate.Spherical3 directionOfMovement;
-}
-
-// Perception messages
-message opendlv.perception.ObjectDistanceToBody [id = 176] {
-  opendlv.coordinate.Cartesian3 bodySkinPosition;
-  opendlv.coordinate.Cartesian3 objectSurfacePosition;
-}
-
-
-
-
-message opendlv.perception.DesiredDirectionOfMovement [id = 178] {
-  opendlv.coordinate.Spherical3 directionOfMovement;
-}
-
-message opendlv.perception.Object [id = 179] {
-  list<opendlv.perception.ObjectProperty> properties;
-  odcore::data::TimeStamp lastSeen;
-  string type;
-  float angle;
-  float size;
-  uint16 objectIndex;
-}
-
-message opendlv.perception.ObjectDesiredAngle [id = 180] {
-  float desiredAngle;
-  uint16 objectIndex;
-}
-
-message opendlv.perception.ObjectDesiredSize [id = 181] {
-  float desiredSize;
-  uint16 objectIndex;
-}
-
-message opendlv.perception.ObjectLooming [id = 182] {
-  odcore::data::TimeStamp identified;
-  opendlv.sensation.Looming looming;
-  uint16 objectIndex;
-}
-
-message opendlv.perception.ObjectProperty [id = 183] {
-  odcore::data::TimeStamp identified;
-  string name;
-  string value;
-  uint16 objectIndex;
-}
-
-message opendlv.perception.ObjectMetricDistance [id = 184] {
-  float distance;
-  float angle;
-  float size;
-  uint32 objId;
-}
-*/
-
-message opendlv.perception.LanePosition [id = 183] {
-  float offset;
-  float heading;
-}
-
-message opendlv.perception.LeadVehicleSize [id = 184] {
-  float size;
-}
-
-// Knowledge
-message opendlv.knowledge.Message [id = 185] {
-  uint32 size;
-  string data;
-  //list<uint8> data;
 }
 
