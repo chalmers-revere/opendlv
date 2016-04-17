@@ -46,7 +46,7 @@ message opendlv.coordinate.Pose [id = 154] {
 message opendlv.proxy.CartesianTimeOfFlight [id = 155] {
   uint32 numberOfPoints [id = 1];
   opendlv.coordinate.Pose origin [id = 2];
-  list<opendlv.coordinate.Cartesian3> points [id = 3];;
+  list<opendlv.coordinate.Cartesian3> points [id = 3];
 }
 
 message opendlv.proxy.SphericalTimeOfFlight [id = 156] {
