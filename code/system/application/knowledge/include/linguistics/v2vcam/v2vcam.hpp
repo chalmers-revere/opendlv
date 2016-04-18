@@ -51,7 +51,6 @@ class V2vCam
   std::ofstream m_sendLog;
   std::ofstream m_receiveLog;
 
-  unsigned long const millisecondsTo2004FromUnixEpoch = 1072915200000;
   unsigned char const m_messageId = 2;
   int32_t m_stationId = 115;
   // Generation time of the (CAM) message in milliseconds

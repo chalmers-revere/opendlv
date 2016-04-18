@@ -21,6 +21,7 @@
 #include <ctype.h>
 #include <cstring>
 #include <cmath>
+#include <ctime>
 #include <iostream>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -105,13 +106,31 @@ V2vCam::~V2vCam()
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
 {
+  std::tm tm = {
+      0, // tm_sec
+      0, // tm_min
+      0, // tm_hour
+      1, // tm_mday
+      0, // tm_mon
+      2004 -1900, // tm_year
+      4, // tm_wday
+      0, // tm_yday
+      -1, // tm_isdst
+      0, // tm_gmtoff (NOTE: only in glibc)
+      nullptr // time zone (NOTE: only in glibc)
+      };
+
+  std::time_t tt = timegm(&tm);
+
+  std::chrono::system_clock::time_point start2004TimePoint = 
+      std::chrono::system_clock::from_time_t(tt);
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
       odcore::data::dmcp::ModuleStateMessage::RUNNING) {
     // std::cout << "Inside the main processing loop." << std::endl;
     unsigned long millisecondsSince2004Epoch =
         std::chrono::system_clock::now().time_since_epoch() /
-        std::chrono::milliseconds(1) - millisecondsTo2004FromUnixEpoch;
+        std::chrono::milliseconds(1) - start2004TimePoint.time_since_epoch() / std::chrono::milliseconds(1);
     m_generationDeltaTime = millisecondsSince2004Epoch%65536;
     std::shared_ptr<opendlv::Buffer> outBuffer(new opendlv::Buffer());
     // Reverser for big and little endian specification of V2V.
