@@ -78,6 +78,7 @@ set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
 ###########################################################################
 # Add subfolders with sources.
 add_subdirectory(core)
+add_subdirectory(libs)
 add_subdirectory(application)
 
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../config/configuration DESTINATION . COMPONENT system)

@@ -69,235 +69,235 @@ void DetectLane::nextContainer(odcore::data::Container &c)
 	// Code to read data
 	// TODO: Implement a way to see if shared image is from left or right camera.
 	// Algorithm is needed to set the search regions depending on the 
-	if (c.getDataType() != odcore::data::image::SharedImage::ID()) {
-//    std::cout << "--- Received unimportant container of type " << 
-//        c.getDataType() << std::endl;
-//    return;
-  }
-//  std::cout << "Received container of type " << c.getDataType() << 
-//      " sent at " <<   c.getSentTimeStamp().getYYYYMMDD_HHMMSSms() << 
-//      " received at " << c.getReceivedTimeStamp().getYYYYMMDD_HHMMSSms() << 
-//      std::endl;
-  
-  odcore::data::image::SharedImage mySharedImg = 
-      c.getData<odcore::data::image::SharedImage>();
-//  cout << "Received a SharedImage of size: (" << mySharedImg.getWidth() << 
-//      ", " << mySharedImg.getHeight() << ")" << endl;
+	if (c.getDataType() == odcore::data::image::SharedImage::ID()) {
 
-  std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(mySharedImg.getName()));
-  
-  const uint32_t nrChannels = 3;//mySharedImg.getBytesPerPixel();;
-  int imgWidth = mySharedImg.getWidth();
-  int imgHeight = mySharedImg.getHeight();
-  cv::Mat image;
- 
-  IplImage* myIplImage;
-  myIplImage = cvCreateImage(cvSize(imgWidth, imgHeight), IPL_DEPTH_8U, nrChannels);
-  cv::Mat src(myIplImage);
-
-  if (!sharedMem->isValid()) {
-    return;
-  }
-  
-  sharedMem->lock();
-  {
-    memcpy(src.data, sharedMem->getSharedMemory(), imgWidth*imgHeight*nrChannels);
-  }
-  sharedMem->unlock();
-  
-  
-  // From this point implement lane detection algorithm
-
-  // TODO: CHECK IF IT IS LEFT OR RIGTH CAMERA
-
-  //-----------------------------
-  // Definitions for the video choice
-  //-----------------------------
-  int width = 640, height = 480;
-  int MAXROW, MINROW;
-
-	MINROW = 280;
-	MAXROW = 450;
-	Eigen::MatrixXd regions(5,4);
-	//region = col1,row1, col2,row2
-  regions << 
-      243, 288, 167, 478,
-      277, 283, 278, 477,
-      297, 280, 360, 477,
-      327, 282, 475, 477,
-      366, 278, 638, 479;    
-  
-  //-----------------------------
-  // Scaling: Calibrations were made for 640x480 resolution
-  //-----------------------------
-  MINROW = MINROW * ( height / 480.0); MAXROW = MAXROW * (height / 480.0);
-  regions.col(0) = regions.col(0) * ( width / 640.0);
-  regions.col(2) = regions.col(2) * ( width / 640.0);
-  regions.col(1) = regions.col(1) * ( height / 480.0);
-  regions.col(3) = regions.col(3) * ( height / 480.0);
-  
-  //-----------------------------
-  // Image processing parameters
-  //-----------------------------
-  int nPoints = MAXROW-MINROW;
-  
-  //-----------------------------
-  // Initializations
-  //-----------------------------
-  
-  // Matrix holding the lines col = row * k + m for the region lines
-  Eigen::MatrixXd lines(regions.rows(),2);
-  
-  // Matrix holding the mean column for each region on each row
-  Eigen::MatrixXd recoveredPoints(nPoints,lines.rows()+2);
-  
-  // Number of search regions
-  long nRegions = recoveredPoints.cols()-1;
-  
-  // Holds the K and M parameters for each region
-  Eigen::MatrixXd K(nRegions,1), M(nRegions,1);
-  
-  // Counts the number of points per each region
-  Eigen::VectorXd pointsPerRegion(nRegions,1);
-  
-  // Holds the index that decides the left and right road track
-  Eigen::MatrixXd regionIndex(2,1);
-  
-  // Holds the location of found lanes
-  Eigen::VectorXd laneLocation2;
-  
-  // Holds the k and m values from the previous frame
-  Eigen::MatrixXd kPrev = Eigen::MatrixXd::Zero(regions.rows()+1, 1);
-  Eigen::MatrixXd mPrev = Eigen::MatrixXd::Zero(regions.rows()+1, 1);
-
-	// Momentum parameter
-	// double alpha = 0.5;
-
-	// Lane offset variable
-	double laneOffset;
-
-	// Holds the index of the left and right road track
-	int p1,p2;
-	//int prevP1,prevP2;
-
-	// Middle region line index
-	int midRegion = (int)(lines.rows()-1)/2;
-
-	//-----------------------------
-  // Extracts the equation for the region lines
-  //-----------------------------
-  GetRegionLinesV2(regions, lines);
-  
-  // Holds the k and m values for the region lines
-  Eigen::MatrixXd k = lines.col(0);
-  Eigen::MatrixXd m = lines.col(1);
-  
-  //-----------------------------
-  // Initialize windows
-  //-----------------------------
-  //namedWindow("1", 1);
-  //namedWindow("Canny",1);
-  
-  //moveWindow("1", 0, 0);
-  
-  //-----------------------------
-  // Re-size the source image
-  //-----------------------------
-  resize(src, src, Size(width,height),0,0,INTER_CUBIC);
-
-  //-----------------------------
-  // Choose processing type
-  //-----------------------------
-  // OLA CHANGE HERE IF NEEDED
-  int T1 = 150;
-  cv::inRange(src, cv::Scalar(T1, T1, T1), cv::Scalar(255, 255, 255), image);
-  medianBlur(image, image, 3);
-
+  //  std::cout << "Received container of type " << c.getDataType() << 
+  //      " sent at " <<   c.getSentTimeStamp().getYYYYMMDD_HHMMSSms() << 
+  //      " received at " << c.getReceivedTimeStamp().getYYYYMMDD_HHMMSSms() << 
+  //      std::endl;
     
-  //-----------------------------
-  // Local line search
-  //-----------------------------
-  ScanImage(&image,&lines,&recoveredPoints,nPoints,MINROW,MAXROW);
-  
-  
-  //-----------------------------
-  // Extract lines from points
-  //-----------------------------
-  ExtractLines(&recoveredPoints,&K,&M,nRegions,nPoints,&pointsPerRegion);
+    odcore::data::image::SharedImage mySharedImg = 
+        c.getData<odcore::data::image::SharedImage>();
+  //  cout << "Received a SharedImage of size: (" << mySharedImg.getWidth() << 
+  //      ", " << mySharedImg.getHeight() << ")" << endl;
 
-  //-----------------------------
-  // Make decision based on lines
-  //-----------------------------
-  laneLocation2 = Eigen::VectorXd::Zero(nRegions, 1);
-  SelectLanesV2(pointsPerRegion, laneLocation2);
-  
-  if (fabs(pointsPerRegion.sum()) > 0.0001){
-    SelectLaneOrientation(regionIndex,laneLocation2,(int)recoveredPoints.cols());
-    p1 = regionIndex(0,0), p2 = regionIndex(1,0);
+    std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(mySharedImg.getName()));
     
+    const uint32_t nrChannels = 3;//mySharedImg.getBytesPerPixel();;
+    int imgWidth = mySharedImg.getWidth();
+    int imgHeight = mySharedImg.getHeight();
+    cv::Mat image;
+   
+    IplImage* myIplImage;
+    myIplImage = cvCreateImage(cvSize(imgWidth, imgHeight), IPL_DEPTH_8U, nrChannels);
+    cv::Mat src(myIplImage);
+
+    if (!sharedMem->isValid()) {
+      return;
+    }
+    
+    sharedMem->lock();
+    {
+      memcpy(src.data, sharedMem->getSharedMemory(), imgWidth*imgHeight*nrChannels);
+    }
+    sharedMem->unlock();
+    
+    
+    // From this point implement lane detection algorithm
+
+    // TODO: CHECK IF IT IS LEFT OR RIGTH CAMERA
+
+    //-----------------------------
+    // Definitions for the video choice
+    //-----------------------------
+    int width = 640, height = 480;
+    int MAXROW, MINROW;
+
+    MINROW = 280;
+    MAXROW = 450;
+    Eigen::MatrixXd regions(5,4);
+    //region = col1,row1, col2,row2
+    regions << 
+        243, 288, 167, 478,
+        277, 283, 278, 477,
+        297, 280, 360, 477,
+        327, 282, 475, 477,
+        366, 278, 638, 479;    
+    
+    //-----------------------------
+    // Scaling: Calibrations were made for 640x480 resolution
+    //-----------------------------
+    MINROW = MINROW * ( height / 480.0); MAXROW = MAXROW * (height / 480.0);
+    regions.col(0) = regions.col(0) * ( width / 640.0);
+    regions.col(2) = regions.col(2) * ( width / 640.0);
+    regions.col(1) = regions.col(1) * ( height / 480.0);
+    regions.col(3) = regions.col(3) * ( height / 480.0);
+    
+    //-----------------------------
+    // Image processing parameters
+    //-----------------------------
+    int nPoints = MAXROW-MINROW;
+    
+    //-----------------------------
+    // Initializations
+    //-----------------------------
+    
+    // Matrix holding the lines col = row * k + m for the region lines
+    Eigen::MatrixXd lines(regions.rows(),2);
+    
+    // Matrix holding the mean column for each region on each row
+    Eigen::MatrixXd recoveredPoints(nPoints,lines.rows()+2);
+    
+    // Number of search regions
+    long nRegions = recoveredPoints.cols()-1;
+    
+    // Holds the K and M parameters for each region
+    Eigen::MatrixXd K(nRegions,1), M(nRegions,1);
+    
+    // Counts the number of points per each region
+    Eigen::VectorXd pointsPerRegion(nRegions,1);
+    
+    // Holds the index that decides the left and right road track
+    Eigen::MatrixXd regionIndex(2,1);
+    
+    // Holds the location of found lanes
+    Eigen::VectorXd laneLocation2;
+    
+    // Holds the k and m values from the previous frame
+    Eigen::MatrixXd kPrev = Eigen::MatrixXd::Zero(regions.rows()+1, 1);
+    Eigen::MatrixXd mPrev = Eigen::MatrixXd::Zero(regions.rows()+1, 1);
+
+    // Momentum parameter
+    // double alpha = 0.5;
+
+    // Lane offset variable
+    double laneOffset;
+
+    // Holds the index of the left and right road track
+    int p1,p2;
+    //int prevP1,prevP2;
+
+    // Middle region line index
+    int midRegion = (int)(lines.rows()-1)/2;
+
+    //-----------------------------
+    // Extracts the equation for the region lines
+    //-----------------------------
+    GetRegionLinesV2(regions, lines);
+    
+    // Holds the k and m values for the region lines
+    Eigen::MatrixXd k = lines.col(0);
+    Eigen::MatrixXd m = lines.col(1);
+    
+    //-----------------------------
+    // Initialize windows
+    //-----------------------------
+    //namedWindow("1", 1);
+    //namedWindow("Canny",1);
+    
+    //moveWindow("1", 0, 0);
+    
+    //-----------------------------
+    // Re-size the source image
+    //-----------------------------
+    resize(src, src, Size(width,height),0,0,INTER_CUBIC);
+
+    //-----------------------------
+    // Choose processing type
+    //-----------------------------
+    // OLA CHANGE HERE IF NEEDED
+    int T1 = 150;
+    cv::inRange(src, cv::Scalar(T1, T1, T1), cv::Scalar(255, 255, 255), image);
+    medianBlur(image, image, 3);
+
+      
+    //-----------------------------
+    // Local line search
+    //-----------------------------
+    ScanImage(&image,&lines,&recoveredPoints,nPoints,MINROW,MAXROW);
     
     
     //-----------------------------
-    //Add momentum & update previous lines
+    // Extract lines from points
     //-----------------------------
-    
-    // AddMomentum(K,kPrev,M,mPrev,alpha,regionIndex);
-    // kPrev = K;
-    // mPrev = M;
-    // prevP1 = p1;
-    // prevP2 = p2;
-    
-    
-    //-----------------------------
-    // Draw boarders/lines - VISUALIZATION
-    //-----------------------------
-    
-    DrawBorders(&src,MINROW,MAXROW,K(p1,0),K(p2,0),M(p1,0),M(p2,0));
- //   DrawTracks(&src, &K, &M,MINROW,MAXROW,Scalar(0,0,255));
- //   DrawTracks(&src, &k,&m,MINROW,Scalar(255,255,255));
-    
+    ExtractLines(&recoveredPoints,&K,&M,nRegions,nPoints,&pointsPerRegion);
 
     //-----------------------------
-    // Calculate lane offset
+    // Make decision based on lines
     //-----------------------------
-    laneOffset = GetLateralPosition(K(p1,0),M(p1,0),
-                                    K(p2,0),M(p2,0),
-                                    lines.col(0)(midRegion),lines.col(1)(midRegion),
-                                    (MAXROW));
-    //-----------------------------
-    // Approximate heading angle
-    //-----------------------------
-    double d1 = GetLateralPosition(K(p1,0),M(p1,0),
-                                K(p2,0),M(p2,0),
-                              lines.col(0)(midRegion),lines.col(1)(midRegion),
-                                (MAXROW));
-    double d2 = GetLateralPosition(K(p1,0),M(p1,0),
-                                K(p2,0),M(p2,0),
+    laneLocation2 = Eigen::VectorXd::Zero(nRegions, 1);
+    SelectLanesV2(pointsPerRegion, laneLocation2);
+    
+    if (fabs(pointsPerRegion.sum()) > 0.0001){
+      SelectLaneOrientation(regionIndex,laneLocation2,(int)recoveredPoints.cols());
+      p1 = regionIndex(0,0), p2 = regionIndex(1,0);
+      
+      
+      
+      //-----------------------------
+      //Add momentum & update previous lines
+      //-----------------------------
+      
+      // AddMomentum(K,kPrev,M,mPrev,alpha,regionIndex);
+      // kPrev = K;
+      // mPrev = M;
+      // prevP1 = p1;
+      // prevP2 = p2;
+      
+      
+      //-----------------------------
+      // Draw boarders/lines - VISUALIZATION
+      //-----------------------------
+      
+      DrawBorders(&src,MINROW,MAXROW,K(p1,0),K(p2,0),M(p1,0),M(p2,0));
+   //   DrawTracks(&src, &K, &M,MINROW,MAXROW,Scalar(0,0,255));
+   //   DrawTracks(&src, &k,&m,MINROW,Scalar(255,255,255));
+      
+
+      //-----------------------------
+      // Calculate lane offset
+      //-----------------------------
+      laneOffset = GetLateralPosition(K(p1,0),M(p1,0),
+                                      K(p2,0),M(p2,0),
+                                      lines.col(0)(midRegion),lines.col(1)(midRegion),
+                                      (MAXROW));
+      //-----------------------------
+      // Approximate heading angle
+      //-----------------------------
+      double d1 = GetLateralPosition(K(p1,0),M(p1,0),
+                                  K(p2,0),M(p2,0),
                                 lines.col(0)(midRegion),lines.col(1)(midRegion),
-                                (MINROW));
+                                  (MAXROW));
+      double d2 = GetLateralPosition(K(p1,0),M(p1,0),
+                                  K(p2,0),M(p2,0),
+                                  lines.col(0)(midRegion),lines.col(1)(midRegion),
+                                  (MINROW));
+      
+      double theta = atan((d2-d1) / (double)15);
+      
+      // DEBUG PRINT
+      //std::cout<<"Heading angle "<<theta<<std::endl;
+      //std::cout<<"Offset "<<laneOffset<<std::endl;
+      
+      
+      // Send the message
+      opendlv::perception::LanePosition lanePosition(laneOffset,theta);
+      odcore::data::Container msg(lanePosition);  
+      getConference().send(msg);
+      
+    }
     
-    double theta = atan((d2-d1) / (double)15);
+    //-----------------------------
+    // Show image
+    //-----------------------------
+    imshow("1", src);
+    waitKey(10);
     
-    // DEBUG PRINT
-    //std::cout<<"Heading angle "<<theta<<std::endl;
-    //std::cout<<"Offset "<<laneOffset<<std::endl;
-		
-    
-    // Send the message
-    opendlv::perception::LanePosition lanePosition(laneOffset,theta);
-    odcore::data::Container msg(lanePosition);  
-    getConference().send(msg);
-		
+    cvReleaseImage(&myIplImage);
+
   }
-  
-  //-----------------------------
-  // Show image
-  //-----------------------------
-  imshow("1", src);
-  waitKey(10);
-	
-  cvReleaseImage(&myIplImage);
-  }
+
+}
 
 void DetectLane::setUp()
 {

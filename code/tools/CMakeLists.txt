@@ -68,6 +68,7 @@ include_directories(${REVEREFH16MAPPING_INCLUDE_DIRS})
 
 ###########################################################################
 # Set libraries to link against.
+
 set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
               ${OPENDLV_LIBRARIES} 
               ${ODCANTOOLS_LIBRARIES}
@@ -75,4 +76,7 @@ set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
               ${REVEREFH16MAPPING_LIBRARIES})
 
 #add_subdirectory(can)
+add_subdirectory(dataspy)
+add_subdirectory(truckreplay)
 add_subdirectory(vboreplay)
+

@@ -1,0 +1,199 @@
+/*
+ * Copyright (C) 2015 Chalmers REVERE
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
+// Cartesian messages
+
+message opendlv.Constants [id = 150] {
+  const double PI = 3.141592653589793;
+  const double DEG2RAD = 0.017453292522222;  // PI/180.0
+  const double RAD2DEG = 57.295779513082325; // 1.0 / DEG2RAD;
+  const double MS2KMH = 3.6;
+  const double KMH2MS = 0.277777777777778; // 1.0 / MS2KMH;
+}
+
+message opendlv.cartesian.Point2 [id = 151] {
+  float p[2] [id = 1];
+}
+
+message opendlv.cartesian.Point3 [id = 152] {
+  float p[3] [id = 1];
+}
+
+message opendlv.cartesian.Position2d [id = 153] {
+  opendlv.cartesian.Point2 position [id = 1];
+  opendlv.cartesian.Point2 rotation [id = 2];
+}
+
+message opendlv.cartesian.Position3d [id = 154] {
+  opendlv.cartesian.Point3 position [id = 1];
+  opendlv.cartesian.Point3 rotation [id = 2];
+}
+
+message opendlv.cartesian.Matrix3x3 [id = 155] {
+  double a11 [id = 1];
+  double a12 [id = 2];
+  double a13 [id = 3];
+  double a21 [id = 4];
+  double a22 [id = 5];
+  double a23 [id = 6];
+  double a31 [id = 7];
+  double a32 [id = 8];
+  double a33 [id = 9];
+}
+
+message opendlv.cartesian.Matrix4x4 [id = 156] {
+  double a11 [id = 1];
+  double a12 [id = 2];
+  double a13 [id = 3];
+  double a14 [id = 4];
+  double a21 [id = 5];
+  double a22 [id = 6];
+  double a23 [id = 7];
+  double a24 [id = 8];
+  double a31 [id = 9];
+  double a32 [id = 10];
+  double a33 [id = 11];
+  double a34 [id = 12];
+  double a41 [id = 13];
+  double a42 [id = 14];
+  double a43 [id = 15];
+  double a44 [id = 16];
+}
+
+// State messages
+message opendlv.system.Orientation [id = 159] {
+  opendlv.cartesian.Matrix4x4 orientation;
+}
+
+// Proxy messages
+message opendlv.system.sensor.PointCloud [id = 160] {
+  uint32 numberOfPoints;
+ // list<opendlv.cartesian.Point3> points;
+}
+
+message opendlv.system.sensor.AltImu10Dof [id = 161] {
+  float acceleration[3];
+  float orientation[3];
+  float heading[3];
+  float altitude;
+}
+
+message opendlv.system.sensor.VehicleCommunicationMessage [id = 162] {
+  string type;
+  uint32 size;
+  list<uint8> data;
+}
+
+message opendlv.system.sensor.Geolocation [id = 163] {
+  float longitude;
+  float latitude;
+  float altitude;
+}
+
+message opendlv.system.actuator.Steering [id = 164] {
+  float deltaAngle;
+}
+
+message opendlv.system.actuator.Brake [id = 165] {
+  float deltaPosition;
+}
+
+message opendlv.system.actuator.Throttle [id = 166] {
+  float deltaPosition;
+}
+
+// Message for testing the Kalman filter.
+message opendlv.system.actuator.Commands [id = 167] {
+  double longitudinalVelocity;
+  double steeringAngle;
+}
+
+message opendlv.system.sensor.TruckLocation [id = 168] {
+  double x;
+  double y;
+  double yaw;
+  double yawRate;
+}
+
+/*
+// Action messages
+message opendlv.action.Correction [id = X] {
+  TimeStamp startTime;
+  std::string type;
+  bool isInhibitory;
+  float amplitude;
+}
+
+// Perception messages
+message opendlv.perception.DesiredOpticalFlow [id = X] {
+  float opticalFlow;
+  float desiredOpticalFlow;
+}
+
+message opendlv.perception.DesiredDirectionOfMovement [id = X] {
+  float directionOfMovement;
+  float desiredDirectionOfMovement;
+}
+
+message opendlv.perception.Object [id = X] {
+  list<opendlv::perception::ObjectProperty> properties;
+  TimeStamp lastSeen;
+  std::string type;
+  float angle;
+  float size;
+  uint32 id;
+}
+
+message opendlv.perception.ObjectDesiredAngle [id = X] {
+  float desiredAngle;
+  uint32 id;
+}
+
+message opendlv.perception.ObjectDesiredSize [id = X] {
+  float desiredSize;
+  uint32 id;
+}
+
+message opendlv.perception.ObjectLooming [id = X] {
+  TimeStamp identified;
+  opendlv::sensation::Looming looming;
+  uint32 id;
+}
+
+message opendlv.perception.ObjectProperty [id = X] {
+  TimeStamp identified;
+  std::string name;
+  std::string value;
+  uint32 id;
+}
+
+message opendlv.perception.ObjectMetricDistance [id = X] {
+  float distance;
+  float angle;
+  float size;
+  uint32 id;
+}
+
+// Sensation
+message opendlv.sensation.Looming [id = X] {
+  float angle;
+  float looming;
+  float size;
+}
+*/
+

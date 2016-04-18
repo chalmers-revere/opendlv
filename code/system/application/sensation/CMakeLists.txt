@@ -19,12 +19,15 @@ project(opendlv-system-application-sensation)
 
 # Set include directories
 include_directories(include)
+include_directories(${EKF_lib_INCLUDE_DIR})
+
 
 # Set libraries
 set(LIBRARIES ${LIBRARIES})
 
 # Build
 file(GLOB_RECURSE thisproject-sources
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/sensation.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/audition/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/echolocation/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/geolocation/*.cpp"
@@ -40,6 +43,15 @@ file(GLOB_RECURSE thisproject-sources
   )
 
 add_library(${PROJECT_NAME}lib-static STATIC ${thisproject-sources})
+
+#add_dependencies(${PROJECT_NAME}lib-static EKF_lib)# --- all the libs should be built before the application
+#add_executable(${PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
+#target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}lib-static ${LIBRARIES} ) 
+
+# Mauro's code:
+add_executable(${PROJECT_NAME}-sensation-mauro "${CMAKE_CURRENT_SOURCE_DIR}/src/sensation-mauro.cpp")
+target_link_libraries(${PROJECT_NAME}-sensation-mauro ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+
 
 add_executable(${PROJECT_NAME}-audition "${CMAKE_CURRENT_SOURCE_DIR}/src/audition/main.cpp")
 target_link_libraries(${PROJECT_NAME}-audition ${PROJECT_NAME}lib-static ${LIBRARIES}) 
@@ -77,10 +89,13 @@ target_link_libraries(${PROJECT_NAME}-vision-monochrome ${PROJECT_NAME}lib-stati
 add_executable(${PROJECT_NAME}-vision-opticalflow "${CMAKE_CURRENT_SOURCE_DIR}/src/vision/opticalflow/main.cpp")
 target_link_libraries(${PROJECT_NAME}-vision-opticalflow ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
+
 # Test
 include(RunTests)
 
 # Install
+install(TARGETS ${PROJECT_NAME}-sensation-mauro RUNTIME DESTINATION bin COMPONENT system-application)
+
 install(TARGETS ${PROJECT_NAME}-audition RUNTIME DESTINATION bin COMPONENT system-application)
 install(TARGETS ${PROJECT_NAME}-echolocation RUNTIME DESTINATION bin COMPONENT system-application)
 install(TARGETS ${PROJECT_NAME}-geolocation RUNTIME DESTINATION bin COMPONENT system-application)

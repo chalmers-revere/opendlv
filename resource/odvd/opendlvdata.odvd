@@ -310,3 +310,17 @@ message opendlv.knowledge.Message [id = 185] {
   //list<uint8> data;
 }
 
+// Message for testing the Kalman filter.
+message opendlv.system.actuator.Commands [id = 186] {
+  double longitudinalVelocity;
+  double steeringAngle;
+}
+
+message opendlv.system.sensor.TruckLocation [id = 187] {
+  double x;
+  double y;
+  double yaw;
+  double yawRate;
+  double long_acc;
+  double lat_acc;
+}

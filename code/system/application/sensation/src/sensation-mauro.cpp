@@ -17,44 +17,9 @@
  * USA.
  */
 
-#ifndef ACT_ACT_HPP_
-#define ACT_ACT_HPP_
+#include "sensation.hpp"
 
-#include <memory>
-
-#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
-#include "opendavinci/odcore/data/Container.h"
-
-namespace opendlv {
-namespace action {
-namespace act {
-
-/**
- * This class provides...
- */
-class Act : public odcore::base::module::TimeTriggeredConferenceClientModule {
-
- public:
-  Act(int32_t const &, char **);
-  Act(Act const &) = delete;
-  Act &operator=(Act const &) = delete;
-  virtual ~Act();
-  virtual void nextContainer(odcore::data::Container &);
-
- private:
-  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
-  void setUp();
-  void tearDown();
-
-  float m_acceleration;
-  float m_steering;
-};
-
-
-
-};
-} // act
-} // action
-} // opendlv
-
-#endif
+int32_t main(int32_t a_argc, char **a_argv) {
+  opendlv::system::application::sensation::Sensation main(a_argc, a_argv);
+  return main.runModule();
+}

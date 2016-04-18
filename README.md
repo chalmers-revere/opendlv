@@ -20,7 +20,7 @@ You can build the entire source tree:
     $ cd opendlv && mkdir build && cd build
     $ cmake ..
     $ make
-
+ 
 Alternatively you can use locally compiled version of OpenDaVINCI by instead running:
 
     $ cmake -DOPENDAVINCI_DIR=/path/to/opendavinci ..

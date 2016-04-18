@@ -63,6 +63,7 @@ void Communicate::nextContainer(odcore::data::Container &c)
 
     odcore::data::Container containerToSend(nextMessage);
     getConference().send(containerToSend);
+
   }
 }
 
