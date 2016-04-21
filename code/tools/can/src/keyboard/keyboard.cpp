@@ -202,16 +202,13 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Keyboard::body()
 //            opendlv::proxy::reverefh16::SteeringRequest steerRequest;
 //            steerRequest.setEnableRequest(true);
 //            steerRequest.setSteeringRoadWheelAngle(steering);
-//            steerRequest.setSteeringDeltaTorque(0);
+//            steerRequest.setSteeringDeltaTorque(33.535);
 
 //            // Create the message mapping.
 //            canmapping::opendlv::proxy::reverefh16::SteeringRequest steeringRequestMapping;
 //            // The high-level message needs to be put into a Container.
 //            odcore::data::Container c(steerRequest);
 //            automotive::GenericCANMessage gcm = steeringRequestMapping.encode(c);
-////cout << "SR1 = " << steerRequest.toString() << ", GCM = " << gcm.toString() << endl;
-////            gcm.setLength(6);
-////            gcm.setData(0x10000003C43); // working first time 1=0x116027235 0.5=116023111 0.1=0x106585636
 //            m_device->write(gcm);
 //cout << "SR2 = " << steerRequest.toString() << ", GCM = " << gcm.toString() << endl;
 //cout << endl;
@@ -247,6 +244,51 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Keyboard::body()
 //cout << endl;
 //        }
       }
+
+    // Disabling steering request at shutdown.
+    {
+        opendlv::proxy::reverefh16::SteeringRequest steerRequest;
+        steerRequest.setEnableRequest(false);
+        steerRequest.setSteeringRoadWheelAngle(0);
+        steerRequest.setSteeringDeltaTorque(33.535);
+
+        // Create the message mapping.
+        canmapping::opendlv::proxy::reverefh16::SteeringRequest steeringRequestMapping;
+        // The high-level message needs to be put into a Container.
+        odcore::data::Container c(steerRequest);
+        automotive::GenericCANMessage gcm = steeringRequestMapping.encode(c);
+        m_device->write(gcm);
+cout << "SR2 = " << steerRequest.toString() << ", GCM = " << gcm.toString() << endl;
+cout << endl;
+    }
+
+    // Disabling acceleration request at shutdown.
+    {
+        opendlv::proxy::reverefh16::AccelerationRequest accelerationRequest;
+        accelerationRequest.setEnableRequest(false);
+        accelerationRequest.setAcceleration(0);
+
+        // Create the message mapping.
+        canmapping::opendlv::proxy::reverefh16::AccelerationRequest accelerationRequestMapping;
+        // The high-level message needs to be put into a Container.
+        odcore::data::Container c(accelerationRequest);
+        automotive::GenericCANMessage gcm = accelerationRequestMapping.encode(c);
+        m_device->write(gcm);
+    }
+    // Disabling brake request at shutdown.
+    {
+        opendlv::proxy::reverefh16::BrakeRequest brakeRequest;
+        brakeRequest.setEnableRequest(false);
+        brakeRequest.setBrake(0);
+
+        // Create the message mapping.
+        canmapping::opendlv::proxy::reverefh16::BrakeRequest brakeRequestMapping;
+        // The high-level message needs to be put into a Container.
+        odcore::data::Container c(brakeRequest);
+        automotive::GenericCANMessage gcm = brakeRequestMapping.encode(c);
+        m_device->write(gcm);
+    }
+
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
