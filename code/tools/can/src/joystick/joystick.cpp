@@ -36,8 +36,8 @@
 
 #include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
-#include "can/canmessagedatastore.hpp"
-#include "can/joystick/joystick.hpp"
+#include "canmessagedatastore.hpp"
+#include "joystick/joystick.hpp"
 
 namespace opendlv {
 namespace tools {
@@ -136,31 +136,18 @@ void Joystick::tearDown()
 void Joystick::nextGenericCANMessage(
 const automotive::GenericCANMessage &gcm)
 {
-  std::cout << "Received CAN message " << gcm.toString() << std::endl;
+  // Map CAN message to high-level data structure.
+  vector<odcore::data::Container> result = m_revereFh16CanMessageMapping.mapNext(gcm);
 
-  //  // Map CAN message to high-level data structure.
-  //  vector<odcore::data::Container> result =
-  //  m_fh16CANMessageMapping.mapNext(gcm);
-
-  //  std::cout << gcm.toString() << ", decoded: " << result.size() <<
-  //  std::endl;
-  //  if (result.size() > 0) {
-  //    auto it = result.begin();
-  //    while (it != result.end()) {
-  //      odcore::data::Container c = (*it);
-  //      if (c.getDataType() == opendlv::gcdc::fh16::Steering::ID()) {
-  //        opendlv::gcdc::fh16::Steering s =
-  //        c.getData<opendlv::gcdc::fh16::Steering>();
-  //        std::cout << s.toString() << std::endl;
-  //      }
-  //      if (c.getDataType() == opendlv::gcdc::fh16::VehicleDynamics::ID()) {
-  //        opendlv::gcdc::fh16::VehicleDynamics v =
-  //        c.getData<opendlv::gcdc::fh16::VehicleDynamics>();
-  //        std::cout << v.toString() << std::endl;
-  //      }
-  //      it++;
-  //    }
-  //  }
+  if (result.size() > 0) {
+    auto it = result.begin();
+    while (it != result.end()) {
+      odcore::data::Container c = (*it);
+      // Send container to conference.
+      getConference().send(c);
+      it++;
+    }
+  }
 }
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Joystick::body()
@@ -208,8 +195,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Joystick::body()
 
 
     opendlv::proxy::reverefh16::BrakeRequest brakeRequest;
-    brakeRequest.setEnable_brakeRequest(false);
-    brakeRequest.setBrakeRequest(0);
+    brakeRequest.setEnableRequest(false);
+    brakeRequest.setBrake(0);
 
     // Create the message mapping.
     canmapping::opendlv::proxy::reverefh16::BrakeRequest brakeRequestMapping;
