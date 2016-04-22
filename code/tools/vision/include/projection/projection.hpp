@@ -58,7 +58,6 @@ class Projection
   void project();
 
 
-  cv::Mat m_feed;
   char m_option;
   double m_recHeight, m_recWidth, m_recPosX, m_recPosY;
   Eigen::MatrixXd m_aMatrix, m_bMatrix, m_projectionMatrix;

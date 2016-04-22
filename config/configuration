@@ -40,7 +40,7 @@ proxy-ledstrip.type = victor
 proxy-ledstrip.port = /dev/ttyUSB6
 
 proxy-camera.type = opencv-ip-axis
-proxy-camera.port = 10.42.0.91
+proxy-camera.port = 10.42.42.90
 proxy-camera.username = root
 proxy-camera.password = gcdc
 proxy-camera.resolution = 1280x720
@@ -53,7 +53,7 @@ proxy-camera.mount.pitch = -0.1
 proxy-camera.mount.yaw = 0.2
 
 proxy-camera:1.type = opencv-ip-axis
-proxy-camera:1.port = ip://192.168.0.121
+proxy-camera:1.port = 10.42.42.91
 proxy-camera:1.username = root
 proxy-camera:1.password = gcdc
 proxy-camera:1.resolution = 1280x720

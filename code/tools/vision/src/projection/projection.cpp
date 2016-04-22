@@ -93,7 +93,6 @@ namespace projection {
 Projection::Projection(int32_t const &a_argc, char **a_argv)
     : odcore::base::module::TimeTriggeredConferenceClientModule(
       a_argc, a_argv, "tools-vision-projection"),
-      m_feed(),
       m_option(),
       m_recHeight(),
       m_recWidth(),
@@ -131,13 +130,15 @@ void Projection::nextContainer(odcore::data::Container &a_c)
     std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(
         odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(
             mySharedImg.getName()));
-    const uint32_t nrChannels = mySharedImg.getBytesPerPixel();
-    const uint32_t imgWidth = mySharedImg.getWidth();
-    const uint32_t imgHeight = mySharedImg.getHeight();
+    uint32_t nrChannels = mySharedImg.getBytesPerPixel();
+    uint32_t imgWidth = mySharedImg.getWidth();
+    uint32_t imgHeight = mySharedImg.getHeight();
 
-    IplImage* myIplImage = cvCreateImage(cvSize(imgWidth,imgHeight), IPL_DEPTH_8U,
+    IplImage* myIplImage;
+    
+    myIplImage = cvCreateImage(cvSize(imgWidth,imgHeight), IPL_DEPTH_8U,
         nrChannels);
-    m_feed = cv::Mat(myIplImage);
+    cv::Mat feed(myIplImage);
 
     if(!sharedMem->isValid()){
       return;
@@ -145,26 +146,28 @@ void Projection::nextContainer(odcore::data::Container &a_c)
 
     sharedMem->lock();
     {
-      memcpy(m_feed.data, sharedMem->getSharedMemory(),
+      memcpy(feed.data, sharedMem->getSharedMemory(),
           imgWidth*imgHeight*nrChannels);
     }
     sharedMem->unlock();
-    const int32_t windowWidth = 640;
-    const int32_t windowHeight = 480;
-    cv::Mat display;
-    cv::resize(m_feed, display, cv::Size(windowWidth, windowHeight), 0, 0,
-      cv::INTER_CUBIC);
+    // const int32_t windowWidth = 640;
+    // const int32_t windowHeight = 480;
+    // cv::Mat display;
+    // cv::resize(m_feed, display, cv::Size(windowWidth, windowHeight), 0, 0,
+    //   cv::INTER_CUBIC);
 
-    putText(display, "Rectangle width: " + std::to_string(m_recWidth), cvPoint(30,30), 
+    putText(feed, "Rectangle width: " + std::to_string(m_recWidth), cvPoint(30,30), 
     1, 0.8, cvScalar(0,0,254), 1, CV_AA);
-    putText(display, "Rectangle height: " + std::to_string(m_recHeight), cvPoint(30,40), 
+    putText(feed, "Rectangle height: " + std::to_string(m_recHeight), cvPoint(30,40), 
     1, 0.8, cvScalar(0,0,254), 1, CV_AA);
-    putText(display, "Position (x,y): (" + std::to_string(m_recPosX) + ","  + std::to_string(m_recPosY) + ")" , cvPoint(30,50), 
+    putText(feed, "Position (x,y): (" + std::to_string(m_recPosX) + ","  + std::to_string(m_recPosY) + ")" , cvPoint(30,50), 
     1, 0.8, cvScalar(0,0,254), 1, CV_AA);
 
-    cv::imshow("Calibration", display);
+    cv::imshow("Calibration", feed);
 
     m_option = (char) cv::waitKey(1);
+
+    cvReleaseImage(&myIplImage);
     return;
   }
 }
@@ -172,6 +175,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Projection::body(){
   config();
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
   odcore::data::dmcp::ModuleStateMessage::RUNNING){
+    if(m_option == 27 )
+      break;
     switch(m_option){
       case 'c':
         std::cout<<"Enter Calibration" << std::endl;
