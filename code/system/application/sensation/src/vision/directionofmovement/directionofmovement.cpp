@@ -90,6 +90,8 @@ void DirectionOfMovement::nextContainer(odcore::data::Container &a_c)
           imgWidth*imgHeight*nrChannels);
     }
     sharedMem->unlock();
+    
+    cvReleaseImage(&myIplImage);
     return;
   }
   if(a_c.getDataType() == opendlv::sensation::OpticalFlow::ID()){
