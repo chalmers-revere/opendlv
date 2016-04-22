@@ -170,9 +170,10 @@ void OpticalFlow::nextContainer(odcore::data::Container &a_c)
   // cv::resize(m_flow, display2, cv::Size(windowWidth, windowHeight), 0, 0,
   //     cv::INTER_CUBIC);
   // cv::imshow("flow",display2);
-  cv::imshow("LK Demo", display1); 
+  cv::imshow("Optical Flow", display1); 
   cv::waitKey(1);
 
+  cvReleaseImage(&myIplImage);
 }
 
 void OpticalFlow::sendContainer()
@@ -247,9 +248,9 @@ void OpticalFlow::setUp()
   m_flow = cv::Mat(m_nAxisPoints,m_nAxisPoints,CV_8UC3, cv::Scalar(0,0,0));
 
 
-  cv::namedWindow( "LK Demo", 1 );
+  cv::namedWindow( "Optical Flow", 1 );
 
-  cv::namedWindow( "flow", 1 );
+  // cv::namedWindow( "flow", 1 );
 }
 
 void OpticalFlow::tearDown()
