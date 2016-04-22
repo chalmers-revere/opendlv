@@ -17,8 +17,11 @@
  * USA.
  */
 
+#include <fstream>
 #include <iostream>
 #include <string>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <vector>
 #include <unistd.h>
 
@@ -130,9 +133,11 @@ void Projection::nextContainer(odcore::data::Container &a_c)
     std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(
         odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(
             mySharedImg.getName()));
-    uint32_t nrChannels = mySharedImg.getBytesPerPixel();
-    uint32_t imgWidth = mySharedImg.getWidth();
-    uint32_t imgHeight = mySharedImg.getHeight();
+    const uint32_t nrChannels = 3;
+    const uint32_t imgWidth = mySharedImg.getWidth();
+    const uint32_t imgHeight = mySharedImg.getHeight();
+
+    // std::cout << imgWidth << "    "<< imgHeight << std::endl;
 
     IplImage* myIplImage;
     
@@ -175,8 +180,6 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Projection::body(){
   config();
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
   odcore::data::dmcp::ModuleStateMessage::RUNNING){
-    if(m_option == 27 )
-      break;
     switch(m_option){
       case 'c':
         std::cout<<"Enter Calibration" << std::endl;
@@ -263,6 +266,22 @@ void Projection::save()
 {
   m_projectionMatrix =  m_aMatrix * m_bMatrix.inverse();
   std::cout << m_projectionMatrix << std::endl;
+
+  struct stat st;
+  if (stat("var/tools/vision/projection", &st) == -1) {
+    system("mkdir -p ./var/tools/vision/projection");
+    // std::cout<<"Created dir"<<std::endl;
+  }
+
+  std::string name;
+  std::cout<< "filename";
+  std::cin >> name;
+
+  std::ofstream file("var/tools/vision/projection/"+name+".csv");
+  if(file.is_open()){
+    file << m_projectionMatrix;
+  }
+  file.close();
 }
 
 
