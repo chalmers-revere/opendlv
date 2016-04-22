@@ -30,23 +30,23 @@
 #include <opendavinci/odcore/data/Container.h>
 #include <automotivedata/generated/automotive/GenericCANMessage.h>
 
-#include "reverefh16mapping/generated/opendlv/proxy/reverefh16/VehicleSate.h"
+#include "reverefh16mapping/generated/opendlv/proxy/reverefh16/VehicleState.h"
 #include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 // Include local header files.
-#include "../include/can/replay/canascreplay.hpp"
+#include "../include/replay/ascreplay.hpp"
 
 /**
  * This class derives from opendlv::proxy::can::replay::CANASCReplay
  * to allow access to protected methods.
  */
-class CANASCReplayTestling : public opendlv::proxy::can::replay::CANASCReplay {
+class CANASCReplayTestling : public opendlv::tools::can::replay::AscReplay {
  private:
   CANASCReplayTestling();
 
  public:
   CANASCReplayTestling(const int32_t &a_argc, char **a_argv)
-      : opendlv::proxy::can::replay::CANASCReplay(a_argc, a_argv)
+      : opendlv::tools::can::replay::AscReplay(a_argc, a_argv)
   {
   }
 
@@ -116,30 +116,30 @@ class CANASCReplayTest : public CxxTest::TestSuite {
     std::vector<odcore::data::Container> result = m_pt->getMessages(payload);
     TS_ASSERT(result.size() == 1);
     TS_ASSERT(
-    result.at(0).getDataType() == opendlv::gcdc::fh16::VehicleDynamics::ID());
+    result.at(0).getDataType() == opendlv::proxy::reverefh16::VehicleState::ID());
 
-    opendlv::gcdc::fh16::VehicleDynamics vd =
-    result.at(0).getData<opendlv::gcdc::fh16::VehicleDynamics>();
-    TS_ASSERT_DELTA(vd.getAcceleration_x(), 1.17188e-05, 1e-5);
-    TS_ASSERT_DELTA(vd.getAcceleration_y(), 0.019543, 1e-5);
-    TS_ASSERT_DELTA(vd.getYawrate(), 0.00047, 1e-5);
+    opendlv::proxy::reverefh16::VehicleState vd =
+    result.at(0).getData<opendlv::proxy::reverefh16::VehicleState>();
+    TS_ASSERT_DELTA(vd.getAccelerationX(), 1.17188e-05, 1e-5);
+    TS_ASSERT_DELTA(vd.getAccelerationY(), 0.019543, 1e-5);
+    TS_ASSERT_DELTA(vd.getYawRate(), 0.00047, 1e-5);
   }
 
   void testEncodeHighLevelMessage()
   {
     // Create a high-level message.
-    opendlv::gcdc::fh16::VehicleDynamics vd;
-    vd.setAcceleration_x(1.17188e-05);
-    vd.setAcceleration_y(0.019543);
-    vd.setYawrate(0.00047);
+    opendlv::proxy::reverefh16::VehicleState vd;
+    vd.setAccelerationX(1.17188e-05);
+    vd.setAccelerationY(0.019543);
+    vd.setYawRate(0.00047);
 
     // Check values therein.
-    TS_ASSERT_DELTA(vd.getAcceleration_x(), 1.17188e-05, 1e-5);
-    TS_ASSERT_DELTA(vd.getAcceleration_y(), 0.019543, 1e-5);
-    TS_ASSERT_DELTA(vd.getYawrate(), 0.00047, 1e-5);
+    TS_ASSERT_DELTA(vd.getAccelerationX(), 1.17188e-05, 1e-5);
+    TS_ASSERT_DELTA(vd.getAccelerationY(), 0.019543, 1e-5);
+    TS_ASSERT_DELTA(vd.getYawRate(), 0.00047, 1e-5);
 
     // Create the message mapping.
-    canmapping::opendlv::gcdc::fh16::VehicleDynamics vd_mapping;
+    canmapping::opendlv::proxy::reverefh16::VehicleState vd_mapping;
     // The high-level message needs to be put into a Container.
     odcore::data::Container c(vd);
     automotive::GenericCANMessage gcm = vd_mapping.encode(c);

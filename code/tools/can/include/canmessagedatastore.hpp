@@ -17,10 +17,42 @@
  * USA.
  */
 
-#include "replay/ascreplay.hpp"
+#ifndef CAN_CANMESSAGEDATASTORE_HPP_
+#define CAN_CANMESSAGEDATASTORE_HPP_
 
-int32_t main(int32_t a_argc, char **a_argv)
-{
-  opendlv::tools::can::replay::AscReplay ascReplay(a_argc, a_argv);
-  return ascReplay.runModule();
+#include <memory>
+
+#include "odcantools/MessageToCANDataStore.h"
+
+namespace automotive {
+namespace odcantools {
+class CANDevice;
 }
+}
+
+namespace odcore {
+namespace data {
+class Container;
+}
+}
+
+namespace opendlv {
+namespace proxy {
+namespace can {
+
+/**
+ * This class maps selected messages to CAN messages.
+ */
+class CanMessageDataStore
+: public automotive::odcantools::MessageToCANDataStore {
+ public:
+  CanMessageDataStore(
+  std::shared_ptr<automotive::odcantools::CANDevice> canDevice);
+  virtual void add(const odcore::data::Container &container);
+};
+
+} // can
+} // proxy
+} // opendlv
+
+#endif
