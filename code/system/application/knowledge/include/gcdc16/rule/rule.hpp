@@ -44,6 +44,13 @@ class Rule : public odcore::base::module::DataTriggeredConferenceClientModule {
  private:
   void setUp();
   void tearDown();
+  void Rule::getDistance();
+  bool Rule::euclideanDistance();
+
+ private:
+  double standstillDistance;
+  double headway;
+  double minimumEuclideanDistance;
 };
 
 } // rule

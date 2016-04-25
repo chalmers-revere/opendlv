@@ -21,6 +21,8 @@
 #include <cstring>
 #include <cmath>
 #include <iostream>
+#include <chrono>
+#include <numeric>
 
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
@@ -41,8 +43,12 @@ namespace act {
   */
 Act::Act(int32_t const &a_argc, char **a_argv)
     : TimeTriggeredConferenceClientModule(a_argc, a_argv, "action-act"),
-    m_acceleration(-2.0f),
-    m_steering(0.0f)
+    m_accelerationCorrection(0.0f),
+    m_breakingcorrection(0.0f),
+    m_steeringCorrection(0.0f),
+    counterAccelerate(0),
+    counterBrake(0),
+    counterSteering(0)
 {
 }
 
@@ -71,26 +77,110 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
+/**
+ * Main function that gets the correction
+ * type and amplitude as well as inhibitory
+ * signal. Values are saved as needed and
+ * packaged and sent to Actuation.
+ */
 void Act::nextContainer(odcore::data::Container &c)
 {
+  float sumOfAccelerate = 0.0f;
+  float sumOfBrake = 0.0f;
+  float sumOfSteering = 0.0f;
+
   if(c.getDataType() == opendlv::action::Correction::ID()) {
     opendlv::action::Correction correction = 
       c.getData<opendlv::action::Correction>();
 
     odcore::data::TimeStamp t0 = correction.getStartTime();
     std::string type = correction.getType();
-    //bool isInhibitory = correction.getIsInhibitory();
+    bool isInhibitory = correction.getIsInhibitory();
     float amplitude = correction.getAmplitude();
 
+    float startTimeVectorAccelerate[];
+    float startTimeVectorBrake[];
+    float startTimeVectorSteering[];
+    float amplitudeVectorAccelerate[];
+    float amplitudeVectorBrake[];
+    float amplitudeVectorSteering[];
+
     if (type == "accelerate") {
-     // std::cout << "accelerate: " << amplitude << std::endl;
-      m_acceleration = amplitude;
-    } else if (type == "brake") {
-      std::cout << "brake: " << amplitude << std::endl;
-    } else if (type == "steering") {
-      std::cout << "steering: " << amplitude << std::endl;
+      inhibitoryCheck(isInhibitory, startTimeVectorAccelerate[], amplitudeVectorAccelerate[], counterAccelerate);
+      startTimeVectorAccelerate[counterAccelerate] = t0;
+      amplitudeVectorAccelerate[counterAccelerate] = amplitude;
+      counterAccelerate++;
+      timeCheck(startTimeVectorAccelerate[], amplitudeVectorAccelerate[], counterAccelerate);
+      sumOfAccelerate = std::accumulate(amplitudeVectorAccelerate.begin(), amplitudeVectorAccelerate.end(), 0.0);
+    }
+
+    else if (type == "brake") {
+      inhibitoryCheck(isInhibitory, startTimeVectorBrake[], amplitudeVectorBrake[], counterBrake);
+      startTimeVectorBrake[counterBrake] = t0;
+      amplitudeVectorBrake[counterBrake] = amplitude;
+      counterBrake++;
+      timeCheck(startTimeVectorBrake[], amplitudeVectorBrake[], counterBrake);
+      sumOfBrake = std::accumulate(amplitudeVectorBrake.begin(), amplitudeVectorBrake.end(), 0.0);
+    }
+
+    else if (type == "steering") {
+      inhibitoryCheck(isInhibitory, startTimeVectorSteering[], amplitudeVectorSteering[], counterSteering);
+      startTimeVectorSteering[counterSteering] = t0;
+      amplitudeVectorSteering[counterSteering] = amplitude;
+      counterSteering++;
+      timeCheck(startTimeVectorSteering[], amplitudeVectorSteering[], counterSteering);
+      sumOfSteering = std::accumulate(amplitudeVectorSteering.begin(), amplitudeVectorSteering.end(), 0.0);
     }
   }
+  float freq = getFrequency();
+  m_accelerationCorrection = sumOfAccelerate/freq;
+  m_breakingcorrection = -sumOfBrake/freq;
+  m_steeringCorrection = sumOfSteering/freq;
+
+  if (m_breakingcorrection < 0) {
+  	opendlv::proxy::Actuation actuation(m_breakingcorrection, m_steeringCorrection, false);
+  	odcore::data::Container c(actuation);
+  	getConference().send(c);
+  }
+
+  else {
+  	opendlv::proxy::Actuation actuation(m_accelerationCorrection, m_steeringCorrection, false);
+  	odcore::data::Container c(actuation);
+  	getConference().send(c);
+  }
+}
+
+/**
+ * Function to ensure that the first element of
+ * the time vector is less than deltaTime seconds
+ * ago. Truncates the vector if it is.
+ */
+void Act::timeCheck(float &timeVector, float &amplitudeVector, uint32_t &counter)
+{
+  	float deltaTime = 0.5f;
+  	double now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    if ( now - timeVector[0] >=deltaTime ) {
+      for (uint32_t count = 0; count < counter; count++) {
+        timeVector[count] = timeVector[count+1]
+        amplitudeVector[count] = amplitudeVector[count+1]
+      }
+      counter = counter -1;
+    }
+}
+
+/**
+ * Checks if an inhibitory signal is recieved
+ * and if so clears the relevant time and amplitude
+ * vectors prior to adding new corrections.
+ */
+int Act::inhibitoryCheck(bool isInhibitory, float &timeVector[], float &amplitudeVector[], uint32_t &counter )
+{
+    if (isInhibitory) {
+      timeVector.clear;
+      amplitudeVector.clear;
+      counter = 0;
+    }
+    return counter;
 }
 
 void Act::setUp()

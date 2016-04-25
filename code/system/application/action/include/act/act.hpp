@@ -44,9 +44,15 @@ class Act : public odcore::base::module::TimeTriggeredConferenceClientModule {
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
   void setUp();
   void tearDown();
+  void Act::timeCheck();
+  int Act::inhibitoryCheck();
 
-  float m_acceleration;
-  float m_steering;
+  float m_accelerationCorrection;
+  float m_brakeCorrection;
+  float m_steeringCorrection;
+  uint32_t counterAccelerate;
+  uint32_t counterBrake;
+  uint32_t counterSteering;
 };
 
 } // act
