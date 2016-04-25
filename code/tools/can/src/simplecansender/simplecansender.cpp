@@ -161,6 +161,7 @@ namespace opendlv {
 
                 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SimpleCANSender::body()
                 {
+                    const uint32_t MAX_MESSAGES = 500;
                     const double tolerance=0.001;
                     string token;
                     const float REQUIRED_FREQ = 100.0;
@@ -206,9 +207,13 @@ namespace opendlv {
                             // The high-level message needs to be put into a Container.
                             odcore::data::Container c(accelerationRequest);
                             m_lastMessage = accelerationRequestMapping.encode(c);
-                            
-                            CLOG1<<"Sending messages";
-                            while(true) m_device->write(m_lastMessage);
+
+                            clog << "Sending " << MAX_MESSAGES << " messages...";
+                            uint32_t cnt = MAX_MESSAGES;
+                            while ( (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) && (--cnt > 0) ) {
+                                m_device->write(m_lastMessage);
+                            }
+                            clog << " done." << endl;
                         }
                         else if(token=="BRR" || (token.length()==4 && token.substr(0,3)=="BRR" && isspace(token.at(3))))
                         {
@@ -237,9 +242,13 @@ namespace opendlv {
                             // The high-level message needs to be put into a Container.
                             odcore::data::Container c(brakeRequest);
                             m_lastMessage = brakeRequestMapping.encode(c);
-                            
-                            CLOG1<<"Sending message...";
-                            while(true) m_device->write(m_lastMessage);
+
+                            clog << "Sending " << MAX_MESSAGES << " messages...";
+                            uint32_t cnt = MAX_MESSAGES;
+                            while ( (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) && (--cnt > 0) ) {
+                                m_device->write(m_lastMessage);
+                            }
+                            clog << " done." << endl;
                         }
                         else if(token=="STR" || (token.length()==4 && token.substr(0,3)=="STR" && isspace(token.at(3))))
                         {
@@ -273,18 +282,26 @@ namespace opendlv {
                             // The high-level message needs to be put into a Container.
                             odcore::data::Container c(steeringRequest);
                             m_lastMessage = steeringRequestMapping.encode(c);
-                            
-                            CLOG1<<"Sending message...";
-                            while(true) m_device->write(m_lastMessage);
+
+                            clog << "Sending " << MAX_MESSAGES << " messages...";
+                            uint32_t cnt = MAX_MESSAGES;
+                            while ( (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) && (--cnt > 0) ) {
+                                m_device->write(m_lastMessage);
+                            }
+                            clog << " done." << endl;
                         }
                         else if(token=="r" || (token.at(0)=='r' && isspace(token.at(1))))
                         {
-                            CLOG1<<"Re-sending last messages";
-                            while(true) m_device->write(m_lastMessage);
+                            clog << "Re-sending last messages " << MAX_MESSAGES << " times...";
+                            uint32_t cnt = MAX_MESSAGES;
+                            while ( (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) && (--cnt > 0) ) {
+                                m_device->write(m_lastMessage);
+                            }
+                            clog << " done." << endl;
                         }
                         else if(token=="exit")
                         {
-                            CLOG1<<"Closing application...";
+                            clog <<"Closing application..." << endl;
                             return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
                         }
                         else
