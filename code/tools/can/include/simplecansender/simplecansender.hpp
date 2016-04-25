@@ -28,64 +28,63 @@
 #include <reverefh16mapping/GeneratedHeaders_reverefh16mapping.h>
 
 namespace automotive {
-class GenericCANMessage;
+    class GenericCANMessage;
 }
 namespace automotive {
-namespace odcantools {
-class CANDevice;
-}
+    namespace odcantools {
+        class CANDevice;
+    }
 }
 namespace odtools {
-namespace recorder {
-class Recorder;
-}
-}
-
-namespace opendlv {
-namespace proxy {
-namespace can {
-class CanMessageDataStore;
-}
-}
+    namespace recorder {
+        class Recorder;
+    }
 }
 
 namespace opendlv {
-namespace tools {
-namespace can {
-namespace simplecansender {
+    namespace proxy {
+        namespace can {
+            class CanMessageDataStore;
+        }
+    }
+}
 
-/**
- * This class opens a PEAK CAN device to send control commands to the vehicle.
- */
-class SimpleCANSender
-: public odcore::base::module::TimeTriggeredConferenceClientModule,
-  public automotive::odcantools::GenericCANMessageListener {
- public:
-  SimpleCANSender(int32_t const &, char **);
-  SimpleCANSender(SimpleCANSender const &) = delete;
-  SimpleCANSender &operator=(SimpleCANSender const &) = delete;
-  virtual ~SimpleCANSender();
+namespace opendlv {
+    namespace tools {
+        namespace can {
+            namespace simplecansender {
+                /**
+                 * This class opens a PEAK CAN device to send control commands to the vehicle.
+                 */
+                class SimpleCANSender
+                : public odcore::base::module::TimeTriggeredConferenceClientModule,
+                  public automotive::odcantools::GenericCANMessageListener {
+                 public:
+                  SimpleCANSender(int32_t const &, char **);
+                  SimpleCANSender(SimpleCANSender const &) = delete;
+                  SimpleCANSender &operator=(SimpleCANSender const &) = delete;
+                  virtual ~SimpleCANSender();
 
-  virtual void nextGenericCANMessage(const automotive::GenericCANMessage &gcm);
+                  virtual void nextGenericCANMessage(const automotive::GenericCANMessage &gcm);
 
- private:
-  void setUp();
-  void tearDown();
-  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+                 private:
+                  void setUp();
+                  void tearDown();
+                  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
- private:
-  odcore::base::FIFOQueue m_fifo;
-  std::shared_ptr<automotive::odcantools::CANDevice> m_device;
-  std::unique_ptr<opendlv::proxy::can::CanMessageDataStore> m_canMessageDataStore;
-  canmapping::CanMapping m_revereFh16CanMessageMapping;
+                 private:
+                  odcore::base::FIFOQueue m_fifo;
+                  std::shared_ptr<automotive::odcantools::CANDevice> m_device;
+                  std::unique_ptr<opendlv::proxy::can::CanMessageDataStore> m_canMessageDataStore;
+                  canmapping::CanMapping m_revereFh16CanMessageMapping;
 
- private:
-    void disableCmds();
-    automotive::GenericCANMessage m_lastMessage;
-};
-} // simplecansender
-} // can
-} // tools
+                 private:
+                    void disableCmds();
+                    automotive::GenericCANMessage m_lastMessage;
+                };
+            } // simplecansender
+        } // can
+    } // tools
 } // opendlv
 
 #endif
