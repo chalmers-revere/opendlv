@@ -167,5 +167,5 @@ knowledge-gcdc16-v2viclcm.rearAxleLocation = 430
 # Tools
 tools-can-joystick.devicenode = /dev/pcan33   # PEAK CAN device.
 tools-can-joystick.joystickdevicenode = /dev/input/js2   # Gamepad.
-
 tools-can-keyboard.devicenode = /dev/pcan33   # PEAK CAN device.
+tools-can-simplesender.devicenode = /dev/pcan33   # PEAK CAN device.
