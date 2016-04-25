@@ -21,9 +21,14 @@
 #define GEOLOCATION_GEOLOCATION_HPP_
 
 #include <memory>
+    
+#include "kalman/ExtendedKalmanFilter.hpp"
 
-#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
+#include <opendlv/data/environment/WGS84Coordinate.h>
+
+#include "geolocation/kinematicmodel.hpp"
 
 namespace opendlv {
 namespace sensation {
@@ -33,17 +38,21 @@ namespace geolocation {
  * This class provides...
  */
 class Geolocation
-: public odcore::base::module::DataTriggeredConferenceClientModule {
+: public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
   Geolocation(int32_t const &, char **);
   Geolocation(Geolocation const &) = delete;
   Geolocation &operator=(Geolocation const &) = delete;
   virtual ~Geolocation();
-  virtual void nextContainer(odcore::data::Container &);
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
  private:
   void setUp();
   void tearDown();
+
+
+   Kalman::ExtendedKalmanFilter<opendlv::sensation::geolocation::State<double>> 
+       m_ekf;
 };
 
 } // geolocation

@@ -24,10 +24,12 @@
 
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
+#include <opendlv/data/environment/Point3.h>
 
 #include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 #include "geolocation/geolocation.hpp"
+#include "geolocation/kinematicobservationmodel.hpp"
 
 namespace opendlv {
 namespace sensation {
@@ -40,8 +42,9 @@ namespace geolocation {
   * @param a_argv Command line arguments.
   */
 Geolocation::Geolocation(int32_t const &a_argc, char **a_argv)
-    : DataTriggeredConferenceClientModule(
-      a_argc, a_argv, "sensation-geolocation")
+    : TimeTriggeredConferenceClientModule(
+      a_argc, a_argv, "sensation-geolocation"),
+    m_ekf()
 {
 }
 
@@ -49,12 +52,119 @@ Geolocation::~Geolocation()
 {
 }
 
-/**
- * Receives .
- * Sends .
- */
-void Geolocation::nextContainer(odcore::data::Container &)
+odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 {
+  opendlv::data::environment::WGS84Coordinate gpsReference;
+  bool hasGpsReference = false;
+
+  odcore::data::TimeStamp previousTimestep;
+  odcore::data::TimeStamp previousDataTimestamp;
+  double timestamp = 0.0;
+
+  Control<double> control; 
+  State<double> state; 
+  SystemModel<double> systemModel;
+    
+  state.setZero();
+
+  KinematicObservationModel<double> kinematicObservationModel(
+      0.0, 0.0,  0.0, 0.0);
+
+  while (getModuleStateAndWaitForRemainingTimeInTimeslice() == 
+      odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+
+    auto gpsReadingContainer = getKeyValueDataStore().get(
+        opendlv::proxy::GpsReading::ID());
+    auto gpsReading = gpsReadingContainer.getData<opendlv::proxy::GpsReading>();
+
+    if (gpsReadingContainer.getReceivedTimeStamp().toMicroseconds() > 0) {
+      if (!hasGpsReference) {
+        gpsReference = opendlv::data::environment::WGS84Coordinate(
+            gpsReading.getLatitude(),
+            opendlv::data::environment::WGS84Coordinate::NORTH,
+            gpsReading.getLongitude(),
+            opendlv::data::environment::WGS84Coordinate::EAST);
+        hasGpsReference = true;
+
+        // TODO: now this variable is set only once using the first data, it is
+        // necessary to write a function able to reset this value to a new
+        // reference frame.
+        previousTimestep = gpsReadingContainer.getReceivedTimeStamp();
+      }
+
+      odcore::data::TimeStamp thisTimestep;
+      odcore::data::TimeStamp duration = thisTimestep - previousTimestep;
+      previousTimestep = thisTimestep;
+
+
+      auto propulsionContainer = getKeyValueDataStore().get(
+          opendlv::proxy::reverefh16::Propulsion::ID());
+      auto propulsion = propulsionContainer.getData<
+          opendlv::proxy::reverefh16::Propulsion>();
+
+      if (propulsionContainer.getReceivedTimeStamp().getSeconds() > 0) {
+        control.v() = propulsion.getPropulsionShaftVehicleSpeed();
+      }
+
+
+      auto steeringContainer = getKeyValueDataStore().get(
+          opendlv::proxy::reverefh16::Steering::ID());
+      auto steering = steeringContainer.getData<
+          opendlv::proxy::reverefh16::Steering>();
+
+      if (steeringContainer.getReceivedTimeStamp().getSeconds() > 0) {
+        control.phi() = steering.getRoadwheelangle();
+      }
+
+
+      opendlv::data::environment::WGS84Coordinate currentLocation(
+          gpsReading.getLatitude(),
+          opendlv::data::environment::WGS84Coordinate::NORTH,
+          gpsReading.getLongitude(),
+          opendlv::data::environment::WGS84Coordinate::EAST);
+
+      opendlv::data::environment::Point3 currentCartesianLocation = 
+          gpsReference.transform(currentLocation);
+
+      KinematicObservationVector<double> z = kinematicObservationModel.h(state);
+      z.Z_x() = currentCartesianLocation.getX();
+      z.Z_y() = currentCartesianLocation.getY();
+      if (gpsReading.getHasHeading()) {
+        z.Z_theta() = gpsReading.getNorthHeading();
+      } else {
+        z.Z_theta() = state.theta();
+      }
+      z.Z_theta_dot() = 0.0; // TODO: Put yaw rate here...
+
+      
+      double deltaTime = duration.toMicroseconds() / 1000000.0;
+      systemModel.updateDeltaT(deltaTime);
+
+      
+      state = m_ekf.predict(systemModel, control);
+
+      bool hasData = false;
+      if (gpsReadingContainer.getReceivedTimeStamp().toMicroseconds() > 
+          previousDataTimestamp.toMicroseconds()) {
+        state = m_ekf.update(kinematicObservationModel, z);
+        previousDataTimestamp = gpsReadingContainer.getReceivedTimeStamp();
+        hasData = true;
+      }
+
+      timestamp += systemModel.getDeltaT();
+
+
+      std::cout   << getName() << "\t" << "timestamp="
+        << timestamp << "\t hasData=" << hasData << "\tx=" << state.x() << ", y=" <<
+        state.y() << ", theta=" << state.theta() << std::endl;
+
+      // TODO: Send proper data.
+    }
+
+  }
+   
+  return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
+
 }
 
 void Geolocation::setUp()
