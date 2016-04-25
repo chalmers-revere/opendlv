@@ -20,6 +20,8 @@
 #ifndef ECHOLOCATION_ECHOLOCATION_HPP_
 #define ECHOLOCATION_ECHOLOCATION_HPP_
 
+// Test comment: remove if you see this.
+
 #include <memory>
 
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"

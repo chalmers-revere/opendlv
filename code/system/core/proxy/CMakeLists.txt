@@ -23,10 +23,10 @@ find_package(OpenCV REQUIRED)
 
 # Set include directories
 include_directories(include)
-include_directories(${OpenCV_INCLUDE_DIR})
+include_directories(${OPENCV_INCLUDE_DIRS})
 
 # Set libraries
-set(LIBRARIES ${LIBRARIES} ${OpenCV_LIBS})
+set(LIBRARIES ${LIBRARIES} ${OPENCV_LIBRARIES})
 
 # Build
 file(GLOB_RECURSE thisproject-sources 
