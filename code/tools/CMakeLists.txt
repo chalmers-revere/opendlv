@@ -27,7 +27,7 @@ SET (CMAKE_MODULE_PATH "${OPENDAVINCI_DIR}/share/cmake-${CMAKE_MAJOR_VERSION}.${
 
 ###########################################################################
 # Global compile flags.
-include(CompileFlagsMod)
+include(CompileFlagsForTools)
 
 ###########################################################################
 # Find CxxTest.
@@ -74,6 +74,6 @@ set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
               ${OPENDLVDATA_LIBRARIES}
               ${REVEREFH16MAPPING_LIBRARIES})
 
-#add_subdirectory(can)
+add_subdirectory(can)
 add_subdirectory(vboreplay)
 add_subdirectory(vision)
