@@ -50,6 +50,7 @@ class OpenCvDevice : public Device {
  private:
   std::unique_ptr<cv::VideoCapture> m_capture;
   cv::Mat m_image;
+  cv::Mat m_distCoeff, m_cameraMatrix;
 };
 
 } // camera

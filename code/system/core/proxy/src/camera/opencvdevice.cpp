@@ -24,6 +24,7 @@
 #include "opencv2/imgproc/imgproc_c.h"
 #include "opencv2/imgproc/imgproc.hpp"
 
+#include <opencv2/core/core.hpp>
 #include "camera/opencvdevice.hpp"
 
 namespace opendlv {
@@ -46,11 +47,14 @@ OpenCvDevice::OpenCvDevice(std::string const &a_name,
     : Device(a_name, a_width, a_height, a_bpp)
     , m_capture(nullptr)
     , m_image()
+    , m_distCoeff()
+    , m_cameraMatrix()
 {
   std::string videoStreamAddress = std::string("http://") + a_username 
     + ":" + a_password + "@" + a_port + "/axis-cgi/mjpg/video.cgi?user=" 
     + a_username + "&password=" + a_password + "&channel=0&.mjpg";
-
+    std::cout<< videoStreamAddress;
+  std::string videoStreamAddressHack = "/home/bjornborg/Videos/rostock.avi";
   m_capture.reset(new cv::VideoCapture(videoStreamAddress));
 
   if (m_capture->isOpened()) {
@@ -62,6 +66,38 @@ OpenCvDevice::OpenCvDevice(std::string const &a_name,
     std::cerr << "[proxy-camera] Could not open camera '" << a_name
               << std::endl;
   }
+  cv::FileStorage fs2;
+  //Reading external calibration file
+  if(a_name == "opencv-ip-axis (10.42.42.90)"){
+    fs2 = cv::FileStorage("var/tools/vision/projection/camera0.yml", cv::FileStorage::READ);
+    fs2["camera_matrix"] >> m_cameraMatrix;
+    fs2["distortion_coefficients"] >> m_distCoeff;
+    std::cout<<"Loaded fisheye calibration for camera 0." << std::endl;
+  }
+  else{
+    fs2 = cv::FileStorage("var/tools/vision/projection/camera1.yml", cv::FileStorage::READ);
+    fs2["camera_matrix"] >> m_cameraMatrix;
+    fs2["distortion_coefficients"] >> m_distCoeff;
+    std::cout<<"Loaded fisheye calibration for camera 1." << std::endl;
+  }
+  
+  // first method: use (type) operator on FileNode.
+  // int frameCount = (int)fs2["frameCount"];
+
+  // std::string date;
+  // second method: use FileNode::operator >>
+  // fs2["calibrationDate"] >> date;
+
+  // cv::Mat cameraMatrix2, distCoeffs2;
+  // fs2["camera_matrix"] >> m_cameraMatrix;
+  // fs2["distortion_coefficients"] >> m_distCoeff;
+
+  // std::cout 
+  // << "frameCount: " << frameCount << endl
+  //      << "calibration date: " << date << endl
+       // << "camera matrix: " << m_cameraMatrix << std::endl
+       // << "distortion coeffs: " << m_distCoeff << std::endl;
+
 }
 
 OpenCvDevice::~OpenCvDevice()
@@ -82,6 +118,12 @@ bool OpenCvDevice::CaptureFrame()
   bool retVal = false;
   if (m_capture != nullptr) {
     if (m_capture->read(m_image)) {
+      if(!m_distCoeff.empty() && !m_cameraMatrix.empty()){
+        cv::Mat tmpClone = m_image.clone();
+        cv::undistort(tmpClone, m_image, m_cameraMatrix, m_distCoeff);
+        tmpClone.release();
+      }
+
       retVal = true;
     }
   }
@@ -93,7 +135,7 @@ bool OpenCvDevice::CopyImageTo(char *a_destination, const uint32_t &a_size)
   bool retVal = false;
 
   if ((a_destination != nullptr) && (a_size > 0)) {
-    std::cout << "a_size: " << a_size << std::endl;
+    // std::cout << "a_size: " << a_size << std::endl;
     ::memcpy(a_destination, m_image.data, a_size);
 
     cv::imshow("Camera feed", m_image);
