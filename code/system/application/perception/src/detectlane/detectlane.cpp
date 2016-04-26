@@ -121,7 +121,8 @@ void DetectLane::nextContainer(odcore::data::Container &c)
   MAXROW = 450;
 
   Eigen::MatrixXd regions(5,4);
-  if(mySharedImg.getName() == "opencv-ip-axis (10.42.42.90)"){
+  bool initialized = false;
+  if(mySharedImg.getName() == "front-left"){
     // Eigen::MatrixXd regions(5,4);
     //region = col1,row1, col2,row2
     regions << 
@@ -129,9 +130,10 @@ void DetectLane::nextContainer(odcore::data::Container &c)
     281, 217, 272, 456,
     328, 228, 382, 452,
     381, 218, 495, 436,
-    448, 197, 622, 416;  
+    448, 197, 622, 416;
+    initialized = true;
   }
-  else{
+  if(mySharedImg.getName() == "front-right"){
     // Eigen::MatrixXd regions(5,4);
     //region = col1,row1,col2,row2
     regions<<
@@ -140,8 +142,11 @@ void DetectLane::nextContainer(odcore::data::Container &c)
     379, 214, 316, 439,
     425, 237, 423, 445,
     507, 221, 574, 414;
+    initialized = true;
   }
-
+  if(!initialized){
+    return;
+  }
 
   
   //-----------------------------

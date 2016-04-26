@@ -36,46 +36,40 @@
 
 #include "projection/projection.hpp"
 
-struct MouseParams
-{
-  MouseParams()
-    : points(),
-    iterator() 
-  {
-    points = Eigen::MatrixXd(2,4);
-  }
-  ~MouseParams() {}
 
-  Eigen::MatrixXd points;
-  uint8_t iterator;
-};
 
-void LoggMouseClicks(int32_t event, int32_t x, int32_t y, int32_t, void* userdata)
+namespace opendlv {
+namespace tools {
+namespace vision {
+namespace projection {
+
+void LogMouseClicks(int32_t a_event, int32_t a_x, int32_t a_y, int32_t, void* a_userdata)
 {  
 
-  MouseParams* click = (MouseParams*)userdata;
-  if  ( event == cv::EVENT_LBUTTONDOWN && click->iterator < 4)
+  opendlv::tools::vision::projection::MouseParams* click = 
+      (opendlv::tools::vision::projection::MouseParams*) a_userdata;
+  if (a_event == cv::EVENT_LBUTTONDOWN && click->iterator < 4)
   {
 
-    std::cout << "(" << x << ", " << y << ")" << std::endl;
-    click->points(0,click->iterator) = x;
-    click->points(1,click->iterator) = y;
+    std::cout << "(" << a_x << ", " << a_y << ")" << std::endl;
+    click->points(0,click->iterator) = a_x;
+    click->points(1,click->iterator) = a_y;
     click->iterator = click->iterator +1;
     std::cout << "Points: " + std::to_string(click->iterator) << std::endl;
     std::cout << (click->points) << std::endl;
   }
-  if  ( event == cv::EVENT_RBUTTONDOWN)
+  if (a_event == cv::EVENT_RBUTTONDOWN)
   {
     click->iterator = 0;
   }
 }
-void projectMouseClicks(int32_t event, int32_t x, int32_t y, int32_t, void* userdata)
+void ProjectMouseClicks(int32_t a_event, int32_t a_x, int32_t a_y, int32_t, void* a_userdata)
 {
   Eigen::Vector3d v;
-  Eigen::MatrixXd* m = (Eigen::MatrixXd*) userdata;
+  Eigen::MatrixXd* m = (Eigen::MatrixXd*) a_userdata;
   
-  if(event == cv::EVENT_LBUTTONDOWN){
-    v << x,y,1;
+  if(a_event == cv::EVENT_LBUTTONDOWN){
+    v << a_x,a_y,1;
     std::cout << *m << std::endl;
     std::cout << v << std::endl;
     v = *m*v;
@@ -88,10 +82,16 @@ void projectMouseClicks(int32_t event, int32_t x, int32_t y, int32_t, void* user
   } 
 }
 
-namespace opendlv {
-namespace tools {
-namespace vision {
-namespace projection {
+MouseParams::MouseParams() : 
+    points(),
+    iterator() 
+{
+  points = Eigen::MatrixXd(2,4);
+}
+MouseParams::~MouseParams()
+{
+}
+
 
 Projection::Projection(int32_t const &a_argc, char **a_argv)
     : odcore::base::module::TimeTriggeredConferenceClientModule(
@@ -177,25 +177,25 @@ void Projection::nextContainer(odcore::data::Container &a_c)
   }
 }
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Projection::body(){
-  config();
+  Config();
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
   odcore::data::dmcp::ModuleStateMessage::RUNNING){
     switch(m_option){
       case 'c':
         std::cout<<"Enter Calibration" << std::endl;
-        calibrate();
+        Calibrate();
         break;
       case'r':
         std::cout<<"Enter Configuration" << std::endl;
-        config();
+        Config();
         break;
       case's':
         std::cout<<"Calculating projection matrix and saving to file" << std::endl;
-        save();
+        Save();
         break;
       case 'p':
         std::cout<< "Projecting points" << std::endl;
-        project();
+        Project();
       default:
         break;
     }
@@ -203,7 +203,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Projection::body(){
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
-void Projection::config()
+void Projection::Config()
 {
   std::cout<< "rectangle width: ";
   std::cin >> m_recWidth;
@@ -233,12 +233,12 @@ void Projection::config()
 
 }
 
-void Projection::calibrate()
+void Projection::Calibrate()
 {
 
   MouseParams mouseClick;
   mouseClick.iterator = 0;
-  cv::setMouseCallback("Calibration", LoggMouseClicks, (void *) &mouseClick);
+  cv::setMouseCallback("Calibration", LogMouseClicks, (void *) &mouseClick);
   cv::waitKey(0);
   cv::setMouseCallback("Calibration", NULL, NULL);
   if(mouseClick.iterator > 3){
@@ -262,7 +262,7 @@ void Projection::calibrate()
     std::cout << "Calibration cancelled." << std::endl;
   }
 }
-void Projection::save()
+void Projection::Save()
 {
   m_projectionMatrix =  m_aMatrix * m_bMatrix.inverse();
   std::cout << m_projectionMatrix << std::endl;
@@ -285,9 +285,9 @@ void Projection::save()
 }
 
 
-void Projection::project()
+void Projection::Project()
 {
-  cv::setMouseCallback("Calibration", projectMouseClicks, (void *) &m_projectionMatrix);
+  cv::setMouseCallback("Calibration", ProjectMouseClicks, (void *) &m_projectionMatrix);
   cv::waitKey(0);
   cv::setMouseCallback("Calibration", NULL, NULL);
   std::cout<< "Exit point projection" << std::endl;
