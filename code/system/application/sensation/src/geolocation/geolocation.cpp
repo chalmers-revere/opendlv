@@ -153,15 +153,15 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 
       timestamp += systemModel.getDeltaT();
 
-
       std::cout   << getName() << "\t" << "timestamp="
         << timestamp << "\t hasData=" << hasData << "\tx=" << state.x() << ", y=" <<
         state.y() << ", theta=" << state.theta() << std::endl;
 
-      // TODO: Send proper data.
+      // Build the proper data to send
       opendlv::data::environment::Point3 currentStateEstimation (state.x(), state.y(), currentCartesianLocation.getZ());
       opendlv::data::environment::WGS84Coordinate currentCartesianLocationEstimation = gpsReference.transform(currentStateEstimation);
       double heading = state.theta();
+
       std::cout   << getName() << "\t" << "timestamp="
         << timestamp << "\t hasData=" << hasData << "\tlat=" << currentCartesianLocationEstimation.getLatitude() << ", long=" <<
         currentCartesianLocationEstimation.getLongitude() << ", theta=" << state.theta() << std::endl;
