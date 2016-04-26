@@ -117,6 +117,13 @@ message opendlv.sensation.Voice [id = 166] {
   //list<uint8> data [id = 4];
 }
 
+message opendlv.sensation.Geolocation [id = 169] {
+  float longitude [id = 1];
+  float latitude [id = 2];
+  float altitude [id = 3];
+  float heading [id = 4];
+}
+
 /*
 message opendlv.sensation.RoadWheel [id = 167] {
   float angle [id = 1];
@@ -132,11 +139,7 @@ message opendlv.sensation.Axle [id = 168] {
   uint8 unitIndex [id = 3];
 }
 
-message opendlv.sensation.Geolocation [id = 169] {
-  float longitude [id = 1];
-  float latitude [id = 2];
-  float altitude [id = 3];
-}
+
 
 message opendlv.sensation.BodyPart [id = 170] {
   opendlv.cartesian.Point3 position [id = 1]; // From body origo to body part center of mass
