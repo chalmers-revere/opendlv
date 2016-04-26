@@ -22,7 +22,7 @@ odsupercomponent.pulsetimeack.yield = 5000 # (in microseconds)
 
 
 ### Proxy
-proxy-can.devicenode = /dev/pcan33         # PEAK CAN device.
+proxy-can.devicenode = /dev/pcan2          # PEAK CAN device.
 proxy-can.record_gcm = 1                   # Set to 1 to dump received CAN data into a .rec file.
 proxy-can.record_mapped_data = 1           # Set to 1 to dump mapped data from a CAN message into a .rec file.
 
@@ -92,12 +92,10 @@ proxy-camera:3.mount.pitch = -0.1
 proxy-camera:3.mount.yaw = 3.0
 
 proxy-gps.type = trimble
-proxy-gps.port = ip://192.168.0.140
 proxy-gps.mount.x = 4.0
 proxy-gps.mount.y = -0.7
 proxy-gps.mount.z = 3.5
-
-proxy-gps.trimble.ip = 10.42.0.73
+proxy-gps.trimble.ip = 10.42.42.112
 proxy-gps.trimble.port = 9999
 
 proxy-imu.type = pololu
@@ -119,7 +117,7 @@ proxy-imu:1.mount.pitch = 0.0
 proxy-imu:1.mount.yaw = 0.0
 
 proxy-lidar.type = sick
-proxy-lidar.port = /dev/ttyUSB1
+proxy-lidar.port = /dev/ttyS1
 proxy-lidar.mount.x = 4.0
 proxy-lidar.mount.y = 0.0
 proxy-lidar.mount.z = 0.3
@@ -137,7 +135,7 @@ proxy-sonararray.mount.pitch = 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
 proxy-sonararray.mount.yaw = 1.57,-1.57,1.57,-1.57,1.57,-1.57,2.36,-2.36
 
 proxy-v2v.type = geonetworking-dual
-proxy-v2v.comboxIp = 10.42.0.54
+proxy-v2v.comboxIp = 10.42.42.61
 proxy-v2v.comboxPort = 5003
 proxy-v2v.mount.x = 3.8,3.8
 proxy-v2v.mount.y = -1.2,1.2
@@ -165,7 +163,7 @@ knowledge-gcdc16-v2viclcm.stationId = 115
 knowledge-gcdc16-v2viclcm.rearAxleLocation = 430
 
 # Tools
-tools-can-joystick.devicenode = /dev/pcan33   # PEAK CAN device.
+tools-can-joystick.devicenode = /dev/pcan2   # PEAK CAN device.
 tools-can-joystick.joystickdevicenode = /dev/input/js2   # Gamepad.
-tools-can-keyboard.devicenode = /dev/pcan33   # PEAK CAN device.
-tools-can-simplecansender.devicenode = /dev/pcan33   # PEAK CAN device.
+tools-can-keyboard.devicenode = /dev/pcan2   # PEAK CAN device.
+tools-can-simplecansender.devicenode = /dev/pcan2   # PEAK CAN device.
