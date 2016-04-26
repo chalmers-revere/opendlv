@@ -72,7 +72,7 @@ void DetectLane::nextContainer(odcore::data::Container &c)
 	if (c.getDataType() != odcore::data::image::SharedImage::ID()) {
 //    std::cout << "--- Received unimportant container of type " << 
 //        c.getDataType() << std::endl;
-//    return;
+    return;
   }
 //  std::cout << "Received container of type " << c.getDataType() << 
 //      " sent at " <<   c.getSentTimeStamp().getYYYYMMDD_HHMMSSms() << 
