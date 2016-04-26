@@ -93,6 +93,13 @@ if("${KALMAN_INCLUDE_DIR}" STREQUAL "")
 endif()
 
 ###########################################################################
+# Find tiny_cnn.
+if("${TINYCNN_INCLUDE_DIR}" STREQUAL "")
+  message(STATUS "No TINYCNN_INCLUDE_DIR was supplied, using the default (./thirdparty/tiny-cnn) directory.")
+  set(TINYCNN_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/thirdparty/tiny-cnn) 
+endif()
+
+###########################################################################
 # Global project variables.
 set(INSTALL_DIR ${CMAKE_INSTALL_PREFIX})
 message(STATUS "Installing OpenDLV to ${INSTALL_DIR}.")
