@@ -1,6 +1,4 @@
-# OpenDLV Proxy - Software component for interfacing with the
-#         low level vehicle interface to access sensors
-#         and actuators
+# OpenDLV vision tools 
 # Copyright (C) 2015 Chalmers REVERE
 #
 # This program is free software; you can redistribute it and/or
@@ -17,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-project(opendlv-tools-projection)
+project(opendlv-tools-vision)
 
 # Set include directories
 include_directories(include)
