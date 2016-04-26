@@ -54,7 +54,6 @@ OpenCvDevice::OpenCvDevice(std::string const &a_name,
     + ":" + a_password + "@" + a_port + "/axis-cgi/mjpg/video.cgi?user=" 
     + a_username + "&password=" + a_password + "&channel=0&.mjpg";
     std::cout<< videoStreamAddress;
-  std::string videoStreamAddressHack = "/home/bjornborg/Videos/rostock.avi";
   m_capture.reset(new cv::VideoCapture(videoStreamAddress));
 
   if (m_capture->isOpened()) {
@@ -66,37 +65,20 @@ OpenCvDevice::OpenCvDevice(std::string const &a_name,
     std::cerr << "[proxy-camera] Could not open camera '" << a_name
               << std::endl;
   }
-  cv::FileStorage fs2;
-  //Reading external calibration file
-  if(a_name == "opencv-ip-axis (10.42.42.90)"){
-    fs2 = cv::FileStorage("var/tools/vision/projection/camera0.yml", cv::FileStorage::READ);
+
+  //Try to read calibration
+  try{
+    cv::FileStorage fs2("var/tools/vision/projection/" + a_name + ".yml",
+        cv::FileStorage::READ);
     fs2["camera_matrix"] >> m_cameraMatrix;
     fs2["distortion_coefficients"] >> m_distCoeff;
-    std::cout<<"Loaded fisheye calibration for camera 0." << std::endl;
+    std::cout << "Loaded fisheye calibration for camera "
+        << a_name << "."<< std::endl;
+    fs2.release();
+  }catch(cv::Exception& e){
+    const char * err_msg = e.what();
+    std::cout<< "Failed to read calibration file. Message: " << err_msg << std::endl;
   }
-  else{
-    fs2 = cv::FileStorage("var/tools/vision/projection/camera1.yml", cv::FileStorage::READ);
-    fs2["camera_matrix"] >> m_cameraMatrix;
-    fs2["distortion_coefficients"] >> m_distCoeff;
-    std::cout<<"Loaded fisheye calibration for camera 1." << std::endl;
-  }
-  
-  // first method: use (type) operator on FileNode.
-  // int frameCount = (int)fs2["frameCount"];
-
-  // std::string date;
-  // second method: use FileNode::operator >>
-  // fs2["calibrationDate"] >> date;
-
-  // cv::Mat cameraMatrix2, distCoeffs2;
-  // fs2["camera_matrix"] >> m_cameraMatrix;
-  // fs2["distortion_coefficients"] >> m_distCoeff;
-
-  // std::cout 
-  // << "frameCount: " << frameCount << endl
-  //      << "calibration date: " << date << endl
-       // << "camera matrix: " << m_cameraMatrix << std::endl
-       // << "distortion coeffs: " << m_distCoeff << std::endl;
 
 }
 

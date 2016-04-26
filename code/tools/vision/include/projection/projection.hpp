@@ -30,13 +30,23 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 
-void LoggMouseClicks(int32_t , int32_t, int32_t, int32_t, void*);
-void projectMouseClicks(int32_t, int32_t, int32_t, int32_t, void*);
-
 namespace opendlv {
 namespace tools {
 namespace vision {
 namespace projection {
+
+void LogMouseClicks(int32_t , int32_t, int32_t, int32_t, void*);
+void ProjectMouseClicks(int32_t, int32_t, int32_t, int32_t, void*);
+
+struct MouseParams
+{
+  Eigen::MatrixXd points;
+  uint8_t iterator;
+  
+  MouseParams();
+  ~MouseParams();
+};
+
 class Projection
 : public odcore::base::module::TimeTriggeredConferenceClientModule{
  public:
@@ -52,15 +62,20 @@ class Projection
   void tearDown();
 
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
-  void calibrate();
-  void config();
-  void save();
-  void project();
+  void Calibrate();
+  void Config();
+  void Save();
+  void Project();
 
 
   char m_option;
-  double m_recHeight, m_recWidth, m_recPosX, m_recPosY;
-  Eigen::MatrixXd m_aMatrix, m_bMatrix, m_projectionMatrix;
+  double m_recHeight;
+  double m_recWidth;
+  double m_recPosX;
+  double m_recPosY;
+  Eigen::MatrixXd m_aMatrix;
+  Eigen::MatrixXd m_bMatrix;
+  Eigen::MatrixXd m_projectionMatrix;
 };
 
 } // projection

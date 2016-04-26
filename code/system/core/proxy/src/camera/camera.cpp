@@ -98,8 +98,8 @@ void Camera::setUp()
     std::string password = kv.getValue<std::string>(
         "proxy-camera.password");
     
-    std::string const name = type + " (" + port + ")";
-    
+    std::string const name = kv.getValue<std::string>(
+        "proxy-camera.name");
     m_device =
     std::unique_ptr<Device>(new OpenCvDevice(name, port, username, password, 
         width, height, bpp));
