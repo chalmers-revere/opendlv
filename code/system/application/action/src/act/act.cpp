@@ -31,9 +31,9 @@
 
 #include "act/act.hpp"
 
-namespace opendlv {
-namespace action {
-namespace act {
+ namespace opendlv {
+  namespace action {
+    namespace act {
 
 /**
   * Constructor.
@@ -41,20 +41,20 @@ namespace act {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-Act::Act(int32_t const &a_argc, char **a_argv)
-    : TimeTriggeredConferenceClientModule(a_argc, a_argv, "action-act"),
-    m_accelerationCorrection(0.0f),
-    m_breakingcorrection(0.0f),
-    m_steeringCorrection(0.0f),
-    counterAccelerate(0),
-    counterBrake(0),
-    counterSteering(0)
-{
-}
+  Act::Act(int32_t const &a_argc, char **a_argv)
+  : TimeTriggeredConferenceClientModule(a_argc, a_argv, "action-act"),
+  m_accelerationCorrection(0.0f),
+  m_breakingcorrection(0.0f),
+  m_steeringCorrection(0.0f),
+  counterAccelerate(0),
+  counterBrake(0),
+  counterSteering(0)
+  {
+  }
 
-Act::~Act()
-{
-}
+  Act::~Act()
+  {
+  }
 
 /**
  * Receives control correction requests, including a modality, if inhibitory,
@@ -62,19 +62,18 @@ Act::~Act()
  * Sends modulated contol signal as individual samples, per modality to Proxy
  * actuators.
  */
-odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
-{
+ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
+ {
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
-      odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+    odcore::data::dmcp::ModuleStateMessage::RUNNING) {
 
   //  std::cout << "Send acc. " << m_acceleration << " Steering: " << m_steering << std::endl;
-  
+
     opendlv::proxy::Actuation actuation(m_acceleration, m_steering, false);
     odcore::data::Container c(actuation);
     getConference().send(c);
   }
-
-  return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
+return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
 /**
@@ -83,15 +82,15 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
  * signal. Values are saved as needed and
  * packaged and sent to Actuation.
  */
-void Act::nextContainer(odcore::data::Container &c)
-{
+ void Act::nextContainer(odcore::data::Container &c)
+ {
   float sumOfAccelerate = 0.0f;
   float sumOfBrake = 0.0f;
   float sumOfSteering = 0.0f;
 
   if(c.getDataType() == opendlv::action::Correction::ID()) {
     opendlv::action::Correction correction = 
-      c.getData<opendlv::action::Correction>();
+    c.getData<opendlv::action::Correction>();
 
     odcore::data::TimeStamp t0 = correction.getStartTime();
     std::string type = correction.getType();
@@ -155,17 +154,17 @@ void Act::nextContainer(odcore::data::Container &c)
  * the time vector is less than deltaTime seconds
  * ago. Truncates the vector if it is.
  */
-void Act::timeCheck(float &timeVector, float &amplitudeVector, uint32_t &counter)
-{
-  	float deltaTime = 0.5f;
-  	double now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    if ( now - timeVector[0] >=deltaTime ) {
-      for (uint32_t count = 0; count < counter; count++) {
-        timeVector[count] = timeVector[count+1]
-        amplitudeVector[count] = amplitudeVector[count+1]
-      }
-      counter = counter -1;
+ void Act::timeCheck(float &timeVector, float &amplitudeVector, uint32_t &counter)
+ {
+   float deltaTime = 0.5f;
+   double now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+   if ( now - timeVector[0] >= deltaTime ) {
+    for (uint32_t count = 0; count < counter; count++) {
+      timeVector[count] = timeVector[count+1]
+      amplitudeVector[count] = amplitudeVector[count+1]
     }
+    counter = counter -1;
+  }
 }
 
 /**
@@ -173,14 +172,14 @@ void Act::timeCheck(float &timeVector, float &amplitudeVector, uint32_t &counter
  * and if so clears the relevant time and amplitude
  * vectors prior to adding new corrections.
  */
-int Act::inhibitoryCheck(bool isInhibitory, float &timeVector[], float &amplitudeVector[], uint32_t &counter )
-{
-    if (isInhibitory) {
-      timeVector.clear;
-      amplitudeVector.clear;
-      counter = 0;
-    }
-    return counter;
+ int Act::inhibitoryCheck(bool isInhibitory, float &timeVector[], float &amplitudeVector[], uint32_t &counter )
+ {
+  if (isInhibitory) {
+    timeVector.clear;
+    amplitudeVector.clear;
+    counter = 0;
+  }
+  return counter;
 }
 
 void Act::setUp()
