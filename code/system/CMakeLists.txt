@@ -67,6 +67,7 @@ include_directories(SYSTEM ${OPENDLVDATA_INCLUDE_DIRS})
 include_directories(SYSTEM ${REVEREFH16MAPPING_INCLUDE_DIRS})
 include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 include_directories(SYSTEM ${KALMAN_INCLUDE_DIR})
+include_directories(SYSTEM ${TINYCNN_INCLUDE_DIR})
 
 ###########################################################################
 # Set libraries to link against.

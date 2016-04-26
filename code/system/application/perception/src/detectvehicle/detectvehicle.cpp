@@ -35,6 +35,8 @@
 
 #include "detectvehicle/detectvehicle.hpp"
 
+#include "runcnnnetwork.cpp"
+
 namespace opendlv {
 namespace perception {
 namespace detectvehicle {
@@ -84,9 +86,6 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
  //     " received at " << c.getReceivedTimeStamp().getYYYYMMDD_HHMMSSms() << 
  //     std::endl;
 
-
-  // TODO Start of pretty bad-performing block that extracts image from memory 
-
   odcore::data::image::SharedImage mySharedImg = 
       c.getData<odcore::data::image::SharedImage>();
 //  cout << "Received a SharedImage of size: (" << mySharedImg.getWidth() << 
@@ -114,13 +113,16 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   sharedMem->unlock();
   
 
-  // end of slow / bad-performing block
-
   // Nr of seconds
   // TODO use something else as timestamp?
   double timeStamp = ((double)c.getSentTimeStamp().toMicroseconds())/1000000;
  // std::cout << "timeStamp: " << timeStamp << std::endl;
-  
+
+
+  ///////////////////////////////////////////////////////////////////
+
+  CnnTest();
+
   m_verifiedVehicles->clear();
   m_vehicleDetectionSystem->update(&myImage, m_verifiedVehicles, timeStamp);
 
@@ -137,14 +139,10 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   int32_t windowWidth = 640;
   int32_t windowHeight = 480;
 
-  /*
-  if (showBlackImgOutput) {
-    outputImg = cv::Scalar(0, 0, 0); //set image black
-  }
-  */
 
   cv::resize(outputImg, outputImg, cv::Size(windowWidth, windowHeight), 0, 0, cv::INTER_CUBIC);
 
+  /*
   std::vector<std::shared_ptr<RememberedVehicle>> memorized;
   m_vehicleMemorySystem->GetMemorizedVehicles(&memorized);
   for (uint32_t i=0; i<memorized.size(); i++) {
@@ -160,6 +158,7 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
     // Show vehicles that were verified this frame (green)
     //cv::rectangle(outputImg, m_verifiedVehicles.at(i)->GetDetectionRectangle(), cv::Scalar(0,255,0));
   }
+  */
 
 //  std::cout << "Nr of memorized vehicles: " << m_vehicleMemorySystem->GetNrMemorizedVehicles() << std::endl;
  // std::cout << "Total nr of vehicle rectangles: " << m_vehicleMemorySystem->GetTotalNrVehicleRects() << std::endl;
