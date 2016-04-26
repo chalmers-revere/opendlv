@@ -45,7 +45,10 @@ LaneKeeping::~LaneKeeping()
 
 void LaneKeeping::setUp()
 {
-  m_vehicle->SetHeading(0.08f);
+  m_vehicle->SetSpeed(9.0f);
+  m_vehicle->SetHeading(0.2f);
+
+  std::cout << "Set up" << std::endl;
 }
 
 void LaneKeeping::tearDown()
@@ -78,6 +81,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LaneKeeping::body()
 
     double lateralPosition = m_vehicle->GetLateralPosition();
     double heading = m_vehicle->GetHeading();
+
+    std::cout << "Heading: " << heading << std::endl;
+
     opendlv::perception::LanePosition lanePosition(lateralPosition, heading);
     odcore::data::Container msg(lanePosition);  
     getConference().send(msg);
