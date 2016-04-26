@@ -61,7 +61,7 @@ void SetOpticalRotation::nextContainer(odcore::data::Container &)
     float heading = lanePosition.getHeading();
 
   	odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
-  	float const gainHeading = kv.getValue<int32_t>("action-setopticalrotation.gain_heading");  
+  	float const gainHeading = kv.getValue<float>("action-setopticalrotation.gain_heading");  
     
     if (std::abs(heading) > 0.0f) {
       float steeringAmplitude = gainHeading * heading;
