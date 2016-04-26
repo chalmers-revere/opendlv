@@ -77,6 +77,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
         opendlv::proxy::GpsReading::ID());
     auto gpsReading = gpsReadingContainer.getData<opendlv::proxy::GpsReading>();
 
+    std::cout   << getName() << "\tLatidude  =  " << gpsReading.getLatitude() << "  Longitude  =  " << gpsReading.getLongitude() << std::endl;
+
     if (gpsReadingContainer.getReceivedTimeStamp().toMicroseconds() > 0) {
       if (!hasGpsReference) {
         gpsReference = opendlv::data::environment::WGS84Coordinate(
@@ -175,7 +177,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       getConference().send(msg);
 
 
-    }
+    } else cout << " NO DATA " << endl;
 
   }
    
