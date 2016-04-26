@@ -66,11 +66,21 @@ OpenCvDevice::OpenCvDevice(std::string const &a_name,
     std::cerr << "[proxy-camera] Could not open camera '" << a_name
               << std::endl;
   }
-
+  cv::FileStorage fs2;
   //Reading external calibration file
-
-  cv::FileStorage fs2("var/tools/vision/projection/camera.yml", cv::FileStorage::READ);
-
+  if(a_name == "opencv-ip-axis (10.42.42.90)"){
+    fs2 = cv::FileStorage("var/tools/vision/projection/camera0.yml", cv::FileStorage::READ);
+    fs2["camera_matrix"] >> m_cameraMatrix;
+    fs2["distortion_coefficients"] >> m_distCoeff;
+    std::cout<<"Loaded fisheye calibration for camera 0." << std::endl;
+  }
+  else{
+    fs2 = cv::FileStorage("var/tools/vision/projection/camera1.yml", cv::FileStorage::READ);
+    fs2["camera_matrix"] >> m_cameraMatrix;
+    fs2["distortion_coefficients"] >> m_distCoeff;
+    std::cout<<"Loaded fisheye calibration for camera 1." << std::endl;
+  }
+  
   // first method: use (type) operator on FileNode.
   // int frameCount = (int)fs2["frameCount"];
 
@@ -79,14 +89,14 @@ OpenCvDevice::OpenCvDevice(std::string const &a_name,
   // fs2["calibrationDate"] >> date;
 
   // cv::Mat cameraMatrix2, distCoeffs2;
-  fs2["camera_matrix"] >> m_cameraMatrix;
-  fs2["distortion_coefficients"] >> m_distCoeff;
+  // fs2["camera_matrix"] >> m_cameraMatrix;
+  // fs2["distortion_coefficients"] >> m_distCoeff;
 
-  std::cout 
+  // std::cout 
   // << "frameCount: " << frameCount << endl
   //      << "calibration date: " << date << endl
-       << "camera matrix: " << m_cameraMatrix << std::endl
-       << "distortion coeffs: " << m_distCoeff << std::endl;
+       // << "camera matrix: " << m_cameraMatrix << std::endl
+       // << "distortion coeffs: " << m_distCoeff << std::endl;
 
 }
 
@@ -108,9 +118,12 @@ bool OpenCvDevice::CaptureFrame()
   bool retVal = false;
   if (m_capture != nullptr) {
     if (m_capture->read(m_image)) {
-      cv::Mat tmpClone = m_image.clone();
-      cv::undistort(tmpClone, m_image, m_cameraMatrix, m_distCoeff);
-      tmpClone.release();
+      if(!m_distCoeff.empty() && !m_cameraMatrix.empty()){
+        cv::Mat tmpClone = m_image.clone();
+        cv::undistort(tmpClone, m_image, m_cameraMatrix, m_distCoeff);
+        tmpClone.release();
+      }
+
       retVal = true;
     }
   }
