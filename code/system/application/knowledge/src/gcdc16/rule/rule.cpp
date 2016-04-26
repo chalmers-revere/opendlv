@@ -42,7 +42,7 @@ namespace rule {
 */
 Rule::Rule(int32_t const &a_argc, char **a_argv)
 : DataTriggeredConferenceClientModule(
-	a_argc, a_argv, "knowledge-gcdc16-rule")
+	a_argc, a_argv, "knowledge-gcdc16-rule"),
 	standstillDistance(6), //TODO: Get actual value at GCDC in meters
 	headway(1), //TODO: Get actual value at GCDC in seconds
 	minimumEuclideanDistance(5) //TODO: Get actual value at GCDC in meters
@@ -57,12 +57,13 @@ Rule::~Rule()
 * Receives .
 * Sends .
 */
-void Rule::getDistances(double hostVelocity, double[] &returnVector)
+double Rule::getDistances(double hostVelocity)
 {
 	double desiredDistance = standstillDistance + headway * hostVelocity;
-	double safeDistance = scalingFactor * desiredDistance;
-	returnVector[0] = desiredDistance;
-	returnvector[1] = safeDistance;
+	//double safeDistance = scalingFactor * desiredDistance;
+	//returnVector[0] = desiredDistance;
+	//returnvector[1] = safeDistance;
+	return desiredDistance;
 }
 
 bool Rule::euclideanDistance(double measuredDistance)
@@ -73,6 +74,9 @@ bool Rule::euclideanDistance(double measuredDistance)
 	}
 	return false;
 
+}
+void Rule::nextContainer(odcore::data::Container &)
+{
 }
 
 void Rule::setUp()

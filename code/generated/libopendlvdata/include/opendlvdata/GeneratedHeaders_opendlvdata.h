@@ -1,0 +1,26 @@
+/*
+ * THIS IS A GENERATED FILE - CHANGES WILL BE OVERWRITTEN.
+ */
+
+#include "opendlvdata/generated/opendlv/Constants.h"
+#include "opendlvdata/generated/opendlv/proxy/GpsReading.h"
+#include "opendlvdata/generated/opendlv/proxy/V2vInbound.h"
+#include "opendlvdata/generated/opendlv/proxy/V2vOutbound.h"
+#include "opendlvdata/generated/opendlv/proxy/Actuation.h"
+#include "opendlvdata/generated/opendlv/proxy/ControlState.h"
+#include "opendlvdata/generated/opendlv/sensation/Voice.h"
+#include "opendlvdata/generated/opendlv/knowledge/Message.h"
+#include "opendlvdata/generated/opendlv/perception/LanePosition.h"
+#include "opendlvdata/generated/opendlv/perception/LeadVehicleSize.h"
+#include "opendlvdata/generated/opendlv/sensation/OpticalFlow.h"
+#include "opendlvdata/generated/opendlv/perception/DesiredOpticalFlow.h"
+#include "opendlvdata/generated/opendlv/action/Correction.h"
+#include "opendlvdata/generated/opendlv/proxy/reverefh16/Pedals.h"
+#include "opendlvdata/generated/opendlv/proxy/reverefh16/AccelerationRequest.h"
+#include "opendlvdata/generated/opendlv/proxy/reverefh16/BrakeRequest.h"
+#include "opendlvdata/generated/opendlv/proxy/reverefh16/SteeringRequest.h"
+#include "opendlvdata/generated/opendlv/proxy/reverefh16/Axles.h"
+#include "opendlvdata/generated/opendlv/proxy/reverefh16/Propulsion.h"
+#include "opendlvdata/generated/opendlv/proxy/reverefh16/VehicleState.h"
+#include "opendlvdata/generated/opendlv/proxy/reverefh16/Wheels.h"
+#include "opendlvdata/generated/opendlv/proxy/reverefh16/Steering.h"

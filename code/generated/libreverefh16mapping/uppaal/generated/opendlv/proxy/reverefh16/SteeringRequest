@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
+<nta>
+	<declaration>// Place global declarations here.
+/*This software is open source. Please see COPYING and AUTHORS for further information.
+This file is auto-generated. DO NOT CHANGE AS YOUR CHANGES MIGHT BE OVERWRITTEN!
+UPPAAL file for: opendlv.proxy.reverefh16.SteeringRequest
+Unordered messages*/
+/*
+
+CANID       : 0x201
+
+CANID       : 0x201
+
+CANID       : 0x201
+*/
+int ID=0;
+const int N=1;
+const int MAX=N*5;
+int list[N+1]={513,514};
+int expectedID[N]={513};
+
+int[0,MAX] counter=0;
+bool received[N]={false};
+
+urgent chan message,Go;
+</declaration>
+	<template>
+		<name x="5" y="5">messageGenerator</name>
+		<declaration>// Place local declarations here.
+
+void nextID(int[0,N] canid)
+{
+    int[0,N] index=0;
+    ID=list[canid];
+    counter++;    
+    if(counter==MAX)
+    {
+        for(index=0;index&lt;N;index++)
+        {
+            if(!received[index])
+            {
+                ID=expectedID[index];
+                counter=0;
+                return;
+            }
+        }
+        counter=0;
+    }
+}</declaration>
+		<location id="id0" x="17" y="-102">
+			<name x="0" y="-136">Send</name>
+			<committed/>
+		</location>
+		<location id="id1" x="-187" y="-102">
+			<name x="-212" y="-144">Ready</name>
+		</location>
+		<init ref="id1"/>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-110" y="-68">message!</label>
+			<nail x="17" y="-42"/>
+			<nail x="-187" y="-42"/>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id0"/>
+			<label kind="select" x="-119" y="-136">n:int[0,N]</label>
+			<label kind="synchronisation" x="-93" y="-119">Go!</label>
+			<label kind="assignment" x="-127" y="-102">nextID(n)</label>
+		</transition>
+	</template>
+	<template>
+		<name>Receiver</name>
+		<declaration>bool complete=false;
+
+void reset()
+{
+    int[0,N] index=0;
+    for(index=0;index&lt;N;index++)
+    {
+        received[index]=false;
+    }
+    complete=false;
+}
+
+void nextExpected()
+{
+    int[0,N] index=0;
+    if(complete)
+    {
+        reset();
+    }
+
+    for(index=0;index&lt;N;index++)
+    {
+        if(ID==expectedID[index])
+        {
+            received[index]=true;
+        }
+    }
+    complete=true;
+    for(index=0;index&lt;N;index++)
+    {
+        if(!received[index])
+        {
+            complete=false;
+            return;
+        }
+    }
+}</declaration>
+		<location id="id2" x="-25" y="-17">
+			<name x="-59" y="-51">Operating</name>
+		</location>
+		<init ref="id2"/>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="119" y="-25">message?</label>
+			<label kind="assignment" x="102" y="-8">nextExpected()</label>
+			<nail x="85" y="25"/>
+			<nail x="85" y="-51"/>
+		</transition>
+	</template>
+	<template>
+		<name>Synchronizer</name>
+		<location id="id3" x="-34" y="0">
+			<name x="-51" y="-34">Normal</name>
+		</location>
+		<init ref="id3"/>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id3"/>
+			<label kind="synchronisation" x="-42" y="34">Go?</label>
+			<nail x="-76" y="51"/>
+			<nail x="17" y="51"/>
+		</transition>
+	</template>
+	<system>// Place template instantiations here.
+
+system messageGenerator,Receiver,Synchronizer;
+    </system>
+	<queries>
+		<query>
+			<formula>!Receiver.complete--&gt;Receiver.complete
+			</formula>
+			<comment>
+			</comment>
+		</query>
+		<query>
+			<formula>A[] not deadlock
+			</formula>
+			<comment>
+			</comment>
+		</query>
+	</queries>
+</nta>
