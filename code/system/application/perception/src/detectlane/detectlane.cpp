@@ -117,7 +117,7 @@ void DetectLane::nextContainer(odcore::data::Container &c)
   int width = 640, height = 480;
   int MAXROW, MINROW;
 
-  MINROW = 280;
+  MINROW = 200;
   MAXROW = 450;
 
   Eigen::MatrixXd regions(5,4);
@@ -125,21 +125,21 @@ void DetectLane::nextContainer(odcore::data::Container &c)
     // Eigen::MatrixXd regions(5,4);
     //region = col1,row1, col2,row2
     regions << 
-    162, 307, 112, 468,
-    248, 311, 236, 460,
-    359, 311, 379, 464,
-    459, 312, 530, 461,
-    518, 306, 626, 414;   
+    156, 229, 91, 441,
+    281, 217, 272, 456,
+    328, 228, 382, 452,
+    381, 218, 495, 436,
+    448, 197, 622, 416;  
   }
   else{
     // Eigen::MatrixXd regions(5,4);
     //region = col1,row1,col2,row2
     regions<<
-    175, 299, 46, 433,
-    237, 320, 162, 461,
-    346, 312, 286, 463,
-    455, 318, 471, 468,
-    518, 310, 584, 463;
+    215, 230, 75, 392,
+    306, 245, 195, 431,
+    379, 214, 316, 439,
+    425, 237, 423, 445,
+    507, 221, 574, 414;
   }
 
 
