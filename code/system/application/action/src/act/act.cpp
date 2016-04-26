@@ -135,6 +135,7 @@ return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
   m_accelerationCorrection = sumOfAccelerate/freq;
   m_breakingCorrection = -sumOfBrake/freq;
   m_steeringCorrection = sumOfSteering/freq;
+  std::cout << "Stearing Correction : " << m_steeringCorrection <<std::endl;
 
   if (m_breakingCorrection < 0) {
   	opendlv::proxy::Actuation actuation(m_breakingCorrection, m_steeringCorrection, false);
