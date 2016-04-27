@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 Chalmers REVERE
+ * Copyright (C) 2016 Chalmers REVERE
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -57,10 +57,17 @@ DetectVehicle::DetectVehicle(int32_t const &a_argc, char **a_argv)
     , m_vehicleDetectionSystem()
     , m_verifiedVehicles()
     , m_vehicleMemorySystem()
+    , m_convNeuralNet()
 {
-  m_vehicleDetectionSystem = std::shared_ptr<VehicleDetectionSystem>(new VehicleDetectionSystem);
-  m_verifiedVehicles = std::shared_ptr<std::vector<std::shared_ptr<DetectedVehicle>>>(new std::vector<std::shared_ptr<DetectedVehicle>>);
-  m_vehicleMemorySystem = std::shared_ptr<VehicleMemorySystem>(new VehicleMemorySystem);
+  m_vehicleDetectionSystem = std::shared_ptr<VehicleDetectionSystem>(
+      new VehicleDetectionSystem);
+  m_verifiedVehicles = 
+      std::shared_ptr<std::vector<std::shared_ptr<DetectedVehicle>>>(
+      new std::vector<std::shared_ptr<DetectedVehicle>>);
+  m_vehicleMemorySystem = std::shared_ptr<VehicleMemorySystem>(
+      new VehicleMemorySystem);
+  m_convNeuralNet = std::shared_ptr<ConvNeuralNet>(
+      new ConvNeuralNet);
 }
 
 DetectVehicle::~DetectVehicle()
@@ -68,8 +75,15 @@ DetectVehicle::~DetectVehicle()
   std::cout << "DetectVehicle::~DetectVehicle()" << std::endl;
 }
 
+void DetectVehicle::setUp()
+{
+  std::cout << "DetectVehicle::setUp()" << std::endl;
+  m_vehicleDetectionSystem->setUp();
+  m_convNeuralNet->setUp();
+}
+
 /**
- * Receives .
+ * Receives SharedImage from camera.
  * Sends .
  */
 void DetectVehicle::nextContainer(odcore::data::Container &c)
@@ -77,29 +91,24 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   std::cout << std::endl;
 
   if (c.getDataType() != odcore::data::image::SharedImage::ID()) {
- //   std::cout << "--- Received unimportant container of type " << 
- //       c.getDataType() << std::endl;
+    // received container that we don't care about
     return;
   }
- // std::cout << "Received container of type " << c.getDataType() << 
- //     " sent at " <<   c.getSentTimeStamp().getYYYYMMDD_HHMMSSms() << 
- //     " received at " << c.getReceivedTimeStamp().getYYYYMMDD_HHMMSSms() << 
- //     std::endl;
 
   odcore::data::image::SharedImage mySharedImg = 
       c.getData<odcore::data::image::SharedImage>();
-//  cout << "Received a SharedImage of size: (" << mySharedImg.getWidth() << 
-//      ", " << mySharedImg.getHeight() << ")" << endl;
 
-  std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(mySharedImg.getName()));
+  std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(
+      odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(
+      mySharedImg.getName()));
   
   const uint32_t nrChannels = mySharedImg.getBytesPerPixel();
   const uint32_t imgWidth = mySharedImg.getWidth();
   const uint32_t imgHeight = mySharedImg.getHeight();
 
-  //std::shared_ptr<cv::Mat> myImage = std::shared_ptr<cv::Mat>(cvCreateImage(cvSize(imgWidth, imgHeight), IPL_DEPTH_8U, nrChannels));
   IplImage* myIplImage;
-  myIplImage = cvCreateImage(cvSize(imgWidth, imgHeight), IPL_DEPTH_8U, nrChannels);
+  myIplImage = cvCreateImage(cvSize(
+      imgWidth, imgHeight), IPL_DEPTH_8U, nrChannels);
   cv::Mat myImage(myIplImage);
 
   if (!sharedMem->isValid()) {
@@ -108,18 +117,19 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   
   sharedMem->lock();
   {
-    memcpy(myImage.data, sharedMem->getSharedMemory(), imgWidth*imgHeight*nrChannels);
+    memcpy(myImage.data, sharedMem->getSharedMemory(), 
+        imgWidth*imgHeight*nrChannels);
   }
   sharedMem->unlock();
+
+  //////////////////////////////////////////////////////////////////////////////
   
 
   // Nr of seconds
   // TODO use something else as timestamp?
   double timeStamp = ((double)c.getSentTimeStamp().toMicroseconds())/1000000;
- // std::cout << "timeStamp: " << timeStamp << std::endl;
+  //std::cout << "timeStamp: " << timeStamp << std::endl;
 
-
-  ///////////////////////////////////////////////////////////////////
 
   CnnTest();
 
@@ -172,12 +182,6 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   // end of plot stuff
   //myImage->release();
   cvReleaseImage(&myIplImage);
-}
-
-void DetectVehicle::setUp()
-{
-  std::cout << "DetectVehicle::setUp()" << std::endl;
-  m_vehicleDetectionSystem->setUp();
 }
 
 void DetectVehicle::tearDown()
