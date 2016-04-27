@@ -21,7 +21,6 @@
 #include <ctype.h>
 #include <cstring>
 #include <cmath>
-#include <ctime>
 #include <iostream>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -31,8 +30,6 @@
 
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
-
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 #include "linguistics/v2vcam/buffer.hpp"
 #include "linguistics/v2vcam/v2vcam.hpp"
@@ -53,7 +50,8 @@ V2vCam::V2vCam(int32_t const &a_argc, char **a_argv)
     : TimeTriggeredConferenceClientModule(
       a_argc, a_argv, "knowledge-linguistics-v2vcam"),
     m_sendLog(),
-    m_receiveLog()
+    m_receiveLog(),
+    m_tt()
 {
   struct stat st;
   if (stat("var/application/knowledge/linguistics/v2vcam", &st) == -1) {
@@ -96,16 +94,8 @@ V2vCam::V2vCam(int32_t const &a_argc, char **a_argv)
 
   m_sendLog << header << std::endl;
   m_receiveLog << header << std::endl;
-}
 
-V2vCam::~V2vCam()
-{
-  m_sendLog.close();
-  m_receiveLog.close();
-}
 
-odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
-{
   std::tm tm = {
       0, // tm_sec
       0, // tm_min
@@ -120,43 +110,45 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
       nullptr // time zone (NOTE: only in glibc)
       };
 
-  std::time_t tt = timegm(&tm);
+  m_tt = timegm(&tm);
+}
 
-  std::chrono::system_clock::time_point start2004TimePoint = 
-      std::chrono::system_clock::from_time_t(tt);
+V2vCam::~V2vCam()
+{
+  m_sendLog.close();
+  m_receiveLog.close();
+}
+
+odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
+{
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
       odcore::data::dmcp::ModuleStateMessage::RUNNING) {
-    // std::cout << "Inside the main processing loop." << std::endl;
-    unsigned long millisecondsSince2004Epoch =
-        std::chrono::system_clock::now().time_since_epoch() /
-        std::chrono::milliseconds(1) - start2004TimePoint.time_since_epoch() / std::chrono::milliseconds(1);
-    m_generationDeltaTime = millisecondsSince2004Epoch%65536;
     std::shared_ptr<opendlv::Buffer> outBuffer(new opendlv::Buffer());
     // Reverser for big and little endian specification of V2V.
     outBuffer->Reversed();
-    outBuffer->AppendByte(m_messageId); //messageId
-    outBuffer->AppendInteger(m_stationId); //stationId
-    outBuffer->AppendInteger(m_generationDeltaTime); //generationDeltaTime
-    outBuffer->AppendByte(m_containerMask); //containerMask
-    outBuffer->AppendInteger(m_stationType); //stationType                
-    outBuffer->AppendInteger(m_latitude); //latitude
-    outBuffer->AppendInteger(m_longitude); //longitude
-    outBuffer->AppendInteger(m_semiMajorConfidence); //semiMajorConfidence
-    outBuffer->AppendInteger(m_semiMinorConfidence); //semiMinorConfidence
-    outBuffer->AppendInteger(m_semiMajorOrientation); //semiMajorOrientation
-    outBuffer->AppendInteger(m_altitude); //altitude
-    outBuffer->AppendInteger(m_heading); //heading value
-    outBuffer->AppendInteger(m_headingConfidence); //headingConfidence
-    outBuffer->AppendInteger(m_speed); //speedValue
-    outBuffer->AppendInteger(m_speedConfidence); //speedConfidence        
-    outBuffer->AppendInteger(m_vehicleLength); //vehicleLength
-    outBuffer->AppendInteger(m_vehicleWidth); //vehicleWidth
-    outBuffer->AppendInteger(m_longitudinalAcc); //longitudinalAcc
-    outBuffer->AppendInteger(m_longitudinalAccConf); //longitudinalAccConf
-    outBuffer->AppendInteger(m_yawRateValue); //yawRateValue
-    outBuffer->AppendInteger(m_yawRateConfidence); //yawRateConfidence        
-    outBuffer->AppendInteger(m_vehicleRole); //vehicleRole
+    outBuffer->AppendByte(GetMessageId()); //messageId
+    outBuffer->AppendInteger(GetStationId()); //stationId
+    outBuffer->AppendInteger(GetGenerationDeltaTime()); //generationDeltaTime
+    outBuffer->AppendByte(GetContainerMask()); //containerMask
+    outBuffer->AppendInteger(GetStationType()); //stationType                
+    outBuffer->AppendInteger(GetLatitude()); //latitude
+    outBuffer->AppendInteger(GetLongitude()); //longitude
+    outBuffer->AppendInteger(GetSemiMajorConfidence()); //semiMajorConfidence
+    outBuffer->AppendInteger(GetSemiMinorConfidence()); //semiMinorConfidence
+    outBuffer->AppendInteger(GetSemiMajorOrientation()); //semiMajorOrientation
+    outBuffer->AppendInteger(GetAltitude()); //altitude
+    outBuffer->AppendInteger(GetHeading()); //heading value
+    outBuffer->AppendInteger(GetHeadingConfidence()); //headingConfidence
+    outBuffer->AppendInteger(GetSpeed()); //speedValue
+    outBuffer->AppendInteger(GetSpeedConfidence()); //speedConfidence        
+    outBuffer->AppendInteger(GetVehicleLength()); //vehicleLength
+    outBuffer->AppendInteger(GetVehicleWidth()); //vehicleWidth
+    outBuffer->AppendInteger(GetLongitudinalAcc()); //longitudinalAcc
+    outBuffer->AppendInteger(GetLongitudinalAccConf()); //longitudinalAccConf
+    outBuffer->AppendInteger(GetYawRateValue()); //yawRateValue
+    outBuffer->AppendInteger(GetYawRateConfidence()); //yawRateConfidence        
+    outBuffer->AppendInteger(GetVehicleRole()); //vehicleRole
 
   
 
@@ -339,6 +331,129 @@ void V2vCam::setUp()
 
 void V2vCam::tearDown()
 {
+}
+
+
+unsigned char V2vCam::GetMessageId()
+{
+  return m_messageId;
+}
+
+int32_t V2vCam::GetStationId()
+{
+  return m_stationId;
+}
+
+int32_t V2vCam::GetGenerationDeltaTime()
+{
+  std::chrono::system_clock::time_point start2004TimePoint = 
+      std::chrono::system_clock::from_time_t(m_tt);
+  unsigned long millisecondsSince2004Epoch =
+      std::chrono::system_clock::now().time_since_epoch() /
+      std::chrono::milliseconds(1) - start2004TimePoint.time_since_epoch() / std::chrono::milliseconds(1);
+  m_generationDeltaTime = millisecondsSince2004Epoch%65536;
+  return m_generationDeltaTime;
+}
+
+unsigned char V2vCam::V2vCam::GetContainerMask()
+{
+  return m_containerMask;
+}
+
+int32_t V2vCam::GetStationType()
+{
+  return m_stationType;
+}
+
+int32_t V2vCam::GetLatitude()
+{
+  int32_t scale = std::pow(10,7);
+  return static_cast<int32_t>(std::round(m_latitude*scale));
+}
+
+int32_t V2vCam::GetLongitude()
+{
+  int32_t scale = std::pow(10,7);
+  return static_cast<int32_t>(std::round(m_longitude*scale));
+}
+
+int32_t V2vCam::GetSemiMajorConfidence()
+{
+  return m_semiMajorConfidence;
+}
+
+int32_t V2vCam::GetSemiMinorConfidence()
+{
+  return m_semiMinorConfidence;
+}
+
+int32_t V2vCam::GetSemiMajorOrientation()
+{
+  return m_semiMajorOrientation;
+}
+
+int32_t V2vCam::GetAltitude()
+{
+  int32_t scale = std::pow(10,2);
+  return static_cast<int32_t>(std::round(m_altitude*scale));
+}
+
+int32_t V2vCam::GetHeading()
+{
+  double scale = std::pow(10,1)*opendlv::Constants::RAD2DEG;
+  double val = static_cast<double>(m_heading);
+  return static_cast<int32_t>(std::round(val*scale));
+}
+
+int32_t V2vCam::GetHeadingConfidence()
+{
+  return m_headingConfidence;
+}
+
+int32_t V2vCam::GetSpeed()
+{
+  int32_t scale = std::pow(10,2);
+  return static_cast<int32_t>(std::round(m_speed*scale));
+}
+
+int32_t V2vCam::GetSpeedConfidence()
+{
+  return m_speedConfidence;
+}
+
+int32_t V2vCam::GetVehicleLength()
+{
+  return m_vehicleLength;
+}
+
+int32_t V2vCam::GetVehicleWidth()
+{
+  return m_vehicleWidth;
+}
+
+int32_t V2vCam::GetLongitudinalAcc()
+{
+  return m_longitudinalAcc;
+}
+
+int32_t V2vCam::GetLongitudinalAccConf()
+{
+  return m_longitudinalAccConf;
+}
+
+int32_t V2vCam::GetYawRateValue()
+{
+  return m_yawRateValue;
+}
+
+int32_t V2vCam::GetYawRateConfidence()
+{
+  return m_yawRateConfidence;
+}
+
+int32_t V2vCam::GetVehicleRole()
+{
+  return m_vehicleRole;
 }
 
 } // v2vcam
