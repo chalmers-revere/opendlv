@@ -24,6 +24,7 @@
 #include "opencv2/imgproc/imgproc_c.h"
 #include "opencv2/imgproc/imgproc.hpp"
 
+#include <opencv2/core/core.hpp>
 #include "camera/opencvdevice.hpp"
 
 namespace opendlv {
@@ -46,11 +47,13 @@ OpenCvDevice::OpenCvDevice(std::string const &a_name,
     : Device(a_name, a_width, a_height, a_bpp)
     , m_capture(nullptr)
     , m_image()
+    , m_distCoeff()
+    , m_cameraMatrix()
 {
   std::string videoStreamAddress = std::string("http://") + a_username 
     + ":" + a_password + "@" + a_port + "/axis-cgi/mjpg/video.cgi?user=" 
     + a_username + "&password=" + a_password + "&channel=0&.mjpg";
-
+    std::cout<< videoStreamAddress;
   m_capture.reset(new cv::VideoCapture(videoStreamAddress));
 
   if (m_capture->isOpened()) {
@@ -62,6 +65,21 @@ OpenCvDevice::OpenCvDevice(std::string const &a_name,
     std::cerr << "[proxy-camera] Could not open camera '" << a_name
               << std::endl;
   }
+
+  //Try to read calibration
+  try{
+    cv::FileStorage fs2("var/tools/vision/projection/" + a_name + ".yml",
+        cv::FileStorage::READ);
+    fs2["camera_matrix"] >> m_cameraMatrix;
+    fs2["distortion_coefficients"] >> m_distCoeff;
+    std::cout << "Loaded fisheye calibration for camera "
+        << a_name << "."<< std::endl;
+    fs2.release();
+  }catch(cv::Exception& e){
+    const char * err_msg = e.what();
+    std::cout<< "Failed to read calibration file. Message: " << err_msg << std::endl;
+  }
+
 }
 
 OpenCvDevice::~OpenCvDevice()
@@ -82,6 +100,12 @@ bool OpenCvDevice::CaptureFrame()
   bool retVal = false;
   if (m_capture != nullptr) {
     if (m_capture->read(m_image)) {
+      if(!m_distCoeff.empty() && !m_cameraMatrix.empty()){
+        cv::Mat tmpClone = m_image.clone();
+        cv::undistort(tmpClone, m_image, m_cameraMatrix, m_distCoeff);
+        tmpClone.release();
+      }
+
       retVal = true;
     }
   }
@@ -93,7 +117,7 @@ bool OpenCvDevice::CopyImageTo(char *a_destination, const uint32_t &a_size)
   bool retVal = false;
 
   if ((a_destination != nullptr) && (a_size > 0)) {
-    std::cout << "a_size: " << a_size << std::endl;
+    // std::cout << "a_size: " << a_size << std::endl;
     ::memcpy(a_destination, m_image.data, a_size);
 
     cv::imshow("Camera feed", m_image);

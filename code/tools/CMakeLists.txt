@@ -27,7 +27,7 @@ SET (CMAKE_MODULE_PATH "${OPENDAVINCI_DIR}/share/cmake-${CMAKE_MAJOR_VERSION}.${
 
 ###########################################################################
 # Global compile flags.
-include(CompileFlagsForTools)
+include(CompileFlags)
 
 ###########################################################################
 # Find CxxTest.
@@ -60,11 +60,12 @@ find_package(opendlvdata REQUIRED)
 
 ###########################################################################
 # Set common include directories.
-include_directories(${OPENDAVINCI_INCLUDE_DIRS})
-include_directories(${OPENDLV_INCLUDE_DIRS})
-include_directories(${ODCANTOOLS_INCLUDE_DIRS})
-include_directories(${OPENDLVDATA_INCLUDE_DIRS})
-include_directories(${REVEREFH16MAPPING_INCLUDE_DIRS})
+include_directories(SYSTEM ${OPENDAVINCI_INCLUDE_DIRS})
+include_directories(SYSTEM ${OPENDLV_INCLUDE_DIRS})
+include_directories(SYSTEM ${ODCANTOOLS_INCLUDE_DIRS})
+include_directories(SYSTEM ${OPENDLVDATA_INCLUDE_DIRS})
+include_directories(SYSTEM ${REVEREFH16MAPPING_INCLUDE_DIRS})
+include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 
 ###########################################################################
 # Set libraries to link against.
@@ -76,3 +77,5 @@ set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
 
 add_subdirectory(can)
 add_subdirectory(vboreplay)
+add_subdirectory(vision)
+add_subdirectory(simulation)
