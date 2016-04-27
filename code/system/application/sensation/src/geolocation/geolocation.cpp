@@ -114,6 +114,13 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       auto steering = steeringContainer.getData<
           opendlv::proxy::reverefh16::Steering>();
 
+      auto vehicleStateContainer = getKeyValueDataStore().get(
+                  opendlv::proxy::reverefh16::VehicleState::ID());
+      auto vehicleState = vehicleStateContainer.getData<
+              opendlv::proxy::reverefh16::VehicleState>();
+      double vehicleYawRate = vehicleState.getYawRate();
+
+
       if (steeringContainer.getReceivedTimeStamp().getSeconds() > 0) {
         control.phi() = steering.getRoadwheelangle();
       }
@@ -136,7 +143,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       } else {
         z.Z_theta() = state.theta();
       }
-      z.Z_theta_dot() = 0.0; // TODO: Put yaw rate here...
+      z.Z_theta_dot() = vehicleYawRate; // TODO: Put yaw rate here...
 
       
       double deltaTime = duration.toMicroseconds() / 1000000.0;
