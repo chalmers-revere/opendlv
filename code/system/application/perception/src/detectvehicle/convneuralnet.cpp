@@ -49,7 +49,7 @@ ConvNeuralNet::~ConvNeuralNet()
 
 // Public functions
 
-void ConvNeuralNet::setUp()
+void ConvNeuralNet::SetUp()
 {
   bool isTrainingNetwork = false;
   this->GetConvNet(m_inputWidth, m_inputHeight, &m_cnn, isTrainingNetwork);
@@ -93,12 +93,12 @@ bool ConvNeuralNet::IsInitialized()
 }
 
 
-void ConvNeuralNet::tearDown()
+void ConvNeuralNet::TearDown()
 {
 }
 
 
-void ConvNeuralNet::update(const cv::Mat* a_imageFrame)
+void ConvNeuralNet::Update(const cv::Mat* a_imageFrame)
 {
   std::cout << "convnet : In update" << std::endl;
 
@@ -118,7 +118,6 @@ void ConvNeuralNet::update(const cv::Mat* a_imageFrame)
   cv::resize(workingImage, workingImage, cv::Size(m_inputWidth*myTestFactor, m_inputHeight*myTestFactor), 0, 0, cv::INTER_CUBIC);
 
   // Do the actual CNN prediction
-  std::cout << "Size of CNN input: " << cnnImageData.at(0).size() << std::endl;
   std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
   tiny_cnn::vec_t result = m_cnn.predict(cnnImageData.at(0));
   std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
@@ -189,16 +188,11 @@ void ConvNeuralNet::update(const cv::Mat* a_imageFrame)
   cv::waitKey(10);
 
 
-
-
-
-
-
   std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
 
-  auto duration0 = std::chrono::duration_cast<std::chrono::microseconds>( t1 - t0 ).count();
-  auto duration1 = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
-  auto duration2 = std::chrono::duration_cast<std::chrono::microseconds>( t3 - t2 ).count();
+  auto duration0 = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+  auto duration1 = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+  auto duration2 = std::chrono::duration_cast<std::chrono::microseconds>(t3 - t2).count();
 
   std::cout << "Preprocess time:  " <<  ((float)duration0)/1000 << " ms" << std::endl;
   std::cout << "CNN time:         " <<  ((float)duration1)/1000 << " ms" << std::endl;
@@ -249,42 +243,39 @@ void ConvNeuralNet::GetConvNet(
 
 
 void ConvNeuralNet::ConvertImageRGB(
-    const std::string& imagefilename,
+    const std::string& a_imagefilename,
     int32_t a_width,
     int32_t a_height,
-    std::vector<tiny_cnn::vec_t>& data)
+    std::vector<tiny_cnn::vec_t>& a_data)
 {
-  cv::Mat img = cv::imread(imagefilename, CV_LOAD_IMAGE_COLOR);
+  cv::Mat img = cv::imread(a_imagefilename, CV_LOAD_IMAGE_COLOR);
 
-  ConvertImageRGB(img, a_width, a_height, data);
+  ConvertImageRGB(img, a_width, a_height, a_data);
 }
 
 void ConvNeuralNet::ConvertImageRGB(
-    cv::Mat img,
+    cv::Mat a_img,
     int32_t a_width,
     int32_t a_height,
-    std::vector<tiny_cnn::vec_t>& data)
+    std::vector<tiny_cnn::vec_t>& a_data)
 {
-  if (img.data == nullptr) {
+  if (a_img.data == nullptr) {
     std::cout << "WARNING: ConvNeuralNet::ConvertImageRGB() - cannot open, or it's not an image!" << std::endl;
     return; // cannot open, or it's not an image
   }
-  else if (img.channels() != 3) {
+  else if (a_img.channels() != 3) {
     std::cout << "WARNING: #channels was not 3!" << std::endl;
     return;
   }
 
 
   cv::Mat_<cv::Vec3b> resized;
-  //cv::imshow("Before eq", img);
+  //cv::imshow("Before eq", a_img);
   // Possibly equalize image, see http://stackoverflow.com/questions/15007304/histogram-equalization-not-working-on-color-image-opencv
-  //cv::imshow("After eq", img);
+  //cv::imshow("After eq", a_img);
   //cv::waitKey(0);
 
-  cv::resize(img, resized, cv::Size(a_width, a_height));
-  
-  //cv::imshow("DEBUG", img);
-  //cv::waitKey(0);
+  cv::resize(a_img, resized, cv::Size(a_width, a_height));
 
 
   float denominator = 255;
@@ -300,19 +291,19 @@ void ConvNeuralNet::ConvertImageRGB(
     }
   }
 
-  data.push_back(d);
+  a_data.push_back(d);
 }
 
 
-void ConvNeuralNet::NormalizeDataRGB(std::vector<tiny_cnn::vec_t>& data)
+void ConvNeuralNet::NormalizeDataRGB(std::vector<tiny_cnn::vec_t>& a_data)
 {
   std::cout << "Normalizing data..." << std::endl;
   double sumR = 0;
   double sumG = 0;
   double sumB = 0;
   long counter = 0;
-  for (uint32_t i=0; i<data.size(); i++) {
-    tiny_cnn::vec_t currentImg = data.at(i);
+  for (uint32_t i=0; i<a_data.size(); i++) {
+    tiny_cnn::vec_t currentImg = a_data.at(i);
     int32_t imgSize = currentImg.size()/3;
     for (int32_t j=0; j<imgSize; j++) {
       sumR += currentImg.at(j + imgSize*0); // red
@@ -333,8 +324,8 @@ void ConvNeuralNet::NormalizeDataRGB(std::vector<tiny_cnn::vec_t>& data)
   double varSumG = 0;
   double varSumB = 0;
   counter = 0;
-  for (uint32_t i=0; i<data.size(); i++) {
-    tiny_cnn::vec_t currentImg = data.at(i);
+  for (uint32_t i=0; i<a_data.size(); i++) {
+    tiny_cnn::vec_t currentImg = a_data.at(i);
     int32_t imgSize = currentImg.size()/3;
     for (int32_t j=0; j<imgSize; j++) {
       varSumR += pow(dataAvgR - currentImg.at(j + imgSize*0), 2);
@@ -351,14 +342,14 @@ void ConvNeuralNet::NormalizeDataRGB(std::vector<tiny_cnn::vec_t>& data)
   std::cout << "dataStdG: " << dataStdG << std::endl;
   std::cout << "dataStdB: " << dataStdB << std::endl;
 
-  for (uint32_t i=0; i<data.size(); i++) {
-    tiny_cnn::vec_t currentImg = data.at(i);
+  for (uint32_t i=0; i<a_data.size(); i++) {
+    tiny_cnn::vec_t currentImg = a_data.at(i);
     int32_t imgSize = currentImg.size()/3;
     for (int32_t j=0; j<imgSize; j++) {
       // Transform data to zero-mean, unit-variance
-      data.at(i).at(j + imgSize*0) = (currentImg.at(j + imgSize*0)-dataAvgR)/dataStdR;
-      data.at(i).at(j + imgSize*1) = (currentImg.at(j + imgSize*1)-dataAvgG)/dataStdG;
-      data.at(i).at(j + imgSize*2) = (currentImg.at(j + imgSize*2)-dataAvgB)/dataStdB;
+      a_data.at(i).at(j + imgSize*0) = (currentImg.at(j + imgSize*0)-dataAvgR)/dataStdR;
+      a_data.at(i).at(j + imgSize*1) = (currentImg.at(j + imgSize*1)-dataAvgG)/dataStdG;
+      a_data.at(i).at(j + imgSize*2) = (currentImg.at(j + imgSize*2)-dataAvgB)/dataStdB;
     }
   }
 
@@ -370,28 +361,28 @@ void ConvNeuralNet::NormalizeDataRGB(std::vector<tiny_cnn::vec_t>& data)
   std::cout << "Data normalized!" << std::endl;
 }
 
-void ConvNeuralNet::ApplyNormalizationRGB(std::vector<tiny_cnn::vec_t>& data,
+void ConvNeuralNet::ApplyNormalizationRGB(std::vector<tiny_cnn::vec_t>& a_data,
     double normAvgR, double normStdR,
     double normAvgG, double normStdG,
     double normAvgB, double normStdB)
 {
-  for (uint32_t i=0; i<data.size(); i++) {
-    tiny_cnn::vec_t currentImg = data.at(i);
+  for (uint32_t i=0; i<a_data.size(); i++) {
+    tiny_cnn::vec_t currentImg = a_data.at(i);
     int32_t imgSize = currentImg.size()/3;
     for (int32_t j=0; j<imgSize; j++) {
       // Transform data to zero-mean, unit-variance
-      data.at(i).at(j + imgSize*0) = (currentImg.at(j + imgSize*0)-normAvgR)/normStdR;
-      data.at(i).at(j + imgSize*1) = (currentImg.at(j + imgSize*1)-normAvgG)/normStdG;
-      data.at(i).at(j + imgSize*2) = (currentImg.at(j + imgSize*2)-normAvgB)/normStdB;
+      a_data.at(i).at(j + imgSize*0) = (currentImg.at(j + imgSize*0)-normAvgR)/normStdR;
+      a_data.at(i).at(j + imgSize*1) = (currentImg.at(j + imgSize*1)-normAvgG)/normStdG;
+      a_data.at(i).at(j + imgSize*2) = (currentImg.at(j + imgSize*2)-normAvgB)/normStdB;
     }
   }
 }
 
 
-cv::Mat ConvNeuralNet::ImageToMat(tiny_cnn::image<>& img, int sizeIncrease) {
-  cv::Mat ori(img.height(), img.width(), CV_8U, &img.at(0, 0));
+cv::Mat ConvNeuralNet::ImageToMat(tiny_cnn::image<>& a_img, int a_sizeIncrease) {
+  cv::Mat ori(a_img.height(), a_img.width(), CV_8U, &a_img.at(0, 0));
   cv::Mat resized;
-  cv::resize(ori, resized, cv::Size(), sizeIncrease, sizeIncrease, cv::INTER_AREA);
+  cv::resize(ori, resized, cv::Size(), a_sizeIncrease, a_sizeIncrease, cv::INTER_AREA);
   return resized;
 }
 

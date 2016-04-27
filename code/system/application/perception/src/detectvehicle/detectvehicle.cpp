@@ -35,7 +35,7 @@
 
 #include "detectvehicle/detectvehicle.hpp"
 
-#include "runcnnnetwork.cpp"
+#include "detectvehicle/convneuralnet.hpp"
 
 namespace opendlv {
 namespace perception {
@@ -80,7 +80,7 @@ void DetectVehicle::setUp()
 {
   std::cout << "DetectVehicle::setUp()" << std::endl;
   m_vehicleDetectionSystem->setUp();
-  m_convNeuralNet->setUp();
+  m_convNeuralNet->SetUp();
 }
 
 /**
@@ -93,6 +93,11 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
 
   if (c.getDataType() != odcore::data::image::SharedImage::ID()) {
     // received container that we don't care about
+    return;
+  }
+
+  if (!m_convNeuralNet->IsInitialized()) {
+    std::cout << "Convolutional Neural Net not yet initialized" << std::endl;
     return;
   }
 
@@ -124,10 +129,6 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   sharedMem->unlock();
 
   //////////////////////////////////////////////////////////////////////////////
-  if (!m_convNeuralNet->IsInitialized()) {
-    std::cout << "Convolutional Neural Net not yet initialized" << std::endl;
-    return;
-  }
 
   // Nr of seconds
   // TODO use something else as timestamp?
@@ -135,7 +136,7 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   //std::cout << "timeStamp: " << timeStamp << std::endl;
 
 
-  m_convNeuralNet->update(&myImage);
+  m_convNeuralNet->Update(&myImage);
 
   /*
   m_verifiedVehicles->clear();
@@ -196,6 +197,7 @@ void DetectVehicle::tearDown()
 {
   std::cout << "DetectVehicle::tearDown()" << std::endl;
   m_vehicleDetectionSystem->tearDown();
+  m_convNeuralNet->TearDown();
 }
 
 } // detectvehicle

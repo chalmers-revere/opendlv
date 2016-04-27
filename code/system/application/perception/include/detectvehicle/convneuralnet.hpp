@@ -37,9 +37,9 @@ public:
 
 /* Public methods */
 public:
-  void setUp();
-  void tearDown();
-  void update(const cv::Mat* a_imageFrame);
+  void SetUp();
+  void TearDown();
+  void Update(const cv::Mat* a_imageFrame);
   bool IsInitialized();
 
 /* Public fields */
@@ -54,32 +54,32 @@ private:
       bool a_isTrainingNetwork);
 
   void ConvertImageRGB(
-      const std::string& directory,
-      int32_t w,
-      int32_t h,
-      std::vector<tiny_cnn::vec_t>& data);
+      const std::string& a_directory,
+      int32_t a_width,
+      int32_t a_height,
+      std::vector<tiny_cnn::vec_t>& a_data);
 
   void ConvertImageRGB(
-      cv::Mat img,
-      int32_t w,
-      int32_t h,
-      std::vector<tiny_cnn::vec_t>& data);
+      cv::Mat a_img,
+      int32_t a_width,
+      int32_t a_height,
+      std::vector<tiny_cnn::vec_t>& a_data);
 
   void ConvertImageDirectory(
-      const std::string& directory,
-      int32_t w,
-      int32_t h,
-      std::vector<tiny_cnn::vec_t>& data,
-      std::vector<tiny_cnn::label_t>& labels);
+      const std::string& a_directory,
+      int32_t a_width,
+      int32_t a_height,
+      std::vector<tiny_cnn::vec_t>& a_data,
+      std::vector<tiny_cnn::label_t>& a_labels);
 
-  void NormalizeDataRGB(std::vector<tiny_cnn::vec_t>& data);
+  void NormalizeDataRGB(std::vector<tiny_cnn::vec_t>& a_data);
 
-  void ApplyNormalizationRGB(std::vector<tiny_cnn::vec_t>& data,
+  void ApplyNormalizationRGB(std::vector<tiny_cnn::vec_t>& a_data,
       double normAvgR, double normStdR,
       double normAvgG, double normStdG,
       double normAvgB, double normStdB);
 
-  cv::Mat ImageToMat(tiny_cnn::image<>& img, int32_t sizeIncrease);
+  cv::Mat ImageToMat(tiny_cnn::image<>& a_img, int32_t a_sizeIncrease);
 
 
 /* Private fields */
