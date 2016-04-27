@@ -252,7 +252,7 @@ void DetectLane::nextContainer(odcore::data::Container &c)
 
 void DetectLane::setUp()
 {
-  m_regions = Eigen::MatrixXd(5,4);
+  m_regions = Eigen::MatrixXd(9,4);
 
   //-----------------------------
   // Scaling: Calibrations were made for 640x480 resolution
@@ -260,25 +260,34 @@ void DetectLane::setUp()
   m_minRow = m_minRow * (m_height / 480.0);
   m_maxRow = m_maxRow * (m_height / 480.0);
 
-  m_leftCameraRegions << 
-    156, 229, 91, 441,
-    281, 217, 272, 456,
-    328, 228, 382, 452,
-    381, 218, 495, 436,
-    448, 197, 622, 416;
+  m_leftCameraRegions = Eigen::MatrixXd(9,4);
+  m_leftCameraRegions <<     
+    125, 161, 16, 215,
+    207, 183, 110, 433,
+    269, 177, 260, 448,
+    295, 183, 308, 451,
+    307, 184, 391, 445,
+    323, 195, 456, 450,
+    361, 197, 531, 453,
+    406, 191, 624, 392,
+    453, 145, 609, 202;
 
   m_leftCameraRegions.col(0) *= (m_width / 640.0);
   m_leftCameraRegions.col(2) *= (m_width / 640.0);
   m_leftCameraRegions.col(1) *= (m_height / 480.0);
   m_leftCameraRegions.col(3) *= (m_height / 480.0);
 
+  m_rightCameraRegions = Eigen::MatrixXd(9,4);
   m_rightCameraRegions <<
-    215, 230, 75, 392,
-    306, 245, 195, 431,
-    379, 214, 316, 439,
-    425, 237, 423, 445,
-    507, 221, 574, 414;
-
+    167, 167, 18, 214,
+    276, 188, 32, 375,
+    360, 198, 205, 416,
+    377, 196, 244, 432,
+    410, 197, 349, 447,
+    423, 198, 424, 450,
+    454, 200, 465, 447,
+    505, 197, 595, 442,
+    578, 158, 627, 193;
   m_rightCameraRegions.col(0) *= (m_width / 640.0);
   m_rightCameraRegions.col(2) *= (m_width / 640.0);
   m_rightCameraRegions.col(1) *= (m_height / 480.0);
