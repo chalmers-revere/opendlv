@@ -206,7 +206,14 @@ void Gps::nextString(std::string const &s) {
     }
   }
 
-std::cout << " GPS reading signals : LAT   " << latitude << "  LONG    " << longitude << std::endl;
+  // according to the page 11 of this guide http://www2.etown.edu/wunderbot/DOWNLOAD/AgGPS114/NMEA_Messages_RevA_Guide_ENG.pdf
+  // the GPS out data with the following format dd mm,mmmm
+  // convert to deg befor sending
+  latitude=latitude/100;
+  longitude=longitude/100;
+
+  // just a check before sending the signal!
+  std::cout << " GPS reading signals : LAT   " << latitude << "  LONG    " << longitude << std::endl;
 
 
   if (gotGpgga && gotGpvtg && gotGphdt) {
