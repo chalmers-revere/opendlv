@@ -37,8 +37,6 @@ ConvNeuralNet::ConvNeuralNet()
     , m_normStdG()
     , m_normAvgB()
     , m_normStdB()
-    , m_pathTrainedCnn()
-    , m_pathNormalizationConstants()
     , m_isInitialized(false)
 {
 }
@@ -58,6 +56,11 @@ void ConvNeuralNet::setUp()
 
   std::cout << "Loading net from file..." << std::endl;
   std::ifstream input(m_pathTrainedCnn);
+
+  if (input.fail()) {
+    std::cout << "WARNING! Could not open file " << m_pathTrainedCnn << std::endl;
+  }
+
   input >> m_cnn;
   std::cout << "nn.depth(): " << m_cnn.depth() << std::endl;
   std::cout << "Loaded." << std::endl;
@@ -66,6 +69,9 @@ void ConvNeuralNet::setUp()
   std::cout << "Reading normalization constants..." << std::endl;
   std::ifstream normInput(m_pathNormalizationConstants);
 
+  if (normInput.fail()) {
+    std::cout << "WARNING! Could not open file " << m_pathNormalizationConstants << std::endl;
+  }
   // RGB images
   normInput >> m_normAvgR;
   normInput >> m_normStdR;
@@ -112,9 +118,80 @@ void ConvNeuralNet::update(const cv::Mat* a_imageFrame)
   cv::resize(workingImage, workingImage, cv::Size(m_inputWidth*myTestFactor, m_inputHeight*myTestFactor), 0, 0, cv::INTER_CUBIC);
 
   // Do the actual CNN prediction
+  std::cout << "Size of CNN input: " << cnnImageData.at(0).size() << std::endl;
   std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
   tiny_cnn::vec_t result = m_cnn.predict(cnnImageData.at(0));
   std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+
+
+  // Pick final layer image
+  auto out_img = m_cnn[m_cnn.depth()-1]->output_to_image();
+
+  cv::Mat spatialMap = this->ImageToMat(out_img, 1);
+
+  // Pick only the "vehicle" (not the "non-vehicle") feature
+  cv::Rect roi(spatialMap.cols/2+1, 1, spatialMap.cols-1, spatialMap.rows-1);
+  roi.width -= roi.x;
+  roi.height -= roi.y;
+  spatialMap = spatialMap(roi);
+  
+  // Draw black lines along the edges to
+  // get rid of the edge effects...
+  cv::line(spatialMap, cv::Point(0, 0), cv::Point(0, spatialMap.rows-1), cv::Scalar(0, 0, 0), 1, 8);
+  cv::line(spatialMap, cv::Point(0, 0), cv::Point(spatialMap.cols-1, 0), cv::Scalar(0, 0, 0), 1, 8);
+  cv::line(spatialMap, cv::Point(spatialMap.cols-1, spatialMap.rows-1), cv::Point(0, spatialMap.rows-1), cv::Scalar(0, 0, 0), 1, 8);
+  cv::line(spatialMap, cv::Point(spatialMap.cols-1, spatialMap.rows-1), cv::Point(spatialMap.cols-1, 0), cv::Scalar(0, 0, 0), 1, 8);
+  
+
+  int32_t resizeFactor = 4;
+  cv::resize(spatialMap, spatialMap, cv::Size(), resizeFactor, resizeFactor, cv::INTER_AREA);
+
+  cv::Mat thresholdedImg;
+  cv::Mat thresholdedImgBinary;
+
+  double thresh = 70;
+  double maxval = 255;
+  cv::threshold(spatialMap, thresholdedImg, thresh, maxval, cv::THRESH_TOZERO);
+  cv::threshold(spatialMap, thresholdedImgBinary, thresh, maxval, cv::THRESH_BINARY);
+
+  // Find connected components in thresholded image
+  std::vector<std::vector<cv::Point> > contours;
+  std::vector<cv::Vec4i> hierarchy;
+  findContours(thresholdedImgBinary, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
+
+  // Draw bounding boxes around the detected connected components
+  std::vector<cv::Rect> boundingRects;
+  std::cout << "Nr of connected components: " << contours.size() << std::endl;
+  for (uint32_t i=0; i<contours.size(); i++) {
+    cv::Rect bRect = cv::boundingRect(contours.at(i));
+
+    // Ignore all bounding boxes that are only one (resized) pixel wide or high
+    if (bRect.width <= 1*resizeFactor || bRect.height <= 1*resizeFactor) {
+      continue;
+    }
+
+    boundingRects.push_back(bRect);
+    
+    // Increase the size of the bounding box to fit the displayed image
+    bRect.x *= myTestFactor;
+    bRect.y *= myTestFactor;
+    bRect.width *= myTestFactor;
+    bRect.height *= myTestFactor;
+    // Draw bounding boxes in red
+    cv::rectangle(workingImage, bRect, cv::Scalar(0, 0, 255));
+  }
+
+
+  cv::imshow("Final spatial map", spatialMap);
+  cv::imshow("Thresholded spatial map", thresholdedImg);
+  cv::imshow("CNN Output", workingImage);
+
+  cv::waitKey(10);
+
+
+
+
+
 
 
   std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
@@ -308,6 +385,14 @@ void ConvNeuralNet::ApplyNormalizationRGB(std::vector<tiny_cnn::vec_t>& data,
       data.at(i).at(j + imgSize*2) = (currentImg.at(j + imgSize*2)-normAvgB)/normStdB;
     }
   }
+}
+
+
+cv::Mat ConvNeuralNet::ImageToMat(tiny_cnn::image<>& img, int sizeIncrease) {
+  cv::Mat ori(img.height(), img.width(), CV_8U, &img.at(0, 0));
+  cv::Mat resized;
+  cv::resize(ori, resized, cv::Size(), sizeIncrease, sizeIncrease, cv::INTER_AREA);
+  return resized;
 }
 
 

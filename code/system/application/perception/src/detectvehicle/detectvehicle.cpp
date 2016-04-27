@@ -131,12 +131,13 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
 
   // Nr of seconds
   // TODO use something else as timestamp?
-  double timeStamp = ((double)c.getSentTimeStamp().toMicroseconds())/1000000;
+  //double timeStamp = ((double)c.getSentTimeStamp().toMicroseconds())/1000000;
   //std::cout << "timeStamp: " << timeStamp << std::endl;
 
 
   m_convNeuralNet->update(&myImage);
 
+  /*
   m_verifiedVehicles->clear();
   m_vehicleDetectionSystem->update(&myImage, m_verifiedVehicles, timeStamp);
 
@@ -155,6 +156,7 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
 
 
   cv::resize(outputImg, outputImg, cv::Size(windowWidth, windowHeight), 0, 0, cv::INTER_CUBIC);
+  */
 
   /*
   std::vector<std::shared_ptr<RememberedVehicle>> memorized;
@@ -174,13 +176,15 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   }
   */
 
-//  std::cout << "Nr of memorized vehicles: " << m_vehicleMemorySystem->GetNrMemorizedVehicles() << std::endl;
- // std::cout << "Total nr of vehicle rectangles: " << m_vehicleMemorySystem->GetTotalNrVehicleRects() << std::endl;
+  /*
+  //std::cout << "Nr of memorized vehicles: " << m_vehicleMemorySystem->GetNrMemorizedVehicles() << std::endl;
+  //std::cout << "Total nr of vehicle rectangles: " << m_vehicleMemorySystem->GetTotalNrVehicleRects() << std::endl;
   cv::imshow("VehicleDetection", outputImg);
   cv::moveWindow("VehicleDetection", 100, 100);
   cv::waitKey(10);
 
   outputImg.release();
+  */
 
   
   // end of plot stuff

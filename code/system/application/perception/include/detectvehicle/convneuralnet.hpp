@@ -79,6 +79,8 @@ private:
       double normAvgG, double normStdG,
       double normAvgB, double normStdB);
 
+  cv::Mat ImageToMat(tiny_cnn::image<>& img, int32_t sizeIncrease);
+
 
 /* Private fields */
 private:
@@ -94,9 +96,9 @@ private:
   double m_normAvgB;
   double m_normStdB;
 
-  std::string m_pathTrainedCnn = 
+  const std::string m_pathTrainedCnn = 
       "share/opendlv/system/application/perception/detectvehicle/trained_cnn";
-  std::string m_pathNormalizationConstants = 
+  const std::string m_pathNormalizationConstants = 
       "share/opendlv/system/application/perception/detectvehicle/normalization_constants";
 
   bool m_isInitialized;
