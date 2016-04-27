@@ -125,6 +125,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
         control.phi() = steering.getRoadwheelangle();
       }
 
+      std::cout   << getName() << "\t" << "timestamp="
+        << timestamp << "\t control "  << vehicleState.getYawRate() << "  vel " << propulsion.getPropulsionShaftVehicleSpeed() << std::endl;
 
       opendlv::data::environment::WGS84Coordinate currentLocation(
           gpsReading.getLatitude(),
