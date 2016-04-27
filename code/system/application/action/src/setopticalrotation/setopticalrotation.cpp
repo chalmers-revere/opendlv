@@ -53,8 +53,32 @@ SetOpticalRotation::~SetOpticalRotation()
  * Receives aim-point angle error.
  * Sends a optical rotation (steer) command to Act.
  */
-void SetOpticalRotation::nextContainer(odcore::data::Container &)
+void SetOpticalRotation::nextContainer(odcore::data::Container &c)
 {
+  if(c.getDataType() == opendlv::perception::LanePosition::ID()){
+    opendlv::perception::LanePosition lanePosition = c.getData<opendlv::perception::LanePosition>();
+    //float offset = lanePosition.getOffset();
+    float heading = lanePosition.getHeading();
+
+  	odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+  	float const gainHeading = kv.getValue<float>("action-setopticalrotation.gain_heading");  
+    
+    if (std::abs(heading) > 0.0f) {
+      float steeringAmplitude = gainHeading * heading;
+      odcore::data::TimeStamp t0;
+      
+      if (heading < 0) {
+	  	opendlv::action::Correction correction(t0, "steering", false, steeringAmplitude);
+      	odcore::data::Container container(correction);
+      	getConference().send(container);
+      }
+      else {
+      	opendlv::action::Correction correction(t0, "steering", false, -steeringAmplitude);
+      	odcore::data::Container container(correction);
+      	getConference().send(container);
+      }
+    } 
+  }
 }
 
 void SetOpticalRotation::setUp()

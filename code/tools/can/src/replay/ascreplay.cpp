@@ -25,7 +25,7 @@
 
 #include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
-#include "can/replay/canascreplay.hpp"
+#include "replay/ascreplay.hpp"
 
 namespace opendlv {
 namespace tools {
@@ -107,7 +107,7 @@ const std::string &nextLineFromASC)
 
     cout << gcm.toString() << ", decoded: " << result.size() << endl;
 
-    result = m_fh16CANMessageMapping.mapNext(gcm);
+    result = m_revereFh16CanMessageMapping.mapNext(gcm);
   }
   return result;
 }
@@ -129,14 +129,14 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode AscReplay::body()
       while (it != result.end()) {
         odcore::data::Container c = (*it);
 
-        if (c.getDataType() == opendlv::gcdc::fh16::Steering::ID()) {
-          opendlv::gcdc::fh16::Steering s =
-          c.getData<opendlv::gcdc::fh16::Steering>();
+        if (c.getDataType() == opendlv::proxy::reverefh16::Steering::ID()) {
+          opendlv::proxy::reverefh16::Steering s =
+          c.getData<opendlv::proxy::reverefh16::Steering>();
           cout << s.toString() << endl;
         }
-        if (c.getDataType() == opendlv::gcdc::fh16::VehicleDynamics::ID()) {
-          opendlv::gcdc::fh16::VehicleDynamics v =
-          c.getData<opendlv::gcdc::fh16::VehicleDynamics>();
+        if (c.getDataType() == opendlv::proxy::reverefh16::VehicleState::ID()) {
+          opendlv::proxy::reverefh16::VehicleState v =
+          c.getData<opendlv::proxy::reverefh16::VehicleState>();
           cout << v.toString() << endl;
         }
 

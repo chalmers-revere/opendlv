@@ -21,6 +21,6 @@
 
 int32_t main(int32_t a_argc, char **a_argv)
 {
-  opendlv::proxy::can::replay::AscReplay ascReplay(a_argc, a_argv);
+  opendlv::tools::can::replay::AscReplay ascReplay(a_argc, a_argv);
   return ascReplay.runModule();
 }

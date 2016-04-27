@@ -72,7 +72,7 @@ void DetectLane::nextContainer(odcore::data::Container &c)
 	if (c.getDataType() != odcore::data::image::SharedImage::ID()) {
 //    std::cout << "--- Received unimportant container of type " << 
 //        c.getDataType() << std::endl;
-//    return;
+    return;
   }
 //  std::cout << "Received container of type " << c.getDataType() << 
 //      " sent at " <<   c.getSentTimeStamp().getYYYYMMDD_HHMMSSms() << 
@@ -81,6 +81,7 @@ void DetectLane::nextContainer(odcore::data::Container &c)
   
   odcore::data::image::SharedImage mySharedImg = 
       c.getData<odcore::data::image::SharedImage>();
+
 //  cout << "Received a SharedImage of size: (" << mySharedImg.getWidth() << 
 //      ", " << mySharedImg.getHeight() << ")" << endl;
 
@@ -116,16 +117,37 @@ void DetectLane::nextContainer(odcore::data::Container &c)
   int width = 640, height = 480;
   int MAXROW, MINROW;
 
-	MINROW = 280;
-	MAXROW = 450;
-	Eigen::MatrixXd regions(5,4);
-	//region = col1,row1, col2,row2
-  regions << 
-      243, 288, 167, 478,
-      277, 283, 278, 477,
-      297, 280, 360, 477,
-      327, 282, 475, 477,
-      366, 278, 638, 479;    
+  MINROW = 200;
+  MAXROW = 450;
+
+  Eigen::MatrixXd regions(5,4);
+  bool initialized = false;
+  if(mySharedImg.getName() == "front-left"){
+    // Eigen::MatrixXd regions(5,4);
+    //region = col1,row1, col2,row2
+    regions << 
+    156, 229, 91, 441,
+    281, 217, 272, 456,
+    328, 228, 382, 452,
+    381, 218, 495, 436,
+    448, 197, 622, 416;
+    initialized = true;
+  }
+  if(mySharedImg.getName() == "front-right"){
+    // Eigen::MatrixXd regions(5,4);
+    //region = col1,row1,col2,row2
+    regions<<
+    215, 230, 75, 392,
+    306, 245, 195, 431,
+    379, 214, 316, 439,
+    425, 237, 423, 445,
+    507, 221, 574, 414;
+    initialized = true;
+  }
+  if(!initialized){
+    return;
+  }
+
   
   //-----------------------------
   // Scaling: Calibrations were made for 640x480 resolution
@@ -209,7 +231,7 @@ void DetectLane::nextContainer(odcore::data::Container &c)
   // Choose processing type
   //-----------------------------
   // OLA CHANGE HERE IF NEEDED
-  int T1 = 150;
+  int T1 = 180;
   cv::inRange(src, cv::Scalar(T1, T1, T1), cv::Scalar(255, 255, 255), image);
   medianBlur(image, image, 3);
 
@@ -254,7 +276,7 @@ void DetectLane::nextContainer(odcore::data::Container &c)
     
     DrawBorders(&src,MINROW,MAXROW,K(p1,0),K(p2,0),M(p1,0),M(p2,0));
  //   DrawTracks(&src, &K, &M,MINROW,MAXROW,Scalar(0,0,255));
- //   DrawTracks(&src, &k,&m,MINROW,Scalar(255,255,255));
+   DrawTracks(&src, &k,&m,MINROW,Scalar(255,255,255));
     
 
     //-----------------------------
@@ -294,6 +316,7 @@ void DetectLane::nextContainer(odcore::data::Container &c)
   // Show image
   //-----------------------------
   imshow("1", src);
+  imshow("2", image);
   waitKey(10);
 	
   cvReleaseImage(&myIplImage);

@@ -81,8 +81,10 @@ class Keyboard
   canmapping::CanMapping m_revereFh16CanMessageMapping;
 
  private:
-  char m_keyAcc;
-  char m_keyBrake;
+  char m_keyIncreaseAcceleration;
+  char m_keyDecreaseAcceleration;
+  char m_keyIncreaseBrake;
+  char m_keyDecreaseBrake;
   char m_keyLeft;
   char m_keyRight;
 };
