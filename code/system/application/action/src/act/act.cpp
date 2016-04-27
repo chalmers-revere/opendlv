@@ -54,7 +54,8 @@
   startTimeVectorSteering(),
   amplitudeVectorAccelerate(),
   amplitudeVectorBrake(),
-  amplitudeVectorSteering()
+  amplitudeVectorSteering(),
+  previousTimestep()
   {
     setUp();
   }
@@ -73,12 +74,7 @@
  {
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
     odcore::data::dmcp::ModuleStateMessage::RUNNING) {
-
-  //  std::cout << "Send acc. " << m_acceleration << " Steering: " << m_steering << std::endl;
-
-  //  opendlv::proxy::Actuation actuation(m_acceleration, m_steering, false);
-  //  odcore::data::Container c(actuation);
-  //  getConference().send(c);
+    
   }
 return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
@@ -94,6 +90,9 @@ return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
   float sumOfAccelerate = 0.0f;
   float sumOfBrake = 0.0f;
   float sumOfSteering = 0.0f;
+  odcore::data::TimeStamp thisTimestep;
+  odcore::data::TimeStamp duration = thisTimestep - previousTimestep;
+  previousTimestep = thisTimestep;
 
   if(c.getDataType() == opendlv::action::Correction::ID()) {
     opendlv::action::Correction correction = 
@@ -108,9 +107,7 @@ return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
     std::cout << "Amplitude:" << amplitude <<std::endl <<std::endl;
 
     float previousAmplitude = 0;
-    if (!amplitudeVectorSteering.empty()) {
-      previousAmplitude = amplitudeVectorSteering.at(amplitudeVectorSteering.size()-1);
-    }
+
 
     if (type == "accelerate") {
       if (!amplitudeVectorAccelerate.empty()) {
@@ -154,7 +151,8 @@ return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
       std::cout << "Sum Of Steering : " << sumOfSteering <<std::endl;
     }
 
-    float freq = getFrequency();
+    double durationInSeconds = duration.toMicroseconds() / 1000000.0;
+    float freq = 60/durationInSeconds;
     m_accelerationCorrection = sumOfAccelerate/freq;
     m_breakingCorrection = -sumOfBrake/freq;
     m_steeringCorrection = sumOfSteering/freq;

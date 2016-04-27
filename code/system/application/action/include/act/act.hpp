@@ -59,6 +59,7 @@ class Act : public odcore::base::module::TimeTriggeredConferenceClientModule {
   std::vector<float> amplitudeVectorAccelerate;
   std::vector<float> amplitudeVectorBrake;
   std::vector<float> amplitudeVectorSteering;
+  odcore::data::TimeStamp previousTimestep;
 };
 
 } // act
