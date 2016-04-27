@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 Chalmers REVERE
+ * Copyright (C) 2016 Chalmers REVERE
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,45 +17,44 @@
  * USA.
  */
 
-#ifndef GCDC16_RULE_RULE_HPP_
-#define GCDC16_RULE_RULE_HPP_
+#ifndef LANEKEEPING_LANEKEEPING_HPP_
+#define LANEKEEPING_LANEKEEPING_HPP_
 
 #include <memory>
 
-#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
-#include "opendavinci/odcore/data/Container.h"
+#include <opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h>
+#include <opendavinci/odcore/data/Container.h>
 
 namespace opendlv {
-namespace knowledge {
-namespace gcdc16 {
-namespace rule {
+namespace tools {
+namespace simulation {
+namespace lanekeeping {
 
-/**
- * This class provides...
- */
-class Rule : public odcore::base::module::DataTriggeredConferenceClientModule {
+class Vehicle;
+
+class LaneKeeping : 
+    public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
-  Rule(int32_t const &, char **);
-  Rule(Rule const &) = delete;
-  Rule &operator=(Rule const &) = delete;
-  virtual ~Rule();
+  LaneKeeping(int32_t const &, char **);
+  LaneKeeping(LaneKeeping const &) = delete;
+  LaneKeeping &operator=(LaneKeeping const &) = delete;
+  virtual ~LaneKeeping();
+
   virtual void nextContainer(odcore::data::Container &);
 
  private:
   void setUp();
   void tearDown();
-  double getDistances(double);
-  bool euclideanDistance(double);
 
- private:
-  double standstillDistance;
-  double headway;
-  double minimumEuclideanDistance;
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+
+  std::unique_ptr<Vehicle> m_vehicle;
+  double m_steering;
 };
 
-} // rule
-} // gcdc16
-} // knowledge
+} // lanekeeping
+} // simulation
+} // tools
 } // opendlv
 
 #endif

@@ -20,6 +20,7 @@ odsupercomponent.pulsetimeack.timeout = 5000 # (in milliseconds)
 # deterministic execution. 
 odsupercomponent.pulsetimeack.yield = 5000 # (in microseconds)
 
+action-setopticalrotation.gain_heading = 0.5
 
 ### Proxy
 proxy-can.devicenode = /dev/pcan2          # PEAK CAN device.
@@ -39,20 +40,22 @@ proxy-toggeler:1.default = Off
 proxy-ledstrip.type = victor
 proxy-ledstrip.port = /dev/ttyUSB6
 
-proxy-camera.type = opencv-ip-axis
-proxy-camera.port = 10.42.42.90
-proxy-camera.username = root
-proxy-camera.password = gcdc
-proxy-camera.resolution = 1280x720
-proxy-camera.bpp = 3
-proxy-camera.mount.x = 3.1
-proxy-camera.mount.y = 0.5
-proxy-camera.mount.z = 1.0
-proxy-camera.mount.roll = 0.0
-proxy-camera.mount.pitch = -0.1
-proxy-camera.mount.yaw = 0.2
+proxy-camera:0.type = opencv-ip-axis
+proxy-camera:0.name = front-left
+proxy-camera:0.port = 10.42.42.90
+proxy-camera:0.username = root
+proxy-camera:0.password = gcdc
+proxy-camera:0.resolution = 1280x720
+proxy-camera:0.bpp = 3
+proxy-camera:0.mount.x = 3.1
+proxy-camera:0.mount.y = 0.5
+proxy-camera:0.mount.z = 1.0
+proxy-camera:0.mount.roll = 0.0
+proxy-camera:0.mount.pitch = -0.1
+proxy-camera:0.mount.yaw = 0.2
 
 proxy-camera:1.type = opencv-ip-axis
+proxy-camera:1.name = front-right
 proxy-camera:1.port = 10.42.42.91
 proxy-camera:1.username = root
 proxy-camera:1.password = gcdc
@@ -66,6 +69,7 @@ proxy-camera:1.mount.pitch = -0.1
 proxy-camera:1.mount.yaw = -0.2
 
 proxy-camera:2.type = opencv-ip-axis
+proxy-camera:2.name = rear-right
 proxy-camera:2.port = 10.42.42.92
 proxy-camera:2.username = root
 proxy-camera:2.password = gcdc
@@ -79,6 +83,7 @@ proxy-camera:2.mount.pitch = -0.1
 proxy-camera:2.mount.yaw = -3.0
 
 proxy-camera:3.type = opencv-ip-axis
+proxy-camera:2.name = rear-left
 proxy-camera:3.port = 10.42.42.93
 proxy-camera:3.username = root
 proxy-camera:3.password = gcdc
