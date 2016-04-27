@@ -44,8 +44,8 @@ class Act : public odcore::base::module::TimeTriggeredConferenceClientModule {
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
   void setUp();
   void tearDown();
-  void timeCheck(std::vector<odcore::data::TimeStamp> &, std::vector<float> &, uint32_t &);
-  int inhibitoryCheck(bool, std::vector<odcore::data::TimeStamp> &, std::vector<float> &, uint32_t &);
+  void timeCheck(std::vector<odcore::data::TimeStamp> &, std::vector<float> &);
+  void inhibitoryCheck(bool, std::vector<odcore::data::TimeStamp> &, std::vector<float> &);
 
   float m_accelerationCorrection;
   float m_breakingCorrection;
@@ -53,6 +53,12 @@ class Act : public odcore::base::module::TimeTriggeredConferenceClientModule {
   uint32_t counterAccelerate;
   uint32_t counterBrake;
   uint32_t counterSteering;
+  std::vector<odcore::data::TimeStamp> startTimeVectorAccelerate;
+  std::vector<odcore::data::TimeStamp> startTimeVectorBrake;
+  std::vector<odcore::data::TimeStamp> startTimeVectorSteering;
+  std::vector<float> amplitudeVectorAccelerate;
+  std::vector<float> amplitudeVectorBrake;
+  std::vector<float> amplitudeVectorSteering;
 };
 
 } // act
