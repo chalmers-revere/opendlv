@@ -55,7 +55,10 @@
   amplitudeVectorAccelerate(),
   amplitudeVectorBrake(),
   amplitudeVectorSteering(),
-  previousTimestep()
+  isInhibitory(false),
+  amplitude(0),
+  t0(""),
+  type("")
   {
     setUp();
   }
@@ -65,21 +68,6 @@
   }
 
 /**
- * Receives control correction requests, including a modality, if inhibitory,
- * amplitude, and a start time.
- * Sends modulated contol signal as individual samples, per modality to Proxy
- * actuators.
- */
- odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
- {
-  while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
-    odcore::data::dmcp::ModuleStateMessage::RUNNING) {
-    
-  }
-return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
-}
-
-/**
  * Main function that gets the correction
  * type and amplitude as well as inhibitory
  * signal. Values are saved as needed and
@@ -87,6 +75,42 @@ return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
  */
  void Act::nextContainer(odcore::data::Container &c)
  {
+
+
+  if(c.getDataType() == opendlv::action::Correction::ID()) {
+    opendlv::action::Correction correction = 
+    c.getData<opendlv::action::Correction>();
+
+    t0 = correction.getStartTime();
+    type = correction.getType();
+    isInhibitory = correction.getIsInhibitory();
+    amplitude = correction.getAmplitude();
+
+    //std::cout << "Type:" << type <<std::endl;
+    //std::cout << "Amplitude:" << amplitude <<std::endl <<std::endl;
+
+
+
+    
+
+
+  }
+}
+
+
+/**
+ * Receives control correction requests, including a modality, if inhibitory,
+ * amplitude, and a start time.
+ * Sends modulated contol signal as individual samples, per modality to Proxy
+ * actuators.
+ */
+ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
+ {
+    odcore::data::TimeStamp previousTimestep;
+
+  while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
+    odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+
   float sumOfAccelerate = 0.0f;
   float sumOfBrake = 0.0f;
   float sumOfSteering = 0.0f;
@@ -94,19 +118,7 @@ return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
   odcore::data::TimeStamp duration = thisTimestep - previousTimestep;
   previousTimestep = thisTimestep;
 
-  if(c.getDataType() == opendlv::action::Correction::ID()) {
-    opendlv::action::Correction correction = 
-    c.getData<opendlv::action::Correction>();
-
-    odcore::data::TimeStamp t0 = correction.getStartTime();
-    std::string type = correction.getType();
-    bool isInhibitory = correction.getIsInhibitory();
-    float amplitude = correction.getAmplitude();
-
-    std::cout << "Type:" << type <<std::endl;
-    std::cout << "Amplitude:" << amplitude <<std::endl <<std::endl;
-
-    float previousAmplitude = 0;
+      float previousAmplitude = 0;
 
 
     if (type == "accelerate") {
@@ -150,9 +162,8 @@ return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
       sumOfSteering = std::accumulate(amplitudeVectorSteering.begin(), amplitudeVectorSteering.end(), 0.0);
       std::cout << "Sum Of Steering : " << sumOfSteering <<std::endl;
     }
-
     double durationInSeconds = duration.toMicroseconds() / 1000000.0;
-    float freq = 60/durationInSeconds;
+    float freq = 1/durationInSeconds;
     m_accelerationCorrection = sumOfAccelerate/freq;
     m_breakingCorrection = -sumOfBrake/freq;
     m_steeringCorrection = sumOfSteering/freq;
@@ -160,7 +171,7 @@ return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
     std::cout << "accelerati Correction : " << m_accelerationCorrection <<std::endl;
     std::cout << "Freq : " << freq <<std::endl;
 
-    if (m_breakingCorrection < 0) {
+        if (m_breakingCorrection < 0) {
       opendlv::proxy::Actuation actuation(m_breakingCorrection, m_steeringCorrection, false);
       odcore::data::Container actuationContainer(actuation);
       getConference().send(actuationContainer);
@@ -171,8 +182,12 @@ return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
       odcore::data::Container actuationContainer(actuation);
       getConference().send(actuationContainer);
     }
+    
   }
+return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
+
+
 
 /**
  * Function to ensure that the first element of
@@ -204,9 +219,9 @@ return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
  * and if so clears the relevant time and amplitude
  * vectors prior to adding new corrections.
  */
- void Act::inhibitoryCheck(bool isInhibitory, std::vector<odcore::data::TimeStamp> &timeVector, std::vector<float> &amplitudeVector)
+ void Act::inhibitoryCheck(bool a_isInhibitory, std::vector<odcore::data::TimeStamp> &timeVector, std::vector<float> &amplitudeVector)
  {
-  if (isInhibitory) {
+  if (a_isInhibitory) {
     timeVector.clear();
     amplitudeVector.clear();    
   }
