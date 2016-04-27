@@ -51,6 +51,9 @@ class V2vCam
   void tearDown();
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
+  void ReadGeolcation(opendlv::sensation::Geolocation &);
+  void ReadCamData(std::string &);
+
   unsigned char GetMessageId();
   int32_t GetStationId();
   int32_t GetGenerationDeltaTime();

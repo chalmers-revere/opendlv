@@ -193,18 +193,20 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
  */
 void V2vCam::nextContainer(odcore::data::Container &c)
 {
-  if(c.getDataType() == opendlv::proxy::GpsReading::ID()) {
-    opendlv::proxy::GpsReading gpsReading = c.getData<opendlv::proxy::GpsReading>();
+  if(c.getDataType() == opendlv::sensation::Geolocation::ID()){
+  // if(c.getDataType() == opendlv::proxy::GpsReading::ID()) {
+    // opendlv::proxy::GpsReading gpsReading = c.getData<opendlv::proxy::GpsReading>();
+    opendlv::sensation::Geolocation gpsReading = c.getData<opendlv::sensation::Geolocation>();
 
     m_latitude = gpsReading.getLatitude();
     m_longitude = gpsReading.getLongitude();
     m_altitude = gpsReading.getAltitude();
-    m_heading = gpsReading.getNorthHeading();
-    m_speed = gpsReading.getSpeed();
+    m_heading = gpsReading.getHeading();
+    // m_speed = gpsReading.getSpeed();
 
     // TODO!! Real values from GPS, but not scaled properly.
 
-    std::cout << "Latitude: " << m_latitude << " Longitude: " << m_longitude << " Speed: " << m_speed << std::endl;
+    // std::cout << "Latitude: " << m_latitude << " Longitude: " << m_longitude << " Speed: " << m_speed << std::endl;
 
   } else if(c.getDataType() == opendlv::sensation::Voice::ID()) {
     opendlv::sensation::Voice message = c.getData<opendlv::sensation::Voice>();
