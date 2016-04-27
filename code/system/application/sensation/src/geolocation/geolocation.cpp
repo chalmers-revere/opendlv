@@ -127,6 +127,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 
       std::cout   << getName() << "\t" << "timestamp="
         << timestamp << "\t control "  << vehicleState.getYawRate() << "  vel " << propulsion.getPropulsionShaftVehicleSpeed() << std::endl;
+      std::cout   << getName() << "\t" << "timestamp="
+        << timestamp << "\t original GPS data  "  << gpsReading.getLatitude() << "  vel " << gpsReading.getLongitude() << std::endl;
 
       opendlv::data::environment::WGS84Coordinate currentLocation(
           gpsReading.getLatitude(),
