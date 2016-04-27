@@ -1,21 +1,21 @@
 /**
- * Copyright (C) 2015 Chalmers REVERE
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
- * USA.
- */
+* Copyright (C) 2015 Chalmers REVERE
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License
+* as published by the Free Software Foundation; either version 2
+* of the License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
+*/
 
 #include <ctype.h>
 #include <cstring>
@@ -31,136 +31,120 @@
 
 #include "act/act.hpp"
 
- namespace opendlv {
+namespace opendlv {
   namespace action {
     namespace act {
 
 /**
-  * Constructor.
-  *
-  * @param a_argc Number of command line arguments.
-  * @param a_argv Command line arguments.
-  */
-  Act::Act(int32_t const &a_argc, char **a_argv)
-  : TimeTriggeredConferenceClientModule(a_argc, a_argv, "action-act"),
-  m_accelerationCorrection(0.0f),
-  m_breakingCorrection(0.0f),
-  m_steeringCorrection(0.0f),
-  counterAccelerate(0),
-  counterBrake(0),
-  counterSteering(0),
-  startTimeVectorAccelerate(),
-  startTimeVectorBrake(),
-  startTimeVectorSteering(),
-  amplitudeVectorAccelerate(),
-  amplitudeVectorBrake(),
-  amplitudeVectorSteering(),
-  isInhibitory(false),
-  amplitude(0),
-  t0(""),
-  type("")
-  {
-    setUp();
-  }
+* Constructor.
+*
+* @param a_argc Number of command line arguments.
+* @param a_argv Command line arguments.
+*/
+Act::Act(int32_t const &a_argc, char **a_argv)
+: TimeTriggeredConferenceClientModule(a_argc, a_argv, "action-act"),
+m_accelerationCorrection(0.0f),
+m_breakingCorrection(0.0f),
+m_steeringCorrection(0.0f),
+m_startTimeVectorAccelerate(),
+m_startTimeVectorBrake(),
+m_startTimeVectorSteering(),
+m_amplitudeVectorAccelerate(),
+m_amplitudeVectorBrake(),
+m_amplitudeVectorSteering(),
+m_isInhibitory(false),
+m_amplitude(0),
+m_t0(""),
+m_type("")
+{
+  setUp();
+}
 
-  Act::~Act()
-  {
-  }
+Act::~Act()
+{
+}
 
 /**
- * Main function that gets the correction
- * type and amplitude as well as inhibitory
- * signal. Values are saved as needed and
- * packaged and sent to Actuation.
- */
- void Act::nextContainer(odcore::data::Container &c)
- {
-
+* Main function that gets the correction
+* m_type and m_amplitude as well as inhibitory
+* signal. Values are saved as needed and
+* packaged and sent to Actuation.
+*/
+void Act::nextContainer(odcore::data::Container &c)
+{
 
   if(c.getDataType() == opendlv::action::Correction::ID()) {
     opendlv::action::Correction correction = 
     c.getData<opendlv::action::Correction>();
 
-    t0 = correction.getStartTime();
-    type = correction.getType();
-    isInhibitory = correction.getIsInhibitory();
-    amplitude = correction.getAmplitude();
+    m_t0 = correction.getStartTime();
+    m_type = correction.getType();
+    m_isInhibitory = correction.getIsInhibitory();
+    m_amplitude = correction.getAmplitude();
 
-    //std::cout << "Type:" << type <<std::endl;
-    //std::cout << "Amplitude:" << amplitude <<std::endl <<std::endl;
-
-
-
-    
-
-
+    std::cout << "m_amplitude:" << m_amplitude <<std::endl <<std::endl;
   }
 }
 
-
 /**
- * Receives control correction requests, including a modality, if inhibitory,
- * amplitude, and a start time.
- * Sends modulated contol signal as individual samples, per modality to Proxy
- * actuators.
- */
- odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
- {
-    odcore::data::TimeStamp previousTimestep;
+* Receives control correction requests, including a modality, if inhibitory,
+* m_amplitude, and a start time.
+* Sends modulated contol signal as individual samples, per modality to Proxy
+* actuators.
+*/
+odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
+{
+  odcore::data::TimeStamp previousTimestep;
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
     odcore::data::dmcp::ModuleStateMessage::RUNNING) {
 
-  float sumOfAccelerate = 0.0f;
-  float sumOfBrake = 0.0f;
-  float sumOfSteering = 0.0f;
-  odcore::data::TimeStamp thisTimestep;
-  odcore::data::TimeStamp duration = thisTimestep - previousTimestep;
-  previousTimestep = thisTimestep;
+    float sumOfAccelerate = 0.0f;
+    float sumOfBrake = 0.0f;
+    float sumOfSteering = 0.0f;
+    odcore::data::TimeStamp thisTimestep;
+    odcore::data::TimeStamp duration = thisTimestep - previousTimestep;
+    previousTimestep = thisTimestep;
+    float previousAmplitude = 0;
 
-      float previousAmplitude = 0;
-
-
-    if (type == "accelerate") {
-      if (!amplitudeVectorAccelerate.empty()) {
-        previousAmplitude = amplitudeVectorAccelerate.at(amplitudeVectorAccelerate.size()-1);
+    if (m_type == "accelerate") {
+      if (!m_amplitudeVectorAccelerate.empty()) {
+        previousAmplitude = m_amplitudeVectorAccelerate.at(m_amplitudeVectorAccelerate.size()-1);
       }
-      inhibitoryCheck(isInhibitory, startTimeVectorAccelerate, amplitudeVectorAccelerate);
-      if (amplitude*previousAmplitude < 0 || fabs(amplitude) > fabs(previousAmplitude)) {
-        startTimeVectorAccelerate.push_back(  t0);
-        amplitudeVectorAccelerate.push_back(amplitude);
-        timeCheck(startTimeVectorAccelerate, amplitudeVectorAccelerate);
+      inhibitoryCheck(m_isInhibitory, m_startTimeVectorAccelerate, m_amplitudeVectorAccelerate);
+      if (m_amplitude*previousAmplitude < 0 || fabs(m_amplitude) > fabs(previousAmplitude)) {
+        m_startTimeVectorAccelerate.push_back(  m_t0);
+        m_amplitudeVectorAccelerate.push_back(m_amplitude);
+        timeCheck(m_startTimeVectorAccelerate, m_amplitudeVectorAccelerate);
       }
-      sumOfAccelerate = std::accumulate(amplitudeVectorAccelerate.begin(), amplitudeVectorAccelerate.end(), 0.0);
+      sumOfAccelerate = std::accumulate(m_amplitudeVectorAccelerate.begin(), m_amplitudeVectorAccelerate.end(), 0.0);
     }
 
-    else if (type == "brake") {
-      if (!amplitudeVectorBrake.empty()) {
-        previousAmplitude = amplitudeVectorBrake.at(amplitudeVectorBrake.size()-1);
+    else if (m_type == "brake") {
+      if (!m_amplitudeVectorBrake.empty()) {
+        previousAmplitude = m_amplitudeVectorBrake.at(m_amplitudeVectorBrake.size()-1);
       }
-      inhibitoryCheck(isInhibitory, startTimeVectorBrake, amplitudeVectorBrake);
-      if (amplitude*previousAmplitude < 0 || fabs(amplitude) > fabs(previousAmplitude)) {
-        startTimeVectorBrake.push_back(t0);
-        amplitudeVectorBrake.push_back(amplitude);
-        timeCheck(startTimeVectorBrake, amplitudeVectorBrake);
+      inhibitoryCheck(m_isInhibitory, m_startTimeVectorBrake, m_amplitudeVectorBrake);
+      if (m_amplitude*previousAmplitude < 0 || fabs(m_amplitude) > fabs(previousAmplitude)) {
+        m_startTimeVectorBrake.push_back(m_t0);
+        m_amplitudeVectorBrake.push_back(m_amplitude);
+        timeCheck(m_startTimeVectorBrake, m_amplitudeVectorBrake);
       }
-      sumOfBrake = std::accumulate(amplitudeVectorBrake.begin(), amplitudeVectorBrake.end(), 0.0);
+      sumOfBrake = std::accumulate(m_amplitudeVectorBrake.begin(), m_amplitudeVectorBrake.end(), 0.0);
     }
 
-    else if (type == "steering") {
-      if (!amplitudeVectorSteering.empty()) {
-        previousAmplitude = amplitudeVectorSteering.at(amplitudeVectorSteering.size()-1);
+    else if (m_type == "steering") {
+      if (!m_amplitudeVectorSteering.empty()) {
+        previousAmplitude = m_amplitudeVectorSteering.at(m_amplitudeVectorSteering.size()-1);
       }
-      inhibitoryCheck(isInhibitory, startTimeVectorSteering, amplitudeVectorSteering);
-      if (amplitude*previousAmplitude < 0 || fabs(amplitude) > fabs(previousAmplitude)) {
-
-
-        startTimeVectorSteering.push_back(t0);
-        amplitudeVectorSteering.push_back(amplitude);
-        timeCheck(startTimeVectorSteering, amplitudeVectorSteering);
+      inhibitoryCheck(m_isInhibitory, m_startTimeVectorSteering, m_amplitudeVectorSteering);
+      if (m_amplitude*previousAmplitude < 0 || fabs(m_amplitude) > fabs(previousAmplitude)) {
+        m_startTimeVectorSteering.push_back(m_t0);
+        m_amplitudeVectorSteering.push_back(m_amplitude);
+        timeCheck(m_startTimeVectorSteering, m_amplitudeVectorSteering);
       }
-      sumOfSteering = std::accumulate(amplitudeVectorSteering.begin(), amplitudeVectorSteering.end(), 0.0);
-      std::cout << "Sum Of Steering : " << sumOfSteering <<std::endl;
+    sumOfSteering = std::accumulate(m_amplitudeVectorSteering.begin(), m_amplitudeVectorSteering.end(), 0.0);
+    std::cout << "Sum Of Steering : " << sumOfSteering <<std::endl;
     }
     double durationInSeconds = duration.toMicroseconds() / 1000000.0;
     float freq = 1/durationInSeconds;
@@ -171,7 +155,7 @@
     std::cout << "accelerati Correction : " << m_accelerationCorrection <<std::endl;
     std::cout << "Freq : " << freq <<std::endl;
 
-        if (m_breakingCorrection < 0) {
+    if (m_breakingCorrection < 0) {
       opendlv::proxy::Actuation actuation(m_breakingCorrection, m_steeringCorrection, false);
       odcore::data::Container actuationContainer(actuation);
       getConference().send(actuationContainer);
@@ -181,21 +165,18 @@
       opendlv::proxy::Actuation actuation(m_accelerationCorrection, m_steeringCorrection, false);
       odcore::data::Container actuationContainer(actuation);
       getConference().send(actuationContainer);
-    }
-    
+    }    
   }
-return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
+  return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
-
-
 /**
- * Function to ensure that the first element of
- * the time vector is less than deltaTime seconds
- * ago. Truncates the vector if it is.
- */
- void Act::timeCheck(std::vector<odcore::data::TimeStamp> &timeVector, std::vector<float> &amplitudeVector)
- {
+* Function to ensure that the first element of
+* the time vector is less than deltaTime seconds
+* ago. Truncates the vector if it is.
+*/
+void Act::timeCheck(std::vector<odcore::data::TimeStamp> &timeVector, std::vector<float> &amplitudeVector)
+{
 
   if (timeVector.size() == 0){
     return;
@@ -215,12 +196,12 @@ return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
 /**
- * Checks if an inhibitory signal is recieved
- * and if so clears the relevant time and amplitude
- * vectors prior to adding new corrections.
- */
- void Act::inhibitoryCheck(bool a_isInhibitory, std::vector<odcore::data::TimeStamp> &timeVector, std::vector<float> &amplitudeVector)
- {
+* Checks if an inhibitory signal is recieved
+* and if so clears the relevant time and m_amplitude
+* vectors prior to adding new corrections.
+*/
+void Act::inhibitoryCheck(bool a_isInhibitory, std::vector<odcore::data::TimeStamp> &timeVector, std::vector<float> &amplitudeVector)
+{
   if (a_isInhibitory) {
     timeVector.clear();
     amplitudeVector.clear();    

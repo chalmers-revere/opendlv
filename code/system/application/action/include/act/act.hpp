@@ -50,19 +50,16 @@ class Act : public odcore::base::module::TimeTriggeredConferenceClientModule {
   float m_accelerationCorrection;
   float m_breakingCorrection;
   float m_steeringCorrection;
-  uint32_t counterAccelerate;
-  uint32_t counterBrake;
-  uint32_t counterSteering;
-  std::vector<odcore::data::TimeStamp> startTimeVectorAccelerate;
-  std::vector<odcore::data::TimeStamp> startTimeVectorBrake;
-  std::vector<odcore::data::TimeStamp> startTimeVectorSteering;
-  std::vector<float> amplitudeVectorAccelerate;
-  std::vector<float> amplitudeVectorBrake;
-  std::vector<float> amplitudeVectorSteering;
-  bool isInhibitory;
-  float amplitude;
-  odcore::data::TimeStamp t0;
-  std::string type;
+  std::vector<odcore::data::TimeStamp> m_startTimeVectorAccelerate;
+  std::vector<odcore::data::TimeStamp> m_startTimeVectorBrake;
+  std::vector<odcore::data::TimeStamp> m_startTimeVectorSteering;
+  std::vector<float> m_amplitudeVectorAccelerate;
+  std::vector<float> m_amplitudeVectorBrake;
+  std::vector<float> m_amplitudeVectorSteering;
+  bool m_isInhibitory;
+  float m_amplitude;
+  odcore::data::TimeStamp m_t0;
+  std::string m_type;
 
 };
 

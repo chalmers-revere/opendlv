@@ -66,15 +66,15 @@ void SetOpticalRotation::nextContainer(odcore::data::Container &c)
     if (fabs(heading) > 0.0f) {
       float steeringAmplitude = gainHeading * heading;
       odcore::data::TimeStamp t0;
-      std::cout << "Stearing Amplitude : " << -steeringAmplitude <<std::endl;
+      std::cout << "Stearing Amplitude : " << steeringAmplitude <<std::endl;
       
       if (heading < 0) {
-	  	opendlv::action::Correction correction(t0, "steering", false, -steeringAmplitude);
+	  	opendlv::action::Correction correction(t0, "steering", false, steeringAmplitude);
       	odcore::data::Container container(correction);
       	getConference().send(container);
       }
       else {
-      	opendlv::action::Correction correction(t0, "steering", false, -steeringAmplitude);
+      	opendlv::action::Correction correction(t0, "steering", false, steeringAmplitude);
       	odcore::data::Container container(correction);
       	getConference().send(container);
       }
