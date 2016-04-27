@@ -21,6 +21,8 @@
 #define CONVNEURALNET_HPP
 
 #include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 #include <tiny_cnn/tiny_cnn.h>
 
 namespace opendlv {
@@ -38,6 +40,7 @@ public:
   void setUp();
   void tearDown();
   void update(const cv::Mat* a_imageFrame);
+  bool IsInitialized();
 
 /* Public fields */
 public:
@@ -50,10 +53,39 @@ private:
       tiny_cnn::network<tiny_cnn::mse, tiny_cnn::gradient_descent>* a_cnn,
       bool a_isTrainingNetwork);
 
+  void ConvertImageRGB(
+      const std::string& directory,
+      int32_t w,
+      int32_t h,
+      std::vector<tiny_cnn::vec_t>& data);
+
+  void ConvertImageRGB(
+      cv::Mat img,
+      int32_t w,
+      int32_t h,
+      std::vector<tiny_cnn::vec_t>& data);
+
+  void ConvertImageDirectory(
+      const std::string& directory,
+      int32_t w,
+      int32_t h,
+      std::vector<tiny_cnn::vec_t>& data,
+      std::vector<tiny_cnn::label_t>& labels);
+
+  void NormalizeDataRGB(std::vector<tiny_cnn::vec_t>& data);
+
+  void ApplyNormalizationRGB(std::vector<tiny_cnn::vec_t>& data,
+      double normAvgR, double normStdR,
+      double normAvgG, double normStdG,
+      double normAvgB, double normStdB);
+
 
 /* Private fields */
 private:
   tiny_cnn::network<tiny_cnn::mse, tiny_cnn::gradient_descent> m_cnn;
+
+  int32_t m_inputWidth;
+  int32_t m_inputHeight;
 
   double m_normAvgR;
   double m_normStdR;
@@ -62,8 +94,12 @@ private:
   double m_normAvgB;
   double m_normStdB;
 
-  std::string m_pathTrainedCnn = "trained_cnn";
-  std::string m_pathNormalizationConstants = "normalization_constants";
+  std::string m_pathTrainedCnn = 
+      "share/opendlv/system/application/perception/detectvehicle/trained_cnn";
+  std::string m_pathNormalizationConstants = 
+      "share/opendlv/system/application/perception/detectvehicle/normalization_constants";
+
+  bool m_isInitialized;
 
 };
 

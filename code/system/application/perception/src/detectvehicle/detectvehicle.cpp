@@ -68,6 +68,7 @@ DetectVehicle::DetectVehicle(int32_t const &a_argc, char **a_argv)
       new VehicleMemorySystem);
   m_convNeuralNet = std::shared_ptr<ConvNeuralNet>(
       new ConvNeuralNet);
+
 }
 
 DetectVehicle::~DetectVehicle()
@@ -123,7 +124,10 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   sharedMem->unlock();
 
   //////////////////////////////////////////////////////////////////////////////
-  
+  if (!m_convNeuralNet->IsInitialized()) {
+    std::cout << "Convolutional Neural Net not yet initialized" << std::endl;
+    return;
+  }
 
   // Nr of seconds
   // TODO use something else as timestamp?
@@ -131,7 +135,7 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   //std::cout << "timeStamp: " << timeStamp << std::endl;
 
 
-  CnnTest();
+  m_convNeuralNet->update(&myImage);
 
   m_verifiedVehicles->clear();
   m_vehicleDetectionSystem->update(&myImage, m_verifiedVehicles, timeStamp);
