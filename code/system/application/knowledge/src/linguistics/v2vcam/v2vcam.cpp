@@ -262,38 +262,38 @@ void V2vCam::nextContainer(odcore::data::Container &c)
       int32_t yawRateConfidence = inIterator->ReadInteger();
       int32_t vehicleRole = inIterator->ReadInteger();
 
-      // std::string output = "*** Cam object ***\n";
+      std::string output = "*** Cam object ***\n";
 
-      // output += "Message Id: " + std::to_string(messageId) + "\n";
-      // output += "Station Id: " + std::to_string(stationId) + "\n";
-      // output += "Generation delta time: " 
-      //     + std::to_string(generationDeltaTime) + "\n";
-      // output += "Container mask: " + std::to_string(containerMask) + "\n";
-      // output += "Station type: " + std::to_string(stationType) + "\n";
-      // output += "Latitude: " + std::to_string(latitude) + "\n";
-      // output += "Longitude: " + std::to_string(longitude) + "\n";
-      // output += "Semi major confidence: " 
-      //     + std::to_string(semiMajorConfidence) + "\n";
-      // output += "Semi minor confidence: " 
-      //     + std::to_string(semiMinorConfidence) + "\n";
-      // output += "Semi major orientation: " 
-      //     + std::to_string(semiMajorOrientation) + "\n";
-      // output += "Altitude: " + std::to_string(altitude) + "\n";
-      // output += "Heading: " + std::to_string(heading) + "\n";
-      // output += "Heading confidence: " 
-      //     + std::to_string(headingConfidence) + "\n";
-      // output += "Speed: " + std::to_string(speed) + "\n";
-      // output += "Speed confidence: " + std::to_string(speedConfidence) + "\n";
-      // output += "Vehicle length: " + std::to_string(vehicleLength) + "\n";
-      // output += "Vehicle width: " + std::to_string(vehicleWidth) + "\n";
-      // output += "Longitudinal acc: " + std::to_string(longitudinalAcc) + "\n";
-      // output += "Longitudinal acc conf: " 
-      //     + std::to_string(longitudinalAccConf) + "\n";
-      // output += "Yaw rate value: " + std::to_string(yawRateValue) + "\n";
-      // output += "Yaw rate confidence: " 
-      //     + std::to_string(yawRateConfidence) + "\n";
-      // output += "Vehicle role: " + std::to_string(vehicleRole) + "\n";
-      // std::cout << output;
+      output += "Message Id: " + std::to_string(messageId) + "\n";
+      output += "Station Id: " + std::to_string(stationId) + "\n";
+      output += "Generation delta time: " 
+          + std::to_string(generationDeltaTime) + "\n";
+      output += "Container mask: " + std::to_string(containerMask) + "\n";
+      output += "Station type: " + std::to_string(stationType) + "\n";
+      output += "Latitude: " + std::to_string(latitude) + "\n";
+      output += "Longitude: " + std::to_string(longitude) + "\n";
+      output += "Semi major confidence: " 
+          + std::to_string(semiMajorConfidence) + "\n";
+      output += "Semi minor confidence: " 
+          + std::to_string(semiMinorConfidence) + "\n";
+      output += "Semi major orientation: " 
+          + std::to_string(semiMajorOrientation) + "\n";
+      output += "Altitude: " + std::to_string(altitude) + "\n";
+      output += "Heading: " + std::to_string(heading) + "\n";
+      output += "Heading confidence: " 
+          + std::to_string(headingConfidence) + "\n";
+      output += "Speed: " + std::to_string(speed) + "\n";
+      output += "Speed confidence: " + std::to_string(speedConfidence) + "\n";
+      output += "Vehicle length: " + std::to_string(vehicleLength) + "\n";
+      output += "Vehicle width: " + std::to_string(vehicleWidth) + "\n";
+      output += "Longitudinal acc: " + std::to_string(longitudinalAcc) + "\n";
+      output += "Longitudinal acc conf: " 
+          + std::to_string(longitudinalAccConf) + "\n";
+      output += "Yaw rate value: " + std::to_string(yawRateValue) + "\n";
+      output += "Yaw rate confidence: " 
+          + std::to_string(yawRateConfidence) + "\n";
+      output += "Vehicle role: " + std::to_string(vehicleRole) + "\n";
+      std::cout << output;
 
       m_receiveLog << std::to_string(messageId) +
         + "," + std::to_string(stationId) +

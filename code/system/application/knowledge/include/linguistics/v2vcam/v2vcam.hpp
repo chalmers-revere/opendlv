@@ -48,6 +48,29 @@ class V2vCam
   void tearDown();
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
+  char GetMessageId();
+  int32_t GetStationId();
+  int32_t GetGenerationDeltaTime();
+  unsigned char GetContainerMask();
+  int32_t GetStationType();
+  double GetLatitude();
+  double GetLongitude();
+  double GetSemiMajorConfidence();
+  double GetSemiMinorConfidence();
+  double GetSemiMajorOrientation();
+  double GetAltitude();
+  double GetHeading();
+  double GetHeadingConfidence();
+  double GetSpeed();
+  double GetSpeedConfidence();
+  double GetVehicleLength();
+  double GetVehicleWidth();
+  double GetLongitudinalAcc();
+  double GetLongitudinalAccConf();
+  double GetYawRateValue();
+  double GetYawRateConfidence();
+  int32_t GetVehicleRole();
+
   std::ofstream m_sendLog;
   std::ofstream m_receiveLog;
 
