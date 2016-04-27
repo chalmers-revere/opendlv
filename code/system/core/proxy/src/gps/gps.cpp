@@ -206,6 +206,9 @@ void Gps::nextString(std::string const &s) {
     }
   }
 
+std::cout << " GPS reading signals : LAT   " << latitude << "  LONG    " << longitude << std::endl;
+
+
   if (gotGpgga && gotGpvtg && gotGphdt) {
     opendlv::proxy::GpsReading nextGps(timestamp, latitude, longitude,
         altitude, northHeading, speed, latitudeDirection, longitudeDirection,
