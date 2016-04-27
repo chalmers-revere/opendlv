@@ -170,6 +170,7 @@ ExternalProject_Add(system
                -DCXXTEST_INCLUDE_DIR=${CXXTEST_INCLUDE_DIR}
                -DEIGEN3_INCLUDE_DIR=${EIGEN3_INCLUDE_DIR}
                -DKALMAN_INCLUDE_DIR=${KALMAN_INCLUDE_DIR}
+               -DTINYCNN_INCLUDE_DIR=${TINYCNN_INCLUDE_DIR}
     TEST_BEFORE_INSTALL 1
     INSTALL_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/system-prefix/src/system-build --target install COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/system-prefix/src/system-build --target ${MAKE_PACKAGE})
 
