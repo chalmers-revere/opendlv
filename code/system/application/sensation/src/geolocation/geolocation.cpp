@@ -176,8 +176,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
         currentWGS84CoordinateEstimation.getLongitude() << ", theta=" << state.theta() << std::endl;
 
       // Send the message
-      opendlv::sensation::Geolocation geoLocationEstimation(currentWGS84CoordinateEstimation.getLatitude(),
-                                                            currentWGS84CoordinateEstimation.getLongitude(),
+      opendlv::sensation::Geolocation geoLocationEstimation(currentWGS84CoordinateEstimation.getLongitude(),
+                                                            currentWGS84CoordinateEstimation.getLatitude(),
                                                             gpsReading.getAltitude(),
                                                             heading);
       odcore::data::Container msg(geoLocationEstimation);
