@@ -21,6 +21,7 @@
 #include <cstring>
 #include <cmath>
 #include <iostream>
+#include <fstream>
 
 #include "detectlane/Drawing.h"
 #include "detectlane/DecisionMaking.h"
@@ -301,9 +302,13 @@ void DetectLane::nextContainer(odcore::data::Container &c)
     double theta = atan((d2-d1) / (double)15);
     
     // DEBUG PRINT
-    //std::cout<<"Heading angle "<<theta<<std::endl;
-    //std::cout<<"Offset "<<laneOffset<<std::endl;
+    std::cout<<"Heading angle "<<theta<<std::endl;
+    std::cout<<"Offset "<<laneOffset<<std::endl;
 		
+    std::ofstream outfile;
+    outfile.open("logg_offset_theta.txt", std::ios_base::app);
+    outfile << laneOffset << " " << theta << "\n";
+    outfile.close();
     
     // Send the message
     opendlv::perception::LanePosition lanePosition(laneOffset,theta);
