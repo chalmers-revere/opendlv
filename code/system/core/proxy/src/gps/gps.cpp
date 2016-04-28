@@ -213,7 +213,7 @@ void Gps::nextString(std::string const &s) {
   longitude=longitude/100;
 
   // just a check before sending the signal!
-  std::cout << " GPS reading signals : LAT   " << latitude << "  LONG    " << longitude << std::endl;
+  // std::cout << " GPS reading signals : LAT   " << latitude << "  LONG    " << longitude << std::endl;
 
 
   if (gotGpgga && gotGpvtg && gotGphdt) {
