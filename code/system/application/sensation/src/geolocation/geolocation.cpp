@@ -77,8 +77,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
         opendlv::proxy::GpsReading::ID());
     auto gpsReading = gpsReadingContainer.getData<opendlv::proxy::GpsReading>();
 
-    std::cout << getName() << "\tLatidude  =  " << gpsReading.getLatitude()
-              << "  Longitude  =  " << gpsReading.getLongitude() << std::endl;
+//    std::cout << getName() << "\tLatidude  =  " << gpsReading.getLatitude()
+//              << "  Longitude  =  " << gpsReading.getLongitude() << std::endl;
 
     if (gpsReadingContainer.getReceivedTimeStamp().toMicroseconds() > 0) {
       if (!hasGpsReference) {
@@ -149,36 +149,57 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       opendlv::data::environment::Point3 currentCartesianLocation = 
           gpsReference.transform(currentLocation);
 
-      KinematicObservationVector<double> z = kinematicObservationModel.h(state);
-      z.Z_x() = currentCartesianLocation.getX();
-      z.Z_y() = currentCartesianLocation.getY();
-      if (gpsReading.getHasHeading()) {
-        z.Z_theta() = gpsReading.getNorthHeading();
-      } else {
-        z.Z_theta() = state.theta();
-      }
-      z.Z_theta_dot() = vehicleYawRate; // TODO: Put yaw rate here...
+      {//kinematic kalman block
+        KinematicObservationVector<double> z = kinematicObservationModel.h(state);
+        z.Z_x() = currentCartesianLocation.getX();
+        z.Z_y() = currentCartesianLocation.getY();
+        if (gpsReading.getHasHeading()) {
+          z.Z_theta() = gpsReading.getNorthHeading();
+        } else {
+          z.Z_theta() = state.theta();
+        }
+        z.Z_theta_dot() = vehicleYawRate; // TODO: Put yaw rate here...
 
       
-      double deltaTime = duration.toMicroseconds() / 1000000.0;
-      systemModel.updateDeltaT(deltaTime);
+        double deltaTime = duration.toMicroseconds() / 1000000.0;
+        systemModel.updateDeltaT(deltaTime);
 
       
-      state = m_ekf.predict(systemModel, control);
+        state = m_ekf.predict(systemModel, control);
 
-      bool hasData = false;
-      if (gpsReadingContainer.getReceivedTimeStamp().toMicroseconds() > 
-          previousDataTimestamp.toMicroseconds()) {
-        state = m_ekf.update(kinematicObservationModel, z);
-        previousDataTimestamp = gpsReadingContainer.getReceivedTimeStamp();
-        hasData = true;
+        bool gpsHasData = false;
+        if (gpsReadingContainer.getReceivedTimeStamp().toMicroseconds() >
+            previousDataTimestamp.toMicroseconds()) {
+          state = m_ekf.update(kinematicObservationModel, z);
+          previousDataTimestamp = gpsReadingContainer.getReceivedTimeStamp();
+          gpsHasData = true;
+        }
+
+        timestamp += systemModel.getDeltaT();
+
+        std::cout   << getName() << "\t" << "timestamp="
+          << timestamp << "\t hasData=" << gpsHasData << "\tx = " << state.x() << ", y = " <<
+          state.y() << ", theta = " << state.theta() << std::endl;
+
+ /*       auto cov = m_ekf.getCovariance();
+
+        auto cov_eigenvalues = cov.eigenvalues();
+
+        auto cov_diagonal = cov.diagonal();
+
+        auto cov_determinant = cov.determinant();
+
+        std::cout   << getName() << "\t"
+                    << "Covariance Matrix = \n" << cov
+                    << "Eigenvalues = \n" << cov_eigenvalues
+                    << "Diagonal = \n " << cov_diagonal
+                    << "Determinand =   " << cov_determinant
+                    << std::endl;
+*/
       }
 
-      timestamp += systemModel.getDeltaT();
 
-      std::cout   << getName() << "\t" << "timestamp="
-        << timestamp << "\t hasData=" << hasData << "\tx=" << state.x() << ", y=" <<
-        state.y() << ", theta=" << state.theta() << std::endl;
+
 
       // Build the proper GPS coordinates to send
       opendlv::data::environment::Point3 currentStateEstimation
@@ -188,7 +209,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       double heading = state.theta();
 
       std::cout   << getName() << "\t" << "timestamp="
-        << timestamp << "\t hasData=" << hasData
+        << timestamp << "\t "
         << "\tlat=" << currentWGS84CoordinateEstimation.getLatitude()
         << ", long=" << currentWGS84CoordinateEstimation.getLongitude()
         << ", theta=" << state.theta() << std::endl;
