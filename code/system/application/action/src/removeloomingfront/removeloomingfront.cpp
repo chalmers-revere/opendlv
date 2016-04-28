@@ -71,7 +71,7 @@
       
     }
     
-    double m_brakeAmplitude = 7*3.14159/180;
+    double m_brakeAmplitude = -1.0;
     odcore::data::TimeStamp t1;
     opendlv::action::Correction correction(t1, "brake", false, m_brakeAmplitude);
     odcore::data::Container container(correction);
