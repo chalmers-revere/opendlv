@@ -29,6 +29,8 @@
 #include "detectvehicle/vehicledetectionsystem.hpp"
 #include "detectvehicle/detectedvehicle.hpp"
 #include "detectvehicle/vehiclememorysystem.hpp"
+#include "detectvehicle/convneuralnet.hpp"
+
 
 
 
@@ -54,9 +56,13 @@ class DetectVehicle
   void setUp();
   void tearDown();
 
+  float PixelPosToHeading(float pixelPosX);
+
   std::shared_ptr<VehicleDetectionSystem> m_vehicleDetectionSystem;
   std::shared_ptr<std::vector<std::shared_ptr<DetectedVehicle>>> m_verifiedVehicles;
   std::shared_ptr<VehicleMemorySystem> m_vehicleMemorySystem;
+
+  std::shared_ptr<ConvNeuralNet> m_convNeuralNet;
 };
 
 } // detectvehicle
