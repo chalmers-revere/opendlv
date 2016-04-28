@@ -106,7 +106,7 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
 
   std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(
       odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(
-      mySharedImg.getName()));
+          mySharedImg.getName()));
   
   const uint32_t nrChannels = mySharedImg.getBytesPerPixel();
   const uint32_t imgWidth = mySharedImg.getWidth();

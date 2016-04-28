@@ -171,11 +171,19 @@ message opendlv.sensation.Looming [id = 173] {
   float size [id = 3];
 }
 
+message opendlv.sensation.OpticalFlow [id = 174] {
+  uint16 nPoint;
+  list<float> x;
+  list<float> y;
+  list<float> u;
+  list<float> v;
+  //float flow;
+}
+
 message opendlv.sensation.DirectionOfMovement [id = 175] {
   opendlv.coordinate.Spherical3 directionOfMovement [id = 1];
 }
 
-// Perception messages
 message opendlv.perception.ObjectDistanceToBody [id = 176] {
   opendlv.coordinate.Cartesian3 bodySkinPosition [id = 1];
   opendlv.coordinate.Cartesian3 objectSurfacePosition [id = 2];
