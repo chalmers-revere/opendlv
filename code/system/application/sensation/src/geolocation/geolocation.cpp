@@ -21,6 +21,7 @@
 #include <cstring>
 #include <cmath>
 #include <iostream>
+#include <fstream>
 
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
@@ -29,6 +30,7 @@
 #include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 #include "geolocation/geolocation.hpp"
+
 
 
 namespace opendlv {
@@ -69,6 +71,15 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 
   KinematicObservationModel<double> kinematicObservationModel(
       0.0, 0.0,  0.0, 0.0);
+
+
+  // To dump data structures into a CSV file, you create an output file first.
+  // std::ofstream fout("../Exp_data/output.csv");
+  std::ofstream fout_ekfState("../Exp_data/output_ekf.csv");
+  fout_ekfState << "%HEADER: Output of the Extended Kalman Filter, data format : \n"
+                << "%timestamp (s), ground truth: x (m),  y (m), theta (rad), theta_dot(rad/s), commands : velocity (m/s) steering angle (rad), noisy data: x (m), y (m), theta (rad), theta_dot (rad/s), ekf estimation vector: x (m), x_dot (m/s), y (m), y_dot (ms), theta (rad), theta_dot(rad/s)  \n"
+                << "%t lat long yaw long_vel wheels_angle Z_x Z_y Z_theta Z_theta_dot HAS_DATA X_x X_x_dot X_y X_y_dot X_theta X_theta_dot sent_lat sent_long sent_alt sent_heading " << endl;
+
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() == 
       odcore::data::dmcp::ModuleStateMessage::RUNNING) {
@@ -149,16 +160,16 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       opendlv::data::environment::Point3 currentCartesianLocation = 
           gpsReference.transform(currentLocation);
 
-      {//kinematic kalman block
-        KinematicObservationVector<double> z = kinematicObservationModel.h(state);
-        z.Z_x() = currentCartesianLocation.getX();
-        z.Z_y() = currentCartesianLocation.getY();
+        //kinematic kalman block
+        KinematicObservationVector<double> observationVector = kinematicObservationModel.h(state);
+        observationVector.Z_x() = currentCartesianLocation.getX();
+        observationVector.Z_y() = currentCartesianLocation.getY();
         if (gpsReading.getHasHeading()) {
-          z.Z_theta() = gpsReading.getNorthHeading();
+          observationVector.Z_theta() = gpsReading.getNorthHeading();
         } else {
-          z.Z_theta() = state.theta();
+          observationVector.Z_theta() = state.theta();
         }
-        z.Z_theta_dot() = vehicleYawRate; // TODO: Put yaw rate here...
+        observationVector.Z_theta_dot() = vehicleYawRate; // TODO: Put yaw rate here...
 
       
         double deltaTime = duration.toMicroseconds() / 1000000.0;
@@ -170,7 +181,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
         bool gpsHasData = false;
         if (gpsReadingContainer.getReceivedTimeStamp().toMicroseconds() >
             previousDataTimestamp.toMicroseconds()) {
-          state = m_ekf.update(kinematicObservationModel, z);
+          state = m_ekf.update(kinematicObservationModel, observationVector);
           previousDataTimestamp = gpsReadingContainer.getReceivedTimeStamp();
           gpsHasData = true;
         }
@@ -180,6 +191,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
         std::cout   << getName() << "\t" << "timestamp="
           << timestamp << "\t hasData=" << gpsHasData << "\tx = " << state.x() << ", y = " <<
           state.y() << ", theta = " << state.theta() << std::endl;
+
+
+
+
 
  /*       auto cov = m_ekf.getCovariance();
 
@@ -196,7 +211,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
                     << "Determinand =   " << cov_determinant
                     << std::endl;
 */
-      }
+
 
 
 
@@ -221,6 +236,19 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
                                                             heading);
       odcore::data::Container msg(geoLocationEstimation);
       getConference().send(msg);
+
+      //save data to file
+      bool   saveToFile = true;
+      if (  saveToFile){
+      fout_ekfState << timestamp << " "
+                    << gpsReading.getLatitude() << " " << gpsReading.getLongitude() << " " << gpsReading.getNorthHeading() <<  " "
+                    << control.v() << " " << control.phi() << " "
+                    << observationVector.Z_x() << " " << observationVector.Z_y() << " " << observationVector.Z_theta() << " " << observationVector.Z_theta_dot() << " " << gpsHasData << " "
+                    << state.x() << " " << state.x_dot() << " "  << state.y() << " " << state.y_dot() << " " << state.theta() << " " << state.theta_dot() << " "
+                    << currentWGS84CoordinateEstimation.getLatitude() <<  currentWGS84CoordinateEstimation.getLongitude() << gpsReading.getAltitude() << heading
+                    << endl;
+      }
+
 
     }
     else   {
