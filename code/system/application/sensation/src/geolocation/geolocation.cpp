@@ -77,6 +77,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
         opendlv::proxy::GpsReading::ID());
     auto gpsReading = gpsReadingContainer.getData<opendlv::proxy::GpsReading>();
 
+    std::cout   << getName() << "\tLatidude  =  " << gpsReading.getLatitude() << "  Longitude  =  " << gpsReading.getLongitude() << std::endl;
+
     if (gpsReadingContainer.getReceivedTimeStamp().toMicroseconds() > 0) {
       if (!hasGpsReference) {
         gpsReference = opendlv::data::environment::WGS84Coordinate(
@@ -112,10 +114,21 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       auto steering = steeringContainer.getData<
           opendlv::proxy::reverefh16::Steering>();
 
+      auto vehicleStateContainer = getKeyValueDataStore().get(
+                  opendlv::proxy::reverefh16::VehicleState::ID());
+      auto vehicleState = vehicleStateContainer.getData<
+              opendlv::proxy::reverefh16::VehicleState>();
+      double vehicleYawRate = vehicleState.getYawRate();
+
+
       if (steeringContainer.getReceivedTimeStamp().getSeconds() > 0) {
         control.phi() = steering.getRoadwheelangle();
       }
 
+      std::cout   << getName() << "\t" << "timestamp="
+        << timestamp << "\t control "  << vehicleState.getYawRate() << "  vel " << propulsion.getPropulsionShaftVehicleSpeed() << std::endl;
+      std::cout   << getName() << "\t" << "timestamp="
+        << timestamp << "\t original GPS data  "  << gpsReading.getLatitude() << "  vel " << gpsReading.getLongitude() << std::endl;
 
       opendlv::data::environment::WGS84Coordinate currentLocation(
           gpsReading.getLatitude(),
@@ -134,7 +147,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       } else {
         z.Z_theta() = state.theta();
       }
-      z.Z_theta_dot() = 0.0; // TODO: Put yaw rate here...
+      z.Z_theta_dot() = vehicleYawRate; // TODO: Put yaw rate here...
 
       
       double deltaTime = duration.toMicroseconds() / 1000000.0;
@@ -157,25 +170,25 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
         << timestamp << "\t hasData=" << hasData << "\tx=" << state.x() << ", y=" <<
         state.y() << ", theta=" << state.theta() << std::endl;
 
-      // Build the proper data to send
+      // Build the proper GPS coordinates to send
       opendlv::data::environment::Point3 currentStateEstimation (state.x(), state.y(), currentCartesianLocation.getZ());
-      opendlv::data::environment::WGS84Coordinate currentCartesianLocationEstimation = gpsReference.transform(currentStateEstimation);
+      opendlv::data::environment::WGS84Coordinate currentWGS84CoordinateEstimation = gpsReference.transform(currentStateEstimation);
       double heading = state.theta();
 
       std::cout   << getName() << "\t" << "timestamp="
-        << timestamp << "\t hasData=" << hasData << "\tlat=" << currentCartesianLocationEstimation.getLatitude() << ", long=" <<
-        currentCartesianLocationEstimation.getLongitude() << ", theta=" << state.theta() << std::endl;
+        << timestamp << "\t hasData=" << hasData << "\tlat=" << currentWGS84CoordinateEstimation.getLatitude() << ", long=" <<
+        currentWGS84CoordinateEstimation.getLongitude() << ", theta=" << state.theta() << std::endl;
 
       // Send the message
-      opendlv::sensation::Geolocation geoLocationEstimation(currentCartesianLocationEstimation.getLatitude(),
-                                                            currentCartesianLocationEstimation.getLongitude(),
+      opendlv::sensation::Geolocation geoLocationEstimation(currentWGS84CoordinateEstimation.getLatitude(),
+                                                            currentWGS84CoordinateEstimation.getLongitude(),
                                                             gpsReading.getAltitude(),
                                                             heading);
       odcore::data::Container msg(geoLocationEstimation);
       getConference().send(msg);
 
 
-    }
+    } else cout << " NO DATA " << endl;
 
   }
    
