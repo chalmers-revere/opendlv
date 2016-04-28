@@ -29,9 +29,9 @@
 
 #include "setopticalrotation/setopticalrotation.hpp"
 
-namespace opendlv {
-namespace action {
-namespace setopticalrotation {
+ namespace opendlv {
+  namespace action {
+    namespace setopticalrotation {
 
 /**
   * Constructor.
@@ -39,29 +39,29 @@ namespace setopticalrotation {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-SetOpticalRotation::SetOpticalRotation(int32_t const &a_argc, char **a_argv)
-    : DataTriggeredConferenceClientModule(
-      a_argc, a_argv, "action-setopticalrotation")
-{
-}
+  SetOpticalRotation::SetOpticalRotation(int32_t const &a_argc, char **a_argv)
+  : DataTriggeredConferenceClientModule(
+    a_argc, a_argv, "action-setopticalrotation")
+  {
+  }
 
-SetOpticalRotation::~SetOpticalRotation()
-{
-}
+  SetOpticalRotation::~SetOpticalRotation()
+  {
+  }
 
 /**
  * Receives aim-point angle error.
  * Sends a optical rotation (steer) command to Act.
  */
-void SetOpticalRotation::nextContainer(odcore::data::Container &c)
-{
+ void SetOpticalRotation::nextContainer(odcore::data::Container &c)
+ {
   if(c.getDataType() == opendlv::perception::LanePosition::ID()){
     opendlv::perception::LanePosition lanePosition = c.getData<opendlv::perception::LanePosition>();
     //float offset = lanePosition.getOffset();
     float heading = lanePosition.getHeading();
 
-  	odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
-  	float const gainHeading = kv.getValue<float>("action-setopticalrotation.gain_heading");  
+    odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+    float const gainHeading = kv.getValue<float>("action-setopticalrotation.gain_heading");  
     
     if (fabs(heading) > 0.0f) {
       float steeringAmplitude = gainHeading * heading;
@@ -69,9 +69,9 @@ void SetOpticalRotation::nextContainer(odcore::data::Container &c)
       std::cout << "Stearing Amplitude : " << steeringAmplitude <<std::endl;
       
       if (heading < 0) {
-	  	opendlv::action::Correction correction(t0, "steering", false, steeringAmplitude);
-      	odcore::data::Container container(correction);
-      	getConference().send(container);
+        opendlv::action::Correction correction(t0, "steering", false, steeringAmplitude);
+        odcore::data::Container container(correction);
+        getConference().send(container);
       }
       else {
       	opendlv::action::Correction correction(t0, "steering", false, steeringAmplitude);

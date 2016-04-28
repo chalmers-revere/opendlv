@@ -29,9 +29,9 @@
 
 #include "removeloomingfront/removeloomingfront.hpp"
 
-namespace opendlv {
-namespace action {
-namespace removeloomingfront {
+ namespace opendlv {
+  namespace action {
+    namespace removeloomingfront {
 
 /**
   * Constructor.
@@ -39,15 +39,15 @@ namespace removeloomingfront {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-RemoveLoomingFront::RemoveLoomingFront(int32_t const &a_argc, char **a_argv)
-    : DataTriggeredConferenceClientModule(
-      a_argc, a_argv, "action-removeloomingfront")
-{
-}
+  RemoveLoomingFront::RemoveLoomingFront(int32_t const &a_argc, char **a_argv)
+  : DataTriggeredConferenceClientModule(
+    a_argc, a_argv, "action-removeloomingfront")
+  {
+  }
 
-RemoveLoomingFront::~RemoveLoomingFront()
-{
-}
+  RemoveLoomingFront::~RemoveLoomingFront()
+  {
+  }
 
 /**
  * Receives looming front with related angle and size
@@ -55,8 +55,31 @@ RemoveLoomingFront::~RemoveLoomingFront()
  * Sends halt command (brake) or in rare cases a world rotation (steer) command
  * to Act.
  */
-void RemoveLoomingFront::nextContainer(odcore::data::Container &)
-{
+ void RemoveLoomingFront::nextContainer(odcore::data::Container &c)
+ {
+   if(c.getDataType() == opendlv::perception::Object::ID()){
+    opendlv::perception::Object m_object = c.getData<opendlv::perception::Object>();
+    float m_size = m_object.getSize();
+
+    std::cout<< "Object Size: " << m_size << std::endl std::endl;
+
+    if (!m_size > 0.25f) {
+    odcore::data::TimeStamp t0;
+    opendlv::action::Correction correction(t0, "brake", false, 0);
+    odcore::data::Container container(correction);
+    getConference().send(container);
+      
+    }
+    
+    double m_brakeAmplitude = 7*3.14159/180;
+    odcore::data::TimeStamp t1;
+    opendlv::action::Correction correction(t1, "brake", false, brakeAmplitude);
+    odcore::data::Container container(correction);
+    getConference().send(container);
+
+  }
+
+
 }
 
 void RemoveLoomingFront::setUp()
