@@ -67,6 +67,7 @@ include_directories(SYSTEM ${OPENDLVDATA_INCLUDE_DIRS})
 include_directories(SYSTEM ${REVEREFH16MAPPING_INCLUDE_DIRS})
 include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 include_directories(SYSTEM ${KALMAN_INCLUDE_DIR})
+include_directories(SYSTEM ${TINYCNN_INCLUDE_DIR})
 
 ###########################################################################
 # Set libraries to link against.
@@ -84,3 +85,5 @@ add_subdirectory(application)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../config/configuration DESTINATION . COMPONENT system)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/system/application/perception/detectvehicle/trainedAnn.xml DESTINATION ./share/opendlv/system/application/perception/detectvehicle/ COMPONENT system)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/system/application/perception/detectvehicle/haar_cars3.xml DESTINATION ./share/opendlv/system/application/perception/detectvehicle/ COMPONENT system)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/system/application/perception/detectvehicle/trained_cnn DESTINATION ./share/opendlv/system/application/perception/detectvehicle/ COMPONENT system)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/system/application/perception/detectvehicle/normalization_constants DESTINATION ./share/opendlv/system/application/perception/detectvehicle/ COMPONENT system)
