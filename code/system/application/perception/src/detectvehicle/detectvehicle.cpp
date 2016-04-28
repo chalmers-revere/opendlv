@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 Chalmers REVERE
+ * Copyright (C) 2016 Chalmers REVERE
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -35,6 +35,8 @@
 
 #include "detectvehicle/detectvehicle.hpp"
 
+#include "detectvehicle/convneuralnet.hpp"
+
 namespace opendlv {
 namespace perception {
 namespace detectvehicle {
@@ -55,10 +57,18 @@ DetectVehicle::DetectVehicle(int32_t const &a_argc, char **a_argv)
     , m_vehicleDetectionSystem()
     , m_verifiedVehicles()
     , m_vehicleMemorySystem()
+    , m_convNeuralNet()
 {
-  m_vehicleDetectionSystem = std::shared_ptr<VehicleDetectionSystem>(new VehicleDetectionSystem);
-  m_verifiedVehicles = std::shared_ptr<std::vector<std::shared_ptr<DetectedVehicle>>>(new std::vector<std::shared_ptr<DetectedVehicle>>);
-  m_vehicleMemorySystem = std::shared_ptr<VehicleMemorySystem>(new VehicleMemorySystem);
+  m_vehicleDetectionSystem = std::shared_ptr<VehicleDetectionSystem>(
+      new VehicleDetectionSystem);
+  m_verifiedVehicles = 
+      std::shared_ptr<std::vector<std::shared_ptr<DetectedVehicle>>>(
+      new std::vector<std::shared_ptr<DetectedVehicle>>);
+  m_vehicleMemorySystem = std::shared_ptr<VehicleMemorySystem>(
+      new VehicleMemorySystem);
+  m_convNeuralNet = std::shared_ptr<ConvNeuralNet>(
+      new ConvNeuralNet);
+
 }
 
 DetectVehicle::~DetectVehicle()
@@ -66,8 +76,15 @@ DetectVehicle::~DetectVehicle()
   std::cout << "DetectVehicle::~DetectVehicle()" << std::endl;
 }
 
+void DetectVehicle::setUp()
+{
+  std::cout << "DetectVehicle::setUp()" << std::endl;
+  m_vehicleDetectionSystem->setUp();
+  m_convNeuralNet->SetUp();
+}
+
 /**
- * Receives .
+ * Receives SharedImage from camera.
  * Sends .
  */
 void DetectVehicle::nextContainer(odcore::data::Container &c)
@@ -75,22 +92,17 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   std::cout << std::endl;
 
   if (c.getDataType() != odcore::data::image::SharedImage::ID()) {
- //   std::cout << "--- Received unimportant container of type " << 
- //       c.getDataType() << std::endl;
+    // received container that we don't care about
     return;
   }
- // std::cout << "Received container of type " << c.getDataType() << 
- //     " sent at " <<   c.getSentTimeStamp().getYYYYMMDD_HHMMSSms() << 
- //     " received at " << c.getReceivedTimeStamp().getYYYYMMDD_HHMMSSms() << 
- //     std::endl;
 
-
-  // TODO Start of pretty bad-performing block that extracts image from memory 
+  if (!m_convNeuralNet->IsInitialized()) {
+    std::cout << "Convolutional Neural Net not yet initialized" << std::endl;
+    return;
+  }
 
   odcore::data::image::SharedImage mySharedImg = 
       c.getData<odcore::data::image::SharedImage>();
-//  cout << "Received a SharedImage of size: (" << mySharedImg.getWidth() << 
-//      ", " << mySharedImg.getHeight() << ")" << endl;
 
   std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(
       odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(
@@ -100,9 +112,9 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   const uint32_t imgWidth = mySharedImg.getWidth();
   const uint32_t imgHeight = mySharedImg.getHeight();
 
-  //std::shared_ptr<cv::Mat> myImage = std::shared_ptr<cv::Mat>(cvCreateImage(cvSize(imgWidth, imgHeight), IPL_DEPTH_8U, nrChannels));
   IplImage* myIplImage;
-  myIplImage = cvCreateImage(cvSize(imgWidth, imgHeight), IPL_DEPTH_8U, nrChannels);
+  myIplImage = cvCreateImage(cvSize(
+      imgWidth, imgHeight), IPL_DEPTH_8U, nrChannels);
   cv::Mat myImage(myIplImage);
 
   if (!sharedMem->isValid()) {
@@ -111,18 +123,22 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   
   sharedMem->lock();
   {
-    memcpy(myImage.data, sharedMem->getSharedMemory(), imgWidth*imgHeight*nrChannels);
+    memcpy(myImage.data, sharedMem->getSharedMemory(), 
+        imgWidth*imgHeight*nrChannels);
   }
   sharedMem->unlock();
-  
 
-  // end of slow / bad-performing block
+  //////////////////////////////////////////////////////////////////////////////
 
   // Nr of seconds
   // TODO use something else as timestamp?
-  double timeStamp = ((double)c.getSentTimeStamp().toMicroseconds())/1000000;
- // std::cout << "timeStamp: " << timeStamp << std::endl;
-  
+  //double timeStamp = ((double)c.getSentTimeStamp().toMicroseconds())/1000000;
+  //std::cout << "timeStamp: " << timeStamp << std::endl;
+
+
+  m_convNeuralNet->Update(&myImage);
+
+  /*
   m_verifiedVehicles->clear();
   m_vehicleDetectionSystem->update(&myImage, m_verifiedVehicles, timeStamp);
 
@@ -139,14 +155,11 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   int32_t windowWidth = 640;
   int32_t windowHeight = 480;
 
-  /*
-  if (showBlackImgOutput) {
-    outputImg = cv::Scalar(0, 0, 0); //set image black
-  }
-  */
 
   cv::resize(outputImg, outputImg, cv::Size(windowWidth, windowHeight), 0, 0, cv::INTER_CUBIC);
+  */
 
+  /*
   std::vector<std::shared_ptr<RememberedVehicle>> memorized;
   m_vehicleMemorySystem->GetMemorizedVehicles(&memorized);
   for (uint32_t i=0; i<memorized.size(); i++) {
@@ -162,14 +175,17 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
     // Show vehicles that were verified this frame (green)
     //cv::rectangle(outputImg, m_verifiedVehicles.at(i)->GetDetectionRectangle(), cv::Scalar(0,255,0));
   }
+  */
 
-//  std::cout << "Nr of memorized vehicles: " << m_vehicleMemorySystem->GetNrMemorizedVehicles() << std::endl;
- // std::cout << "Total nr of vehicle rectangles: " << m_vehicleMemorySystem->GetTotalNrVehicleRects() << std::endl;
+  /*
+  //std::cout << "Nr of memorized vehicles: " << m_vehicleMemorySystem->GetNrMemorizedVehicles() << std::endl;
+  //std::cout << "Total nr of vehicle rectangles: " << m_vehicleMemorySystem->GetTotalNrVehicleRects() << std::endl;
   cv::imshow("VehicleDetection", outputImg);
   cv::moveWindow("VehicleDetection", 100, 100);
   cv::waitKey(10);
 
   outputImg.release();
+  */
 
   
   // end of plot stuff
@@ -177,16 +193,11 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   cvReleaseImage(&myIplImage);
 }
 
-void DetectVehicle::setUp()
-{
-  std::cout << "DetectVehicle::setUp()" << std::endl;
-  m_vehicleDetectionSystem->setUp();
-}
-
 void DetectVehicle::tearDown()
 {
   std::cout << "DetectVehicle::tearDown()" << std::endl;
   m_vehicleDetectionSystem->tearDown();
+  m_convNeuralNet->TearDown();
 }
 
 } // detectvehicle
