@@ -53,7 +53,35 @@ namespace detectlane {
   */
 DetectLane::DetectLane(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(
-      a_argc, a_argv, "perception-detectlane")
+      a_argc, a_argv, "perception-detectlane"),
+    m_width(640),
+    m_height(480),
+    m_maxRow(450),
+    m_minRow(200),
+    m_p1(),
+    m_p2(),
+    m_midRegion(),
+    m_threshold(180),
+    m_laneOffset(),
+    m_d1(),
+    m_d2(),
+    m_theta(),
+    m_initialized(false),
+    m_regions(),
+    m_leftCameraRegions(),
+    m_rightCameraRegions(),
+    m_lines(),
+    m_nPoints(),
+    m_nRegions(),
+    m_recoveredPoints(),
+    m_K(),
+    m_M(),
+    m_k(),
+    m_m(),
+    m_pointsPerRegion(),
+    m_regionIndex(),
+    m_laneLocation2()
+
 {
 }
 
@@ -115,206 +143,107 @@ void DetectLane::nextContainer(odcore::data::Container &c)
   //-----------------------------
   // Definitions for the video choice
   //-----------------------------
-  int width = 640, height = 480;
-  int MAXROW, MINROW;
-
-  MINROW = 200;
-  MAXROW = 450;
-
-  Eigen::MatrixXd regions(5,4);
-  bool initialized = false;
+  m_initialized = false;
   if(mySharedImg.getName() == "front-left"){
-    // Eigen::MatrixXd regions(5,4);
-    //region = col1,row1, col2,row2
-    regions << 
-    156, 229, 91, 441,
-    281, 217, 272, 456,
-    328, 228, 382, 452,
-    381, 218, 495, 436,
-    448, 197, 622, 416;
-    initialized = true;
+    m_regions = m_leftCameraRegions;
+    m_initialized = true;
   }
   if(mySharedImg.getName() == "front-right"){
-    // Eigen::MatrixXd regions(5,4);
-    //region = col1,row1,col2,row2
-    regions<<
-    215, 230, 75, 392,
-    306, 245, 195, 431,
-    379, 214, 316, 439,
-    425, 237, 423, 445,
-    507, 221, 574, 414;
-    initialized = true;
+    m_regions = m_rightCameraRegions;
+    m_initialized = true;
   }
-  if(!initialized){
+  if(!m_initialized){
     return;
   }
-
   
-  //-----------------------------
-  // Scaling: Calibrations were made for 640x480 resolution
-  //-----------------------------
-  MINROW = MINROW * ( height / 480.0); MAXROW = MAXROW * (height / 480.0);
-  regions.col(0) = regions.col(0) * ( width / 640.0);
-  regions.col(2) = regions.col(2) * ( width / 640.0);
-  regions.col(1) = regions.col(1) * ( height / 480.0);
-  regions.col(3) = regions.col(3) * ( height / 480.0);
-  
-  //-----------------------------
-  // Image processing parameters
-  //-----------------------------
-  int nPoints = MAXROW-MINROW;
-  
-  //-----------------------------
-  // Initializations
-  //-----------------------------
-  
-  // Matrix holding the lines col = row * k + m for the region lines
-  Eigen::MatrixXd lines(regions.rows(),2);
-  
-  // Matrix holding the mean column for each region on each row
-  Eigen::MatrixXd recoveredPoints(nPoints,lines.rows()+2);
-  
-  // Number of search regions
-  long nRegions = recoveredPoints.cols()-1;
-  
-  // Holds the K and M parameters for each region
-  Eigen::MatrixXd K(nRegions,1), M(nRegions,1);
-  
-  // Counts the number of points per each region
-  Eigen::VectorXd pointsPerRegion(nRegions,1);
-  
-  // Holds the index that decides the left and right road track
-  Eigen::MatrixXd regionIndex(2,1);
-  
-  // Holds the location of found lanes
-  Eigen::VectorXd laneLocation2;
-  
-  // Holds the k and m values from the previous frame
-  Eigen::MatrixXd kPrev = Eigen::MatrixXd::Zero(regions.rows()+1, 1);
-  Eigen::MatrixXd mPrev = Eigen::MatrixXd::Zero(regions.rows()+1, 1);
-
-	// Momentum parameter
-	// double alpha = 0.5;
-
-	// Lane offset variable
-	double laneOffset;
-
-	// Holds the index of the left and right road track
-	int p1,p2;
-	//int prevP1,prevP2;
-
 	// Middle region line index
-	int midRegion = (int)(lines.rows()-1)/2;
+	m_midRegion = (int)(m_lines.rows()-1)/2;
 
 	//-----------------------------
   // Extracts the equation for the region lines
   //-----------------------------
-  GetRegionLinesV2(regions, lines);
+  GetRegionLinesV2(m_regions, m_lines);
   
   // Holds the k and m values for the region lines
-  Eigen::MatrixXd k = lines.col(0);
-  Eigen::MatrixXd m = lines.col(1);
-  
-  //-----------------------------
-  // Initialize windows
-  //-----------------------------
-  //namedWindow("1", 1);
-  //namedWindow("Canny",1);
-  
-  //moveWindow("1", 0, 0);
+  m_k = m_lines.col(0);
+  m_m = m_lines.col(1);
   
   //-----------------------------
   // Re-size the source image
   //-----------------------------
-  resize(src, src, Size(width,height),0,0,INTER_CUBIC);
+  resize(src, src, Size(m_width,m_height),0,0,INTER_CUBIC);
 
   //-----------------------------
   // Choose processing type
   //-----------------------------
-  // OLA CHANGE HERE IF NEEDED
-  int T1 = 180;
-  cv::inRange(src, cv::Scalar(T1, T1, T1), cv::Scalar(255, 255, 255), image);
+  cv::inRange(src, cv::Scalar(m_threshold, m_threshold, m_threshold), cv::Scalar(255, 255, 255), image);
   medianBlur(image, image, 3);
 
     
   //-----------------------------
   // Local line search
   //-----------------------------
-  ScanImage(&image,&lines,&recoveredPoints,nPoints,MINROW,MAXROW);
+  ScanImage(&image,&m_lines,&m_recoveredPoints,m_nPoints,m_minRow,m_maxRow);
   
   
   //-----------------------------
   // Extract lines from points
   //-----------------------------
-  ExtractLines(&recoveredPoints,&K,&M,nRegions,nPoints,&pointsPerRegion);
+  ExtractLines(&m_recoveredPoints,&m_K,&m_M,m_nRegions,m_nPoints,&m_pointsPerRegion);
 
   //-----------------------------
   // Make decision based on lines
   //-----------------------------
-  laneLocation2 = Eigen::VectorXd::Zero(nRegions, 1);
-  SelectLanesV2(pointsPerRegion, laneLocation2);
+  SelectLanesV2(m_pointsPerRegion, m_laneLocation2);
   
-  if (fabs(pointsPerRegion.sum()) > 0.0001){
-    SelectLaneOrientation(regionIndex,laneLocation2,(int)recoveredPoints.cols());
-    p1 = regionIndex(0,0), p2 = regionIndex(1,0);
-    
-    
-    
-    //-----------------------------
-    //Add momentum & update previous lines
-    //-----------------------------
-    
-    // AddMomentum(K,kPrev,M,mPrev,alpha,regionIndex);
-    // kPrev = K;
-    // mPrev = M;
-    // prevP1 = p1;
-    // prevP2 = p2;
-    
+  if (fabs(m_pointsPerRegion.sum()) > 0.0001){
+    SelectLaneOrientation(m_regionIndex,m_laneLocation2,(int)m_recoveredPoints.cols());
+    m_p1 = m_regionIndex(0,0);
+    m_p2 = m_regionIndex(1,0);
     
     //-----------------------------
     // Draw boarders/lines - VISUALIZATION
     //-----------------------------
+    DrawBorders(&src,m_minRow,m_maxRow,m_K(m_p1,0),m_K(m_p2,0),m_M(m_p1,0),m_M(m_p2,0));
+    //DrawTracks(&src, &K, &M,MINROW,MAXROW,Scalar(0,0,255));
+    DrawTracks(&src, &m_k,&m_m,m_minRow,Scalar(255,255,255));
     
-    DrawBorders(&src,MINROW,MAXROW,K(p1,0),K(p2,0),M(p1,0),M(p2,0));
- //   DrawTracks(&src, &K, &M,MINROW,MAXROW,Scalar(0,0,255));
-   DrawTracks(&src, &k,&m,MINROW,Scalar(255,255,255));
-    
-
     //-----------------------------
     // Calculate lane offset
     //-----------------------------
-    laneOffset = GetLateralPosition(K(p1,0),M(p1,0),
-                                    K(p2,0),M(p2,0),
-                                    lines.col(0)(midRegion),lines.col(1)(midRegion),
-                                    (MAXROW));
+    m_laneOffset = GetLateralPosition(m_K(m_p1,0),m_M(m_p1,0),
+                                    m_K(m_p2,0),m_M(m_p2,0),
+                                    m_lines.col(0)(m_midRegion),m_lines.col(1)(m_midRegion),
+                                    (m_maxRow));
     //-----------------------------
     // Approximate heading angle
     //-----------------------------
-    double d1 = GetLateralPosition(K(p1,0),M(p1,0),
-                                K(p2,0),M(p2,0),
-                              lines.col(0)(midRegion),lines.col(1)(midRegion),
-                                (MAXROW));
-    double d2 = GetLateralPosition(K(p1,0),M(p1,0),
-                                K(p2,0),M(p2,0),
-                                lines.col(0)(midRegion),lines.col(1)(midRegion),
-                                (MINROW));
-    
-    double theta = atan((d2-d1) / (double)15);
+    m_d1 = GetLateralPosition(m_K(m_p1,0),m_M(m_p1,0),
+                                m_K(m_p2,0),m_M(m_p2,0),
+                              m_lines.col(0)(m_midRegion),m_lines.col(1)(m_midRegion),
+                                (m_maxRow));
+    m_d2 = GetLateralPosition(m_K(m_p1,0),m_M(m_p1,0),
+                                m_K(m_p2,0),m_M(m_p2,0),
+                                m_lines.col(0)(m_midRegion),m_lines.col(1)(m_midRegion),
+                                (m_minRow));
+    // Factor 15 is assumed length between minRow and Maxrow in real life
+    m_theta = atan((m_d2-m_d1) / (double)15);
     
     // DEBUG PRINT
-    std::cout<<"Heading angle "<<theta<<std::endl;
-    std::cout<<"Offset "<<laneOffset<<std::endl;
+    std::cout<<"Heading angle "<<m_theta<<std::endl;
+    std::cout<<"Offset "<<m_laneOffset<<std::endl;
 		
     std::ofstream outfile;
     outfile.open("logg_offset_theta.txt", std::ios_base::app);
-    outfile << laneOffset << " " << theta << "\n";
+    outfile << m_laneOffset << " " << m_theta << "\n";
     outfile.close();
     
     // Send the message
-    opendlv::perception::LanePosition lanePosition(laneOffset,theta);
-    odcore::data::Container msg(lanePosition);  
-    getConference().send(msg);
-		
+    if(std::isfinite(m_theta) && std::isfinite(m_laneOffset)){
+      opendlv::perception::LanePosition lanePosition(m_laneOffset,m_theta);
+      odcore::data::Container msg(lanePosition);  
+      getConference().send(msg);
+    }		
   }
   
   //-----------------------------
@@ -329,6 +258,76 @@ void DetectLane::nextContainer(odcore::data::Container &c)
 
 void DetectLane::setUp()
 {
+  m_regions = Eigen::MatrixXd(9,4);
+
+  //-----------------------------
+  // Scaling: Calibrations were made for 640x480 resolution
+  //-----------------------------
+  m_minRow = m_minRow * (m_height / 480.0);
+  m_maxRow = m_maxRow * (m_height / 480.0);
+
+  m_leftCameraRegions = Eigen::MatrixXd(9,4);
+  m_leftCameraRegions <<     
+    125, 161, 16, 215,
+    207, 183, 110, 433,
+    269, 177, 260, 448,
+    295, 183, 308, 451,
+    307, 184, 391, 445,
+    323, 195, 456, 450,
+    361, 197, 531, 453,
+    406, 191, 624, 392,
+    453, 145, 609, 202;
+
+  m_leftCameraRegions.col(0) *= (m_width / 640.0);
+  m_leftCameraRegions.col(2) *= (m_width / 640.0);
+  m_leftCameraRegions.col(1) *= (m_height / 480.0);
+  m_leftCameraRegions.col(3) *= (m_height / 480.0);
+
+  m_rightCameraRegions = Eigen::MatrixXd(9,4);
+  m_rightCameraRegions <<
+    167, 167, 18, 214,
+    276, 188, 32, 375,
+    360, 198, 205, 416,
+    377, 196, 244, 432,
+    410, 197, 349, 447,
+    423, 198, 424, 450,
+    454, 200, 465, 447,
+    505, 197, 595, 442,
+    578, 158, 627, 193;
+  m_rightCameraRegions.col(0) *= (m_width / 640.0);
+  m_rightCameraRegions.col(2) *= (m_width / 640.0);
+  m_rightCameraRegions.col(1) *= (m_height / 480.0);
+  m_rightCameraRegions.col(3) *= (m_height / 480.0);
+
+  
+  //-----------------------------
+  // Image processing parameters
+  //-----------------------------
+  m_nPoints = m_maxRow-m_minRow;
+  
+  //-----------------------------
+  // Initializations
+  //-----------------------------
+  m_lines = Eigen::MatrixXd(m_regions.rows(),2);
+
+  m_recoveredPoints = Eigen::MatrixXd(m_nPoints,m_lines.rows()+2);
+  
+  m_nRegions = m_recoveredPoints.cols()-1;
+  
+  // Holds the K and M parameters for each region
+  m_K = Eigen::MatrixXd(m_nRegions,1);
+  m_M = Eigen::MatrixXd(m_nRegions,1);
+  
+  // Counts the number of points per each region
+  m_pointsPerRegion = Eigen::VectorXd(m_nRegions,1);
+  
+  // Holds the index that decides the left and right road track
+  m_regionIndex = Eigen::MatrixXd(2,1);
+
+  m_laneLocation2 = Eigen::VectorXd::Zero(m_nRegions, 1);
+  
+
+
 }
 
 void DetectLane::tearDown()

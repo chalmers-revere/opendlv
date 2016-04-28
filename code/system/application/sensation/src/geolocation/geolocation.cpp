@@ -29,7 +29,7 @@
 #include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 #include "geolocation/geolocation.hpp"
-#include "geolocation/kinematicobservationmodel.hpp"
+
 
 namespace opendlv {
 namespace sensation {
@@ -77,7 +77,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
         opendlv::proxy::GpsReading::ID());
     auto gpsReading = gpsReadingContainer.getData<opendlv::proxy::GpsReading>();
 
-    std::cout   << getName() << "\tLatidude  =  " << gpsReading.getLatitude() << "  Longitude  =  " << gpsReading.getLongitude() << std::endl;
+    std::cout << getName() << "\tLatidude  =  " << gpsReading.getLatitude()
+              << "  Longitude  =  " << gpsReading.getLongitude() << std::endl;
 
     if (gpsReadingContainer.getReceivedTimeStamp().toMicroseconds() > 0) {
       if (!hasGpsReference) {
@@ -108,6 +109,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
         control.v() = propulsion.getPropulsionShaftVehicleSpeed();
       }
 
+      // if we don't get any data from the CAN, we try to fill the speed from GPS data
+      auto gpsSpeed = gpsReading.getSpeed();
+      if (propulsion.getPropulsionShaftVehicleSpeed() < 0.00001) control.v() = gpsSpeed;
+
 
       auto steeringContainer = getKeyValueDataStore().get(
           opendlv::proxy::reverefh16::Steering::ID());
@@ -126,9 +131,14 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       }
 
       std::cout   << getName() << "\t" << "timestamp="
-        << timestamp << "\t control "  << vehicleState.getYawRate() << "  vel " << propulsion.getPropulsionShaftVehicleSpeed() << std::endl;
+        << timestamp << "\t control: steering wheel angle = "  << vehicleState.getYawRate()
+        << "  vel " << propulsion.getPropulsionShaftVehicleSpeed()
+        << std::endl;
       std::cout   << getName() << "\t" << "timestamp="
-        << timestamp << "\t original GPS data  "  << gpsReading.getLatitude() << "  vel " << gpsReading.getLongitude() << std::endl;
+        << timestamp << "\t original GPS data  "
+        << gpsReading.getLatitude() << "  vel "
+        << gpsReading.getLongitude() << " altitude "
+        << gpsReading.getAltitude() << std::endl;
 
       opendlv::data::environment::WGS84Coordinate currentLocation(
           gpsReading.getLatitude(),
@@ -171,13 +181,17 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
         state.y() << ", theta=" << state.theta() << std::endl;
 
       // Build the proper GPS coordinates to send
-      opendlv::data::environment::Point3 currentStateEstimation (state.x(), state.y(), currentCartesianLocation.getZ());
-      opendlv::data::environment::WGS84Coordinate currentWGS84CoordinateEstimation = gpsReference.transform(currentStateEstimation);
+      opendlv::data::environment::Point3 currentStateEstimation
+              (state.x(), state.y(), currentCartesianLocation.getZ());
+      opendlv::data::environment::WGS84Coordinate currentWGS84CoordinateEstimation =
+              gpsReference.transform(currentStateEstimation);
       double heading = state.theta();
 
       std::cout   << getName() << "\t" << "timestamp="
-        << timestamp << "\t hasData=" << hasData << "\tlat=" << currentWGS84CoordinateEstimation.getLatitude() << ", long=" <<
-        currentWGS84CoordinateEstimation.getLongitude() << ", theta=" << state.theta() << std::endl;
+        << timestamp << "\t hasData=" << hasData
+        << "\tlat=" << currentWGS84CoordinateEstimation.getLatitude()
+        << ", long=" << currentWGS84CoordinateEstimation.getLongitude()
+        << ", theta=" << state.theta() << std::endl;
 
       // Send the message
       opendlv::sensation::Geolocation geoLocationEstimation(currentWGS84CoordinateEstimation.getLatitude(),
@@ -187,8 +201,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       odcore::data::Container msg(geoLocationEstimation);
       getConference().send(msg);
 
-
-    } else cout << " NO DATA " << endl;
+    }
+    else   {
+        std::cout << getName() << "\t"<< " NO DATA " << std::endl;
+    }
 
   }
    

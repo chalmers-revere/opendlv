@@ -21,7 +21,7 @@
 #define DETECTLANE_DETECTLANE_HPP_
 
 #include <memory>
-
+#include <Eigen/Dense>
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
 
@@ -42,6 +42,52 @@ class DetectLane
   virtual void nextContainer(odcore::data::Container &);
 
  private:
+  int m_width;
+  int m_height;
+  int m_maxRow;
+  int m_minRow;
+  int m_p1;
+  int m_p2;
+  int m_midRegion;
+  int m_threshold;
+  double m_laneOffset;
+  double m_d1;
+  double m_d2;
+  double m_theta;
+
+  bool m_initialized;
+
+  // Matrix holding region lines
+  Eigen::MatrixXd m_regions;
+  Eigen::MatrixXd m_leftCameraRegions;
+  Eigen::MatrixXd m_rightCameraRegions;
+  
+  // Matrix holding the lines col = row * k + m for the region lines
+  Eigen::MatrixXd m_lines;
+  
+  // Number of scan lines / points
+  int m_nPoints;
+  // Number of search regions
+  long m_nRegions;
+
+  // Matrix holding the mean column for each region on each row
+  Eigen::MatrixXd m_recoveredPoints;
+
+  // Holds the K and M parameters for each region
+  Eigen::MatrixXd m_K;
+  Eigen::MatrixXd m_M;
+  Eigen::MatrixXd m_k;
+  Eigen::MatrixXd m_m;
+  // Counts the number of points per each region
+  Eigen::VectorXd m_pointsPerRegion;
+  
+  // Holds the index that decides the left and right road track
+  Eigen::MatrixXd m_regionIndex;
+  
+  // Holds the location of found lanes
+  Eigen::VectorXd m_laneLocation2;
+  
+
   void setUp();
   void tearDown();
 };

@@ -87,12 +87,15 @@ void Audition::nextContainer(odcore::data::Container &c)
     {
       case 1:
         v2vMsgType = "denm";
+        std::cout << "Sent denm." << std::endl;
       break;
       case 2:
         v2vMsgType = "cam";
+        std::cout << "Sent cam." << std::endl;
       break;
       case 10:
         v2vMsgType = "iclcm";
+        std::cout << "Sent iclcm." << std::endl;
       break;
       default:
         std::cout << "Received invalid message ID.";
