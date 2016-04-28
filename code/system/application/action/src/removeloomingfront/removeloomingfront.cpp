@@ -61,9 +61,9 @@
     opendlv::perception::Object m_object = c.getData<opendlv::perception::Object>();
     float m_size = m_object.getSize();
 
-    std::cout<< "Object Size: " << m_size << std::endl std::endl;
+    std::cout<< "Object Size: " << m_size << std::endl<<std::endl;
 
-    if (!m_size > 0.25f) {
+    if (!(m_size > 0.3f)) {
     odcore::data::TimeStamp t0;
     opendlv::action::Correction correction(t0, "brake", false, 0);
     odcore::data::Container container(correction);
@@ -73,7 +73,7 @@
     
     double m_brakeAmplitude = 7*3.14159/180;
     odcore::data::TimeStamp t1;
-    opendlv::action::Correction correction(t1, "brake", false, brakeAmplitude);
+    opendlv::action::Correction correction(t1, "brake", false, m_brakeAmplitude);
     odcore::data::Container container(correction);
     getConference().send(container);
 
