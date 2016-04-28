@@ -132,7 +132,7 @@ message opendlv.sensation.Axle [id = 168] {
   uint8 axleIndex [id = 2];
   uint8 unitIndex [id = 3];
 }
-*.
+*/
 
 message opendlv.sensation.Geolocation [id = 169] {
   float latitude [id = 1];
