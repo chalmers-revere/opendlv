@@ -77,7 +77,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
         opendlv::proxy::GpsReading::ID());
     auto gpsReading = gpsReadingContainer.getData<opendlv::proxy::GpsReading>();
 
-    std::cout   << getName() << "\tLatidude  =  " << gpsReading.getLatitude() << "  Longitude  =  " << gpsReading.getLongitude() << std::endl;
+    std::cout << getName() << "\tLatidude  =  " << gpsReading.getLatitude()
+              << "  Longitude  =  " << gpsReading.getLongitude() << std::endl;
 
     if (gpsReadingContainer.getReceivedTimeStamp().toMicroseconds() > 0) {
       if (!hasGpsReference) {
@@ -136,7 +137,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       std::cout   << getName() << "\t" << "timestamp="
         << timestamp << "\t original GPS data  "
         << gpsReading.getLatitude() << "  vel "
-        << gpsReading.getLongitude() << std::endl;
+        << gpsReading.getLongitude() << " altitude "
+        << gpsReading.getAltitude() << std::endl;
 
       opendlv::data::environment::WGS84Coordinate currentLocation(
           gpsReading.getLatitude(),

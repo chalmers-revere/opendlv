@@ -22,8 +22,6 @@
 
 #include <memory>
     
-
-
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
 #include <opendlv/data/environment/WGS84Coordinate.h>
