@@ -37,6 +37,7 @@ ConvNeuralNet::ConvNeuralNet()
     , m_normStdG()
     , m_normAvgB()
     , m_normStdB()
+    , m_detectedVehicles()
     , m_isInitialized(false)
 {
 }
@@ -159,7 +160,8 @@ void ConvNeuralNet::Update(const cv::Mat* a_imageFrame)
   findContours(thresholdedImgBinary, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
 
   // Draw bounding boxes around the detected connected components
-  std::vector<cv::Rect> boundingRects;
+  //std::vector<cv::Rect> boundingRects;
+  m_detectedVehicles.clear();
   std::cout << "Nr of connected components: " << contours.size() << std::endl;
   for (uint32_t i=0; i<contours.size(); i++) {
     cv::Rect bRect = cv::boundingRect(contours.at(i));
@@ -169,7 +171,8 @@ void ConvNeuralNet::Update(const cv::Mat* a_imageFrame)
       continue;
     }
 
-    boundingRects.push_back(bRect);
+    //boundingRects.push_back(bRect);
+    m_detectedVehicles.push_back(bRect);
     
     // Increase the size of the bounding box to fit the displayed image
     bRect.x *= myTestFactor;
