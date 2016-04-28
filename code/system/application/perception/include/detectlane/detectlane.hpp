@@ -24,6 +24,7 @@
 #include <Eigen/Dense>
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
+#include "detectlane/InversePerspectiveMapping.hpp"
 
 namespace opendlv {
 namespace perception {
@@ -57,6 +58,7 @@ class DetectLane
 
   bool m_initialized;
 
+
   // Matrix holding region lines
   Eigen::MatrixXd m_regions;
   Eigen::MatrixXd m_leftCameraRegions;
@@ -87,6 +89,9 @@ class DetectLane
   // Holds the location of found lanes
   Eigen::VectorXd m_laneLocation2;
   
+  // Inverse perspective mapping class
+  InversePerspectiveMapping m_ipm;
+
 
   void setUp();
   void tearDown();

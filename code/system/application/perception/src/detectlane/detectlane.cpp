@@ -79,7 +79,8 @@ DetectLane::DetectLane(int32_t const &a_argc, char **a_argv)
     m_m(),
     m_pointsPerRegion(),
     m_regionIndex(),
-    m_laneLocation2()
+    m_laneLocation2(),
+    m_ipm()
 
 {
 }
@@ -145,6 +146,7 @@ void DetectLane::nextContainer(odcore::data::Container &c)
   m_initialized = false;
   if(mySharedImg.getName() == "front-left"){
     m_regions = m_leftCameraRegions;
+    m_ipm.applyHomography(src,src);
     m_initialized = true;
   }
   if(mySharedImg.getName() == "front-right"){
@@ -252,6 +254,21 @@ void DetectLane::nextContainer(odcore::data::Container &c)
 
 void DetectLane::setUp()
 {
+  std::vector<cv::Point2f> regionPoints;
+  regionPoints.push_back(cv::Point2f(-260, 417) );
+  regionPoints.push_back(cv::Point2f(1039, 335) );
+  regionPoints.push_back(cv::Point2f( 440, 142) );
+  regionPoints.push_back(cv::Point2f(170, 142) );
+
+  std::vector<cv::Point2f> outputPoints;
+  outputPoints.push_back(cv::Point2f(0, m_height) );
+  outputPoints.push_back(cv::Point2f(m_width, m_height) );
+  outputPoints.push_back(cv::Point2f(m_width, 0) );
+  outputPoints.push_back(cv::Point2f(0, 0) ); 
+  m_ipm = InversePerspectiveMapping(cv::Size(m_width,m_height),cv::Size(m_width,m_height),regionPoints,outputPoints);
+
+
+
   m_regions = Eigen::MatrixXd(9,4);
 
   //-----------------------------
@@ -261,16 +278,24 @@ void DetectLane::setUp()
   m_maxRow = m_maxRow * (m_height / 480.0);
 
   m_leftCameraRegions = Eigen::MatrixXd(9,4);
-  m_leftCameraRegions <<     
-    125, 161, 16, 215,
-    207, 183, 110, 433,
-    269, 177, 260, 448,
-    295, 183, 308, 451,
-    307, 184, 391, 445,
-    323, 195, 456, 450,
-    361, 197, 531, 453,
-    406, 191, 624, 392,
-    453, 145, 609, 202;
+  m_leftCameraRegions << 19, 0, 19, 40,
+                         87, 0, 87, 40,
+                         160,0,160, 40,
+                         221,0,221, 40,
+                         266,0,266, 40,
+                         313,0,313, 40,
+                         379,0,379, 40,
+                         572,0,572, 40;
+  // m_leftCameraRegions <<     
+  //   125, 161, 16, 215,
+  //   207, 183, 110, 433,
+  //   269, 177, 260, 448,
+  //   295, 183, 308, 451,
+  //   307, 184, 391, 445,
+  //   323, 195, 456, 450,
+  //   361, 197, 531, 453,
+  //   406, 191, 624, 392,
+  //   453, 145, 609, 202;
 
   m_leftCameraRegions.col(0) *= (m_width / 640.0);
   m_leftCameraRegions.col(2) *= (m_width / 640.0);
