@@ -42,7 +42,7 @@ public:
   void Update(const cv::Mat* a_imageFrame);
   bool IsInitialized();
 
-  void GetDetectedVehicles(std::vector<cv::Rect>);
+  void GetDetectedVehicles(std::vector<cv::Rect>* container);
 
 /* Public fields */
 public:

@@ -124,6 +124,22 @@ message opendlv.sensation.Geolocation [id = 169] {
   float heading [id = 4];
 }
 
+message opendlv.perception.Object [id = 179] {
+  list<opendlv.perception.ObjectProperty> properties [id = 1];
+  odcore::data::TimeStamp lastSeen [id = 2];
+  string type [id = 3];
+  float angle [id = 4];
+  float size [id = 5];
+  uint16 objectIndex [id = 6];
+}
+
+message opendlv.perception.ObjectProperty [id = 183] {
+  odcore::data::TimeStamp identified [id = 1];
+  string name [id = 2];
+  string value [id = 3];
+  uint16 objectIndex [id = 4];
+}
+
 /*
 message opendlv.sensation.RoadWheel [id = 167] {
   float angle [id = 1];
@@ -185,15 +201,6 @@ message opendlv.perception.DesiredDirectionOfMovement [id = 178] {
   opendlv.coordinate.Spherical3 directionOfMovement [id = 1];
 }
 
-message opendlv.perception.Object [id = 179] {
-  list<opendlv.perception.ObjectProperty> properties [id = 1];
-  odcore::data::TimeStamp lastSeen [id = 2];
-  string type [id = 3];
-  float angle [id = 4];
-  float size [id = 5];
-  uint16 objectIndex [id = 6];
-}
-
 message opendlv.perception.ObjectDesiredAngle [id = 180] {
   float desiredAngle [id = 1];
   uint16 objectIndex [id = 2];
@@ -208,13 +215,6 @@ message opendlv.perception.ObjectLooming [id = 182] {
   odcore::data::TimeStamp identified [id = 1];
   opendlv.sensation.Looming looming [id = 2];
   uint16 objectIndex [id = 3];
-}
-
-message opendlv.perception.ObjectProperty [id = 183] {
-  odcore::data::TimeStamp identified [id = 1];
-  string name [id = 2];
-  string value [id = 3];
-  uint16 objectIndex [id = 4];
 }
 
 message opendlv.perception.ObjectMetricDistance [id = 184] {
