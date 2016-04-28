@@ -92,10 +92,10 @@ class V2vCam
   int32_t m_semiMajorConfidence = 4095;
   int32_t m_semiMinorConfidence = 4095;
   int32_t m_semiMajorOrientation = 3601;
-  float m_altitude = 8000.01;
-  float m_heading = 360.1*opendlv::Constants::DEG2RAD;
+  double m_altitude = 8000.01;
+  double m_heading = 360.1*opendlv::Constants::DEG2RAD;
   int32_t m_headingConfidence = 127;
-  float m_speed = 163.83; //
+  double m_speed = 163.83; //
   int32_t m_speedConfidence = 127;
   int32_t m_vehicleLength = 73;
   int32_t m_vehicleWidth = 25;

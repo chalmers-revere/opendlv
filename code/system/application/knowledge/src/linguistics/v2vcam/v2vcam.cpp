@@ -159,28 +159,28 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
     odcore::data::Container c(nextMessage);
     getConference().send(c);
 
-    m_sendLog << std::to_string(m_messageId) +
-        + "," + std::to_string(m_stationId) +
-        + "," + std::to_string(m_generationDeltaTime) +
-        + "," + std::to_string(m_containerMask) +
-        + "," + std::to_string(m_stationType) +
-        + "," + std::to_string(m_latitude) +
-        + "," + std::to_string(m_longitude) +
-        + "," + std::to_string(m_semiMajorConfidence) +
-        + "," + std::to_string(m_semiMinorConfidence) +
-        + "," + std::to_string(m_semiMajorOrientation) +
-        + "," + std::to_string(m_altitude) +
-        + "," + std::to_string(m_heading) +
-        + "," + std::to_string(m_headingConfidence) +
-        + "," + std::to_string(m_speed)
-        + "," + std::to_string(m_speedConfidence) +
-        + "," + std::to_string(m_vehicleLength) +
-        + "," + std::to_string(m_vehicleWidth) +
-        + "," + std::to_string(m_longitudinalAcc) +
-        + "," + std::to_string(m_longitudinalAccConf) +
-        + "," + std::to_string(m_yawRateValue) +
-        + "," + std::to_string(m_yawRateConfidence) +
-        + "," + std::to_string(m_vehicleRole);
+    m_sendLog << std::to_string(GetMessageId()) +
+        + "," + std::to_string(GetStationId()) +
+        + "," + std::to_string(GetGenerationDeltaTime()) +
+        + "," + std::to_string(GetContainerMask()) +
+        + "," + std::to_string(GetStationType()) +
+        + "," + std::to_string(GetLatitude()) +
+        + "," + std::to_string(GetLongitude()) +
+        + "," + std::to_string(GetSemiMajorConfidence()) +
+        + "," + std::to_string(GetSemiMinorConfidence()) +
+        + "," + std::to_string(GetSemiMajorOrientation()) +
+        + "," + std::to_string(GetAltitude()) +
+        + "," + std::to_string(GetHeading()) +
+        + "," + std::to_string(GetHeadingConfidence()) +
+        + "," + std::to_string(GetSpeed())
+        + "," + std::to_string(GetSpeedConfidence()) +
+        + "," + std::to_string(GetVehicleLength()) +
+        + "," + std::to_string(GetVehicleWidth()) +
+        + "," + std::to_string(GetLongitudinalAcc()) +
+        + "," + std::to_string(GetLongitudinalAccConf()) +
+        + "," + std::to_string(GetYawRateValue()) +
+        + "," + std::to_string(GetYawRateConfidence()) +
+        + "," + std::to_string(GetVehicleRole());
     m_sendLog << std::endl;
 
   }

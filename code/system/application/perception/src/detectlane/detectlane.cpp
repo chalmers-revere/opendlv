@@ -230,19 +230,20 @@ void DetectLane::nextContainer(odcore::data::Container &c)
     m_theta = atan((m_d2-m_d1) / (double)15);
     
     // DEBUG PRINT
-    std::cout<<"Heading angle "<<theta<<std::endl;
-    std::cout<<"Offset "<<laneOffset<<std::endl;
+    std::cout<<"Heading angle "<<m_theta<<std::endl;
+    std::cout<<"Offset "<<m_laneOffset<<std::endl;
 		
     std::ofstream outfile;
     outfile.open("logg_offset_theta.txt", std::ios_base::app);
-    outfile << laneOffset << " " << theta << "\n";
+    outfile << m_laneOffset << " " << m_theta << "\n";
     outfile.close();
     
     // Send the message
-    opendlv::perception::LanePosition lanePosition(m_laneOffset,m_theta);
-    odcore::data::Container msg(lanePosition);  
-    getConference().send(msg);
-		
+    if(std::isfinite(m_theta) && std::isfinite(m_laneOffset)){
+      opendlv::perception::LanePosition lanePosition(m_laneOffset,m_theta);
+      odcore::data::Container msg(lanePosition);  
+      getConference().send(msg);
+    }		
   }
   
   //-----------------------------

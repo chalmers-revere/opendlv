@@ -83,7 +83,7 @@ proxy-camera:2.mount.pitch = -0.1
 proxy-camera:2.mount.yaw = -3.0
 
 proxy-camera:3.type = opencv-ip-axis
-proxy-camera:2.name = rear-left
+proxy-camera:3.name = rear-left
 proxy-camera:3.port = 10.42.42.93
 proxy-camera:3.username = root
 proxy-camera:3.password = gcdc

@@ -117,12 +117,6 @@ message opendlv.sensation.Voice [id = 166] {
   //list<uint8> data [id = 4];
 }
 
-message opendlv.sensation.Geolocation [id = 169] {
-  float longitude [id = 1];
-  float latitude [id = 2];
-  float altitude [id = 3];
-  float heading [id = 4];
-}
 
 /*
 message opendlv.sensation.RoadWheel [id = 167] {
@@ -138,9 +132,15 @@ message opendlv.sensation.Axle [id = 168] {
   uint8 axleIndex [id = 2];
   uint8 unitIndex [id = 3];
 }
+*.
 
-
-
+message opendlv.sensation.Geolocation [id = 169] {
+  float longitude [id = 1];
+  float latitude [id = 2];
+  float altitude [id = 3];
+  float heading [id = 4];
+}
+/*
 message opendlv.sensation.BodyPart [id = 170] {
   opendlv.cartesian.Point3 position [id = 1]; // From body origo to body part center of mass
   string gemoetryPath [id = 2];
@@ -170,7 +170,7 @@ message opendlv.sensation.Looming [id = 173] {
   float looming [id = 2];
   float size [id = 3];
 }
-
+*/
 message opendlv.sensation.OpticalFlow [id = 174] {
   uint16 nPoint;
   list<float> x;
@@ -179,7 +179,7 @@ message opendlv.sensation.OpticalFlow [id = 174] {
   list<float> v;
   //float flow;
 }
-
+/*
 message opendlv.sensation.DirectionOfMovement [id = 175] {
   opendlv.coordinate.Spherical3 directionOfMovement [id = 1];
 }
@@ -249,14 +249,6 @@ message opendlv.perception.LanePosition [id = 186] {
 
 message opendlv.perception.LeadVehicleSize [id = 187] {
   float size [id = 1];
-}
-
-message opendlv.sensation.OpticalFlow [id = 188] {
-  float flow [id = 1];
-}
-
-message opendlv.perception.DesiredOpticalFlow [id = 189] {
-  float flow [id = 1];
 }
 
 // Action messages
