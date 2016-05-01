@@ -78,7 +78,7 @@ void DirectionOfMovement::nextContainer(odcore::data::Container &a_c)
 
     IplImage* myIplImage = cvCreateImage(cvSize(imgWidth,imgHeight), IPL_DEPTH_8U,
         nrChannels);
-    m_image = cv::Mat(myIplImage);
+    cv::Mat tmpImage = cv::Mat(myIplImage);
 
     if(!sharedMem->isValid()){
       return;
@@ -86,12 +86,13 @@ void DirectionOfMovement::nextContainer(odcore::data::Container &a_c)
 
     sharedMem->lock();
     {
-      memcpy(m_image.data, sharedMem->getSharedMemory(),
+      memcpy(tmpImage.data, sharedMem->getSharedMemory(),
           imgWidth*imgHeight*nrChannels);
     }
     sharedMem->unlock();
-    
+    m_image = tmpImage.clone();
     cvReleaseImage(&myIplImage);
+    
     return;
   }
   if(a_c.getDataType() == opendlv::sensation::OpticalFlow::ID()){

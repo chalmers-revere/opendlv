@@ -164,16 +164,14 @@ void OpticalFlow::nextContainer(odcore::data::Container &a_c)
   
   const int32_t windowWidth = 640;
   const int32_t windowHeight = 480;
-  cv::Mat display1, display2;
+  cv::Mat display1;
   cv::resize(m_image, display1, cv::Size(windowWidth, windowHeight), 0, 0,
       cv::INTER_CUBIC);
-  // cv::resize(m_flow, display2, cv::Size(windowWidth, windowHeight), 0, 0,
-  //     cv::INTER_CUBIC);
-  // cv::imshow("flow",display2);
   cv::imshow("Optical Flow", display1); 
   cv::waitKey(1);
 
   cvReleaseImage(&myIplImage);
+  m_image.release();
 }
 
 void OpticalFlow::sendContainer()
