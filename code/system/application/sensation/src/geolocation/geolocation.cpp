@@ -245,7 +245,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
                     << control.v() << " " << control.phi() << " "
                     << observationVector.Z_x() << " " << observationVector.Z_y() << " " << observationVector.Z_theta() << " " << observationVector.Z_theta_dot() << " " << gpsHasData << " "
                     << state.x() << " " << state.x_dot() << " "  << state.y() << " " << state.y_dot() << " " << state.theta() << " " << state.theta_dot() << " "
-                    << currentWGS84CoordinateEstimation.getLatitude() <<  currentWGS84CoordinateEstimation.getLongitude() << gpsReading.getAltitude() << heading
+                    << currentWGS84CoordinateEstimation.getLatitude() << " " <<   currentWGS84CoordinateEstimation.getLongitude() << " " << gpsReading.getAltitude() << " " << heading
                     << endl;
       }
 
