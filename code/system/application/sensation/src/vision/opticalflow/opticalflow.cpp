@@ -66,10 +66,12 @@ OpticalFlow::OpticalFlow(int32_t const &a_argc, char **a_argv)
       m_outputSharedImage(),
       m_sharedMemory()
 {
+  cv::namedWindow( "Optical Flow", 1 );
 }
 
 OpticalFlow::~OpticalFlow()
 {
+  m_image.release();
 }
 
 /**
@@ -164,12 +166,9 @@ void OpticalFlow::nextContainer(odcore::data::Container &a_c)
   
   const int32_t windowWidth = 640;
   const int32_t windowHeight = 480;
-  cv::Mat display1, display2;
+  cv::Mat display1;
   cv::resize(m_image, display1, cv::Size(windowWidth, windowHeight), 0, 0,
       cv::INTER_CUBIC);
-  // cv::resize(m_flow, display2, cv::Size(windowWidth, windowHeight), 0, 0,
-  //     cv::INTER_CUBIC);
-  // cv::imshow("flow",display2);
   cv::imshow("Optical Flow", display1); 
   cv::waitKey(1);
 
@@ -247,10 +246,6 @@ void OpticalFlow::setUp()
 
   m_flow = cv::Mat(m_nAxisPoints,m_nAxisPoints,CV_8UC3, cv::Scalar(0,0,0));
 
-
-  cv::namedWindow( "Optical Flow", 1 );
-
-  // cv::namedWindow( "flow", 1 );
 }
 
 void OpticalFlow::tearDown()

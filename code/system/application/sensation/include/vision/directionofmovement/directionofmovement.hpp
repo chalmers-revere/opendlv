@@ -51,7 +51,7 @@ class DirectionOfMovement
   void setUp();
   void tearDown();
 
-  Eigen::MatrixXd m_FOE;
+  Eigen::VectorXd m_Foe;
   cv::Mat m_image;
 
 

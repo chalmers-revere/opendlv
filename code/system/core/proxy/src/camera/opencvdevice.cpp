@@ -61,7 +61,7 @@ OpenCvDevice::OpenCvDevice(std::string const &a_name,
     m_capture->set(CV_CAP_PROP_FRAME_HEIGHT, a_height);
   }
   else {
-    std::cerr << "[proxy-camera] Could not open camera '" << a_name
+    std::cerr << "[proxy-camera] Could not open camera: " << a_name
               << std::endl;
   }
 
@@ -121,7 +121,6 @@ bool OpenCvDevice::CopyImageTo(char *a_destination, const uint32_t &a_size)
 
     // cv::imshow("Camera feed", m_image);
     // cv::waitKey(10);
-
     retVal = true;
   }
 

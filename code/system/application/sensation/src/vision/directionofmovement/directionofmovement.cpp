@@ -48,13 +48,15 @@ namespace directionofmovement {
 DirectionOfMovement::DirectionOfMovement(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(
       a_argc, a_argv, "sensation-vision-directionofmovement"),
-      m_FOE(),
+      m_Foe(2),
       m_image()
 {
+  cv::namedWindow( "FOE", 1 );
 }
 
 DirectionOfMovement::~DirectionOfMovement()
-{
+{ 
+  m_image.release();
 }
 
 /**
@@ -78,7 +80,7 @@ void DirectionOfMovement::nextContainer(odcore::data::Container &a_c)
 
     IplImage* myIplImage = cvCreateImage(cvSize(imgWidth,imgHeight), IPL_DEPTH_8U,
         nrChannels);
-    m_image = cv::Mat(myIplImage);
+    cv::Mat tmpImage = cv::Mat(myIplImage);
 
     if(!sharedMem->isValid()){
       return;
@@ -86,12 +88,14 @@ void DirectionOfMovement::nextContainer(odcore::data::Container &a_c)
 
     sharedMem->lock();
     {
-      memcpy(m_image.data, sharedMem->getSharedMemory(),
+      memcpy(tmpImage.data, sharedMem->getSharedMemory(),
           imgWidth*imgHeight*nrChannels);
     }
     sharedMem->unlock();
-    
+    m_image.release();
+    m_image = tmpImage.clone();
     cvReleaseImage(&myIplImage);
+    
     return;
   }
   if(a_c.getDataType() == opendlv::sensation::OpticalFlow::ID()){
@@ -115,9 +119,18 @@ void DirectionOfMovement::nextContainer(odcore::data::Container &a_c)
     B.col(0) = flow.col(3).cwiseProduct(flow.col(0))-flow.col(1).cwiseProduct(flow.col(2));
     
     // FOE = (A * A^T)^-1 * A^T * B
-    m_FOE = (A.transpose()*A).inverse() * A.transpose() * B;
-    // std::cout<< m_FOE << std::endl;
-    cv::circle(m_image, cv::Point2f(m_FOE(0),m_FOE(1)), 3, cv::Scalar(0,255,0), -1, 8);
+    Eigen::VectorXd FoeMomentum = ((A.transpose()*A).inverse() * A.transpose() * B) - m_Foe;
+    if(FoeMomentum.allFinite()){
+      if(FoeMomentum.norm() > 10){
+        m_Foe = m_Foe + FoeMomentum/FoeMomentum.norm()*10;
+      }
+      else{
+        m_Foe = m_Foe + FoeMomentum/20;
+      }
+    }
+    
+    std::cout<< m_Foe.transpose() << std::endl;
+    cv::circle(m_image, cv::Point2f(m_Foe(0),m_Foe(1)), 3, cv::Scalar(0,0,255), -1, 8);
     const int32_t windowWidth = 640;
     const int32_t windowHeight = 480;
     cv::Mat display;
@@ -133,7 +146,6 @@ void DirectionOfMovement::nextContainer(odcore::data::Container &a_c)
 
 void DirectionOfMovement::setUp()
 {
-  cv::namedWindow( "FOE", 1 );
 }
 
 void DirectionOfMovement::tearDown()
