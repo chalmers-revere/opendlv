@@ -167,8 +167,8 @@ void ConvNeuralNet::Update(const cv::Mat* a_imageFrame)
   cv::line(nonVehicleMap, cv::Point(nonVehicleMap.cols-1, nonVehicleMap.rows-1), cv::Point(nonVehicleMap.cols-1, 0), cv::Scalar(0, 0, 0), 1, 8);
   
 
-  std::cout << "spatialMap size: " << spatialMap.rows << " " << spatialMap.cols << std::endl;
-  std::cout << "nonVehicleMap size: " << nonVehicleMap.rows << " " << nonVehicleMap.cols << std::endl;
+  //std::cout << "spatialMap size: " << spatialMap.rows << " " << spatialMap.cols << std::endl;
+  //std::cout << "nonVehicleMap size: " << nonVehicleMap.rows << " " << nonVehicleMap.cols << std::endl;
   cv::Mat mapDifference;
   cv::subtract(spatialMap, nonVehicleMap, mapDifference);
 

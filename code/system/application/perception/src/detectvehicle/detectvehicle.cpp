@@ -57,6 +57,7 @@ DetectVehicle::DetectVehicle(int32_t const &a_argc, char **a_argv)
     , m_vehicleMemorySystem()
     , m_convNeuralNet()
 {
+  /*
   m_vehicleDetectionSystem = std::shared_ptr<VehicleDetectionSystem>(
       new VehicleDetectionSystem);
   m_verifiedVehicles = 
@@ -64,6 +65,7 @@ DetectVehicle::DetectVehicle(int32_t const &a_argc, char **a_argv)
       new std::vector<std::shared_ptr<DetectedVehicle>>);
   m_vehicleMemorySystem = std::shared_ptr<VehicleMemorySystem>(
       new VehicleMemorySystem);
+  */
   m_convNeuralNet = std::shared_ptr<ConvNeuralNet>(
       new ConvNeuralNet);
 
@@ -78,7 +80,7 @@ DetectVehicle::~DetectVehicle()
 void DetectVehicle::setUp()
 {
   std::cout << "DetectVehicle::setUp()" << std::endl;
-  m_vehicleDetectionSystem->setUp();
+  //m_vehicleDetectionSystem->setUp();
 }
 
 /**
@@ -224,7 +226,7 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
 void DetectVehicle::tearDown()
 {
   std::cout << "DetectVehicle::tearDown()" << std::endl;
-  m_vehicleDetectionSystem->tearDown();
+  //m_vehicleDetectionSystem->tearDown();
   m_convNeuralNet->TearDown();
 }
 
