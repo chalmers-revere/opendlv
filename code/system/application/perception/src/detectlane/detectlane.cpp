@@ -138,7 +138,6 @@ void DetectLane::nextContainer(odcore::data::Container &c)
     // Re-size the source image
     //-----------------------------
     resize(src, src, Size(m_width,m_height),0,0,INTER_CUBIC);
-    
 
     
     // From this point implement lane detection algorithm
@@ -242,6 +241,9 @@ void DetectLane::nextContainer(odcore::data::Container &c)
       opendlv::perception::LanePosition lanePosition(laneOffset,theta);
       odcore::data::Container msg(lanePosition);  
       getConference().send(msg);
+
+
+
   		}
     }
     
