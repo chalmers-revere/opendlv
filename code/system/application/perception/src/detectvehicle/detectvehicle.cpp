@@ -67,6 +67,7 @@ DetectVehicle::DetectVehicle(int32_t const &a_argc, char **a_argv)
   m_convNeuralNet = std::shared_ptr<ConvNeuralNet>(
       new ConvNeuralNet);
 
+  m_convNeuralNet->SetUp();
 }
 
 DetectVehicle::~DetectVehicle()
@@ -78,7 +79,6 @@ void DetectVehicle::setUp()
 {
   std::cout << "DetectVehicle::setUp()" << std::endl;
   m_vehicleDetectionSystem->setUp();
-  m_convNeuralNet->SetUp();
 }
 
 /**
@@ -161,6 +161,8 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
     std::cout << "    type:        " << type << std::endl;
     std::cout << "    angle:       " << angle << std::endl;
     std::cout << "    size:        " << size << std::endl;
+    std::cout << "    angle (deg): " << (angle*(float)opendlv::Constants::RAD2DEG) << std::endl;
+    std::cout << "    size (deg):  " << (size*(float)opendlv::Constants::RAD2DEG) << std::endl;
     std::cout << "    objectIndex: " << objectIndex << std::endl;
   }
 
@@ -231,7 +233,7 @@ float DetectVehicle::PixelPosToHeading(float pixelPosX)
 {
   float assumedImageWidth = 800;
   float midPoint = assumedImageWidth/2;
-  float assumedFov = 3.1416f*2/3;
+  float assumedFov = opendlv::Constants::DEG2RAD*60;
   float pixelsPerRadian = assumedImageWidth/assumedFov;
 
   std::cout << std::endl;
