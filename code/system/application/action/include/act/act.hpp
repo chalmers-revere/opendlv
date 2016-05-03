@@ -48,7 +48,7 @@ class Act : public odcore::base::module::TimeTriggeredConferenceClientModule {
   void inhibitoryCheck(bool, std::vector<odcore::data::TimeStamp> &, std::vector<float> &);
 
   float m_accelerationCorrection;
-  float m_breakingCorrection;
+  float m_brakeCorrection;
   float m_steeringCorrection;
   std::vector<odcore::data::TimeStamp> m_startTimeVectorAccelerate;
   std::vector<odcore::data::TimeStamp> m_startTimeVectorBrake;

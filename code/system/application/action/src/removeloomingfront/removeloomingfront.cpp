@@ -64,22 +64,21 @@
     std::cout<< "Object Size: " << m_size << std::endl<<std::endl;
 
     if (!(m_size > 0.3f)) {
-    odcore::data::TimeStamp t0;
-    opendlv::action::Correction correction(t0, "brake", false, 0);
-    odcore::data::Container container(correction);
-    getConference().send(container);
+      odcore::data::TimeStamp t0;
+      opendlv::action::Correction correction(t0, "brake", false, 0);
+      odcore::data::Container container(correction);
+      getConference().send(container);
       
     }
-    
-    double m_brakeAmplitude = -1.0;
-    odcore::data::TimeStamp t1;
-    opendlv::action::Correction correction(t1, "brake", false, m_brakeAmplitude);
-    odcore::data::Container container(correction);
-    getConference().send(container);
-
+    else {
+      double m_brakeAmplitude = -1.0;
+      odcore::data::TimeStamp t1;
+      opendlv::action::Correction correction(t1, "brake", false, m_brakeAmplitude);
+      odcore::data::Container container(correction);
+      getConference().send(container);
+      std::cout<< "Braking!: " << m_size << std::endl<<std::endl;
+    }
   }
-
-
 }
 
 void RemoveLoomingFront::setUp()

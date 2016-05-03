@@ -44,7 +44,7 @@ namespace opendlv {
 Act::Act(int32_t const &a_argc, char **a_argv)
 : TimeTriggeredConferenceClientModule(a_argc, a_argv, "action-act"),
 m_accelerationCorrection(0.0f),
-m_breakingCorrection(0.0f),
+m_brakeCorrection(0.0f),
 m_steeringCorrection(0.0f),
 m_startTimeVectorAccelerate(),
 m_startTimeVectorBrake(),
@@ -144,19 +144,18 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
         timeCheck(m_startTimeVectorSteering, m_amplitudeVectorSteering);
       }
     sumOfSteering = std::accumulate(m_amplitudeVectorSteering.begin(), m_amplitudeVectorSteering.end(), 0.0);
-    std::cout << "Sum Of Steering : " << sumOfSteering <<std::endl;
+    
     }
     double durationInSeconds = duration.toMicroseconds() / 1000000.0;
     float freq = 1/durationInSeconds;
     m_accelerationCorrection = sumOfAccelerate/freq;
-    m_breakingCorrection = -sumOfBrake/freq;
+    m_brakeCorrection  = -sumOfBrake/freq;
     m_steeringCorrection = sumOfSteering/freq;
-    std::cout << "Stearing Correction : " << m_steeringCorrection <<std::endl;
-    std::cout << "accelerati Correction : " << m_accelerationCorrection <<std::endl;
-    std::cout << "Freq : " << freq <<std::endl;
-
-    if (m_breakingCorrection < 0) {
-      opendlv::proxy::Actuation actuation(m_breakingCorrection, m_steeringCorrection, false);
+    std::cout << "Steering Correction : " << m_steeringCorrection <<std::endl;
+    std::cout << "Acceleration Correction : " << m_accelerationCorrection+m_brakeCorrection <<std::endl;
+    
+    if (m_brakeCorrection < 0) {
+      opendlv::proxy::Actuation actuation(m_brakeCorrection, m_steeringCorrection, false);
       odcore::data::Container actuationContainer(actuation);
       getConference().send(actuationContainer);
     }
