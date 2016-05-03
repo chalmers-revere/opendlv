@@ -223,13 +223,13 @@ void DetectLane::nextContainer(odcore::data::Container &c)
       // Factor 15 is assumed length between minRow and Maxrow in real life
       double theta = atan((d2-d1) / (double)4);
       
-
+      if(std::isfinite(theta) && std::isfinite(laneOffset)){
       std::cout<<"Offset: "<<laneOffset<<" Heading: "<<theta<<std::endl;
       // Send the message
       opendlv::perception::LanePosition lanePosition(laneOffset,theta);
       odcore::data::Container msg(lanePosition);  
       getConference().send(msg);
-  		
+  		}
     }
     
     //-----------------------------
