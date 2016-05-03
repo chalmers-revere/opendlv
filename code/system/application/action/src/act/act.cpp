@@ -55,13 +55,18 @@ m_amplitudeVectorSteering(),
 m_isInhibitory(false),
 m_amplitude(0),
 m_t0(""),
-m_type("")
+m_type(""),
+m_logSteering()
 {
   setUp();
+      odcore::data::TimeStamp now;
+    std::string filename("Steering" + now.getYYYYMMDD_HHMMSS() +".log");
+    m_logSteering.open(filename, std::ios::out|std::ios::app);
 }
 
 Act::~Act()
 {
+  m_logSteering.close();
 }
 
 /**
@@ -153,6 +158,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
     m_steeringCorrection = sumOfSteering/freq;
     std::cout << "Steering Correction : " << m_steeringCorrection <<std::endl;
     std::cout << "Acceleration Correction : " << m_accelerationCorrection+m_brakeCorrection <<std::endl;
+    m_logSteering << m_steeringCorrection << std::endl;
     
     if (m_brakeCorrection < 0) {
       opendlv::proxy::Actuation actuation(m_brakeCorrection, m_steeringCorrection, false);

@@ -21,6 +21,7 @@
 #define ACT_ACT_HPP_
 
 #include <memory>
+ #include <fstream>
 
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
@@ -60,6 +61,7 @@ class Act : public odcore::base::module::TimeTriggeredConferenceClientModule {
   float m_amplitude;
   odcore::data::TimeStamp m_t0;
   std::string m_type;
+  std::ofstream m_logSteering;
 
 };
 

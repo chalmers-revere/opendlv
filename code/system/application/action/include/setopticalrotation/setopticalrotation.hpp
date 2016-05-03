@@ -21,6 +21,7 @@
 #define SETOPTICALROTATION_SETOPTICALROTATION_HPP_
 
 #include <memory>
+#include <fstream>
 
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
@@ -41,9 +42,12 @@ class SetOpticalRotation
   virtual ~SetOpticalRotation();
   virtual void nextContainer(odcore::data::Container &);
 
+
  private:
   void setUp();
   void tearDown();
+
+  std::ofstream m_logRotation;
 };
 
 } // setopticalrotation

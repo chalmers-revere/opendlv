@@ -41,12 +41,17 @@
   */
   SetOpticalRotation::SetOpticalRotation(int32_t const &a_argc, char **a_argv)
   : DataTriggeredConferenceClientModule(
-    a_argc, a_argv, "action-setopticalrotation")
+    a_argc, a_argv, "action-setopticalrotation"),
+    m_logRotation()
   {
+    odcore::data::TimeStamp now;
+    std::string filename("Rotation" + now.getYYYYMMDD_HHMMSS() +".log");
+    m_logRotation.open(filename, std::ios::out|std::ios::app);
   }
 
   SetOpticalRotation::~SetOpticalRotation()
   {
+    m_logRotation.close();
   }
 
 /**
@@ -67,6 +72,7 @@
       float steeringAmplitude = gainHeading * heading;
       odcore::data::TimeStamp t0;
       std::cout << "Stearing Amplitude : " << steeringAmplitude <<std::endl;
+      m_logRotation << steeringAmplitude << std::endl;
       
       if (heading < 0) {
         opendlv::action::Correction correction(t0, "steering", false, steeringAmplitude);
