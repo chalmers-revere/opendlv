@@ -121,7 +121,6 @@ bool OpenCvDevice::CopyImageTo(char *a_destination, const uint32_t &a_size)
 
     // cv::imshow("Camera feed", m_image);
     // cv::waitKey(10);
-
     retVal = true;
   }
 
