@@ -89,6 +89,7 @@ MouseParams::MouseParams() :
     iterator() 
 {
   points = Eigen::MatrixXd(2,4);
+  cv::namedWindow("Calibration", 1 );
 }
 MouseParams::~MouseParams()
 {
@@ -117,7 +118,6 @@ Projection::~Projection()
 }
 void Projection::setUp()
 {
-  cv::namedWindow("Calibration", 1 );
 }
 
 void Projection::tearDown()

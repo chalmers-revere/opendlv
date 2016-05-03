@@ -51,6 +51,7 @@ DirectionOfMovement::DirectionOfMovement(int32_t const &a_argc, char **a_argv)
       m_Foe(2),
       m_image()
 {
+  cv::namedWindow( "FOE", 1 );
 }
 
 DirectionOfMovement::~DirectionOfMovement()
@@ -119,9 +120,17 @@ void DirectionOfMovement::nextContainer(odcore::data::Container &a_c)
     
     // FOE = (A * A^T)^-1 * A^T * B
     Eigen::VectorXd FoeMomentum = ((A.transpose()*A).inverse() * A.transpose() * B) - m_Foe;
-    m_Foe = m_Foe + FoeMomentum/FoeMomentum.norm()*10;
-    // std::cout<< m_FOE << std::endl;
-    cv::circle(m_image, cv::Point2f(m_Foe(0),m_Foe(1)), 3, cv::Scalar(0,255,0), -1, 8);
+    if(FoeMomentum.allFinite()){
+      if(FoeMomentum.norm() > 10){
+        m_Foe = m_Foe + FoeMomentum/FoeMomentum.norm()*10;
+      }
+      else{
+        m_Foe = m_Foe + FoeMomentum/20;
+      }
+    }
+    
+    std::cout<< m_Foe.transpose() << std::endl;
+    cv::circle(m_image, cv::Point2f(m_Foe(0),m_Foe(1)), 3, cv::Scalar(0,0,255), -1, 8);
     const int32_t windowWidth = 640;
     const int32_t windowHeight = 480;
     cv::Mat display;
@@ -137,7 +146,6 @@ void DirectionOfMovement::nextContainer(odcore::data::Container &a_c)
 
 void DirectionOfMovement::setUp()
 {
-  cv::namedWindow( "FOE", 1 );
 }
 
 void DirectionOfMovement::tearDown()

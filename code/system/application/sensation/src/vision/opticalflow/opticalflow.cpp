@@ -66,6 +66,7 @@ OpticalFlow::OpticalFlow(int32_t const &a_argc, char **a_argv)
       m_outputSharedImage(),
       m_sharedMemory()
 {
+  cv::namedWindow( "Optical Flow", 1 );
 }
 
 OpticalFlow::~OpticalFlow()
@@ -245,10 +246,6 @@ void OpticalFlow::setUp()
 
   m_flow = cv::Mat(m_nAxisPoints,m_nAxisPoints,CV_8UC3, cv::Scalar(0,0,0));
 
-
-  cv::namedWindow( "Optical Flow", 1 );
-
-  // cv::namedWindow( "flow", 1 );
 }
 
 void OpticalFlow::tearDown()
