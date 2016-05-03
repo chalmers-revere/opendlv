@@ -1,22 +1,19 @@
 #include "detectlane/InversePerspectiveMapping.hpp"
 
 
-InversePerspectiveMapping::InversePerspectiveMapping():
-	m_originalSize(),
-  m_outputSize(),
-	m_regionPoints(),
-	m_outputPoints(),
-	m_H(),
-	m_H_inv(),
-	m_gridX(),
-	m_gridY(),
-	m_inverseGridX(),
-	m_inverseGridY()
-	{
-		
-	}
-
-
+InversePerspectiveMapping::InversePerspectiveMapping()
+	: m_originalSize(),
+	  m_outputSize(),
+		m_regionPoints(),
+		m_outputPoints(),
+		m_H(),
+		m_H_inv(),
+		m_gridX(),
+		m_gridY(),
+		m_inverseGridX(),
+		m_inverseGridY()
+{
+}
 InversePerspectiveMapping::InversePerspectiveMapping(const cv::Size& a_originalSize,const cv::Size& a_outputSize,
 		 const std::vector<cv::Point2f>& a_regionPoints, const std::vector<cv::Point2f>& a_outputPoints)
 	: m_originalSize(a_originalSize),
@@ -30,12 +27,29 @@ InversePerspectiveMapping::InversePerspectiveMapping(const cv::Size& a_originalS
 		m_inverseGridX(),
 		m_inverseGridY()
 {
+
 	m_H = cv::getPerspectiveTransform( m_regionPoints, m_outputPoints );
 	m_H_inv = m_H.inv();
 	
 	generateRemappingFunction();
 	
 }
+
+void InversePerspectiveMapping::initialize(const cv::Size& a_originalSize,const cv::Size& a_outputSize,
+		 const std::vector<cv::Point2f>& a_regionPoints, const std::vector<cv::Point2f>& a_outputPoints){
+	m_H = cv::getPerspectiveTransform( a_regionPoints, a_outputPoints );
+	m_H_inv = m_H.inv();
+
+	m_originalSize = a_originalSize;
+	m_outputSize = a_outputSize;
+
+	m_regionPoints = a_regionPoints;
+	m_outputPoints = a_outputPoints;
+	
+	generateRemappingFunction();
+
+}
+
 
 void InversePerspectiveMapping::applyHomography(cv::Mat &a_inputImage,cv::Mat &a_outputImage, int a_borderCondition)
 {
@@ -66,7 +80,7 @@ cv::Point2d InversePerspectiveMapping::applyHomography(const cv::Point2d& inputP
 	const double u = a_H.at<double>(0,0) * inputPoint.x + a_H.at<double>(0,1) * inputPoint.y + a_H.at<double>(0,2);
 	const double v = a_H.at<double>(1,0) * inputPoint.x + a_H.at<double>(1,1) * inputPoint.y + a_H.at<double>(1,2);
 	const double s = a_H.at<double>(2,0) * inputPoint.x + a_H.at<double>(2,1) * inputPoint.y + a_H.at<double>(2,2);
-	if ( abs(s) >0.000f )
+	if ( fabs(s)>0.0000001 )
 	{
 		returnPoint.x = ( u / s );
 		returnPoint.y = ( v / s );
@@ -108,5 +122,3 @@ void InversePerspectiveMapping::generateRemappingFunction()
 		}
 	}	
 }
-
-		

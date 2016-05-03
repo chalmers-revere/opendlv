@@ -120,9 +120,6 @@ bool OpenCvDevice::CopyImageTo(char *a_destination, const uint32_t &a_size)
     // std::cout << "a_size: " << a_size << std::endl;
     ::memcpy(a_destination, m_image.data, a_size);
 
-    cv::imshow("Camera feed", m_image);
-    cv::waitKey(10);
-
     retVal = true;
   }
 

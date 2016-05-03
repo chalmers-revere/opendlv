@@ -43,19 +43,14 @@ class DetectLane
   virtual void nextContainer(odcore::data::Container &);
 
  private:
+  bool m_setup;
   int m_width;
   int m_height;
   int m_maxRow;
   int m_minRow;
-  int m_p1;
-  int m_p2;
   int m_midRegion;
   int m_threshold;
-  double m_laneOffset;
-  double m_d1;
-  double m_d2;
-  double m_theta;
-
+  
   bool m_initialized;
 
 
@@ -66,6 +61,8 @@ class DetectLane
   
   // Matrix holding the lines col = row * k + m for the region lines
   Eigen::MatrixXd m_lines;
+  Eigen::MatrixXd m_leftLines;
+  Eigen::MatrixXd m_rightLines;
   
   // Number of scan lines / points
   int m_nPoints;
@@ -76,10 +73,9 @@ class DetectLane
   Eigen::MatrixXd m_recoveredPoints;
 
   // Holds the K and M parameters for each region
-  Eigen::MatrixXd m_K;
-  Eigen::MatrixXd m_M;
-  Eigen::MatrixXd m_k;
-  Eigen::MatrixXd m_m;
+  Eigen::MatrixXd m_k, m_m;
+
+  Eigen::MatrixXd m_K, m_M;
   // Counts the number of points per each region
   Eigen::VectorXd m_pointsPerRegion;
   
@@ -90,8 +86,8 @@ class DetectLane
   Eigen::VectorXd m_laneLocation2;
   
   // Inverse perspective mapping class
-  InversePerspectiveMapping m_ipm;
-
+  std::unique_ptr<InversePerspectiveMapping> m_leftIpm;
+  std::unique_ptr<InversePerspectiveMapping> m_rightIpm;
 
   void setUp();
   void tearDown();

@@ -14,12 +14,13 @@ class InversePerspectiveMapping
 
 public:
 	InversePerspectiveMapping();
-
 	InversePerspectiveMapping(const cv::Size &a_originalSize,const cv::Size &a_outputSize,
 			const std::vector<cv::Point2f>& a_regionPoints, const std::vector<cv::Point2f>& a_outputPoints);
 	void applyHomography(cv::Mat &a_inputImage,cv::Mat &a_outputImage, int borderMode = cv::BORDER_CONSTANT);
 	cv::Point2d applyHomography(const cv::Point2d& inputPoint, const cv::Mat& a_H);
 	void drawPoints( const std::vector<cv::Point2f>& _points, cv::Mat& _img );
+	void initialize(const cv::Size& a_originalSize,const cv::Size& a_outputSize,
+		 const std::vector<cv::Point2f>& a_regionPoints, const std::vector<cv::Point2f>& a_outputPoints);
 
 private:
 	void generateRemappingFunction();
