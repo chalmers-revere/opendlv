@@ -43,7 +43,8 @@ namespace tools {
 namespace vision {
 namespace projection {
 
-void LogMouseClicks(int32_t a_event, int32_t a_x, int32_t a_y, int32_t, void* a_userdata)
+void LogMouseClicks(int32_t a_event, int32_t a_x, int32_t a_y, int32_t,
+    void* a_userdata)
 {  
 
   opendlv::tools::vision::projection::MouseParams* click = 
@@ -63,7 +64,8 @@ void LogMouseClicks(int32_t a_event, int32_t a_x, int32_t a_y, int32_t, void* a_
     click->iterator = 0;
   }
 }
-void ProjectMouseClicks(int32_t a_event, int32_t a_x, int32_t a_y, int32_t, void* a_userdata)
+void ProjectMouseClicks(int32_t a_event, int32_t a_x, int32_t a_y, int32_t,
+    void* a_userdata)
 {
   Eigen::Vector3d v;
   Eigen::MatrixXd* m = (Eigen::MatrixXd*) a_userdata;
@@ -161,16 +163,15 @@ void Projection::nextContainer(odcore::data::Container &a_c)
     // cv::resize(m_feed, display, cv::Size(windowWidth, windowHeight), 0, 0,
     //   cv::INTER_CUBIC);
 
-    putText(feed, "Rectangle width: " + std::to_string(m_recWidth), cvPoint(30,30), 
-    1, 0.8, cvScalar(0,0,254), 1, CV_AA);
-    putText(feed, "Rectangle height: " + std::to_string(m_recHeight), cvPoint(30,40), 
-    1, 0.8, cvScalar(0,0,254), 1, CV_AA);
-    putText(feed, "Position (x,y): (" + std::to_string(m_recPosX) + ","  + std::to_string(m_recPosY) + ")" , cvPoint(30,50), 
-    1, 0.8, cvScalar(0,0,254), 1, CV_AA);
+    putText(feed, "Rectangle width: " + std::to_string(m_recWidth),
+        cvPoint(30,30), 1, 0.8, cvScalar(0,0,254), 1, CV_AA);
+    putText(feed, "Rectangle height: " + std::to_string(m_recHeight),
+        cvPoint(30,40), 1, 0.8, cvScalar(0,0,254), 1, CV_AA);
+    putText(feed, "Position (x,y): (" + std::to_string(m_recPosX) + "," 
+        + std::to_string(m_recPosY) + ")" , cvPoint(30,50), 1, 0.8,
+        cvScalar(0,0,254), 1, CV_AA);
 
     cv::imshow("Calibration", feed);
-
-    m_option = (char) cv::waitKey(1);
 
     cvReleaseImage(&myIplImage);
     return;
@@ -180,6 +181,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Projection::body(){
   Config();
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
   odcore::data::dmcp::ModuleStateMessage::RUNNING){
+    
+    m_option = (char) cv::waitKey(1);
     switch(m_option){
       case 'c':
         std::cout<<"Enter Calibration" << std::endl;
@@ -190,12 +193,16 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Projection::body(){
         Config();
         break;
       case's':
-        std::cout<<"Calculating projection matrix and saving to file" << std::endl;
+        std::cout<<"Calculating projection matrix and saving to file" 
+            << std::endl;
         Save();
         break;
       case 'p':
         std::cout<< "Projecting points" << std::endl;
         Project();
+      case 'q':
+      case 27:
+        return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
       default:
         break;
     }
@@ -287,7 +294,8 @@ void Projection::Save()
 
 void Projection::Project()
 {
-  cv::setMouseCallback("Calibration", ProjectMouseClicks, (void *) &m_projectionMatrix);
+  cv::setMouseCallback("Calibration", ProjectMouseClicks, 
+      (void *) &m_projectionMatrix);
   cv::waitKey(0);
   cv::setMouseCallback("Calibration", NULL, NULL);
   std::cout<< "Exit point projection" << std::endl;

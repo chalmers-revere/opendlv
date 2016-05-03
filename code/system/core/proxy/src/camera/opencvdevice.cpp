@@ -53,7 +53,6 @@ OpenCvDevice::OpenCvDevice(std::string const &a_name,
   std::string videoStreamAddress = std::string("http://") + a_username 
     + ":" + a_password + "@" + a_port + "/axis-cgi/mjpg/video.cgi?user=" 
     + a_username + "&password=" + a_password + "&channel=0&.mjpg";
-  std::string videoStreamAddressHack = "/home/bjornborg/Videos/rostock.avi";
   m_capture.reset(new cv::VideoCapture(videoStreamAddress));
 
   if (m_capture->isOpened()) {
@@ -62,7 +61,7 @@ OpenCvDevice::OpenCvDevice(std::string const &a_name,
     m_capture->set(CV_CAP_PROP_FRAME_HEIGHT, a_height);
   }
   else {
-    std::cerr << "[proxy-camera] Could not open camera '" << a_name
+    std::cerr << "[proxy-camera] Could not open camera: " << a_name
               << std::endl;
   }
 

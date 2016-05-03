@@ -70,6 +70,7 @@ OpticalFlow::OpticalFlow(int32_t const &a_argc, char **a_argv)
 
 OpticalFlow::~OpticalFlow()
 {
+  m_image.release();
 }
 
 /**
@@ -171,7 +172,6 @@ void OpticalFlow::nextContainer(odcore::data::Container &a_c)
   cv::waitKey(1);
 
   cvReleaseImage(&myIplImage);
-  m_image.release();
 }
 
 void OpticalFlow::sendContainer()

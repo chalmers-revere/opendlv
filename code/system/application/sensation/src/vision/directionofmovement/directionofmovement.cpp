@@ -48,13 +48,14 @@ namespace directionofmovement {
 DirectionOfMovement::DirectionOfMovement(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(
       a_argc, a_argv, "sensation-vision-directionofmovement"),
-      m_FOE(),
+      m_Foe(2),
       m_image()
 {
 }
 
 DirectionOfMovement::~DirectionOfMovement()
-{
+{ 
+  m_image.release();
 }
 
 /**
@@ -90,6 +91,7 @@ void DirectionOfMovement::nextContainer(odcore::data::Container &a_c)
           imgWidth*imgHeight*nrChannels);
     }
     sharedMem->unlock();
+    m_image.release();
     m_image = tmpImage.clone();
     cvReleaseImage(&myIplImage);
     
@@ -116,9 +118,10 @@ void DirectionOfMovement::nextContainer(odcore::data::Container &a_c)
     B.col(0) = flow.col(3).cwiseProduct(flow.col(0))-flow.col(1).cwiseProduct(flow.col(2));
     
     // FOE = (A * A^T)^-1 * A^T * B
-    m_FOE = (A.transpose()*A).inverse() * A.transpose() * B;
+    Eigen::VectorXd FoeMomentum = ((A.transpose()*A).inverse() * A.transpose() * B) - m_Foe;
+    m_Foe = m_Foe + FoeMomentum/FoeMomentum.norm()*10;
     // std::cout<< m_FOE << std::endl;
-    cv::circle(m_image, cv::Point2f(m_FOE(0),m_FOE(1)), 3, cv::Scalar(0,255,0), -1, 8);
+    cv::circle(m_image, cv::Point2f(m_Foe(0),m_Foe(1)), 3, cv::Scalar(0,255,0), -1, 8);
     const int32_t windowWidth = 640;
     const int32_t windowHeight = 480;
     cv::Mat display;
