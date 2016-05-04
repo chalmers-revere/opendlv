@@ -79,7 +79,10 @@ DetectLane::DetectLane(int32_t const &a_argc, char **a_argv)
     m_regionIndex(),
     m_laneLocation2(),
     m_leftIpm(),
-    m_rightIpm()
+    m_rightIpm(),
+    m_transformationMatrix(),
+    m_leftTransformationMatrix(),
+    m_rightTransformationMatrix()
 
 {
 }
@@ -136,7 +139,6 @@ void DetectLane::nextContainer(odcore::data::Container &c)
     // Re-size the source image
     //-----------------------------
     resize(src, src, Size(m_width,m_height),0,0,INTER_CUBIC);
-    
 
     
     // From this point implement lane detection algorithm
@@ -145,15 +147,17 @@ void DetectLane::nextContainer(odcore::data::Container &c)
     //-----------------------------
     m_initialized = false;
     if(mySharedImg.getName() == "front-left"){
-      m_regions = m_leftCameraRegions;
       m_leftIpm->applyHomography(src,src);
+      m_regions = m_leftCameraRegions;
       m_lines = m_leftLines;
+      m_transformationMatrix = m_leftTransformationMatrix;
       m_initialized = true;
     }
     if(mySharedImg.getName() == "front-right"){
-      m_regions = m_rightCameraRegions;
       m_rightIpm->applyHomography(src,src);
+      m_regions = m_rightCameraRegions;
       m_lines = m_rightLines;
+      m_transformationMatrix = m_rightTransformationMatrix;
       m_initialized = true;
     }
     if(!m_initialized){
@@ -210,6 +214,9 @@ void DetectLane::nextContainer(odcore::data::Container &c)
                                       m_lines.col(0)(m_midRegion),m_lines.col(1)(m_midRegion),
                                       (m_maxRow));
 
+      double laneOffsetV2 = GetLaneOffset(m_K(p1,0),m_M(p1,0),
+            m_K(p2,0),m_M(p2,0),m_maxRow);
+      std::cout<<laneOffsetV2<<std::endl;
       //-----------------------------
       // Approximate heading angle
       //-----------------------------
@@ -223,13 +230,21 @@ void DetectLane::nextContainer(odcore::data::Container &c)
                                   (m_minRow));
       // Factor 15 is assumed length between minRow and Maxrow in real life
       double theta = atan((d2-d1) / (double)4);
-      
+
+
+      double newLaneOffset = GetLaneOffset(m_K(p1,0),m_M(p1,0),m_K(p2,0),m_M(p2,0),m_maxRow);
+      double newHeadingAngle = GetHeadingAngle(m_K(p1,0),m_M(p1,0),m_K(p2,0),m_M(p2,0),m_minRow,m_maxRow);
+
       if(std::isfinite(theta) && std::isfinite(laneOffset)){
       std::cout<<"Offset: "<<laneOffset<<" Heading: "<<theta<<std::endl;
+      std::cout<<"New offset: "<<newLaneOffset<<" New heading: "<<newHeadingAngle<<std::endl;
       // Send the message
       opendlv::perception::LanePosition lanePosition(laneOffset,theta);
       odcore::data::Container msg(lanePosition);  
       getConference().send(msg);
+
+
+
   		}
     }
     
@@ -248,12 +263,6 @@ void DetectLane::setUp()
 {
   m_width = 640;
   m_height = 480;
-
-  // regionPoints.push_back(cv::Point2f(-260, 417) );
-  // regionPoints.push_back(cv::Point2f(1039, 335) );
-  // regionPoints.push_back(cv::Point2f( 440, 142) );
-  // regionPoints.push_back(cv::Point2f(170, 142) );
-
 
   std::vector<cv::Point2f> leftRegionPoints;
   leftRegionPoints.push_back(cv::Point2f(-170,480));
@@ -295,16 +304,7 @@ void DetectLane::setUp()
       325,0,325,100,
       380,0,380,100,
       490,0,490,100,
-      590,0,590,100;  // m_leftCameraRegions <<     
-  //   125, 161, 16, 215,
-  //   207, 183, 110, 433,
-  //   269, 177, 260, 448,
-  //   295, 183, 308, 451,
-  //   307, 184, 391, 445,
-  //   323, 195, 456, 450,
-  //   361, 197, 531, 453,
-  //   406, 191, 624, 392,
-  //   453, 145, 609, 202;
+      590,0,590,100;
 
   m_leftCameraRegions.col(0) *= (m_width / 640.0) / 2;
   m_leftCameraRegions.col(2) *= (m_width / 640.0) / 2;
@@ -360,12 +360,99 @@ void DetectLane::setUp()
   m_K = Eigen::MatrixXd(m_nRegions,1);
   m_M = Eigen::MatrixXd(m_nRegions,1);
 
+  m_leftTransformationMatrix = readreadThreeByThreeMatrix("/home/batko/Desktop/leftTransformationMatrix.txt");
+  m_rightTransformationMatrix = readreadThreeByThreeMatrix("/home/batko/Desktop/rightTransformationMatrix.txt");
+
   m_setup = true;
  }
 
 void DetectLane::tearDown()
 {
 }
+
+Eigen::Matrix3d DetectLane::readreadThreeByThreeMatrix(std::string fileName)
+{
+  std::ifstream file(fileName);
+
+  Eigen::Matrix3d transformationMatrix;
+
+
+  if (file.is_open())
+  {
+    for(int i = 0; i < 3; i++){
+      for(int j = 0; j < 3; j++){
+       double item = 0.0;
+       file >> item;
+        transformationMatrix(i,j) = item;
+      }
+    }
+  }
+  
+  file.close();
+
+  return transformationMatrix;
+
+}
+
+void DetectLane::TransformPointToGlobalFrame(Eigen::Vector3d &point)
+{
+
+  point = m_transformationMatrix * point;
+  point = point / point(2);
+
+}
+
+double DetectLane::GetHeadingAngle(double kLeft,double mLeft, double kRight, double mRight, double row1, double row2)
+{
+  //Find x,y point of middle of lane for row1
+  double colLeft1 = kLeft * row1 + mLeft;
+  double colRight1 = kRight * row1 + mRight;
+
+  Eigen::Vector3d leftPoint1(colLeft1, row1, 1);
+  TransformPointToGlobalFrame(leftPoint1);
+  
+  Eigen::Vector3d rightPoint1(colRight1, row1, 1);  
+  TransformPointToGlobalFrame(rightPoint1);
+
+  double dxPoint1 = (leftPoint1(0) + rightPoint1(0) ) / 2.0;
+  double dyPoint1 = (leftPoint1(1) + rightPoint1(1) ) / 2.0;
+
+  //Find x,y point of middle of lane for row2
+  double colLeft2 = kLeft * row2 + mLeft;
+  double colRight2 = kRight * row2 + mRight;
+
+  Eigen::Vector3d leftPoint2(colLeft2, row2, 1);
+  TransformPointToGlobalFrame(leftPoint2);
+
+  Eigen::Vector3d rightPoint2(colRight2, row2, 1);  
+  TransformPointToGlobalFrame(rightPoint2);
+
+  double dxPoint2 = (leftPoint2(0) + rightPoint2(0) ) / 2.0;
+  double dyPoint2 = (leftPoint2(1) + rightPoint2(1) ) / 2.0;
+
+  return std::atan2(dxPoint1-dxPoint2,dyPoint1-dyPoint2);
+
+}
+
+
+double DetectLane::GetLaneOffset(double kLeft,double mLeft, double kRight, double mRight,double row)
+{
+  double colLeft = kLeft * row + mLeft;
+  double colRight = kRight * row + mRight;
+
+  Eigen::Vector3d leftPoint(colLeft, row, 1);
+  std::cout<<leftPoint<<std::endl;
+  TransformPointToGlobalFrame(leftPoint);
+  std::cout<<leftPoint<<std::endl;
+
+  Eigen::Vector3d rightPoint(colRight, row, 1);  
+  TransformPointToGlobalFrame(rightPoint);
+
+  return (leftPoint(0) + rightPoint(0)) / 2.0;
+
+}
+
+
 
 } // detectlane
 } // perception
