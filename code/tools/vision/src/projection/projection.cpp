@@ -111,11 +111,23 @@ Projection::Projection(int32_t const &a_argc, char **a_argv)
       m_regionPoints(),
       m_outputPoints(),
       m_inputSize(),
-      m_outputSize()
+      m_outputSize(),
+      m_warpPointsFileName(),
+      m_leftWarpPointsFileName(),
+      m_rightWarpPointsFileName(),
+      m_transformationMatrixFileName(),
+      m_leftTransformationMatrixFileName(),
+      m_rightTransformationMatrisFileName()
 {
   m_aMatrix = Eigen::MatrixXd(3,3);
   m_bMatrix = Eigen::MatrixXd(3,3);
   m_projectionMatrix = Eigen::MatrixXd(3,3);
+
+  m_leftWarpPointsFileName = "leftCameraWarpPoints.csv";
+  m_rightWarpPointsFileName = "rightCameraWarpPoints.csv";
+
+  m_leftTransformationMatrixFileName = "leftCameraTransformationMatrix.csv";
+  m_rightTransformationMatrisFileName = "rightCameraTransformationMatrix.csv";
 }
 
 Projection::~Projection()
@@ -182,8 +194,17 @@ void Projection::nextContainer(odcore::data::Container &a_c)
     }
     sharedMem->unlock();
 
-    cv::resize(feed,feed,m_inputSize);
+    if(mySharedImg.getName() == "front-left"){
+      m_warpPointsFileName = m_leftWarpPointsFileName;
+      m_transformationMatrixFileName = m_leftTransformationMatrixFileName;
+    }
+    else if(mySharedImg.getName() == "front-right"){
+      m_warpPointsFileName = m_rightWarpPointsFileName;
+      m_transformationMatrixFileName = m_rightTransformationMatrisFileName;
+    }
 
+    cv::resize(feed,feed,m_inputSize);
+     
     if(m_applyWarp){
       cv::Mat warped;
       cv::resize(feed,warped,m_inputSize);
@@ -291,45 +312,21 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Projection::body(){
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
-void Projection::Warp()
+void Projection::SavePerspectivePoints()
 {
-  // m_applyWarp = true;
-  // while(getModuleStateAndWaitForRemainingTimeInTimeslice() ==
-  // odcore::data::dmcp::ModuleStateMessage::RUNNING)
-  // {
-  //   char key = (char) cv::waitKey(1); //time interval for reading key input;
-  //   switch(key){
-  //     case '1':
-  //       m_point = 0;
-  //       break;
-  //     case '2':
-  //       m_point = 1;
-  //       break;
-  //     case '3':
-  //       m_point = 2;
-  //       break;
-  //     case '4':
-  //       m_point = 3;
-  //       break;
-  //     case 'w':
-  //       m_regionPoints.at(m_point).y -= 5;
-  //       break;
-  //     case 's':
-  //       m_regionPoints.at(m_point).y += 5;
-  //       break;
-  //     case 'a':
-  //       m_regionPoints.at(m_point).x -= 5;
-  //       break;
-  //     case 'd':
-  //       m_regionPoints.at(m_point).x += 5;
-  //       break;
-  //     case 'q':
-  //     case 27:
-  //       return;
-  //     default:
-  //       break;
-  //   }
-  // } 
+  Eigen::MatrixXd points(4,2);
+  for(int i = 0; i < 4; i ++){
+    points(i,0) = m_regionPoints.at(i).x;
+    points(i,1) = m_regionPoints.at(i).y;
+  }
+   
+  std::string path = "./var/tools/vision/projection/";
+  std::ofstream file("path" + m_warpPointsFileName);
+
+  if(file.is_open())
+    file << points;
+  file.close();
+ 
 }
 
 void Projection::ReadMatrix()
@@ -420,7 +417,7 @@ void Projection::Calibrate()
 }
 void Projection::Save()
 {
-  std::string path = "./var/tools/vision/projection";
+  std::string path = "./var/tools/vision/projection/";
   m_projectionMatrix =  m_aMatrix * m_bMatrix.inverse();
   std::cout << m_projectionMatrix << std::endl;
   // const static Eigen::IOFormat CSVFormat(Eigen::StreamPrecision,
@@ -433,16 +430,13 @@ void Projection::Save()
     // std::cout<<"Created dir"<<std::endl;
   }
 
-  std::string filename;
-  std::cout<< "filename" << std::endl;
-  std::cin >> filename;
 
-  std::ofstream file(path+ "/" + filename + ".csv");
+  std::ofstream file(path  + m_transformationMatrixFileName );
   if(file.is_open()){
     file << m_projectionMatrix.format(saveFormat);
   }
   file.close();
-  std::cout<<"Saved to file to " + path + "/!" << std::endl;
+  std::cout<<"Saved to file to " + path + "!" << std::endl;
 }
 
 

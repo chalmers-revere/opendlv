@@ -68,6 +68,7 @@ class Projection
   void Project();
   void ReadMatrix();
   void Warp();
+  void SavePerspectivePoints();
 
   double m_recHeight;
   double m_recWidth;
@@ -85,6 +86,13 @@ class Projection
   cv::Size m_inputSize;
   cv::Size m_outputSize;
 
+  std::string m_warpPointsFileName;
+  std::string m_leftWarpPointsFileName;
+  std::string m_rightWarpPointsFileName;
+
+  std::string m_transformationMatrixFileName;
+  std::string m_leftTransformationMatrixFileName;
+  std::string m_rightTransformationMatrisFileName;
 
 };
 
