@@ -22,6 +22,7 @@
 
 #include <memory>
 
+#include <opendavinci/odcore/base/Mutex.h>
 #include "odcantools/MessageToCANDataStore.h"
 
 namespace automotive {
@@ -51,6 +52,7 @@ class CanMessageDataStore
   virtual void add(odcore::data::Container const &container);
 
  private:
+  odcore::base::Mutex m_dataStoreMutex;
   bool m_enabled;
 };
 
