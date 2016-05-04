@@ -19,6 +19,7 @@
 
 #include <iostream>
 
+#include <opendavinci/odcore/base/Lock.h>
 #include <opendavinci/odcore/data/Container.h>
 #include <automotivedata/generated/automotive/GenericCANMessage.h>
 #include <odcantools/CANDevice.h>
@@ -33,12 +34,15 @@ namespace can {
 CanMessageDataStore::CanMessageDataStore(
 std::shared_ptr<automotive::odcantools::CANDevice> canDevice)
     : automotive::odcantools::MessageToCANDataStore(canDevice),
+    m_dataStoreMutex(),
     m_enabled(false)
 {
 }
 
 void CanMessageDataStore::add(odcore::data::Container const &a_container)
 {
+  odcore::base::Lock l(m_dataStoreMutex);
+
   // TODO: Kids, do not try this at home. Issue: #19.
   odcore::data::Container &container = const_cast<odcore::data::Container &>(
       a_container);
