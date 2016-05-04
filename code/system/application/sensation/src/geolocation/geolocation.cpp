@@ -143,7 +143,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       }
 
       std::cout   << getName() << "\t" << "timestamp="
-        << timestamp << "\t control: steering wheel angle = "  << vehicleState.getYawRate()
+        << timestamp << "\t control: steering wheel angle = "  << steering.getRoadwheelangle()
         << "  vel " << propulsion.getPropulsionShaftVehicleSpeed()
         << std::endl;
       std::cout   << getName() << "\t" << "timestamp="
@@ -241,7 +241,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       //save data to file
       bool   saveToFile = true;
       if (  saveToFile){
-      fout_ekfState << timestamp << " "
+      fout_ekfState << std::setprecision(19) << timestamp << " "
                     << gpsReading.getLatitude() << " " << gpsReading.getLongitude() << " " << gpsReading.getNorthHeading() <<  " "
                     << control.v() << " " << control.phi() << " "
                     << observationVector.Z_x() << " " << observationVector.Z_y() << " " << observationVector.Z_theta() << " " << observationVector.Z_theta_dot() << " " << gpsHasData << " "
