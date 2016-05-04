@@ -29,7 +29,7 @@
 #include "opencv2/video/tracking.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
-
+#include "projection/InversePerspectiveMapping.hpp"
 namespace opendlv {
 namespace tools {
 namespace vision {
@@ -66,7 +66,7 @@ class Projection
   void Config();
   void Save();
   void Project();
-
+  void Warp();
 
   char m_option;
   double m_recHeight;
@@ -76,6 +76,16 @@ class Projection
   Eigen::MatrixXd m_aMatrix;
   Eigen::MatrixXd m_bMatrix;
   Eigen::MatrixXd m_projectionMatrix;
+
+  bool m_applyWarp;
+  int m_point;
+  std::vector<cv::Point2f> m_regionPoints;
+  std::vector<cv::Point2f> m_outputPoints;
+
+  cv::Size m_inputSize;
+  cv::Size m_outputSize;
+
+
 };
 
 } // projection
