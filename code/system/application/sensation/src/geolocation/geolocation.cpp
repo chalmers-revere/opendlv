@@ -76,7 +76,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 
   // To dump data structures into a CSV file, you create an output file first.
   // std::ofstream fout("../Exp_data/output.csv");
-  std::ofstream fout_ekfState("../Exp_data/output_ekf.csv");
+  std::ofstream fout_ekfState("./output_ekf.csv");
   fout_ekfState << "%HEADER: Output of the Extended Kalman Filter, data format : \n"
                 << "%timestamp (s), ground truth: x (m),  y (m), theta (rad), theta_dot(rad/s), commands : velocity (m/s) steering angle (rad), noisy data: x (m), y (m), theta (rad), theta_dot (rad/s), ekf estimation vector: x (m), x_dot (m/s), y (m), y_dot (ms), theta (rad), theta_dot(rad/s)  \n"
                 << "%t lat long yaw long_vel wheels_angle Z_x Z_y Z_theta Z_theta_dot HAS_DATA X_x X_x_dot X_y X_y_dot X_theta X_theta_dot sent_lat sent_long sent_alt sent_heading " << endl;
