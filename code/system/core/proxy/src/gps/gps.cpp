@@ -163,6 +163,11 @@ void Gps::nextString(std::string const &s) {
       longitude = std::stod(fields.at(4));
       longitudeDirection = fields.at(5)[0];
 
+
+      std::cout << getName() << " GPS sending signals : Latitude : " << latitude
+                   << " Longitude : " << longitude << std::endl;
+
+
       // 0: Non valid, 1: GPS fix, 2: DGPS fix, 4: RTK fix int, 5: RTK float int
       int gpsQuality = std::stoi(fields.at(6));
       if (gpsQuality == 4 || gpsQuality == 5) {
@@ -213,7 +218,9 @@ void Gps::nextString(std::string const &s) {
   longitude=longitude/100;
 
   // just a check before sending the signal!
-  // std::cout << " GPS reading signals : LAT   " << latitude << "  LONG    " << longitude << std::endl;
+  std::cout << getName() << " GPS sending signals : Latitude : " << latitude
+               << " Longitude : " << longitude << std::endl;
+
 
 
   if (gotGpgga && gotGpvtg && gotGphdt) {
