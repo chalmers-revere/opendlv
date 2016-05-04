@@ -182,12 +182,14 @@ void Projection::nextContainer(odcore::data::Container &a_c)
     }
     sharedMem->unlock();
 
+    cv::resize(feed,feed,m_inputSize);
 
     if(m_applyWarp){
       cv::Mat warped;
       cv::resize(feed,warped,m_inputSize);
       InversePerspectiveMapping ipm(m_inputSize,m_outputSize,m_regionPoints,m_outputPoints);
       ipm.applyHomography(warped,warped);
+      ipm.drawPoints(m_regionPoints,feed);
       cv::namedWindow("Warped");
       cv::imshow("Warped",warped);
     }
