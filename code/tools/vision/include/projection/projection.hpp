@@ -68,7 +68,6 @@ class Projection
   void Project();
   void Warp();
 
-  char m_option;
   double m_recHeight;
   double m_recWidth;
   double m_recPosX;

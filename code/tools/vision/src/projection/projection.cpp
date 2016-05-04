@@ -98,7 +98,6 @@ MouseParams::~MouseParams()
 Projection::Projection(int32_t const &a_argc, char **a_argv)
     : odcore::base::module::TimeTriggeredConferenceClientModule(
       a_argc, a_argv, "tools-vision-projection"),
-      m_option(),
       m_recHeight(),
       m_recWidth(),
       m_recPosX(),
@@ -143,7 +142,7 @@ void Projection::setUp()
   m_outputPoints.push_back(cv::Point2f(outputWidth,outputHeight));
   m_outputPoints.push_back(cv::Point2f(outputWidth,0));
   m_outputPoints.push_back(cv::Point2f(0,0));
-
+}
 void Projection::tearDown()
 {
 }
@@ -183,15 +182,13 @@ void Projection::nextContainer(odcore::data::Container &a_c)
     sharedMem->unlock();
 
 
-    if(m_applyWarp)
-    {
-      //cv::Mat warped;
-      //cv::resize(feed,warped,m_inputSize);
-      //InversePerspectiveMapping ipm(m_inputSize,m_outputSize,m_regionPoints,m_outputPoints);
-      //ipm.applyHomography(warped,warped);
-      //cv::namedWindow("Warped");
-      //cv::imshow("Warped",warped);
-
+    if(m_applyWarp){
+      cv::Mat warped;
+      cv::resize(feed,warped,m_inputSize);
+      InversePerspectiveMapping ipm(m_inputSize,m_outputSize,m_regionPoints,m_outputPoints);
+      ipm.applyHomography(warped,warped);
+      cv::namedWindow("Warped");
+      cv::imshow("Warped",warped);
     }
     // const int32_t windowWidth = 640;
     // const int32_t windowHeight = 480;
@@ -216,36 +213,72 @@ void Projection::nextContainer(odcore::data::Container &a_c)
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Projection::body(){
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
   odcore::data::dmcp::ModuleStateMessage::RUNNING){
-    
-    m_option = (char) cv::waitKey(1);
-    switch(m_option){
-      case 'c':
-        std::cout<<"Enter Calibration" << std::endl;
-        Calibrate();
-        break;
-      case'r':
-        std::cout<<"Enter Configuration" << std::endl;
-        Config();
-        break;
-      case's':
-        std::cout<<"Calculating projection matrix and saving to file" 
-            << std::endl;
-        Save();
-        break;
-      case 'p':
-        std::cout<< "Projecting points" << std::endl;
-        Project();
-      case 'w':
-        m_applyWarp = !m_applyWarp;
-        if(m_applyWarp == true){
-          std::cout<<"Warp drive" <<std::endl;
+      if(!m_applyWarp){
+        char key = (char) cv::waitKey(1);
+        switch(key){
+          case 'c':
+            std::cout<<"Enter Calibration" << std::endl;
+            Calibrate();
+            break;
+          case'r':
+            std::cout<<"Enter Configuration" << std::endl;
+            Config();
+            break;
+          case's':
+            std::cout<<"Calculating projection matrix and saving to file" 
+                << std::endl;
+            Save();
+            break;
+          case 'p':
+            std::cout<< "Projecting points" << std::endl;
+            Project();
+          case 'w':
+            m_applyWarp = !m_applyWarp;
+            if(m_applyWarp == true){
+              std::cout<<"Warp drive" <<std::endl;
+            }
+            break;
+          case 'q':
+          case 27:
+            return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
+          default:
+            break;
         }
-        break;
-      case 'q':
-      case 27:
-        return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
-      default:
-        break;
+      }
+      else{
+        char key = (char) cv::waitKey(1); //time interval for reading key input;
+        switch(key){
+          case '1':
+            m_point = 0;
+            break;
+          case '2':
+            m_point = 1;
+            break;
+          case '3':
+            m_point = 2;
+            break;
+          case '4':
+            m_point = 3;
+            break;
+          case 'w':
+            m_regionPoints.at(m_point).y -= 5;
+            break;
+          case 's':
+            m_regionPoints.at(m_point).y += 5;
+            break;
+          case 'a':
+            m_regionPoints.at(m_point).x -= 5;
+            break;
+          case 'd':
+            m_regionPoints.at(m_point).x += 5;
+            break;
+          case 'q':
+          case 27:
+            m_applyWarp = !m_applyWarp;
+          default:
+            break;
+        }
+      
     }
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
@@ -253,31 +286,43 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Projection::body(){
 
 void Projection::Warp()
 {
-  m_applyWarp = true;
-  while(getModuleStateAndWaitForRemainingTimeInTimeslice() ==
-  odcore::data::dmcp::ModuleStateMessage::RUNNING)
-  {
-    char key = (char)cv::waitKey(1); //time interval for reading key input;
-    if(key == '1')
-      m_point = 0;
-    else if(key == '2')
-      m_point = 1;
-    else if(key == '3')
-      m_point = 2;
-    else if(key == '4')
-      m_point = 3;
-    else if(key == 'w')
-      m_regionPoints.at(m_point).y -= 5;
-    else if(key == 's')
-      m_regionPoints.at(m_point).y += 5;
-    else if (key == 'a')
-      m_regionPoints.at(m_point).x -= 5;
-    else if (key == 'd')
-      m_regionPoints.at(m_point).x += 5;
-    else if (key == 'q')
-      break; 
-  } 
-
+  // m_applyWarp = true;
+  // while(getModuleStateAndWaitForRemainingTimeInTimeslice() ==
+  // odcore::data::dmcp::ModuleStateMessage::RUNNING)
+  // {
+  //   char key = (char) cv::waitKey(1); //time interval for reading key input;
+  //   switch(key){
+  //     case '1':
+  //       m_point = 0;
+  //       break;
+  //     case '2':
+  //       m_point = 1;
+  //       break;
+  //     case '3':
+  //       m_point = 2;
+  //       break;
+  //     case '4':
+  //       m_point = 3;
+  //       break;
+  //     case 'w':
+  //       m_regionPoints.at(m_point).y -= 5;
+  //       break;
+  //     case 's':
+  //       m_regionPoints.at(m_point).y += 5;
+  //       break;
+  //     case 'a':
+  //       m_regionPoints.at(m_point).x -= 5;
+  //       break;
+  //     case 'd':
+  //       m_regionPoints.at(m_point).x += 5;
+  //       break;
+  //     case 'q':
+  //     case 27:
+  //       return;
+  //     default:
+  //       break;
+  //   }
+  // } 
 }
 
 void Projection::Config()
@@ -343,7 +388,7 @@ void Projection::Save()
 {
   m_projectionMatrix =  m_aMatrix * m_bMatrix.inverse();
   std::cout << m_projectionMatrix << std::endl;
-  const static IOFormat CSVFormat(StreamPrecision, DontAlignCols, ", ", "\n");
+  const static Eigen::IOFormat CSVFormat(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", "\n");
   struct stat st;
   if (stat("var/tools/vision/projection", &st) == -1) {
     system("mkdir -p ./var/tools/vision/projection");
@@ -359,6 +404,7 @@ void Projection::Save()
     file << m_projectionMatrix.format(CSVFormat);
   }
   file.close();
+  std::cout<<"Saved to file!" << std::endl;
 }
 
 
