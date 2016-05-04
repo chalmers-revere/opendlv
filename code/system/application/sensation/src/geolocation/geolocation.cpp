@@ -144,7 +144,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 
 
       if (steeringContainer.getReceivedTimeStamp().getSeconds() > 0) {
-        control.phi() = steering.getRoadwheelangle();
+        control.phi() = steering.getSteeringwheelangle()/22.0;
       }
 
       std::cout   << getName() << "\t" << "timestamp="
