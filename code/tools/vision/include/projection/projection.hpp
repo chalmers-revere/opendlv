@@ -66,6 +66,7 @@ class Projection
   void Config();
   void Save();
   void Project();
+  void ReadMatrix();
   void Warp();
 
   double m_recHeight;

@@ -17,6 +17,7 @@
  * USA.
  */
 
+#include <ctype.h>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -124,11 +125,11 @@ void Projection::setUp()
 {
   cv::namedWindow("Calibration", 1 );
 
-  int inputWidth = 640;
-  int inputHeight = 480;
+  uint32_t inputWidth = 640;
+  uint32_t inputHeight = 480;
 
-  int outputWidth = inputWidth;
-  int outputHeight = inputHeight;
+  uint32_t outputWidth = inputWidth;
+  uint32_t outputHeight = inputHeight;
 
   m_inputSize = cv::Size(inputWidth,inputHeight);
   m_outputSize = cv::Size(outputWidth, outputHeight);
@@ -223,6 +224,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Projection::body(){
           case'r':
             std::cout<<"Enter Configuration" << std::endl;
             Config();
+            break;
+          case 'e':
+            std::cout << "Read file" << std::endl;
+            ReadMatrix();
             break;
           case's':
             std::cout<<"Calculating projection matrix and saving to file" 
@@ -325,6 +330,33 @@ void Projection::Warp()
   // } 
 }
 
+void Projection::ReadMatrix()
+{
+  Eigen::MatrixXd m(3,3);
+  std::ifstream indata;
+  std::string filename;
+  std::cout << "Input filename: " << std::endl;
+  std::cin >> filename;
+  std::string filepath = "/opt/opendlv/var/tools/vision/projection/"
+      + filename + ".csv";
+  indata.open(filepath, std::ifstream::in);
+  if(indata.is_open()){
+    for(uint8_t i = 0; i < 3; ++i){
+      for(uint8_t j = 0; j < 3; ++j){
+        double item;
+        indata >> item;
+        // std::cout<<item<<", ";
+        m(i,j) = item;
+      }
+    }
+    std::cout<< m << std::endl;
+  }
+  else{
+    std::cout<< "File not found." << std::endl;
+  }
+  indata.close();
+}
+
 void Projection::Config()
 {
   std::cout<< "rectangle width: ";
@@ -386,25 +418,29 @@ void Projection::Calibrate()
 }
 void Projection::Save()
 {
+  std::string path = "./var/tools/vision/projection";
   m_projectionMatrix =  m_aMatrix * m_bMatrix.inverse();
   std::cout << m_projectionMatrix << std::endl;
-  const static Eigen::IOFormat CSVFormat(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", "\n");
+  // const static Eigen::IOFormat CSVFormat(Eigen::StreamPrecision,
+  //     Eigen::DontAlignCols, ", ", "\n");
+  const static Eigen::IOFormat saveFormat(Eigen::StreamPrecision,
+      Eigen::DontAlignCols, " ", " ", "", "", "", "");
   struct stat st;
-  if (stat("var/tools/vision/projection", &st) == -1) {
-    system("mkdir -p ./var/tools/vision/projection");
+  if (stat(path.c_str(), &st) == -1) {
+    system(("mkdir -p " + path).c_str());
     // std::cout<<"Created dir"<<std::endl;
   }
 
-  std::string name;
-  std::cout<< "filename";
-  std::cin >> name;
+  std::string filename;
+  std::cout<< "filename" << std::endl;
+  std::cin >> filename;
 
-  std::ofstream file("var/tools/vision/projection/"+name+".csv");
+  std::ofstream file(path+ "/" + filename + ".csv");
   if(file.is_open()){
-    file << m_projectionMatrix.format(CSVFormat);
+    file << m_projectionMatrix.format(saveFormat);
   }
   file.close();
-  std::cout<<"Saved to file!" << std::endl;
+  std::cout<<"Saved to file to " + path + "/!" << std::endl;
 }
 
 
