@@ -48,7 +48,9 @@ namespace directionofmovement {
 DirectionOfMovement::DirectionOfMovement(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(
       a_argc, a_argv, "sensation-vision-directionofmovement"),
-      m_Foe(2),
+      m_foePix(2),
+      m_foeWorld(2),
+      m_pixel2World(3,3),
       m_image()
 {
   cv::namedWindow( "FOE", 1 );
@@ -119,18 +121,20 @@ void DirectionOfMovement::nextContainer(odcore::data::Container &a_c)
     B.col(0) = flow.col(3).cwiseProduct(flow.col(0))-flow.col(1).cwiseProduct(flow.col(2));
     
     // FOE = (A * A^T)^-1 * A^T * B
-    Eigen::VectorXd FoeMomentum = ((A.transpose()*A).inverse() * A.transpose() * B) - m_Foe;
+    Eigen::VectorXd FoeMomentum = ((A.transpose()*A).inverse() * A.transpose() * B) - m_foePix;
     if(FoeMomentum.allFinite()){
       if(FoeMomentum.norm() > 10){
-        m_Foe = m_Foe + FoeMomentum/FoeMomentum.norm()*10;
+        m_foePix = m_foePix + FoeMomentum/FoeMomentum.norm()*10;
       }
       else{
-        m_Foe = m_Foe + FoeMomentum/20;
+        m_foePix = m_foePix + FoeMomentum/20;
       }
     }
+
+    // SendContainer();
     
-    std::cout<< m_Foe.transpose() << std::endl;
-    cv::circle(m_image, cv::Point2f(m_Foe(0),m_Foe(1)), 3, cv::Scalar(0,0,255), -1, 8);
+    std::cout<< m_foePix.transpose() << std::endl;
+    cv::circle(m_image, cv::Point2f(m_foePix(0),m_foePix(1)), 3, cv::Scalar(0,0,255), -1, 8);
     const int32_t windowWidth = 640;
     const int32_t windowHeight = 480;
     cv::Mat display;
@@ -143,9 +147,36 @@ void DirectionOfMovement::nextContainer(odcore::data::Container &a_c)
   }
   
 }
+void DirectionOfMovement::SendContainer()
+{
+  float v[3] = {0,0,1};
+  opendlv::coordinate::Spherical3 spherical3Message(v);
+  opendlv::sensation::DirectionOfMovement nextMessage(spherical3Message);
+  odcore::data::Container c(nextMessage);
+  getConference().send(c);
+}
 
 void DirectionOfMovement::setUp()
 {
+ // std::ifstream file("fileName");
+
+ // Eigen::Matrix3d transformationMatrix;
+
+
+ // if (file.is_open())
+ // {
+ //   for(int i = 0; i < 3; i++){
+ //     for(int j = 0; j < 3; j++){
+ //      double item = 0.0;
+ //      file >> item;
+ //       transformationMatrix(i,j) = item;
+ //     }
+ //   }
+ // }
+ 
+ // file.close();
+
+
 }
 
 void DirectionOfMovement::tearDown()

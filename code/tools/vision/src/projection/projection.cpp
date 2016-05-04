@@ -72,14 +72,13 @@ void ProjectMouseClicks(int32_t a_event, int32_t a_x, int32_t a_y, int32_t,
   
   if(a_event == cv::EVENT_LBUTTONDOWN){
     v << a_x,a_y,1;
-    std::cout << *m << std::endl;
-    std::cout << v << std::endl;
-    v = *m*v;
-
-    std::cout << v << std::endl;
-    // v = v * 1/v(3);
-
+    // std::cout << *m << std::endl;
     // std::cout << v << std::endl;
+    v = *m*v;
+    v = v / v(2);
+
+
+    std::cout << v << std::endl;
 
   } 
 }
@@ -178,7 +177,6 @@ void Projection::nextContainer(odcore::data::Container &a_c)
   }
 }
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Projection::body(){
-  Config();
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
   odcore::data::dmcp::ModuleStateMessage::RUNNING){
     
@@ -254,11 +252,11 @@ void Projection::Calibrate()
         mouseClick.points(1,0),mouseClick.points(1,1),mouseClick.points(1,2),
         1,1,1;
     w << mouseClick.points(0,3), mouseClick.points(1,3), 1;
-    std::cout<<q<< std::endl;
-    std::cout<<w<< std::endl;
+    // std::cout<<q<< std::endl;
+    // std::cout<<w<< std::endl;
 
     Eigen::Vector3d scale = q.colPivHouseholderQr().solve(w);
-    std::cout<<scale<<std::endl;
+    // std::cout<<scale<<std::endl;
 
     m_bMatrix << scale(0)*q.col(0),scale(1)*q.col(1),scale(2)*q.col(2);
     std::cout<< m_bMatrix << std::endl;
@@ -273,7 +271,7 @@ void Projection::Save()
 {
   m_projectionMatrix =  m_aMatrix * m_bMatrix.inverse();
   std::cout << m_projectionMatrix << std::endl;
-
+  const static IOFormat CSVFormat(StreamPrecision, DontAlignCols, ", ", "\n");
   struct stat st;
   if (stat("var/tools/vision/projection", &st) == -1) {
     system("mkdir -p ./var/tools/vision/projection");
@@ -286,7 +284,7 @@ void Projection::Save()
 
   std::ofstream file("var/tools/vision/projection/"+name+".csv");
   if(file.is_open()){
-    file << m_projectionMatrix;
+    file << m_projectionMatrix.format(CSVFormat);
   }
   file.close();
 }
