@@ -23,6 +23,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <iomanip>      // std::setprecision
 
 #include <opendavinci/odcore/base/KeyValueConfiguration.h>
 #include <opendavinci/odcore/data/Container.h>
@@ -164,8 +165,8 @@ void Gps::nextString(std::string const &s) {
       longitudeDirection = fields.at(5)[0];
 
 
-      std::cout << getName() << " GPS sending signals : Latitude : " << latitude
-                   << " Longitude : " << longitude << std::endl;
+      std::cout << getName() << " GPS received signals : Latitude : " << std::setprecision(19) << latitude
+                   << " Longitude : " << std::setprecision(19) << longitude << std::endl;
 
 
       // 0: Non valid, 1: GPS fix, 2: DGPS fix, 4: RTK fix int, 5: RTK float int
@@ -214,12 +215,12 @@ void Gps::nextString(std::string const &s) {
   // according to the page 11 of this guide http://www2.etown.edu/wunderbot/DOWNLOAD/AgGPS114/NMEA_Messages_RevA_Guide_ENG.pdf
   // the GPS out data with the following format dd mm,mmmm
   // convert to deg befor sending
-  latitude=latitude/100;
-  longitude=longitude/100;
+  latitude=latitude/100.0;
+  longitude=longitude/100.0;
 
   // just a check before sending the signal!
-  std::cout << getName() << " GPS sending signals : Latitude : " << latitude
-               << " Longitude : " << longitude << std::endl;
+  std::cout << getName() << " GPS sending signals : Latitude : " << latitude << std::setprecision(19)
+               << " Longitude : " << std::setprecision(19) << longitude << std::endl;
 
 
 
