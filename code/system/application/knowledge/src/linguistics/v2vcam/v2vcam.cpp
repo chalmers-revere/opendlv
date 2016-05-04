@@ -51,7 +51,7 @@ V2vCam::V2vCam(int32_t const &a_argc, char **a_argv)
       a_argc, a_argv, "knowledge-linguistics-v2vcam"),
     m_sendLog(),
     m_receiveLog(),
-    m_tt()
+    m_timeType2004()
 {
   struct stat st;
   if (stat("var/application/knowledge/linguistics/v2vcam", &st) == -1) {
@@ -110,7 +110,7 @@ V2vCam::V2vCam(int32_t const &a_argc, char **a_argv)
       nullptr // time zone (NOTE: only in glibc)
       };
 
-  m_tt = timegm(&tm);
+  m_timeType2004 = timegm(&tm);
 }
 
 V2vCam::~V2vCam()
@@ -349,7 +349,7 @@ int32_t V2vCam::GetStationId()
 int32_t V2vCam::GetGenerationDeltaTime()
 {
   std::chrono::system_clock::time_point start2004TimePoint = 
-      std::chrono::system_clock::from_time_t(m_tt);
+      std::chrono::system_clock::from_time_t(m_timeType2004);
   unsigned long millisecondsSince2004Epoch =
       std::chrono::system_clock::now().time_since_epoch() /
       std::chrono::milliseconds(1) - start2004TimePoint.time_since_epoch() / std::chrono::milliseconds(1);

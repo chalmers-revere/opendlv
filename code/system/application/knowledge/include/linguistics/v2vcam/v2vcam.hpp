@@ -79,7 +79,7 @@ class V2vCam
 
   std::ofstream m_sendLog;
   std::ofstream m_receiveLog;
-  std::time_t m_tt;
+  std::time_t m_timeType2004;
 
   unsigned char const m_messageId = 2;
   int32_t m_stationId = 115;

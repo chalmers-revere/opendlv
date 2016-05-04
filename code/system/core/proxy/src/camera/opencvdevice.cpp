@@ -53,7 +53,8 @@ OpenCvDevice::OpenCvDevice(std::string const &a_name,
   std::string videoStreamAddress = std::string("http://") + a_username 
     + ":" + a_password + "@" + a_port + "/axis-cgi/mjpg/video.cgi?user=" 
     + a_username + "&password=" + a_password + "&channel=0&.mjpg";
-  m_capture.reset(new cv::VideoCapture(videoStreamAddress));
+  std::string videoStreamAddressHack = "/home/bjornborg/Videos/rostock.avi";
+  m_capture.reset(new cv::VideoCapture(videoStreamAddressHack));
 
   if (m_capture->isOpened()) {
     std::cout << "Open. width: " << a_width << " height: " << a_height << std::endl;
