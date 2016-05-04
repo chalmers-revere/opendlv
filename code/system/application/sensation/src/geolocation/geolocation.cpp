@@ -118,12 +118,17 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
           opendlv::proxy::reverefh16::Propulsion>();
 
       if (propulsionContainer.getReceivedTimeStamp().getSeconds() > 0) {
-        control.v() = propulsion.getPropulsionShaftVehicleSpeed();
+        control.v() = propulsion.getPropulsionShaftVehicleSpeed()/3.6; // TODO: to m/s --- get the message in si unit
       }
 
+
+      if (propulsion.getPropulsionShaftVehicleSpeed() < 0.001) {
+          control.v() = 0.0;
       // if we don't get any data from the CAN, we try to fill the speed from GPS data
-      auto gpsSpeed = gpsReading.getSpeed();
-      if (propulsion.getPropulsionShaftVehicleSpeed() < 0.00001) control.v() = gpsSpeed;
+          //auto gpsSpeed = gpsReading.getSpeed();
+          //          if (gpsSpeed > 1.0 ){
+          //          control.v() = gpsSpeed;}
+      }
 
 
       auto steeringContainer = getKeyValueDataStore().get(
@@ -143,8 +148,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       }
 
       std::cout   << getName() << "\t" << "timestamp="
-        << timestamp << "\t control: steering wheel angle = "  << steering.getRoadwheelangle()
-        << "  vel " << propulsion.getPropulsionShaftVehicleSpeed()
+        << timestamp << "\t control:  steering.getRoadwheelangle = "  << steering.getRoadwheelangle()
+        << " steering.getSteeringwheelangle " << steering.getSteeringwheelangle()
+        << "  propulsion.getPropulsionShaftVehicleSpeed " << propulsion.getPropulsionShaftVehicleSpeed()
         << std::endl;
       std::cout   << getName() << "\t" << "timestamp="
         << timestamp << "\t original GPS data  "
