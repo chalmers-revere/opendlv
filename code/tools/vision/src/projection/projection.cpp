@@ -103,7 +103,13 @@ Projection::Projection(int32_t const &a_argc, char **a_argv)
       m_recPosY(),
       m_aMatrix(),
       m_bMatrix(),
-      m_projectionMatrix()
+      m_projectionMatrix(),
+      m_applyWarp(false),
+      m_point(),
+      m_regionPoints(),
+      m_outputPoints(),
+      m_inputSize(),
+      m_outputSize()
 {
   m_aMatrix = Eigen::MatrixXd(3,3);
   m_bMatrix = Eigen::MatrixXd(3,3);
@@ -116,6 +122,25 @@ Projection::~Projection()
 void Projection::setUp()
 {
   cv::namedWindow("Calibration", 1 );
+
+  int inputWidth = 640;
+  int inputHeight = 480;
+
+  int outputWidth = inputWidth;
+  int outputHeight = inputHeight;
+
+  m_inputSize = cv::Size(inputWidth,inputHeight);
+  m_outputSize = cv::Size(outputWidth, outputHeight);
+
+  m_regionPoints.push_back(cv::Point2f(0,inputHeight));
+  m_regionPoints.push_back(cv::Point2f(inputWidth,inputHeight));
+  m_regionPoints.push_back(cv::Point2f(inputWidth,0));
+  m_regionPoints.push_back(cv::Point2f(0,0));
+
+  m_outputPoints.push_back(cv::Point2f(0,outputHeight));
+  m_outputPoints.push_back(cv::Point2f(outputWidth,outputHeight));
+  m_outputPoints.push_back(cv::Point2f(outputWidth,0));
+  m_outputPoints.push_back(cv::Point2f(0,0));
 }
 
 void Projection::tearDown()
@@ -155,6 +180,18 @@ void Projection::nextContainer(odcore::data::Container &a_c)
           imgWidth*imgHeight*nrChannels);
     }
     sharedMem->unlock();
+
+
+    if(m_applyWarp)
+    {
+      //cv::Mat warped;
+      //cv::resize(feed,warped,m_inputSize);
+      //InversePerspectiveMapping ipm(m_inputSize,m_outputSize,m_regionPoints,m_outputPoints);
+      //ipm.applyHomography(warped,warped);
+      //cv::namedWindow("Warped");
+      //cv::imshow("Warped",warped);
+
+    }
     // const int32_t windowWidth = 640;
     // const int32_t windowHeight = 480;
     // cv::Mat display;
@@ -196,11 +233,49 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Projection::body(){
       case 'p':
         std::cout<< "Projecting points" << std::endl;
         Project();
+        break;
+      case 'w':
+        if(m_applyWarp == false)
+        {
+          std::cout<<"Warp drive" <<std::endl;
+          //Warp();
+        } else 
+        {
+          m_applyWarp = false;
+        }
       default:
         break;
     }
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
+}
+
+void Projection::Warp()
+{
+  m_applyWarp = true;
+  while(true)
+  {
+    char key = (char)cv::waitKey(1); //time interval for reading key input;
+    if(key == '1')
+      m_point = 0;
+    else if(key == '2')
+      m_point = 1;
+    else if(key == '3')
+      m_point = 2;
+    else if(key == '4')
+      m_point = 3;
+    else if(key == 'w')
+      m_regionPoints.at(m_point).y -= 5;
+    else if(key == 's')
+      m_regionPoints.at(m_point).y += 5;
+    else if (key == 'a')
+      m_regionPoints.at(m_point).x -= 5;
+    else if (key == 'd')
+      m_regionPoints.at(m_point).x += 5;
+    else if (key == 'q')
+      break; 
+  } 
+
 }
 
 void Projection::Config()
