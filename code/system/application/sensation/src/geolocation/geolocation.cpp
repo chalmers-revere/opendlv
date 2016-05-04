@@ -22,6 +22,7 @@
 #include <cmath>
 #include <iostream>
 #include <fstream>
+#include <iomanip>      // std::setprecision
 
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
@@ -147,8 +148,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
         << std::endl;
       std::cout   << getName() << "\t" << "timestamp="
         << timestamp << "\t original GPS data  "
-        << gpsReading.getLatitude() << "  vel "
-        << gpsReading.getLongitude() << " altitude "
+        << std::setprecision(19) << gpsReading.getLatitude() << "  vel "
+        << std::setprecision(19) << gpsReading.getLongitude() << " altitude "
         << gpsReading.getAltitude() << std::endl;
 
       opendlv::data::environment::WGS84Coordinate currentLocation(
@@ -226,8 +227,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       std::cout   << getName() << "\t" << "timestamp="
         << timestamp << "\t "
         << "\tlat=" << currentWGS84CoordinateEstimation.getLatitude()
-        << ", long=" << currentWGS84CoordinateEstimation.getLongitude()
-        << ", theta=" << state.theta() << std::endl;
+        << ", long=" << std::setprecision(19) << currentWGS84CoordinateEstimation.getLongitude()
+        << ", theta=" << std::setprecision(19) << state.theta() << std::endl;
 
       // Send the message
       opendlv::sensation::Geolocation geoLocationEstimation(currentWGS84CoordinateEstimation.getLatitude(),
