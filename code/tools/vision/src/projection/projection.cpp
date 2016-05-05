@@ -26,14 +26,13 @@
 #include <vector>
 #include <unistd.h>
 
-#include <opendavinci/odcore/data/Container.h>
-
-#include "opendavinci/odcore/base/KeyValueConfiguration.h"
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
-
 #include "opendavinci/GeneratedHeaders_OpenDaVINCI.h"
+#include "opendavinci/odcore/data/Container.h"
+#include "opendavinci/odcore/base/KeyValueConfiguration.h"
 #include "opendavinci/odcore/wrapper/SharedMemoryFactory.h"
 #include "opendavinci/odcore/wrapper/SharedMemory.h"
+
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 #include "projection/projection.hpp"
 
@@ -65,6 +64,7 @@ void LogMouseClicks(int32_t a_event, int32_t a_x, int32_t a_y, int32_t,
     click->iterator = 0;
   }
 }
+
 void ProjectMouseClicks(int32_t a_event, int32_t a_x, int32_t a_y, int32_t,
     void* a_userdata)
 {
@@ -91,6 +91,7 @@ MouseParams::MouseParams() :
   points = Eigen::MatrixXd(2,4);
   cv::namedWindow("Calibration", 1 );
 }
+
 MouseParams::~MouseParams()
 {
 }
@@ -134,6 +135,7 @@ Projection::Projection(int32_t const &a_argc, char **a_argv)
 Projection::~Projection()
 {
 }
+
 void Projection::setUp()
 {
   cv::namedWindow("Calibration", 1 );
@@ -144,20 +146,21 @@ void Projection::setUp()
   uint32_t outputWidth = inputWidth;
   uint32_t outputHeight = inputHeight;
 
-  m_inputSize = cv::Size(inputWidth,inputHeight);
+  m_inputSize = cv::Size(inputWidth, inputHeight);
   m_outputSize = cv::Size(outputWidth, outputHeight);
 
-  m_regionPoints.push_back(cv::Point2f(0,inputHeight));
-  m_regionPoints.push_back(cv::Point2f(inputWidth,inputHeight));
-  m_regionPoints.push_back(cv::Point2f(inputWidth,0));
+  m_regionPoints.push_back(cv::Point2f(0, inputHeight));
+  m_regionPoints.push_back(cv::Point2f(inputWidth, inputHeight));
+  m_regionPoints.push_back(cv::Point2f(inputWidth, 0));
   m_regionPoints.push_back(cv::Point2f(0,0));
 
-  m_outputPoints.push_back(cv::Point2f(0,outputHeight));
-  m_outputPoints.push_back(cv::Point2f(outputWidth,outputHeight));
-  m_outputPoints.push_back(cv::Point2f(outputWidth,0));
-  m_outputPoints.push_back(cv::Point2f(0,0));
+  m_outputPoints.push_back(cv::Point2f(0, outputHeight));
+  m_outputPoints.push_back(cv::Point2f(outputWidth, outputHeight));
+  m_outputPoints.push_back(cv::Point2f(outputWidth, 0));
+  m_outputPoints.push_back(cv::Point2f(0, 0));
   m_initialized = true;
 }
+
 void Projection::tearDown()
 {
 }
@@ -181,7 +184,7 @@ void Projection::nextContainer(odcore::data::Container &a_c)
 
     IplImage* myIplImage;
     
-    myIplImage = cvCreateImage(cvSize(imgWidth,imgHeight), IPL_DEPTH_8U,
+    myIplImage = cvCreateImage(cvSize(imgWidth, imgHeight), IPL_DEPTH_8U,
         nrChannels);
     cv::Mat feed(myIplImage);
 
@@ -209,13 +212,13 @@ void Projection::nextContainer(odcore::data::Container &a_c)
        
       if(m_applyWarp){
         cv::Mat warped;
-        cv::resize(feed,warped,m_inputSize);
-        InversePerspectiveMapping ipm(m_inputSize,m_outputSize,m_regionPoints,
+        cv::resize(feed,warped, m_inputSize);
+        InversePerspectiveMapping ipm(m_inputSize, m_outputSize, m_regionPoints,
             m_outputPoints);
-        ipm.applyHomography(warped,warped);
-        ipm.drawPoints(m_regionPoints,feed);
+        ipm.ApplyHomography(warped, warped);
+        ipm.DrawPoints(m_regionPoints, feed);
         cv::namedWindow("Warped");
-        cv::imshow("Warped",warped);
+        cv::imshow("Warped", warped);
       }
       // const int32_t windowWidth = 640;
       // const int32_t windowHeight = 480;
@@ -238,6 +241,7 @@ void Projection::nextContainer(odcore::data::Container &a_c)
     return;
   }
 }
+
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Projection::body(){
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
   odcore::data::dmcp::ModuleStateMessage::RUNNING){
@@ -245,11 +249,11 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Projection::body(){
         char key = (char) cv::waitKey(1);
         switch(key){
           case 'c':
-            std::cout<<"Enter Calibration" << std::endl;
+            std::cout << "Enter Calibration" << std::endl;
             Calibrate();
             break;
           case'r':
-            std::cout<<"Enter Configuration" << std::endl;
+            std::cout << "Enter Configuration" << std::endl;
             Config();
             break;
           case 'e':
@@ -257,17 +261,17 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Projection::body(){
             ReadMatrix();
             break;
           case's':
-            std::cout<<"Calculating projection matrix and saving to file" 
+            std::cout << "Calculating projection matrix and saving to file" 
                 << std::endl;
             Save();
             break;
           case 'p':
-            std::cout<< "Projecting points" << std::endl;
+            std::cout << "Projecting points" << std::endl;
             Project();
           case 'w':
             m_applyWarp = !m_applyWarp;
             if(m_applyWarp == true){
-              std::cout<<"Warp drive" <<std::endl;
+              std::cout<<"Warp drive" << std::endl;
             }
             break;
           case 'q':
@@ -362,13 +366,13 @@ void Projection::ReadMatrix()
 
 void Projection::Config()
 {
-  std::cout<< "rectangle width: ";
+  std::cout << "rectangle width: ";
   std::cin >> m_recWidth;
-  std::cout<< "rectangle height: ";
+  std::cout << "rectangle height: ";
   std::cin >> m_recHeight;
-  std::cout<< "x position: ";
+  std::cout << "x position: ";
   std::cin >> m_recPosX;
-  std::cout<< "y position: ";
+  std::cout << "y position: ";
   std::cin >> m_recPosY;
   Eigen::MatrixXd q(3,3), w(3,1);
   q <<  m_recPosX, m_recPosX, m_recPosX+m_recWidth,
@@ -383,7 +387,7 @@ void Projection::Config()
   Eigen::Vector3d scale = q.colPivHouseholderQr().solve(w);
   std::cout<<scale<<std::endl;
 
-  m_aMatrix << scale(0)*q.col(0) ,scale(1)*q.col(1),scale(2)*q.col(2);
+  m_aMatrix << scale(0)*q.col(0) ,scale(1)*q.col(1), scale(2)*q.col(2);
   std::cout<< m_aMatrix << std::endl;
 
   std::cout<<"Configuration done." << std::endl;
@@ -419,12 +423,13 @@ void Projection::Calibrate()
     std::cout << "Calibration cancelled." << std::endl;
   }
 }
+
 void Projection::Save()
 {
   std::string path;
-  std::cout<<"Enter path to save matrices\n";
-  std::cin>> path;
-  std::cout<<"\nEntered path : "<<path<<std::endl;
+  std::cout << "Enter path to save matrices\n";
+  std::cin >> path;
+  std::cout << "\nEntered path : " << path << std::endl;
   
   m_projectionMatrix =  m_aMatrix * m_bMatrix.inverse();
   std::cout << m_projectionMatrix << std::endl;
@@ -456,7 +461,7 @@ void Projection::Project()
       (void *) &m_projectionMatrix);
   cv::waitKey(0);
   cv::setMouseCallback("Calibration", NULL, NULL);
-  std::cout<< "Exit point projection" << std::endl;
+  std::cout << "Exit point projection" << std::endl;
 }
 
 } // projection
