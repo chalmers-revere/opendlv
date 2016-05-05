@@ -22,6 +22,7 @@
 #include <cmath>
 #include <iostream>
 #include <fstream>
+#include <iomanip>      // std::setprecision
 
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
@@ -75,7 +76,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 
   // To dump data structures into a CSV file, you create an output file first.
   // std::ofstream fout("../Exp_data/output.csv");
-  std::ofstream fout_ekfState("output_ekf.csv");
+  std::ofstream fout_ekfState("./output_ekf.csv");
   fout_ekfState << "%HEADER: Output of the Extended Kalman Filter, data format : \n"
                 << "%timestamp (s), ground truth: x (m),  y (m), theta (rad), theta_dot(rad/s), commands : velocity (m/s) steering angle (rad), noisy data: x (m), y (m), theta (rad), theta_dot (rad/s), ekf estimation vector: x (m), x_dot (m/s), y (m), y_dot (ms), theta (rad), theta_dot(rad/s)  \n"
                 << "%t lat long yaw long_vel wheels_angle Z_x Z_y Z_theta Z_theta_dot HAS_DATA X_x X_x_dot X_y X_y_dot X_theta X_theta_dot sent_lat sent_long sent_alt sent_heading " << endl;
@@ -117,12 +118,17 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
           opendlv::proxy::reverefh16::Propulsion>();
 
       if (propulsionContainer.getReceivedTimeStamp().getSeconds() > 0) {
-        control.v() = propulsion.getPropulsionShaftVehicleSpeed();
+        control.v() = propulsion.getPropulsionShaftVehicleSpeed()/3.6; // TODO: to m/s --- get the message in si unit
       }
 
+
+      if (propulsion.getPropulsionShaftVehicleSpeed() < 0.001) {
+          control.v() = 0.0;
       // if we don't get any data from the CAN, we try to fill the speed from GPS data
-      auto gpsSpeed = gpsReading.getSpeed();
-      if (propulsion.getPropulsionShaftVehicleSpeed() < 0.00001) control.v() = gpsSpeed;
+          //auto gpsSpeed = gpsReading.getSpeed();
+          //          if (gpsSpeed > 1.0 ){
+          //          control.v() = gpsSpeed;}
+      }
 
 
       auto steeringContainer = getKeyValueDataStore().get(
@@ -138,17 +144,18 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 
 
       if (steeringContainer.getReceivedTimeStamp().getSeconds() > 0) {
-        control.phi() = steering.getRoadwheelangle();
+        control.phi() = steering.getSteeringwheelangle()/22.0;
       }
 
       std::cout   << getName() << "\t" << "timestamp="
-        << timestamp << "\t control: steering wheel angle = "  << vehicleState.getYawRate()
-        << "  vel " << propulsion.getPropulsionShaftVehicleSpeed()
+        << timestamp << "\t control:  steering.getRoadwheelangle = "  << steering.getRoadwheelangle()
+        << " steering.getSteeringwheelangle " << steering.getSteeringwheelangle()
+        << "  propulsion.getPropulsionShaftVehicleSpeed " << propulsion.getPropulsionShaftVehicleSpeed()
         << std::endl;
       std::cout   << getName() << "\t" << "timestamp="
         << timestamp << "\t original GPS data  "
-        << gpsReading.getLatitude() << "  vel "
-        << gpsReading.getLongitude() << " altitude "
+        << std::setprecision(19) << gpsReading.getLatitude() << "  vel "
+        << std::setprecision(19) << gpsReading.getLongitude() << " altitude "
         << gpsReading.getAltitude() << std::endl;
 
       opendlv::data::environment::WGS84Coordinate currentLocation(
@@ -226,8 +233,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       std::cout   << getName() << "\t" << "timestamp="
         << timestamp << "\t "
         << "\tlat=" << currentWGS84CoordinateEstimation.getLatitude()
-        << ", long=" << currentWGS84CoordinateEstimation.getLongitude()
-        << ", theta=" << state.theta() << std::endl;
+        << ", long=" << std::setprecision(19) << currentWGS84CoordinateEstimation.getLongitude()
+        << ", theta=" << std::setprecision(19) << state.theta() << std::endl;
 
       // Send the message
       opendlv::sensation::Geolocation geoLocationEstimation(currentWGS84CoordinateEstimation.getLatitude(),
@@ -240,12 +247,12 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       //save data to file
       bool   saveToFile = true;
       if (  saveToFile){
-      fout_ekfState << timestamp << " "
+      fout_ekfState << std::setprecision(19) << timestamp << " "
                     << gpsReading.getLatitude() << " " << gpsReading.getLongitude() << " " << gpsReading.getNorthHeading() <<  " "
                     << control.v() << " " << control.phi() << " "
                     << observationVector.Z_x() << " " << observationVector.Z_y() << " " << observationVector.Z_theta() << " " << observationVector.Z_theta_dot() << " " << gpsHasData << " "
                     << state.x() << " " << state.x_dot() << " "  << state.y() << " " << state.y_dot() << " " << state.theta() << " " << state.theta_dot() << " "
-                    << currentWGS84CoordinateEstimation.getLatitude() <<  currentWGS84CoordinateEstimation.getLongitude() << gpsReading.getAltitude() << heading
+                    << currentWGS84CoordinateEstimation.getLatitude() << " " <<   currentWGS84CoordinateEstimation.getLongitude() << " " << gpsReading.getAltitude() << " " << heading
                     << endl;
       }
 
