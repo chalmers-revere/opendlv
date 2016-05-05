@@ -208,9 +208,10 @@ void Projection::nextContainer(odcore::data::Container &a_c)
     if(m_applyWarp){
       cv::Mat warped;
       cv::resize(feed,warped,m_inputSize);
-      InversePerspectiveMapping ipm(m_inputSize,m_outputSize,m_regionPoints,m_outputPoints);
-      ipm.applyHomography(warped,warped);
-      ipm.drawPoints(m_regionPoints,feed);
+      InversePerspectiveMapping ipm(m_inputSize,m_outputSize,m_regionPoints,
+          m_outputPoints);
+      ipm.ApplyHomography(warped,warped);
+      ipm.DrawPoints(m_regionPoints,feed);
       cv::namedWindow("Warped");
       cv::imshow("Warped",warped);
     }
@@ -321,7 +322,7 @@ void Projection::SavePerspectivePoints()
   }
    
   std::string path = "./var/tools/vision/projection/";
-  std::ofstream file("path" + m_warpPointsFileName);
+  std::ofstream file(path + m_warpPointsFileName);
 
   if(file.is_open())
     file << points;
@@ -437,6 +438,8 @@ void Projection::Save()
   }
   file.close();
   std::cout<<"Saved to file to " + path + "!" << std::endl;
+
+  SavePerspectivePoints();
 }
 
 

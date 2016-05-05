@@ -113,7 +113,9 @@ void DetectLane::nextContainer(odcore::data::Container &c)
     odcore::data::image::SharedImage mySharedImg = 
         c.getData<odcore::data::image::SharedImage>();
 
-    std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(mySharedImg.getName()));
+    std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(
+          odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(
+              mySharedImg.getName()));
     
     const uint32_t nrChannels = 3;//mySharedImg.getBytesPerPixel();;
     int imgWidth = mySharedImg.getWidth();
@@ -121,7 +123,8 @@ void DetectLane::nextContainer(odcore::data::Container &c)
     cv::Mat image;
    
     IplImage* myIplImage;
-    myIplImage = cvCreateImage(cvSize(imgWidth, imgHeight), IPL_DEPTH_8U, nrChannels);
+    myIplImage = cvCreateImage(cvSize(imgWidth, imgHeight),
+        IPL_DEPTH_8U, nrChannels);
     cv::Mat src(myIplImage);
     cv::Mat test;
 
@@ -131,7 +134,8 @@ void DetectLane::nextContainer(odcore::data::Container &c)
     
     sharedMem->lock();
     {
-      memcpy(src.data, sharedMem->getSharedMemory(), imgWidth*imgHeight*nrChannels);
+      memcpy(src.data, sharedMem->getSharedMemory(),
+          imgWidth*imgHeight*nrChannels);
     }
     sharedMem->unlock();
     
@@ -147,14 +151,14 @@ void DetectLane::nextContainer(odcore::data::Container &c)
     //-----------------------------
     m_initialized = false;
     if(mySharedImg.getName() == "front-left"){
-      m_leftIpm->applyHomography(src,src);
+      m_leftIpm->ApplyHomography(src,src);
       m_regions = m_leftCameraRegions;
       m_lines = m_leftLines;
       m_transformationMatrix = m_leftTransformationMatrix;
       m_initialized = true;
     }
     if(mySharedImg.getName() == "front-right"){
-      m_rightIpm->applyHomography(src,src);
+      m_rightIpm->ApplyHomography(src,src);
       m_regions = m_rightCameraRegions;
       m_lines = m_rightLines;
       m_transformationMatrix = m_rightTransformationMatrix;
@@ -171,7 +175,8 @@ void DetectLane::nextContainer(odcore::data::Container &c)
     //-----------------------------
     // Choose processing type
     //-----------------------------
-    cv::inRange(src, cv::Scalar(m_threshold, m_threshold, m_threshold), cv::Scalar(255, 255, 255), image);
+    cv::inRange(src, cv::Scalar(m_threshold, m_threshold, m_threshold),
+        cv::Scalar(255, 255, 255), image);
     medianBlur(image, image, 3);
 
      
@@ -184,7 +189,8 @@ void DetectLane::nextContainer(odcore::data::Container &c)
     //-----------------------------
     // Extract lines from points
     //-----------------------------
-    ExtractLines(&m_recoveredPoints,&m_K,&m_M,m_nRegions,m_nPoints,&m_pointsPerRegion);
+    ExtractLines(&m_recoveredPoints,&m_K,&m_M,m_nRegions,m_nPoints,
+        &m_pointsPerRegion);
 
     m_laneLocation2 = Eigen::VectorXd::Zero(m_nRegions, 1);
     
@@ -195,14 +201,16 @@ void DetectLane::nextContainer(odcore::data::Container &c)
     
     if (fabs(m_pointsPerRegion.sum()) > 0.0001){
       
-      SelectLaneOrientation(m_regionIndex,m_laneLocation2,(int)m_recoveredPoints.cols());
+      SelectLaneOrientation(m_regionIndex,m_laneLocation2,
+          (int)m_recoveredPoints.cols());
       int p1 = m_regionIndex(0,0);
       int p2 = m_regionIndex(1,0);
       
       //-----------------------------
       // Draw boarders/lines - VISUALIZATION
       //-----------------------------
-      DrawBorders(&src,m_minRow,m_maxRow,m_K(p1,0),m_K(p2,0),m_M(p1,0),m_M(p2,0));
+      DrawBorders(&src,m_minRow,m_maxRow,m_K(p1,0),m_K(p2,0),m_M(p1,0),
+          m_M(p2,0));
       //DrawTracks(&src, &K, &M,MINROW,MAXROW,Scalar(0,0,255));
       DrawTracks(&src, &m_k,&m_m,m_minRow,Scalar(255,255,255));
       
@@ -210,9 +218,10 @@ void DetectLane::nextContainer(odcore::data::Container &c)
       // Calculate lane offset
       //-----------------------------
       double laneOffset = GetLateralPosition(m_K(p1,0),m_M(p1,0),
-                                      m_K(p2,0),m_M(p2,0),
-                                      m_lines.col(0)(m_midRegion),m_lines.col(1)(m_midRegion),
-                                      (m_maxRow));
+          m_K(p2,0),m_M(p2,0),
+          m_lines.col(0)(m_midRegion),
+          m_lines.col(1)(m_midRegion),
+          (m_maxRow));
 
       double laneOffsetV2 = GetLaneOffset(m_K(p1,0),m_M(p1,0),
             m_K(p2,0),m_M(p2,0),m_maxRow);
@@ -221,23 +230,27 @@ void DetectLane::nextContainer(odcore::data::Container &c)
       // Approximate heading angle
       //-----------------------------
       double d1 = GetLateralPosition(m_K(p1,0),m_M(p1,0),
-                                  m_K(p2,0),m_M(p2,0),
-                                m_lines.col(0)(m_midRegion),m_lines.col(1)(m_midRegion),
-                                  (m_maxRow));
+          m_K(p2,0),m_M(p2,0),
+          m_lines.col(0)(m_midRegion),
+          m_lines.col(1)(m_midRegion),
+          (m_maxRow));
       double d2 = GetLateralPosition(m_K(p1,0),m_M(p1,0),
-                                  m_K(p2,0),m_M(p2,0),
-                                  m_lines.col(0)(m_midRegion),m_lines.col(1)(m_midRegion),
-                                  (m_minRow));
+          m_K(p2,0),m_M(p2,0),
+          m_lines.col(0)(m_midRegion),m_lines.col(1)(m_midRegion),
+          (m_minRow));
       // Factor 15 is assumed length between minRow and Maxrow in real life
       double theta = atan((d2-d1) / (double)4);
 
 
-      double newLaneOffset = GetLaneOffset(m_K(p1,0),m_M(p1,0),m_K(p2,0),m_M(p2,0),m_maxRow);
-      double newHeadingAngle = GetHeadingAngle(m_K(p1,0),m_M(p1,0),m_K(p2,0),m_M(p2,0),m_minRow,m_maxRow);
+      double newLaneOffset = GetLaneOffset(m_K(p1,0),
+          m_M(p1,0),m_K(p2,0),m_M(p2,0),m_maxRow);
+      double newHeadingAngle = GetHeadingAngle(m_K(p1,0),
+          m_M(p1,0),m_K(p2,0),m_M(p2,0),m_minRow,m_maxRow);
 
       if(std::isfinite(theta) && std::isfinite(laneOffset)){
       std::cout<<"Offset: "<<laneOffset<<" Heading: "<<theta<<std::endl;
-      std::cout<<"New offset: "<<newLaneOffset<<" New heading: "<<newHeadingAngle<<std::endl;
+      std::cout<<"New offset: "<<newLaneOffset<<" New heading: "
+          <<newHeadingAngle<<std::endl;
       // Send the message
       opendlv::perception::LanePosition lanePosition(laneOffset,theta);
       odcore::data::Container msg(lanePosition);  
@@ -284,8 +297,12 @@ void DetectLane::setUp()
   outputPoints.push_back(cv::Point2f(0, 0) ); 
 
 
-  m_leftIpm.reset(new InversePerspectiveMapping(cv::Size(m_width,m_height),cv::Size(m_width/2,m_height/2),leftRegionPoints,outputPoints));
-  m_rightIpm.reset(new InversePerspectiveMapping(cv::Size(m_width,m_height),cv::Size(m_width/2,m_height/2),rightRegionPoints,outputPoints));
+  m_leftIpm.reset(new InversePerspectiveMapping(
+          cv::Size(m_width,m_height),cv::Size(m_width/2,m_height/2),
+          leftRegionPoints,outputPoints));
+  m_rightIpm.reset(new InversePerspectiveMapping(
+          cv::Size(m_width,m_height),cv::Size(m_width/2,m_height/2),
+          rightRegionPoints,outputPoints));
     
 
   m_regions = Eigen::MatrixXd(7,4);
@@ -360,8 +377,10 @@ void DetectLane::setUp()
   m_K = Eigen::MatrixXd(m_nRegions,1);
   m_M = Eigen::MatrixXd(m_nRegions,1);
 
-  m_leftTransformationMatrix = readreadThreeByThreeMatrix("/home/batko/Desktop/leftTransformationMatrix.txt");
-  m_rightTransformationMatrix = readreadThreeByThreeMatrix("/home/batko/Desktop/rightTransformationMatrix.txt");
+  m_leftTransformationMatrix = readreadThreeByThreeMatrix(
+          "/home/batko/Desktop/leftTransformationMatrix.txt");
+  m_rightTransformationMatrix = readreadThreeByThreeMatrix(
+          "/home/batko/Desktop/rightTransformationMatrix.txt");
 
   m_setup = true;
  }
@@ -402,7 +421,8 @@ void DetectLane::TransformPointToGlobalFrame(Eigen::Vector3d &point)
 
 }
 
-double DetectLane::GetHeadingAngle(double kLeft,double mLeft, double kRight, double mRight, double row1, double row2)
+double DetectLane::GetHeadingAngle(double kLeft,double mLeft, double kRight,
+    double mRight, double row1, double row2)
 {
   //Find x,y point of middle of lane for row1
   double colLeft1 = kLeft * row1 + mLeft;
@@ -435,7 +455,8 @@ double DetectLane::GetHeadingAngle(double kLeft,double mLeft, double kRight, dou
 }
 
 
-double DetectLane::GetLaneOffset(double kLeft,double mLeft, double kRight, double mRight,double row)
+double DetectLane::GetLaneOffset(double kLeft,double mLeft, double kRight,
+    double mRight,double row)
 {
   double colLeft = kLeft * row + mLeft;
   double colRight = kRight * row + mRight;

@@ -1,5 +1,5 @@
-#ifndef __INVERSEPERSPECTIVEMAPPING_HPP_
-#define __INVERSEPERSPECTIVEMAPPING_HPP_
+#ifndef DETECTLANE_INVERSEPERSPECTIVEMAPPING_HPP_
+#define DETECTLANE_INVERSEPERSPECTIVEMAPPING_HPP_
 
 #include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -14,16 +14,21 @@ class InversePerspectiveMapping
 
 public:
 	InversePerspectiveMapping();
-	InversePerspectiveMapping(const cv::Size &a_originalSize,const cv::Size &a_outputSize,
-			const std::vector<cv::Point2f>& a_regionPoints, const std::vector<cv::Point2f>& a_outputPoints);
-	void applyHomography(cv::Mat &a_inputImage,cv::Mat &a_outputImage, int borderMode = cv::BORDER_CONSTANT);
-	cv::Point2d applyHomography(const cv::Point2d& inputPoint, const cv::Mat& a_H);
-	void drawPoints( const std::vector<cv::Point2f>& _points, cv::Mat& _img );
-	void initialize(const cv::Size& a_originalSize,const cv::Size& a_outputSize,
-		 const std::vector<cv::Point2f>& a_regionPoints, const std::vector<cv::Point2f>& a_outputPoints);
+	InversePerspectiveMapping(cv::Size const &a_originalSize,
+			cv::Size const &a_outputSize,
+			std::vector<cv::Point2f> const &a_regionPoints,
+			std::vector<cv::Point2f> const &a_outputPoints);
+	void ApplyHomography(cv::Mat &a_inputImage,cv::Mat &a_outputImage,
+			int borderMode = cv::BORDER_CONSTANT);
+	cv::Point2d ApplyHomography(cv::Point2d const & inputPoint,
+			cv::Mat const &a_H);
+	void DrawPoints(std::vector<cv::Point2f> const & _points, cv::Mat& _img );
+	void Initialize(cv::Size const & a_originalSize,cv::Size const & a_outputSize,
+		  std::vector<cv::Point2f> const & a_regionPoints,
+		 	std::vector<cv::Point2f> const & a_outputPoints);
 
 private:
-	void generateRemappingFunction();
+	void GenerateRemappingFunction();
 	
 	cv::Size m_originalSize;
 	cv::Size m_outputSize;
@@ -42,6 +47,8 @@ private:
 	
 
 };
+
+
 
 
 

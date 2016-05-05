@@ -45,6 +45,15 @@ class DetectLane
   virtual void nextContainer(odcore::data::Container &);
 
  private:
+  void setUp();
+  void tearDown();
+  Eigen::Matrix3d readreadThreeByThreeMatrix(std::string fileName);
+  void TransformPointToGlobalFrame(Eigen::Vector3d &point);
+  double GetLaneOffset(double kLeft,double mLeft, double kRight,
+      double mRight,double col);
+  double GetHeadingAngle(double kLeft,double mLeft, double kRight,
+      double mRight, double row1, double row2);
+
   bool m_setup;
   int m_width;
   int m_height;
@@ -94,14 +103,6 @@ class DetectLane
   Eigen::Matrix3d m_transformationMatrix;
   Eigen::Matrix3d m_leftTransformationMatrix;
   Eigen::Matrix3d m_rightTransformationMatrix;
-  
-
-  void setUp();
-  void tearDown();
-  Eigen::Matrix3d readreadThreeByThreeMatrix(std::string fileName);
-  void TransformPointToGlobalFrame(Eigen::Vector3d &point);
-  double GetLaneOffset(double kLeft,double mLeft, double kRight, double mRight,double col);
-  double GetHeadingAngle(double kLeft,double mLeft, double kRight, double mRight, double row1, double row2);
 
 };
 
