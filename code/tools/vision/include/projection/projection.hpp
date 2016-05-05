@@ -94,6 +94,8 @@ class Projection
   std::string m_leftTransformationMatrixFileName;
   std::string m_rightTransformationMatrisFileName;
 
+  bool m_initialized;
+
 };
 
 } // projection

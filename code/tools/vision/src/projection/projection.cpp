@@ -117,7 +117,8 @@ Projection::Projection(int32_t const &a_argc, char **a_argv)
       m_rightWarpPointsFileName(),
       m_transformationMatrixFileName(),
       m_leftTransformationMatrixFileName(),
-      m_rightTransformationMatrisFileName()
+      m_rightTransformationMatrisFileName(),
+      m_initialized(false)
 {
   m_aMatrix = Eigen::MatrixXd(3,3);
   m_bMatrix = Eigen::MatrixXd(3,3);
@@ -155,6 +156,7 @@ void Projection::setUp()
   m_outputPoints.push_back(cv::Point2f(outputWidth,outputHeight));
   m_outputPoints.push_back(cv::Point2f(outputWidth,0));
   m_outputPoints.push_back(cv::Point2f(0,0));
+  m_initialized = true;
 }
 void Projection::tearDown()
 {
@@ -194,44 +196,45 @@ void Projection::nextContainer(odcore::data::Container &a_c)
     }
     sharedMem->unlock();
 
-    if(mySharedImg.getName() == "front-left"){
-      m_warpPointsFileName = m_leftWarpPointsFileName;
-      m_transformationMatrixFileName = m_leftTransformationMatrixFileName;
+    if(m_initialized){
+      if(mySharedImg.getName() == "front-left"){
+        m_warpPointsFileName = m_leftWarpPointsFileName;
+        m_transformationMatrixFileName = m_leftTransformationMatrixFileName;
+      }
+      else if(mySharedImg.getName() == "front-right"){
+        m_warpPointsFileName = m_rightWarpPointsFileName;
+        m_transformationMatrixFileName = m_rightTransformationMatrisFileName;
+      }
+      cv::resize(feed,feed,m_inputSize);
+       
+      if(m_applyWarp){
+        cv::Mat warped;
+        cv::resize(feed,warped,m_inputSize);
+        InversePerspectiveMapping ipm(m_inputSize,m_outputSize,m_regionPoints,
+            m_outputPoints);
+        ipm.applyHomography(warped,warped);
+        ipm.drawPoints(m_regionPoints,feed);
+        cv::namedWindow("Warped");
+        cv::imshow("Warped",warped);
+      }
+      // const int32_t windowWidth = 640;
+      // const int32_t windowHeight = 480;
+      // cv::Mat display;
+      // cv::resize(m_feed, display, cv::Size(windowWidth, windowHeight), 0, 0,
+      //   cv::INTER_CUBIC);
+
+      putText(feed, "Rectangle width: " + std::to_string(m_recWidth),
+          cvPoint(30,30), 1, 0.8, cvScalar(0,0,254), 1, CV_AA);
+      putText(feed, "Rectangle height: " + std::to_string(m_recHeight),
+          cvPoint(30,40), 1, 0.8, cvScalar(0,0,254), 1, CV_AA);
+      putText(feed, "Position (x,y): (" + std::to_string(m_recPosX) + "," 
+          + std::to_string(m_recPosY) + ")" , cvPoint(30,50), 1, 0.8,
+          cvScalar(0,0,254), 1, CV_AA);
+
+      cv::imshow("Calibration", feed);
+
+      cvReleaseImage(&myIplImage);
     }
-    else if(mySharedImg.getName() == "front-right"){
-      m_warpPointsFileName = m_rightWarpPointsFileName;
-      m_transformationMatrixFileName = m_rightTransformationMatrisFileName;
-    }
-
-    cv::resize(feed,feed,m_inputSize);
-     
-    if(m_applyWarp){
-      cv::Mat warped;
-      cv::resize(feed,warped,m_inputSize);
-      InversePerspectiveMapping ipm(m_inputSize,m_outputSize,m_regionPoints,
-          m_outputPoints);
-      ipm.ApplyHomography(warped,warped);
-      ipm.DrawPoints(m_regionPoints,feed);
-      cv::namedWindow("Warped");
-      cv::imshow("Warped",warped);
-    }
-    // const int32_t windowWidth = 640;
-    // const int32_t windowHeight = 480;
-    // cv::Mat display;
-    // cv::resize(m_feed, display, cv::Size(windowWidth, windowHeight), 0, 0,
-    //   cv::INTER_CUBIC);
-
-    putText(feed, "Rectangle width: " + std::to_string(m_recWidth),
-        cvPoint(30,30), 1, 0.8, cvScalar(0,0,254), 1, CV_AA);
-    putText(feed, "Rectangle height: " + std::to_string(m_recHeight),
-        cvPoint(30,40), 1, 0.8, cvScalar(0,0,254), 1, CV_AA);
-    putText(feed, "Position (x,y): (" + std::to_string(m_recPosX) + "," 
-        + std::to_string(m_recPosY) + ")" , cvPoint(30,50), 1, 0.8,
-        cvScalar(0,0,254), 1, CV_AA);
-
-    cv::imshow("Calibration", feed);
-
-    cvReleaseImage(&myIplImage);
     return;
   }
 }
@@ -418,7 +421,11 @@ void Projection::Calibrate()
 }
 void Projection::Save()
 {
-  std::string path = "./var/tools/vision/projection/";
+  std::string path;
+  std::cout<<"Enter path to save matrices\n";
+  std::cin>> path;
+  std::cout<<"\nEntered path : "<<path<<std::endl;
+  
   m_projectionMatrix =  m_aMatrix * m_bMatrix.inverse();
   std::cout << m_projectionMatrix << std::endl;
   // const static Eigen::IOFormat CSVFormat(Eigen::StreamPrecision,
