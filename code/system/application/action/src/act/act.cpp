@@ -59,8 +59,8 @@ m_type(""),
 m_logSteering()
 {
   setUp();
-      odcore::data::TimeStamp now;
-    std::string filename("Steering" + now.getYYYYMMDD_HHMMSS() +".log");
+    odcore::data::TimeStamp now;
+    std::string filename("Steering" + now.getYYYYMMDD_HHMMSS() + ".log");
     m_logSteering.open(filename, std::ios::out|std::ios::app);
 }
 
@@ -112,64 +112,66 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
     previousTimestep = thisTimestep;
     float previousAmplitude = 0;
 
-    if (m_type == "accelerate") {
-      if (!m_amplitudeVectorAccelerate.empty()) {
-        previousAmplitude = m_amplitudeVectorAccelerate.at(m_amplitudeVectorAccelerate.size()-1);
+    if ( m_type == "accelerate" ) {
+      if ( !m_amplitudeVectorAccelerate.empty() ) {
+        previousAmplitude = m_amplitudeVectorAccelerate.at(m_amplitudeVectorAccelerate.size() - 1 );
       }
       inhibitoryCheck(m_isInhibitory, m_startTimeVectorAccelerate, m_amplitudeVectorAccelerate);
-      if (m_amplitude*previousAmplitude < 0 || fabs(m_amplitude) > fabs(previousAmplitude)) {
-        m_startTimeVectorAccelerate.push_back(  m_t0);
+      if ( m_amplitude*previousAmplitude < 0 || fabs(m_amplitude) > fabs(previousAmplitude) ) {
+        m_startTimeVectorAccelerate.push_back(m_t0);
         m_amplitudeVectorAccelerate.push_back(m_amplitude);
         timeCheck(m_startTimeVectorAccelerate, m_amplitudeVectorAccelerate);
       }
-      sumOfAccelerate = std::accumulate(m_amplitudeVectorAccelerate.begin(), m_amplitudeVectorAccelerate.end(), 0.0);
+      sumOfAccelerate = std::accumulate(m_amplitudeVectorAccelerate.begin(), m_amplitudeVectorAccelerate.end(), 0.0 );
     }
 
-    else if (m_type == "brake") {
-      if (!m_amplitudeVectorBrake.empty()) {
-        previousAmplitude = m_amplitudeVectorBrake.at(m_amplitudeVectorBrake.size()-1);
+    else if ( m_type == "brake" ) {
+      if ( !m_amplitudeVectorBrake.empty() ) {
+        previousAmplitude = m_amplitudeVectorBrake.at(m_amplitudeVectorBrake.size() -1 );
       }
       inhibitoryCheck(m_isInhibitory, m_startTimeVectorBrake, m_amplitudeVectorBrake);
-      if (m_amplitude*previousAmplitude < 0 || fabs(m_amplitude) > fabs(previousAmplitude)) {
+      if ( m_amplitude*previousAmplitude < 0 || fabs(m_amplitude) > fabs(previousAmplitude) ) {
         m_startTimeVectorBrake.push_back(m_t0);
         m_amplitudeVectorBrake.push_back(m_amplitude);
         timeCheck(m_startTimeVectorBrake, m_amplitudeVectorBrake);
       }
-      sumOfBrake = std::accumulate(m_amplitudeVectorBrake.begin(), m_amplitudeVectorBrake.end(), 0.0);
+      sumOfBrake = std::accumulate(m_amplitudeVectorBrake.begin(), m_amplitudeVectorBrake.end(), 0.0 );
     }
 
-    else if (m_type == "steering") {
-      if (!m_amplitudeVectorSteering.empty()) {
-        previousAmplitude = m_amplitudeVectorSteering.at(m_amplitudeVectorSteering.size()-1);
+    else if ( m_type == "steering" ) {
+      if ( !m_amplitudeVectorSteering.empty() ) {
+        previousAmplitude = m_amplitudeVectorSteering.at(m_amplitudeVectorSteering.size() -1 );
       }
       inhibitoryCheck(m_isInhibitory, m_startTimeVectorSteering, m_amplitudeVectorSteering);
-      if (m_amplitude*previousAmplitude < 0 || fabs(m_amplitude) > fabs(previousAmplitude)) {
+      if ( m_amplitude*previousAmplitude < 0 || fabs(m_amplitude) > fabs(previousAmplitude) ) {
         m_startTimeVectorSteering.push_back(m_t0);
         m_amplitudeVectorSteering.push_back(m_amplitude);
         timeCheck(m_startTimeVectorSteering, m_amplitudeVectorSteering);
       }
-    sumOfSteering = std::accumulate(m_amplitudeVectorSteering.begin(), m_amplitudeVectorSteering.end(), 0.0);
+    sumOfSteering = std::accumulate(m_amplitudeVectorSteering.begin(), m_amplitudeVectorSteering.end(), 0.0 );
     
     }
     double durationInSeconds = duration.toMicroseconds() / 1000000.0;
-    float freq = 1/durationInSeconds;
-    m_accelerationCorrection = sumOfAccelerate/freq;
-    m_brakeCorrection  = -sumOfBrake/freq;
-    m_steeringCorrection = sumOfSteering/freq;
-    std::cout << "Steering Correction : " << m_steeringCorrection <<std::endl;
-    std::cout << "Acceleration Correction : " << m_accelerationCorrection+m_brakeCorrection <<std::endl;
+    float freq = 1 / durationInSeconds;
+    m_accelerationCorrection = sumOfAccelerate / freq;
+    m_brakeCorrection  = -sumOfBrake / freq;
+    m_steeringCorrection = sumOfSteering / freq;
+    //std::cout << "Steering Correction : " << m_steeringCorrection <<std::endl;
+    //std::cout << "Acceleration Correction : " << m_accelerationCorrection+m_brakeCorrection <<std::endl;
     m_logSteering << m_steeringCorrection << std::endl;
     
-    if (m_brakeCorrection < 0) {
-      opendlv::proxy::Actuation actuation(m_brakeCorrection, m_steeringCorrection, false);
+    if ( m_brakeCorrection < 0 ) {
+      opendlv::proxy::Actuation actuation(m_brakeCorrection, m_steeringCorrection, true);
       odcore::data::Container actuationContainer(actuation);
       getConference().send(actuationContainer);
+      std::cout << "Steering Correction 1: " << m_steeringCorrection << std::endl;
     }
 
     else {
-      opendlv::proxy::Actuation actuation(m_accelerationCorrection, m_steeringCorrection, false);
+      opendlv::proxy::Actuation actuation(m_accelerationCorrection, m_steeringCorrection, true);
       odcore::data::Container actuationContainer(actuation);
       getConference().send(actuationContainer);
+      std::cout << "Steering Correction 2: " << m_steeringCorrection << std::endl;
     }    
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
@@ -183,20 +185,20 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
 void Act::timeCheck(std::vector<odcore::data::TimeStamp> &timeVector, std::vector<float> &amplitudeVector)
 {
 
-  if (timeVector.size() == 0){
+  if ( timeVector.size() == 0 ){
     return;
   }
-  double deltaTime = 1000000*0.5f;
+  double deltaTime = 1000000 * 0.5f;
   odcore::data::TimeStamp nowTimeStamp;
   double now = nowTimeStamp.toMicroseconds();
   double firstTime = timeVector.at(0).toMicroseconds();
   if ( now - firstTime >= deltaTime ) {
-    for (uint32_t count = 0; count < timeVector.size()-1; count++) {
-      timeVector.at(count) = timeVector.at(count+1);
-      amplitudeVector.at(count) = amplitudeVector.at(count+1);
+    for ( uint32_t count = 0; count < timeVector.size() - 1; count++ ) {
+      timeVector.at(count) = timeVector.at(count + 1);
+      amplitudeVector.at(count) = amplitudeVector.at(count + 1);
     }
-    timeVector.erase(timeVector.begin()+timeVector.size()-1);
-    amplitudeVector.erase(amplitudeVector.begin()+amplitudeVector.size()-1);
+    timeVector.erase(timeVector.begin() + timeVector.size() - 1);
+    amplitudeVector.erase(amplitudeVector.begin() + amplitudeVector.size() - 1);
   }
 }
 
@@ -207,7 +209,7 @@ void Act::timeCheck(std::vector<odcore::data::TimeStamp> &timeVector, std::vecto
 */
 void Act::inhibitoryCheck(bool a_isInhibitory, std::vector<odcore::data::TimeStamp> &timeVector, std::vector<float> &amplitudeVector)
 {
-  if (a_isInhibitory) {
+  if ( a_isInhibitory ) {
     timeVector.clear();
     amplitudeVector.clear();    
   }

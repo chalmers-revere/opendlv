@@ -214,9 +214,8 @@ void DetectLane::nextContainer(odcore::data::Container &c)
                                       m_lines.col(0)(m_midRegion),m_lines.col(1)(m_midRegion),
                                       (m_maxRow));
 
-      double laneOffsetV2 = GetLaneOffset(m_K(p1,0),m_M(p1,0),
-            m_K(p2,0),m_M(p2,0),m_maxRow);
-      std::cout<<laneOffsetV2<<std::endl;
+      //double laneOffsetV2 = GetLaneOffset(m_K(p1,0),m_M(p1,0), m_K(p2,0),m_M(p2,0),m_maxRow);
+      //std::cout<<laneOffsetV2<<std::endl;
       //-----------------------------
       // Approximate heading angle
       //-----------------------------
@@ -232,12 +231,13 @@ void DetectLane::nextContainer(odcore::data::Container &c)
       double theta = atan((d2-d1) / (double)4);
 
 
-      double newLaneOffset = GetLaneOffset(m_K(p1,0),m_M(p1,0),m_K(p2,0),m_M(p2,0),m_maxRow);
-      double newHeadingAngle = GetHeadingAngle(m_K(p1,0),m_M(p1,0),m_K(p2,0),m_M(p2,0),m_minRow,m_maxRow);
+      //double newLaneOffset = GetLaneOffset(m_K(p1,0),m_M(p1,0),m_K(p2,0),m_M(p2,0),m_maxRow);
+      //double newHeadingAngle = GetHeadingAngle(m_K(p1,0),m_M(p1,0),m_K(p2,0),m_M(p2,0),m_minRow,m_maxRow);
 
       if(std::isfinite(theta) && std::isfinite(laneOffset)){
-      std::cout<<"Offset: "<<laneOffset<<" Heading: "<<theta<<std::endl;
-      std::cout<<"New offset: "<<newLaneOffset<<" New heading: "<<newHeadingAngle<<std::endl;
+      std::cout<<"Offset: "<<laneOffset<< std::endl;
+      std::cout<<"Heading: "<<theta<<std::endl<<std::endl;
+      //std::cout<<"New offset: "<<newLaneOffset<<" New heading: "<<newHeadingAngle<<std::endl;
       // Send the message
       opendlv::perception::LanePosition lanePosition(laneOffset,theta);
       odcore::data::Container msg(lanePosition);  
@@ -438,9 +438,9 @@ double DetectLane::GetLaneOffset(double kLeft,double mLeft, double kRight, doubl
   double colRight = kRight * row + mRight;
 
   Eigen::Vector3d leftPoint(colLeft, row, 1);
-  std::cout<<leftPoint<<std::endl;
+  //std::cout<<leftPoint<<std::endl;
   TransformPointToGlobalFrame(leftPoint);
-  std::cout<<leftPoint<<std::endl;
+  //std::cout<<leftPoint<<std::endl;
 
   Eigen::Vector3d rightPoint(colRight, row, 1);  
   TransformPointToGlobalFrame(rightPoint);
