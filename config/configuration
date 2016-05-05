@@ -181,3 +181,7 @@ tools-can-joystick.devicenode = /dev/pcan2   # PEAK CAN device.
 tools-can-joystick.joystickdevicenode = /dev/input/js2   # Gamepad.
 tools-can-keyboard.devicenode = /dev/pcan2   # PEAK CAN device.
 tools-can-simplecansender.devicenode = /dev/pcan2   # PEAK CAN device.
+
+# Perception
+perception-detectlane.inputSize = 640,480
+perception-detectlane.outputSize = 640,480

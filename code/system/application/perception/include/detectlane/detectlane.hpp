@@ -47,21 +47,30 @@ class DetectLane
  private:
   void setUp();
   void tearDown();
-  Eigen::Matrix3d readreadThreeByThreeMatrix(std::string fileName);
+  Eigen::MatrixXd ReadMatrix(std::string fileName,int nRows,
+      int nCols);
   void TransformPointToGlobalFrame(Eigen::Vector3d &point);
   double GetLaneOffset(double kLeft,double mLeft, double kRight,
-      double mRight,double col);
+      double mRight,double col, int p1, int p2);
   double GetHeadingAngle(double kLeft,double mLeft, double kRight,
-      double mRight, double row1, double row2);
+      double mRight, double row1, double row2, int p1, int p2);
+  void ReadWarpPointsMatrix(std::vector<cv::Point2f> & a_points,
+      std::string a_fileName);
+  void ReadInputWindowSize(std::string a_stringStream);
+  void ReadOutputWindowSize(std::string a_stringStream);
+
 
   bool m_setup;
   int m_width;
   int m_height;
+  int m_outputWidth;
+  int m_outputHeight;
   int m_maxRow;
   int m_minRow;
   int m_midRegion;
   int m_threshold;
   
+  double m_standardLaneWidth;  
   bool m_initialized;
 
 
