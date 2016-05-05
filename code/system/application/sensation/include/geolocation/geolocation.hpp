@@ -22,13 +22,15 @@
 
 #include <memory>
     
-#include "kalman/ExtendedKalmanFilter.hpp"
-
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
 #include <opendlv/data/environment/WGS84Coordinate.h>
 
+#include "kalman/ExtendedKalmanFilter.hpp"
 #include "geolocation/kinematicmodel.hpp"
+#include "geolocation/kinematicobservationmodel.hpp"
+
+
 
 namespace opendlv {
 namespace sensation {
