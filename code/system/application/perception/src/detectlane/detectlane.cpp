@@ -521,7 +521,7 @@ double DetectLane::GetHeadingAngle(double kLeft,double mLeft, double kRight,
     double dxPoint2 = point2(0);
     double dyPoint2 = point2(1);
 
-    return std::atan2(dxPoint1-dxPoint2,dyPoint1-dyPoint2);
+    return std::atan2(dyPoint1-dyPoint2,dxPoint1-dxPoint2);
 
   }
   else 
@@ -552,7 +552,7 @@ double DetectLane::GetHeadingAngle(double kLeft,double mLeft, double kRight,
     double dxPoint2 = (leftPoint2(0) + rightPoint2(0) ) / 2.0;
     double dyPoint2 = (leftPoint2(1) + rightPoint2(1) ) / 2.0;
 
-    return std::atan2(dxPoint1-dxPoint2,dyPoint1-dyPoint2);
+    return std::atan2(dyPoint1-dyPoint2,dxPoint1-dxPoint2);
   }
 }
 
@@ -568,9 +568,9 @@ double DetectLane::GetLaneOffset(double kLeft,double mLeft, double kRight,
     TransformPointToGlobalFrame(point);
 
     if(leftPointIndex <= m_nRegions / 2 - 1)
-      return ( point(0) - m_standardLaneWidth / 2 );
+      return ( point(1) - m_standardLaneWidth / 2 );
     else
-      return ( point(0) + m_standardLaneWidth / 2 ); 
+      return ( point(1) + m_standardLaneWidth / 2 ); 
   
   }
   else 
@@ -584,7 +584,7 @@ double DetectLane::GetLaneOffset(double kLeft,double mLeft, double kRight,
     Eigen::Vector3d rightPoint(colRight, row, 1);  
     TransformPointToGlobalFrame(rightPoint);
 
-    return (leftPoint(0) + rightPoint(0)) / 2.0;
+    return (leftPoint(1) + rightPoint(1)) / 2.0;
   }
 }
 

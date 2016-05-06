@@ -28,7 +28,7 @@
 #include "opendavinci/odcore/data/TimeStamp.h"
 
 #include "opendlv/data/environment/Point3.h"
-#include "opendlv/data/GeneratedHeaders_opendlvdata.h"
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 #include "geolocation/geolocation.hpp"
 
