@@ -14,8 +14,8 @@ manualdriver.brakepedalposition in 0x106 at bit 8 for 8 bit is little endian mul
 manualdriver.accelerationpedalposition in 0x106 at bit 0 for 8 bit is little endian multiply by 0.4 add 0 with range [0, 102];
 
 // CAN message for acceleration.
-accelerationrequest.enable_accrequest in 0x203 at bit 16 for 1 bit is little endian multiply by 1 add 0 with range [0, 1];
-accelerationrequest.accelerationrequest in 0x203 at bit 0 for 16 bit is little endian multiply by 0.00048828125 add -15.687 with range [-15.687, 16.31251171875];
+accelerationrequest.accelerationrequestpedal in 0x203 at bit 0 for 8 bit is little endian multiply by 0.4 add 0 with range [0, 102];
+accelerationrequest.enable_accrequest in 0x203 at bit 8 for 1 bit is little endian multiply by 1 add 0 with range [0, 1];
 
 // CAN message for deceleration.
 brakerequest.enable_brakerequest in 0x202 at bit 16 for 1 bit is little endian multiply by 1 add 0 with range [0, 1];
@@ -75,7 +75,7 @@ unordered mapping opendlv.proxy.reverefh16.Pedals {
 
 unordered mapping opendlv.proxy.reverefh16.AccelerationRequest {
     accelerationrequest.enable_accrequest : 1;
-    accelerationrequest.accelerationrequest : 2;
+    accelerationrequest.accelerationrequestpedal : 2;
 }
 
 unordered mapping opendlv.proxy.reverefh16.BrakeRequest {
@@ -146,9 +146,9 @@ test opendlv.proxy.reverefh16.BrakeRequest {
 }
 
 // 0x7FA501 read as acc_req=5 acc_ena=1 by the gateway
-test opendlv.proxy.reverefh16.AccelerationRequest {
-  0x203: 0x7FA501
-  
-  id 1 = 1
-  id 2 = 5
-}
+//test opendlv.proxy.reverefh16.AccelerationRequest {
+//  0x203: 0x7FA501
+//  
+//  id 1 = 1
+//  id 2 = 5
+//}

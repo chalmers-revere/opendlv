@@ -232,7 +232,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Keyboard::body()
 //        {
 //            opendlv::proxy::reverefh16::AccelerationRequest accelerationRequest;
 //            accelerationRequest.setEnableRequest(true);
-//            accelerationRequest.setAcceleration(v);
+//            accelerationRequest.setAccelerationPedalPosition(v);
 
 //            // Create the message mapping.
 //            canmapping::opendlv::proxy::reverefh16::AccelerationRequest accelerationRequestMapping;
@@ -258,15 +258,13 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Keyboard::body()
         odcore::data::Container c(steerRequest);
         automotive::GenericCANMessage gcm = steeringRequestMapping.encode(c);
         m_device->write(gcm);
-cout << "SR2 = " << steerRequest.toString() << ", GCM = " << gcm.toString() << endl;
-cout << endl;
     }
 
     // Disabling acceleration request at shutdown.
     {
         opendlv::proxy::reverefh16::AccelerationRequest accelerationRequest;
         accelerationRequest.setEnableRequest(false);
-        accelerationRequest.setAcceleration(0);
+        accelerationRequest.setAccelerationPedalPosition(0);
 
         // Create the message mapping.
         canmapping::opendlv::proxy::reverefh16::AccelerationRequest accelerationRequestMapping;
