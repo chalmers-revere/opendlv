@@ -129,8 +129,8 @@ Projection::Projection(int32_t const &a_argc, char **a_argv)
   m_leftWarpPointsFileName = "leftCameraWarpPoints.csv";
   m_rightWarpPointsFileName = "rightCameraWarpPoints.csv";
 
-  m_leftTransformationMatrixFileName = "leftCameraTransformationMatrix.csv";
-  m_rightTransformationMatrisFileName = "rightCameraTransformationMatrix.csv";
+  m_leftTransformationMatrixFileName = "leftCameraTransformationMatrix";
+  m_rightTransformationMatrisFileName = "rightCameraTransformationMatrix";
 }
 
 Projection::~Projection()
@@ -141,8 +141,8 @@ void Projection::setUp()
 {
   cv::namedWindow("Calibration", 1 );
 
-  uint32_t inputWidth = 640;
-  uint32_t inputHeight = 480;
+  uint32_t inputWidth = 1280;
+  uint32_t inputHeight = 720;
 
   uint32_t outputWidth = inputWidth;
   uint32_t outputHeight = inputHeight;
@@ -209,7 +209,7 @@ void Projection::nextContainer(odcore::data::Container &a_c)
         m_warpPointsFileName = m_rightWarpPointsFileName;
         m_transformationMatrixFileName = m_rightTransformationMatrisFileName;
       }
-      cv::resize(feed,feed,m_inputSize);
+      // cv::resize(feed,feed,m_inputSize);
        
       if(m_applyWarp){
         cv::Mat warped;
@@ -269,6 +269,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Projection::body(){
           case 'p':
             std::cout << "Projecting points" << std::endl;
             Project();
+            break;
           case 'w':
             m_applyWarp = !m_applyWarp;
             if(m_applyWarp == true){
@@ -297,17 +298,31 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Projection::body(){
           case '4':
             m_point = 3;
             break;
-          case 'w':
+          case 'i':
             m_regionPoints.at(m_point).y -= 5;
             break;
-          case 's':
+          case 'k':
             m_regionPoints.at(m_point).y += 5;
             break;
-          case 'a':
+          case 'j':
             m_regionPoints.at(m_point).x -= 5;
             break;
-          case 'd':
+          case 'l':
             m_regionPoints.at(m_point).x += 5;
+            break;
+          case 's':
+            std::cout << 
+                "Calculating projection matrix and saving to file in warp mode"
+                << std::endl;
+            Save();
+            break;
+          case 'c':
+            std::cout << "Enter Calibration in warp mode" << std::endl;
+            Calibrate();
+            break;
+          case 'p':
+            std::cout << "Projecting points in warp mode" << std::endl;
+            Project();
             break;
           case 'q':
           case 27:
@@ -399,9 +414,16 @@ void Projection::Calibrate()
 
   MouseParams mouseClick;
   mouseClick.iterator = 0;
-  cv::setMouseCallback("Calibration", LogMouseClicks, (void *) &mouseClick);
+  std::string mode;
+  if(m_applyWarp){
+    mode = "Warped";
+  }
+  else{
+    mode = "Calibration";
+  }
+  cv::setMouseCallback(mode, LogMouseClicks, (void *) &mouseClick);
   cv::waitKey(0);
-  cv::setMouseCallback("Calibration", NULL, NULL);
+  cv::setMouseCallback(mode, NULL, NULL);
   if(mouseClick.iterator > 3){
     Eigen::MatrixXd q(3,3), w(3,1);
     q << mouseClick.points(0,0),mouseClick.points(0,1),mouseClick.points(0,2),
@@ -438,6 +460,13 @@ void Projection::Save()
 
   m_projectionMatrix =  m_aMatrix * m_bMatrix.inverse();
 
+  std::string projectionMatrixFileName;
+  if(m_applyWarp){
+    projectionMatrixFileName = m_transformationMatrixFileName + "Warped.csv";
+  } else {
+    projectionMatrixFileName = m_transformationMatrixFileName + ".csv";
+  }
+
   if(inputPathString == "yes")
   {
     std::cout << m_projectionMatrix << std::endl;
@@ -451,7 +480,7 @@ void Projection::Save()
       // std::cout<<"Created dir"<<std::endl;
     }
 
-    std::ofstream file(m_path + "/" + m_transformationMatrixFileName );
+    std::ofstream file(m_path + "/" + projectionMatrixFileName );
     if(file.is_open()){
       file << m_projectionMatrix.format(saveFormat);
     }
@@ -474,10 +503,17 @@ void Projection::Save()
 
 void Projection::Project()
 {
-  cv::setMouseCallback("Calibration", ProjectMouseClicks, 
+  std::string mode;
+  if(m_applyWarp){
+    mode = "Warped";
+  }
+  else{
+    mode = "Calibration";
+  }
+  cv::setMouseCallback(mode, ProjectMouseClicks, 
       (void *) &m_projectionMatrix);
   cv::waitKey(0);
-  cv::setMouseCallback("Calibration", NULL, NULL);
+  cv::setMouseCallback(mode, NULL, NULL);
   std::cout << "Exit point projection" << std::endl;
 }
 
