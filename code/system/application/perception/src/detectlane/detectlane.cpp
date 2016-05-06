@@ -65,7 +65,7 @@ DetectLane::DetectLane(int32_t const &a_argc, char **a_argv)
     m_minRow(200),
     m_midRegion(),
     m_threshold(180),
-    m_standardLaneWidth(375),
+    m_standardLaneWidth(3.75),
     m_initialized(false),
     m_regions(),
     m_leftCameraRegions(),
