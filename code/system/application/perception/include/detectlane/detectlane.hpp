@@ -113,6 +113,8 @@ class DetectLane
   Eigen::Matrix3d m_leftTransformationMatrix;
   Eigen::Matrix3d m_rightTransformationMatrix;
 
+  Eigen::Vector3d m_scale;
+
 };
 
 } // detectlane

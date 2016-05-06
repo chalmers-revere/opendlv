@@ -87,7 +87,8 @@ DetectLane::DetectLane(int32_t const &a_argc, char **a_argv)
     m_rightIpm(),
     m_transformationMatrix(),
     m_leftTransformationMatrix(),
-    m_rightTransformationMatrix()
+    m_rightTransformationMatrix(),
+    m_scale()
 
 {
 }
@@ -341,6 +342,8 @@ void DetectLane::setUp()
   std::string inputSizeString = kv.getValue<std::string>("perception-detectlane.inputSize");
   ReadInputWindowSize(inputSizeString);
 
+  m_width = 1280;
+  m_height = 720;
   std::string outputSizeString = kv.getValue<std::string>("perception-detectlane.outputSize");
   ReadOutputWindowSize(outputSizeString);
 
@@ -372,7 +375,7 @@ void DetectLane::setUp()
   // Scaling: Calibrations were made for 640x480 resolution
   //-----------------------------
   m_minRow = 0;//m_minRow * (m_height / 480.0);
-  m_maxRow = m_height;//m_maxRow * (m_height / 480.0);
+  m_maxRow = m_outputHeight;//m_maxRow * (m_height / 480.0);
 
   std::string leftCameraRegionsFile = 
     "./share/opendlv/system/application/perception/detectlane/leftCameraRegions.csv";
@@ -435,7 +438,8 @@ void DetectLane::setUp()
   m_rightTransformationMatrix = ReadMatrix(
           "/home/batko/Desktop/rightTransformationMatrix.txt",3,3);
 
-
+  m_scale << m_width / (double)m_outputWidth, m_height / (double)m_outputHeight, 1;
+ 
   if(false)
   {
     std::cout<<"Input size\n";
@@ -495,7 +499,7 @@ Eigen::MatrixXd DetectLane::ReadMatrix(std::string fileName, int nRows,
 
 void DetectLane::TransformPointToGlobalFrame(Eigen::Vector3d &point)
 {
-
+  point = point.cwiseProduct(m_scale);
   point = m_transformationMatrix * point;
   point = point / point(2);
 
