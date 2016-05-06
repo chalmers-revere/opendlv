@@ -162,7 +162,7 @@ sensation-vision-opticalflow.maxLevel = 3
 sensation-vision-opticalflow.minEigThreshold = 0.001
 sensation-vision-opticalflow.nAxisPoints = 15
 
-# V2V temp
+# V2V 
 knowledge-linguistics-v2vcam.stationId = 115
 knowledge-linguistics-v2vcam.stationType = 8 #heavy truck
 knowledge-linguistics-v2vcam.vehicleLength = 47
