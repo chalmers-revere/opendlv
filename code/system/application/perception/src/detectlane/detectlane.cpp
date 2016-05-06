@@ -65,7 +65,7 @@ DetectLane::DetectLane(int32_t const &a_argc, char **a_argv)
     m_minRow(200),
     m_midRegion(),
     m_threshold(180),
-    m_standardLaneWidth(3.75),
+    m_standardLaneWidth(375),
     m_initialized(false),
     m_regions(),
     m_leftCameraRegions(),
@@ -428,9 +428,11 @@ void DetectLane::setUp()
   m_M = Eigen::MatrixXd(m_nRegions,1);
 
   m_leftTransformationMatrix = ReadMatrix(
-          "/home/batko/Desktop/leftTransformationMatrixWarped.txt",3,3);
+          "/opt/opendlv/share/opendlv/tools/vision/projection/leftCameraTransformationMatrixWarped.csv",3,3);
+  std::cout<<m_leftTransformationMatrix;
+  std::cout<<"\n------\n----\n---\n";
   m_rightTransformationMatrix = ReadMatrix(
-          "/home/batko/Desktop/rightTransformationMatrixWarped.txt",3,3);
+          "/opt/opendlv/share/opendlv/tools/vision/projection/rightCameraTransformationMatrixWarped.csv",3,3);
 
   m_scale << m_width / (double)m_outputWidth, m_height / (double)m_outputHeight, 1;
  
@@ -493,9 +495,19 @@ Eigen::MatrixXd DetectLane::ReadMatrix(std::string fileName, int nRows,
 
 void DetectLane::TransformPointToGlobalFrame(Eigen::Vector3d &point)
 {
+  // std::cout<<"point before \n";
+  // std::cout<<point<<std::endl;
   point = point.cwiseProduct(m_scale);
+  // std::cout<<"point after 1\n";
+  // std::cout<<point<<std::endl;
   point = m_transformationMatrix * point;
+
+  // std::cout<<"point final before \n";
+  // std::cout<<point<<std::endl;
+
   point = point / point(2);
+  // std::cout<<"point final \n";
+  // std::cout<<point<<std::endl;
 
 }
 
@@ -565,6 +577,7 @@ double DetectLane::GetLaneOffset(double kLeft,double mLeft, double kRight,
     Eigen::Vector3d point(col, row, 1);
     TransformPointToGlobalFrame(point);
 
+    std::cout<<"Lane is at position : " << point(1) <<std::endl;
     if(leftPointIndex <= m_nRegions / 2 - 1)
       return ( point(1) - m_standardLaneWidth / 2 );
     else
@@ -581,7 +594,6 @@ double DetectLane::GetLaneOffset(double kLeft,double mLeft, double kRight,
    
     Eigen::Vector3d rightPoint(colRight, row, 1);  
     TransformPointToGlobalFrame(rightPoint);
-
     return (leftPoint(1) + rightPoint(1)) / 2.0;
   }
 }
