@@ -375,14 +375,14 @@ void Projection::Config()
   std::cout << "y position: ";
   std::cin >> m_recPosY;
   Eigen::MatrixXd q(3,3), w(3,1);
-  q <<  m_recPosX, m_recPosX, m_recPosX+m_recWidth,
-        m_recPosY + m_recHeight, m_recPosY, m_recPosY,
+  q <<  m_recPosX, m_recPosX, m_recPosX+m_recHeight,
+        m_recPosY + m_recWidth, m_recPosY, m_recPosY,
         1,1,1;
   std::cout<<q<<std::endl;
-  w <<  m_recPosX+m_recWidth,
-        m_recPosY + m_recHeight,
+  w <<  m_recPosX + m_recHeight,
+        m_recPosY + m_recWidth,
         1;
-  std::cout<<w<<std::endl;
+  std::cout << w << std::endl;
 
   Eigen::Vector3d scale = q.colPivHouseholderQr().solve(w);
   std::cout<<scale<<std::endl;
@@ -435,9 +435,11 @@ void Projection::Save()
   std::cin >> inputPathString;
   std::cout<<"\n";
 
+
+  m_projectionMatrix =  m_aMatrix * m_bMatrix.inverse();
+
   if(inputPathString == "yes")
   {
-    m_projectionMatrix =  m_aMatrix * m_bMatrix.inverse();
     std::cout << m_projectionMatrix << std::endl;
     // const static Eigen::IOFormat CSVFormat(Eigen::StreamPrecision,
     //     Eigen::DontAlignCols, ", ", "\n");
