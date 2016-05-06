@@ -119,6 +119,7 @@ Projection::Projection(int32_t const &a_argc, char **a_argv)
       m_transformationMatrixFileName(),
       m_leftTransformationMatrixFileName(),
       m_rightTransformationMatrisFileName(),
+      m_path(),
       m_initialized(false)
 {
   m_aMatrix = Eigen::MatrixXd(3,3);
@@ -320,7 +321,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Projection::body(){
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
-void Projection::SavePerspectivePoints()
+void Projection::SavePerspectivePoints(std::string a_path)
 {
   Eigen::MatrixXd points(4,2);
   for(int i = 0; i < 4; i ++){
@@ -328,8 +329,7 @@ void Projection::SavePerspectivePoints()
     points(i,1) = m_regionPoints.at(i).y;
   }
    
-  std::string path = "./var/tools/vision/projection/";
-  std::ofstream file(path + m_warpPointsFileName);
+  std::ofstream file(a_path + m_warpPointsFileName);
 
   if(file.is_open())
     file << points;
@@ -426,10 +426,9 @@ void Projection::Calibrate()
 
 void Projection::Save()
 {
-  std::string path;
   std::cout << "Enter path to save matrices\n";
-  std::cin >> path;
-  std::cout << "\nEntered path : " << path << std::endl;
+  std::cin >> m_path;
+  std::cout << "\nEntered path : " << m_path << std::endl;
   
   m_projectionMatrix =  m_aMatrix * m_bMatrix.inverse();
   std::cout << m_projectionMatrix << std::endl;
@@ -438,20 +437,20 @@ void Projection::Save()
   const static Eigen::IOFormat saveFormat(Eigen::StreamPrecision,
       Eigen::DontAlignCols, " ", " ", "", "", "", "");
   struct stat st;
-  if (stat(path.c_str(), &st) == -1) {
-    system(("mkdir -p " + path).c_str());
+  if (stat(m_path.c_str(), &st) == -1) {
+    system(("mkdir -p " + m_path).c_str());
     // std::cout<<"Created dir"<<std::endl;
   }
 
 
-  std::ofstream file(path  + m_transformationMatrixFileName );
+  std::ofstream file(m_path  + m_transformationMatrixFileName );
   if(file.is_open()){
     file << m_projectionMatrix.format(saveFormat);
   }
   file.close();
-  std::cout<<"Saved to file to " + path + "!" << std::endl;
+  std::cout<<"Saved to file to " + m_path + "!" << std::endl;
 
-  SavePerspectivePoints();
+  SavePerspectivePoints(m_path);
 }
 
 
