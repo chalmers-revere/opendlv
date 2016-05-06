@@ -93,5 +93,9 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/tools/vision/projection
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/tools/vision/projection/rightCameraWarpPoints.csv DESTINATION ./share/opendlv/tools/vision/projection/ COMPONENT system)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/system/application/perception/detectlane/leftCameraRegions.csv DESTINATION ./share/opendlv/system/application/perception/detectlane/ COMPONENT system)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/system/application/perception/detectlane/rightCameraRegions.csv DESTINATION ./share/opendlv/system/application/perception/detectlane/ COMPONENT system)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/system/application/perception/detectlane/rightCameraRegionsWarped.csv DESTINATION ./share/opendlv/system/application/perception/detectlane/ COMPONENT system)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/system/application/perception/detectlane/leftCameraRegions.csv DESTINATION ./share/opendlv/system/application/perception/detectlane/ COMPONENT system)
+
+
 
 

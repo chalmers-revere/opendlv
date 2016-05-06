@@ -144,13 +144,7 @@ void DetectLane::nextContainer(odcore::data::Container &c)
           imgWidth*imgHeight*nrChannels);
     }
     sharedMem->unlock();
-    
-    //-----------------------------
-    // Re-size the source image
-    //-----------------------------
-    resize(src, src, Size(m_width,m_height), 0, 0, INTER_CUBIC);
-
-    
+        
     // From this point implement lane detection algorithm
     //-----------------------------
     // Definitions for the video choice
@@ -434,9 +428,9 @@ void DetectLane::setUp()
   m_M = Eigen::MatrixXd(m_nRegions,1);
 
   m_leftTransformationMatrix = ReadMatrix(
-          "/home/batko/Desktop/leftTransformationMatrix.txt",3,3);
+          "/home/batko/Desktop/leftTransformationMatrixWarped.txt",3,3);
   m_rightTransformationMatrix = ReadMatrix(
-          "/home/batko/Desktop/rightTransformationMatrix.txt",3,3);
+          "/home/batko/Desktop/rightTransformationMatrixWarped.txt",3,3);
 
   m_scale << m_width / (double)m_outputWidth, m_height / (double)m_outputHeight, 1;
  
