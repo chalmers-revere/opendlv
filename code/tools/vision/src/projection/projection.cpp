@@ -426,31 +426,47 @@ void Projection::Calibrate()
 
 void Projection::Save()
 {
-  std::cout << "Enter path to save matrices\n";
+  std::cout << "Enter path to save transformation matrices: ";
   std::cin >> m_path;
-  std::cout << "\nEntered path : " << m_path << std::endl;
+  std::cout << "\nEntered path: " << m_path << std::endl;
   
-  m_projectionMatrix =  m_aMatrix * m_bMatrix.inverse();
-  std::cout << m_projectionMatrix << std::endl;
-  // const static Eigen::IOFormat CSVFormat(Eigen::StreamPrecision,
-  //     Eigen::DontAlignCols, ", ", "\n");
-  const static Eigen::IOFormat saveFormat(Eigen::StreamPrecision,
-      Eigen::DontAlignCols, " ", " ", "", "", "", "");
-  struct stat st;
-  if (stat(m_path.c_str(), &st) == -1) {
-    system(("mkdir -p " + m_path).c_str());
-    // std::cout<<"Created dir"<<std::endl;
+  std::string inputPathString;
+  std::cout << "Save transformation matrices?(yes/no): ";
+  std::cin >> inputPathString;
+  std::cout<<"\n";
+
+  if(inputPathString == "yes")
+  {
+    m_projectionMatrix =  m_aMatrix * m_bMatrix.inverse();
+    std::cout << m_projectionMatrix << std::endl;
+    // const static Eigen::IOFormat CSVFormat(Eigen::StreamPrecision,
+    //     Eigen::DontAlignCols, ", ", "\n");
+    const static Eigen::IOFormat saveFormat(Eigen::StreamPrecision,
+        Eigen::DontAlignCols, " ", " ", "", "", "", "");
+    struct stat st;
+    if (stat(m_path.c_str(), &st) == -1) {
+      system(("mkdir -p " + m_path).c_str());
+      // std::cout<<"Created dir"<<std::endl;
+    }
+
+    std::ofstream file(m_path + "/" + m_transformationMatrixFileName );
+    if(file.is_open()){
+      file << m_projectionMatrix.format(saveFormat);
+    }
+    file.close();
+    std::cout<<"Saved matrices to: " + m_path << std::endl;
+
   }
 
+  std::cout << "Save warp matrices also? (yes/no)?: ";
+  std::cin >> inputPathString;
+  std::cout << "\n";
+  if(inputPathString == "yes")
+  {
+    SavePerspectivePoints(m_path + "/");
+    std::cout<<"Saved points to:" + m_path << std::endl;
 
-  std::ofstream file(m_path  + m_transformationMatrixFileName );
-  if(file.is_open()){
-    file << m_projectionMatrix.format(saveFormat);
   }
-  file.close();
-  std::cout<<"Saved to file to " + m_path + "!" << std::endl;
-
-  SavePerspectivePoints(m_path);
 }
 
 
