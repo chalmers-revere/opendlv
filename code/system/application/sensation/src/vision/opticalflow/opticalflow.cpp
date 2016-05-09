@@ -142,7 +142,7 @@ void OpticalFlow::nextContainer(odcore::data::Container &a_c)
   for(uint32_t i = 0; i < m_endImagePoints.size(); i++){
     cv::circle(m_image, m_endImagePoints[i], 3, cv::Scalar(0,0,255), -1, 8);            
   }
-  sendContainer();
+  SendContainer();
   // updateFlow();
   // std::cout<< m_flow << std::endl;
 
@@ -175,7 +175,7 @@ void OpticalFlow::nextContainer(odcore::data::Container &a_c)
   cvReleaseImage(&myIplImage);
 }
 
-void OpticalFlow::sendContainer()
+void OpticalFlow::SendContainer()
 {
   uint16_t nPoints = m_staticImagePoints.size();
   std::vector<float> x,y,u,v;

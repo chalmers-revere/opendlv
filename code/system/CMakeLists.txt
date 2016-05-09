@@ -87,3 +87,8 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/system/application/perc
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/system/application/perception/detectvehicle/haar_cars3.xml DESTINATION ./share/opendlv/system/application/perception/detectvehicle/ COMPONENT system)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/system/application/perception/detectvehicle/trained_cnn DESTINATION ./share/opendlv/system/application/perception/detectvehicle/ COMPONENT system)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/system/application/perception/detectvehicle/normalization_constants DESTINATION ./share/opendlv/system/application/perception/detectvehicle/ COMPONENT system)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/tools/vision/projection/leftCameraTransformationMatrix.csv DESTINATION ./share/opendlv/tools/vision/projection/ COMPONENT system)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/tools/vision/projection/rightCameraTransformationMatrix.csv DESTINATION ./share/opendlv/tools/vision/projection/ COMPONENT system)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/tools/vision/projection/leftCameraWarpPoints.csv DESTINATION ./share/opendlv/tools/vision/projection/ COMPONENT system)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/tools/vision/projection/rightCameraWarpPoints.csv DESTINATION ./share/opendlv/tools/vision/projection/ COMPONENT system)
+

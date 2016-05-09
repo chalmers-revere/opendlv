@@ -51,7 +51,7 @@ V2vCam::V2vCam(int32_t const &a_argc, char **a_argv)
       a_argc, a_argv, "knowledge-linguistics-v2vcam"),
     m_sendLog(),
     m_receiveLog(),
-    m_tt()
+    m_timeType2004()
 {
   struct stat st;
   if (stat("var/application/knowledge/linguistics/v2vcam", &st) == -1) {
@@ -110,7 +110,7 @@ V2vCam::V2vCam(int32_t const &a_argc, char **a_argv)
       nullptr // time zone (NOTE: only in glibc)
       };
 
-  m_tt = timegm(&tm);
+  m_timeType2004 = timegm(&tm);
 }
 
 V2vCam::~V2vCam()
@@ -129,7 +129,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
     outBuffer->Reversed();
     outBuffer->AppendByte(GetMessageId()); //messageId
     outBuffer->AppendInteger(GetStationId()); //stationId
-    outBuffer->AppendInteger(GetGenerationDeltaTime()); //generationDeltaTime
+    outBuffer->AppendInteger(GenerateGenerationDeltaTime()); //generationDeltaTime
     outBuffer->AppendByte(GetContainerMask()); //containerMask
     outBuffer->AppendInteger(GetStationType()); //stationType                
     outBuffer->AppendInteger(GetLatitude()); //latitude
@@ -161,7 +161,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
 
     m_sendLog << std::to_string(GetMessageId()) +
         + "," + std::to_string(GetStationId()) +
-        + "," + std::to_string(GetGenerationDeltaTime()) +
+        + "," + std::to_string(GenerateGenerationDeltaTime()) +
         + "," + std::to_string(GetContainerMask()) +
         + "," + std::to_string(GetStationType()) +
         + "," + std::to_string(GetLatitude()) +
@@ -208,7 +208,8 @@ void V2vCam::nextContainer(odcore::data::Container &c)
 
     // std::cout << "Latitude: " << m_latitude << " Longitude: " << m_longitude << " Speed: " << m_speed << std::endl;
 
-  } else if(c.getDataType() == opendlv::sensation::Voice::ID()) {
+  } 
+  else if(c.getDataType() == opendlv::sensation::Voice::ID()) {
     opendlv::sensation::Voice message = c.getData<opendlv::sensation::Voice>();
     // std::cout<<message.getType()<<std::endl;
     if(strcmp(message.getType().c_str(),"cam") == 0)
@@ -324,10 +325,14 @@ void V2vCam::setUp()
   // std::string const type = kv.getValue<std::string>("proxy-v2v.type");
   
   m_stationId = kv.getValue<int32_t>("knowledge-linguistics-v2vcam.stationId");
-  m_stationType = kv.getValue<int32_t>("knowledge-linguistics-v2vcam.stationType");
-  m_vehicleLength = kv.getValue<int32_t>("knowledge-linguistics-v2vcam.vehicleLength");
-  m_vehicleWidth = kv.getValue<int32_t>("knowledge-linguistics-v2vcam.vehicleWidth");
-  m_vehicleRole = kv.getValue<int32_t>("knowledge-linguistics-v2vcam.vehicleRole");
+  m_stationType = 
+      kv.getValue<int32_t>("knowledge-linguistics-v2vcam.stationType");
+  m_vehicleLength = 
+      kv.getValue<int32_t>("knowledge-linguistics-v2vcam.vehicleLength");
+  m_vehicleWidth = 
+      kv.getValue<int32_t>("knowledge-linguistics-v2vcam.vehicleWidth");
+  m_vehicleRole = 
+      kv.getValue<int32_t>("knowledge-linguistics-v2vcam.vehicleRole");
   
 }
 
@@ -336,124 +341,125 @@ void V2vCam::tearDown()
 }
 
 
-unsigned char V2vCam::GetMessageId()
+unsigned char V2vCam::GetMessageId() const
 {
   return m_messageId;
 }
 
-int32_t V2vCam::GetStationId()
+int32_t V2vCam::GetStationId() const
 {
   return m_stationId;
 }
 
-int32_t V2vCam::GetGenerationDeltaTime()
+int32_t V2vCam::GenerateGenerationDeltaTime()
 {
   std::chrono::system_clock::time_point start2004TimePoint = 
-      std::chrono::system_clock::from_time_t(m_tt);
+      std::chrono::system_clock::from_time_t(m_timeType2004);
   unsigned long millisecondsSince2004Epoch =
       std::chrono::system_clock::now().time_since_epoch() /
-      std::chrono::milliseconds(1) - start2004TimePoint.time_since_epoch() / std::chrono::milliseconds(1);
+      std::chrono::milliseconds(1) 
+      - start2004TimePoint.time_since_epoch() / std::chrono::milliseconds(1);
   m_generationDeltaTime = millisecondsSince2004Epoch%65536;
   return m_generationDeltaTime;
 }
 
-unsigned char V2vCam::V2vCam::GetContainerMask()
+unsigned char V2vCam::V2vCam::GetContainerMask() const
 {
   return m_containerMask;
 }
 
-int32_t V2vCam::GetStationType()
+int32_t V2vCam::GetStationType() const
 {
   return m_stationType;
 }
 
-int32_t V2vCam::GetLatitude()
+int32_t V2vCam::GetLatitude() const
 {
   int32_t scale = std::pow(10,7);
   return static_cast<int32_t>(std::round(m_latitude*scale));
 }
 
-int32_t V2vCam::GetLongitude()
+int32_t V2vCam::GetLongitude() const
 {
   int32_t scale = std::pow(10,7);
   return static_cast<int32_t>(std::round(m_longitude*scale));
 }
 
-int32_t V2vCam::GetSemiMajorConfidence()
+int32_t V2vCam::GetSemiMajorConfidence() const
 {
   return m_semiMajorConfidence;
 }
 
-int32_t V2vCam::GetSemiMinorConfidence()
+int32_t V2vCam::GetSemiMinorConfidence() const
 {
   return m_semiMinorConfidence;
 }
 
-int32_t V2vCam::GetSemiMajorOrientation()
+int32_t V2vCam::GetSemiMajorOrientation() const
 {
   return m_semiMajorOrientation;
 }
 
-int32_t V2vCam::GetAltitude()
+int32_t V2vCam::GetAltitude() const
 {
   int32_t scale = std::pow(10,2);
   return static_cast<int32_t>(std::round(m_altitude*scale));
 }
 
-int32_t V2vCam::GetHeading()
+int32_t V2vCam::GetHeading() const
 {
   double scale = std::pow(10,1)*opendlv::Constants::RAD2DEG;
   double val = static_cast<double>(m_heading);
   return static_cast<int32_t>(std::round(val*scale));
 }
 
-int32_t V2vCam::GetHeadingConfidence()
+int32_t V2vCam::GetHeadingConfidence() const
 {
   return m_headingConfidence;
 }
 
-int32_t V2vCam::GetSpeed()
+int32_t V2vCam::GetSpeed() const
 {
   int32_t scale = std::pow(10,2);
   return static_cast<int32_t>(std::round(m_speed*scale));
 }
 
-int32_t V2vCam::GetSpeedConfidence()
+int32_t V2vCam::GetSpeedConfidence() const
 {
   return m_speedConfidence;
 }
 
-int32_t V2vCam::GetVehicleLength()
+int32_t V2vCam::GetVehicleLength() const
 {
   return m_vehicleLength;
 }
 
-int32_t V2vCam::GetVehicleWidth()
+int32_t V2vCam::GetVehicleWidth() const
 {
   return m_vehicleWidth;
 }
 
-int32_t V2vCam::GetLongitudinalAcc()
+int32_t V2vCam::GetLongitudinalAcc() const
 {
   return m_longitudinalAcc;
 }
 
-int32_t V2vCam::GetLongitudinalAccConf()
+int32_t V2vCam::GetLongitudinalAccConf() const
 {
   return m_longitudinalAccConf;
 }
 
-int32_t V2vCam::GetYawRateValue()
+int32_t V2vCam::GetYawRateValue() const
 {
   return m_yawRateValue;
 }
 
-int32_t V2vCam::GetYawRateConfidence()
+int32_t V2vCam::GetYawRateConfidence() const
 {
   return m_yawRateConfidence;
 }
 
-int32_t V2vCam::GetVehicleRole()
+int32_t V2vCam::GetVehicleRole() const
 {
   return m_vehicleRole;
 }

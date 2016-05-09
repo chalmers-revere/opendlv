@@ -51,7 +51,11 @@ class DirectionOfMovement
   void setUp();
   void tearDown();
 
-  Eigen::VectorXd m_Foe;
+  void SendContainer();
+
+  Eigen::VectorXd m_foePix;
+  Eigen::VectorXd m_foeWorld;
+  Eigen::MatrixXd m_pixel2World;
   cv::Mat m_image;
 
 

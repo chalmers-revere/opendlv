@@ -28,11 +28,11 @@ message opendlv.Constants [id = 150] {
 message opendlv.coordinate.Cartesian3 [id = 151] {
   float p[3] [id = 1]; // x, y, z
 }
-
+*/
 message opendlv.coordinate.Spherical3 [id = 152] {
   float p[3] [id = 1]; // radius, zenith, azimuth
 }
-
+/*
 message opendlv.coordinate.Quaternion3 [id = 153] {
   float o[4] [id = 1]; // x, y, z, w
 }
@@ -188,18 +188,19 @@ message opendlv.sensation.Looming [id = 173] {
 }
 */
 message opendlv.sensation.OpticalFlow [id = 174] {
-  uint16 nPoint;
-  list<float> x;
-  list<float> y;
-  list<float> u;
-  list<float> v;
-  //float flow;
+  uint16 nPoint [id = 1];
+  list<float> x [id = 2];
+  list<float> y [id = 3];
+  list<float> u [id = 4];
+  list<float> v [id = 5];
+  //float flow  [id = 6];
 }
-/*
+
 message opendlv.sensation.DirectionOfMovement [id = 175] {
   opendlv.coordinate.Spherical3 directionOfMovement [id = 1];
 }
 
+/*
 message opendlv.perception.ObjectDistanceToBody [id = 176] {
   opendlv.coordinate.Cartesian3 bodySkinPosition [id = 1];
   opendlv.coordinate.Cartesian3 objectSurfacePosition [id = 2];
@@ -269,7 +270,7 @@ message opendlv.proxy.reverefh16.Pedals [id = 191] {
 
 message opendlv.proxy.reverefh16.AccelerationRequest [id = 192] {
     bool enableRequest [id = 1];
-    double acceleration [id = 2];
+    double accelerationPedalPosition [id = 2];
 }
 
 message opendlv.proxy.reverefh16.BrakeRequest [id = 193] {
