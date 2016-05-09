@@ -17,17 +17,17 @@
  * USA.
  */
 
-#include <ctype.h>
-#include <cstring>
 #include <cmath>
-#include <iostream>
+#include <cstring>
+#include <ctype.h>
 #include <fstream>
-#include <iomanip>      // std::setprecision
+#include <iomanip>
+#include <iostream>
 
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
-#include <opendlv/data/environment/Point3.h>
 
+#include "opendlv/data/environment/Point3.h"
 #include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 #include "geolocation/geolocation.hpp"
@@ -64,10 +64,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
   odcore::data::TimeStamp previousDataTimestamp;
   double timestamp = 0.0;
 
-  Control<double> control; 
-  State<double> state; 
+  Control<double> control;
+  State<double> state;
   SystemModel<double> systemModel;
-    
+
   state.setZero();
 
   KinematicObservationModel<double> kinematicObservationModel(
@@ -77,16 +77,24 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
   // To dump data structures into a CSV file, you create an output file first.
   // std::ofstream fout("../Exp_data/output.csv");
   std::ofstream fout_ekfState("./output_ekf.csv");
-  fout_ekfState << "%HEADER: Output of the Extended Kalman Filter, data format : \n"
-                << "%timestamp (s), ground truth: x (m),  y (m), theta (rad), theta_dot(rad/s), commands : velocity (m/s) steering angle (rad), noisy data: x (m), y (m), theta (rad), theta_dot (rad/s), ekf estimation vector: x (m), x_dot (m/s), y (m), y_dot (ms), theta (rad), theta_dot(rad/s)  \n"
-                << "%t lat long yaw long_vel wheels_angle Z_x Z_y Z_theta Z_theta_dot HAS_DATA X_x X_x_dot X_y X_y_dot X_theta X_theta_dot sent_lat sent_long sent_alt sent_heading " << endl;
+  fout_ekfState
+      << "%HEADER: Output of the Extended Kalman Filter, data format : \n"
+      << "%timestamp (s), ground truth: x (m),  y (m), theta (rad), "
+      << "theta_dot(rad/s), commands : velocity (m/s) steering angle (rad), "
+      << "noisy data: x (m), y (m), theta (rad), theta_dot (rad/s), "
+      << "ekf estimation vector: x (m), x_dot (m/s), y (m), y_dot (ms), "
+      << "theta (rad), theta_dot(rad/s)  \n"
+      << "%t lat long yaw long_vel wheels_angle Z_x Z_y Z_theta Z_theta_dot "
+      << "HAS_DATA X_x X_x_dot X_y X_y_dot X_theta X_theta_dot sent_lat "
+      << "sent_long sent_alt sent_heading "
+      << endl;
 
 
-  while (getModuleStateAndWaitForRemainingTimeInTimeslice() == 
+  while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
       odcore::data::dmcp::ModuleStateMessage::RUNNING) {
 
-    auto gpsReadingContainer = getKeyValueDataStore().get(
-        opendlv::proxy::GpsReading::ID());
+    auto gpsReadingContainer =
+        getKeyValueDataStore().get(opendlv::proxy::GpsReading::ID());
     auto gpsReading = gpsReadingContainer.getData<opendlv::proxy::GpsReading>();
 
 //    std::cout << getName() << "\tLatidude  =  " << gpsReading.getLatitude()
@@ -118,13 +126,15 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
           opendlv::proxy::reverefh16::Propulsion>();
 
       if (propulsionContainer.getReceivedTimeStamp().getSeconds() > 0) {
-        control.v() = propulsion.getPropulsionShaftVehicleSpeed()/3.6; // TODO: to m/s --- get the message in si unit
+        control.v() = propulsion.getPropulsionShaftVehicleSpeed()/3.6;
+        // TODO: to m/s --- get the message in si unit
       }
 
 
       if (propulsion.getPropulsionShaftVehicleSpeed() < 0.001) {
           control.v() = 0.0;
-      // if we don't get any data from the CAN, we try to fill the speed from GPS data
+      // if we don't get any data from the CAN,
+      // we try to fill the speed from GPS data
           //auto gpsSpeed = gpsReading.getSpeed();
           //          if (gpsSpeed > 1.0 ){
           //          control.v() = gpsSpeed;}
@@ -148,9 +158,12 @@ std::cout << " the vehicle speed is : " << gpsReading.getSpeed() << endl;
       }
 
       std::cout   << getName() << "\t" << "timestamp="
-        << timestamp << "\t control:  steering.getRoadwheelangle = "  << steering.getRoadwheelangle()
-        << " steering.getSteeringwheelangle " << steering.getSteeringwheelangle()
-        << "  propulsion.getPropulsionShaftVehicleSpeed " << propulsion.getPropulsionShaftVehicleSpeed()
+        << timestamp << "\t control:  steering.getRoadwheelangle = "
+        << steering.getRoadwheelangle()
+        << " steering.getSteeringwheelangle "
+        << steering.getSteeringwheelangle()
+        << "  propulsion.getPropulsionShaftVehicleSpeed "
+        << propulsion.getPropulsionShaftVehicleSpeed()
         << std::endl;
       std::cout   << getName() << "\t" << "timestamp="
         << timestamp << "\t original GPS data  "
@@ -164,40 +177,44 @@ std::cout << " the vehicle speed is : " << gpsReading.getSpeed() << endl;
           gpsReading.getLongitude(),
           opendlv::data::environment::WGS84Coordinate::EAST);
 
-      opendlv::data::environment::Point3 currentCartesianLocation = 
+      opendlv::data::environment::Point3 currentCartesianLocation =
           gpsReference.transform(currentLocation);
 
-        //kinematic kalman block
-        KinematicObservationVector<double> observationVector = kinematicObservationModel.h(state);
-        observationVector.Z_x() = currentCartesianLocation.getX();
-        observationVector.Z_y() = currentCartesianLocation.getY();
-        if (gpsReading.getHasHeading()) {
-          observationVector.Z_theta() = gpsReading.getNorthHeading();
-        } else {
-          observationVector.Z_theta() = state.theta();
-        }
-        observationVector.Z_theta_dot() = vehicleYawRate; // TODO: Put yaw rate here...
+      //kinematic kalman block
+      KinematicObservationVector<double> observationVector =
+          kinematicObservationModel.h(state);
+      observationVector.Z_x() = currentCartesianLocation.getX();
+      observationVector.Z_y() = currentCartesianLocation.getY();
+      if (gpsReading.getHasHeading()) {
+        observationVector.Z_theta() = gpsReading.getNorthHeading();
+      }
+      else {
+        observationVector.Z_theta() = state.theta();
+      }
+      observationVector.Z_theta_dot() = vehicleYawRate;
+      // TODO: Put yaw rate here...
 
-      
-        double deltaTime = duration.toMicroseconds() / 1000000.0;
-        systemModel.updateDeltaT(deltaTime);
 
-      
-        state = m_ekf.predict(systemModel, control);
+      double deltaTime = duration.toMicroseconds() / 1000000.0;
+      systemModel.updateDeltaT(deltaTime);
 
-        bool gpsHasData = false;
-        if (gpsReadingContainer.getReceivedTimeStamp().toMicroseconds() >
-            previousDataTimestamp.toMicroseconds()) {
-          state = m_ekf.update(kinematicObservationModel, observationVector);
-          previousDataTimestamp = gpsReadingContainer.getReceivedTimeStamp();
-          gpsHasData = true;
-        }
 
-        timestamp += systemModel.getDeltaT();
+      state = m_ekf.predict(systemModel, control);
 
-        std::cout   << getName() << "\t" << "timestamp="
-          << timestamp << "\t hasData=" << gpsHasData << "\tx = " << state.x() << ", y = " <<
-          state.y() << ", theta = " << state.theta() << std::endl;
+      bool gpsHasData = false;
+      if (gpsReadingContainer.getReceivedTimeStamp().toMicroseconds() >
+          previousDataTimestamp.toMicroseconds()) {
+        state = m_ekf.update(kinematicObservationModel, observationVector);
+        previousDataTimestamp = gpsReadingContainer.getReceivedTimeStamp();
+        gpsHasData = true;
+      }
+
+      timestamp += systemModel.getDeltaT();
+
+      std::cout   << getName() << "\t" << "timestamp="
+        << timestamp << "\t hasData=" << gpsHasData << "\tx = " << state.x()
+        << ", y = " <<
+        state.y() << ", theta = " << state.theta() << std::endl;
 
 
 
@@ -230,6 +247,7 @@ const double gpsToCoGDisplacement_y = 1.5; //meters
               (state.x() + gpsToCoGDisplacement_x,
                state.y() + gpsToCoGDisplacement_y,
                currentCartesianLocation.getZ());
+
 //TODO: convert here x and y to get the position of the rear axle
 
       opendlv::data::environment::WGS84Coordinate currentWGS84CoordinateEstimation =
@@ -250,13 +268,16 @@ const double gpsToCoGDisplacement_y = 1.5; //meters
 
       double longitudinalAccelerationConfidence = 0.0;
 
+
       std::cout   << getName() << "\t" << "timestamp="
         << timestamp << "\t "
         << "\tlat=" << currentWGS84CoordinateEstimation.getLatitude()
-        << ", long=" << std::setprecision(19) << currentWGS84CoordinateEstimation.getLongitude()
+        << ", long=" << std::setprecision(19)
+        << currentWGS84CoordinateEstimation.getLongitude()
         << ", theta=" << std::setprecision(19) << state.theta() << std::endl;
 
       // Send the message
+
       opendlv::sensation::Geolocation geoLocationEstimation(currentWGS84CoordinateEstimation.getLatitude(),
                                                             currentWGS84CoordinateEstimation.getLongitude(),
                                                             positionConfidence,
@@ -279,25 +300,36 @@ const double gpsToCoGDisplacement_y = 1.5; //meters
       //save data to file
       bool   saveToFile = true;
       if (  saveToFile){
-      fout_ekfState << std::setprecision(19) << timestamp << " "
-                    << gpsReading.getLatitude() << " " << gpsReading.getLongitude() << " " << gpsReading.getNorthHeading() <<  " "
-                    << control.v() << " " << control.phi() << " "
-                    << observationVector.Z_x() << " " << observationVector.Z_y() << " " << observationVector.Z_theta() << " " << observationVector.Z_theta_dot() << " " << gpsHasData << " "
-                    << state.x() << " " << state.x_dot() << " "  << state.y() << " " << state.y_dot() << " " << state.theta() << " " << state.theta_dot() << " "
-                    << currentWGS84CoordinateEstimation.getLatitude() << " " <<   currentWGS84CoordinateEstimation.getLongitude() << " " << gpsReading.getAltitude() << " " << heading
-                    << endl;
+      fout_ekfState
+          << std::setprecision(19) << timestamp << " "
+          << gpsReading.getLatitude() << " "
+          << gpsReading.getLongitude() << " "
+          << gpsReading.getNorthHeading() <<  " "
+          << control.v() << " "
+          << control.phi() << " "
+          << observationVector.Z_x() << " "
+          << observationVector.Z_y() << " "
+          << observationVector.Z_theta() << " "
+          << observationVector.Z_theta_dot() << " "
+          << gpsHasData << " "
+          << state.x() << " "
+          << state.x_dot() << " "
+          << state.y() << " "
+          << state.y_dot() << " "
+          << state.theta() << " "
+          << state.theta_dot() << " "
+          << currentWGS84CoordinateEstimation.getLatitude() << " "
+          << currentWGS84CoordinateEstimation.getLongitude() << " "
+          << gpsReading.getAltitude() << " "
+          << heading
+          << endl;
       }
-
-
     }
-    else   {
+    else {
         std::cout << getName() << "\t"<< " NO DATA " << std::endl;
     }
-
   }
-   
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
-
 }
 
 void Geolocation::setUp()
@@ -322,14 +354,14 @@ return confidence;
 double Geolocation::calculateHeadingConfidence()
 {
 auto covSR = m_ekf.getCovariance();
-confidence = std::sqrt(covSR(4,4)*covSR(4,4));
+double confidence = std::sqrt(covSR(4,4)*covSR(4,4));
 return confidence; // if information is not available
 }
 
-double Geolocation::calculateHeadingConfidence()
+double Geolocation::calculateHeadingRateConfidence()
 {
 auto covSR = m_ekf.getCovariance();
-confidence = std::sqrt(covSR(5,5)*covSR(5,5));
+double confidence = std::sqrt(covSR(5,5)*covSR(5,5));
 return confidence; // if information is not available
 }
 

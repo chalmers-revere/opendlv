@@ -28,11 +28,11 @@ message opendlv.Constants [id = 150] {
 message opendlv.coordinate.Cartesian3 [id = 151] {
   float p[3] [id = 1]; // x, y, z
 }
-
+*/
 message opendlv.coordinate.Spherical3 [id = 152] {
   float p[3] [id = 1]; // radius, zenith, azimuth
 }
-
+/*
 message opendlv.coordinate.Quaternion3 [id = 153] {
   float o[4] [id = 1]; // x, y, z, w
 }
@@ -145,6 +145,7 @@ message opendlv.sensation.Geolocation [id = 169] {
   double longitudinalAccelerationConfidence [id=12]; 
 }
 
+
 /*
 message opendlv.sensation.RoadWheel [id = 167] {
   float angle [id = 1];
@@ -159,9 +160,10 @@ message opendlv.sensation.Axle [id = 168] {
   uint8 axleIndex [id = 2];
   uint8 unitIndex [id = 3];
 }
+*/
 
 
-
+/*
 message opendlv.sensation.BodyPart [id = 170] {
   opendlv.cartesian.Point3 position [id = 1]; // From body origo to body part center of mass
   string gemoetryPath [id = 2];
@@ -191,12 +193,21 @@ message opendlv.sensation.Looming [id = 173] {
   float looming [id = 2];
   float size [id = 3];
 }
+*/
+message opendlv.sensation.OpticalFlow [id = 174] {
+  uint16 nPoint [id = 1];
+  list<float> x [id = 2];
+  list<float> y [id = 3];
+  list<float> u [id = 4];
+  list<float> v [id = 5];
+  //float flow  [id = 6];
+}
 
 message opendlv.sensation.DirectionOfMovement [id = 175] {
   opendlv.coordinate.Spherical3 directionOfMovement [id = 1];
 }
 
-// Perception messages
+/*
 message opendlv.perception.ObjectDistanceToBody [id = 176] {
   opendlv.coordinate.Cartesian3 bodySkinPosition [id = 1];
   opendlv.coordinate.Cartesian3 objectSurfacePosition [id = 2];
@@ -264,14 +275,6 @@ message opendlv.perception.LeadVehicleSize [id = 187] {
   float size [id = 1];
 }
 
-message opendlv.sensation.OpticalFlow [id = 188] {
-  float flow [id = 1];
-}
-
-message opendlv.perception.DesiredOpticalFlow [id = 189] {
-  float flow [id = 1];
-}
-
 // Action messages
 message opendlv.action.Correction [id = 190] {
   odcore::data::TimeStamp startTime [id = 1];
@@ -290,7 +293,7 @@ message opendlv.proxy.reverefh16.Pedals [id = 191] {
 
 message opendlv.proxy.reverefh16.AccelerationRequest [id = 192] {
     bool enableRequest [id = 1];
-    double acceleration [id = 2];
+    double accelerationPedalPosition [id = 2];
 }
 
 message opendlv.proxy.reverefh16.BrakeRequest [id = 193] {
