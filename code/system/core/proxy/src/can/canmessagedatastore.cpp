@@ -34,8 +34,10 @@ namespace can {
 CanMessageDataStore::CanMessageDataStore(
 std::shared_ptr<automotive::odcantools::CANDevice> canDevice)
     : automotive::odcantools::MessageToCANDataStore(canDevice),
+
     m_dataStoreMutex(),
     m_enabled(false)
+
 {
 }
 

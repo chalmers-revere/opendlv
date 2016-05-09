@@ -42,6 +42,8 @@ public:
   void Update(const cv::Mat* a_imageFrame);
   bool IsInitialized();
 
+  void GetDetectedVehicles(std::vector<cv::Rect>* container);
+
 /* Public fields */
 public:
 
@@ -100,6 +102,8 @@ private:
       "share/opendlv/system/application/perception/detectvehicle/trained_cnn";
   const std::string m_pathNormalizationConstants = 
       "share/opendlv/system/application/perception/detectvehicle/normalization_constants";
+
+  std::vector<cv::Rect> m_detectedVehicles;
 
   bool m_isInitialized;
 

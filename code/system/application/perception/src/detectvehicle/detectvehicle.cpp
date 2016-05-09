@@ -35,8 +35,6 @@
 
 #include "detectvehicle/detectvehicle.hpp"
 
-#include "detectvehicle/convneuralnet.hpp"
-
 namespace opendlv {
 namespace perception {
 namespace detectvehicle {
@@ -89,12 +87,11 @@ void DetectVehicle::setUp()
  */
 void DetectVehicle::nextContainer(odcore::data::Container &c)
 {
-  std::cout << std::endl;
-
   if (c.getDataType() != odcore::data::image::SharedImage::ID()) {
     // received container that we don't care about
     return;
   }
+  std::cout << std::endl;
 
   if (!m_convNeuralNet->IsInitialized()) {
     std::cout << "Convolutional Neural Net not yet initialized" << std::endl;
@@ -103,6 +100,9 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
 
   odcore::data::image::SharedImage mySharedImg = 
       c.getData<odcore::data::image::SharedImage>();
+
+  // extract time stamp from container
+  odcore::data::TimeStamp timeStampOfImage = c.getSentTimeStamp();
 
   std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(
       odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(
@@ -137,6 +137,32 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
 
 
   m_convNeuralNet->Update(&myImage);
+
+  std::vector<cv::Rect> detections;
+  m_convNeuralNet->GetDetectedVehicles(&detections);
+
+
+  for (uint32_t i=0; i<detections.size(); i++) {
+    cv::Rect currentBoundingBox = detections.at(i);
+
+    std::vector<opendlv::perception::ObjectProperty> properties;
+    odcore::data::TimeStamp lastSeen = timeStampOfImage;
+    std::string type = "vehicle";
+    float headingOfXmin = this->PixelPosToHeading(currentBoundingBox.x);
+    float headingOfXmax = this->PixelPosToHeading(currentBoundingBox.x + currentBoundingBox.width);
+    float size = headingOfXmin - headingOfXmax;
+    float angle = headingOfXmin - size/2; //midpoint of box
+    uint16_t objectIndex = i;
+
+    opendlv::perception::Object detectedObject(properties, lastSeen, type, angle, size, objectIndex);
+    odcore::data::Container objectContainer(detectedObject);
+    getConference().send(objectContainer);
+
+    std::cout << "    type:        " << type << std::endl;
+    std::cout << "    angle:       " << angle << std::endl;
+    std::cout << "    size:        " << size << std::endl;
+    std::cout << "    objectIndex: " << objectIndex << std::endl;
+  }
 
   /*
   m_verifiedVehicles->clear();
@@ -198,6 +224,28 @@ void DetectVehicle::tearDown()
   std::cout << "DetectVehicle::tearDown()" << std::endl;
   m_vehicleDetectionSystem->tearDown();
   m_convNeuralNet->TearDown();
+}
+
+
+float DetectVehicle::PixelPosToHeading(float pixelPosX)
+{
+  float assumedImageWidth = 800;
+  float midPoint = assumedImageWidth/2;
+  float assumedFov = 3.1416f*2/3;
+  float pixelsPerRadian = assumedImageWidth/assumedFov;
+
+  std::cout << std::endl;
+  /*
+  std::cout << "pixelPosX:          " << pixelPosX << std::endl;
+  std::cout << "midPoint:           " << midPoint << std::endl;
+  std::cout << "assumedFov:         " << assumedFov << std::endl;
+  std::cout << "pixelsPerRadian:    " << pixelsPerRadian << std::endl;
+  std::cout << "midPoint-pixelPosX: " << (midPoint-pixelPosX) << std::endl;
+  std::cout << "(midPoint-pixelPosX)/pixelsPerRadian: " << ((midPoint-pixelPosX)/pixelsPerRadian) << std::endl;
+  */
+  float heading = (midPoint-pixelPosX)/pixelsPerRadian;
+  //std::cout << "heading: " << heading << std::endl;
+  return heading;
 }
 
 } // detectvehicle
