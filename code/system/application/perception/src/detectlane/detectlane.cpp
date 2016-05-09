@@ -150,15 +150,32 @@ void DetectLane::nextContainer(odcore::data::Container &c)
     // Definitions for the video choice
     //-----------------------------
     m_initialized = false;
+    cv::resize(src,src,cv::Size(m_outputWidth,m_outputHeight));
     if(mySharedImg.getName() == "front-left"){
+      /* OLD CODE 
       m_leftIpm->ApplyHomography(src,src);
+      m_regions = m_leftCameraRegions;
+      m_lines = m_leftLines;
+      m_transformationMatrix = m_leftTransformationMatrix;
+      m_initialized = true;
+      */
+
+      // New code
       m_regions = m_leftCameraRegions;
       m_lines = m_leftLines;
       m_transformationMatrix = m_leftTransformationMatrix;
       m_initialized = true;
     }
     if(mySharedImg.getName() == "front-right"){
+      /* OLD CODE
       m_rightIpm->ApplyHomography(src,src);
+      m_regions = m_rightCameraRegions;
+      m_lines = m_rightLines;
+      m_transformationMatrix = m_rightTransformationMatrix;
+      m_initialized = true;
+      */
+
+      // New code
       m_regions = m_rightCameraRegions;
       m_lines = m_rightLines;
       m_transformationMatrix = m_rightTransformationMatrix;
@@ -371,6 +388,7 @@ void DetectLane::setUp()
   m_minRow = 0;//m_minRow * (m_height / 480.0);
   m_maxRow = m_outputHeight;//m_maxRow * (m_height / 480.0);
 
+  /* OLD CODE 
   std::string leftCameraRegionsFile = 
     "./share/opendlv/system/application/perception/detectlane/leftCameraRegions.csv";
   m_leftCameraRegions = ReadMatrix(leftCameraRegionsFile,
@@ -380,7 +398,27 @@ void DetectLane::setUp()
     "./share/opendlv/system/application/perception/detectlane/rightCameraRegions.csv";
   m_rightCameraRegions = ReadMatrix(rightCameraRegionsFile,
       m_regions.rows(),m_regions.cols());
+  */
 
+  m_leftCameraRegions = Eigen::MatrixXd(7,4);
+  m_leftCameraRegions <<
+    0 , 40 , 0 ,40 ,
+    0 , 30 , 0, 10,
+    0 , 30 , 0 ,10,
+    0 , 30 , 0 ,10,
+    0, 30 , 0 , 10,
+    0 , 0 ,0 ,0,
+    0 ,0 ,0 ,0;
+
+  m_rightCameraRegions = Eigen::MatrixXd(7,4);
+  m_rightCameraRegions <<
+    0 , 40 , 0 ,40 ,
+    0 , 30 , 0, 10,
+    0 , 30 , 0 ,10,
+    0 , 30 , 0 ,10,
+    0, 30 , 0 , 10,
+    0 , 0 ,0 ,0,
+    0 ,0 ,0 ,0;
 
   m_leftCameraRegions.col(0) *= (m_outputWidth / 640.0);
   m_leftCameraRegions.col(2) *= (m_outputWidth / 640.0);
@@ -427,12 +465,23 @@ void DetectLane::setUp()
   m_K = Eigen::MatrixXd(m_nRegions,1);
   m_M = Eigen::MatrixXd(m_nRegions,1);
 
+  /* OLD CODE 
   m_leftTransformationMatrix = ReadMatrix(
           "/opt/opendlv/share/opendlv/tools/vision/projection/leftCameraTransformationMatrixWarped.csv",3,3);
   std::cout<<m_leftTransformationMatrix;
   std::cout<<"\n------\n----\n---\n";
   m_rightTransformationMatrix = ReadMatrix(
           "/opt/opendlv/share/opendlv/tools/vision/projection/rightCameraTransformationMatrixWarped.csv",3,3);
+  */
+
+  // NEW CODE
+  m_leftTransformationMatrix = ReadMatrix(
+          "/opt/opendlv/share/opendlv/tools/vision/projection/leftCameraTransformationMatrix.csv",3,3);
+  std::cout<<m_leftTransformationMatrix;
+  std::cout<<"\n------\n----\n---\n";
+  m_rightTransformationMatrix = ReadMatrix(
+          "/opt/opendlv/share/opendlv/tools/vision/projection/rightCameraTransformationMatrix.csv",3,3);
+  // --------------------------------
 
   m_scale << m_width / (double)m_outputWidth, m_height / (double)m_outputHeight, 1;
  
