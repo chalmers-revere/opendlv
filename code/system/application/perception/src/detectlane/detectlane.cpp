@@ -167,6 +167,11 @@ void DetectLane::nextContainer(odcore::data::Container &c)
       m_transformationMatrix = m_rightTransformationMatrix;
       m_initialized = true;
     }
+    
+    
+    cvReleaseImage(&myIplImage);
+
+
     if(!m_initialized){
       return;
     }
@@ -282,7 +287,6 @@ void DetectLane::nextContainer(odcore::data::Container &c)
     imshow("1", src);
     imshow("2", image);
     waitKey(1);
-    cvReleaseImage(&myIplImage);
   }
 }
 
