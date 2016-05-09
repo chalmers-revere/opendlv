@@ -211,7 +211,6 @@ void DetectLane::nextContainer(odcore::data::Container &c)
         m_maxRow);
 
 
-    
     //-----------------------------
     // Extract lines from points
     //-----------------------------
@@ -232,6 +231,9 @@ void DetectLane::nextContainer(odcore::data::Container &c)
       int p1 = m_regionIndex(0,0);
       int p2 = m_regionIndex(1,0);
       
+      if(p1==p2){
+        return;
+      }
       //-----------------------------
       // Draw boarders/lines - VISUALIZATION
       //-----------------------------
@@ -264,7 +266,7 @@ void DetectLane::nextContainer(odcore::data::Container &c)
           m_lines.col(0)(m_midRegion),m_lines.col(1)(m_midRegion),
           (m_minRow));
       // Factor 4 is assumed length between minRow and Maxrow in real life
-      double theta = atan((d2-d1) / (double)4);
+      double theta = atan((d2-d1) / (double)15);
 
 
       double newLaneOffset = GetLaneOffset(m_K(p1,0),
@@ -395,9 +397,8 @@ void DetectLane::setUp()
   //-----------------------------
   // Scaling: Calibrations were made for 640x480 resolution
   //-----------------------------
-  m_minRow = 150;//m_minRow * (m_height / 480.0);
-  m_maxRow = 450;//m_maxRow * (m_height / 480.0);
-
+  m_minRow = 150 * m_outputHeight  / 480.0;
+  m_maxRow = 450 * m_outputHeight / 480.0;
   /* OLD CODE 
   std::string leftCameraRegionsFile = 
     "./share/opendlv/system/application/perception/detectlane/leftCameraRegions.csv";
@@ -419,7 +420,6 @@ void DetectLane::setUp()
     303, 100, 528, 469,
     319, 105, 609, 332,
     336, 87, 630, 201;
-
 
 
   m_rightCameraRegions = Eigen::MatrixXd(7,4);
@@ -451,7 +451,7 @@ void DetectLane::setUp()
   //-----------------------------
   // Image processing parameters
   //-----------------------------
-  m_nPoints = m_maxRow - m_minRow;
+  m_nPoints = (m_maxRow - m_minRow) / 2;
   
   //-----------------------------
   // Initializations
