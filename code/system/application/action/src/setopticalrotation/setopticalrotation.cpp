@@ -67,6 +67,7 @@
 
     odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
     float const gainHeading = kv.getValue<float>("action-setopticalrotation.gain_heading");  
+    //float gainHeading = 0.5f;
     
     if ( fabs(heading) > 0.0f ) {
       float steeringAmplitude = gainHeading * heading;

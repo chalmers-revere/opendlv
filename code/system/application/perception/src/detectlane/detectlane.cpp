@@ -261,7 +261,7 @@ void DetectLane::nextContainer(odcore::data::Container &c)
           << std::endl;
 
       std::cout << "New offset: " << newLaneOffset << " New heading: "
-          << newHeadingAngle << std::endl;
+          << newHeadingAngle << std::endl << std::endl;
 
       
       if(std::isfinite(theta) && std::isfinite(laneOffset)){

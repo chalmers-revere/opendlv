@@ -20,7 +20,7 @@ odsupercomponent.pulsetimeack.timeout = 5000 # (in milliseconds)
 # deterministic execution. 
 odsupercomponent.pulsetimeack.yield = 5000 # (in microseconds)
 
-action-setopticalrotation.gain_heading = 0.75
+action-setopticalrotation.gain_heading = 0.5
 
 ### Proxy
 proxy-can.devicenode = /dev/pcan2          # PEAK CAN device.
