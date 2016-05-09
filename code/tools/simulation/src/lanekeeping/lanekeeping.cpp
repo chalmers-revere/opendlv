@@ -75,8 +75,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LaneKeeping::body()
     odcore::data::TimeStamp duration = thisTimestep - previousTimestep;
     previousTimestep = thisTimestep;
 
-    double deltaTime = duration.toMicroseconds() / 1000000.0;
 
+    std::cout << "m_steering: " << m_steering << std::endl;
+    double deltaTime = duration.toMicroseconds() / 1000000.0;
+    std::cout << "deltaTime: " << deltaTime << std::endl; 
     m_vehicle->Update(m_steering, deltaTime);
 
     double lateralPosition = m_vehicle->GetLateralPosition();

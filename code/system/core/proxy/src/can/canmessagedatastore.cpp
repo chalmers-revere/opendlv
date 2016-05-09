@@ -34,8 +34,10 @@ namespace can {
 CanMessageDataStore::CanMessageDataStore(
 std::shared_ptr<automotive::odcantools::CANDevice> canDevice)
     : automotive::odcantools::MessageToCANDataStore(canDevice),
+
     m_dataStoreMutex(),
-    m_enabled(false)
+    m_enabled(true)
+
 {
 }
 
@@ -75,7 +77,7 @@ void CanMessageDataStore::add(odcore::data::Container const &a_container)
           brakeRequestMapping;
       automotive::GenericCANMessage genericCanMessage = 
           brakeRequestMapping.encode(brakeRequestContainer);
-      m_canDevice->write(genericCanMessage);
+      //m_canDevice->write(genericCanMessage);
 
     } else {
       opendlv::proxy::reverefh16::AccelerationRequest accelerationRequest;
@@ -90,7 +92,7 @@ void CanMessageDataStore::add(odcore::data::Container const &a_container)
           accelerationRequestMapping;
       automotive::GenericCANMessage genericCanMessage = 
           accelerationRequestMapping.encode(accelerationRequestContainer);
-      m_canDevice->write(genericCanMessage);
+     // m_canDevice->write(genericCanMessage);
     }
     
     opendlv::proxy::reverefh16::SteeringRequest steeringRequest;
@@ -100,6 +102,9 @@ void CanMessageDataStore::add(odcore::data::Container const &a_container)
     steeringRequest.setSteeringDeltaTorque(33.535); 
     odcore::data::Container steeringRequestContainer(steeringRequest);
 
+
+    std::cout << "Steering: " << steering << std::endl << std::endl;
+    
     canmapping::opendlv::proxy::reverefh16::SteeringRequest 
         steeringRequestMapping;
     automotive::GenericCANMessage genericCanMessage 

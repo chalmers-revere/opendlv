@@ -33,6 +33,7 @@
 
 
 
+
 // TODO add documentation
 
 namespace opendlv {
@@ -54,6 +55,8 @@ class DetectVehicle
  private:
   void setUp();
   void tearDown();
+
+  float PixelPosToHeading(float pixelPosX);
 
   std::shared_ptr<VehicleDetectionSystem> m_vehicleDetectionSystem;
   std::shared_ptr<std::vector<std::shared_ptr<DetectedVehicle>>> m_verifiedVehicles;
