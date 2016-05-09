@@ -68,7 +68,7 @@ class Projection
   void Project();
   void ReadMatrix();
   void Warp();
-  void SavePerspectivePoints();
+  void SavePerspectivePoints(std::string a_path);
 
   double m_recHeight;
   double m_recWidth;
@@ -93,6 +93,8 @@ class Projection
   std::string m_transformationMatrixFileName;
   std::string m_leftTransformationMatrixFileName;
   std::string m_rightTransformationMatrisFileName;
+
+  std::string m_path;
 
   bool m_initialized;
 

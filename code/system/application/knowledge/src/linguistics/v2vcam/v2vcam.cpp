@@ -22,11 +22,13 @@
 #include <cstring>
 #include <cmath>
 #include <iostream>
+#include <iomanip>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
  
 #include "opendavinci/odcore/base/KeyValueConfiguration.h"
+#include "opendlv/data/environment/WGS84Coordinate.h"
 
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
@@ -204,6 +206,11 @@ void V2vCam::nextContainer(odcore::data::Container &c)
     m_heading = gpsReading.getHeading();
     // m_speed = gpsReading.getSpeed();
 
+  
+
+
+
+
     // TODO!! Real values from GPS, but not scaled properly.
 
     // std::cout << "Latitude: " << m_latitude << " Longitude: " << m_longitude << " Speed: " << m_speed << std::endl;
@@ -313,6 +320,14 @@ void V2vCam::nextContainer(odcore::data::Container &c)
         + "," + std::to_string(yawRateConfidence) +
         + "," + std::to_string(vehicleRole);
         m_receiveLog << std::endl;
+
+        {
+          using namespace opendlv::data::environment;
+          opendlv::data::environment::WGS84Coordinate coordPacket(latitude/10000000.0, WGS84Coordinate::NORTH, longitude/10000000.0, WGS84Coordinate::EAST);
+          std::cout << std::setprecision(11) << coordPacket.getLatitude() << " " << coordPacket.getLongitude() << std::endl;
+          odcore::data::Container nextC(coordPacket);
+          getConference().send(nextC);
+        }
 
     }
   }

@@ -162,7 +162,7 @@ sensation-vision-opticalflow.maxLevel = 3
 sensation-vision-opticalflow.minEigThreshold = 0.001
 sensation-vision-opticalflow.nAxisPoints = 15
 
-# V2V temp
+# V2V 
 knowledge-linguistics-v2vcam.stationId = 115
 knowledge-linguistics-v2vcam.stationType = 8 #heavy truck
 knowledge-linguistics-v2vcam.vehicleLength = 47
@@ -181,3 +181,7 @@ tools-can-joystick.devicenode = /dev/pcan2   # PEAK CAN device.
 tools-can-joystick.joystickdevicenode = /dev/input/js2   # Gamepad.
 tools-can-keyboard.devicenode = /dev/pcan2   # PEAK CAN device.
 tools-can-simplecansender.devicenode = /dev/pcan2   # PEAK CAN device.
+
+# Perception
+perception-detectlane.inputSize = 640,480
+perception-detectlane.outputSize = 640,480
