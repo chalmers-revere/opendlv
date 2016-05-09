@@ -22,12 +22,17 @@
 #include <cmath>
 #include <iostream>
 
+#include "opendavinci/odcore/base/Lock.h"
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
 
 #include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
+#include "opendavinci/GeneratedHeaders_OpenDaVINCI.h"
+#include "opendavinci/odcore/wrapper/SharedMemoryFactory.h"
+#include "opendavinci/odcore/wrapper/SharedMemory.h"
 #include "vision/directionofmovement/directionofmovement.hpp"
+
 
 namespace opendlv {
 namespace sensation {
@@ -42,24 +47,136 @@ namespace directionofmovement {
   */
 DirectionOfMovement::DirectionOfMovement(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(
-      a_argc, a_argv, "sensation-vision-directionofmovement")
+      a_argc, a_argv, "sensation-vision-directionofmovement"),
+      m_foePix(2),
+      m_foeWorld(2),
+      m_pixel2World(3,3),
+      m_image()
 {
+  cv::namedWindow( "FOE", 1 );
 }
 
 DirectionOfMovement::~DirectionOfMovement()
-{
+{ 
+  m_image.release();
 }
 
 /**
  * Receives .
  * Sends .
  */
-void DirectionOfMovement::nextContainer(odcore::data::Container &)
+void DirectionOfMovement::nextContainer(odcore::data::Container &a_c)
 {
+
+  if(a_c.getDataType() == odcore::data::image::SharedImage::ID()){
+    odcore::data::image::SharedImage mySharedImg =
+        a_c.getData<odcore::data::image::SharedImage>();
+    // std::cout<<mySharedImg.getName()<<std::endl;
+
+    std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(
+        odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(
+            mySharedImg.getName()));
+    const uint32_t nrChannels = mySharedImg.getBytesPerPixel();
+    const uint32_t imgWidth = mySharedImg.getWidth();
+    const uint32_t imgHeight = mySharedImg.getHeight();
+
+    IplImage* myIplImage = cvCreateImage(cvSize(imgWidth,imgHeight), IPL_DEPTH_8U,
+        nrChannels);
+    cv::Mat tmpImage = cv::Mat(myIplImage);
+
+    if(!sharedMem->isValid()){
+      return;
+    }
+
+    sharedMem->lock();
+    {
+      memcpy(tmpImage.data, sharedMem->getSharedMemory(),
+          imgWidth*imgHeight*nrChannels);
+    }
+    sharedMem->unlock();
+    m_image.release();
+    m_image = tmpImage.clone();
+    cvReleaseImage(&myIplImage);
+    
+    return;
+  }
+  if(a_c.getDataType() == opendlv::sensation::OpticalFlow::ID()){
+    opendlv::sensation::OpticalFlow message = 
+        a_c.getData<opendlv::sensation::OpticalFlow>();
+    std::vector<float> x,y,u,v;
+    uint16_t nPoints = message.getNPoint();
+    x = message.getListOfX();
+    y = message.getListOfY();
+    u = message.getListOfU();
+    v = message.getListOfV();
+
+    Eigen::MatrixXd flow(nPoints, 4);
+    Eigen::MatrixXd A(nPoints,2);
+    Eigen::MatrixXd B(nPoints,1);
+    for(uint8_t i = 0; i < nPoints; ++i){
+      flow.row(i) << x[i],y[i],u[i],v[i];
+    }
+    A.col(0) = flow.col(3);
+    A.col(1) = -flow.col(2);
+    B.col(0) = flow.col(3).cwiseProduct(flow.col(0))-flow.col(1).cwiseProduct(flow.col(2));
+    
+    // FOE = (A * A^T)^-1 * A^T * B
+    Eigen::VectorXd FoeMomentum = ((A.transpose()*A).inverse() * A.transpose() * B) - m_foePix;
+    if(FoeMomentum.allFinite()){
+      if(FoeMomentum.norm() > 10){
+        m_foePix = m_foePix + FoeMomentum/FoeMomentum.norm()*10;
+      }
+      else{
+        m_foePix = m_foePix + FoeMomentum/20;
+      }
+    }
+
+    // SendContainer();
+    
+    std::cout<< m_foePix.transpose() << std::endl;
+    cv::circle(m_image, cv::Point2f(m_foePix(0),m_foePix(1)), 3, cv::Scalar(0,0,255), -1, 8);
+    const int32_t windowWidth = 640;
+    const int32_t windowHeight = 480;
+    cv::Mat display;
+    cv::resize(m_image, display, cv::Size(windowWidth, windowHeight), 0, 0,
+      cv::INTER_CUBIC);
+    cv::imshow("FOE", display);
+
+    cv::waitKey(1);
+    return;
+  }
+  
+}
+void DirectionOfMovement::SendContainer()
+{
+  float v[3] = {0,0,1};
+  opendlv::coordinate::Spherical3 spherical3Message(v);
+  opendlv::sensation::DirectionOfMovement nextMessage(spherical3Message);
+  odcore::data::Container c(nextMessage);
+  getConference().send(c);
 }
 
 void DirectionOfMovement::setUp()
 {
+ // std::ifstream file("fileName");
+
+ // Eigen::Matrix3d transformationMatrix;
+
+
+ // if (file.is_open())
+ // {
+ //   for(int i = 0; i < 3; i++){
+ //     for(int j = 0; j < 3; j++){
+ //      double item = 0.0;
+ //      file >> item;
+ //       transformationMatrix(i,j) = item;
+ //     }
+ //   }
+ // }
+ 
+ // file.close();
+
+
 }
 
 void DirectionOfMovement::tearDown()

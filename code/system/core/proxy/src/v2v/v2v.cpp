@@ -90,13 +90,13 @@ void V2v::nextPacket(const odcore::io::Packet &p)
   void V2v::nextContainer(odcore::data::Container &c)
   {
     if(c.getDataType() == opendlv::proxy::V2vOutbound::ID()){
-      // std::cout << "Got an outbound message" << std::endl;
+      std::cout << "Got an outbound message" << std::endl;
       opendlv::proxy::V2vOutbound message = 
       c.getData<opendlv::proxy::V2vOutbound>();
       std::string data = message.getData();
 
       try {
-
+        std::cout<< "Message sent." << std::endl;
         m_udpsender->send(data);
       }
       catch(string &exception) {

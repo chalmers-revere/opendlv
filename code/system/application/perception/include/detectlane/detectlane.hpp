@@ -21,9 +21,12 @@
 #define DETECTLANE_DETECTLANE_HPP_
 
 #include <memory>
-
+#include <iostream>
+#include <fstream>
+#include <Eigen/Dense>
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
+#include "detectlane/InversePerspectiveMapping.hpp"
 
 namespace opendlv {
 namespace perception {
@@ -44,6 +47,63 @@ class DetectLane
  private:
   void setUp();
   void tearDown();
+  Eigen::Matrix3d readreadThreeByThreeMatrix(std::string fileName);
+  void TransformPointToGlobalFrame(Eigen::Vector3d &point);
+  double GetLaneOffset(double kLeft,double mLeft, double kRight,
+      double mRight,double col);
+  double GetHeadingAngle(double kLeft,double mLeft, double kRight,
+      double mRight, double row1, double row2);
+
+  bool m_setup;
+  int m_width;
+  int m_height;
+  int m_maxRow;
+  int m_minRow;
+  int m_midRegion;
+  int m_threshold;
+  
+  bool m_initialized;
+
+
+  // Matrix holding region lines
+  Eigen::MatrixXd m_regions;
+  Eigen::MatrixXd m_leftCameraRegions;
+  Eigen::MatrixXd m_rightCameraRegions;
+  
+  // Matrix holding the lines col = row * k + m for the region lines
+  Eigen::MatrixXd m_lines;
+  Eigen::MatrixXd m_leftLines;
+  Eigen::MatrixXd m_rightLines;
+  
+  // Number of scan lines / points
+  int m_nPoints;
+  // Number of search regions
+  long m_nRegions;
+
+  // Matrix holding the mean column for each region on each row
+  Eigen::MatrixXd m_recoveredPoints;
+
+  // Holds the K and M parameters for each region
+  Eigen::MatrixXd m_k, m_m;
+
+  Eigen::MatrixXd m_K, m_M;
+  // Counts the number of points per each region
+  Eigen::VectorXd m_pointsPerRegion;
+  
+  // Holds the index that decides the left and right road track
+  Eigen::MatrixXd m_regionIndex;
+  
+  // Holds the location of found lanes
+  Eigen::VectorXd m_laneLocation2;
+
+  // Inverse perspective mapping class
+  std::unique_ptr<InversePerspectiveMapping> m_leftIpm;
+  std::unique_ptr<InversePerspectiveMapping> m_rightIpm;
+
+  Eigen::Matrix3d m_transformationMatrix;
+  Eigen::Matrix3d m_leftTransformationMatrix;
+  Eigen::Matrix3d m_rightTransformationMatrix;
+
 };
 
 } // detectlane
