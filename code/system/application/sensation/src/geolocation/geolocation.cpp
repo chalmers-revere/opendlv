@@ -64,10 +64,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
   odcore::data::TimeStamp previousDataTimestamp;
   double timestamp = 0.0;
 
-  Control<double> control; 
-  State<double> state; 
+  Control<double> control;
+  State<double> state;
   SystemModel<double> systemModel;
-    
+
   state.setZero();
 
   KinematicObservationModel<double> kinematicObservationModel(
@@ -77,7 +77,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
   // To dump data structures into a CSV file, you create an output file first.
   // std::ofstream fout("../Exp_data/output.csv");
   std::ofstream fout_ekfState("./output_ekf.csv");
-  fout_ekfState 
+  fout_ekfState
       << "%HEADER: Output of the Extended Kalman Filter, data format : \n"
       << "%timestamp (s), ground truth: x (m),  y (m), theta (rad), "
       << "theta_dot(rad/s), commands : velocity (m/s) steering angle (rad), "
@@ -86,14 +86,14 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       << "theta (rad), theta_dot(rad/s)  \n"
       << "%t lat long yaw long_vel wheels_angle Z_x Z_y Z_theta Z_theta_dot "
       << "HAS_DATA X_x X_x_dot X_y X_y_dot X_theta X_theta_dot sent_lat "
-      << "sent_long sent_alt sent_heading " 
+      << "sent_long sent_alt sent_heading "
       << endl;
 
 
-  while (getModuleStateAndWaitForRemainingTimeInTimeslice() == 
+  while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
       odcore::data::dmcp::ModuleStateMessage::RUNNING) {
 
-    auto gpsReadingContainer = 
+    auto gpsReadingContainer =
         getKeyValueDataStore().get(opendlv::proxy::GpsReading::ID());
     auto gpsReading = gpsReadingContainer.getData<opendlv::proxy::GpsReading>();
 
@@ -133,14 +133,14 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 
       if (propulsion.getPropulsionShaftVehicleSpeed() < 0.001) {
           control.v() = 0.0;
-      // if we don't get any data from the CAN, 
+      // if we don't get any data from the CAN,
       // we try to fill the speed from GPS data
           //auto gpsSpeed = gpsReading.getSpeed();
           //          if (gpsSpeed > 1.0 ){
           //          control.v() = gpsSpeed;}
       }
 
-
+std::cout << " the vehicle speed is : " << gpsReading.getSpeed() << endl;
       auto steeringContainer = getKeyValueDataStore().get(
           opendlv::proxy::reverefh16::Steering::ID());
       auto steering = steeringContainer.getData<
@@ -158,9 +158,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       }
 
       std::cout   << getName() << "\t" << "timestamp="
-        << timestamp << "\t control:  steering.getRoadwheelangle = " 
+        << timestamp << "\t control:  steering.getRoadwheelangle = "
         << steering.getRoadwheelangle()
-        << " steering.getSteeringwheelangle " 
+        << " steering.getSteeringwheelangle "
         << steering.getSteeringwheelangle()
         << "  propulsion.getPropulsionShaftVehicleSpeed "
         << propulsion.getPropulsionShaftVehicleSpeed()
@@ -177,28 +177,28 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
           gpsReading.getLongitude(),
           opendlv::data::environment::WGS84Coordinate::EAST);
 
-      opendlv::data::environment::Point3 currentCartesianLocation = 
+      opendlv::data::environment::Point3 currentCartesianLocation =
           gpsReference.transform(currentLocation);
 
       //kinematic kalman block
-      KinematicObservationVector<double> observationVector = 
+      KinematicObservationVector<double> observationVector =
           kinematicObservationModel.h(state);
       observationVector.Z_x() = currentCartesianLocation.getX();
       observationVector.Z_y() = currentCartesianLocation.getY();
       if (gpsReading.getHasHeading()) {
         observationVector.Z_theta() = gpsReading.getNorthHeading();
-      } 
+      }
       else {
         observationVector.Z_theta() = state.theta();
       }
-      observationVector.Z_theta_dot() = vehicleYawRate; 
+      observationVector.Z_theta_dot() = vehicleYawRate;
       // TODO: Put yaw rate here...
 
-    
+
       double deltaTime = duration.toMicroseconds() / 1000000.0;
       systemModel.updateDeltaT(deltaTime);
 
-    
+
       state = m_ekf.predict(systemModel, control);
 
       bool gpsHasData = false;
@@ -212,7 +212,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       timestamp += systemModel.getDeltaT();
 
       std::cout   << getName() << "\t" << "timestamp="
-        << timestamp << "\t hasData=" << gpsHasData << "\tx = " << state.x() 
+        << timestamp << "\t hasData=" << gpsHasData << "\tx = " << state.x()
         << ", y = " <<
         state.y() << ", theta = " << state.theta() << std::endl;
 
@@ -220,74 +220,107 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 
 
 
- /*       auto cov = m_ekf.getCovariance();
+        auto cov = m_ekf.getCovariance();
 
-        auto cov_eigenvalues = cov.eigenvalues();
+//        auto cov_eigenvalues = cov.eigenvalues();
 
         auto cov_diagonal = cov.diagonal();
 
-        auto cov_determinant = cov.determinant();
+//        auto cov_determinant = cov.determinant();
 
         std::cout   << getName() << "\t"
-                    << "Covariance Matrix = \n" << cov
-                    << "Eigenvalues = \n" << cov_eigenvalues
-                    << "Diagonal = \n " << cov_diagonal
-                    << "Determinand =   " << cov_determinant
+//                    << "\nCovariance Matrix = \n" << cov
+//                    << "\nEigenvalues = \n" << cov_eigenvalues
+                    << "\nDiagonal = \n " << cov_diagonal
+//                    << "\nDeterminand =   " << cov_determinant
                     << std::endl;
-*/
 
 
 
-
+//TODO: convert here x and y to get the position of the rear axle
+const double gpsToCoGDisplacement_x = -2.5; //meters  //TODO : check the values!!!
+const double gpsToCoGDisplacement_y = 1.5; //meters
+//TODO: these two constants must be measured and set somewhere else
 
       // Build the proper GPS coordinates to send
       opendlv::data::environment::Point3 currentStateEstimation
-              (state.x(), state.y(), currentCartesianLocation.getZ());
-      opendlv::data::environment::WGS84Coordinate 
-          currentWGS84CoordinateEstimation =
-          gpsReference.transform(currentStateEstimation);
-      double heading = state.theta();
+              (state.x() + gpsToCoGDisplacement_x,
+               state.y() + gpsToCoGDisplacement_y,
+               currentCartesianLocation.getZ());
+
+//TODO: convert here x and y to get the position of the rear axle
+
+      opendlv::data::environment::WGS84Coordinate currentWGS84CoordinateEstimation =
+              gpsReference.transform(currentStateEstimation);
+      double heading = std::asin(std::sin(state.theta()));  // asin(sin(theta)) make sure that the heading is in [-pi,+pi]
+
+      double positionConfidence = calculatePositionConfidence();
+
+      double headingConfidence = calculateHeadingConfidence();
+
+      double speedConfidence = calculateSpeedConfidence();
+
+      double yawRate = state.theta_dot();
+
+      double yawRateConfidence = calculateHeadingConfidence();
+
+      double longitudinalAcceleration = 0.0;
+
+      double longitudinalAccelerationConfidence = 0.0;
+
 
       std::cout   << getName() << "\t" << "timestamp="
         << timestamp << "\t "
         << "\tlat=" << currentWGS84CoordinateEstimation.getLatitude()
-        << ", long=" << std::setprecision(19) 
+        << ", long=" << std::setprecision(19)
         << currentWGS84CoordinateEstimation.getLongitude()
         << ", theta=" << std::setprecision(19) << state.theta() << std::endl;
 
       // Send the message
-      opendlv::sensation::Geolocation geoLocationEstimation(
-          currentWGS84CoordinateEstimation.getLatitude(),
-          currentWGS84CoordinateEstimation.getLongitude(),
-          gpsReading.getAltitude(),
-          heading);
+
+      opendlv::sensation::Geolocation geoLocationEstimation(currentWGS84CoordinateEstimation.getLatitude(),
+                                                            currentWGS84CoordinateEstimation.getLongitude(),
+                                                            positionConfidence,
+                                                            gpsReading.getAltitude(),
+                                                            heading,
+                                                            headingConfidence,
+                                                            control.v(),
+                                                            speedConfidence,
+                                                            yawRate,
+                                                            yawRateConfidence,
+                                                            longitudinalAcceleration,
+                                                            longitudinalAccelerationConfidence
+                                                            );
+
+
+
       odcore::data::Container msg(geoLocationEstimation);
       getConference().send(msg);
 
       //save data to file
       bool   saveToFile = true;
       if (  saveToFile){
-      fout_ekfState 
+      fout_ekfState
           << std::setprecision(19) << timestamp << " "
-          << gpsReading.getLatitude() << " " 
-          << gpsReading.getLongitude() << " " 
+          << gpsReading.getLatitude() << " "
+          << gpsReading.getLongitude() << " "
           << gpsReading.getNorthHeading() <<  " "
-          << control.v() << " " 
+          << control.v() << " "
           << control.phi() << " "
-          << observationVector.Z_x() << " " 
-          << observationVector.Z_y() << " " 
-          << observationVector.Z_theta() << " " 
-          << observationVector.Z_theta_dot() << " " 
+          << observationVector.Z_x() << " "
+          << observationVector.Z_y() << " "
+          << observationVector.Z_theta() << " "
+          << observationVector.Z_theta_dot() << " "
           << gpsHasData << " "
-          << state.x() << " " 
-          << state.x_dot() << " "  
-          << state.y() << " " 
-          << state.y_dot() << " " 
-          << state.theta() << " " 
+          << state.x() << " "
+          << state.x_dot() << " "
+          << state.y() << " "
+          << state.y_dot() << " "
+          << state.theta() << " "
           << state.theta_dot() << " "
-          << currentWGS84CoordinateEstimation.getLatitude() << " " 
-          << currentWGS84CoordinateEstimation.getLongitude() << " " 
-          << gpsReading.getAltitude() << " " 
+          << currentWGS84CoordinateEstimation.getLatitude() << " "
+          << currentWGS84CoordinateEstimation.getLongitude() << " "
+          << gpsReading.getAltitude() << " "
           << heading
           << endl;
       }
@@ -295,7 +328,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
     else {
         std::cout << getName() << "\t"<< " NO DATA " << std::endl;
     }
-  } 
+  }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
@@ -306,6 +339,38 @@ void Geolocation::setUp()
 void Geolocation::tearDown()
 {
 }
+
+
+double Geolocation::calculatePositionConfidence()
+{
+auto covSR = m_ekf.getCovariance();
+
+double positionConfidence_x = std::sqrt(covSR(0,0)*covSR(0,0));
+double positionConfidence_y = std::sqrt(covSR(2,2)*covSR(2,2));
+double confidence = std::max(positionConfidence_x,positionConfidence_y);
+return confidence;
+}
+
+double Geolocation::calculateHeadingConfidence()
+{
+auto covSR = m_ekf.getCovariance();
+double confidence = std::sqrt(covSR(4,4)*covSR(4,4));
+return confidence; // if information is not available
+}
+
+double Geolocation::calculateHeadingRateConfidence()
+{
+auto covSR = m_ekf.getCovariance();
+double confidence = std::sqrt(covSR(5,5)*covSR(5,5));
+return confidence; // if information is not available
+}
+
+double Geolocation::calculateSpeedConfidence()
+{
+
+return 0.0; // if information is not available
+}
+
 
 } // geolocation
 } // sensation
