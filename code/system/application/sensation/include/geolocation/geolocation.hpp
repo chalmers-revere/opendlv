@@ -52,6 +52,27 @@ class Geolocation
   void setUp();
   void tearDown();
 
+  /**
+    *  Accuracy of the geographical position m
+    *
+    */
+  double calculatePositionConfidence();
+
+
+  /** The heading confidence in rad
+    */
+  double calculateHeadingConfidence();
+
+  /**   The heading rate in rad/s.
+    *
+    */
+  double calculateHeadingRateConfidence();
+
+  /**   Speed confidence in m/s.
+    *
+    */
+   double calculateSpeedConfidence();
+
 
    Kalman::ExtendedKalmanFilter<opendlv::sensation::geolocation::State<double>> 
        m_ekf;

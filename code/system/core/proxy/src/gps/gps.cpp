@@ -217,6 +217,8 @@ void Gps::nextString(std::string const &s) {
   // convert to deg befor sending
   latitude=latitude/100.0;
   longitude=longitude/100.0;
+  latitude = int(latitude) + (latitude - int(latitude))/60.0;
+  longitude = int(longitude) + (longitude - int(longitude))/60.0;
 
   // just a check before sending the signal!
   std::cout << getName() << " GPS sending signals : Latitude : " << latitude << std::setprecision(19)

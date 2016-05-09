@@ -140,7 +140,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
           //          control.v() = gpsSpeed;}
       }
 
-
+std::cout << " the vehicle speed is : " << gpsReading.getSpeed() << endl;
       auto steeringContainer = getKeyValueDataStore().get(
           opendlv::proxy::reverefh16::Steering::ID());
       auto steering = steeringContainer.getData<
@@ -220,33 +220,54 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 
 
 
- /*       auto cov = m_ekf.getCovariance();
+        auto cov = m_ekf.getCovariance();
 
-        auto cov_eigenvalues = cov.eigenvalues();
+//        auto cov_eigenvalues = cov.eigenvalues();
 
         auto cov_diagonal = cov.diagonal();
 
-        auto cov_determinant = cov.determinant();
+//        auto cov_determinant = cov.determinant();
 
         std::cout   << getName() << "\t"
-                    << "Covariance Matrix = \n" << cov
-                    << "Eigenvalues = \n" << cov_eigenvalues
-                    << "Diagonal = \n " << cov_diagonal
-                    << "Determinand =   " << cov_determinant
+//                    << "\nCovariance Matrix = \n" << cov
+//                    << "\nEigenvalues = \n" << cov_eigenvalues
+                    << "\nDiagonal = \n " << cov_diagonal
+//                    << "\nDeterminand =   " << cov_determinant
                     << std::endl;
-*/
 
 
 
-
+//TODO: convert here x and y to get the position of the rear axle
+const double gpsToCoGDisplacement_x = -2.5; //meters  //TODO : check the values!!!
+const double gpsToCoGDisplacement_y = 1.5; //meters
+//TODO: these two constants must be measured and set somewhere else
 
       // Build the proper GPS coordinates to send
       opendlv::data::environment::Point3 currentStateEstimation
-              (state.x(), state.y(), currentCartesianLocation.getZ());
-      opendlv::data::environment::WGS84Coordinate 
-          currentWGS84CoordinateEstimation =
-          gpsReference.transform(currentStateEstimation);
-      double heading = state.theta();
+              (state.x() + gpsToCoGDisplacement_x,
+               state.y() + gpsToCoGDisplacement_y,
+               currentCartesianLocation.getZ());
+
+//TODO: convert here x and y to get the position of the rear axle
+
+      opendlv::data::environment::WGS84Coordinate currentWGS84CoordinateEstimation =
+              gpsReference.transform(currentStateEstimation);
+      double heading = std::asin(std::sin(state.theta()));  // asin(sin(theta)) make sure that the heading is in [-pi,+pi]
+
+      double positionConfidence = calculatePositionConfidence();
+
+      double headingConfidence = calculateHeadingConfidence();
+
+      double speedConfidence = calculateSpeedConfidence();
+
+      double yawRate = state.theta_dot();
+
+      double yawRateConfidence = calculateHeadingConfidence();
+
+      double longitudinalAcceleration = 0.0;
+
+      double longitudinalAccelerationConfidence = 0.0;
+
 
       std::cout   << getName() << "\t" << "timestamp="
         << timestamp << "\t "
@@ -256,11 +277,23 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
         << ", theta=" << std::setprecision(19) << state.theta() << std::endl;
 
       // Send the message
-      opendlv::sensation::Geolocation geoLocationEstimation(
-          currentWGS84CoordinateEstimation.getLatitude(),
-          currentWGS84CoordinateEstimation.getLongitude(),
-          gpsReading.getAltitude(),
-          heading);
+
+      opendlv::sensation::Geolocation geoLocationEstimation(currentWGS84CoordinateEstimation.getLatitude(),
+                                                            currentWGS84CoordinateEstimation.getLongitude(),
+                                                            positionConfidence,
+                                                            gpsReading.getAltitude(),
+                                                            heading,
+                                                            headingConfidence,
+                                                            control.v(),
+                                                            speedConfidence,
+                                                            yawRate,
+                                                            yawRateConfidence,
+                                                            longitudinalAcceleration,
+                                                            longitudinalAccelerationConfidence
+                                                            );
+
+
+
       odcore::data::Container msg(geoLocationEstimation);
       getConference().send(msg);
 
@@ -306,6 +339,38 @@ void Geolocation::setUp()
 void Geolocation::tearDown()
 {
 }
+
+
+double Geolocation::calculatePositionConfidence()
+{
+auto covSR = m_ekf.getCovariance();
+
+double positionConfidence_x = std::sqrt(covSR(0,0)*covSR(0,0));
+double positionConfidence_y = std::sqrt(covSR(2,2)*covSR(2,2));
+double confidence = std::max(positionConfidence_x,positionConfidence_y);
+return confidence;
+}
+
+double Geolocation::calculateHeadingConfidence()
+{
+auto covSR = m_ekf.getCovariance();
+double confidence = std::sqrt(covSR(4,4)*covSR(4,4));
+return confidence; // if information is not available
+}
+
+double Geolocation::calculateHeadingRateConfidence()
+{
+auto covSR = m_ekf.getCovariance();
+double confidence = std::sqrt(covSR(5,5)*covSR(5,5));
+return confidence; // if information is not available
+}
+
+double Geolocation::calculateSpeedConfidence()
+{
+
+return 0.0; // if information is not available
+}
+
 
 } // geolocation
 } // sensation
