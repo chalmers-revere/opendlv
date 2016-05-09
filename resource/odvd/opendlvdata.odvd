@@ -131,8 +131,8 @@ message opendlv.sensation.Voice [id = 166] {
 //    A.1.16.1 LongitudinalAccelerationValue
 //    A.1.16.2 longitudinalAccelerationConfidence
 message opendlv.sensation.Geolocation [id = 169] {
-  double longitude [id = 1];
-  double latitude [id = 2];
+  double latitude [id = 1];
+  double longitude [id = 2];
   double positionConfidence [id = 3];
   double altitude [id = 4];
   double heading [id = 5];

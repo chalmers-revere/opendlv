@@ -389,8 +389,8 @@ void DetectLane::setUp()
   //-----------------------------
   // Scaling: Calibrations were made for 640x480 resolution
   //-----------------------------
-  m_minRow = 0;//m_minRow * (m_height / 480.0);
-  m_maxRow = m_outputHeight;//m_maxRow * (m_height / 480.0);
+  m_minRow = 150;//m_minRow * (m_height / 480.0);
+  m_maxRow = 450;//m_maxRow * (m_height / 480.0);
 
   /* OLD CODE 
   std::string leftCameraRegionsFile = 
@@ -406,13 +406,15 @@ void DetectLane::setUp()
 
   m_leftCameraRegions = Eigen::MatrixXd(7,4);
   m_leftCameraRegions <<
-    0 , 40 , 0 ,40 ,
-    0 , 30 , 0, 10,
-    0 , 30 , 0 ,10,
-    0 , 30 , 0 ,10,
-    0, 30 , 0 , 10,
-    0 , 0 ,0 ,0,
-    0 ,0 ,0 ,0;
+    221, 122, 13, 233,
+    267, 114, 33, 461,
+    293, 112, 327, 462,
+    299, 101, 444, 474,
+    303, 100, 528, 469,
+    319, 105, 609, 332,
+    336, 87, 630, 201;
+
+
 
   m_rightCameraRegions = Eigen::MatrixXd(7,4);
   m_rightCameraRegions <<

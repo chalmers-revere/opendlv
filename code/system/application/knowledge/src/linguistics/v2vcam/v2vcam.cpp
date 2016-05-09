@@ -184,7 +184,14 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
         + "," + std::to_string(GetYawRateConfidence()) +
         + "," + std::to_string(GetVehicleRole());
     m_sendLog << std::endl;
-
+    // std::cout<< "Latitude: " << m_latitude << " Longitude: " << m_longitude << std::endl;
+    {
+        using namespace opendlv::data::environment;
+        opendlv::data::environment::WGS84Coordinate coordPacket(m_latitude, WGS84Coordinate::NORTH, m_longitude, WGS84Coordinate::EAST);
+        std::cout << std::setprecision(11) << coordPacket.getLatitude() << " " << coordPacket.getLongitude() << std::endl;
+        odcore::data::Container nextC(coordPacket);
+        getConference().send(nextC);
+      }
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
