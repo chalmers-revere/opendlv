@@ -121,9 +121,6 @@ void SelectLanesV2(Eigen::VectorXd &numberOfPoints,Eigen::VectorXd &laneLocation
 }
 
 
-
-
-
 void SelectLaneOrientation(Eigen::MatrixXd &regionIndex,Eigen::VectorXd &laneLocation,int nRegions)
 {
   int nTracks = (int)laneLocation.rows();
