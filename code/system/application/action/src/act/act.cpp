@@ -148,8 +148,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
         m_amplitudeVectorSteering.push_back(m_amplitude);
         timeCheck(m_startTimeVectorSteering, m_amplitudeVectorSteering);
       }
-    sumOfSteering = std::accumulate(m_amplitudeVectorSteering.begin(), m_amplitudeVectorSteering.end(), 0.0 );
-    
+      sumOfSteering = std::accumulate(m_amplitudeVectorSteering.begin(), m_amplitudeVectorSteering.end(), 0.0 );
     }
     double durationInSeconds = duration.toMicroseconds() / 1000000.0;
     float freq = 1 / durationInSeconds;
@@ -172,6 +171,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
       odcore::data::Container actuationContainer(actuation);
       getConference().send(actuationContainer);
       std::cout << "Steering Correction 2: " << m_steeringCorrection << std::endl;
+
+      
     }    
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
@@ -188,7 +189,7 @@ void Act::timeCheck(std::vector<odcore::data::TimeStamp> &timeVector, std::vecto
   if ( timeVector.size() == 0 ){
     return;
   }
-  double deltaTime = 1000000 * 0.5f;
+  double deltaTime = 1000000 * 0.5f; // 0.5 s in microseconds
   odcore::data::TimeStamp nowTimeStamp;
   double now = nowTimeStamp.toMicroseconds();
   double firstTime = timeVector.at(0).toMicroseconds();
