@@ -205,13 +205,19 @@ void V2vCam::nextContainer(odcore::data::Container &c)
   if(c.getDataType() == opendlv::sensation::Geolocation::ID()){
   // if(c.getDataType() == opendlv::proxy::GpsReading::ID()) {
     // opendlv::proxy::GpsReading gpsReading = c.getData<opendlv::proxy::GpsReading>();
-    opendlv::sensation::Geolocation gpsReading = c.getData<opendlv::sensation::Geolocation>();
+    opendlv::sensation::Geolocation geolocationReading = c.getData<opendlv::sensation::Geolocation>();
 
-    m_latitude = gpsReading.getLatitude();
-    m_longitude = gpsReading.getLongitude();
-    m_altitude = gpsReading.getAltitude();
-    m_heading = gpsReading.getHeading();
-    // m_speed = gpsReading.getSpeed();
+    m_latitude = geolocationReading.getLatitude();
+    m_longitude = geolocationReading.getLongitude();
+    m_altitude = geolocationReading.getAltitude();
+    m_heading = geolocationReading.getHeading();
+    m_headingConfidence = geolocationReading.getHeadingConfidence();
+    m_speed = geolocationReading.getSpeed();
+    m_speedConfidence = geolocationReading.getSpeedConfidence();
+    m_yawRateValue = geolocationReading.getYawRate();
+    m_yawRateConfidence = geolocationReading.getYawRateConfidence();
+    m_longitudinalAcc = geolocationReading.getLongitudinalAcceleration();
+    m_longitudinalAccConf = geolocationReading.getLongitudinalAccelerationConfidence();
 
   
 
@@ -437,7 +443,10 @@ int32_t V2vCam::GetHeading() const
 
 int32_t V2vCam::GetHeadingConfidence() const
 {
-  return m_headingConfidence;
+  double scale = std::pow(10,1)*opendlv::Constants::RAD2DEG;
+  double val = static_cast<double>(m_headingConfidence);
+  return static_cast<int32_t>(std::round(val*scale));
+  // return m_headingConfidence;
 }
 
 int32_t V2vCam::GetSpeed() const
@@ -448,7 +457,10 @@ int32_t V2vCam::GetSpeed() const
 
 int32_t V2vCam::GetSpeedConfidence() const
 {
-  return m_speedConfidence;
+  int32_t scale = std::pow(10,2);
+  return static_cast<int32_t>(std::round(m_speedConfidence*scale));
+
+  // return m_speedConfidence;
 }
 
 int32_t V2vCam::GetVehicleLength() const
@@ -463,21 +475,28 @@ int32_t V2vCam::GetVehicleWidth() const
 
 int32_t V2vCam::GetLongitudinalAcc() const
 {
-  return m_longitudinalAcc;
+  int32_t scale = std::pow(10,1);
+  return static_cast<int32_t> (m_longitudinalAcc*scale);
 }
 
 int32_t V2vCam::GetLongitudinalAccConf() const
 {
-  return m_longitudinalAccConf;
+  int32_t scale = std::pow(10,1);
+  return static_cast<int32_t> (m_longitudinalAccConf*scale);
+
+  // return m_longitudinalAccConf;
 }
 
 int32_t V2vCam::GetYawRateValue() const
 {
-  return m_yawRateValue;
+  int32_t scale = std::pow(10,2);
+  double conversion = opendlv::Constants::RAD2DEG;
+  return static_cast<int32_t> (m_yawRateValue*scale*conversion);
 }
 
 int32_t V2vCam::GetYawRateConfidence() const
 {
+  //Todo this
   return m_yawRateConfidence;
 }
 
