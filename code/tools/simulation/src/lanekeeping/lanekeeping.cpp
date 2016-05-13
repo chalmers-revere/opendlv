@@ -78,13 +78,14 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LaneKeeping::body()
 
     std::cout << "m_steering: " << m_steering << std::endl;
     double deltaTime = duration.toMicroseconds() / 1000000.0;
-    std::cout << "deltaTime: " << deltaTime << std::endl; 
+    //std::cout << "deltaTime: " << deltaTime << std::endl; 
     m_vehicle->Update(m_steering, deltaTime);
 
     double lateralPosition = m_vehicle->GetLateralPosition();
     double heading = m_vehicle->GetHeading();
 
     std::cout << "Heading: " << heading << std::endl;
+    std::cout << "Heading (degrees): " << (heading*57.295779513) << std::endl;
 
     opendlv::perception::LanePosition lanePosition(lateralPosition, heading);
     odcore::data::Container msg(lanePosition);  

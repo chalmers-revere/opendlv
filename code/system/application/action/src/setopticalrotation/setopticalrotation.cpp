@@ -72,7 +72,7 @@
     if ( fabs(heading) > 0.0f ) {
       float steeringAmplitude = gainHeading * heading;
       odcore::data::TimeStamp t0;
-      std::cout << "Stearing Amplitude : " << steeringAmplitude << std::endl;
+      std::cout << "Stearing Amplitude: " << steeringAmplitude << std::endl;
       m_logRotation << steeringAmplitude << std::endl;
       
       if ( heading < 0 ) {
