@@ -17,43 +17,30 @@
  * USA.
  */
 
-#ifndef GPS_GPS_HPP_
-#define GPS_GPS_HPP_
+#ifndef GPS_GPSSTRINGDECODER_HPP_
+#define GPS_GPSSTRINGDECODER_HPP_
 
-#include <memory>
-
-#include <opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h>
-#include <opendavinci/odcore/data/Container.h>
-#include <opendavinci/odcore/io/tcp/TCPConnection.h>
-
-#include "gps/gpsstringdecoder.hpp"
+#include <opendavinci/odcore/io/StringListener.h>
+#include <opendavinci/odcore/io/conference/ContainerConference.h>
 
 namespace opendlv {
 namespace proxy {
 namespace gps {
 
-class Device;
-
 /**
- * This class provides...
+ * This class decodes the received string.
  */
-class Gps : public odcore::base::module::DataTriggeredConferenceClientModule {
+class GpsStringDecoder : public odcore::io::StringListener {
  public:
-  Gps(int32_t const &, char **);
-  Gps(Gps const &) = delete;
-  Gps &operator=(Gps const &) = delete;
-  virtual ~Gps();
+  GpsStringDecoder(odcore::io::conference::ContainerConference &);
+  GpsStringDecoder(GpsStringDecoder const &) = delete;
+  GpsStringDecoder &operator=(GpsStringDecoder const &) = delete;
+  virtual ~GpsStringDecoder();
 
-  virtual void nextContainer(odcore::data::Container &c);
+  virtual void nextString(const std::string &s);
 
  private:
-  void setUp();
-  void tearDown();
-  
- private:
-  std::unique_ptr<Device> m_device;
-  std::shared_ptr<odcore::io::tcp::TCPConnection> m_trimble;
-  std::unique_ptr<GpsStringDecoder> m_gpsStringDecoder;
+  odcore::io::conference::ContainerConference &m_conference;
 };
 
 } // gps
