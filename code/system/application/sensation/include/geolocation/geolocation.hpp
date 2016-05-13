@@ -76,6 +76,13 @@ class Geolocation
 
    Kalman::ExtendedKalmanFilter<opendlv::sensation::geolocation::State<double>> 
        m_ekf;
+
+
+   const double m_gpsToCoGDisplacement_x = -1.5; ///--> Displacement between the real position of the GPS and the CoG of the vehicle in [m]
+   const double m_gpsToCoGDisplacement_y = -1.0; ///--> Displacement between the real position of the GPS and the CoG of the vehicle in [m]
+   const double m_gpsToCoGDisplacement_z = -2.3; ///--> Displacement between the real position of the GPS and the CoG of the vehicle in [m]
+
+
 };
 
 } // geolocation

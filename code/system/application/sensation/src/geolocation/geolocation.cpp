@@ -237,16 +237,13 @@ std::cout << " the vehicle speed is : " << gpsReading.getSpeed() << endl;
 
 
 
-//TODO: convert here x and y to get the position of the rear axle
-const double gpsToCoGDisplacement_x = -2.5; //meters  //TODO : check the values!!!
-const double gpsToCoGDisplacement_y = 1.5; //meters
-//TODO: these two constants must be measured and set somewhere else
+
 
       // Build the proper GPS coordinates to send
       opendlv::data::environment::Point3 currentStateEstimation
-              (state.x() + gpsToCoGDisplacement_x,
-               state.y() + gpsToCoGDisplacement_y,
-               currentCartesianLocation.getZ());
+              (state.x() + m_gpsToCoGDisplacement_x,
+               state.y() + m_gpsToCoGDisplacement_y,
+               currentCartesianLocation.getZ() + m_gpsToCoGDisplacement_z);
 
 //TODO: convert here x and y to get the position of the rear axle
 
@@ -355,14 +352,14 @@ double Geolocation::calculateHeadingConfidence()
 {
 auto covSR = m_ekf.getCovariance();
 double confidence = std::sqrt(covSR(4,4)*covSR(4,4));
-return confidence; // if information is not available
+return confidence;
 }
 
 double Geolocation::calculateHeadingRateConfidence()
 {
 auto covSR = m_ekf.getCovariance();
 double confidence = std::sqrt(covSR(5,5)*covSR(5,5));
-return confidence; // if information is not available
+return confidence;
 }
 
 double Geolocation::calculateSpeedConfidence()
