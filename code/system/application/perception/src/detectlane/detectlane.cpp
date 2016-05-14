@@ -149,7 +149,7 @@ void DetectLane::nextContainer(odcore::data::Container &c)
     // Definitions for the video choice
     //-----------------------------
     m_initialized = false;
-    cv::resize(src,src,cv::Size(m_outputWidth,m_outputHeight));
+    //cv::resize(src,src,cv::Size(m_outputWidth,m_outputHeight));
     if(mySharedImg.getName() == "front-left"){
       /* OLD CODE 
       m_leftIpm->ApplyHomography(src,src);
@@ -161,10 +161,10 @@ void DetectLane::nextContainer(odcore::data::Container &c)
       */
 
       // New code
-      m_regions = m_leftCameraRegions;
-      m_lines = m_leftLines;
-      m_transformationMatrix = m_leftTransformationMatrix;
-      m_initialized = true;
+      // m_regions = m_leftCameraRegions;
+      // m_lines = m_leftLines;
+      // m_transformationMatrix = m_leftTransformationMatrix;
+      // m_initialized = true;
     }
     if(mySharedImg.getName() == "front-right"){
       /* OLD CODE
@@ -174,13 +174,13 @@ void DetectLane::nextContainer(odcore::data::Container &c)
       m_lines = m_rightLines;
       m_transformationMatrix = m_rightTransformationMatrix;
       m_initialized = true;
-      */
+      //*/
 
       // New code
-      m_regions = m_rightCameraRegions;
-      m_lines = m_rightLines;
-      m_transformationMatrix = m_rightTransformationMatrix;
-      m_initialized = true;
+      // m_regions = m_rightCameraRegions;
+      // m_lines = m_rightLines;
+      // m_transformationMatrix = m_rightTransformationMatrix;
+      // m_initialized = true;
     }
     
     
@@ -211,7 +211,6 @@ void DetectLane::nextContainer(odcore::data::Container &c)
         m_maxRow);
 
 
-    
     //-----------------------------
     // Extract lines from points
     //-----------------------------
@@ -232,6 +231,9 @@ void DetectLane::nextContainer(odcore::data::Container &c)
       int p1 = m_regionIndex(0,0);
       int p2 = m_regionIndex(1,0);
       
+      if(p1==p2){
+        return;
+      }
       //-----------------------------
       // Draw boarders/lines - VISUALIZATION
       //-----------------------------
@@ -248,7 +250,7 @@ void DetectLane::nextContainer(odcore::data::Container &c)
           m_K(p2,0), m_M(p2,0),
           m_lines.col(0)(m_midRegion),
           m_lines.col(1)(m_midRegion),
-          (m_maxRow));
+          (m_minRow));
 
 
       //-----------------------------
@@ -264,8 +266,7 @@ void DetectLane::nextContainer(odcore::data::Container &c)
           m_lines.col(0)(m_midRegion),m_lines.col(1)(m_midRegion),
           (m_minRow));
       // Factor 4 is assumed length between minRow and Maxrow in real life
-      double theta = atan((d2-d1) / (double)4);
-
+      double theta = atan((d2-d1) / (double)15);
 
       double newLaneOffset = GetLaneOffset(m_K(p1,0),
           m_M(p1,0),m_K(p2,0), m_M(p2,0),m_maxRow,p1,p2);
@@ -282,7 +283,7 @@ void DetectLane::nextContainer(odcore::data::Container &c)
       if(std::isfinite(theta) && std::isfinite(laneOffset)){
         // Send the message
 
-      opendlv::perception::LanePosition lanePosition(laneOffset,theta);
+      opendlv::perception::LanePosition lanePosition(laneOffset,laneOffset);
       odcore::data::Container msg(lanePosition);  
       getConference().send(msg);
 
@@ -395,9 +396,8 @@ void DetectLane::setUp()
   //-----------------------------
   // Scaling: Calibrations were made for 640x480 resolution
   //-----------------------------
-  m_minRow = 0;//m_minRow * (m_height / 480.0);
-  m_maxRow = m_outputHeight;//m_maxRow * (m_height / 480.0);
-
+  m_minRow = 150 * m_outputHeight  / 480.0;
+  m_maxRow = 450 * m_outputHeight / 480.0;
   /* OLD CODE 
   std::string leftCameraRegionsFile = 
     "./share/opendlv/system/application/perception/detectlane/leftCameraRegions.csv";
@@ -412,23 +412,33 @@ void DetectLane::setUp()
 
   m_leftCameraRegions = Eigen::MatrixXd(7,4);
   m_leftCameraRegions <<
-    0 , 40 , 0 ,40 ,
-    0 , 30 , 0, 10,
-    0 , 30 , 0 ,10,
-    0 , 30 , 0 ,10,
-    0, 30 , 0 , 10,
-    0 , 0 ,0 ,0,
-    0 ,0 ,0 ,0;
+88, 196, 88, 227,
+240, 201, 240, 368,
+285, 206, 285, 442,
+305, 201, 305, 474,
+325, 202, 325, 454,
+400, 199, 400, 298,
+540, 174, 540, 198;
+
+
+    // 221, 122, 13, 233,
+    // 267, 114, 33, 461,
+    // 293, 112, 327, 462,
+    // 299, 101, 444, 474,
+    // 303, 100, 528, 469,
+    // 319, 105, 609, 332,
+    // 336, 87, 630, 201;
+
 
   m_rightCameraRegions = Eigen::MatrixXd(7,4);
   m_rightCameraRegions <<
-    0 , 40 , 0 ,40 ,
-    0 , 30 , 0, 10,
-    0 , 30 , 0 ,10,
-    0 , 30 , 0 ,10,
-    0, 30 , 0 , 10,
-    0 , 0 ,0 ,0,
-    0 ,0 ,0 ,0;
+    88, 196, 88, 227,
+270, 201, 270, 368,
+360, 201, 360, 474,
+380, 202, 380, 454,
+400, 202, 400, 454,
+500, 199, 500, 298,
+540, 174, 540, 198;
 
   m_leftCameraRegions.col(0) *= (m_outputWidth / 640.0);
   m_leftCameraRegions.col(2) *= (m_outputWidth / 640.0);
@@ -448,8 +458,7 @@ void DetectLane::setUp()
 
   //-----------------------------
   // Image processing parameters
-  //-----------------------------
-  m_nPoints = m_maxRow - m_minRow;
+  m_nPoints = (m_maxRow - m_minRow) / 2;
   
   //-----------------------------
   // Initializations
