@@ -51,8 +51,9 @@ class V2vCam
   void tearDown();
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
-  void ReadGeolcation(opendlv::sensation::Geolocation &);
-  void ReadCamData(std::string &);
+  void ReadGeolocation(opendlv::sensation::Geolocation &);
+  void ReadVoice(opendlv::sensation::Voice &);
+  void SendWGS84Coordinate();
 
   unsigned char GetMessageId() const;
   int32_t GetStationId() const;
@@ -83,7 +84,6 @@ class V2vCam
 
   unsigned char const m_messageId = 2;
   int32_t m_stationId = 115;
-  // Generation time of the (CAM) message in milliseconds
   int32_t m_generationDeltaTime = 0; 
   unsigned char m_containerMask = 128;
   int32_t m_stationType = 8;

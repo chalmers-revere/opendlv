@@ -185,13 +185,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
         + "," + std::to_string(GetVehicleRole());
     m_sendLog << std::endl;
     // std::cout<< "Latitude: " << m_latitude << " Longitude: " << m_longitude << std::endl;
-    //{
-    //    using namespace opendlv::data::environment;
-    //    opendlv::data::environment::WGS84Coordinate coordPacket(m_latitude, WGS84Coordinate::NORTH, m_longitude, WGS84Coordinate::EAST);
-    //    std::cout << std::setprecision(11) << coordPacket.getLatitude() << " " << coordPacket.getLongitude() << std::endl;
-    //    odcore::data::Container nextC(coordPacket);
-    //    getConference().send(nextC);
-    //  }
+
     std::string output = "*** Cam object ***\n";
 
       output += "Message Id: " + std::to_string(GetMessageId()) + "\n";
@@ -229,120 +223,102 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
 }
 
 /**
- * Receives .
+ * Receives geolocation-, voice containers.
  * Sends .
  */
 void V2vCam::nextContainer(odcore::data::Container &c)
 {
   if(c.getDataType() == opendlv::sensation::Geolocation::ID()){
-  // if(c.getDataType() == opendlv::proxy::GpsReading::ID()) {
-    // opendlv::proxy::GpsReading gpsReading = c.getData<opendlv::proxy::GpsReading>();
     opendlv::sensation::Geolocation geolocationReading = c.getData<opendlv::sensation::Geolocation>();
+    ReadGeolocation(geolocationReading);
+  } else if(c.getDataType() == opendlv::sensation::Voice::ID()) {
+    opendlv::sensation::Voice voiceReading = c.getData<opendlv::sensation::Voice>();
+    ReadVoice(voiceReading);
+  }
+}
 
-    m_latitude = geolocationReading.getLatitude();
-    m_longitude = geolocationReading.getLongitude();
-    m_altitude = geolocationReading.getAltitude();
-    m_heading = geolocationReading.getHeading();
-    m_headingConfidence = geolocationReading.getHeadingConfidence();
-    m_speed = geolocationReading.getSpeed();
-    m_speedConfidence = geolocationReading.getSpeedConfidence();
-    m_yawRateValue = geolocationReading.getYawRate();
-    m_yawRateConfidence = geolocationReading.getYawRateConfidence();
-    m_longitudinalAcc = geolocationReading.getLongitudinalAcceleration();
-    m_longitudinalAccConf = geolocationReading.getLongitudinalAccelerationConfidence();
+void V2vCam::ReadGeolocation(opendlv::sensation::Geolocation &a_reading)
+{
+  m_latitude = a_reading.getLatitude();
+  m_longitude = a_reading.getLongitude();
+  m_altitude = a_reading.getAltitude();
+  m_heading = a_reading.getHeading();
+  m_headingConfidence = a_reading.getHeadingConfidence();
+  m_speed = a_reading.getSpeed();
+  m_speedConfidence = a_reading.getSpeedConfidence();
+  m_yawRateValue = a_reading.getYawRate();
+  m_yawRateConfidence = a_reading.getYawRateConfidence();
+  m_longitudinalAcc = a_reading.getLongitudinalAcceleration();
+  m_longitudinalAccConf = a_reading.getLongitudinalAccelerationConfidence();
+}
 
-  
+void V2vCam::ReadVoice(opendlv::sensation::Voice &a_reading)
+{
+  if(strcmp(a_reading.getType().c_str(),"cam") == 0){
+    std::string dataString = a_reading.getData();
+    std::vector<unsigned char> data(dataString.begin(), dataString.end());
+    std::shared_ptr<Buffer const> buffer(new Buffer(data));
+    std::shared_ptr<Buffer::Iterator> inIterator = buffer->GetIterator();
+    //Long and little endian reverser
+    inIterator->ItReversed();
 
+    unsigned char messageId = inIterator->ReadByte();
+    int32_t stationId = inIterator->ReadInteger();
+    int32_t generationDeltaTime = inIterator->ReadInteger();
+    unsigned char containerMask =  inIterator->ReadByte();
+    int32_t stationType = inIterator->ReadInteger();
+    int32_t latitude = inIterator->ReadInteger();
+    int32_t longitude = inIterator->ReadInteger();
+    int32_t semiMajorConfidence = inIterator->ReadInteger();
+    int32_t semiMinorConfidence = inIterator->ReadInteger();
+    int32_t semiMajorOrientation = inIterator->ReadInteger();
+    int32_t altitude = inIterator->ReadInteger();
+    int32_t heading = inIterator->ReadInteger();
+    int32_t headingConfidence = inIterator->ReadInteger();
+    int32_t speed = inIterator->ReadInteger();
+    int32_t speedConfidence = inIterator->ReadInteger();
+    int32_t vehicleLength = inIterator->ReadInteger();
+    int32_t vehicleWidth = inIterator->ReadInteger();
+    int32_t longitudinalAcc = inIterator->ReadInteger();
+    int32_t longitudinalAccConf = inIterator->ReadInteger();
+    int32_t yawRateValue = inIterator->ReadInteger();
+    int32_t yawRateConfidence = inIterator->ReadInteger();
+    int32_t vehicleRole = inIterator->ReadInteger();
 
+    std::string output = "*** Cam object ***\n";
 
+    output += "Message Id: " + std::to_string(messageId) + "\n";
+    output += "Station Id: " + std::to_string(stationId) + "\n";
+    output += "Generation delta time: " 
+        + std::to_string(generationDeltaTime) + "\n";
+    output += "Container mask: " + std::to_string(containerMask) + "\n";
+    output += "Station type: " + std::to_string(stationType) + "\n";
+    output += "Latitude: " + std::to_string(latitude) + "\n";
+    output += "Longitude: " + std::to_string(longitude) + "\n";
+    output += "Semi major confidence: " 
+        + std::to_string(semiMajorConfidence) + "\n";
+    output += "Semi minor confidence: " 
+        + std::to_string(semiMinorConfidence) + "\n";
+    output += "Semi major orientation: " 
+        + std::to_string(semiMajorOrientation) + "\n";
+    output += "Altitude: " + std::to_string(altitude) + "\n";
+    output += "Heading: " + std::to_string(heading) + "\n";
+    output += "Heading confidence: " 
+        + std::to_string(headingConfidence) + "\n";
+    output += "Speed: " + std::to_string(speed) + "\n";
+    output += "Speed confidence: " + std::to_string(speedConfidence) + "\n";
+    output += "Vehicle length: " + std::to_string(vehicleLength) + "\n";
+    output += "Vehicle width: " + std::to_string(vehicleWidth) + "\n";
+    output += "Longitudinal acc: " + std::to_string(longitudinalAcc) + "\n";
+    output += "Longitudinal acc conf: " 
+        + std::to_string(longitudinalAccConf) + "\n";
+    output += "Yaw rate value: " + std::to_string(yawRateValue) + "\n";
+    output += "Yaw rate confidence: " 
+        + std::to_string(yawRateConfidence) + "\n";
+    output += "Vehicle role: " + std::to_string(vehicleRole) + "\n";
+    std::cout << output;
 
-    // TODO!! Real values from GPS, but not scaled properly.
-
-    // std::cout << "Latitude: " << m_latitude << " Longitude: " << m_longitude << " Speed: " << m_speed << std::endl;
-
-  } 
-  else if(c.getDataType() == opendlv::sensation::Voice::ID()) {
-    opendlv::sensation::Voice message = c.getData<opendlv::sensation::Voice>();
-    // std::cout<<message.getType()<<std::endl;
-    if(strcmp(message.getType().c_str(),"cam") == 0)
-    {
-      std::string dataString = message.getData();
-      std::vector<unsigned char> data(dataString.begin(), dataString.end());
-    
-      // std::vector<unsigned char> v = message.getListOfData();
-      // std::cout<< "Received CAM \n";
-      std::shared_ptr<Buffer const> buffer(new Buffer(data));
-      // std::cout<< buffer->GetSize()<<std::endl;
-      std::shared_ptr<Buffer::Iterator> inIterator = buffer->GetIterator();
-      //Long and little endian reverser
-      inIterator->ItReversed();
-      
-      // std::vector<unsigned char> const bytes = v;
-      // std::stringstream ss;
-      // for (uint i = 0; i < bytes.size(); i++) {
-      //     ss << std::to_string(bytes.at(i));
-      //     ss << "|";
-      // }
-      // std::cout<<ss.str()<<std::endl;
-
-
-      unsigned char messageId = inIterator->ReadByte();
-      int32_t stationId = inIterator->ReadInteger();
-      int32_t generationDeltaTime = inIterator->ReadInteger();
-      unsigned char containerMask =  inIterator->ReadByte();
-      int32_t stationType = inIterator->ReadInteger();
-      int32_t latitude = inIterator->ReadInteger();
-      int32_t longitude = inIterator->ReadInteger();
-      int32_t semiMajorConfidence = inIterator->ReadInteger();
-      int32_t semiMinorConfidence = inIterator->ReadInteger();
-      int32_t semiMajorOrientation = inIterator->ReadInteger();
-      int32_t altitude = inIterator->ReadInteger();
-      int32_t heading = inIterator->ReadInteger();
-      int32_t headingConfidence = inIterator->ReadInteger();
-      int32_t speed = inIterator->ReadInteger();
-      int32_t speedConfidence = inIterator->ReadInteger();
-      int32_t vehicleLength = inIterator->ReadInteger();
-      int32_t vehicleWidth = inIterator->ReadInteger();
-      int32_t longitudinalAcc = inIterator->ReadInteger();
-      int32_t longitudinalAccConf = inIterator->ReadInteger();
-      int32_t yawRateValue = inIterator->ReadInteger();
-      int32_t yawRateConfidence = inIterator->ReadInteger();
-      int32_t vehicleRole = inIterator->ReadInteger();
-
-      std::string output = "*** Cam object ***\n";
-
-      output += "Message Id: " + std::to_string(messageId) + "\n";
-      output += "Station Id: " + std::to_string(stationId) + "\n";
-      output += "Generation delta time: " 
-          + std::to_string(generationDeltaTime) + "\n";
-      output += "Container mask: " + std::to_string(containerMask) + "\n";
-      output += "Station type: " + std::to_string(stationType) + "\n";
-      output += "Latitude: " + std::to_string(latitude) + "\n";
-      output += "Longitude: " + std::to_string(longitude) + "\n";
-      output += "Semi major confidence: " 
-          + std::to_string(semiMajorConfidence) + "\n";
-      output += "Semi minor confidence: " 
-          + std::to_string(semiMinorConfidence) + "\n";
-      output += "Semi major orientation: " 
-          + std::to_string(semiMajorOrientation) + "\n";
-      output += "Altitude: " + std::to_string(altitude) + "\n";
-      output += "Heading: " + std::to_string(heading) + "\n";
-      output += "Heading confidence: " 
-          + std::to_string(headingConfidence) + "\n";
-      output += "Speed: " + std::to_string(speed) + "\n";
-      output += "Speed confidence: " + std::to_string(speedConfidence) + "\n";
-      output += "Vehicle length: " + std::to_string(vehicleLength) + "\n";
-      output += "Vehicle width: " + std::to_string(vehicleWidth) + "\n";
-      output += "Longitudinal acc: " + std::to_string(longitudinalAcc) + "\n";
-      output += "Longitudinal acc conf: " 
-          + std::to_string(longitudinalAccConf) + "\n";
-      output += "Yaw rate value: " + std::to_string(yawRateValue) + "\n";
-      output += "Yaw rate confidence: " 
-          + std::to_string(yawRateConfidence) + "\n";
-      output += "Vehicle role: " + std::to_string(vehicleRole) + "\n";
-      std::cout << output;
-
-      m_receiveLog << std::to_string(messageId) +
+    m_receiveLog << std::to_string(messageId) +
         + "," + std::to_string(stationId) +
         + "," + std::to_string(generationDeltaTime) +
         + "," + std::to_string(containerMask) +
@@ -364,19 +340,24 @@ void V2vCam::nextContainer(odcore::data::Container &c)
         + "," + std::to_string(yawRateValue) +
         + "," + std::to_string(yawRateConfidence) +
         + "," + std::to_string(vehicleRole);
-        m_receiveLog << std::endl;
+        m_receiveLog << std::endl; 
 
-        //{
-        //  using namespace opendlv::data::environment;
-        //  opendlv::data::environment::WGS84Coordinate coordPacket(latitude/10000000.0, WGS84Coordinate::NORTH, longitude/10000000.0, WGS84Coordinate::EAST);
-        //  std::cout << std::setprecision(11) << coordPacket.getLatitude() << " " << coordPacket.getLongitude() << std::endl;
-        //  odcore::data::Container nextC(coordPacket);
-        //  getConference().send(nextC);
-        //}
-
-    }
+  } else {
+    std::cout << "Message type not CAM." << std::endl;
   }
 }
+
+void V2vCam::SendWGS84Coordinate()
+{
+  opendlv::data::environment::WGS84Coordinate coordPacket(m_latitude, 
+      opendlv::data::environment::WGS84Coordinate::NORTH, m_longitude, 
+      opendlv::data::environment::WGS84Coordinate::EAST);
+  // std::cout << std::setprecision(11) << coordPacket.getLatitude() 
+  //     << " " << coordPacket.getLongitude() << std::endl;
+  odcore::data::Container nextC(coordPacket);
+  getConference().send(nextC);
+}
+
 
 void V2vCam::setUp()
 {
@@ -478,7 +459,6 @@ int32_t V2vCam::GetHeadingConfidence() const
   double scale = std::pow(10,1)*opendlv::Constants::RAD2DEG;
   double val = static_cast<double>(m_headingConfidence);
   return static_cast<int32_t>(std::round(val*scale));
-  // return m_headingConfidence;
 }
 
 int32_t V2vCam::GetSpeed() const
@@ -491,8 +471,6 @@ int32_t V2vCam::GetSpeedConfidence() const
 {
   int32_t scale = std::pow(10,2);
   return static_cast<int32_t>(std::round(m_speedConfidence*scale));
-
-  // return m_speedConfidence;
 }
 
 int32_t V2vCam::GetVehicleLength() const
@@ -515,8 +493,6 @@ int32_t V2vCam::GetLongitudinalAccConf() const
 {
   int32_t scale = std::pow(10,1);
   return static_cast<int32_t> (m_longitudinalAccConf*scale);
-
-  // return m_longitudinalAccConf;
 }
 
 int32_t V2vCam::GetYawRateValue() const
@@ -528,8 +504,27 @@ int32_t V2vCam::GetYawRateValue() const
 
 int32_t V2vCam::GetYawRateConfidence() const
 {
-  //Todo this
-  return m_yawRateConfidence;
+  double conversion = opendlv::Constants::RAD2DEG;
+  double val = m_yawRateConfidence * conversion;
+  if(m_yawRateConfidence < 0){
+    return 8;
+  }else if (val <= 0.01){
+    return 0;
+  }else if (val <= 0.05){
+    return 1;
+  }else if (val <= 0.1){
+    return 2;
+  }else if (val <= 1){
+    return 3;
+  }else if (val <= 5){
+    return 4;
+  }else if (val <= 10){
+    return 5;
+  }else if (val <= 100){
+    return 6;
+  }else {
+    return 7;
+  }
 }
 
 int32_t V2vCam::GetVehicleRole() const
