@@ -59,6 +59,7 @@ void Vehicle::SetSpeed(double a_speed)
 
 void Vehicle::Update(double a_theta, double a_dt)
 {
+  a_theta = -a_theta;
   double const a = m_cmToFront;
   double const b = m_cmToRear;
   double const cF = m_corneringStiffnessFront;
@@ -86,23 +87,23 @@ void Vehicle::Update(double a_theta, double a_dt)
       a * cF * a_theta
       ) / m_inertia;
 
-    v = v + vdot * a_dt;
-    r = r + rdot * a_dt;
-    
-    psi = psi + r * a_dt;
-
-    double di = u * a_dt;
-    double dj = v * a_dt;
-
-    x = x + cos(psi) * di - sin(psi) * dj;
-    y = y + sin(psi) * di + cos(psi) * dj;
+  v = v + vdot * a_dt;
+  r = r + rdot * a_dt;
   
-    m_heading = psi;
-    m_lateralPosition = y;
-    m_lateralVelocity = v;
-    m_longitudinalPosition = x;
-    m_speed = u;
-    m_yawRate = r;
+  psi = psi + r * a_dt;
+
+  double di = u * a_dt;
+  double dj = v * a_dt;
+
+  x = x + cos(psi) * di - sin(psi) * dj;
+  y = y + sin(psi) * di + cos(psi) * dj;
+
+  m_heading = psi;
+  m_lateralPosition = y;
+  m_lateralVelocity = v;
+  m_longitudinalPosition = x;
+  m_speed = u;
+  m_yawRate = r;
 }
 
 } // lanekeeping

@@ -29,9 +29,9 @@
 
 #include "setopticalrotation/setopticalrotation.hpp"
 
-namespace opendlv {
-namespace action {
-namespace setopticalrotation {
+ namespace opendlv {
+  namespace action {
+    namespace setopticalrotation {
 
 /**
   * Constructor.
@@ -39,41 +39,49 @@ namespace setopticalrotation {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-SetOpticalRotation::SetOpticalRotation(int32_t const &a_argc, char **a_argv)
-    : DataTriggeredConferenceClientModule(
-      a_argc, a_argv, "action-setopticalrotation")
-{
-}
+  SetOpticalRotation::SetOpticalRotation(int32_t const &a_argc, char **a_argv)
+  : DataTriggeredConferenceClientModule(
+    a_argc, a_argv, "action-setopticalrotation"),
+    m_logRotation()
+  {
+    odcore::data::TimeStamp now;
+    std::string filename("Rotation" + now.getYYYYMMDD_HHMMSS() + ".log");
+    m_logRotation.open(filename, std::ios::out|std::ios::app);
+  }
 
-SetOpticalRotation::~SetOpticalRotation()
-{
-}
+  SetOpticalRotation::~SetOpticalRotation()
+  {
+    m_logRotation.close();
+  }
 
 /**
  * Receives aim-point angle error.
  * Sends a optical rotation (steer) command to Act.
  */
-void SetOpticalRotation::nextContainer(odcore::data::Container &c)
-{
+ void SetOpticalRotation::nextContainer(odcore::data::Container &c)
+ {
   if(c.getDataType() == opendlv::perception::LanePosition::ID()){
     opendlv::perception::LanePosition lanePosition = c.getData<opendlv::perception::LanePosition>();
     //float offset = lanePosition.getOffset();
     float heading = lanePosition.getHeading();
 
-  	odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
-  	float const gainHeading = kv.getValue<float>("action-setopticalrotation.gain_heading");  
+    odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+    float const gainHeading = kv.getValue<float>("action-setopticalrotation.gain_heading");  
+    //float gainHeading = 0.5f;
     
-    if (std::abs(heading) > 0.0f) {
+    if ( fabs(heading) > 0.0f ) {
       float steeringAmplitude = gainHeading * heading;
       odcore::data::TimeStamp t0;
+      std::cout << "Stearing Amplitude: " << steeringAmplitude << std::endl;
+      m_logRotation << steeringAmplitude << std::endl;
       
-      if (heading < 0) {
-	  	opendlv::action::Correction correction(t0, "steering", false, steeringAmplitude);
-      	odcore::data::Container container(correction);
-      	getConference().send(container);
+      if ( heading < 0 ) {
+        opendlv::action::Correction correction(t0, "steering", false, steeringAmplitude);
+        odcore::data::Container container(correction);
+        getConference().send(container);
       }
       else {
-      	opendlv::action::Correction correction(t0, "steering", false, -steeringAmplitude);
+      	opendlv::action::Correction correction(t0, "steering", false, steeringAmplitude);
       	odcore::data::Container container(correction);
       	getConference().send(container);
       }

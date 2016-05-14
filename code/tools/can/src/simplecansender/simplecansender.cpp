@@ -134,7 +134,7 @@ namespace opendlv {
                         {
                             opendlv::proxy::reverefh16::AccelerationRequest accelerationRequest;
                             accelerationRequest.setEnableRequest(false);
-                            accelerationRequest.setAcceleration(0);
+                            accelerationRequest.setAccelerationPedalPosition(0);
 
                             // Create the message mapping.
                             canmapping::opendlv::proxy::reverefh16::AccelerationRequest accelerationRequestMapping;
@@ -185,9 +185,9 @@ namespace opendlv {
                             opendlv::proxy::reverefh16::AccelerationRequest accelerationRequest;
                             
                             getline(cin,token,':');
-                            double acceleration=stod(token);
-                            CLOG1<<"Acceleration value: "<<acceleration<<endl;
-                            accelerationRequest.setAcceleration(acceleration);
+                            double accelerationPedalPosition=stod(token);
+                            CLOG1<<"AccelerationPedalPosition value: "<<accelerationPedalPosition<<endl;
+                            accelerationRequest.setAccelerationPedalPosition(accelerationPedalPosition);
                             
                             getline(cin,token,':');
                             double enable=stod(token);

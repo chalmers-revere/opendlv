@@ -80,7 +80,10 @@ void CanMessageDataStore::add(odcore::data::Container const &a_container)
     } else {
       opendlv::proxy::reverefh16::AccelerationRequest accelerationRequest;
       accelerationRequest.setEnableRequest(m_enabled);
-      accelerationRequest.setAcceleration(acceleration);
+
+// TODO: map requested acceleration value to acceleration pedal position
+
+      accelerationRequest.setAccelerationPedalPosition(acceleration);
       odcore::data::Container accelerationRequestContainer(accelerationRequest);
 
       canmapping::opendlv::proxy::reverefh16::AccelerationRequest 
@@ -96,7 +99,7 @@ void CanMessageDataStore::add(odcore::data::Container const &a_container)
     // Must be -33.535 to disable deltatorque.
     steeringRequest.setSteeringDeltaTorque(33.535); 
     odcore::data::Container steeringRequestContainer(steeringRequest);
-
+    
     canmapping::opendlv::proxy::reverefh16::SteeringRequest 
         steeringRequestMapping;
     automotive::GenericCANMessage genericCanMessage 

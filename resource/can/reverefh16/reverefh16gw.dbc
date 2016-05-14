@@ -41,9 +41,9 @@ BO_ 262 ManualDriver: 4 VehicleGateWay
  SG_ BrakePedalPosition : 8|8@1+ (0.4,0) [0|102] "Percent" Vector__XXX
  SG_ AccelerationPedalPosition : 0|8@1+ (0.4,0) [0|102] "Percent" Vector__XXX
 
-BO_ 515 AccelerationRequest: 3 Chalmers
- SG_ Enable_AccRequest : 16|1@1+ (1,0) [0|1] "bool" Vector__XXX
- SG_ AccelerationRequest : 0|16@1+ (0.00048828125,-15.687) [-15.687|16.31251171875] "m/s2" Vector__XXX
+BO_ 515 AccelerationRequest: 2 Chalmers
+ SG_ AccelerationRequestPedal : 0|8@1+ (0.4,0) [0|102] "Percent" Vector__XXX
+ SG_ Enable_AccRequest : 8|1@1+ (1,0) [0|1] "bool" Vector__XXX
 
 BO_ 514 BrakeRequest: 3 Chalmers
  SG_ Enable_BrakeRequest : 16|1@1+ (1,0) [0|1] "bool" Vector__XXX
@@ -118,6 +118,7 @@ BA_ "GenMsgCycleTime" BO_ 258 10;
 BA_ "GenMsgCycleTime" BO_ 257 20;
 BA_ "GenSigStartValue" SG_ 262 BrakePedalPosition 255;
 BA_ "GenSigStartValue" SG_ 262 AccelerationPedalPosition 255;
+BA_ "GenSigStartValue" SG_ 515 AccelerationRequestPedal 255;
 BA_ "GenSigStartValue" SG_ 263 SteeringWheelAngle 65535;
 BA_ "GenSigStartValue" SG_ 263 RoadWheelAngle 32765.3997378768;
 

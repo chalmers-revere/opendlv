@@ -21,7 +21,6 @@
 #include <cstring>
 #include <cmath>
 #include <iostream>
-#include <fstream>
 
 #include "detectlane/Drawing.h"
 #include "detectlane/DecisionMaking.h"
@@ -154,6 +153,7 @@ void DetectLane::nextContainer(odcore::data::Container &c)
     if(mySharedImg.getName() == "front-left"){
       /* OLD CODE 
       m_leftIpm->ApplyHomography(src,src);
+
       m_regions = m_leftCameraRegions;
       m_lines = m_leftLines;
       m_transformationMatrix = m_leftTransformationMatrix;
@@ -169,6 +169,7 @@ void DetectLane::nextContainer(odcore::data::Container &c)
     if(mySharedImg.getName() == "front-right"){
       /* OLD CODE
       m_rightIpm->ApplyHomography(src,src);
+
       m_regions = m_rightCameraRegions;
       m_lines = m_rightLines;
       m_transformationMatrix = m_rightTransformationMatrix;
@@ -181,6 +182,11 @@ void DetectLane::nextContainer(odcore::data::Container &c)
       m_transformationMatrix = m_rightTransformationMatrix;
       m_initialized = true;
     }
+    
+    
+    cvReleaseImage(&myIplImage);
+
+
     if(!m_initialized){
       return;
     }
@@ -200,8 +206,10 @@ void DetectLane::nextContainer(odcore::data::Container &c)
     //-----------------------------
     // Local line search
     //-----------------------------
+
     ScanImage(&image, &m_lines, &m_recoveredPoints, m_nPoints, m_minRow, 
         m_maxRow);
+
 
     
     //-----------------------------
@@ -235,11 +243,13 @@ void DetectLane::nextContainer(odcore::data::Container &c)
       //-----------------------------
       // Calculate lane offset
       //-----------------------------
+
       double laneOffset = GetLateralPosition(m_K(p1,0), m_M(p1,0),
           m_K(p2,0), m_M(p2,0),
           m_lines.col(0)(m_midRegion),
           m_lines.col(1)(m_midRegion),
           (m_maxRow));
+
 
       //-----------------------------
       // Approximate heading angle
@@ -256,8 +266,7 @@ void DetectLane::nextContainer(odcore::data::Container &c)
       // Factor 4 is assumed length between minRow and Maxrow in real life
       double theta = atan((d2-d1) / (double)4);
 
-      // TODO: Check that the calculations are correct with the sign
-      // Newly implemented version used with calibrated camera parameters
+
       double newLaneOffset = GetLaneOffset(m_K(p1,0),
           m_M(p1,0),m_K(p2,0), m_M(p2,0),m_maxRow,p1,p2);
       double newHeadingAngle = GetHeadingAngle(m_K(p1,0),
@@ -267,10 +276,12 @@ void DetectLane::nextContainer(odcore::data::Container &c)
           << std::endl;
 
       std::cout << "New offset: " << newLaneOffset << " New heading: "
-          << newHeadingAngle << std::endl;
+          << newHeadingAngle << std::endl << std::endl;
+
       
       if(std::isfinite(theta) && std::isfinite(laneOffset)){
         // Send the message
+
       opendlv::perception::LanePosition lanePosition(laneOffset,theta);
       odcore::data::Container msg(lanePosition);  
       getConference().send(msg);
@@ -291,7 +302,6 @@ void DetectLane::nextContainer(odcore::data::Container &c)
     imshow("1", src);
     imshow("2", image);
     waitKey(1);
-    cvReleaseImage(&myIplImage);
   }
 }
 
@@ -510,6 +520,7 @@ void DetectLane::setUp()
     for(int i = 0; i < 4; i++)
       std::cout<<rightRegionPoints.at(i).x << " " << rightRegionPoints.at(i).y<<std::endl;
 
+
   }
   m_setup = true;
  }
@@ -525,13 +536,16 @@ Eigen::MatrixXd DetectLane::ReadMatrix(std::string fileName, int nRows,
 
   Eigen::MatrixXd matrix(nRows,nCols);
 
+
   if (file.is_open()) {
     for(int i = 0; i < nRows; i++){
       for(int j = 0; j < nCols; j++){
         double item = 0.0;
         file >> item;
+
    
         matrix(i,j) = item;
+
       }
     }
   }
@@ -563,6 +577,7 @@ void DetectLane::TransformPointToGlobalFrame(Eigen::Vector3d &point)
 double DetectLane::GetHeadingAngle(double kLeft,double mLeft, double kRight,
     double mRight, double row1, double row2, int leftPointIndex, 
     int rightPointIndex )
+
 {
   if( leftPointIndex == rightPointIndex )
   {
@@ -605,6 +620,7 @@ double DetectLane::GetHeadingAngle(double kLeft,double mLeft, double kRight,
     Eigen::Vector3d leftPoint2(colLeft2, row2, 1);
     TransformPointToGlobalFrame(leftPoint2);
 
+
     Eigen::Vector3d rightPoint2(colRight2, row2, 1);  
     TransformPointToGlobalFrame(rightPoint2);
 
@@ -614,6 +630,7 @@ double DetectLane::GetHeadingAngle(double kLeft,double mLeft, double kRight,
     return std::atan2(dyPoint1-dyPoint2,dxPoint1-dxPoint2);
   }
 }
+
 
 
 double DetectLane::GetLaneOffset(double kLeft,double mLeft, double kRight,
