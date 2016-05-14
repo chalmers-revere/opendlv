@@ -106,8 +106,8 @@ void GpsStringDecoder::nextString(std::string const &s) {
       longitudeDirection = fields.at(5)[0];
 
 
-      std::cout << "[proxy-gpsstringdecoder] GPS received signals : Latitude : " << std::setprecision(19) << latitude
-                   << " Longitude : " << std::setprecision(19) << longitude << std::endl;
+      // std::cout << "[proxy-gpsstringdecoder] GPS received signals : Latitude : " << std::setprecision(19) << latitude
+      //              << " Longitude : " << std::setprecision(19) << longitude << std::endl;
 
 
       // 0: Non valid, 1: GPS fix, 2: DGPS fix, 4: RTK fix int, 5: RTK float int

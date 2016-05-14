@@ -106,6 +106,7 @@ void Gps::setUp()
 
 void Gps::tearDown()
 {
+  m_trimble->setStringListener(NULL);
 }
 
 void Gps::nextContainer(odcore::data::Container &c) {

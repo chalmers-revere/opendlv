@@ -192,6 +192,38 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
     //    odcore::data::Container nextC(coordPacket);
     //    getConference().send(nextC);
     //  }
+    std::string output = "*** Cam object ***\n";
+
+      output += "Message Id: " + std::to_string(GetMessageId()) + "\n";
+      output += "Station Id: " + std::to_string(GetStationId()) + "\n";
+      output += "Generation delta time: " 
+          + std::to_string(GenerateGenerationDeltaTime()) + "\n";
+      output += "Container mask: " + std::to_string(GetContainerMask()) + "\n";
+      output += "Station type: " + std::to_string(GetStationType()) + "\n";
+      output += "Latitude: " + std::to_string(GetLatitude()) + "\n";
+      output += "Longitude: " + std::to_string(GetLongitude()) + "\n";
+      output += "Semi major confidence: " 
+          + std::to_string(GetSemiMajorConfidence()) + "\n";
+      output += "Semi minor confidence: " 
+          + std::to_string(GetSemiMinorConfidence()) + "\n";
+      output += "Semi major orientation: " 
+          + std::to_string(GetSemiMajorOrientation()) + "\n";
+      output += "Altitude: " + std::to_string(GetAltitude()) + "\n";
+      output += "Heading: " + std::to_string(GetHeading()) + "\n";
+      output += "Heading confidence: " 
+          + std::to_string(GetHeadingConfidence()) + "\n";
+      output += "Speed: " + std::to_string(GetSpeed()) + "\n";
+      output += "Speed confidence: " + std::to_string(GetSpeedConfidence()) + "\n";
+      output += "Vehicle length: " + std::to_string(GetVehicleLength()) + "\n";
+      output += "Vehicle width: " + std::to_string(GetVehicleWidth()) + "\n";
+      output += "Longitudinal acc: " + std::to_string(GetLongitudinalAcc()) + "\n";
+      output += "Longitudinal acc conf: " 
+          + std::to_string(GetLongitudinalAccConf()) + "\n";
+      output += "Yaw rate value: " + std::to_string(GetYawRateValue()) + "\n";
+      output += "Yaw rate confidence: " 
+          + std::to_string(GetYawRateConfidence()) + "\n";
+      output += "Vehicle role: " + std::to_string(GetVehicleRole()) + "\n";
+      std::cout << output;
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
