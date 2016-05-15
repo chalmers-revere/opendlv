@@ -77,9 +77,9 @@ message opendlv.proxy.GpsReading [id = 161] {
   double timestamp [id = 1];
   double latitude [id = 2];
   double longitude [id = 3];
-  float altitude [id = 4];
-  float northHeading [id = 5];
-  float speed [id = 6];
+  double altitude [id = 4];
+  double northHeading [id = 5];
+  double speed [id = 6];
   uint8 latitudeDirection [id = 7];
   uint8 longitudeDirection [id = 8];
   uint8 satelliteCount [id = 9];
@@ -117,6 +117,32 @@ message opendlv.sensation.Voice [id = 166] {
   //list<uint8> data [id = 4];
 }
 
+// according to the GCDC document we have to send the following information from localization:
+//    A.1.12.1 Latitude reference position
+//    A.1.12.2 Longitude reference position
+//    A.1.12.3 Position confidence ellipse interval 95%
+//    A.1.13.1 HeadingValue
+//    A.1.13.2 Heading confidence interval 95%
+//    A.1.14.1 SpeedValue
+//    A.1.14.2 Speed confidence interval 95%
+//    A.1.15.1 YawRateValue
+//    A.1.15.2 Yaw rate confidence interval 95%
+//    A.1.16.1 LongitudinalAccelerationValue
+//    A.1.16.2 longitudinalAccelerationConfidence
+message opendlv.sensation.Geolocation [id = 169] {
+  double latitude [id = 1];
+  double longitude [id = 2];
+  double positionConfidence [id = 3];
+  double altitude [id = 4];
+  double heading [id = 5];
+  double headingConfidence [id = 6];
+  double speed [id = 7];
+  double speedConfidence [id = 8];
+  double yawRate [id = 9];
+  double yawRateConfidence [id = 10];
+  double longitudinalAcceleration [id = 11];
+  double longitudinalAccelerationConfidence [id=12]; 
+}
 
 message opendlv.perception.Object [id = 179] {
   list<opendlv.perception.ObjectProperty> properties [id = 1];
@@ -150,12 +176,7 @@ message opendlv.sensation.Axle [id = 168] {
 }
 */
 
-message opendlv.sensation.Geolocation [id = 169] {
-  float latitude [id = 1];
-  float longitude [id = 2];
-  float altitude [id = 3];
-  float heading [id = 4];
-}
+
 /*
 message opendlv.sensation.BodyPart [id = 170] {
   opendlv.cartesian.Point3 position [id = 1]; // From body origo to body part center of mass
