@@ -56,8 +56,8 @@ V2vCam::V2vCam(int32_t const &a_argc, char **a_argv)
     m_timeType2004()
 {
   struct stat st;
-  if (stat("var/application/knowledge/linguistics/v2vcam", &st) == -1) {
-    system("mkdir -p ./var/application/knowledge/linguistics/v2vcam");
+  if (::stat("var/application/knowledge/linguistics/v2vcam", &st) == -1) {
+    ::system("mkdir -p ./var/application/knowledge/linguistics/v2vcam");
     // std::cout<<"Created dir"<<std::endl;
   }
   odcore::data::TimeStamp nu;

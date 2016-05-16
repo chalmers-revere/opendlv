@@ -335,3 +335,9 @@ message opendlv.proxy.reverefh16.Steering [id = 199] {
     double steeringwheelangle [id = 2];
 }
 
+
+// This message broadcasts the system's health as key/values.
+message opendlv.system.diagnostics.HealthStatus [id = 200] {
+    map<string,string> status [id = 1];
+}
+
