@@ -15,15 +15,17 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-# Date: 2016-05-10
+# Date: 2016-05-16
 
-FROM pletron/opendlv:latest
+FROM seresearch/odsimulation:latest
 
 # Set locale (fix the locale warnings)
 RUN localedef -v -c -i en_US -f UTF-8 en_US.UTF-8 || :
+
+RUN apt-get install -y libpopt-dev opendavinci-odcandatastructuregenerator opendavinci-oddatastructuregenerator opendavinci-odcantools
 
 ADD ./ /opt/data
 
 WORKDIR /opt/data
 
-RUN mkdir -p build && cd build && PATH=$PATH:/opt/od/bin cmake -D CMAKE_INSTALL_PREFIX=/opt/odlv -D OPENDAVINCI_DIR=/opt/od .. && make
+RUN mkdir -p build && cd build && PATH=$PATH:/usr/bin cmake -D CMAKE_INSTALL_PREFIX=/opt/odlv -D OPENDAVINCI_DIR=/usr/ .. && make
