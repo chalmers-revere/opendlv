@@ -67,10 +67,10 @@ void ManualOverride::tearDown()
 void ManualOverride::nextContainer(odcore::data::Container &a_container)
 {
   // TODO: currently vehicle specific.
-  if (a_container.getDataType() == opendlv::proxy::reverefh16::Pedals::ID()) {
+  if (a_container.getDataType() == opendlv::proxy::reverefh16::ManualControl::ID()) {
 
     auto manualControl = 
-        a_container.getData<opendlv::proxy::reverefh16::Pedals>();
+        a_container.getData<opendlv::proxy::reverefh16::ManualControl>();
     double accelerationPedalPosition = manualControl.getAccelerationPedalPosition();
     double brakePedalPosition = manualControl.getBrakePedalPosition();
     double torsionBarTorque = manualControl.getTorsionBarTorque();

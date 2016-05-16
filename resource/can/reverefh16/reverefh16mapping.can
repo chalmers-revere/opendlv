@@ -67,7 +67,7 @@ wheelspeeds1.frontaxle1wheelspeedleft in 0x101 at bit 0 for 16 bit is little end
 // made available as soon as all required CAN signals have been received
 // from the low-level CAN receiver regardless of the received order.
 ///////////////////////////////////////////////////////////////////////////////
-unordered mapping opendlv.proxy.reverefh16.Pedals {
+unordered mapping opendlv.proxy.reverefh16.ManualControl {
     manualdriver.accelerationpedalposition : 1;
     manualdriver.brakepedalposition : 2;
     manualdriver.torsionbartorque : 3;
