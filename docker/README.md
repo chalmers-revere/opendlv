@@ -24,7 +24,7 @@ as latest automatically.
 [Example output]:http://i.imgur.com/eWsbz4m.jpg
 
 
-Make sure to be located in the opendlv/docker folder before running.
+Make sure to be located in the opendlv/docker/run folder before running. The components will use the `configuration` file located in this directory.
 
 **Start everything (-d flag sets detached mode):**
 ````
