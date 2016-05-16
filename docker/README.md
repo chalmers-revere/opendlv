@@ -70,7 +70,7 @@ docker-compose logs opendlv-system-application-perception-detectvehicle
 version: "2"
 services:
   odsupercomponent:
-    image: pletron/opendlv:latest
+    image: revere/opendlv:latest
     volumes:
     - .:/opt/data
     working_dir: "/opt/data"
@@ -84,7 +84,7 @@ services:
   # Proxy
 
   opendlv-system-core-proxy-can:
-    image: pletron/opendlv:latest
+    image: revere/opendlv:latest
     volumes:
     - .:/opt/data
     working_dir: "/opt/data"
@@ -97,7 +97,7 @@ services:
 
 
   opendlv-system-core-proxy-camera-0:
-    image: pletron/opendlv:latest
+    image: revere/opendlv:latest
     volumes:
     - .:/opt/data
     working_dir: "/opt/data"
@@ -109,7 +109,7 @@ services:
     command: "opendlv-system-core-proxy-camera --cid=111 --freq=10 --id=0"
 
   opendlv-system-core-proxy-camera-1:
-    image: pletron/opendlv:latest
+    image: revere/opendlv:latest
     volumes:
     - .:/opt/data
     working_dir: "/opt/data"
@@ -122,7 +122,7 @@ services:
 
 
   opendlv-system-core-proxy-v2v:
-    image: pletron/opendlv:latest
+    image: revere/opendlv:latest
     volumes:
     - .:/opt/data
     working_dir: "/opt/data"
@@ -135,7 +135,7 @@ services:
 
 
   opendlv-system-core-proxy-gps:
-    image: pletron/opendlv:latest
+    image: revere/opendlv:latest
     volumes:
     - .:/opt/data
     working_dir: "/opt/data"
@@ -151,7 +151,7 @@ services:
   # Sensation
 
   opendlv-system-application-sensation-audition:
-    image: pletron/opendlv:latest
+    image: revere/opendlv:latest
     volumes:
     - .:/opt/data
     working_dir: "/opt/data"
@@ -167,7 +167,7 @@ services:
   # Perception
 
   opendlv-system-application-perception-detectlane:
-    image: pletron/opendlv:latest
+    image: revere/opendlv:latest
     volumes:
     - .:/opt/data
     working_dir: "/opt/data"
@@ -180,7 +180,7 @@ services:
     
     
   opendlv-system-application-perception-detectvehicle:
-    image: pletron/opendlv:latest
+    image: revere/opendlv:latest
     volumes:
     - .:/opt/data
     working_dir: "/opt/data"
@@ -196,7 +196,7 @@ services:
   # Knowledge
 
   opendlv-system-application-knowledge-gcdc16-v2viclcm:
-    image: pletron/opendlv:latest
+    image: revere/opendlv:latest
     volumes:
     - .:/opt/data
     working_dir: "/opt/data"
@@ -209,7 +209,7 @@ services:
     
     
   opendlv-system-application-knowledge-linguistics-v2vcam:
-    image: pletron/opendlv:latest
+    image: revere/opendlv:latest
     volumes:
     - .:/opt/data
     working_dir: "/opt/data"
@@ -222,7 +222,7 @@ services:
     
     
   opendlv-system-application-knowledge-linguistics-v2vdenm:
-    image: pletron/opendlv:latest
+    image: revere/opendlv:latest
     volumes:
     - .:/opt/data
     working_dir: "/opt/data"
@@ -238,7 +238,7 @@ services:
   # Action
 
   opendlv-system-application-action-act:
-    image: pletron/opendlv:latest
+    image: revere/opendlv:latest
     volumes:
     - .:/opt/data
     working_dir: "/opt/data"
@@ -251,7 +251,7 @@ services:
 
 
   opendlv-system-application-action-communicate:
-    image: pletron/opendlv:latest
+    image: revere/opendlv:latest
     volumes:
     - .:/opt/data
     working_dir: "/opt/data"
@@ -264,7 +264,7 @@ services:
     
     
   opendlv-system-application-action-keepobjectsize:
-    image: pletron/opendlv:latest
+    image: revere/opendlv:latest
     volumes:
     - .:/opt/data
     working_dir: "/opt/data"
@@ -277,7 +277,7 @@ services:
 
 
   opendlv-system-application-action-keepobjectalignment:
-    image: pletron/opendlv:latest
+    image: revere/opendlv:latest
     volumes:
     - .:/opt/data
     working_dir: "/opt/data"
@@ -290,7 +290,7 @@ services:
     
 
   opendlv-system-application-action-setopticalflow:
-    image: pletron/opendlv:latest
+    image: revere/opendlv:latest
     volumes:
     - .:/opt/data
     working_dir: "/opt/data"
@@ -304,7 +304,7 @@ services:
 
 
   opendlv-new-component:
-    image: pletron/opendlv:latest
+    image: revere/opendlv:latest
     volumes:
     - .:/opt/data
     working_dir: "/opt/data"
