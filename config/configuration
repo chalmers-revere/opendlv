@@ -10,6 +10,9 @@
 global.buffer.memorySegmentSize = 4000000 # Size of a memory segment in bytes.
 global.buffer.numberOfMemorySegments = 50 # Number of memory segments.
 
+# List of modules expected to participate in a session.
+global.session.expectedModules = action-act,action-communicate,action-decreaseobjectsize,action-keepobjectalignment,action-keepobjectsize,action-removeloomingfront,action-setopticalflow,action-setopticalrotation,knowledge-gcdc16-rule,knowledge-gcdc16-v2viclcm,knowledge-identity,knowledge-linguistics-v2vcam,knowledge-linguistics-v2vdenm,knowledge-scene,perception-detectlane,perception-detectvehicle,sensation-audition,sensation-echolocation-looming,sensation-echolocation-object,sensation-geolocation,sensation-proprioception-orientation,sensation-vision-directionofmovement,sensation-vision-edge,sensation-vision-looming,sensation-vision-opticalflow,diagnostics,proxy-camera:0,proxy-camera:1,proxy-camera:2,proxy-camera:3,proxy-can,proxy-gps,proxy-imu,proxy-imu:1,proxy-ledstrip,proxy-lidar,proxy-sonararray,proxy-beacons,proxy-v2v,safety-checkactuation,safety-manualoverride
+
 ###############################################################################
 ###############################################################################
 #
