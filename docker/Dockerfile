@@ -15,13 +15,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-# Date: 2016-03-05
+# Date: 2016-05-10
 
-FROM seresearch/odsimulation:latest
-MAINTAINER Christian Berger "christian.berger@gu.se"
+FROM pletron/opendlv:latest
 
 # Set locale (fix the locale warnings)
 RUN localedef -v -c -i en_US -f UTF-8 en_US.UTF-8 || :
 
-ADD opendlv /opt/opendlv
+ADD ./ /opt/data
 
+WORKDIR /opt/data
+
+RUN mkdir -p build && cd build && PATH=$PATH:/opt/od/bin cmake -D CMAKE_INSTALL_PREFIX=/opt/odlv -D OPENDAVINCI_DIR=/opt/od .. && make
