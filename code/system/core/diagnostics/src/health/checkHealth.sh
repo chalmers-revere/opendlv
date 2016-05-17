@@ -18,17 +18,21 @@
 # USA.
 
 # Reachability tests:
+HAS_MULTICAST_ROUTE=$(route -n | grep "225.0.0.0" 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
 PING_LOCALHOST=$(ping -W1 -c1 127.0.0.1 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
 PING_SCOTT1=$(ping -W1 -c1 10.42.42.1 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
-PING_SCOTT2=$(ping -W1 -c1 10.42.42.2 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
-MULTICAST_ROUTE=$(route -n | grep "225.0.0.0" 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
+PING_SCOTT2=$(ping -W1 -c1 10.42.42.60 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
+PING_TRIMBLE=$(ping -W1 -c1 10.42.42.112 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
+PING_COMBOX=$(ping -W1 -c1 10.42.42.61 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
 
 # Devnode tests:
-DEVNODE_PCAN=$(test -e /dev/pcan 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
+HAS_DEV_PCAN=$(test -e /dev/pcan 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
 
-echo "diagnostics-health.ping.localhost=$PING_LOCALHOST"
-echo "diagnostics-health.ping.scott1=$PING_SCOTT1"
-echo "diagnostics-health.ping.scott2=$PING_SCOTT2"
-echo "diagnostics-health.multicast.route=$MULTICAST_ROUTE"
-echo "diagnostics-health.devnode.pcan=$DEVNODE_PCAN"
+echo "has.multicast_route=$HAS_MULTICAST_ROUTE"
+echo "ping.localhost=$PING_LOCALHOST"
+echo "ping.scott1=$PING_SCOTT1"
+echo "ping.scott2=$PING_SCOTT2"
+echo "ping.trimble=$PING_TRIMBLE"
+echo "ping.combox=$PING_COMBOX"
+echo "has.dev.pcan=$HAS_DEV_PCAN"
 
