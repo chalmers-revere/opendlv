@@ -27,6 +27,7 @@ include_directories(include)
 # Build
 file(GLOB_RECURSE thisproject-sources 
   "${CMAKE_CURRENT_SOURCE_DIR}/src/joystick/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/ps3controller/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/simplecansender/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/keyboard/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/replay/*.cpp"
@@ -37,6 +38,9 @@ add_library(${PROJECT_NAME}lib-static STATIC ${thisproject-sources})
 
 add_executable(${PROJECT_NAME}-joystick "${CMAKE_CURRENT_SOURCE_DIR}/src/joystick/main.cpp")
 target_link_libraries(${PROJECT_NAME}-joystick ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+
+add_executable(${PROJECT_NAME}-ps3controller "${CMAKE_CURRENT_SOURCE_DIR}/src/ps3controller/main.cpp")
+target_link_libraries(${PROJECT_NAME}-ps3controller ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
 add_executable(${PROJECT_NAME}-simplecansender "${CMAKE_CURRENT_SOURCE_DIR}/src/simplecansender/main.cpp")
 target_link_libraries(${PROJECT_NAME}-simplecansender ${PROJECT_NAME}lib-static ${LIBRARIES}) 
@@ -54,4 +58,5 @@ include(RunTests)
 install(TARGETS ${PROJECT_NAME}-simplecansender RUNTIME DESTINATION bin COMPONENT tools)
 install(TARGETS ${PROJECT_NAME}-keyboard RUNTIME DESTINATION bin COMPONENT tools)
 install(TARGETS ${PROJECT_NAME}-joystick RUNTIME DESTINATION bin COMPONENT tools)
+install(TARGETS ${PROJECT_NAME}-ps3controller RUNTIME DESTINATION bin COMPONENT tools)
 install(TARGETS ${PROJECT_NAME}-replay RUNTIME DESTINATION bin COMPONENT tools)
