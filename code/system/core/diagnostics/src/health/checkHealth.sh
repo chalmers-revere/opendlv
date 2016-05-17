@@ -24,7 +24,8 @@ SCOTT1=10.42.42.60
 COMBOX=10.42.42.61
 TRIMBLE=10.42.42.112
 MULTICAST_ROUTE=225.0.0.0
-DEV_PCAN=/dev/pcan2
+CAN_PORT=2
+DEV_PCAN=/dev/pcan${CAN_PORT}
 DEV_PCAN_SPEED=0x011c
 
 # Reachability tests:
@@ -37,9 +38,9 @@ PING_COMBOX=$(ping -W1 -c1 $COMBOX 2>&1 >/dev/null && echo "PASSED" || echo "FAI
 
 # Devnode tests:
 HAS_DEV_PCAN=$(test -e $DEV_PCAN 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
-PCAN_NETDEV_DISABLED=$(cat /proc/pcan | grep -v "^*" | cut -f3 -d" ")
+PCAN_NETDEV_DISABLED=$(cat pcan | grep -v "^*" | tr -s " " " " | cut -f3 -d" "| sed "${CAN_PORT}q;d")
 PCAN_NETDEV_DISABLED=$(test "$PCAN_NETDEV_DISABLED" == "-NA-" && echo "PASSED" || echo "FAILED")
-PCAN_CORRECT_SPEED=$(cat /proc/pcan | grep -v "^*" | cut -f6 -d" ")
+PCAN_CORRECT_SPEED=$(cat pcan | grep -v "^*" | tr -s " " " " | cut -f6 -d" "| sed "${CAN_PORT}q;d")
 PCAN_CORRECT_SPEED=$(test "$PCAN_CORRECT_SPEED" == "$DEV_PCAN_SPEED" && echo "PASSED" || echo "FAILED")
 
 # System:
