@@ -220,4 +220,5 @@ perception-detectlane.outputSize = 640,480
 ###############################################################################
 # Diagnostics
 diagnostics-health.script = ./checkHealth.sh
+diagnostics-health.sleep = 60 # Sleep between health checks in seconds
 

@@ -45,6 +45,7 @@ class Health : public odcore::base::module::TimeTriggeredConferenceClientModule 
 
  private:
   std::string m_healthScript;
+  int32_t m_sleep;
 };
 
 } // health

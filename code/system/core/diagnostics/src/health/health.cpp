@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "opendavinci/odcore/base/KeyValueConfiguration.h"
+#include "opendavinci/odcore/base/Thread.h"
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/strings/StringToolbox.h"
 
@@ -45,6 +46,7 @@ namespace health {
 Health::Health(int32_t const &a_argc, char **a_argv)
     : TimeTriggeredConferenceClientModule(a_argc, a_argv, "diagnostics-health")
     , m_healthScript()
+    , m_sleep(60)
 {
 }
 
@@ -88,6 +90,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Health::body()
       // Broadcast HealthStatus.
       odcore::data::Container c(hs);
       getConference().send(c);
+
+      // Slowing down check.
+      odcore::base::Thread::usleepFor(m_sleep * 1000 * 1000);
     }
   }
 
@@ -99,6 +104,8 @@ void Health::setUp()
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
   m_healthScript = kv.getValue<std::string>("diagnostics-health.script");
+  m_sleep = kv.getValue<int32_t>("diagnostics-health.sleep");
+  m_sleep = (m_sleep < 0) ? 60 : m_sleep;
 }
 
 void Health::tearDown()
