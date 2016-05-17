@@ -1,7 +1,20 @@
+###############################################################################
+###############################################################################
+#
+# GLOBAL CONFIGURATION
+#
+# The following attributes define the buffer sizes for recording and
+# replaying. You need to adjust these parameters depending on the
+# camera resolution for example (640x480x3 --> 1,000,000 for memorySegment,
+# 1280x720x3 --> 2,800,000), 1280x1024x3 --> 3,932,160
+global.buffer.memorySegmentSize = 4000000 # Size of a memory segment in bytes.
+global.buffer.numberOfMemorySegments = 50 # Number of memory segments.
+
+###############################################################################
+###############################################################################
 #
 # CONFIGURATION FOR ODSUPERCOMPONENT
 #
-
 # If the managed level is pulse_shift, all connected modules will be informed
 # about the supercomponent's real time by this increment per module. Thus, the
 # execution times per modules are better aligned with supercomponent and the
@@ -20,8 +33,16 @@ odsupercomponent.pulsetimeack.timeout = 5000 # (in milliseconds)
 # deterministic execution. 
 odsupercomponent.pulsetimeack.yield = 5000 # (in microseconds)
 
+# List of modules (without blanks) that will not get a pulse message from odsupercomponent.
+odsupercomponent.pulsetimeack.exclude = odcockpit
+
+###############################################################################
+###############################################################################
+
 action-setopticalrotation.gain_heading = 0.5
 
+###############################################################################
+###############################################################################
 ### Proxy
 proxy-can.devicenode = /dev/pcan2          # PEAK CAN device.
 proxy-can.record_gcm = 1                   # Set to 1 to dump received CAN data into a .rec file.
@@ -147,12 +168,17 @@ proxy-v2v.mount.y = -1.2,1.2
 proxy-v2v.mount.z = 3.5,3.5
 proxy-v2v.listenPort = 5000
 
+###############################################################################
+###############################################################################
+
 safety-checkactuation.maxAllowedDeceleration = 3
 
 safety-manualoverride.accelerationPedalPositionThreshold = 0.1
 safety-manualoverride.brakePedalPositionThreshold = 0.1
 safety-manualoverride.torsionBarTorqueThreshold = 1.5
 
+###############################################################################
+###############################################################################
 # Sensation Optical flow
 
 sensation-vision-opticalflow.termCritMaxCount = 20
@@ -162,7 +188,9 @@ sensation-vision-opticalflow.maxLevel = 3
 sensation-vision-opticalflow.minEigThreshold = 0.001
 sensation-vision-opticalflow.nAxisPoints = 15
 
-# V2V temp
+###############################################################################
+###############################################################################
+# V2V
 knowledge-linguistics-v2vcam.stationId = 115
 knowledge-linguistics-v2vcam.stationType = 8 #heavy truck
 knowledge-linguistics-v2vcam.vehicleLength = 47
@@ -176,8 +204,21 @@ knowledge-linguistics-v2vdenm.stationType = 8 #heavy truck
 knowledge-gcdc16-v2viclcm.stationId = 115
 knowledge-gcdc16-v2viclcm.rearAxleLocation = 430
 
+###############################################################################
+###############################################################################
 # Tools
 tools-can-joystick.devicenode = /dev/pcan2   # PEAK CAN device.
 tools-can-joystick.joystickdevicenode = /dev/input/js2   # Gamepad.
 tools-can-keyboard.devicenode = /dev/pcan2   # PEAK CAN device.
 tools-can-simplecansender.devicenode = /dev/pcan2   # PEAK CAN device.
+
+# Perception
+perception-detectlane.inputSize = 640,480
+perception-detectlane.outputSize = 640,480
+
+###############################################################################
+###############################################################################
+# Diagnostics
+diagnostics-health.script = ./checkHealth.sh
+diagnostics-health.sleep = 60 # Sleep between health checks in seconds
+

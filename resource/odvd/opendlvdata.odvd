@@ -77,9 +77,9 @@ message opendlv.proxy.GpsReading [id = 161] {
   double timestamp [id = 1];
   double latitude [id = 2];
   double longitude [id = 3];
-  float altitude [id = 4];
-  float northHeading [id = 5];
-  float speed [id = 6];
+  double altitude [id = 4];
+  double northHeading [id = 5];
+  double speed [id = 6];
   uint8 latitudeDirection [id = 7];
   uint8 longitudeDirection [id = 8];
   uint8 satelliteCount [id = 9];
@@ -117,6 +117,48 @@ message opendlv.sensation.Voice [id = 166] {
   //list<uint8> data [id = 4];
 }
 
+// according to the GCDC document we have to send the following information from localization:
+//    A.1.12.1 Latitude reference position
+//    A.1.12.2 Longitude reference position
+//    A.1.12.3 Position confidence ellipse interval 95%
+//    A.1.13.1 HeadingValue
+//    A.1.13.2 Heading confidence interval 95%
+//    A.1.14.1 SpeedValue
+//    A.1.14.2 Speed confidence interval 95%
+//    A.1.15.1 YawRateValue
+//    A.1.15.2 Yaw rate confidence interval 95%
+//    A.1.16.1 LongitudinalAccelerationValue
+//    A.1.16.2 longitudinalAccelerationConfidence
+message opendlv.sensation.Geolocation [id = 169] {
+  double latitude [id = 1];
+  double longitude [id = 2];
+  double positionConfidence [id = 3];
+  double altitude [id = 4];
+  double heading [id = 5];
+  double headingConfidence [id = 6];
+  double speed [id = 7];
+  double speedConfidence [id = 8];
+  double yawRate [id = 9];
+  double yawRateConfidence [id = 10];
+  double longitudinalAcceleration [id = 11];
+  double longitudinalAccelerationConfidence [id=12]; 
+}
+
+message opendlv.perception.Object [id = 179] {
+  list<opendlv.perception.ObjectProperty> properties [id = 1];
+  odcore::data::TimeStamp lastSeen [id = 2];
+  string type [id = 3];
+  float angle [id = 4];
+  float size [id = 5];
+  uint16 objectIndex [id = 6];
+}
+
+message opendlv.perception.ObjectProperty [id = 183] {
+  odcore::data::TimeStamp identified [id = 1];
+  string name [id = 2];
+  string value [id = 3];
+  uint16 objectIndex [id = 4];
+}
 
 /*
 message opendlv.sensation.RoadWheel [id = 167] {
@@ -134,12 +176,7 @@ message opendlv.sensation.Axle [id = 168] {
 }
 */
 
-message opendlv.sensation.Geolocation [id = 169] {
-  float latitude [id = 1];
-  float longitude [id = 2];
-  float altitude [id = 3];
-  float heading [id = 4];
-}
+
 /*
 message opendlv.sensation.BodyPart [id = 170] {
   opendlv.cartesian.Point3 position [id = 1]; // From body origo to body part center of mass
@@ -194,15 +231,6 @@ message opendlv.perception.DesiredDirectionOfMovement [id = 178] {
   opendlv.coordinate.Spherical3 directionOfMovement [id = 1];
 }
 
-message opendlv.perception.Object [id = 179] {
-  list<opendlv.perception.ObjectProperty> properties [id = 1];
-  odcore::data::TimeStamp lastSeen [id = 2];
-  string type [id = 3];
-  float angle [id = 4];
-  float size [id = 5];
-  uint16 objectIndex [id = 6];
-}
-
 message opendlv.perception.ObjectDesiredAngle [id = 180] {
   float desiredAngle [id = 1];
   uint16 objectIndex [id = 2];
@@ -217,13 +245,6 @@ message opendlv.perception.ObjectLooming [id = 182] {
   odcore::data::TimeStamp identified [id = 1];
   opendlv.sensation.Looming looming [id = 2];
   uint16 objectIndex [id = 3];
-}
-
-message opendlv.perception.ObjectProperty [id = 183] {
-  odcore::data::TimeStamp identified [id = 1];
-  string name [id = 2];
-  string value [id = 3];
-  uint16 objectIndex [id = 4];
 }
 
 message opendlv.perception.ObjectMetricDistance [id = 184] {
@@ -312,5 +333,11 @@ message opendlv.proxy.reverefh16.Wheels [id = 198] {
 message opendlv.proxy.reverefh16.Steering [id = 199] {
     double roadwheelangle [id = 1];
     double steeringwheelangle [id = 2];
+}
+
+
+// This message broadcasts the system's health as key/values.
+message opendlv.system.diagnostics.HealthStatus [id = 200] {
+    map<string,string> status [id = 1];
 }
 

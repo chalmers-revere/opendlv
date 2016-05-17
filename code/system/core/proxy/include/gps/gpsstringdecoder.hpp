@@ -17,41 +17,34 @@
  * USA.
  */
 
-#ifndef SETOPTICALROTATION_SETOPTICALROTATION_HPP_
-#define SETOPTICALROTATION_SETOPTICALROTATION_HPP_
+#ifndef GPS_GPSSTRINGDECODER_HPP_
+#define GPS_GPSSTRINGDECODER_HPP_
 
-#include <memory>
-#include <fstream>
-
-#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
-#include "opendavinci/odcore/data/Container.h"
+#include <opendavinci/odcore/io/StringListener.h>
+#include <opendavinci/odcore/io/conference/ContainerConference.h>
 
 namespace opendlv {
-namespace action {
-namespace setopticalrotation {
+namespace proxy {
+namespace gps {
 
 /**
- * This class provides...
+ * This class decodes the received string.
  */
-class SetOpticalRotation
-: public odcore::base::module::DataTriggeredConferenceClientModule {
+class GpsStringDecoder : public odcore::io::StringListener {
  public:
-  SetOpticalRotation(int32_t const &, char **);
-  SetOpticalRotation(SetOpticalRotation const &) = delete;
-  SetOpticalRotation &operator=(SetOpticalRotation const &) = delete;
-  virtual ~SetOpticalRotation();
-  virtual void nextContainer(odcore::data::Container &);
+  GpsStringDecoder(odcore::io::conference::ContainerConference &);
+  GpsStringDecoder(GpsStringDecoder const &) = delete;
+  GpsStringDecoder &operator=(GpsStringDecoder const &) = delete;
+  virtual ~GpsStringDecoder();
 
+  virtual void nextString(const std::string &s);
 
  private:
-  void setUp();
-  void tearDown();
-
-  std::ofstream m_logRotation;
+  odcore::io::conference::ContainerConference &m_conference;
 };
 
-} // setopticalrotation
-} // action
+} // gps
+} // proxy
 } // opendlv
 
 #endif

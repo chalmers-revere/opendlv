@@ -37,6 +37,7 @@ ConvNeuralNet::ConvNeuralNet()
     , m_normStdG()
     , m_normAvgB()
     , m_normStdB()
+    , m_detectedVehicles()
     , m_isInitialized(false)
 {
 }
@@ -58,7 +59,8 @@ void ConvNeuralNet::SetUp()
   std::ifstream input(m_pathTrainedCnn);
 
   if (input.fail()) {
-    std::cout << "WARNING! Could not open file " << m_pathTrainedCnn << std::endl;
+    std::cout << "WARNING! Could not open file " << m_pathTrainedCnn << 
+        std::endl;
   }
 
   input >> m_cnn;
@@ -70,7 +72,8 @@ void ConvNeuralNet::SetUp()
   std::ifstream normInput(m_pathNormalizationConstants);
 
   if (normInput.fail()) {
-    std::cout << "WARNING! Could not open file " << m_pathNormalizationConstants << std::endl;
+    std::cout << "WARNING! Could not open file " << 
+        m_pathNormalizationConstants << std::endl;
   }
   // RGB images
   normInput >> m_normAvgR;
@@ -79,9 +82,12 @@ void ConvNeuralNet::SetUp()
   normInput >> m_normStdG;
   normInput >> m_normAvgB;
   normInput >> m_normStdB;
-  std::cout << "(avgR, stdR): (" << m_normAvgR << ", " << m_normStdR << ")" << std::endl;
-  std::cout << "(avgG, stdG): (" << m_normAvgG << ", " << m_normStdG << ")" << std::endl;
-  std::cout << "(avgB, stdB): (" << m_normAvgB << ", " << m_normStdB << ")" << std::endl;
+  std::cout << "(avgR, stdR): (" << m_normAvgR << ", " << m_normStdR << 
+      ")" << std::endl;
+  std::cout << "(avgG, stdG): (" << m_normAvgG << ", " << m_normStdG << 
+      ")" << std::endl;
+  std::cout << "(avgB, stdB): (" << m_normAvgB << ", " << m_normStdB << 
+      ")" << std::endl;
   std::cout << "Normalization constants read." << std::endl;
 
   m_isInitialized = true;
@@ -100,27 +106,32 @@ void ConvNeuralNet::TearDown()
 
 void ConvNeuralNet::Update(const cv::Mat* a_imageFrame)
 {
-  std::cout << "convnet : In update" << std::endl;
-
   std::vector<tiny_cnn::vec_t> cnnImageData;
 
-  std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
+  std::chrono::high_resolution_clock::time_point t0 = 
+      std::chrono::high_resolution_clock::now();
 
   cv::Mat workingImage;
   a_imageFrame->copyTo(workingImage);
   
   // RGB images
-  this->ConvertImageRGB(workingImage, m_inputWidth, m_inputHeight, cnnImageData);
-  this->ApplyNormalizationRGB(cnnImageData, m_normAvgR, m_normStdR, m_normAvgG, m_normStdG, m_normAvgB, m_normStdB);
+  this->ConvertImageRGB(workingImage, m_inputWidth, m_inputHeight, 
+      cnnImageData);
+  this->ApplyNormalizationRGB(cnnImageData, m_normAvgR, m_normStdR, 
+      m_normAvgG, m_normStdG, m_normAvgB, m_normStdB);
 
   // For displaying (each pixel increased in size)
   double myTestFactor = 4;
-  cv::resize(workingImage, workingImage, cv::Size(m_inputWidth*myTestFactor, m_inputHeight*myTestFactor), 0, 0, cv::INTER_CUBIC);
+  cv::resize(workingImage, workingImage, 
+      cv::Size(m_inputWidth*myTestFactor, m_inputHeight*myTestFactor), 0, 0, 
+      cv::INTER_CUBIC);
 
   // Do the actual CNN prediction
-  std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+  std::chrono::high_resolution_clock::time_point t1 = 
+      std::chrono::high_resolution_clock::now();
   tiny_cnn::vec_t result = m_cnn.predict(cnnImageData.at(0));
-  std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+  std::chrono::high_resolution_clock::time_point t2 = 
+      std::chrono::high_resolution_clock::now();
 
 
   // Pick final layer image
@@ -136,14 +147,19 @@ void ConvNeuralNet::Update(const cv::Mat* a_imageFrame)
   
   // Draw black lines along the edges to
   // get rid of the edge effects...
-  cv::line(spatialMap, cv::Point(0, 0), cv::Point(0, spatialMap.rows-1), cv::Scalar(0, 0, 0), 1, 8);
-  cv::line(spatialMap, cv::Point(0, 0), cv::Point(spatialMap.cols-1, 0), cv::Scalar(0, 0, 0), 1, 8);
-  cv::line(spatialMap, cv::Point(spatialMap.cols-1, spatialMap.rows-1), cv::Point(0, spatialMap.rows-1), cv::Scalar(0, 0, 0), 1, 8);
-  cv::line(spatialMap, cv::Point(spatialMap.cols-1, spatialMap.rows-1), cv::Point(spatialMap.cols-1, 0), cv::Scalar(0, 0, 0), 1, 8);
+  cv::line(spatialMap, cv::Point(0, 0), cv::Point(0, spatialMap.rows-1), 
+      cv::Scalar(0, 0, 0), 1, 8);
+  cv::line(spatialMap, cv::Point(0, 0), cv::Point(spatialMap.cols-1, 0), 
+      cv::Scalar(0, 0, 0), 1, 8);
+  cv::line(spatialMap, cv::Point(spatialMap.cols-1, spatialMap.rows-1), 
+      cv::Point(0, spatialMap.rows-1), cv::Scalar(0, 0, 0), 1, 8);
+  cv::line(spatialMap, cv::Point(spatialMap.cols-1, spatialMap.rows-1), 
+      cv::Point(spatialMap.cols-1, 0), cv::Scalar(0, 0, 0), 1, 8);
   
 
   int32_t resizeFactor = 4;
-  cv::resize(spatialMap, spatialMap, cv::Size(), resizeFactor, resizeFactor, cv::INTER_AREA);
+  cv::resize(spatialMap, spatialMap, cv::Size(), resizeFactor, resizeFactor, 
+      cv::INTER_AREA);
 
   cv::Mat thresholdedImg;
   cv::Mat thresholdedImgBinary;
@@ -151,15 +167,18 @@ void ConvNeuralNet::Update(const cv::Mat* a_imageFrame)
   double thresh = 70;
   double maxval = 255;
   cv::threshold(spatialMap, thresholdedImg, thresh, maxval, cv::THRESH_TOZERO);
-  cv::threshold(spatialMap, thresholdedImgBinary, thresh, maxval, cv::THRESH_BINARY);
+  cv::threshold(spatialMap, thresholdedImgBinary, thresh, maxval, 
+      cv::THRESH_BINARY);
 
   // Find connected components in thresholded image
   std::vector<std::vector<cv::Point> > contours;
   std::vector<cv::Vec4i> hierarchy;
-  findContours(thresholdedImgBinary, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
+  findContours(thresholdedImgBinary, contours, hierarchy, CV_RETR_TREE, 
+      CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
 
   // Draw bounding boxes around the detected connected components
-  std::vector<cv::Rect> boundingRects;
+  //std::vector<cv::Rect> boundingRects;
+  m_detectedVehicles.clear();
   std::cout << "Nr of connected components: " << contours.size() << std::endl;
   for (uint32_t i=0; i<contours.size(); i++) {
     cv::Rect bRect = cv::boundingRect(contours.at(i));
@@ -168,37 +187,63 @@ void ConvNeuralNet::Update(const cv::Mat* a_imageFrame)
     if (bRect.width <= 1*resizeFactor || bRect.height <= 1*resizeFactor) {
       continue;
     }
-
-    boundingRects.push_back(bRect);
     
     // Increase the size of the bounding box to fit the displayed image
     bRect.x *= myTestFactor;
     bRect.y *= myTestFactor;
     bRect.width *= myTestFactor;
     bRect.height *= myTestFactor;
+
+    //boundingRects.push_back(bRect);
+    m_detectedVehicles.push_back(bRect);
+
     // Draw bounding boxes in red
     cv::rectangle(workingImage, bRect, cv::Scalar(0, 0, 255));
+
+    std::ostringstream mySs;
+    mySs << "ID " << i;
+    std::string distText = mySs.str();
+    putText(workingImage, distText.c_str(), cv::Point(bRect.x, bRect.y), 
+        cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar(0, 150, 50));
   }
 
 
   cv::imshow("Final spatial map", spatialMap);
   cv::imshow("Thresholded spatial map", thresholdedImg);
   cv::imshow("CNN Output", workingImage);
+  std::cout << "CNN output width: " << workingImage.cols << std::endl;
 
   cv::waitKey(10);
 
 
-  std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
+  std::chrono::high_resolution_clock::time_point t3 = 
+      std::chrono::high_resolution_clock::now();
 
-  auto duration0 = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
-  auto duration1 = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-  auto duration2 = std::chrono::duration_cast<std::chrono::microseconds>(t3 - t2).count();
+  auto duration0 = 
+      std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+  auto duration1 = 
+      std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+  auto duration2 = 
+      std::chrono::duration_cast<std::chrono::microseconds>(t3 - t2).count();
 
-  std::cout << "Preprocess time:  " <<  ((float)duration0)/1000 << " ms" << std::endl;
-  std::cout << "CNN time:         " <<  ((float)duration1)/1000 << " ms" << std::endl;
-  std::cout << "Postprocess time: " <<  ((float)duration2)/1000 << " ms" << std::endl << std::endl;
+  std::cout << "Preprocess time:  " <<  ((float)duration0)/1000 << " ms" 
+      << std::endl;
+  std::cout << "CNN time:         " <<  ((float)duration1)/1000 << " ms" 
+      << std::endl;
+  std::cout << "Postprocess time: " <<  ((float)duration2)/1000 << " ms" 
+      << std::endl << std::endl;
 }
 
+
+void ConvNeuralNet::GetDetectedVehicles(std::vector<cv::Rect>* container)
+{
+  container->clear();
+  for (uint32_t i=0; i<m_detectedVehicles.size(); i++) {
+    container->push_back(m_detectedVehicles.at(i));
+    // TODO rectangles seem to contain weird values sometimes...
+    //std::cout << "DEBUG: " << i << "      width: " << m_detectedVehicles.at(i).width << std::endl;
+  }
+}
 
 
 
@@ -286,7 +331,8 @@ void ConvNeuralNet::ConvertImageRGB(
   for (int32_t i = 0; i < a_height; i++) { // Go over all rows
     for (int32_t j = 0; j < a_width; j++) { // Go over all columns
       for (int32_t c = 0; c < 3; c++) { // Go through all channels
-        d[a_width*a_height*c + a_width*(i + padding) + (j + padding)] = resized.at<cv::Vec3b>(i, j)[c]/denominator*(max - min) + min;
+        d[a_width*a_height*c + a_width*(i + padding) + (j + padding)] = 
+            resized.at<cv::Vec3b>(i, j)[c]/denominator*(max - min) + min;
       }
     }
   }
