@@ -70,7 +70,7 @@ message opendlv.proxy.ControlState [id = 165] {
 }
 
 message opendlv.proxy.EchoReading [id = 156] {
-  list<opendlv.coordinate.Direction> directions [id = 1];
+  list<opendlv.model.Direction> directions [id = 1];
   list<double> radii [id = 2];
   uint32 numberOfPoints [id = 3];
 }
@@ -138,7 +138,7 @@ message opendlv.sensation.DynamicState [id = 170] {
 }
 
 message opendlv.sensation.BodyPart [id = 170] {
-  opendlv.cartesian.Point3 position [id = 1]; // From body origo to body part center of mass
+  opendlv.model.Cartesian3 position [id = 1]; // From body origo to body part center of mass
   string gemoetryPath [id = 2];
   float width [id = 3];
   float height [id = 4];
@@ -190,9 +190,9 @@ message opendlv.perception.Object [id = 179] {
   odcore::data::TimeStamp identified [id = 1];
   string type [id = 2];
 
-  opendlv.coordinate.Direction direction [id = 3];
+  opendlv.model.Direction direction [id = 3];
   float directionConfidence [id = 4];
-  opendlv.coordinate.Direction directionRate [id = 5];
+  opendlv.model.Direction directionRate [id = 5];
   float directionRateConfidence [id = 6];
 
   float distance [id = 7];
@@ -209,7 +209,7 @@ message opendlv.perception.Object [id = 179] {
 }
 
 message opendlv.perception.ObjectDesiredDirection [id = 180] {
-  opendlv.coordinate.Direction desiredDirection [id = 1];
+  opendlv.model.Direction desiredDirection [id = 1];
   uint16 objectId [id = 2];
 }
 
