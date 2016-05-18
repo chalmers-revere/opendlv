@@ -160,14 +160,14 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
     m_logSteering << m_steeringCorrection << std::endl;
     
     if ( m_brakeCorrection < 0 ) {
-      opendlv::proxy::Actuation actuation(m_brakeCorrection, m_steeringCorrection, true);
+      opendlv::proxy::Actuation actuation(m_brakeCorrection, m_steeringCorrection, false);
       odcore::data::Container actuationContainer(actuation);
       getConference().send(actuationContainer);
       std::cout << "Steering Correction 1: " << m_steeringCorrection << std::endl;
     }
 
     else {
-      opendlv::proxy::Actuation actuation(m_accelerationCorrection, m_steeringCorrection, true);
+      opendlv::proxy::Actuation actuation(m_accelerationCorrection, m_steeringCorrection, false);
       odcore::data::Container actuationContainer(actuation);
       getConference().send(actuationContainer);
       std::cout << "Steering Correction 2: " << m_steeringCorrection << std::endl;

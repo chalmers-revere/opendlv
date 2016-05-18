@@ -29,6 +29,7 @@
  
 #include "opendavinci/odcore/base/KeyValueConfiguration.h"
 #include "opendlv/data/environment/WGS84Coordinate.h"
+#include "opendlv/data/environment/Point3.h"
 
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
@@ -341,6 +342,55 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice &a_reading)
         + "," + std::to_string(yawRateConfidence) +
         + "," + std::to_string(vehicleRole);
         m_receiveLog << std::endl; 
+
+    opendlv::data::environment::WGS84Coordinate currentLocation(
+    m_latitude, opendlv::data::environment::WGS84Coordinate::NORTH,
+    m_longitude, opendlv::data::environment::WGS84Coordinate::EAST);
+
+    opendlv::data::environment::Point3 currentCartesianLocation =
+    gpsReference.transform(currentLocation);
+
+    opendlv::data::environment::WGS84Coordinate currentLocation(
+    latitude, opendlv::data::environment::WGS84Coordinate::NORTH,
+    longitude, opendlv::data::environment::WGS84Coordinate::EAST);
+
+    opendlv::data::environment::Point3 currentObjectCartesianLocation =
+    gpsReference.transform(currentLocation);
+
+    double xOffset = currentCartesianLocation.getX() - currentObjectCartesianLocation.getX();
+    double yOffset = currentCartesianLocation.getY() - currentObjectCartesianLocation.getY();
+    double azimuth;
+
+    if (yOffset == 0){
+      if (xOffset < 0){
+        azimuth = 3.14159;
+      } else {
+        azimuth = 0;
+      }
+    } else if (xOffset == 0){
+      if (yOffset < 0){
+        azimuth = -3.14159 / 2;
+      } else {
+        azimuth = 3.14159 / 2;;
+      }
+    } else {
+      azimuth = atan(xOffset/yOffset);
+    }
+
+    double distance = sqrt((xOffset * xOffset) + (yOffset * yOffset));
+
+    opendlv::model::direction objectDirection(azimuth, 0);
+
+    std::vector<std::string> properties;
+    properties.push_back("Station Id: " + std::to_string(stationId));
+    properties.push_back("Vehicle length: " + std::to_string(vehicleLength));
+    properties.push_back("Vehicle width: " + std::to_string(vehicleWidth));
+    
+    opendlv::perception::Object detectedObject("", "vehicle", objectDirection, 1, -1, -1, distance, 1, -1, -1, -1, -1, properties, -1 );
+    odcore::data::Container objectContainer(detectedObject);
+    getConference().send(objectContainer);
+
+
 
   } else {
     std::cout << "Message type not CAM." << std::endl;
