@@ -55,56 +55,34 @@ Scene::~Scene()
 void Scene::nextContainer(odcore::data::Container &a_container)
 {
 
-	  if(c.getDataType() == opendlv::perception::Object::ID()) {
+  if(a_container.getDataType() == opendlv::perception::Object::ID()) {
     opendlv::perception::Object unpackedObject =
     a_container.getData<opendlv::perception::Object>();
 
     m_ID = unpackedObject.getObjectId();
 
-    if (m_ID == -1) {
+    if (m_ID != -1) {
+    	return;    	
+    } else {    	
     	m_timeStamp = unpackedObject.getIdentified();
     	m_type = unpackedObject.getDataType();
     	m_direction = unpackedObject.getDirection();
     	m_azimuth = m_direction.getAzimuth();
     	m_directionConfidence = unpackedObject.getDirectionConfidence();
-    	m_
-
-    	
+    	m_directionRate = unpackedObject.getDirectionRate();
+    	m_directionRateConfidence = unpackedObject.getDirectionRateConfidence();
+    	m_distance = unpackedObject.getDistance();
+    	m_distanceConfidence = unpackedObject.getDistanceConfidence();
+    	m_angularSize = unpackedObject.getAngularSize();
+    	m_angularSizeConfidence = unpackedObject.getAngularSizeConfidence();
+    	m_angularSizeRate = unpackedObject.getAngularSizeRate();
+    	m_angularSizeRateConfidence = unpackedObject.getAngularSizeRateConfidence();
     }
-
   }
 
 
 
 
-
-
-
-
-
-
-
-
-  message opendlv.perception.Object [id = 179] {
-  odcore::data::TimeStamp identified [id = 1];
-  string type [id = 2];
-
-  opendlv.coordinate.Direction direction [id = 3];
-  float directionConfidence [id = 4];
-  opendlv.coordinate.Direction directionRate [id = 5];
-  float directionRateConfidence [id = 6];
-
-  float distance [id = 7];
-  float distanceConfidence [id = 8];
-
-  float angularSize [id = 9];
-  float angularSizeConfidence [id = 10];
-  float angularSizeRate [id = 11];
-  float angularSizeRateConfidence [id = 12];
-
-  list<string> properties [id = 13];
-
-  uint16 objectId [id = 14];
 }
 
 void Scene::setUp()
