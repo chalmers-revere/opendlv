@@ -189,26 +189,27 @@ message opendlv.sensation.DesiredDirectionOfMovement [id = 178] {
 message opendlv.perception.Object [id = 179] {
   odcore::data::TimeStamp identified [id = 1];
   string type [id = 2];
+  float typeConfidence [id = 3];
 
-  opendlv.model.Direction direction [id = 3];
-  float directionConfidence [id = 4];
-  opendlv.model.Direction directionRate [id = 5];
-  float directionRateConfidence [id = 6];
+  opendlv.model.Direction direction [id = 4];
+  float directionConfidence [id = 5];
+  opendlv.model.Direction directionRate [id = 6];
+  float directionRateConfidence [id = 7];
 
-  float distance [id = 7];
-  float distanceConfidence [id = 8];
+  float distance [id = 8];
+  float distanceConfidence [id = 9];
 
-  float angularSize [id = 9];
-  float angularSizeConfidence [id = 10];
-  float angularSizeRate [id = 11];
-  float angularSizeRateConfidence [id = 12];
+  float angularSize [id = 10];
+  float angularSizeConfidence [id = 11];
+  float angularSizeRate [id = 12];
+  float angularSizeRateConfidence [id = 13];
 
-  float confidence [id = 13];
-  uint16 sources [id = 14];
+  float confidence [id = 14];
+  uint16 sources [id = 15];
 
-  list<string> properties [id = 15];
+  list<string> properties [id = 16];
 
-  uint16 objectId [id = 16];
+  uint16 objectId [id = 17];
 }
 
 message opendlv.perception.ObjectDesiredDirection [id = 180] {
