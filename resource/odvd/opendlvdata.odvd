@@ -94,7 +94,7 @@ message opendlv.proxy.GyroscopeReading [id = 158] {
 }
 
 message opendlv.proxy.LedRequest [id = 159] {
-  int numberOfLeds [id = 1];
+  uint8 numberOfLeds [id = 1];
   string data [id = 2];
 }
 
@@ -151,14 +151,14 @@ message opendlv.sensation.BodyPart [id = 170] {
   float roll [id = 1];
   float pitch [id = 2];
   float yaw [id = 3];
-  int partIndex [id = 4];
+  uint8 partIndex [id = 4];
 }
 
   message opendlv.sensation.Balance [id = 172] {
   float rollRate [id = 1];
   float pitchRate [id = 2];
   float yawRate [id = 3];
-  int partIndex [id = 4];
+  uint8 partIndex [id = 4];
 }
 
 message opendlv.sensation.Looming [id = 173] {
