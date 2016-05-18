@@ -70,7 +70,7 @@ message opendlv.proxy.ControlState [id = 165] {
 }
 
 message opendlv.proxy.EchoReading [id = 156] {
-  list<opendlv.coordinate.Direction> directions [id = 1];
+  list<opendlv.model.Direction> directions [id = 1];
   list<double> radii [id = 2];
   uint32 numberOfPoints [id = 3];
 }
@@ -94,7 +94,7 @@ message opendlv.proxy.GyroscopeReading [id = 158] {
 }
 
 message opendlv.proxy.LedRequest [id = 159] {
-  int numberOfLeds [id = 1];
+  uint16 numberOfLeds [id = 1];
   string data [id = 2];
 }
 
@@ -190,9 +190,9 @@ message opendlv.perception.Object [id = 179] {
   odcore::data::TimeStamp identified [id = 1];
   string type [id = 2];
 
-  opendlv.coordinate.Direction direction [id = 3];
+  opendlv.model.Direction direction [id = 3];
   float directionConfidence [id = 4];
-  opendlv.coordinate.Direction directionRate [id = 5];
+  opendlv.model.Direction directionRate [id = 5];
   float directionRateConfidence [id = 6];
 
   float distance [id = 7];
@@ -203,13 +203,16 @@ message opendlv.perception.Object [id = 179] {
   float angularSizeRate [id = 11];
   float angularSizeRateConfidence [id = 12];
 
-  list<string> properties [id = 13];
+  float confidence [id = 13];
+  uint16 sources [id = 14];
 
-  uint16 objectId [id = 14];
+  list<string> properties [id = 15];
+
+  uint16 objectId [id = 16];
 }
 
 message opendlv.perception.ObjectDesiredDirection [id = 180] {
-  opendlv.coordinate.Direction desiredDirection [id = 1];
+  opendlv.model.Direction desiredDirection [id = 1];
   uint16 objectId [id = 2];
 }
 
