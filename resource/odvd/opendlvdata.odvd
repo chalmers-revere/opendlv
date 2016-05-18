@@ -37,24 +37,16 @@ message opendlv.model.State [id = 153] {
   opendlv.model.Cartesian3 position [id = 1];
   opendlv.model.Cartesian3 velocity [id = 2];
   opendlv.model.Cartesian3 acceleration [id = 3];
-  opendlv.model.Cartesian3 angularDisplacement [id = 4];
+  opendlv.model.Cartesian3 angularDisplacement [id = 4]; // TODO: Should we have a quaternion here to avoid internal transformations?
   opendlv.model.Cartesian3 angularVelocity [id = 5];
   opendlv.model.Cartesian3 angularAcceleration [id = 6];
   uint16 frameId [id = 7];
 }
 
-message opendlv.proxy.EchoReading [id = 156] {
-  list<opendlv.coordinate.Direction> directions [id = 1];
-  list<double> radii [id = 2];
-  uint32 numberOfPoints [id = 3];
-}
-
-message opendlv.proxy.CompassReading [id = 157] {
-  float heading[3] [id = 1];
-}
-
-message opendlv.proxy.GyroscopeReading [id = 158] {
-  float orientation[3] [id = 1];
+message opendlv.proxy.ActuationRequest [id = 164] {
+  float acceleration [id = 1];
+  float steering [id = 2];
+  bool isValid [id = 3];
 }
 
 message opendlv.proxy.AccelerometerReading [id = 159] {
@@ -63,6 +55,24 @@ message opendlv.proxy.AccelerometerReading [id = 159] {
 
 message opendlv.proxy.AltimeterReading [id = 160] {
   float altitude [id = 1];
+}
+
+message opendlv.proxy.CompassReading [id = 157] {
+  float heading[3] [id = 1];
+}
+
+message opendlv.proxy.ControlOverrideState [id = 165] {
+  bool isOverridden [id = 1];
+}
+
+message opendlv.proxy.ControlState [id = 165] {
+  bool isAutonomous [id = 1];
+}
+
+message opendlv.proxy.EchoReading [id = 156] {
+  list<opendlv.coordinate.Direction> directions [id = 1];
+  list<double> radii [id = 2];
+  uint32 numberOfPoints [id = 3];
 }
 
 message opendlv.proxy.GpsReading [id = 161] {
@@ -79,6 +89,21 @@ message opendlv.proxy.GpsReading [id = 161] {
   bool hasRtk [id = 11];
 }
 
+message opendlv.proxy.GyroscopeReading [id = 158] {
+  float orientation[3] [id = 1];
+}
+
+message opendlv.proxy.LedRequest [id = 159] {
+  int numberOfLeds [id = 1];
+  string dataRedChannel [id = 2];
+  string dataGreenChannel [id = 3];
+  string dataBlueChannel [id = 4];
+}
+
+message opendlv.proxy.ToggleRequest [id = 159] {
+  list<bool> toggleValues [id = 1];
+}
+
 message opendlv.proxy.V2vReading [id = 162] {
   uint32 size [id = 1];
   string data [id = 2];
@@ -89,16 +114,9 @@ message opendlv.proxy.V2vRequest [id = 163] {
   string data [id = 2];
 }
 
-message opendlv.proxy.ActuationRequest [id = 164] {
-  float acceleration [id = 1];
-  float steering [id = 2];
-  bool isValid [id = 3];
-}
 
-message opendlv.proxy.ControlState [id = 165] {
-  bool allowAutonomous [id = 1];
-  bool isOverridden [id = 2];
-}
+
+
 
 message opendlv.sensation.Voice [id = 166] {
   string type [id = 1];
