@@ -22,52 +22,50 @@ message opendlv.Constants [id = 150] {
   const double RAD2DEG = 57.295779513082325; // 1.0 / DEG2RAD;
 }
 
-  message opendlv.coordinate.Cartesian3 [id = 151] {
+message opendlv.model.Cartesian3 [id = 151] {
   float x [id = 1];
   float y [id = 2];
   float z [id = 3];
 }
 
-message opendlv.coordinate.Direction [id = 152] {
-  float azinuth [id = 1];
+message opendlv.model.Direction [id = 152] {
+  float azimuth [id = 1];
   float zenith [id = 2];
 }
 
-  message opendlv.coordinate.Quaternion3 [id = 153] {
-  float x [id = 1];
-  float y [id = 2];
-  float z [id = 3];
-  float w [id = 4];
+message opendlv.model.State [id = 153] {
+  opendlv.model.Cartesian3 position [id = 1];
+  opendlv.model.Cartesian3 velocity [id = 2];
+  opendlv.model.Cartesian3 acceleration [id = 3];
+  opendlv.model.Cartesian3 angularDisplacement [id = 4];
+  opendlv.model.Cartesian3 angularVelocity [id = 5];
+  opendlv.model.Cartesian3 angularAcceleration [id = 6];
+  uint16 frameId [id = 7];
 }
 
-  message opendlv.coordinate.Pose [id = 154] {
-  opendlv.coordinate.Cartesian3 position [id = 1];
-  opendlv.coordinate.Quaternion3 orientation [id = 2];
-}
-
-message opendlv.proxy.Echo [id = 156] {
+message opendlv.proxy.EchoReading [id = 156] {
   list<opendlv.coordinate.Direction> directions [id = 1];
   list<double> radii [id = 2];
   uint32 numberOfPoints [id = 3];
 }
 
-message opendlv.proxy.Compass [id = 157] {
+message opendlv.proxy.CompassReading [id = 157] {
   float heading[3] [id = 1];
 }
 
-message opendlv.proxy.Gyroscope [id = 158] {
+message opendlv.proxy.GyroscopeReading [id = 158] {
   float orientation[3] [id = 1];
 }
 
-message opendlv.proxy.Accelerometer [id = 159] {
+message opendlv.proxy.AccelerometerReading [id = 159] {
   float acceleration[3] [id = 1];
 }
 
-message opendlv.proxy.Altimeter [id = 160] {
+message opendlv.proxy.AltimeterReading [id = 160] {
   float altitude [id = 1];
 }
 
-message opendlv.proxy.Gps [id = 161] {
+message opendlv.proxy.GpsReading [id = 161] {
   double timestamp [id = 1];
   double latitude [id = 2];
   double longitude [id = 3];
@@ -81,28 +79,25 @@ message opendlv.proxy.Gps [id = 161] {
   bool hasRtk [id = 11];
 }
 
-message opendlv.proxy.V2vInbound [id = 162] {
+message opendlv.proxy.V2vReading [id = 162] {
   uint32 size [id = 1];
   string data [id = 2];
 }
 
-message opendlv.proxy.V2vOutbound [id = 163] {
+message opendlv.proxy.V2vRequest [id = 163] {
   uint32 size [id = 1];
   string data [id = 2];
 }
 
-message opendlv.proxy.Actuation [id = 164] {
+message opendlv.proxy.ActuationRequest [id = 164] {
   float acceleration [id = 1];
   float steering [id = 2];
   bool isValid [id = 3];
 }
 
-message opendlv.proxy.ControlOverride [id = 165] {
-  bool isOverridden [id = 1];
-}
-
 message opendlv.proxy.ControlState [id = 165] {
   bool allowAutonomous [id = 1];
+  bool isOverridden [id = 2];
 }
 
 message opendlv.sensation.Voice [id = 166] {
@@ -178,46 +173,33 @@ message opendlv.sensation.DesiredDirectionOfMovement [id = 178] {
 message opendlv.perception.Object [id = 179] {
   odcore::data::TimeStamp identified [id = 1];
   string type [id = 2];
-  float azimuth [id = 3];
-  float zenith [id = 4];
-  uint16 objectId [id = 5];
+
+  opendlv.coordinate.Direction direction [id = 3];
+  float directionConfidence [id = 4];
+  opendlv.coordinate.Direction directionRate [id = 5];
+  float directionRateConfidence [id = 6];
+
+  float distance [id = 7];
+  float distanceConfidence [id = 8];
+
+  float angularSize [id = 9];
+  float angularSizeConfidence [id = 10];
+  float angularSizeRate [id = 11];
+  float angularSizeRateConfidence [id = 12];
+
+  list<string> properties [id = 13];
+
+  uint16 objectId [id = 14];
 }
 
 message opendlv.perception.ObjectDesiredDirection [id = 180] {
-  float desiredAngle [id = 1];
+  opendlv.coordinate.Direction desiredDirection [id = 1];
   uint16 objectId [id = 2];
 }
 
-message opendlv.perception.ObjectDesiredSize [id = 181] {
-  float desiredSize [id = 1];
+message opendlv.perception.ObjectDesiredAngularSize [id = 181] {
+  float desiredAngularSize [id = 1];
   uint16 objectId [id = 2];
-}
-
-message opendlv.perception.ObjectLooming [id = 182] {
-  odcore::data::TimeStamp identified [id = 1];
-  float looming [id = 2];
-  uint16 objectId [id = 3];
-}
-
-message opendlv.perception.ObjectMetricDistance [id = 184] {
-  odcore::data::TimeStamp identified [id = 1];
-  float distance [id = 2];
-  float distanceConfidence [id = 3];
-  uint16 objectId [id = 4];
-}
-
-message opendlv.perception.ObjectProperty [id = 183] {
-  odcore::data::TimeStamp identified [id = 1];
-  string name [id = 2];
-  string value [id = 3];
-  uint16 objectId [id = 4];
-}
-
-message opendlv.perception.ObjectSize [id = 184] {
-  odcore::data::TimeStamp identified [id = 1];
-  float size [id = 2];
-  float sizeConfidence [id = 3];
-  uint16 objectId [id = 4];
 }
 
 message opendlv.knowledge.Message [id = 185] {
