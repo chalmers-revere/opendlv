@@ -70,6 +70,7 @@ void Scene::nextContainer(odcore::data::Container &a_container)
     	m_azimuth = m_direction.getAzimuth();
     	m_directionConfidence = unpackedObject.getDirectionConfidence();
     	m_directionRate = unpackedObject.getDirectionRate();
+    	m_directionRateAzimuth = m_directionRate.getAzimuth();
     	m_directionRateConfidence = unpackedObject.getDirectionRateConfidence();
     	m_distance = unpackedObject.getDistance();
     	m_distanceConfidence = unpackedObject.getDistanceConfidence();
@@ -77,6 +78,9 @@ void Scene::nextContainer(odcore::data::Container &a_container)
     	m_angularSizeConfidence = unpackedObject.getAngularSizeConfidence();
     	m_angularSizeRate = unpackedObject.getAngularSizeRate();
     	m_angularSizeRateConfidence = unpackedObject.getAngularSizeRateConfidence();
+    	m_confidence = unpackedObject.getConfidence();
+    	m_sources = unpackedObject.getSources();
+    	m_properties = unpackedObject.getProperties();
     }
   }
 

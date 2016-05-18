@@ -387,7 +387,7 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice &a_reading)
     properties.push_back("Vehicle length: " + std::to_string(vehicleLength));
     properties.push_back("Vehicle width: " + std::to_string(vehicleWidth));
     
-    opendlv::perception::Object detectedObject("", "vehicle", objectDirection, 1, objectDirectionRate, -1, distance, 1, -1, -1, -1, -1, properties, -1 );
+    opendlv::perception::Object detectedObject("", "vehicle", objectDirection, 0.5, objectDirectionRate, -1, distance, 0.5, -1, -1, -1, -1, 1, 1, properties, -1 );
     odcore::data::Container objectContainer(detectedObject);
     getConference().send(objectContainer);
 
