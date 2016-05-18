@@ -95,13 +95,11 @@ message opendlv.proxy.GyroscopeReading [id = 158] {
 
 message opendlv.proxy.LedRequest [id = 159] {
   int numberOfLeds [id = 1];
-  string dataRedChannel [id = 2];
-  string dataGreenChannel [id = 3];
-  string dataBlueChannel [id = 4];
+  string data [id = 2];
 }
 
-message opendlv.proxy.ToggleRequest [id = 159] {
-  list<bool> toggleValues [id = 1];
+message opendlv.proxy.RelayRequest [id = 159] {
+  list<bool> relayState [id = 1];
 }
 
 message opendlv.proxy.V2vReading [id = 162] {
@@ -114,32 +112,32 @@ message opendlv.proxy.V2vRequest [id = 163] {
   string data [id = 2];
 }
 
-
-
-
-
 message opendlv.sensation.Voice [id = 166] {
   string type [id = 1];
   uint32 size [id = 2];
   string data [id = 3];
 }
 
-  message opendlv.sensation.Geolocation [id = 169] {
+message opendlv.sensation.Geolocation [id = 169] {
   double latitude [id = 1];
-  double longitude [id = 2];
-  double positionConfidence [id = 3];
-  double altitude [id = 4];
-  double heading [id = 5];
-  double headingConfidence [id = 6];
-  double speed [id = 7];
-  double speedConfidence [id = 8];
-  double yawRate [id = 9];
-  double yawRateConfidence [id = 10];
-  double longitudinalAcceleration [id = 11];
-  double longitudinalAccelerationConfidence [id=12]; 
+  float latitudeConfidence [id = 2];
+  double longitude [id = 3];
+  float longitudeConfidence [id = 4];
+  float altitude [id = 5];
+  float heading [id = 6];
+  float headingConfidence [id = 7];
 }
 
-  message opendlv.sensation.BodyPart [id = 170] {
+message opendlv.sensation.DynamicState [id = 170] {
+ // double speed [id = 7];
+ // double speedConfidence [id = 8];
+ // double yawRate [id = 9];
+ // double yawRateConfidence [id = 10];
+ // double longitudinalAcceleration [id = 11];
+ // double longitudinalAccelerationConfidence [id=12]; 
+}
+
+message opendlv.sensation.BodyPart [id = 170] {
   opendlv.cartesian.Point3 position [id = 1]; // From body origo to body part center of mass
   string gemoetryPath [id = 2];
   float width [id = 3];
