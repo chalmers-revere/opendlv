@@ -49,7 +49,7 @@ message opendlv.proxy.ActuationRequest [id = 164] {
   bool isValid [id = 3];
 }
 
-message opendlv.proxy.AccelerometerReading [id = 159] {
+message opendlv.proxy.AccelerometerReading [id = 204] { // duplicated ID, was 159!
   float acceleration[3] [id = 1];
 }
 
@@ -61,7 +61,7 @@ message opendlv.proxy.CompassReading [id = 157] {
   float heading[3] [id = 1];
 }
 
-message opendlv.proxy.ControlOverrideState [id = 165] {
+message opendlv.proxy.ControlOverrideState [id = 202] { // duplicated ID, was 202!
   bool isOverridden [id = 1];
 }
 
@@ -98,7 +98,7 @@ message opendlv.proxy.LedRequest [id = 159] {
   string data [id = 2];
 }
 
-message opendlv.proxy.RelayRequest [id = 159] {
+message opendlv.proxy.RelayRequest [id = 203] { // duplicated ID, was 159!
   list<bool> relayState [id = 1];
 }
 
@@ -128,7 +128,7 @@ message opendlv.sensation.Geolocation [id = 169] {
   float headingConfidence [id = 7];
 }
 
-message opendlv.sensation.DynamicState [id = 170] {
+message opendlv.sensation.DynamicState [id = 201] { // duplicated ID, was 170!
  // double speed [id = 7];
  // double speedConfidence [id = 8];
  // double yawRate [id = 9];
@@ -290,3 +290,6 @@ message opendlv.proxy.reverefh16.Steering [id = 199] {
     double steeringwheelangle [id = 2];
 }
 
+message opendlv.system.diagnostics.HealthStatus [id = 200] {
+    map<string,string> status [id = 1];
+}
