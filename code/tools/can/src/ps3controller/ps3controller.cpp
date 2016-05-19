@@ -189,9 +189,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode PS3Controller::body()
   const double RANGE_ACCELERATION_MIN = 0; // acceleration can be between 0%...
   const double RANGE_ACCELERATION_MAX = 50; // ...and 50% 
   const double RANGE_DECELERATION_MIN = 0; // deceleration can be between 0 m/s^2...
-  const double RANGE_DECELERATION_MAX = -10; // ...and -6 m/s^2
-  const double RANGE_ROTATION_MIN = -10; // the torque can be between -20 Nm...
-  const double RANGE_ROTATION_MAX = 10; // ...and 20 Nm
+  const double RANGE_DECELERATION_MAX = -10; // ...and -10 m/s^2
+  const double RANGE_ROTATION_MIN = -10; // the torque can be between -10 Nm...
+  const double RANGE_ROTATION_MAX = 10; // ...and 10 Nm
   
   double acceleration = 0;
   double deceleration = 0;
@@ -271,7 +271,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode PS3Controller::body()
                 }
                 // no else-if as many of these events can occur simultaneously
                 if(js.number==17){ // CIRCLE BUTTON AXIS
-                    CLOG2 << "Axis number " << (int)js.number << " with value " << (int)js.value << " (X BUTTON AXIS)"<<endl;
+                    CLOG2 << "Axis number " << (int)js.number << " with value " << (int)js.value << " (CIRCLE BUTTON AXIS)"<<endl;
                     
                     // sends a false flagged steering packet
                     {
