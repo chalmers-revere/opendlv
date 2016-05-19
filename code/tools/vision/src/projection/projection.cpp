@@ -474,10 +474,11 @@ void Projection::Save()
     //     Eigen::DontAlignCols, ", ", "\n");
     const static Eigen::IOFormat saveFormat(Eigen::StreamPrecision,
         Eigen::DontAlignCols, " ", " ", "", "", "", "");
+    
     struct stat st;
     if (::stat(m_path.c_str(), &st) == -1) {
       ::system(("mkdir -p " + m_path).c_str());
-      // std::cout<<"Created dir"<<std::endl;
+      std::cout<<"Created dir"<<std::endl;
     }
 
     std::ofstream file(m_path + "/" + projectionMatrixFileName );

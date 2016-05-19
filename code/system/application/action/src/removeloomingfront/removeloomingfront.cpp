@@ -55,8 +55,9 @@
  * Sends halt command (brake) or in rare cases a world rotation (steer) command
  * to Act.
  */
- void RemoveLoomingFront::nextContainer(odcore::data::Container &c)
+ void RemoveLoomingFront::nextContainer(odcore::data::Container &)
  {
+   /*
    if(c.getDataType() == opendlv::perception::Object::ID()){
     opendlv::perception::Object m_object = c.getData<opendlv::perception::Object>();
     float m_size = m_object.getSize();
@@ -79,6 +80,7 @@
       std::cout<< "Braking!: " << m_size << std::endl<<std::endl;
     }
   }
+  */
 }
 
 void RemoveLoomingFront::setUp()

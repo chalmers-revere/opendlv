@@ -51,19 +51,20 @@ void CanMessageDataStore::add(odcore::data::Container const &a_container)
     opendlv::proxy::ControlState controlState
       = container.getData<opendlv::proxy::ControlState>();
 
-    m_enabled = controlState.getAllowAutonomous();
+    m_enabled = controlState.getIsAutonomous();
 
-  } else if (container.getDataType() == opendlv::proxy::Actuation::ID()){
-    opendlv::proxy::Actuation actuation 
-      = container.getData<opendlv::proxy::Actuation>();
+  } else if (container.getDataType() 
+      == opendlv::proxy::ActuationRequest::ID()) {
+    opendlv::proxy::ActuationRequest actuationRequest 
+      = container.getData<opendlv::proxy::ActuationRequest>();
 
-    bool isValid = actuation.getIsValid();
+    bool isValid = actuationRequest.getIsValid();
     if (!isValid) {
       return;
     }
 
-    float acceleration = actuation.getAcceleration();
-    float steering = actuation.getSteering();
+    float acceleration = actuationRequest.getAcceleration();
+    float steering = actuationRequest.getSteering();
 
     if (acceleration < 0.0f) {
       opendlv::proxy::reverefh16::BrakeRequest brakeRequest;

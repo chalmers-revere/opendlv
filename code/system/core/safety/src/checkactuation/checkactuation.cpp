@@ -60,19 +60,19 @@ void CheckActuation::tearDown()
 
 void CheckActuation::nextContainer(odcore::data::Container &a_container)
 {
-  if (a_container.getDataType() == opendlv::proxy::Actuation::ID()){
-    opendlv::proxy::Actuation actuation 
-        = a_container.getData<opendlv::proxy::Actuation>();
-    float acceleration = actuation.getAcceleration();
+  if (a_container.getDataType() == opendlv::proxy::ActuationRequest::ID()){
+    opendlv::proxy::ActuationRequest actuationRequest 
+        = a_container.getData<opendlv::proxy::ActuationRequest>();
+    float acceleration = actuationRequest.getAcceleration();
 
     if (acceleration < -m_maxAllowedDeceleration) {
       acceleration = -m_maxAllowedDeceleration;
-      actuation.setAcceleration(acceleration);
+      actuationRequest.setAcceleration(acceleration);
     }
 
-    actuation.setIsValid(true);
+    actuationRequest.setIsValid(true);
     
-    odcore::data::Container c(actuation);
+    odcore::data::Container c(actuationRequest);
     getConference().send(c);
   }
 }
