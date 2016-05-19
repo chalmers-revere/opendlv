@@ -28,7 +28,6 @@
 #include "opendavinci/odcore/data/TimeStamp.h"
 
 #include "opendlv/data/environment/Point3.h"
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 #include "geolocation/geolocation.hpp"
 
@@ -65,10 +64,12 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
   double timestamp = 0.0;
 
   Control<double> control;
-  State<double> state;
+
   SystemModel<double> systemModel;
 
-  state.setZero();
+   State<double> state;
+   state.setZero();
+  m_ekf.init(state);
 
   KinematicObservationModel<double> kinematicObservationModel(
       0.0, 0.0,  0.0, 0.0);
@@ -210,6 +211,13 @@ std::cout << "\n\n the vehicle speed is : " << gpsReading.getSpeed() << endl;
       bool gpsHasData = false;
       if (gpsReadingContainer.getReceivedTimeStamp().toMicroseconds() >
           previousDataTimestamp.toMicroseconds()) {
+
+          std::cout << "observation vector "
+                    << observationVector.Z_x() << " "
+                    << observationVector.Z_y() << " "
+                    << observationVector.Z_theta() << " "
+                    << observationVector.Z_theta_dot() << " "
+                    << endl;
         state = m_ekf.update(kinematicObservationModel, observationVector);
         previousDataTimestamp = gpsReadingContainer.getReceivedTimeStamp();
         gpsHasData = true;
@@ -223,6 +231,9 @@ std::cout << "\n\n the vehicle speed is : " << gpsReading.getSpeed() << endl;
         state.y() << ", theta = " << state.theta() << std::endl;
 
 
+//     std::cout << "covariance matrix  Kalman : \n " << m_ekf.getCovariance() << "\n" << std::endl;
+//       std::cout << "covariance matrix  systemModel : \n " << systemModel.getCovariance()<< "\n" << std::endl;
+//       std::cout << "covariance matrix  kinematicObservationModel : \n " << kinematicObservationModel.getCovariance()<< "\n" << std::endl;
 
 //TODO: convert here x and y to get the position of the rear axle
       opendlv::data::environment::WGS84Coordinate currentWGS84CoordinateEstimation;
@@ -239,7 +250,9 @@ std::cout << "\n\n the vehicle speed is : " << gpsReading.getSpeed() << endl;
       else
       {
        currentWGS84CoordinateEstimation = currentLocation;
-       cout << "NAN - sending gps data instead";
+       std::cout << "NAN - sending gps data instead"<<std::endl;
+       filterReset( currentCartesianLocation, gpsReading);
+       state = m_ekf.getState();
       }
 
       double heading = 0;
@@ -373,6 +386,24 @@ double Geolocation::calculateSpeedConfidence()
 return 0.0; // if information is not available
 }
 
+
+void Geolocation::filterReset(opendlv::data::environment::Point3 a_currentCartesianLocation,
+                              opendlv::proxy::GpsReading a_currentWGS84Location )
+{
+
+
+State<double> state;
+state <<  a_currentCartesianLocation.getX(),
+          0.0, //a_currentWGS84Location.getSpeed() * std::cos (a_currentWGS84Location.getNorthHeading()),
+          a_currentCartesianLocation.getY(),
+          0.0, //a_currentWGS84Location.getSpeed() * std::sin (a_currentWGS84Location.getNorthHeading()),
+          a_currentWGS84Location.getNorthHeading(),
+          0.0, //(a_currentWGS84Location.getSpeed() / 3.4 ) * std::tan(a_currentWGS84Location.getNorthHeading());
+
+m_ekf.init(state);
+m_ekf.setCovariance(Eigen::Matrix<double, 6, 6>::Identity());
+
+}
 
 } // geolocation
 } // sensation
