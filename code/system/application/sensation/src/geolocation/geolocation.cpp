@@ -295,7 +295,7 @@ std::cout << " the vehicle speed is : " << gpsReading.getSpeed() << endl;
       getConference().send(msg);
 
       //save data to file
-      bool   saveToFile = true;
+      bool   saveToFile = false;
       if (  saveToFile){
       fout_ekfState
           << std::setprecision(19) << timestamp << " "

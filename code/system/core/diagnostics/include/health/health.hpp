@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 Chalmers REVERE
+ * Copyright (C) 2016 Christian Berger
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,41 +17,39 @@
  * USA.
  */
 
-#ifndef SETOPTICALROTATION_SETOPTICALROTATION_HPP_
-#define SETOPTICALROTATION_SETOPTICALROTATION_HPP_
+#ifndef DIAGNOSTICS_HEALTH_HPP_
+#define DIAGNOSTICS_HEALTH_HPP_
 
-#include <memory>
-#include <fstream>
+#include <string>
 
-#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
-#include "opendavinci/odcore/data/Container.h"
+#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 
 namespace opendlv {
-namespace action {
-namespace setopticalrotation {
+namespace diagnostics {
+namespace health {
 
 /**
- * This class provides...
+ * This class regularly checks system health.
  */
-class SetOpticalRotation
-: public odcore::base::module::DataTriggeredConferenceClientModule {
+class Health : public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
-  SetOpticalRotation(int32_t const &, char **);
-  SetOpticalRotation(SetOpticalRotation const &) = delete;
-  SetOpticalRotation &operator=(SetOpticalRotation const &) = delete;
-  virtual ~SetOpticalRotation();
-  virtual void nextContainer(odcore::data::Container &);
-
+  Health(int32_t const &, char **);
+  Health(Health const &) = delete;
+  Health &operator=(Health const &) = delete;
+  virtual ~Health();
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
  private:
   void setUp();
   void tearDown();
 
-  std::ofstream m_logRotation;
+ private:
+  std::string m_healthScript;
+  int32_t m_sleep;
 };
 
-} // setopticalrotation
-} // action
+} // health
+} // diagnostics
 } // opendlv
 
 #endif

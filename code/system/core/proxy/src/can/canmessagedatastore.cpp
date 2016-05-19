@@ -99,7 +99,7 @@ void CanMessageDataStore::add(odcore::data::Container const &a_container)
     // Must be -33.535 to disable deltatorque.
     steeringRequest.setSteeringDeltaTorque(33.535); 
     odcore::data::Container steeringRequestContainer(steeringRequest);
-
+    
     canmapping::opendlv::proxy::reverefh16::SteeringRequest 
         steeringRequestMapping;
     automotive::GenericCANMessage genericCanMessage 

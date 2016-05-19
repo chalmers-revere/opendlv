@@ -21,6 +21,7 @@
 #define ACT_ACT_HPP_
 
 #include <memory>
+ #include <fstream>
 
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
@@ -44,15 +45,24 @@ class Act : public odcore::base::module::TimeTriggeredConferenceClientModule {
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
   void setUp();
   void tearDown();
-  void timeCheck(std::vector<odcore::data::TimeStamp> &, std::vector<float> &, uint32_t &);
-  int inhibitoryCheck(bool, std::vector<odcore::data::TimeStamp> &, std::vector<float> &, uint32_t &);
+  void timeCheck(std::vector<odcore::data::TimeStamp> &, std::vector<float> &);
+  void inhibitoryCheck(bool, std::vector<odcore::data::TimeStamp> &, std::vector<float> &);
 
   float m_accelerationCorrection;
-  float m_breakingCorrection;
+  float m_brakeCorrection;
   float m_steeringCorrection;
-  uint32_t counterAccelerate;
-  uint32_t counterBrake;
-  uint32_t counterSteering;
+  std::vector<odcore::data::TimeStamp> m_startTimeVectorAccelerate;
+  std::vector<odcore::data::TimeStamp> m_startTimeVectorBrake;
+  std::vector<odcore::data::TimeStamp> m_startTimeVectorSteering;
+  std::vector<float> m_amplitudeVectorAccelerate;
+  std::vector<float> m_amplitudeVectorBrake;
+  std::vector<float> m_amplitudeVectorSteering;
+  bool m_isInhibitory;
+  float m_amplitude;
+  odcore::data::TimeStamp m_t0;
+  std::string m_type;
+  std::ofstream m_logSteering;
+
 };
 
 } // act
