@@ -59,7 +59,7 @@ void Communicate::nextContainer(odcore::data::Container &c)
     opendlv::knowledge::Message message = 
         c.getData<opendlv::knowledge::Message>();
 
-    opendlv::proxy::V2vOutbound nextMessage(message.getSize(),message.getData());
+    opendlv::proxy::V2vRequest nextMessage(message.getSize(),message.getData());
 
     odcore::data::Container containerToSend(nextMessage);
     getConference().send(containerToSend);
