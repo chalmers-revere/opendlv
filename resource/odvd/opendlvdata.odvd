@@ -141,27 +141,23 @@ message opendlv.sensation.Geolocation [id = 176] {
 
 message opendlv.sensation.Looming [id = 177] {
   uint16 numberOfPoints [id = 1];
-  list<float> azimuth [id = 2];
-  list<float> zenith [id = 3];
+  list<opendlv.model.Direction> directions [id = 2];
   list<float> expansion [id = 4];
 }
 
 message opendlv.sensation.OpticalFlow [id = 178] {
   uint16 numberOfPoints [id = 1];
-  list<float> azimuth [id = 2];
-  list<float> zenith [id = 3];
-  list<float> u [id = 4];
-  list<float> v [id = 5];
+  list<opendlv.model.Direction> directions [id = 2];
+  list<float> u [id = 3];
+  list<float> v [id = 4];
 }
 
 message opendlv.sensation.DirectionOfMovement [id = 179] {
-  float azimuth [id = 1];
-  float zenith [id = 2];
+  opendlv.model.Direction direction [id = 1];
 }
 
 message opendlv.sensation.DesiredDirectionOfMovement [id = 180] {
-  float azimuth [id = 1];
-  float zenith [id = 2];
+  opendlv.model.Direction direction [id = 1];
 }
 
 message opendlv.perception.Object [id = 181] {
