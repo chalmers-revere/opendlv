@@ -58,9 +58,9 @@ void LaneKeeping::tearDown()
 
 void LaneKeeping::nextContainer(odcore::data::Container &a_c)
 {
-  if(a_c.getDataType() == opendlv::proxy::Actuation::ID()){
-    auto actuation = a_c.getData<opendlv::proxy::Actuation>();
-    m_steering = actuation.getSteering();
+  if(a_c.getDataType() == opendlv::proxy::ActuationRequest::ID()){
+    auto actuationRequest = a_c.getData<opendlv::proxy::ActuationRequest>();
+    m_steering = actuationRequest.getSteering();
   }
 }
 
@@ -85,11 +85,13 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LaneKeeping::body()
     double heading = m_vehicle->GetHeading();
 
     std::cout << "Heading: " << heading << std::endl;
-    std::cout << "Heading (degrees): " << (heading*57.295779513) << std::endl;
+    std::cout << "Heading (degrees): " << (heading * 57.295779513) << std::endl;
+    std::cout << "Lateral position: " << lateralPosition << std::endl;
 
-    opendlv::perception::LanePosition lanePosition(lateralPosition, heading);
-    odcore::data::Container msg(lanePosition);  
-    getConference().send(msg);
+// TODO: Use Surface instead.
+//    opendlv::perception::LanePosition lanePosition(lateralPosition, heading);
+//    odcore::data::Container msg(lanePosition);  
+//    getConference().send(msg);
   }
 
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
