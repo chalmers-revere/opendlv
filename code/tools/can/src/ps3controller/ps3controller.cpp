@@ -185,7 +185,14 @@ const automotive::GenericCANMessage &gcm)
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode PS3Controller::body()
 {
-  //const double MAX_RANGE = 32768.0;
+  /* Lessons learned from live test:
+   * - Activating the program takes exclusive control of acceleration 
+   * (no manual override, unless the Emergency switch is pressed)
+   * - Care must be taken when activating the brakes, since braking too much 
+   * is *very* uncomfortable -and potentially dangerous-, on the other hand a 
+   * smaller maximum value for the deceleration could be dangerous as well, since it
+   * could impair the possiblity to perform an emergency brake while using the controller.
+   */
   const double RANGE_ACCELERATION_MIN = 0; // acceleration can be between 0%...
   const double RANGE_ACCELERATION_MAX = 50; // ...and 50% 
   const double RANGE_DECELERATION_MIN = 0; // deceleration can be between 0 m/s^2...
