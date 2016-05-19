@@ -33,7 +33,6 @@ message opendlv.model.Direction [id = 152] {
   float zenith [id = 2];
 }
 
-// TODO: Should we have a quaternion here to avoid internal transformations?
 message opendlv.model.State [id = 153] {
   opendlv.model.Cartesian3 position [id = 1];
   opendlv.model.Cartesian3 angularDisplacement [id = 2];
@@ -188,7 +187,7 @@ message opendlv.perception.Object [id = 181] {
 
   list<string> properties [id = 16];
 
-  uint16 objectId [id = 17];
+  uint16 id [id = 17];
 }
 
 message opendlv.perception.ObjectDesiredDirection [id = 182] {
@@ -201,12 +200,33 @@ message opendlv.perception.ObjectDesiredAngularSize [id = 183] {
   uint16 objectId [id = 2];
 }
 
-message opendlv.knowledge.Message [id = 184] {
+message opendlv.perception.Surface [id = 184] {
+  odcore::data::TimeStamp identified [id = 1];
+  string type [id = 2];
+  float typeConfidence [id = 3];
+
+  list<opendlv.model.Cartesian3> edges [id = 4];
+  float edgesConfidence [id = 5];
+
+  bool traversable [id = 6];
+
+  float confidence [id = 7];
+  uint16 sources [id = 8];
+
+  list<string> properties [id = 9];
+
+  uint16 id [id = 10];
+
+  list<uint16> connectedWith [id = 11];
+  list<uint16> traversableTo [id = 12];
+}
+
+message opendlv.knowledge.Message [id = 185] {
   uint32 size [id = 1];
   string data [id = 2];
 }
 
-message opendlv.action.Correction [id = 185] {
+message opendlv.action.Correction [id = 186] {
   odcore::data::TimeStamp startTime [id = 1];
   string type [id = 2];
   bool isInhibitory [id = 3];
