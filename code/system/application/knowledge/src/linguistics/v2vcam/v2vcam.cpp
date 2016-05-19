@@ -357,40 +357,50 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice &a_reading)
     opendlv::data::environment::Point3 currentObjectCartesianLocation =
     gpsReference.transform(currentLocation);
 
-    double xOffset = currentCartesianLocation.getX() - currentObjectCartesianLocation.getX();
-    double yOffset = currentCartesianLocation.getY() - currentObjectCartesianLocation.getY();
-    double azimuth;
+    double m_xOffset = currentCartesianLocation.getX() - currentObjectCartesianLocation.getX();
+    double m_yOffset = currentCartesianLocation.getY() - currentObjectCartesianLocation.getY();
+    double m_azimuth;
 
-    if (yOffset == 0){
-      if (xOffset < 0){
-        azimuth = 3.14159;
+    if (m_yOffset == 0){
+      if (m_xOffset < 0){
+        m_azimuth = 3.14159;
       } else {
-        azimuth = 0;
+        m_azimuth = 0;
       }
-    } else if (xOffset == 0){
-      if (yOffset < 0){
-        azimuth = -3.14159 / 2.0;
+    } else if (m_xOffset == 0){
+      if (m_yOffset < 0){
+        m_azimuth = -3.14159 / 2.0;
       } else {
-        azimuth = 3.14159 / 2.0;
+        m_azimuth = 3.14159 / 2.0;
       }
     } else {
-      azimuth = std::atan(xOffset/yOffset);
+      m_azimuth = std::atan(xOffset/yOffset);
     }
 
-    double distance = std::sqrt((xOffset * xOffset) + (yOffset * yOffset));
-
-    opendlv::model::direction objectDirection(azimuth, 0.0);
-    opendlv::model::direction objectDirectionRate(-1, -1);
-
-    std::vector<std::string> properties;
-    properties.push_back("Station Id: " + std::to_string(stationId));
-    properties.push_back("Vehicle length: " + std::to_string(vehicleLength));
-    properties.push_back("Vehicle width: " + std::to_string(vehicleWidth));
+    std::string m_type = "vehicle";
+    float m_typeConfidence = 1.0f;
+    opendlv::model::direction m_objectDirection(m_azimuth, 0.0);
+    float m_objectDirectionConfidence = 0.5f;
+    opendlv::model::direction m_objectDirectionRate(-1, -1);
+    float m_objectDirectionRateConfidence = -1.0f;
+    double m_distance = std::sqrt((m_xOffset * m_xOffset) + (m_yOffset * m_yOffset));
+    float m_distanceConfidence = 0.5f;
+    float m_angularSize = -1.0f;
+    float m_angularSizeConfidence = -1.0f;
+    float m_angularSizeRate = -1.0f;
+    float m_angularSizeRateConfidence = -1.0f;
+    float m_confidence = 1.0f;
+    uint16_t m_sources = 1;
+    std::vector<std::string> m_properties;
+    m_properties.push_back("Station Id: " + std::to_string(stationId));
+    m_properties.push_back("Vehicle length: " + std::to_string(vehicleLength));
+    m_properties.push_back("Vehicle width: " + std::to_string(vehicleWidth));
+    uint16_t m_objectId = -1;
     
-    opendlv::perception::Object detectedObject("", "vehicle", objectDirection, 0.5, objectDirectionRate, -1, distance, 0.5, -1, -1, -1, -1, 1, 1, properties, -1 );
+    opendlv::perception::Object detectedObject("" m_type, m_typeConfidence, m_objectDirection, m_objectDirectionConfidence, m_objectDirectionRate, m_objectDirectionRateConfidence,
+    m_distance, m_distanceConfidence, m_angularSize, m_angularSizeConfidence, m_angularSizeRate, m_angularSizeRateConfidence, m_confidence, m_sources, m_properties, m_objectId);
     odcore::data::Container objectContainer(detectedObject);
     getConference().send(objectContainer);
-
 
 
   } else {

@@ -66,6 +66,7 @@ void Scene::nextContainer(odcore::data::Container &a_container)
     } else {    	
     	m_timeStamp = unpackedObject.getIdentified();
     	m_type = unpackedObject.getDataType();
+    	m_typeConfidence = unpackedObject.getTypeConfidence();
     	m_direction = unpackedObject.getDirection();
     	m_azimuth = m_direction.getAzimuth();
     	m_directionConfidence = unpackedObject.getDirectionConfidence();
