@@ -58,8 +58,9 @@
  * Receives aim-point angle error.
  * Sends a optical rotation (steer) command to Act.
  */
- void SetOpticalRotation::nextContainer(odcore::data::Container &c)
+ void SetOpticalRotation::nextContainer(odcore::data::Container &)
  {
+   /*
   if(c.getDataType() == opendlv::perception::LanePosition::ID()){
     opendlv::perception::LanePosition lanePosition = c.getData<opendlv::perception::LanePosition>();
     //float offset = lanePosition.getOffset();
@@ -87,6 +88,7 @@
       }
     } 
   }
+  */
 }
 
 void SetOpticalRotation::setUp()
