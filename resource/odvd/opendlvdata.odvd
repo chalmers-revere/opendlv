@@ -187,7 +187,7 @@ message opendlv.perception.Object [id = 181] {
 
   list<string> properties [id = 16];
 
-  uint16 id [id = 17];
+  uint16 objectId [id = 17];
 }
 
 message opendlv.perception.ObjectDesiredDirection [id = 182] {
@@ -215,7 +215,7 @@ message opendlv.perception.Surface [id = 184] {
 
   list<string> properties [id = 9];
 
-  uint16 id [id = 10];
+  uint16 surfaceId [id = 10];
 
   list<uint16> connectedWith [id = 11];
   list<uint16> traversableTo [id = 12];
