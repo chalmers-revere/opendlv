@@ -161,12 +161,12 @@ public:
      *
      * Where b = vehicle wheelbase and phi=steering angle
      *
-     * @param [ ] wheelbase = vehiche wheelbase, default value = 3.8 (m)
+     * @param [ ] wheelbase = vehiche wheelbase, default value = 3.4 (m)
      */
     struct vehicleParams {
       double wheelbase;   ///--> distance between the front axle and the rear axle of a vechicle
 
-      vehicleParams() : wheelbase(3.8) {}
+      vehicleParams() : wheelbase(defaultWheelbase) {}
 
       /**
        * @brief Espose the wheelbase to be set by the user
@@ -174,6 +174,9 @@ public:
        * @param [in] wheelbase = vehiche wheelbase, default value = 3.8 (m)
        */
       void setWheelbase (double _wheelbase) { wheelbase = _wheelbase; }
+
+    private :
+      const double defaultWheelbase = 3.8;
 
     };
     vehicleParams m_vehicleParams;
@@ -319,6 +322,8 @@ protected:
 
     //! Variables to handle a variable timestamp in the data
     double delta_t = 0.0;
+
+
 };
 
 } // geolocation

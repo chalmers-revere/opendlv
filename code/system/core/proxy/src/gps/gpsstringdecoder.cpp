@@ -156,10 +156,10 @@ void GpsStringDecoder::nextString(std::string const &s) {
   // according to the page 11 of this guide http://www2.etown.edu/wunderbot/DOWNLOAD/AgGPS114/NMEA_Messages_RevA_Guide_ENG.pdf
   // the GPS out data with the following format dd mm,mmmm
   // convert to deg befor sending
-  latitude=latitude/100.0;
-  longitude=longitude/100.0;
-  latitude = int(latitude) + (latitude - int(latitude))*100/60.0;
-  longitude = int(longitude) + (longitude - int(longitude))*100/60.0;
+//  latitude=latitude/100.0;
+//  longitude=longitude/100.0;
+//  latitude = int(latitude) + (latitude - int(latitude))*100/60.0;
+//  longitude = int(longitude) + (longitude - int(longitude))*100/60.0;
 
   // just a check before sending the signal!
   std::cout << "[proxy-gpsstringdecoder] GPS sending signals : Latitude : " << latitude << std::setprecision(19)

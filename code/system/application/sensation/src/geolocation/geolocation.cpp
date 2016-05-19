@@ -86,10 +86,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       << "theta (rad), theta_dot(rad/s)  \n"
       << "%t lat long yaw long_vel wheels_angle Z_x Z_y Z_theta Z_theta_dot "
       << "HAS_DATA X_x X_x_dot X_y X_y_dot X_theta X_theta_dot sent_lat "
-      << "sent_long sent_alt sent_heading "
+      << "sent_long sent_alt sent_heading positionConfidence headingConfidence yawRateConfidence"
       << endl;
 
-
+  cout << getName() << " Geolocation module started " << endl;
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
       odcore::data::dmcp::ModuleStateMessage::RUNNING) {
 
@@ -126,7 +126,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
           opendlv::proxy::reverefh16::Propulsion>();
 
       if (propulsionContainer.getReceivedTimeStamp().getSeconds() > 0) {
-        control.v() = propulsion.getPropulsionShaftVehicleSpeed()/3.6;
+        control.v() = propulsion.getPropulsionShaftVehicleSpeed();// /3.6;
         // TODO: to m/s --- get the message in si unit
       }
 
@@ -140,7 +140,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
           //          control.v() = gpsSpeed;}
       }
 
-std::cout << " the vehicle speed is : " << gpsReading.getSpeed() << endl;
+std::cout << "\n\n the vehicle speed is : " << gpsReading.getSpeed() << endl;
       auto steeringContainer = getKeyValueDataStore().get(
           opendlv::proxy::reverefh16::Steering::ID());
       auto steering = steeringContainer.getData<
@@ -154,7 +154,7 @@ std::cout << " the vehicle speed is : " << gpsReading.getSpeed() << endl;
 
 
       if (steeringContainer.getReceivedTimeStamp().getSeconds() > 0) {
-        control.phi() = steering.getSteeringwheelangle()/22.0;
+        control.phi() = steering.getSteeringwheelangle()/m_steeringToWheelRatio;
       }
 
       std::cout   << getName() << "\t" << "timestamp="
@@ -165,6 +165,7 @@ std::cout << " the vehicle speed is : " << gpsReading.getSpeed() << endl;
         << "  propulsion.getPropulsionShaftVehicleSpeed "
         << propulsion.getPropulsionShaftVehicleSpeed()
         << std::endl;
+
       std::cout   << getName() << "\t" << "timestamp="
         << timestamp << "\t original GPS data  "
         << std::setprecision(19) << gpsReading.getLatitude() << "  vel "
@@ -200,6 +201,11 @@ std::cout << " the vehicle speed is : " << gpsReading.getSpeed() << endl;
 
 
       state = m_ekf.predict(systemModel, control);
+      std::cout   << getName() << "\t" << "timestamp="
+        << timestamp << "\t prediction x = " << state.x()
+        << ", y = " <<
+        state.y() << ", theta = " << state.theta() << std::endl;
+
 
       bool gpsHasData = false;
       if (gpsReadingContainer.getReceivedTimeStamp().toMicroseconds() >
@@ -212,44 +218,41 @@ std::cout << " the vehicle speed is : " << gpsReading.getSpeed() << endl;
       timestamp += systemModel.getDeltaT();
 
       std::cout   << getName() << "\t" << "timestamp="
-        << timestamp << "\t hasData=" << gpsHasData << "\tx = " << state.x()
+        << timestamp << "\t hasData=" << gpsHasData << "\t estimation x = " << state.x()
         << ", y = " <<
         state.y() << ", theta = " << state.theta() << std::endl;
 
 
 
-
-
-        auto cov = m_ekf.getCovariance();
-
-//        auto cov_eigenvalues = cov.eigenvalues();
-
-        auto cov_diagonal = cov.diagonal();
-
-//        auto cov_determinant = cov.determinant();
-
-        std::cout   << getName() << "\t"
-//                    << "\nCovariance Matrix = \n" << cov
-//                    << "\nEigenvalues = \n" << cov_eigenvalues
-                    << "\nDiagonal = \n " << cov_diagonal
-//                    << "\nDeterminand =   " << cov_determinant
-                    << std::endl;
-
-
-
-
-
-      // Build the proper GPS coordinates to send
-      opendlv::data::environment::Point3 currentStateEstimation
-              (state.x() + m_gpsToCoGDisplacement_x,
-               state.y() + m_gpsToCoGDisplacement_y,
-               currentCartesianLocation.getZ() + m_gpsToCoGDisplacement_z);
-
 //TODO: convert here x and y to get the position of the rear axle
+      opendlv::data::environment::WGS84Coordinate currentWGS84CoordinateEstimation;
+      // if one of the coordinates is nan, it gives the last GPS available measure
+      if (!std::isnan(state.x()) && !std::isnan(state.y()) )
+      {
+          // Build the proper GPS coordinates to send
+          opendlv::data::environment::Point3 currentStateEstimation
+                  (state.x() + m_gpsToCoGDisplacement_x,
+                   state.y() + m_gpsToCoGDisplacement_y,
+                   currentCartesianLocation.getZ() + m_gpsToCoGDisplacement_z);
+          currentWGS84CoordinateEstimation = gpsReference.transform(currentStateEstimation);
+      }
+      else
+      {
+       currentWGS84CoordinateEstimation = currentLocation;
+       cout << "NAN - sending gps data instead";
+      }
 
-      opendlv::data::environment::WGS84Coordinate currentWGS84CoordinateEstimation =
-              gpsReference.transform(currentStateEstimation);
-      double heading = std::asin(std::sin(state.theta()));  // asin(sin(theta)) make sure that the heading is in [-pi,+pi]
+      double heading = 0;
+      if (!std::isnan(state.theta()))
+      {
+          heading = std::asin(std::sin(state.theta()));  // asin(sin(theta)) make sure that the heading is in [-pi,+pi]
+      }
+      else
+      {
+          heading = gpsReading.getNorthHeading();
+      }
+
+
 
       double positionConfidence = calculatePositionConfidence();
 
@@ -269,12 +272,11 @@ std::cout << " the vehicle speed is : " << gpsReading.getSpeed() << endl;
       std::cout   << getName() << "\t" << "timestamp="
         << timestamp << "\t "
         << "\tlat=" << currentWGS84CoordinateEstimation.getLatitude()
-        << ", long=" << std::setprecision(19)
+        << ", long="
         << currentWGS84CoordinateEstimation.getLongitude()
-        << ", theta=" << std::setprecision(19) << state.theta() << std::endl;
+        << ", theta=" << state.theta() << std::endl;
 
       // Send the message
-
       opendlv::sensation::Geolocation geoLocationEstimation(currentWGS84CoordinateEstimation.getLatitude(),
                                                             currentWGS84CoordinateEstimation.getLongitude(),
                                                             positionConfidence,
@@ -295,7 +297,7 @@ std::cout << " the vehicle speed is : " << gpsReading.getSpeed() << endl;
       getConference().send(msg);
 
       //save data to file
-      bool   saveToFile = false;
+      bool   saveToFile = true;
       if (  saveToFile){
       fout_ekfState
           << std::setprecision(19) << timestamp << " "
@@ -318,12 +320,15 @@ std::cout << " the vehicle speed is : " << gpsReading.getSpeed() << endl;
           << currentWGS84CoordinateEstimation.getLatitude() << " "
           << currentWGS84CoordinateEstimation.getLongitude() << " "
           << gpsReading.getAltitude() << " "
-          << heading
+          << heading << " "
+          << positionConfidence << " "
+          << headingConfidence << " "
+          << yawRateConfidence << " "
           << endl;
       }
     }
-    else {
-        std::cout << getName() << "\t"<< " NO DATA " << std::endl;
+    else { //TODO: remove this if not necessary anymore
+        //std::cout << getName() << "\t"<< " NO DATA " << std::endl;
     }
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
@@ -344,22 +349,22 @@ auto covSR = m_ekf.getCovariance();
 
 double positionConfidence_x = std::sqrt(covSR(0,0)*covSR(0,0));
 double positionConfidence_y = std::sqrt(covSR(2,2)*covSR(2,2));
-double confidence = std::max(positionConfidence_x,positionConfidence_y);
-return confidence;
+return std::max(std::sqrt(positionConfidence_x),
+                std::sqrt(positionConfidence_y));
 }
 
 double Geolocation::calculateHeadingConfidence()
 {
 auto covSR = m_ekf.getCovariance();
 double confidence = std::sqrt(covSR(4,4)*covSR(4,4));
-return confidence;
+return std::sqrt(confidence);
 }
 
 double Geolocation::calculateHeadingRateConfidence()
 {
 auto covSR = m_ekf.getCovariance();
 double confidence = std::sqrt(covSR(5,5)*covSR(5,5));
-return confidence;
+return std::sqrt(confidence);
 }
 
 double Geolocation::calculateSpeedConfidence()
