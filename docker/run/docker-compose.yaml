@@ -1,250 +1,770 @@
-# Please note that docker-compose does not prescribe a startup order
 
+# Please note that docker-compose does not prescribe a startup order
 
 version: "2"
 services:
-  odsupercomponent:
-    image: revere/opendlv:latest
-    volumes:
-    - .:/opt/data
-    working_dir: "/opt/data"
-    environment:
-    - LD_LIBRARY_PATH=/opt/od/lib
-    - PATH=/opt/od/bin
-    command: "odsupercomponent --cid=111"
+    odsupercomponent:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        command: "odsupercomponent --cid=111 --verbose=1"
 
 
 
-  # Proxy
-
-  opendlv-system-core-proxy-can:
-    image: revere/opendlv:latest
-    volumes:
-    - .:/opt/data
-    working_dir: "/opt/data"
-    depends_on:
-      - odsupercomponent
-    environment:
-    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
-    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
-    command: "opendlv-system-core-proxy-can --cid=111 --freq=100"
+    ### ACTION ###
 
 
-  opendlv-system-core-proxy-camera-0:
-    image: revere/opendlv:latest
-    volumes:
-    - .:/opt/data
-    working_dir: "/opt/data"
-    depends_on:
-      - odsupercomponent
-    environment:
-    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
-    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
-    command: "opendlv-system-core-proxy-camera --cid=111 --freq=10 --id=0"
-
-  opendlv-system-core-proxy-camera-1:
-    image: revere/opendlv:latest
-    volumes:
-    - .:/opt/data
-    working_dir: "/opt/data"
-    depends_on:
-      - odsupercomponent
-    environment:
-    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
-    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
-    command: "opendlv-system-core-proxy-camera --cid=111 --freq=10 --id=1"
+    opendlv-system-application-action-act:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-application-action-act --cid=111 --freq=100"
 
 
-  opendlv-system-core-proxy-v2v:
-    image: revere/opendlv:latest
-    volumes:
-    - .:/opt/data
-    working_dir: "/opt/data"
-    depends_on:
-      - odsupercomponent
-    environment:
-    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
-    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
-    command: "opendlv-system-core-proxy-camera --cid=111 --freq=1"
+    opendlv-system-application-action-communicate:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-application-action-communicate --cid=111"
 
 
-  opendlv-system-core-proxy-gps:
-    image: revere/opendlv:latest
-    volumes:
-    - .:/opt/data
-    working_dir: "/opt/data"
-    depends_on:
-      - odsupercomponent
-    environment:
-    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
-    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
-    command: "opendlv-system-core-proxy-gps --cid=111 --freq=1"
+    opendlv-system-application-action-increaseobjectmargin:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-application-action-increaseobjectmargin --cid=111"
 
 
 
-  # Sensation
-
-  opendlv-system-application-sensation-audition:
-    image: revere/opendlv:latest
-    volumes:
-    - .:/opt/data
-    working_dir: "/opt/data"
-    depends_on:
-      - odsupercomponent
-    environment:
-    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
-    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
-    command: "opendlv-system-application-sensation-audition --cid=111 --freq=1"
-    
-
-
-  # Perception
-
-  opendlv-system-application-perception-detectlane:
-    image: revere/opendlv:latest
-    volumes:
-    - .:/opt/data
-    working_dir: "/opt/data"
-    depends_on:
-      - odsupercomponent
-    environment:
-    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
-    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
-    command: "opendlv-system-application-perception-detectlane --cid=111 --freq=1"
-    
-    
-  opendlv-system-application-perception-detectvehicle:
-    image: revere/opendlv:latest
-    volumes:
-    - .:/opt/data
-    working_dir: "/opt/data"
-    depends_on:
-      - odsupercomponent
-    environment:
-    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
-    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
-    command: "opendlv-system-application-perception-detectvehicle --cid=111 --freq=1"
+    opendlv-system-application-action-keepobjectalignment:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-application-action-keepobjectalignment --cid=111"
 
 
 
-  # Knowledge
-
-  opendlv-system-application-knowledge-gcdc16-v2viclcm:
-    image: revere/opendlv:latest
-    volumes:
-    - .:/opt/data
-    working_dir: "/opt/data"
-    depends_on:
-      - odsupercomponent
-    environment:
-    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
-    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
-    command: "opendlv-system-application-knowledge-gcdc16-v2viclcm --cid=111 --freq=25"
-    
-    
-  opendlv-system-application-knowledge-linguistics-v2vcam:
-    image: revere/opendlv:latest
-    volumes:
-    - .:/opt/data
-    working_dir: "/opt/data"
-    depends_on:
-      - odsupercomponent
-    environment:
-    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
-    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
-    command: "opendlv-system-application-knowledge-linguistics-v2vcam --cid=111 --freq=25"
-    
-    
-  opendlv-system-application-knowledge-linguistics-v2vdenm:
-    image: revere/opendlv:latest
-    volumes:
-    - .:/opt/data
-    working_dir: "/opt/data"
-    depends_on:
-      - odsupercomponent
-    environment:
-    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
-    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
-    command: "opendlv-system-application-knowledge-linguistics-v2vdenm --cid=111 --freq=25"
-    
-    
-    
-  # Action
-
-  opendlv-system-application-action-act:
-    image: revere/opendlv:latest
-    volumes:
-    - .:/opt/data
-    working_dir: "/opt/data"
-    depends_on:
-      - odsupercomponent
-    environment:
-    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
-    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
-    command: "opendlv-system-application-action-act --cid=111 --freq=100"
-
-
-  opendlv-system-application-action-communicate:
-    image: revere/opendlv:latest
-    volumes:
-    - .:/opt/data
-    working_dir: "/opt/data"
-    depends_on:
-      - odsupercomponent
-    environment:
-    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
-    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
-    command: "opendlv-system-application-action-communicate --cid=111"
-    
-    
-  opendlv-system-application-action-keepobjectsize:
-    image: revere/opendlv:latest
-    volumes:
-    - .:/opt/data
-    working_dir: "/opt/data"
-    depends_on:
-      - odsupercomponent
-    environment:
-    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
-    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
-    command: "opendlv-system-application-action-keepobjectsize --cid=111"
-
-
-  opendlv-system-application-action-keepobjectalignment:
-    image: revere/opendlv:latest
-    volumes:
-    - .:/opt/data
-    working_dir: "/opt/data"
-    depends_on:
-      - odsupercomponent
-    environment:
-    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
-    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
-    command: "opendlv-system-application-action-keepobjectalignment --cid=111"
-    
-
-  opendlv-system-application-action-setopticalflow:
-    image: revere/opendlv:latest
-    volumes:
-    - .:/opt/data
-    working_dir: "/opt/data"
-    depends_on:
-      - odsupercomponent
-    environment:
-    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
-    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
-    command: "opendlv-system-application-action-setopticalflow --cid=111"
+    opendlv-system-application-action-keepobjectsize:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-application-action-keepobjectsize --cid=111"
 
 
 
-  opendlv-new-component:
-    image: revere/opendlv:latest
-    volumes:
-    - .:/opt/data
-    working_dir: "/opt/data"
-    depends_on:
-      - odsupercomponent
-    environment:
-    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
-    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
-    command: "opendlv-system-application-action-setopticalflow --cid=111"
+
+    opendlv-system-application-action-removeloomingfront:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-application-action-removeloomingfront --cid=111"
+
+
+    opendlv-system-application-action-setopticalflow:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-application-action-setopticalflow --cid=111"
+
+
+    opendlv-system-application-action-setopticalrotation:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-application-action-setopticalrotation --cid=111"
+
+
+
+
+    ### KNOWLEDGE ###
+
+    opendlv-system-application-knowledge-gcdc16-rule:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-application-knowledge-gcdc16-rule --cid=111"
+
+
+    opendlv-system-application-knowledge-gcdc16-v2viclcm:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-application-knowledge-gcdc16-v2viclcm --cid=111 --freq=25"
+
+
+    opendlv-system-application-knowledge-identity:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-application-knowledge-identity --cid=111"
+
+
+    opendlv-system-application-knowledge-linguistics-v2vdenm:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-application-knowledge-linguistics-v2vdenm --cid=111 --freq=25"
+
+
+    opendlv-system-application-knowledge-linguistics-v2vdenm:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-application-knowledge-linguistics-v2vdenm --cid=111 --freq=25"
+
+
+    opendlv-system-application-knowledge-scene:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-application-knowledge-scene --cid=111"
+
+
+
+    ### PERCEPTION ###
+
+
+    opendlv-system-application-perception-detectlane-1:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        - /tmp/.X11-unix:/tmp/.X11-unix
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - DISPLAY=$DISPLAY
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-application-perception-detectlane --cid=111 --id=0"
+
+
+    # opendlv-system-application-perception-detectlane-2:
+    #     image: chalmersrevere/opendlv:latest
+    #     volumes:
+    #     - .:/opt/data
+    #     - /tmp/.X11-unix:/tmp/.X11-unix
+    #     working_dir: "/opt/data"
+    #     depends_on:
+    #     - odsupercomponent
+    #     environment:
+    #     - DISPLAY=$DISPLAY
+    #     - LD_LIBRARY_PATH=/opt/odlv/lib
+    #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    #     command: "opendlv-system-application-perception-detectlane --cid=111 --id=1"
+
+
+    # opendlv-system-application-perception-detectlane-3:
+    #     image: chalmersrevere/opendlv:latest
+    #     volumes:
+    #     - .:/opt/data
+    #     - /tmp/.X11-unix:/tmp/.X11-unix
+    #     working_dir: "/opt/data"
+    #     depends_on:
+    #     - odsupercomponent
+    #     environment:
+    #     - DISPLAY=$DISPLAY
+    #     - LD_LIBRARY_PATH=/opt/odlv/lib
+    #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    #     command: "opendlv-system-application-perception-detectlane --cid=111 --id=2"
+
+
+    # opendlv-system-application-perception-detectlane-4:
+    #     image: chalmersrevere/opendlv:latest
+    #     volumes:
+    #     - .:/opt/data
+    #     - /tmp/.X11-unix:/tmp/.X11-unix
+    #     working_dir: "/opt/data"
+    #     depends_on:
+    #     - odsupercomponent
+    #     environment:
+    #     - DISPLAY=$DISPLAY
+    #     - LD_LIBRARY_PATH=/opt/odlv/lib
+    #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    #     command: "opendlv-system-application-perception-detectlane --cid=111 --id=3"
+
+
+    opendlv-system-application-perception-detectvehicle-1:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        - /tmp/.X11-unix:/tmp/.X11-unix
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - DISPLAY=$DISPLAY
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-application-perception-detectvehicle --cid=111 --id=0"
+
+
+    # opendlv-system-application-perception-detectvehicle-2:
+    #     image: chalmersrevere/opendlv:latest
+    #     volumes:
+    #     - .:/opt/data
+    #     - /tmp/.X11-unix:/tmp/.X11-unix
+    #     working_dir: "/opt/data"
+    #     depends_on:
+    #     - odsupercomponent
+    #     environment:
+    #     - DISPLAY=$DISPLAY
+    #     - LD_LIBRARY_PATH=/opt/odlv/lib
+    #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    #     command: "opendlv-system-application-perception-detectvehicle --cid=111 --id=1"
+
+
+    # opendlv-system-application-perception-detectvehicle-3:
+    #     image: chalmersrevere/opendlv:latest
+    #     volumes:
+    #     - .:/opt/data
+    #     - /tmp/.X11-unix:/tmp/.X11-unix
+    #     working_dir: "/opt/data"
+    #     depends_on:
+    #     - odsupercomponent
+    #     environment:
+    #     - DISPLAY=$DISPLAY
+    #     - LD_LIBRARY_PATH=/opt/odlv/lib
+    #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    #     command: "opendlv-system-application-perception-detectvehicle --cid=111 --id=2"
+
+
+    # opendlv-system-application-perception-detectvehicle-4:
+    #     image: chalmersrevere/opendlv:latest
+    #     volumes:
+    #     - .:/opt/data
+    #     - /tmp/.X11-unix:/tmp/.X11-unix
+    #     working_dir: "/opt/data"
+    #     depends_on:
+    #     - odsupercomponent
+    #     environment:
+    #     - DISPLAY=$DISPLAY
+    #     - LD_LIBRARY_PATH=/opt/odlv/lib
+    #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    #     command: "opendlv-system-application-perception-detectvehicle --cid=111 --id=3"
+
+
+
+    ### SENSATION ###
+
+    opendlv-system-application-sensation-audition:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-application-sensation-audition --cid=111"
+
+
+    opendlv-system-application-sensation-echolocation:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-application-sensation-echolocation --cid=111"
+
+
+    opendlv-system-application-sensation-geolocation:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-application-sensation-geolocation --cid=111 --freq=30"
+
+
+    opendlv-system-application-sensation-proprioception-orientation:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-application-sensation-proprioception-orientation --cid=111"
+
+
+
+    opendlv-system-application-sensation-vision-directionofmovement:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        - /tmp/.X11-unix:/tmp/.X11-unix
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - DISPLAY=$DISPLAY
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-application-sensation-vision-directionofmovement --cid=111"
+
+
+
+    # opendlv-system-application-sensation-vision-edge:
+    #     image: chalmersrevere/opendlv:latest
+    #     volumes:
+    #     - .:/opt/data
+    #     working_dir: "/opt/data"
+    #     depends_on:
+    #     - odsupercomponent
+    #     environment:
+    #     - LD_LIBRARY_PATH=/opt/odlv/lib
+    #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    #     command: "opendlv-system-application-knowledge-sensation-vision-edge --cid=111"
+
+
+
+    opendlv-system-application-sensation-vision-looming-1:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        - /tmp/.X11-unix:/tmp/.X11-unix
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - DISPLAY=$DISPLAY
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-application-sensation-vision-looming --cid=111 --id=0"
+
+
+    # opendlv-system-application-sensation-vision-looming-2:
+    #     image: chalmersrevere/opendlv:latest
+    #     volumes:
+    #     - .:/opt/data
+    #     - /tmp/.X11-unix:/tmp/.X11-unix
+    #     working_dir: "/opt/data"
+    #     depends_on:
+    #     - odsupercomponent
+    #     environment:
+    #     - DISPLAY=$DISPLAY
+    #     - LD_LIBRARY_PATH=/opt/odlv/lib
+    #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    #     command: "opendlv-system-application-sensation-vision-looming --cid=111 --id=1"
+
+
+    # opendlv-system-application-sensation-vision-looming-3:
+    #     image: chalmersrevere/opendlv:latest
+    #     volumes:
+    #     - .:/opt/data
+    #     - /tmp/.X11-unix:/tmp/.X11-unix
+    #     working_dir: "/opt/data"
+    #     depends_on:
+    #     - odsupercomponent
+    #     environment:
+    #     - DISPLAY=$DISPLAY
+    #     - LD_LIBRARY_PATH=/opt/odlv/lib
+    #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    #     command: "opendlv-system-application-sensation-vision-looming --cid=111 --id=2"
+
+
+    # opendlv-system-application-sensation-vision-looming-4:
+    #     image: chalmersrevere/opendlv:latest
+    #     volumes:
+    #     - .:/opt/data
+    #     - /tmp/.X11-unix:/tmp/.X11-unix
+    #     working_dir: "/opt/data"
+    #     depends_on:
+    #     - odsupercomponent
+    #     environment:
+    #     - DISPLAY=$DISPLAY
+    #     - LD_LIBRARY_PATH=/opt/odlv/lib
+    #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    #     command: "opendlv-system-application-sensation-vision-looming --cid=111 --id=3"
+
+
+    opendlv-system-application-sensation-vision-opticalflow-1:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        - /tmp/.X11-unix:/tmp/.X11-unix
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - DISPLAY=$DISPLAY
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-application-sensation-vision-opticalflow --cid=111 --id=0"
+
+
+    # opendlv-system-application-sensation-vision-opticalflow-2:
+    #     image: chalmersrevere/opendlv:latest
+    #     volumes:
+    #     - .:/opt/data
+    #     - /tmp/.X11-unix:/tmp/.X11-unix
+    #     working_dir: "/opt/data"
+    #     depends_on:
+    #     - odsupercomponent
+    #     environment:
+    #     - DISPLAY=$DISPLAY
+    #     - LD_LIBRARY_PATH=/opt/odlv/lib
+    #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    #     command: "opendlv-system-application-sensation-vision-opticalflow --cid=111 --id=1"
+
+
+    # opendlv-system-application-sensation-vision-opticalflow-3:
+    #     image: chalmersrevere/opendlv:latest
+    #     volumes:
+    #     - .:/opt/data
+    #     - /tmp/.X11-unix:/tmp/.X11-unix
+    #     working_dir: "/opt/data"
+    #     depends_on:
+    #     - odsupercomponent
+    #     environment:
+    #     - DISPLAY=$DISPLAY
+    #     - LD_LIBRARY_PATH=/opt/odlv/lib
+    #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    #     command: "opendlv-system-application-sensation-vision-opticalflow --cid=111 --id=2"
+
+
+    # opendlv-system-application-sensation-vision-opticalflow-4:
+    #     image: chalmersrevere/opendlv:latest
+    #     volumes:
+    #     - .:/opt/data
+    #     - /tmp/.X11-unix:/tmp/.X11-unix
+    #     working_dir: "/opt/data"
+    #     depends_on:
+    #     - odsupercomponent
+    #     environment:
+    #     - DISPLAY=$DISPLAY
+    #     - LD_LIBRARY_PATH=/opt/odlv/lib
+    #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    #     command: "opendlv-system-application-sensation-vision-opticalflow --cid=111 --id=3"
+
+
+
+    ### CORE ###
+
+    opendlv-system-core-diagnostics:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-core-diagnostics --cid=111"
+
+
+    ### CORE PROXY ###
+
+    opendlv-system-core-proxy-camera-1:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        - /tmp/.X11-unix:/tmp/.X11-unix
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - DISPLAY=$DISPLAY
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-core-proxy-camera --cid=111 --freq=25 --id=0"
+
+
+    # opendlv-system-core-proxy-camera-2:
+    #     image: chalmersrevere/opendlv:latest
+    #     volumes:
+    #     - .:/opt/data
+    #     - /tmp/.X11-unix:/tmp/.X11-unix
+    #     working_dir: "/opt/data"
+    #     depends_on:
+    #     - odsupercomponent
+    #     environment:
+    #     - DISPLAY=$DISPLAY
+    #     - LD_LIBRARY_PATH=/opt/odlv/lib
+    #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    #     command: "opendlv-system-core-proxy-camera --cid=111 --freq=25 --id=1"
+
+
+    # opendlv-system-core-proxy-camera-3:
+    #     image: chalmersrevere/opendlv:latest
+    #     volumes:
+    #     - .:/opt/data
+    #     - /tmp/.X11-unix:/tmp/.X11-unix
+    #     working_dir: "/opt/data"
+    #     depends_on:
+    #     - odsupercomponent
+    #     environment:
+    #     - DISPLAY=$DISPLAY
+    #     - LD_LIBRARY_PATH=/opt/odlv/lib
+    #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    #     command: "opendlv-system-core-proxy-camera --cid=111 --freq=25 --id=2"
+
+
+    # opendlv-system-core-proxy-camera-4:
+    #     image: chalmersrevere/opendlv:latest
+    #     volumes:
+    #     - .:/opt/data
+    #     - /tmp/.X11-unix:/tmp/.X11-unix
+    #     working_dir: "/opt/data"
+    #     depends_on:
+    #     - odsupercomponent
+    #     environment:
+    #     - DISPLAY=$DISPLAY
+    #     - LD_LIBRARY_PATH=/opt/odlv/lib
+    #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    #     command: "opendlv-system-core-proxy-camera --cid=111 --freq=25 --id=3"
+
+
+    opendlv-system-core-proxy-can:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        cap_add:
+        - SYS_NICE
+        devices:
+        - "/dev/pcanpci2:/dev/pcan2"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-core-proxy-can --cid=111 --freq=100"
+
+
+    opendlv-system-core-proxy-gps:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-core-proxy-gps --cid=111"
+
+
+    opendlv-system-core-proxy-imu:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-core-proxy-imu --cid=111 --freq=10"
+
+
+    opendlv-system-core-proxy-ledstrip:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-core-proxy-ledstrip --cid=111"
+
+
+    opendlv-system-core-proxy-lidar:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-core-proxy-lidar --cid=111 --freq=10"
+
+
+    opendlv-system-core-proxy-sonararray-1:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-core-proxy-sonararray --cid=111 --freq=10 --id=0"
+
+
+    opendlv-system-core-proxy-sonararray-2:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-core-proxy-sonararray --cid=111 --freq=10 --id=1"
+
+
+    opendlv-system-core-proxy-toggeler:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-core-proxy-toggeler --cid=111"
+
+
+    opendlv-system-core-proxy-v2v:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-core-proxy-v2v --cid=111"
+
+
+
+    ### CORE SAFETY ###
+
+    opendlv-system-core-safety-checkactuation:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-core-safety-checkactuation --cid=111"
+
+
+    opendlv-system-core-safety-manualoverride:
+        image: chalmersrevere/opendlv:latest
+        volumes:
+        - .:/opt/data
+        working_dir: "/opt/data"
+        depends_on:
+        - odsupercomponent
+        environment:
+        - LD_LIBRARY_PATH=/opt/odlv/lib
+        - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+        command: "opendlv-system-core-safety-manualoverride --cid=111"
+
+
+
+
+
+
+

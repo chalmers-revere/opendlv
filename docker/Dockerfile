@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-# Date: 2016-05-16
+# Date: 2016-05-20
 
 FROM seresearch/odsimulation:latest
 
@@ -28,4 +28,4 @@ ADD ./ /opt/data
 
 WORKDIR /opt/data
 
-RUN mkdir -p build && cd build && PATH=$PATH:/usr/bin cmake -D CMAKE_INSTALL_PREFIX=/opt/odlv -D OPENDAVINCI_DIR=/usr/ .. && make
+RUN mkdir -p build-docker && cd build-docker && PATH=$PATH:/usr/bin cmake -D CMAKE_INSTALL_PREFIX=/opt/odlv -D OPENDAVINCI_DIR=/usr/ .. && make
