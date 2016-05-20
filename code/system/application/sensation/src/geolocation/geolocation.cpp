@@ -77,6 +77,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 
   // To dump data structures into a CSV file, you create an output file first.
   // std::ofstream fout("../Exp_data/output.csv");
+  bool   saveToFile = true;
   std::ofstream fout_ekfState("./output_ekf.csv");
   fout_ekfState
       << "%HEADER: Output of the Extended Kalman Filter, data format : \n"
@@ -202,10 +203,12 @@ std::cout << "\n\n the vehicle speed is : " << gpsReading.getSpeed() << endl;
 
 
       state = m_ekf.predict(systemModel, control);
-      std::cout   << getName() << "\t" << "timestamp="
-        << timestamp << "\t prediction x = " << state.x()
-        << ", y = " <<
-        state.y() << ", theta = " << state.theta() << std::endl;
+      std::cout   << getName() << "\t"
+                  << "timestamp = "  << timestamp
+                  << " deltaTime = " << deltaTime
+                  << "\t prediction x = " << state.x()
+                  << ", y = " << state.y()
+                  << ", theta = " << state.theta() << std::endl;
 
 
       bool gpsHasData = false;
@@ -237,6 +240,7 @@ std::cout << "\n\n the vehicle speed is : " << gpsReading.getSpeed() << endl;
 
 //TODO: convert here x and y to get the position of the rear axle
       opendlv::data::environment::WGS84Coordinate currentWGS84CoordinateEstimation;
+      bool ekfSuccess=true;
       // if one of the coordinates is nan, it gives the last GPS available measure
       if (!std::isnan(state.x()) && !std::isnan(state.y()) )
       {
@@ -253,6 +257,7 @@ std::cout << "\n\n the vehicle speed is : " << gpsReading.getSpeed() << endl;
        std::cout << "NAN - sending gps data instead"<<std::endl;
        filterReset( currentCartesianLocation, gpsReading);
        state = m_ekf.getState();
+       ekfSuccess = false;
       }
 
       double heading = 0;
@@ -263,19 +268,20 @@ std::cout << "\n\n the vehicle speed is : " << gpsReading.getSpeed() << endl;
       else
       {
           heading = gpsReading.getNorthHeading();
+          ekfSuccess = false;
       }
 
 
 
-      double positionConfidence = calculatePositionConfidence();
+      double positionConfidence = calculatePositionConfidence(ekfSuccess);
 
-      double headingConfidence = calculateHeadingConfidence();
+      double headingConfidence = calculateHeadingConfidence(ekfSuccess);
 
-      double speedConfidence = calculateSpeedConfidence();
+      double speedConfidence = calculateSpeedConfidence(ekfSuccess);
 
       double yawRate = state.theta_dot();
 
-      double yawRateConfidence = calculateHeadingConfidence();
+      double yawRateConfidence = calculateHeadingConfidence(ekfSuccess);
 
       double longitudinalAcceleration = 0.0;
 
@@ -310,7 +316,6 @@ std::cout << "\n\n the vehicle speed is : " << gpsReading.getSpeed() << endl;
       getConference().send(msg);
 
       //save data to file
-      bool   saveToFile = true;
       if (  saveToFile){
       fout_ekfState
           << std::setprecision(19) << timestamp << " "
@@ -356,33 +361,44 @@ void Geolocation::tearDown()
 }
 
 
-double Geolocation::calculatePositionConfidence()
+double Geolocation::calculatePositionConfidence(bool a_filterSuccess)
 {
-auto covSR = m_ekf.getCovariance();
+    if (!a_filterSuccess){
+        return -1;
+    }
+    auto covSR = m_ekf.getCovariance();
 
-double positionConfidence_x = std::sqrt(covSR(0,0)*covSR(0,0));
-double positionConfidence_y = std::sqrt(covSR(2,2)*covSR(2,2));
-return std::max(std::sqrt(positionConfidence_x),
-                std::sqrt(positionConfidence_y));
+    double positionConfidence_x = std::sqrt(covSR(0,0)*covSR(0,0));
+    double positionConfidence_y = std::sqrt(covSR(2,2)*covSR(2,2));
+    return std::max(std::sqrt(positionConfidence_x),
+                    std::sqrt(positionConfidence_y));
 }
 
-double Geolocation::calculateHeadingConfidence()
+double Geolocation::calculateHeadingConfidence(bool a_filterSuccess)
 {
-auto covSR = m_ekf.getCovariance();
-double confidence = std::sqrt(covSR(4,4)*covSR(4,4));
-return std::sqrt(confidence);
+    if (!a_filterSuccess){
+        return -1;
+    }
+    auto covSR = m_ekf.getCovariance();
+    double confidence = std::sqrt(covSR(4,4)*covSR(4,4));
+    return std::sqrt(confidence);
 }
 
-double Geolocation::calculateHeadingRateConfidence()
+double Geolocation::calculateHeadingRateConfidence(bool a_filterSuccess)
 {
-auto covSR = m_ekf.getCovariance();
-double confidence = std::sqrt(covSR(5,5)*covSR(5,5));
-return std::sqrt(confidence);
+    if (!a_filterSuccess){
+        return -1;
+    }
+    auto covSR = m_ekf.getCovariance();
+    double confidence = std::sqrt(covSR(5,5)*covSR(5,5));
+    return std::sqrt(confidence);
 }
 
-double Geolocation::calculateSpeedConfidence()
+double Geolocation::calculateSpeedConfidence(bool a_filterSuccess)
 {
-
+    if (!a_filterSuccess){
+        return -1;
+    }
 return 0.0; // if information is not available
 }
 

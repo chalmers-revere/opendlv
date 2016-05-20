@@ -56,22 +56,22 @@ class Geolocation
     *  Accuracy of the geographical position m
     *
     */
-  double calculatePositionConfidence();
+  double calculatePositionConfidence(bool a_filterSuccess);
 
 
   /** The heading confidence in rad
     */
-  double calculateHeadingConfidence();
+  double calculateHeadingConfidence(bool a_filterSuccess);
 
   /**   The heading rate in rad/s.
     *
     */
-  double calculateHeadingRateConfidence();
+  double calculateHeadingRateConfidence(bool a_filterSuccess);
 
   /**   Speed confidence in m/s.
     *
     */
-   double calculateSpeedConfidence();
+   double calculateSpeedConfidence(bool a_filterSuccess);
 
    /**   Reset the EKF
      *
