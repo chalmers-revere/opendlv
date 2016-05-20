@@ -101,10 +101,12 @@ services:
         image: chalmersrevere/opendlv:latest
         volumes:
         - .:/opt/data
+        - /tmp/.X11-unix:/tmp/.X11-unix
         working_dir: "/opt/data"
         depends_on:
         - odsupercomponent
         environment:
+        - DISPLAY=:1
         - LD_LIBRARY_PATH=/opt/odlv/lib
         - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
         command: "opendlv-system-application-action-setopticalflow --cid=111"
@@ -218,7 +220,7 @@ services:
         depends_on:
         - odsupercomponent
         environment:
-        - DISPLAY=$DISPLAY
+        - DISPLAY=:1
         - LD_LIBRARY_PATH=/opt/odlv/lib
         - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
         command: "opendlv-system-application-perception-detectlane --cid=111 --id=0"
@@ -233,7 +235,7 @@ services:
     #     depends_on:
     #     - odsupercomponent
     #     environment:
-    #     - DISPLAY=$DISPLAY
+    #     - DISPLAY=:1
     #     - LD_LIBRARY_PATH=/opt/odlv/lib
     #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
     #     command: "opendlv-system-application-perception-detectlane --cid=111 --id=1"
@@ -248,7 +250,7 @@ services:
     #     depends_on:
     #     - odsupercomponent
     #     environment:
-    #     - DISPLAY=$DISPLAY
+    #     - DISPLAY=:1
     #     - LD_LIBRARY_PATH=/opt/odlv/lib
     #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
     #     command: "opendlv-system-application-perception-detectlane --cid=111 --id=2"
@@ -263,7 +265,7 @@ services:
     #     depends_on:
     #     - odsupercomponent
     #     environment:
-    #     - DISPLAY=$DISPLAY
+    #     - DISPLAY=:1
     #     - LD_LIBRARY_PATH=/opt/odlv/lib
     #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
     #     command: "opendlv-system-application-perception-detectlane --cid=111 --id=3"
@@ -278,7 +280,7 @@ services:
         depends_on:
         - odsupercomponent
         environment:
-        - DISPLAY=$DISPLAY
+        - DISPLAY=:1
         - LD_LIBRARY_PATH=/opt/odlv/lib
         - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
         command: "opendlv-system-application-perception-detectvehicle --cid=111 --id=0"
@@ -293,7 +295,7 @@ services:
     #     depends_on:
     #     - odsupercomponent
     #     environment:
-    #     - DISPLAY=$DISPLAY
+    #     - DISPLAY=:1
     #     - LD_LIBRARY_PATH=/opt/odlv/lib
     #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
     #     command: "opendlv-system-application-perception-detectvehicle --cid=111 --id=1"
@@ -308,7 +310,7 @@ services:
     #     depends_on:
     #     - odsupercomponent
     #     environment:
-    #     - DISPLAY=$DISPLAY
+    #     - DISPLAY=:1
     #     - LD_LIBRARY_PATH=/opt/odlv/lib
     #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
     #     command: "opendlv-system-application-perception-detectvehicle --cid=111 --id=2"
@@ -323,7 +325,7 @@ services:
     #     depends_on:
     #     - odsupercomponent
     #     environment:
-    #     - DISPLAY=$DISPLAY
+    #     - DISPLAY=:1
     #     - LD_LIBRARY_PATH=/opt/odlv/lib
     #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
     #     command: "opendlv-system-application-perception-detectvehicle --cid=111 --id=3"
@@ -394,7 +396,7 @@ services:
         depends_on:
         - odsupercomponent
         environment:
-        - DISPLAY=$DISPLAY
+        - DISPLAY=:1
         - LD_LIBRARY_PATH=/opt/odlv/lib
         - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
         command: "opendlv-system-application-sensation-vision-directionofmovement --cid=111"
@@ -424,7 +426,7 @@ services:
         depends_on:
         - odsupercomponent
         environment:
-        - DISPLAY=$DISPLAY
+        - DISPLAY=:1
         - LD_LIBRARY_PATH=/opt/odlv/lib
         - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
         command: "opendlv-system-application-sensation-vision-looming --cid=111 --id=0"
@@ -439,7 +441,7 @@ services:
     #     depends_on:
     #     - odsupercomponent
     #     environment:
-    #     - DISPLAY=$DISPLAY
+    #     - DISPLAY=:1
     #     - LD_LIBRARY_PATH=/opt/odlv/lib
     #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
     #     command: "opendlv-system-application-sensation-vision-looming --cid=111 --id=1"
@@ -454,7 +456,7 @@ services:
     #     depends_on:
     #     - odsupercomponent
     #     environment:
-    #     - DISPLAY=$DISPLAY
+    #     - DISPLAY=:1
     #     - LD_LIBRARY_PATH=/opt/odlv/lib
     #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
     #     command: "opendlv-system-application-sensation-vision-looming --cid=111 --id=2"
@@ -469,7 +471,7 @@ services:
     #     depends_on:
     #     - odsupercomponent
     #     environment:
-    #     - DISPLAY=$DISPLAY
+    #     - DISPLAY=:1
     #     - LD_LIBRARY_PATH=/opt/odlv/lib
     #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
     #     command: "opendlv-system-application-sensation-vision-looming --cid=111 --id=3"
@@ -484,7 +486,7 @@ services:
         depends_on:
         - odsupercomponent
         environment:
-        - DISPLAY=$DISPLAY
+        - DISPLAY=:1
         - LD_LIBRARY_PATH=/opt/odlv/lib
         - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
         command: "opendlv-system-application-sensation-vision-opticalflow --cid=111 --id=0"
@@ -499,7 +501,7 @@ services:
     #     depends_on:
     #     - odsupercomponent
     #     environment:
-    #     - DISPLAY=$DISPLAY
+    #     - DISPLAY=:1
     #     - LD_LIBRARY_PATH=/opt/odlv/lib
     #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
     #     command: "opendlv-system-application-sensation-vision-opticalflow --cid=111 --id=1"
@@ -514,7 +516,7 @@ services:
     #     depends_on:
     #     - odsupercomponent
     #     environment:
-    #     - DISPLAY=$DISPLAY
+    #     - DISPLAY=:1
     #     - LD_LIBRARY_PATH=/opt/odlv/lib
     #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
     #     command: "opendlv-system-application-sensation-vision-opticalflow --cid=111 --id=2"
@@ -529,7 +531,7 @@ services:
     #     depends_on:
     #     - odsupercomponent
     #     environment:
-    #     - DISPLAY=$DISPLAY
+    #     - DISPLAY=:1
     #     - LD_LIBRARY_PATH=/opt/odlv/lib
     #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
     #     command: "opendlv-system-application-sensation-vision-opticalflow --cid=111 --id=3"
@@ -562,7 +564,7 @@ services:
         depends_on:
         - odsupercomponent
         environment:
-        - DISPLAY=$DISPLAY
+        - DISPLAY=:1
         - LD_LIBRARY_PATH=/opt/odlv/lib
         - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
         command: "opendlv-system-core-proxy-camera --cid=111 --freq=25 --id=0"
@@ -577,7 +579,7 @@ services:
     #     depends_on:
     #     - odsupercomponent
     #     environment:
-    #     - DISPLAY=$DISPLAY
+    #     - DISPLAY=:1
     #     - LD_LIBRARY_PATH=/opt/odlv/lib
     #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
     #     command: "opendlv-system-core-proxy-camera --cid=111 --freq=25 --id=1"
@@ -592,7 +594,7 @@ services:
     #     depends_on:
     #     - odsupercomponent
     #     environment:
-    #     - DISPLAY=$DISPLAY
+    #     - DISPLAY=:1
     #     - LD_LIBRARY_PATH=/opt/odlv/lib
     #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
     #     command: "opendlv-system-core-proxy-camera --cid=111 --freq=25 --id=2"
@@ -607,7 +609,7 @@ services:
     #     depends_on:
     #     - odsupercomponent
     #     environment:
-    #     - DISPLAY=$DISPLAY
+    #     - DISPLAY=:1
     #     - LD_LIBRARY_PATH=/opt/odlv/lib
     #     - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
     #     command: "opendlv-system-core-proxy-camera --cid=111 --freq=25 --id=3"
