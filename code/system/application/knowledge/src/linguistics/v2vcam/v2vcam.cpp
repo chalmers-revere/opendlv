@@ -38,6 +38,7 @@
 #include "linguistics/v2vcam/v2vcam.hpp"
 
 
+
 namespace opendlv {
 namespace knowledge {
 namespace linguistics {
@@ -357,12 +358,13 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
         + "," + std::to_string(vehicleRole);
         m_receiveLog << std::endl; 
 
-    opendlv::data::environment::WGS84Coordinate currentLocation(
-    m_latitude, opendlv::data::environment::WGS84Coordinate::NORTH,
-    m_longitude, opendlv::data::environment::WGS84Coordinate::EAST);
+    opendlv::data::environment::WGS84Coordinate gpsReference;
 
-    opendlv::data::environment::Point3 currentCartesianLocation =
-    gpsReference.transform(currentLocation);
+    gpsReference = opendlv::data::environment::WGS84Coordinate(
+    m_latitude,
+    opendlv::data::environment::WGS84Coordinate::NORTH,
+    m_longitude,
+    opendlv::data::environment::WGS84Coordinate::EAST);
 
     opendlv::data::environment::WGS84Coordinate currentLocation(
     latitude, opendlv::data::environment::WGS84Coordinate::NORTH,
@@ -371,33 +373,34 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
     opendlv::data::environment::Point3 currentObjectCartesianLocation =
     gpsReference.transform(currentLocation);
 
-    double m_xOffset = currentCartesianLocation.getX() - currentObjectCartesianLocation.getX();
-    double m_yOffset = currentCartesianLocation.getY() - currentObjectCartesianLocation.getY();
-    double m_azimuth;
+    double m_xOffset = currentObjectCartesianLocation.getX();
+    double m_yOffset = currentObjectCartesianLocation.getY();
+    float m_azimuth;
 
-    if (m_yOffset == 0){
-      if (m_xOffset < 0){
+    if (std::abs(m_yOffset) < 0.001){
+      if (m_xOffset < 0.0){
         m_azimuth = 3.14159;
       } else {
-        m_azimuth = 0;
+        m_azimuth = 0.0;
       }
-    } else if (m_xOffset == 0){
-      if (m_yOffset < 0){
+    } else if (std::abs(m_xOffset) < 0.001){
+      if (m_yOffset < 0.0){
         m_azimuth = -3.14159 / 2.0;
       } else {
         m_azimuth = 3.14159 / 2.0;
       }
     } else {
-      m_azimuth = std::atan(xOffset/yOffset);
+      m_azimuth = std::atan(m_xOffset/m_yOffset);
     }
 
+    odcore::data::TimeStamp now;
     std::string m_type = "vehicle";
     float m_typeConfidence = 1.0f;
-    opendlv::model::direction m_objectDirection(m_azimuth, 0.0);
+    opendlv::model::Direction m_objectDirection(m_azimuth, 0.0);
     float m_objectDirectionConfidence = 0.5f;
-    opendlv::model::direction m_objectDirectionRate(-1, -1);
+    opendlv::model::Direction m_objectDirectionRate(-1, -1);
     float m_objectDirectionRateConfidence = -1.0f;
-    double m_distance = std::sqrt((m_xOffset * m_xOffset) + (m_yOffset * m_yOffset));
+    float m_distance = std::sqrt((m_xOffset * m_xOffset) + (m_yOffset * m_yOffset));
     float m_distanceConfidence = 0.5f;
     float m_angularSize = -1.0f;
     float m_angularSizeConfidence = -1.0f;
@@ -411,7 +414,7 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
     m_properties.push_back("Vehicle width: " + std::to_string(vehicleWidth));
     uint16_t m_objectId = -1;
     
-    opendlv::perception::Object detectedObject("" m_type, m_typeConfidence, m_objectDirection, m_objectDirectionConfidence, m_objectDirectionRate, m_objectDirectionRateConfidence,
+    opendlv::perception::Object detectedObject(now, m_type, m_typeConfidence, m_objectDirection, m_objectDirectionConfidence, m_objectDirectionRate, m_objectDirectionRateConfidence,
     m_distance, m_distanceConfidence, m_angularSize, m_angularSizeConfidence, m_angularSizeRate, m_angularSizeRateConfidence, m_confidence, m_sources, m_properties, m_objectId);
     odcore::data::Container objectContainer(detectedObject);
     getConference().send(objectContainer);
