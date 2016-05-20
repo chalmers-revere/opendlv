@@ -29,7 +29,7 @@ GITVERSION=$(shell git describe --abbrev=0 --tags | head -n1)
 GITHASH=$(shell git rev-parse --short HEAD)
 GITUNCOMMITTEDCHANGES=$(shell if [ "`git ls-files -m ..`" != "" ]; then echo "-modified"; else echo ""; fi)
 VERSION="$(GITVERSION)-$(GITHASH)$(GITUNCOMMITTEDCHANGES)"
-REPOSITORY=revere
+REPOSITORY=chalmersrevere
 DOCKER_BUILD_NAME=build_container
 BUILDLOG=build.log
 OPENDLV_HOST_PATH=$(shell dirname $(shell pwd))
@@ -41,7 +41,7 @@ build/Makefile:
 
 clean:
 	rm -f $(BUILDLOG)
-	rm -fr ../build
+	rm -fr ../build-docker
 
 docker-push: docker-tag-latest
 	docker push $(REPOSITORY)/$(PRODUCT):latest
