@@ -126,6 +126,8 @@ void Lidar::setUp()
     cerr << "[" << getName() << "] Could not connect to Sickan: " << exception << endl;
   }
 
+  Status();
+
   std::cout << "Connected to Sickan, please wait for configuration" << std::endl;
 
   m_startResponse[0] = 0x06;
@@ -194,6 +196,8 @@ void Lidar::setUp()
 
   bool once = false;
   while(!m_startConfirmed) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(250));
+
     if(m_settingsMode && !once) { //wait for settingsmode
       SetCentimeterMode();        //set mode to centimeter
       m_settingsMode = false;
@@ -213,6 +217,7 @@ void Lidar::setUp()
 
 void Lidar::nextString(const std::string &s) 
 {
+  std::string alpha = "0123456789ABCDEF";
   const uint32_t stringLength = s.length();
 
   uint32_t bufferSize = 44; //TODO: Set a constant somewhere 
@@ -225,6 +230,8 @@ void Lidar::nextString(const std::string &s)
     }
 
     unsigned char byte = static_cast<unsigned char>(s[i]);
+
+    std::cout << alpha[(int)byte/16] << alpha[(int)byte%16] << ' ';
 
     m_buffer[bufferSize-1] = byte;
   
@@ -330,6 +337,13 @@ void Lidar::SendData()
 {
   odcore::data::Container c(m_latestReading);
   getConference().send(c);
+}
+
+void Lidar::Status()
+{
+  unsigned char statusCall[] = {0x02, 0x00, 0x01, 0x00, 0x31, 0x15, 0x12 };
+  std::string statusString( reinterpret_cast< char const* >(statusCall), 7) ;
+  m_sick->send(statusString);
 }
 
 void Lidar::StartScan()

@@ -55,6 +55,7 @@ class Lidar : public odcore::base::module::TimeTriggeredConferenceClientModule,
   void ConvertToDistances();
   void SendData();
   void WriteToFile();
+  void Status();
   void StartScan();
   void StopScan();
   void SetBaud9600();

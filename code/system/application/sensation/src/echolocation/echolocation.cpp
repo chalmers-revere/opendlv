@@ -81,7 +81,15 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
   
   std::vector<opendlv::perception::Object> identifiedObjects;
 
-  
+  std::vector<uint32_t> usedPoints;
+  std::vector<uint32_t> pointCloud;
+  pointCloud.pushBack(0);
+
+  for(uint32_t i = 0; i < pointCloud.size(); i++) {
+		for(uint32_t j = i; j < m_angels.size(); j++) {
+			int pointCloud[i]
+		}
+  }
 
 
 
