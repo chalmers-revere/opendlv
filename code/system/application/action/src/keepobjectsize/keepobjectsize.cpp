@@ -54,8 +54,9 @@ KeepObjectSize::~KeepObjectSize()
  * current size, and desired size.
  * Sends speed correction commands (throttle) to Act.
  */
-void KeepObjectSize::nextContainer(odcore::data::Container &c)
+void KeepObjectSize::nextContainer(odcore::data::Container &)
 {
+  /*
   if(c.getDataType() == opendlv::perception::LeadVehicleSize::ID()){
     opendlv::perception::LeadVehicleSize leadVehicleSize = 
         c.getData<opendlv::perception::LeadVehicleSize>();
@@ -82,6 +83,7 @@ void KeepObjectSize::nextContainer(odcore::data::Container &c)
       getConference().send(container);
     }
   }
+  */
 }
 
 void KeepObjectSize::setUp()
