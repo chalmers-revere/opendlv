@@ -15,38 +15,48 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+# COMMAND FOR BUILDING INSIDE IMAGE:
+# docker run --name build_container \
+# 			-v $(OPENDLV_HOST_PATH):/opt/data \
+# 			-w /opt/data \
+# 			-e "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:"$(OPENDAVINCI_PATH)"/bin" \
+# 			-e "LD_LIBRARY_PATH="$(OPENDAVINCI_PATH)"/lib" \
+# 			-it $(REPOSITORY)/$(PRODUCT):latest \
+# 			sh -c "mkdir -p build && cd build && cmake -D CMAKE_INSTALL_PREFIX="$(OPENDLV_PATH)" -D OPENDAVINCI_DIR="$(OPENDAVINCI_PATH)" .. && make clean && make"
+
 PRODUCT=opendlv
 GITVERSION=$(shell git describe --abbrev=0 --tags | head -n1)
 GITHASH=$(shell git rev-parse --short HEAD)
 GITUNCOMMITTEDCHANGES=$(shell if [ "`git ls-files -m ..`" != "" ]; then echo "-modified"; else echo ""; fi)
 VERSION="$(GITVERSION)-$(GITHASH)$(GITUNCOMMITTEDCHANGES)"
-REPOSITORY=seresearch
-
+REPOSITORY=revere
+DOCKER_BUILD_NAME=build_container
 BUILDLOG=build.log
+OPENDLV_HOST_PATH=$(shell dirname $(shell pwd))
 
-all: build-incremental docker-tag-latest
+all: docker-update-image build/Makefile
 
 build/Makefile:
-	rm -fr build opendlv && mkdir opendlv && mkdir build && cd build && PATH=/opt/od/bin:$$PATH cmake -D OPENDAVINCI_DIR=/opt/od -D CMAKE_INSTALL_PREFIX=../opendlv ../.. && make
-
-build-incremental: build/Makefile
-	cd build && find . -name "system*-build" -type f -exec rm -f {} \; && find . -name "tools*-build" -type f -exec rm -f {} \; && make && cd ..
+	cd .. && docker build -f docker/Dockerfile -t $(REPOSITORY)/$(PRODUCT):$(VERSION) . | tee docker/$(BUILDLOG) || exit 1
 
 clean:
 	rm -f $(BUILDLOG)
-	rm -fr build opendlv
+	rm -fr ../build
 
-docker: build-incremental docker-update-image
-	docker build -t $(REPOSITORY)/$(PRODUCT):$(VERSION) . | tee $(BUILDLOG) || exit 1
+docker-push: docker-tag-latest
+	docker push $(REPOSITORY)/$(PRODUCT):latest
 
 docker-update-image:
 	docker pull $(shell awk '/^FROM/ { print $$2; exit }' Dockerfile)
 
-docker-tag-latest: docker
-	docker tag -f $(shell tail -1 $(BUILDLOG) | cut -f3 -d" ") $(REPOSITORY)/$(PRODUCT):latest
+docker-tag-latest:
+	docker tag $(shell tail -1 $(BUILDLOG) | cut -f3 -d" ") $(REPOSITORY)/$(PRODUCT):latest
 
 docker-cleanup:
 	docker rm $$(docker ps -a -q)
 
 run-example1: docker-tag-latest
 	cd example1 && docker-compose up
+
+run-all: docker-tag-latest
+	cd run && docker-compose up -d
