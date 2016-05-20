@@ -283,9 +283,9 @@ void DetectLane::nextContainer(odcore::data::Container &c)
       if(std::isfinite(theta) && std::isfinite(laneOffset)){
         // Send the message
 
-      opendlv::perception::LanePosition lanePosition(laneOffset,laneOffset);
-      odcore::data::Container msg(lanePosition);  
-      getConference().send(msg);
+//      opendlv::perception::LanePosition lanePosition(laneOffset,laneOffset);
+//      odcore::data::Container msg(lanePosition);  
+//      getConference().send(msg);
 
 
 

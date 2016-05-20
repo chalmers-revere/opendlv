@@ -73,7 +73,7 @@ Act::~Act()
 * Main function that gets the correction
 * m_type and m_amplitude as well as inhibitory
 * signal. Values are saved as needed and
-* packaged and sent to Actuation.
+* packaged and sent to ActuationRequest.
 */
 void Act::nextContainer(odcore::data::Container &c)
 {
@@ -160,15 +160,15 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
     m_logSteering << m_steeringCorrection << std::endl;
     
     if ( m_brakeCorrection < 0 ) {
-      opendlv::proxy::Actuation actuation(m_brakeCorrection, m_steeringCorrection, true);
-      odcore::data::Container actuationContainer(actuation);
+      opendlv::proxy::ActuationRequest actuationRequest(m_brakeCorrection, m_steeringCorrection, true);
+      odcore::data::Container actuationContainer(actuationRequest);
       getConference().send(actuationContainer);
       std::cout << "Steering Correction 1: " << m_steeringCorrection << std::endl;
     }
 
     else {
-      opendlv::proxy::Actuation actuation(m_accelerationCorrection, m_steeringCorrection, true);
-      odcore::data::Container actuationContainer(actuation);
+      opendlv::proxy::ActuationRequest actuationRequest(m_accelerationCorrection, m_steeringCorrection, true);
+      odcore::data::Container actuationContainer(actuationRequest);
       getConference().send(actuationContainer);
       std::cout << "Steering Correction 2: " << m_steeringCorrection << std::endl;
 

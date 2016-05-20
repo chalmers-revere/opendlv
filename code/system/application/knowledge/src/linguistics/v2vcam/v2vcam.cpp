@@ -56,9 +56,9 @@ V2vCam::V2vCam(int32_t const &a_argc, char **a_argv)
     m_timeType2004()
 {
   struct stat st;
-  if (stat("var/application/knowledge/linguistics/v2vcam", &st) == -1) {
-    system("mkdir -p ./var/application/knowledge/linguistics/v2vcam");
-    // std::cout<<"Created dir"<<std::endl;
+  if (::stat("var/application/knowledge/linguistics/v2vcam", &st) == -1) {
+    ::system("mkdir -p ./var/application/knowledge/linguistics/v2vcam");
+    std::cout<<"Created dir"<<std::endl;
   }
   odcore::data::TimeStamp nu;
 
@@ -228,34 +228,48 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
  */
 void V2vCam::nextContainer(odcore::data::Container &c)
 {
-  if(c.getDataType() == opendlv::sensation::Geolocation::ID()){
-    opendlv::sensation::Geolocation geolocationReading = c.getData<opendlv::sensation::Geolocation>();
-    ReadGeolocation(geolocationReading);
+  if (c.getDataType() == opendlv::sensation::Geolocation::ID()) {
+    opendlv::sensation::Geolocation geolocation = 
+        c.getData<opendlv::sensation::Geolocation>();
+    ReadGeolocation(geolocation);
+  } else if (c.getDataType() == opendlv::model::DynamicState::ID()) {
+    opendlv::model::DynamicState dynamicState = 
+        c.getData<opendlv::model::DynamicState>();
+    int16_t frameId = dynamicState.getFrameId();
+    if (frameId == 0) {
+      ReadDynamicState(dynamicState);
+    }
   } else if(c.getDataType() == opendlv::sensation::Voice::ID()) {
-    opendlv::sensation::Voice voiceReading = c.getData<opendlv::sensation::Voice>();
-    ReadVoice(voiceReading);
+    opendlv::sensation::Voice voice = c.getData<opendlv::sensation::Voice>();
+    ReadVoice(voice);
   }
 }
 
-void V2vCam::ReadGeolocation(opendlv::sensation::Geolocation &a_reading)
+void V2vCam::ReadDynamicState(
+    opendlv::model::DynamicState const &a_dynamicState)
 {
-  m_latitude = a_reading.getLatitude();
-  m_longitude = a_reading.getLongitude();
-  m_altitude = a_reading.getAltitude();
-  m_heading = a_reading.getHeading();
-  m_headingConfidence = a_reading.getHeadingConfidence();
-  m_speed = a_reading.getSpeed();
-  m_speedConfidence = a_reading.getSpeedConfidence();
-  m_yawRateValue = a_reading.getYawRate();
-  m_yawRateConfidence = a_reading.getYawRateConfidence();
-  m_longitudinalAcc = a_reading.getLongitudinalAcceleration();
-  m_longitudinalAccConf = a_reading.getLongitudinalAccelerationConfidence();
+  m_speed = a_dynamicState.getVelocity().getX();
+  m_speedConfidence = a_dynamicState.getVelocityConfidence().getX();
+  m_yawRateValue = a_dynamicState.getAngularVelocity().getZ();
+  m_yawRateConfidence = a_dynamicState.getAngularVelocityConfidence().getZ();
+  m_longitudinalAcc = a_dynamicState.getAcceleration().getX();
+  m_longitudinalAccConf = a_dynamicState.getAccelerationConfidence().getX();
 }
 
-void V2vCam::ReadVoice(opendlv::sensation::Voice &a_reading)
+void V2vCam::ReadGeolocation(
+    opendlv::sensation::Geolocation const &a_geolocation)
 {
-  if(strcmp(a_reading.getType().c_str(),"cam") == 0){
-    std::string dataString = a_reading.getData();
+  m_latitude = a_geolocation.getLatitude();
+  m_longitude = a_geolocation.getLongitude();
+  m_altitude = a_geolocation.getAltitude();
+  m_heading = a_geolocation.getHeading();
+  m_headingConfidence = a_geolocation.getHeadingConfidence();
+}
+
+void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
+{
+  if(strcmp(a_voice.getType().c_str(),"cam") == 0){
+    std::string dataString = a_voice.getData();
     std::vector<unsigned char> data(dataString.begin(), dataString.end());
     std::shared_ptr<Buffer const> buffer(new Buffer(data));
     std::shared_ptr<Buffer::Iterator> inIterator = buffer->GetIterator();

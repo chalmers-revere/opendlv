@@ -21,13 +21,26 @@ project(opendlv-system-core-diagnostics)
 include_directories(include)
 
 # Build
-file(GLOB_RECURSE thisproject-sources "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+file(GLOB_RECURSE thisproject-sources 
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/health/*.cpp"
+)
+
 add_library(${PROJECT_NAME}lib-static STATIC ${thisproject-sources})
+
 add_executable(${PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
 target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+
+add_executable(${PROJECT_NAME}-health "${CMAKE_CURRENT_SOURCE_DIR}/src/health/main.cpp")
+target_link_libraries(${PROJECT_NAME}-health ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
 # Test
 include(RunTests)
 
 # Install
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin COMPONENT system-core)
+install(TARGETS ${PROJECT_NAME}-health RUNTIME DESTINATION bin COMPONENT system-core)
+install(TARGETS ${PROJECT_NAME}-health RUNTIME DESTINATION bin COMPONENT system-core)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/health/checkHealth.sh DESTINATION bin PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ)
+
+

@@ -177,16 +177,21 @@ void OpticalFlow::nextContainer(odcore::data::Container &a_c)
 
 void OpticalFlow::SendContainer()
 {
-  uint16_t nPoints = m_staticImagePoints.size();
-  std::vector<float> x,y,u,v;
+  uint16_t numberOfPoints = m_staticImagePoints.size();
+  std::vector<opendlv::model::Direction> directions;
+  std::vector<float> u;
+  std::vector<float> v;
   for(uint8_t i = 0; i < m_staticImagePoints.size(); i++){
     // std::cout<< m_staticImagePoints[i].x << std::endl;
-    x.push_back(m_staticImagePoints[i].x);
-    y.push_back(m_staticImagePoints[i].y);
-    u.push_back(m_endImagePoints[i].x - m_staticImagePoints[i].x);
-    v.push_back(m_endImagePoints[i].y - m_staticImagePoints[i].y);
+    float x = m_staticImagePoints[i].x;
+    float y = m_staticImagePoints[i].y;
+    opendlv::model::Direction direction(x, y);
+
+    directions.push_back(direction);
+    u.push_back(m_endImagePoints[i].x - x);
+    v.push_back(m_endImagePoints[i].y - y);
   }
-  opendlv::sensation::OpticalFlow nextMessage(nPoints,x,y,u,v);
+  opendlv::sensation::OpticalFlow nextMessage(numberOfPoints, directions, u, v);
   odcore::data::Container c(nextMessage);
   getConference().send(c);
 }
