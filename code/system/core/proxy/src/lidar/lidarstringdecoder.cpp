@@ -60,8 +60,8 @@ LidarStringDecoder::LidarStringDecoder(odcore::io::conference::ContainerConferen
   m_startResponse[4] = 0x00;
   m_startResponse[5] = 0xA0;
   m_startResponse[6] = 0x00;
-  m_startResponse[7] = 0x10;
-  m_startResponse[8] = 0x16;
+  m_startResponse[7] = 0x10; //11?
+  m_startResponse[8] = 0x16; //17?
   m_startResponse[9] = 0x0A;
   m_measurementHeader[0] = 0x02;
   m_measurementHeader[1] = 0x80;
@@ -111,8 +111,8 @@ LidarStringDecoder::LidarStringDecoder(odcore::io::conference::ContainerConferen
   m_centimeterResponse[38] = 0x00;
   m_centimeterResponse[39] = 0x02;
   m_centimeterResponse[40] = 0xCB;
-  m_centimeterResponse[41] = 0x10;
-  m_centimeterResponse[42] = 0xB0;
+  m_centimeterResponse[41] = 0x10; //11?
+  m_centimeterResponse[42] = 0xB0; //B1?
   m_centimeterResponse[43] = 0x11;
 }
 
