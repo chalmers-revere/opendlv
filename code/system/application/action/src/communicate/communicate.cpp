@@ -52,18 +52,19 @@ Communicate::~Communicate()
  * Receives messages to communicate.
  * Sends message via V2V or HMI.
  */
-void Communicate::nextContainer(odcore::data::Container &c)
+void Communicate::nextContainer(odcore::data::Container &a_c)
 {
-  if(c.getDataType() == opendlv::knowledge::Message::ID()){
-    // std::cout << "Got message!" << std::endl;
-    opendlv::knowledge::Message message = 
-        c.getData<opendlv::knowledge::Message>();
-
-    opendlv::proxy::V2vRequest nextMessage(message.getSize(),message.getData());
-
-    odcore::data::Container containerToSend(nextMessage);
-    getConference().send(containerToSend);
+  if(a_cc.getDataType() != opendlv::knowledge::Message::ID()){
+    return;
   }
+  // std::cout << "Got message!" << std::endl;
+  opendlv::knowledge::Message message = 
+      a_c.getData<opendlv::knowledge::Message>();
+
+  opendlv::proxy::V2vRequest nextMessage(message.getSize(),message.getData());
+
+  odcore::data::Container containerToSend(nextMessage);
+  getConference().send(containerToSend);
 }
 
 void Communicate::setUp()
