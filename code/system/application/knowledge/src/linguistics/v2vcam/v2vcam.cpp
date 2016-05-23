@@ -249,11 +249,14 @@ void V2vCam::nextContainer(odcore::data::Container &c)
 }
 
 void V2vCam::ReadDynamicState(
-    opendlv::model::DynamicState const &)
+    opendlv::model::DynamicState const &a_dynamicState)
 {
-  // m_speed = a_dynamicState.getVelocity().getX();
-  // m_speedConfidence = a_dynamicState.getVelocityConfidence().getX();
+  m_speed = a_dynamicState.getVelocity().getX();
+  // std::cout << a_dynamicState.getVelocity().getX() << std::endl;
+  m_speedConfidence = a_dynamicState.getVelocityConfidence().getX();
+  // std::cout << a_dynamicState.getVelocityConfidence().getX() << std::endl;
   // m_yawRateValue = a_dynamicState.getAngularVelocity().getZ();
+  std::cout << a_dynamicState.getAngularVelocity().getZ() << std::endl;
   // m_yawRateConfidence = a_dynamicState.getAngularVelocityConfidence().getZ();
   // m_longitudinalAcc = a_dynamicState.getAcceleration().getX();
   // m_longitudinalAccConf = a_dynamicState.getAccelerationConfidence().getX();
@@ -265,8 +268,10 @@ void V2vCam::ReadGeolocation(
   m_latitude = a_geolocation.getLatitude();
   m_longitude = a_geolocation.getLongitude();
   m_altitude = a_geolocation.getAltitude();
-  // m_heading = a_geolocation.getHeading();
-  // m_headingConfidence = a_geolocation.getHeadingConfidence();
+  m_heading = a_geolocation.getHeading();
+  // std::cout << a_geolocation.getHeading() << std::endl;
+  m_headingConfidence = a_geolocation.getHeadingConfidence();
+  // std::cout << a_geolocation.getHeadingConfidence() << std::endl;
 }
 
 void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
@@ -474,9 +479,23 @@ int32_t V2vCam::GetHeading() const
 
 int32_t V2vCam::GetHeadingConfidence() const
 {
-  double scale = std::pow(10,1)*opendlv::Constants::RAD2DEG;
-  double val = static_cast<double>(m_headingConfidence);
-  return static_cast<int32_t>(std::round(val*scale));
+  double conversion = opendlv::Constants::RAD2DEG;
+  double scale = std::pow(10,1);
+  double val = m_headingConfidence*scale*conversion;
+  // std::cout << val << std::endl;
+  if(val < 0){
+    return 127;
+  }
+  else if(val < 1){
+    return 1;
+  }
+  else if(val > 125){
+    return 126;
+  }
+  else{
+    return static_cast<int32_t>(std::round(val));
+
+  }
 }
 
 int32_t V2vCam::GetSpeed() const
@@ -487,9 +506,23 @@ int32_t V2vCam::GetSpeed() const
 
 int32_t V2vCam::GetSpeedConfidence() const
 {
-  return 127;
-  // int32_t scale = std::pow(10,2);
-  // return static_cast<int32_t>(std::round(m_speedConfidence*scale));
+  // std::cout << m_speedConfidence << std::endl;
+
+  if(m_speedConfidence < 0){
+    return 127;
+  }
+  else if(m_speedConfidence < 0.01){
+    return 1;
+  }
+  else if(m_heading > 1.25){
+    return 126;
+  }
+  else{
+
+    int32_t scale = std::pow(10,2);
+    return static_cast<int32_t>(std::round(m_speedConfidence*scale));
+
+  }
 }
 
 int32_t V2vCam::GetVehicleLength() const
