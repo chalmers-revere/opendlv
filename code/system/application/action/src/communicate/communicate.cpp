@@ -54,7 +54,7 @@ Communicate::~Communicate()
  */
 void Communicate::nextContainer(odcore::data::Container &a_c)
 {
-  if(a_cc.getDataType() != opendlv::knowledge::Message::ID()){
+  if(a_c.getDataType() != opendlv::knowledge::Message::ID()){
     return;
   }
   // std::cout << "Got message!" << std::endl;
