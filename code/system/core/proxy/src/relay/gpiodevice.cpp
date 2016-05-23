@@ -17,10 +17,42 @@
  * USA.
  */
 
-#include "toggeler/toggeler.hpp"
+#include "relay/gpiodevice.hpp"
 
-int32_t main(int32_t a_argc, char **a_argv)
+namespace opendlv {
+namespace proxy {
+namespace relay {
+
+/**
+ * Constructor.
+ *
+ */
+GpioDevice::GpioDevice(std::vector<bool> a_initialValues, 
+    std::vector<uint16_t> a_pins, std::string const &a_deviceNode):
+  Device(a_initialValues),
+  m_device() 
 {
-  opendlv::proxy::toggeler::Toggeler toggeler(a_argc, a_argv);
-  return toggeler.runModule();
+  (void)a_pins;
+  (void)a_deviceNode;
 }
+
+GpioDevice::~GpioDevice()
+{
+}
+
+bool GpioDevice::IsActive(uint16_t const a_index) const
+{
+  (void) a_index;
+  return false;
+}
+
+void GpioDevice::SetValue(uint16_t const a_index, bool const a_value)
+{
+  (void) a_index;
+  (void) a_value;
+}
+
+} // relay
+} // proxy
+} // opendlv
+

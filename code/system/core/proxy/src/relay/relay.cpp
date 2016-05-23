@@ -24,15 +24,16 @@
 
 #include "opendavinci/odcore/base/KeyValueConfiguration.h"
 #include "opendavinci/odcore/data/Container.h"
+#include "opendavinci/odcore/strings/StringToolbox.h"
 
 #include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
-#include "toggeler/toggeler.hpp"
-#include "toggeler/device.hpp"
+#include "relay/relay.hpp"
+#include "relay/gpiodevice.hpp"
 
 namespace opendlv {
 namespace proxy {
-namespace toggeler {
+namespace relay {
 
 /**
   * Constructor.
@@ -40,44 +41,69 @@ namespace toggeler {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-Toggeler::Toggeler(int32_t const &a_argc, char **a_argv)
+Relay::Relay(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(
-      a_argc, a_argv, "proxy-toggeler")
+      a_argc, a_argv, "proxy-relay")
     , m_device()
 {
 }
 
-Toggeler::~Toggeler()
+Relay::~Relay()
 {
 }
 
-void Toggeler::nextContainer(odcore::data::Container &)
+void Relay::nextContainer(odcore::data::Container &)
 {
 }
 
-void Toggeler::setUp()
+void Relay::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
-  std::string const type =
-  kv.getValue<std::string>("proxy-toggeler.type");
-  /*  std::string const port = kv.getValue<std::string>(
-   *      "proxy-toggeler.port");
-  */
-  if (type.compare("serial") == 0) {
-    //      m_device = std::unique_ptr<Device>(new SerialDevice());
+  std::string const type = kv.getValue<std::string>("proxy-relay.type");
+
+  std::string const valuesString = 
+      kv.getValue<std::string>("proxy-relay.values");
+
+  std::vector<bool> values;
+
+  std::vector<std::string> valuesVector = 
+      odcore::strings::StringToolbox::split(valuesString, ',');
+  for (auto valueString : valuesVector) {
+    bool value = static_cast<bool>(std::stoi(valueString));
+    values.push_back(value);
+  }
+
+  if (type.compare("gpio") == 0) {
+    std::string const deviceNode = 
+        kv.getValue<std::string>("proxy-relay.gpio.device_node");
+
+    std::string const pinsString = 
+        kv.getValue<std::string>("proxy-relay.gpio.pins");
+
+    std::vector<uint16_t> pins;
+
+    std::vector<std::string> pinsVector = 
+        odcore::strings::StringToolbox::split(pinsString, ',');
+    for (auto pinString : pinsVector) {
+      uint16_t pin = std::stoi(pinString);
+      pins.push_back(pin);
+    }
+
+     m_device = std::unique_ptr<Device>(new GpioDevice(values, pins,
+         deviceNode));
   }
 
   if (m_device.get() == nullptr) {
-    std::cerr << "[proxy-toggeler] No valid device driver defined."
+    std::cerr << "[proxy-relay] No valid device driver defined."
               << std::endl;
   }
 }
 
-void Toggeler::tearDown()
+void Relay::tearDown()
 {
 }
 
-} // toggeler
+} // relay
 } // proxy
 } // opendlv
