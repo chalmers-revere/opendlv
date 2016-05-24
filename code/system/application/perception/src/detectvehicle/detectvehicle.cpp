@@ -56,6 +56,7 @@ DetectVehicle::DetectVehicle(int32_t const &a_argc, char **a_argv)
     , m_verifiedVehicles()
     , m_vehicleMemorySystem()
     , m_convNeuralNet()
+    , m_scale(1, 1, 1)
 {
   /*
   m_vehicleDetectionSystem = std::shared_ptr<VehicleDetectionSystem>(
@@ -69,7 +70,6 @@ DetectVehicle::DetectVehicle(int32_t const &a_argc, char **a_argv)
   m_convNeuralNet = std::shared_ptr<ConvNeuralNet>(
       new ConvNeuralNet);
 
-  m_convNeuralNet->SetUp();
 }
 
 DetectVehicle::~DetectVehicle()
@@ -81,6 +81,9 @@ void DetectVehicle::setUp()
 {
   std::cout << "DetectVehicle::setUp()" << std::endl;
   //m_vehicleDetectionSystem->setUp();
+  m_convNeuralNet->SetUp();
+  float scale = 1280.0f/800.0f;
+  m_scale = Eigen::Vector3d(scale, scale, 1);
 }
 
 /**
@@ -260,7 +263,8 @@ void DetectVehicle::TransformPointToGlobalFrame(Eigen::Vector3d &point,
 {
   // std::cout<<"point before \n";
   // std::cout<<point<<std::endl;
-  // point = point.cwiseProduct(m_scale); // should not be needed...
+  //Eigen::Vector3d scale(1.6, 1.6, 1);
+  point = point.cwiseProduct(m_scale);
   // std::cout<<"point after 1\n";
   // std::cout<<point<<std::endl;
   point = transformationMatrix * point;
