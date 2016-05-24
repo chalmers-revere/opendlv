@@ -62,13 +62,13 @@ V2vCam::V2vCam(int32_t const &a_argc, char **a_argv)
     ::system("mkdir -p ./var/application/knowledge/linguistics/v2vcam");
     std::cout<<"Created dir"<<std::endl;
   }
-  odcore::data::TimeStamp nu;
+  odcore::data::TimeStamp now;
 
   std::stringstream filenameSend;
   std::stringstream filenameReceive;
 
-  filenameSend << "/" << nu.getYYYYMMDD_HHMMSS() << " cam send.log";
-  filenameReceive << "/" << nu.getYYYYMMDD_HHMMSS() << " cam receive.log";
+  filenameSend << "/" << now.getYYYYMMDD_HHMMSS() << " cam send.log";
+  filenameReceive << "/" << now.getYYYYMMDD_HHMMSS() << " cam receive.log";
   m_sendLog.open("var/application/knowledge/linguistics/v2vcam" 
     + filenameSend.str(), std::ios::out | std::ios::app);
   m_receiveLog.open("var/application/knowledge/linguistics/v2vcam" 
@@ -376,8 +376,8 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
     opendlv::data::environment::WGS84Coordinate::EAST);
 
     opendlv::data::environment::WGS84Coordinate currentLocation(
-    latitude, opendlv::data::environment::WGS84Coordinate::NORTH,
-    longitude, opendlv::data::environment::WGS84Coordinate::EAST);
+    latitude/std::pow(10,7), opendlv::data::environment::WGS84Coordinate::NORTH,
+    longitude/std::pow(10,7), opendlv::data::environment::WGS84Coordinate::EAST);
 
     opendlv::data::environment::Point3 currentObjectCartesianLocation =
     gpsReference.transform(currentLocation);
