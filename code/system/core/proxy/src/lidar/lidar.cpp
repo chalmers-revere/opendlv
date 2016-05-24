@@ -64,18 +64,18 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Lidar::body()
       == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
     if(m_lidarStringDecoder->IsRunning()) {
       SendData();
-      std::cout << "Echo sent" << std endl;
+      std::cout << "Echo sent" << std::endl;
     }
     else if(m_lidarStringDecoder->IsCentimeterMode()){
       StartScan();
       m_lidarStringDecoder->NotCentimeterMode();
-      std::cout << "Centimeter mode!" << std endl;
+      std::cout << "Centimeter mode!" << std::endl;
     }
     else if(m_lidarStringDecoder->IsSettingsMode())
     {
       SetCentimeterMode();
       m_lidarStringDecoder->NotSettingsMode();
-      std::cout << "Settings mode" << std endl;
+      std::cout << "Settings mode" << std::endl;
     }
   }
 
