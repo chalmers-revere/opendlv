@@ -64,15 +64,18 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Lidar::body()
       == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
     if(m_lidarStringDecoder->IsRunning()) {
       SendData();
+      std::cout << "Echo sent" << std endl;
     }
     else if(m_lidarStringDecoder->IsCentimeterMode()){
       StartScan();
       m_lidarStringDecoder->NotCentimeterMode();
+      std::cout << "Centimeter mode!" << std endl;
     }
     else if(m_lidarStringDecoder->IsSettingsMode())
     {
       SetCentimeterMode();
       m_lidarStringDecoder->NotSettingsMode();
+      std::cout << "Settings mode" << std endl;
     }
   }
 
@@ -84,7 +87,7 @@ void Lidar::setUp()
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
   std::string const type = kv.getValue<std::string>("proxy-lidar.type");
-  
+
   double x = kv.getValue<float>("proxy-lidar.mount.x");
   double y = kv.getValue<float>("proxy-lidar.mount.y");
   double z = kv.getValue<float>("proxy-lidar.mount.z");
