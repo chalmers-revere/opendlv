@@ -121,7 +121,7 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
 					}
 				}
 		  }
-		  if(pointCloud.size() > 4) { //TODO: evaluate parameter and move to config
+		  if(pointCloud.size() > 10) { //TODO: evaluate parameter and move to config
 		  	//std::cout << "Nytt object!" << std::endl;
 		  	
 				double minDist = m_distances[pointCloud[0]];
@@ -159,10 +159,10 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
 				identifiedObjects[objectCounter].setDirectionConfidence(0.5f);
 				identifiedObjects[objectCounter].setDirectionRateConfidence(-1.0f);
 				identifiedObjects[objectCounter].setAngularSize(maxAngle-minAngle);
-				identifiedObjects[objectCounter].setAngularSizeConfidence(0.5);
+				identifiedObjects[objectCounter].setAngularSizeConfidence(0.5f);
 				identifiedObjects[objectCounter].setAngularSizeRateConfidence(-1.0f);
 				identifiedObjects[objectCounter].setConfidence(dynConfidence);
-				identifiedObjects[objectCounter].setSources(1);
+				identifiedObjects[objectCounter].setSources(1.0f);
 
 				objectCounter++;
 		  }
@@ -173,7 +173,9 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
 	for(uint32_t i = 0; i < objectCounter; i++) {
   	odcore::data::Container c(identifiedObjects[i]);
   	getConference().send(c);
-  	std::cout << "Object sent with distance " << identifiedObjects[i].getDistance() << " and angle:"  << identifiedObjects[i].getDirection().getAzimuth() << std::endl;
+  	std::cout << "Object sent with distance: " << identifiedObjects[i].getDistance() << " and angle:"  << 
+  			identifiedObjects[i].getDirection().getAzimuth() << "and angular size: " << 
+  			identifiedObjects[i].getAngularSize() << std::endl;
 	}
 
 }

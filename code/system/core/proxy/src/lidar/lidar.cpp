@@ -62,9 +62,29 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Lidar::body()
 {
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() 
       == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+    /*
+    opendlv::model::Direction direction(0.0f,0.0f);
+    std::vector<opendlv::model::Direction> directions;
+    std::vector<double> distances;
+    float PI = 3.1415f;
+    for(int i = 0; i < 361; i++)
+    {
+      direction.setAzimuth(i * PI/ 360.0f);
+      directions.push_back(direction);
+      distances.push_back(1.0);
+    }
+    opendlv::proxy::EchoReading reading; 
+
+    reading.setListOfDirections(directions);
+    reading.setListOfRadii(distances);
+    reading.setNumberOfPoints(distances.size());
+    odcore::data::Container c(reading);
+    getConference().send(c);
+    */
+    
     if(m_lidarStringDecoder->IsRunning()) {
       SendData();
-      std::cout << "Echo sent" << std::endl;
+      //std::cout << "Echo sent" << std::endl;
     }
     else if(m_lidarStringDecoder->IsCentimeterMode()){
       StartScan();
@@ -77,6 +97,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Lidar::body()
       m_lidarStringDecoder->NotSettingsMode();
       std::cout << "Settings mode" << std::endl;
     }
+    
   }
 
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
@@ -84,6 +105,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Lidar::body()
 
 void Lidar::setUp()
 {
+  
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
   std::string const type = kv.getValue<std::string>("proxy-lidar.type");
@@ -127,6 +149,7 @@ void Lidar::setUp()
   std::cout << "Connected to Sickan, please wait for configuration" << std::endl;
 
   SettingsMode(); //Enter settings mode
+  
 }
 
 void Lidar::SendData()
