@@ -165,7 +165,7 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
 	for(uint32_t i = 0; i < objectCounter; i++) {
   	odcore::data::Container c(identifiedObjects[i]);
   	getConference().send(c);
-  	std::cout << "Object sent" << std::endl;
+  	std::cout << "Object sent with distance " << identifiedObjects[i].getDistance() << std::endl;
 	}
 
 }
