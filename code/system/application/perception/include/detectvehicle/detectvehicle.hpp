@@ -25,6 +25,8 @@
 
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
+ 
+#include <Eigen/Dense>
 
 #include "detectvehicle/vehicledetectionsystem.hpp"
 #include "detectvehicle/detectedvehicle.hpp"
@@ -55,6 +57,11 @@ class DetectVehicle
  private:
   void setUp();
   void tearDown();
+
+  Eigen::MatrixXd ReadMatrix(std::string fileName,int nRows,
+      int nCols);
+  void sendObjectInformation(std::vector<cv::Rect>* detections, 
+      odcore::data::TimeStamp timeStampOfImage);
 
   float PixelPosToHeading(float pixelPosX);
 

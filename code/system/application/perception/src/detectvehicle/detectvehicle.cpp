@@ -137,66 +137,40 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   //double timeStamp = ((double)c.getSentTimeStamp().toMicroseconds())/1000000;
   //std::cout << "timeStamp: " << timeStamp << std::endl;
 
+  Eigen::Matrix3d transformationMatrix;
+
+  std::string cameraName = mySharedImg.getName();
+  std::cout << "Received image from camera \"" << cameraName  << "\"!" << std::endl;
+
+  if (cameraName == "front-left") {
+    transformationMatrix = ReadMatrix(
+        "/opt/opendlv/share/opendlv/tools/vision/projection/leftCameraTransformationMatrix.csv",3,3);
+  }
+  else if (cameraName == "front-right") {
+    transformationMatrix = ReadMatrix(
+        "/opt/opendlv/share/opendlv/tools/vision/projection/rightCameraTransformationMatrix.csv",3,3);
+  }
+  else {
+    std::cout << "Cannot load transformation matrix for " << cameraName 
+        << ", aborting image analysis..." << std::endl;
+
+    // Release memory, no memory leaks for the people!
+    cvReleaseImage(&myIplImage);
+    return;
+  }
+
 
   m_convNeuralNet->Update(&myImage);
 
   std::vector<cv::Rect> detections;
   m_convNeuralNet->GetDetectedVehicles(&detections);
 
+  sendObjectInformation(&detections, timeStampOfImage);
 
-  for (uint32_t i=0; i<detections.size(); i++) {
-    cv::Rect currentBoundingBox = detections.at(i);
 
-    odcore::data::TimeStamp lastSeen = timeStampOfImage;
-    
-    std::string type = "vehicle";
-    float typeConfidence = 0.8f;
 
-    float headingOfXmin = this->PixelPosToHeading(currentBoundingBox.x);
-    float headingOfXmax = this->PixelPosToHeading(currentBoundingBox.x + currentBoundingBox.width);
-    float angularSize = headingOfXmin - headingOfXmax;
-    float angularSizeConfidence = 0.8f;
-
-    float azimuth = headingOfXmin - angularSize / 2.0f; //midpoint of box
-    float zenith = 0.0f;
-    opendlv::model::Direction direction(azimuth, zenith);
-    float directionConfidence = 1.0f;
-
-    float azimuthRate = 0.0f;
-    float zenithRate = 0.0f;
-    opendlv::model::Direction directionRate(azimuthRate, zenithRate);
-    float directionRateConfidence = -1.0f;
-
-    float distance = 0.0f;
-    float distanceConfidence = -1.0;
-
-    float angularSizeRate = 0.0f;
-    float angularSizeRateConfidence = -1.0f;
-
-    float confidence = 0.8f;
-    uint16_t sources = 1;
-
-    std::vector<std::string> properties;
-
-    uint16_t objectId = -1;
-
-    opendlv::perception::Object detectedObject(lastSeen, type, typeConfidence,
-        direction, directionConfidence, directionRate, directionRateConfidence,
-        distance, distanceConfidence, angularSize, angularSizeConfidence,
-        angularSizeRate, angularSizeRateConfidence, confidence, sources,
-        properties, objectId);
-    odcore::data::Container objectContainer(detectedObject);
-    getConference().send(objectContainer);
-
-    std::cout << "    type:          " << type << std::endl;
-    std::cout << "    angle:         " << angle << std::endl;
-    std::cout << "    size:          " << size << std::endl;
-    std::cout << "    angle (deg):   " << (angle*(float)opendlv::Constants::RAD2DEG) << std::endl;
-    std::cout << "    size (deg):    " << (size*(float)opendlv::Constants::RAD2DEG) << std::endl;
-    std::cout << "    objectIndex:   " << objectIndex << std::endl;
-    std::cout << "    azimuth:       " << azimuth << std::endl;
-    std::cout << "    angular size:  " << angularSize << std::endl;
-  }
+  // Old stuff below
+  
 
   /*
   m_verifiedVehicles->clear();
@@ -260,6 +234,96 @@ void DetectVehicle::tearDown()
   m_convNeuralNet->TearDown();
 }
 
+Eigen::MatrixXd DetectVehicle::ReadMatrix(std::string fileName, int nRows,
+    int nCols)
+{
+  std::ifstream file(fileName);
+
+  Eigen::MatrixXd matrix(nRows,nCols);
+
+  if (file.is_open()) {
+    for(int i = 0; i < nRows; i++){
+      for(int j = 0; j < nCols; j++){
+        double item = 0.0;
+        file >> item;
+        matrix(i,j) = item;
+      }
+    }
+  }  
+  file.close();
+
+  return matrix;
+}
+
+void DetectVehicle::sendObjectInformation(std::vector<cv::Rect>* detections, 
+    odcore::data::TimeStamp timeStampOfImage)
+{
+  std::cout << "Sending info about " << detections->size() 
+      << " objects..." << std::endl;
+  for (uint32_t i=0; i<detections->size(); i++) {
+    
+    cv::Rect currentBoundingBox = detections->at(i);
+
+    odcore::data::TimeStamp lastSeen = timeStampOfImage;
+    
+    std::string type = "vehicle";
+    float typeConfidence = 1.0f;
+
+
+    float headingOfXmin = this->PixelPosToHeading(currentBoundingBox.x);
+    float headingOfXmax = this->PixelPosToHeading(currentBoundingBox.x + currentBoundingBox.width);
+    float angularSize = headingOfXmin - headingOfXmax;
+    float angularSizeConfidence = -1.0f;
+
+
+    float azimuth = headingOfXmin - angularSize / 2.0f; //midpoint of box
+    float zenith = 0.0f;
+    opendlv::model::Direction direction(azimuth, zenith);
+    float directionConfidence = -1.0f;
+
+    float azimuthRate = 0.0f;
+    float zenithRate = 0.0f;
+    opendlv::model::Direction directionRate(azimuthRate, zenithRate);
+    float directionRateConfidence = -1.0f;
+
+
+    float distance = 0.0f;
+    float distanceConfidence = -1.0;
+
+
+    float angularSizeRate = 0.0f;
+    float angularSizeRateConfidence = -1.0f;
+
+
+    float confidence = 0.1f;
+    uint16_t sources = 1;
+
+    std::vector<std::string> properties;
+
+    uint16_t objectId = -1;
+
+    opendlv::perception::Object detectedObject(lastSeen, type, typeConfidence,
+        direction, directionConfidence, directionRate, directionRateConfidence,
+        distance, distanceConfidence, angularSize, angularSizeConfidence,
+        angularSizeRate, angularSizeRateConfidence, confidence, sources,
+        properties, objectId);
+    odcore::data::Container objectContainer(detectedObject);
+    getConference().send(objectContainer);
+
+    std::cout << "DetectedObject:"     << type << std::endl;
+    std::cout << "    type:          " << type << std::endl;
+    /*
+    std::cout << "    angle:         " << angle << std::endl;
+    std::cout << "    size:          " << size << std::endl;
+    std::cout << "    angle (deg):   " << (angle*(float)opendlv::Constants::RAD2DEG) << std::endl;
+    std::cout << "    size (deg):    " << (size*(float)opendlv::Constants::RAD2DEG) << std::endl;
+    std::cout << "    objectIndex:   " << objectIndex << std::endl;
+    std::cout << "    azimuth:       " << azimuth << std::endl;
+    std::cout << "    angular size:  " << angularSize << std::endl;
+    */
+  }
+}
+
 
 float DetectVehicle::PixelPosToHeading(float pixelPosX)
 {
@@ -268,7 +332,6 @@ float DetectVehicle::PixelPosToHeading(float pixelPosX)
   float assumedFov = opendlv::Constants::DEG2RAD*60;
   float pixelsPerRadian = assumedImageWidth/assumedFov;
 
-  std::cout << std::endl;
   /*
   std::cout << "pixelPosX:          " << pixelPosX << std::endl;
   std::cout << "midPoint:           " << midPoint << std::endl;
