@@ -284,7 +284,7 @@ void DetectVehicle::sendObjectInformation(std::vector<cv::Rect>* detections,
     odcore::data::TimeStamp lastSeen = timeStampOfImage;
     
     std::string type = "vehicle";
-    float typeConfidence = 1.0f;
+    float typeConfidence = 0.5f;
 
     Eigen::Vector3d pointBottomLeft(
         currentBoundingBox.x, 
@@ -335,8 +335,13 @@ void DetectVehicle::sendObjectInformation(std::vector<cv::Rect>* detections,
     std::vector<std::string> properties;
 
     uint16_t objectId = -1;
-
-    if (angularSize < 0) {
+/*
+    float detectionWidth = (float) 
+        sqrt(pow(pointBottomRight(0) - pointBottomLeft(0),2) + 
+        pow(pointBottomRight(1) - pointBottomLeft(1),2));
+*/
+    if (angularSize < 0 || distance > 150) {
+      // Something fishy with this detection
       continue;
     }
 
