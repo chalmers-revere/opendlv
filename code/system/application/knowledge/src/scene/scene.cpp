@@ -55,7 +55,6 @@ Scene::~Scene()
 void Scene::nextContainer(odcore::data::Container &a_container)
 {
 
-  /*
   if(a_container.getDataType() == opendlv::perception::Object::ID()) {
     opendlv::perception::Object unpackedObject =
     a_container.getData<opendlv::perception::Object>();
@@ -64,30 +63,35 @@ void Scene::nextContainer(odcore::data::Container &a_container)
 
     if (m_ID != -1) {
     	return;    	
-    } else {    	
-    	odcore::data::TimeStamp m_timeStamp = unpackedObject.getIdentified();
-    	std::string m_type = unpackedObject.getType();
-    	float m_typeConfidence = unpackedObject.getTypeConfidence();
-    	opendlv::model::Direction m_direction = unpackedObject.getDirection();
-    	float m_azimuth = m_direction.getAzimuth();
-    	float m_directionConfidence = unpackedObject.getDirectionConfidence();
-    	opendlv::model::Direction m_directionRate = unpackedObject.getDirectionRate();
-    	float m_directionRateAzimuth = m_directionRate.getAzimuth();
-    	float m_directionRateConfidence = unpackedObject.getDirectionRateConfidence();
-    	float m_distance = unpackedObject.getDistance();
-    	float m_distanceConfidence = unpackedObject.getDistanceConfidence();
-    	float m_angularSize = unpackedObject.getAngularSize();
-    	float m_angularSizeConfidence = unpackedObject.getAngularSizeConfidence();
-    	float m_angularSizeRate = unpackedObject.getAngularSizeRate();
-    	float m_angularSizeRateConfidence = unpackedObject.getAngularSizeRateConfidence();
-    	float m_confidence = unpackedObject.getConfidence();
-    	uint16_t m_sources = unpackedObject.getSources();
-    	std::vector<std::string> m_properties = unpackedObject.getListOfProperties();
     }
+    //odcore::data::TimeStamp m_timeStamp = unpackedObject.getIdentified();
+    std::string m_type = unpackedObject.getType();
+    //float m_typeConfidence = unpackedObject.getTypeConfidence();
+    opendlv::model::Direction m_direction = unpackedObject.getDirection();
+	float m_azimuth = m_direction.getAzimuth();
+	//float m_directionConfidence = unpackedObject.getDirectionConfidence();
+	//opendlv::model::Direction m_directionRate = unpackedObject.getDirectionRate();
+	//float m_directionRateAzimuth = m_directionRate.getAzimuth();
+	//float m_directionRateConfidence = unpackedObject.getDirectionRateConfidence();
+	float m_distance = unpackedObject.getDistance();
+	//float m_distanceConfidence = unpackedObject.getDistanceConfidence();
+	//float m_angularSize = unpackedObject.getAngularSize();
+	//float m_angularSizeConfidence = unpackedObject.getAngularSizeConfidence();
+	//float m_angularSizeRate = unpackedObject.getAngularSizeRate();
+	//float m_angularSizeRateConfidence = unpackedObject.getAngularSizeRateConfidence();
+	//float m_confidence = unpackedObject.getConfidence();
+	//uint16_t m_sources = unpackedObject.getSources();
+	//std::vector<std::string> m_properties = unpackedObject.getListOfProperties();
+    
+    std::cout << "ID: " << m_ID << std::endl;
+    std::cout << "Type: " << m_type << std::endl;
+    std::cout << "Distance: " << m_distance << std::endl;
+    std::cout << "Angle: " << m_azimuth << std::endl << std::endl;
+
   }
 
-*/
-(void)a_container;
+
+
 
 }
 

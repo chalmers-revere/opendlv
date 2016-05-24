@@ -80,7 +80,7 @@ void Act::nextContainer(odcore::data::Container &a_container)
 
   if(a_container.getDataType() == opendlv::action::Correction::ID()) {
     opendlv::action::Correction correction = 
-    c.getData<opendlv::action::Correction>();
+    a_container.getData<opendlv::action::Correction>();
 
     m_t0 = correction.getStartTime();
     m_type = correction.getType();

@@ -379,9 +379,9 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
 
     if (std::abs(m_yOffset) < 0.001){
       if (m_xOffset < 0.0){
-        m_azimuth = 3.14159;
+        m_azimuth = 3.14159f;
       } else {
-        m_azimuth = 0.0;
+        m_azimuth = 0.0f;
       }
     } else if (std::abs(m_xOffset) < 0.001){
       if (m_yOffset < 0.0){
@@ -396,15 +396,15 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
     odcore::data::TimeStamp now;
     std::string m_type = "vehicle";
     float m_typeConfidence = 1.0f;
-    opendlv::model::Direction m_objectDirection(m_azimuth, 0.0);
+    opendlv::model::Direction m_objectDirection(m_azimuth, 0.0f);
     float m_objectDirectionConfidence = 0.5f;
-    opendlv::model::Direction m_objectDirectionRate(-1, -1);
+    opendlv::model::Direction m_objectDirectionRate(0.0f, 0.0f);
     float m_objectDirectionRateConfidence = -1.0f;
     float m_distance = std::sqrt((m_xOffset * m_xOffset) + (m_yOffset * m_yOffset));
     float m_distanceConfidence = 0.5f;
     float m_angularSize = -1.0f;
     float m_angularSizeConfidence = -1.0f;
-    float m_angularSizeRate = -1.0f;
+    float m_angularSizeRate = 0.0f;
     float m_angularSizeRateConfidence = -1.0f;
     float m_confidence = 1.0f;
     uint16_t m_sources = 1;
