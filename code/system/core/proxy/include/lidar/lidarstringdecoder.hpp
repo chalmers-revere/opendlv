@@ -19,7 +19,7 @@
 
 #ifndef LIDAR_LIDARSTRINGDECODER_HPP_
 #define LIDAR_LIDARSTRINGDECODER_HPP_
-
+ 
 #include <opendavinci/odcore/io/StringListener.h>
 #include <opendavinci/odcore/io/conference/ContainerConference.h>
 

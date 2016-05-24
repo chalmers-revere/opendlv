@@ -115,12 +115,14 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
 					uint32_t x = pointCloud[i];
 					double dist = PointDistance(m_angles[x], m_distances[x], m_angles[j], m_distances[j]);
 					if(dist < 1 && !Contains(j,pointCloud)) {
+						std::cout << "Close points" << std::endl;
 						pointCloud.push_back(j);
 						usedPoints.push_back(j);
 					}
 				}
 		  }
-		  if(pointCloud.size() > 4) {
+		  if(pointCloud.size() > 4) { //TODO: evaluate parameter and move to config
+		  	std::cout << "Nytt object!" << std::endl;
 		  	
 				double minDist = m_distances[pointCloud[0]];
 				//uint32_t minIndex = pointCloud[0];
@@ -141,7 +143,7 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
 				}
 				//Set Object
 				//TODO: Dynamic confidence
-				float dynConfidence = sqrt(static_cast<float>(pointCloud.size()))/3;
+				float dynConfidence = std::sqrt(static_cast<float>(pointCloud.size()))/3.0f;
 				if(dynConfidence > 1) {
 					dynConfidence = 1;
 				}
@@ -150,7 +152,7 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
 				identifiedObjects[objectCounter].setTypeConfidence(-1.0f);
 				identifiedObjects[objectCounter].setDistance(minDist);
 				identifiedObjects[objectCounter].setDistanceConfidence(0.5f);
-				opendlv::model::Direction objectDirection = opendlv::model::Direction((maxAngle+minAngle)/2, 0.0f);
+				opendlv::model::Direction objectDirection = opendlv::model::Direction((maxAngle+minAngle)/2.0f, 0.0f);
 				identifiedObjects[objectCounter].setDirection(objectDirection);
 				identifiedObjects[objectCounter].setDirectionConfidence(0.5f);
 				identifiedObjects[objectCounter].setDirectionRateConfidence(-1.0f);
@@ -191,7 +193,7 @@ double Echolocation::PointDistance(float a_angle1, double a_dist1, float a_angle
 	double y1 = std::sin(static_cast<double>(a_angle1))*a_dist1;
 	double x2 = std::cos(static_cast<double>(a_angle2))*a_dist2;
 	double y2 = std::sin(static_cast<double>(a_angle2))*a_dist2;
-	double between = sqrt(pow(x1-x2,2) + pow(y1-y2,2));
+	double between = std::sqrt(std::pow(x1-x2,2) + std::pow(y1-y2,2));
 	return between;
 }
 

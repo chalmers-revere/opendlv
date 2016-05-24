@@ -173,6 +173,7 @@ bool LidarStringDecoder::CheckForStartResponse()
 
 opendlv::proxy::EchoReading LidarStringDecoder::GetLatestReading() const
 {
+//  std::lock_guard<std::mutex> guard(g_readingMutex);
   return m_latestReading;
 }
 
@@ -206,6 +207,8 @@ void LidarStringDecoder::ConvertToDistances()
       m_radii.push_back(radius);
     }
   }
+
+ // std::lock_guard<std::mutex> guard(g_readingMutex);
 
   m_latestReading.setListOfDirections(m_directions);
   m_latestReading.setListOfRadii(m_radii);
