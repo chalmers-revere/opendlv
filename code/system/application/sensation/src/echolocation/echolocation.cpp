@@ -104,7 +104,7 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
   uint32_t nPoints = m_angles.size();
   uint32_t objectCounter = 0;
 
-  std::cout << "Before algorithm, new points: " << nNewPointsoints << std::endl;
+  std::cout << "Before algorithm, new points: " << nNewPoints << std::endl;
 
 	for(uint32_t k = 0; k < nPoints; k++) {
 		pointCloud.clear();
