@@ -30,7 +30,7 @@
 #include "geolocation/kinematicmodel.hpp"
 #include "geolocation/kinematicobservationmodel.hpp"
 
-
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 namespace opendlv {
 namespace sensation {
@@ -56,31 +56,39 @@ class Geolocation
     *  Accuracy of the geographical position m
     *
     */
-  double calculatePositionConfidence();
+  double calculatePositionConfidence(bool a_filterSuccess);
 
 
   /** The heading confidence in rad
     */
-  double calculateHeadingConfidence();
+  double calculateHeadingConfidence(bool a_filterSuccess);
 
   /**   The heading rate in rad/s.
     *
     */
-  double calculateHeadingRateConfidence();
+  double calculateHeadingRateConfidence(bool a_filterSuccess);
 
   /**   Speed confidence in m/s.
     *
     */
-   double calculateSpeedConfidence();
+   double calculateSpeedConfidence(bool a_filterSuccess);
+
+   /**   Reset the EKF
+     *
+     */
+   void filterReset(opendlv::data::environment::Point3 a_currentCartesianLocation,
+                    opendlv::proxy::GpsReading a_currentWGS84Location );
 
 
    Kalman::ExtendedKalmanFilter<opendlv::sensation::geolocation::State<double>> 
        m_ekf;
 
 
+
    const double m_gpsToCoGDisplacement_x = -1.5; ///--> Displacement between the real position of the GPS and the CoG of the vehicle in [m]
    const double m_gpsToCoGDisplacement_y = -1.0; ///--> Displacement between the real position of the GPS and the CoG of the vehicle in [m]
    const double m_gpsToCoGDisplacement_z = -2.3; ///--> Displacement between the real position of the GPS and the CoG of the vehicle in [m]
+   const double m_steeringToWheelRatio = -22.0;  ///--> Ration between the steering wheel angle sensor and the actual wheels angle
 
 
 };

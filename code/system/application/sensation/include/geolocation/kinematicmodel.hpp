@@ -149,6 +149,16 @@ public:
     double getDeltaT ( ) {return delta_t;}
 
 
+/*    void resetState(const S& x){
+        this->
+    this->S.x = 0.0;// x;
+    this->S.x_dot = 0.0;
+    this->S.y = 0.0;
+    this->S.y_dot = 0.0;
+    this->S.theta = 0.0;
+    this->S.theta_dot = x.theta_dot();
+    }*/
+
     /**
      * @brief Definition of the parameters for the truck kinematic model
      *
@@ -161,19 +171,22 @@ public:
      *
      * Where b = vehicle wheelbase and phi=steering angle
      *
-     * @param [ ] wheelbase = vehiche wheelbase, default value = 3.8 (m)
+     * @param [ ] wheelbase = vehiche wheelbase, default value = 3.4 (m)
      */
     struct vehicleParams {
       double wheelbase;   ///--> distance between the front axle and the rear axle of a vechicle
 
-      vehicleParams() : wheelbase(3.8) {}
+      vehicleParams() : wheelbase(defaultWheelbase) {}
 
       /**
        * @brief Espose the wheelbase to be set by the user
        *
-       * @param [in] wheelbase = vehiche wheelbase, default value = 3.8 (m)
+       * @param [in] wheelbase = vehiche wheelbase, default value = 3.4 (m)
        */
-      void setWheelbase (double _wheelbase) { wheelbase = _wheelbase; }
+      void setWheelbase (double a_wheelbase) { wheelbase = a_wheelbase; }
+
+    private :
+      const double defaultWheelbase = 3.4;
 
     };
     vehicleParams m_vehicleParams;
@@ -319,6 +332,8 @@ protected:
 
     //! Variables to handle a variable timestamp in the data
     double delta_t = 0.0;
+
+
 };
 
 } // geolocation
