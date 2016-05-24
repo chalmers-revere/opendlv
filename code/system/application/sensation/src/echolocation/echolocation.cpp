@@ -68,7 +68,7 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
   odcore::data::TimeStamp diffStamp = now - m_times.back(); //Remove old data
   double diffSeconds = diffStamp.toMicroseconds() / 1000000.0;
 
-  while(diffSeconds < 0.55) {
+  while(diffSeconds < 1.05) {
   	m_times.pop_back();
   	m_angles.pop_back();
   	m_distances.pop_back();
@@ -137,6 +137,10 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
 				}
 				//Set Object
 				//TODO: Dynamic confidence
+				float dynConfidence = sqrt(static_cast<float>(pointCloud.size()))/3;
+				if(dynConfidence > 1) {
+					dynConfidence = 1;
+				}
 				identifiedObjects[objectCounter] = opendlv::perception::Object();
 				identifiedObjects[objectCounter].setIdentified(now);
 				identifiedObjects[objectCounter].setTypeConfidence(-1.0f);
@@ -149,7 +153,7 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
 				identifiedObjects[objectCounter].setAngularSize(maxAngle-minAngle);
 				identifiedObjects[objectCounter].setAngularSizeConfidence(0.5);
 				identifiedObjects[objectCounter].setAngularSizeRateConfidence(-1.0f);
-				identifiedObjects[objectCounter].setTypeConfidence(1);
+				identifiedObjects[objectCounter].setConfidence(dynConfidence);
 				identifiedObjects[objectCounter].setSources(1);
 
 				objectCounter++;
