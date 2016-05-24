@@ -26,6 +26,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <math.h>
  
 #include "opendavinci/odcore/base/KeyValueConfiguration.h"
 #include "opendlv/data/environment/WGS84Coordinate.h"
@@ -367,8 +368,8 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
     opendlv::data::environment::WGS84Coordinate::EAST);
 
     opendlv::data::environment::WGS84Coordinate currentLocation(
-    latitude, opendlv::data::environment::WGS84Coordinate::NORTH,
-    longitude, opendlv::data::environment::WGS84Coordinate::EAST);
+    latitude / std::pow(10,7), opendlv::data::environment::WGS84Coordinate::NORTH,
+    longitude / std::pow(10,7), opendlv::data::environment::WGS84Coordinate::EAST);
 
     opendlv::data::environment::Point3 currentObjectCartesianLocation =
     gpsReference.transform(currentLocation);
@@ -390,7 +391,7 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
         m_azimuth = 3.14159 / 2.0;
       }
     } else {
-      m_azimuth = std::atan(m_xOffset/m_yOffset);
+      m_azimuth = std::atan2(m_yOffset, m_xOffset);
     }
 
     odcore::data::TimeStamp now;
@@ -407,7 +408,8 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
     float m_angularSizeRate = 0.0f;
     float m_angularSizeRateConfidence = -1.0f;
     float m_confidence = 1.0f;
-    uint16_t m_sources = 1;
+    std::vector<std::string> m_sources;
+    m_sources.push_back("v2vcam");
     std::vector<std::string> m_properties;
     m_properties.push_back("Station Id: " + std::to_string(stationId));
     m_properties.push_back("Vehicle length: " + std::to_string(vehicleLength));

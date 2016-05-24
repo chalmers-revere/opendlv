@@ -179,7 +179,7 @@ message opendlv.perception.Object [id = 181] {
   float angularSizeRateConfidence [id = 13];
 
   float confidence [id = 14];
-  uint16 sources [id = 15];
+  list<string> sources [id = 15];
 
   list<string> properties [id = 16];
 

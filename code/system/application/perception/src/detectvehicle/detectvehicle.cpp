@@ -172,7 +172,8 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
     float angularSizeRateConfidence = -1.0f;
 
     float confidence = 0.8f;
-    uint16_t sources = 1;
+    std::vector<std::string> sources;
+    sources.push_back("Camera");
 
     std::vector<std::string> properties;
 
