@@ -107,7 +107,15 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
       c.getData<odcore::data::image::SharedImage>();
 
   // extract time stamp from container
-  odcore::data::TimeStamp timeStampOfImage = c.getSentTimeStamp();
+  //odcore::data::TimeStamp timeStampOfImage = c.getSentTimeStamp();
+  odcore::data::TimeStamp timeStampOfImage = c.getReceivedTimeStamp();
+
+  odcore::data::TimeStamp nowTimeStamp;
+
+  //double tmpSeconds = (nowTimeStamp - timeStampOfImage).toMicroseconds() / 1000000.0;
+  //std::cout << "tmpSeconds: " << tmpSeconds << std::endl;
+  //std::cout << "timeStampOfImage: " << timeStampOfImage << std::endl;
+  //std::cout << "timeStampOfImage (s): " << (timeStampOfImage.toMicroseconds() / 1000000.0) << std::endl;
 
   std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(
       odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(
@@ -168,7 +176,7 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   std::vector<cv::Rect> detections;
   m_convNeuralNet->GetDetectedVehicles(&detections);
 
-  sendObjectInformation(&detections, timeStampOfImage, transformationMatrix);
+  sendObjectInformation(&detections, timeStampOfImage, transformationMatrix, cameraName);
 
 
 
@@ -279,7 +287,8 @@ void DetectVehicle::TransformPointToGlobalFrame(Eigen::Vector3d &point,
 
 void DetectVehicle::sendObjectInformation(std::vector<cv::Rect>* detections, 
     odcore::data::TimeStamp timeStampOfImage, 
-    Eigen::Matrix3d transformationMatrix)
+    Eigen::Matrix3d transformationMatrix,
+    std::string cameraName)
 {
   for (uint32_t i=0; i<detections->size(); i++) {
     
@@ -335,7 +344,7 @@ void DetectVehicle::sendObjectInformation(std::vector<cv::Rect>* detections,
 
     float confidence = 0.1f;
     std::vector<std::string> sources;
-    sources.push_back("Camera");
+    sources.push_back(cameraName);
 
     std::vector<std::string> properties;
 
