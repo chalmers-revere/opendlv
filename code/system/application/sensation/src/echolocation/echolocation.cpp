@@ -61,7 +61,7 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
 	if(a_c.getDataType() != opendlv::proxy::EchoReading::ID()){
   	return;
   }
-  std::cout << "Echolocation container recieved" << std::endl;
+  //std::cout << "Echolocation container recieved" << std::endl;
 
   odcore::data::TimeStamp now;
 
@@ -115,14 +115,14 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
 					uint32_t x = pointCloud[i];
 					double dist = PointDistance(m_angles[x], m_distances[x], m_angles[j], m_distances[j]);
 					if(dist < 1 && !Contains(j,pointCloud)) {
-						std::cout << "Close points" << std::endl;
+						//std::cout << "Close points" << std::endl;
 						pointCloud.push_back(j);
 						usedPoints.push_back(j);
 					}
 				}
 		  }
 		  if(pointCloud.size() > 4) { //TODO: evaluate parameter and move to config
-		  	std::cout << "Nytt object!" << std::endl;
+		  	//std::cout << "Nytt object!" << std::endl;
 		  	
 				double minDist = m_distances[pointCloud[0]];
 				//uint32_t minIndex = pointCloud[0];
@@ -142,7 +142,7 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
 					}
 				}
 
-				std::cout << "Setting object!" << std::endl;
+				//std::cout << "Setting object!" << std::endl;
 				//Set Object
 				//TODO: Dynamic confidence
 				float dynConfidence = std::sqrt(static_cast<float>(pointCloud.size()))/3.0f;
@@ -173,7 +173,7 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
 	for(uint32_t i = 0; i < objectCounter; i++) {
   	odcore::data::Container c(identifiedObjects[i]);
   	getConference().send(c);
-  	std::cout << "Object sent with distance " << identifiedObjects[i].getDistance() << std::endl;
+  	std::cout << "Object sent with distance " << identifiedObjects[i].getDistance() << " and angle:"  << identifiedObjects[i].getDistance().getAzimuth() << std::endl;
 	}
 
 }
