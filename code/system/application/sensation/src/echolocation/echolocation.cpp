@@ -173,7 +173,7 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
 	for(uint32_t i = 0; i < objectCounter; i++) {
   	odcore::data::Container c(identifiedObjects[i]);
   	getConference().send(c);
-  	std::cout << "Object sent with distance " << identifiedObjects[i].getDistance() << " and angle:"  << identifiedObjects[i].getDistance().getAzimuth() << std::endl;
+  	std::cout << "Object sent with distance " << identifiedObjects[i].getDistance() << " and angle:"  << identifiedObjects[i].getDirection().getAzimuth() << std::endl;
 	}
 
 }
