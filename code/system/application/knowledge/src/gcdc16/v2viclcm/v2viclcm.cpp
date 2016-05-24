@@ -152,9 +152,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vIclcm::body()
     std::vector<unsigned char> bytes = outBuffer->GetBytes();
     std::string bytesString(bytes.begin(),bytes.end());
     // std::cout<< bytesString << std::endl;
-    opendlv::knowledge::Message nextMessage(bytesString.size(),bytesString);
-    odcore::data::Container c(nextMessage);
-    getConference().send(c);
+    // opendlv::knowledge::Message nextMessage(bytesString.size(),bytesString);
+    // odcore::data::Container c(nextMessage);
+    // getConference().send(c);
 
 
 

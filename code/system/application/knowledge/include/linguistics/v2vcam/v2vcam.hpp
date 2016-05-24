@@ -90,9 +90,9 @@ class V2vCam
   int32_t m_stationType = 8;
   double m_latitude = 90.0000001;
   double m_longitude = 180.0000001;
-  int32_t m_semiMajorConfidence = 4095;
-  int32_t m_semiMinorConfidence = 4095;
-  int32_t m_semiMajorOrientation = 3601;
+  double m_semiMajorConfidence = -1;
+  double m_semiMinorConfidence = -1;
+  double m_semiMajorOrientation = -1;
   double m_altitude = 8000.01;
   double m_heading = 360.1*opendlv::Constants::DEG2RAD;
   double m_headingConfidence = -1;

@@ -29,12 +29,14 @@
  
 #include "opendavinci/odcore/base/KeyValueConfiguration.h"
 #include "opendlv/data/environment/WGS84Coordinate.h"
+#include "opendlv/data/environment/Point3.h"
 
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
 
 #include "linguistics/v2vcam/buffer.hpp"
 #include "linguistics/v2vcam/v2vcam.hpp"
+
 
 
 namespace opendlv {
@@ -256,7 +258,7 @@ void V2vCam::ReadDynamicState(
   m_speedConfidence = a_dynamicState.getVelocityConfidence().getX();
   // std::cout << a_dynamicState.getVelocityConfidence().getX() << std::endl;
   // m_yawRateValue = a_dynamicState.getAngularVelocity().getZ();
-  std::cout << a_dynamicState.getAngularVelocity().getZ() << std::endl;
+  // std::cout << a_dynamicState.getAngularVelocity().getZ() << std::endl;
   // m_yawRateConfidence = a_dynamicState.getAngularVelocityConfidence().getZ();
   // m_longitudinalAcc = a_dynamicState.getAcceleration().getX();
   // m_longitudinalAccConf = a_dynamicState.getAccelerationConfidence().getX();
@@ -365,6 +367,68 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
         + "," + std::to_string(vehicleRole);
         m_receiveLog << std::endl; 
 
+    opendlv::data::environment::WGS84Coordinate gpsReference;
+
+    gpsReference = opendlv::data::environment::WGS84Coordinate(
+    m_latitude,
+    opendlv::data::environment::WGS84Coordinate::NORTH,
+    m_longitude,
+    opendlv::data::environment::WGS84Coordinate::EAST);
+
+    opendlv::data::environment::WGS84Coordinate currentLocation(
+    latitude, opendlv::data::environment::WGS84Coordinate::NORTH,
+    longitude, opendlv::data::environment::WGS84Coordinate::EAST);
+
+    opendlv::data::environment::Point3 currentObjectCartesianLocation =
+    gpsReference.transform(currentLocation);
+
+    double m_xOffset = currentObjectCartesianLocation.getX();
+    double m_yOffset = currentObjectCartesianLocation.getY();
+    float m_azimuth;
+
+    if (std::abs(m_yOffset) < 0.001){
+      if (m_xOffset < 0.0){
+        m_azimuth = 3.14159f;
+      } else {
+        m_azimuth = 0.0f;
+      }
+    } else if (std::abs(m_xOffset) < 0.001){
+      if (m_yOffset < 0.0){
+        m_azimuth = -3.14159 / 2.0;
+      } else {
+        m_azimuth = 3.14159 / 2.0;
+      }
+    } else {
+      m_azimuth = std::atan(m_xOffset/m_yOffset);
+    }
+
+    odcore::data::TimeStamp now;
+    std::string m_type = "vehicle";
+    float m_typeConfidence = 1.0f;
+    opendlv::model::Direction m_objectDirection(m_azimuth, 0.0f);
+    float m_objectDirectionConfidence = 0.5f;
+    opendlv::model::Direction m_objectDirectionRate(0.0f, 0.0f);
+    float m_objectDirectionRateConfidence = -1.0f;
+    float m_distance = std::sqrt((m_xOffset * m_xOffset) + (m_yOffset * m_yOffset));
+    float m_distanceConfidence = 0.5f;
+    float m_angularSize = -1.0f;
+    float m_angularSizeConfidence = -1.0f;
+    float m_angularSizeRate = 0.0f;
+    float m_angularSizeRateConfidence = -1.0f;
+    float m_confidence = 1.0f;
+    uint16_t m_sources = 1;
+    std::vector<std::string> m_properties;
+    m_properties.push_back("Station Id: " + std::to_string(stationId));
+    m_properties.push_back("Vehicle length: " + std::to_string(vehicleLength));
+    m_properties.push_back("Vehicle width: " + std::to_string(vehicleWidth));
+    uint16_t m_objectId = -1;
+    
+    opendlv::perception::Object detectedObject(now, m_type, m_typeConfidence, m_objectDirection, m_objectDirectionConfidence, m_objectDirectionRate, m_objectDirectionRateConfidence,
+    m_distance, m_distanceConfidence, m_angularSize, m_angularSizeConfidence, m_angularSizeRate, m_angularSizeRateConfidence, m_confidence, m_sources, m_properties, m_objectId);
+    odcore::data::Container objectContainer(detectedObject);
+    getConference().send(objectContainer);
+
+
   } else {
     // std::cout << "Message type not CAM." << std::endl;
   }
@@ -440,47 +504,105 @@ int32_t V2vCam::GetStationType() const
 int32_t V2vCam::GetLatitude() const
 {
   int32_t scale = std::pow(10,7);
-  return static_cast<int32_t>(std::round(m_latitude*scale));
+  double val = m_latitude*scale;
+  if(val < -900000000 || val > 900000000){
+    return 900000001;
+  }
+  else {    
+    return static_cast<int32_t>(std::round(val));
+  }
 }
 
 int32_t V2vCam::GetLongitude() const
 {
   int32_t scale = std::pow(10,7);
-  return static_cast<int32_t>(std::round(m_longitude*scale));
+  double val = m_longitude*scale;
+  if(val< -1800000000 || val > 1800000000){
+    return 1800000001;
+  }
+  else{
+    return static_cast<int32_t>(std::round(val));
+  }
 }
 
 int32_t V2vCam::GetSemiMajorConfidence() const
 {
-  return m_semiMajorConfidence;
+  int32_t scale = std::pow(10,2);
+  double val = m_semiMajorConfidence*scale;
+  if(val < 0){
+    return 4095;
+  }
+  else if(val < 1){
+    return 1;
+  }
+  else if(val > 4093){
+    return 4094
+  }
+  else{
+    return static_cast<int32_t>(std::round(val));
+  }
 }
 
 int32_t V2vCam::GetSemiMinorConfidence() const
 {
-  return m_semiMinorConfidence;
+  int32_t scale = std::pow(10,2);
+  double val = m_semiMinorConfidence*scale;
+  if(val < 0){
+    return 4095;
+  }
+  else if(val < 1){
+    return 1;
+  }
+  else if(val > 4093){
+    return 4094
+  }
+  else{
+    return static_cast<int32_t>(std::round(val));
+  }
 }
 
 int32_t V2vCam::GetSemiMajorOrientation() const
 {
-  return m_semiMajorOrientation;
+  double conversion = opendlv::Constants::RAD2DEG;
+  int32_t scale = std::pow(10,2);
+  double val = m_semiMajorOrientation*scale*conversion;
+  if(val < 0 || val > 3600){
+    return 3601;
+  }
+  else {
+    return static_cast<int32_t>(std::round(val));
+  }
 }
 
 int32_t V2vCam::GetAltitude() const
 {
   int32_t scale = std::pow(10,2);
-  return static_cast<int32_t>(std::round(m_altitude*scale));
+  double val = m_altitude*scale;
+  if(val < -100000 || val > 800000){
+    return 800001;
+  }
+  else{
+    return static_cast<int32_t>(std::round(val));
+  }
 }
 
 int32_t V2vCam::GetHeading() const
 {
-  double scale = std::pow(10,1)*opendlv::Constants::RAD2DEG;
-  double val = static_cast<double>(m_heading);
-  return static_cast<int32_t>(std::round(val*scale));
+  double conversion = opendlv::Constants::RAD2DEG;
+  int32_t scale = std::pow(10,1);
+  double val = m_heading*scale*conversion;
+  if(val < 0 || val > 3600){
+    return 3601;
+  }
+  else {
+    return static_cast<int32_t>(std::round(val));
+  }
 }
 
 int32_t V2vCam::GetHeadingConfidence() const
 {
   double conversion = opendlv::Constants::RAD2DEG;
-  double scale = std::pow(10,1);
+  int32_t scale = std::pow(10,1);
   double val = m_headingConfidence*scale*conversion;
   // std::cout << val << std::endl;
   if(val < 0){
