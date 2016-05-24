@@ -1,9 +1,39 @@
+/**
+ * Copyright (C) 2015 Chalmers REVERE
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
+
+#include <fcntl.h>
+#include <linux/i2c-dev.h>
+#include <sys/ioctl.h>
+
 #include "imu/pololualtimu10device.hpp"
 
-PololuAltImu10Device::PololuAltImu10Device(std::string const a_deviceName) :
-    m_deviceFile(),
-    m_initialized(false),
-    Device()
+namespace opendlv {
+namespace proxy {
+namespace imu {
+
+/**
+ * Constructor.
+ *
+ */
+PololuAltImu10Device::PololuAltImu10Device(std::string const &a_deviceName) :
+    Device(),
+    m_deviceFile()
 {
   m_deviceFile = open(a_deviceName.c_str(), O_RDWR);
   if (m_deviceFile < 0) {
@@ -11,11 +41,13 @@ PololuAltImu10Device::PololuAltImu10Device(std::string const a_deviceName) :
     return;
   }
  
-  std::cout << "I2C bus " << a_deviceName << " opened successfully." << std::endl;
+  std::cout << "I2C bus " << a_deviceName << " opened successfully." 
+      << std::endl;
 
   uint8_t address = 0x6b;
-  if (ioctl(file, I2C_SLAVE, address) < 0) {
-    std::cerr << "Failed to acquire bus access or talk to slave device." << std::endl;
+  if (ioctl(m_deviceFile, I2C_SLAVE, address) < 0) {
+    std::cerr << "Failed to acquire bus access or talk to slave device." 
+        << std::endl;
     return;
   }
 
@@ -24,6 +56,10 @@ PololuAltImu10Device::PololuAltImu10Device(std::string const a_deviceName) :
   I2cWriteRegister(0x12, 0x04);
 
   m_initialized = true;
+}
+
+PololuAltImu10Device::~PololuAltImu10Device()
+{
 }
 
 void PololuAltImu10Device::I2cWriteRegister(uint8_t a_register, uint8_t a_value)
@@ -48,7 +84,7 @@ opendlv::proxy::AccelerometerReading PololuAltImu10Device::ReadAccelerometer()
   uint8_t status = write(m_deviceFile, buffer, 1);
   if (status != 1) {
     std::cerr <<  "Failed to write to the i2c bus." << std::endl;
-    return;
+    return nullptr;
   }
 
   char outBuffer[6];
@@ -81,8 +117,8 @@ opendlv::proxy::AccelerometerReading PololuAltImu10Device::ReadAccelerometer()
   float scaledY = static_cast<float>(y);
   float scaledZ = static_cast<float>(z);
 
-  float[] reading = {scaledX, scaledY, scaledZ};
-  opendlv::proxy::AccelerometerReading acceleromoterReading(reading);
+  float reading[] = {scaledX, scaledY, scaledZ};
+  opendlv::proxy::AccelerometerReading accelerometerReading(reading);
   return accelerometerReading;
 }
 
@@ -94,7 +130,7 @@ opendlv::proxy::GyroscopeReading PololuAltImu10Device::ReadGyroscope()
   uint8_t status = write(m_deviceFile, buffer, 1);
   if (status != 1) {
     std::cerr <<  "Failed to write to the i2c bus." << std::endl;
-    return;
+    return nullptr;
   }
 
   char outBuffer[6];
@@ -127,7 +163,11 @@ opendlv::proxy::GyroscopeReading PololuAltImu10Device::ReadGyroscope()
   float scaledY = static_cast<float>(y);
   float scaledZ = static_cast<float>(z);
 
-  float[] reading = {scaledX, scaledY, scaledZ};
+  float reading[] = {scaledX, scaledY, scaledZ};
   opendlv::proxy::GyroscopeReading gyroscopeReading(reading);
   return gyroscopeReading;
 }
+
+} // imu
+} // proxy
+} // opendlv

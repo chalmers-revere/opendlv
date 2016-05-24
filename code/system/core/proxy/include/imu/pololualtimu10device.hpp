@@ -17,37 +17,32 @@
  * USA.
  */
 
-#ifndef IMU_IMU_HPP_
-#define IMU_IMU_HPP_
+#ifndef IMU_POLOLUALTIMU10DEVICE_HPP_
+#define IMU_POLOLUALTIMU10DEVICE_HPP_
 
-#include <memory>
+#include <cstdint>
+#include <iostream>
+#include <string>
 
-#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
-#include "opendavinci/odcore/data/Container.h"
+#include "imu/device.hpp"
 
 namespace opendlv {
 namespace proxy {
 namespace imu {
 
-class Device;
-
-/**
- * This class provides...
- */
-class Imu
-: public odcore::base::module::DataTriggeredConferenceClientModule {
+class PololuAltImu10Device : public Device {
  public:
-  Imu(int32_t const &, char **);
-  Imu(Imu const &) = delete;
-  Imu &operator=(Imu const &) = delete;
-  virtual ~Imu();
-  virtual void nextContainer(odcore::data::Container &);
+  PololuAltImu10Device(std::string const &);
+  PololuAltImu10Device(PololuAltImu10Device const &) = delete;
+  PololuAltImu10Device &operator=(PololuAltImu10Device const &) = delete;
+  virtual ~PololuAltImu10Device();
+  opendlv::proxy::AccelerometerReading ReadAccelerometer();
+  opendlv::proxy::GyroscopeReading ReadGyroscope();
 
  private:
-  void setUp();
-  void tearDown();
+  void I2cWriteRegister(uint8_t, uint8_t);
 
-  std::unique_ptr<Device> m_device;
+  int16_t m_deviceFile;
 };
 
 } // imu
