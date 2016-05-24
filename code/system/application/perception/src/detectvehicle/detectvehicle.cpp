@@ -348,7 +348,7 @@ void DetectVehicle::sendObjectInformation(std::vector<cv::Rect>* detections,
     odcore::data::Container objectContainer(detectedObject);
     getConference().send(objectContainer);
 
-    std::cout << "Sending DetectedObject:"     << type << std::endl;
+    std::cout << "Sending DetectedObject:" << std::endl;
     std::cout << "    type:          " << type << std::endl;
     std::cout << "    azimuth:       " << azimuth << std::endl;
     std::cout << "    azimuth (deg): " << (azimuth*(float)opendlv::Constants::RAD2DEG) << std::endl;
