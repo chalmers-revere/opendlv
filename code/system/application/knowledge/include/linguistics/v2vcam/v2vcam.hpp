@@ -95,15 +95,15 @@ class V2vCam
   int32_t m_semiMajorOrientation = 3601;
   double m_altitude = 8000.01;
   double m_heading = 360.1*opendlv::Constants::DEG2RAD;
-  double m_headingConfidence = 127;
+  double m_headingConfidence = 12.7*opendlv::Constants::DEG2RAD;
   double m_speed = 163.83; //
-  double m_speedConfidence = 127;
+  double m_speedConfidence = -1;
   int32_t m_vehicleLength = 73;
   int32_t m_vehicleWidth = 25;
-  double m_longitudinalAcc = 161;
-  double m_longitudinalAccConf = 102;
-  double m_yawRateValue = 32767;
-  double m_yawRateConfidence = 8;
+  double m_longitudinalAcc = 16.1;
+  double m_longitudinalAccConf = 10.2;
+  double m_yawRateValue = 327.67*opendlv::Constants::DEG2RAD;
+  double m_yawRateConfidence = -1;
   int32_t m_vehicleRole = 0;
 };
 

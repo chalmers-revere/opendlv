@@ -93,6 +93,9 @@ void GpsStringDecoder::nextString(std::string const &s) {
     }
 
     std::string type = fields.at(0);
+    // for(auto qq : fields){
+    //   std::cout << qq << ", ";
+    // }
 
     if (type == "GPGGA") {
       gotGpgga = true;
@@ -149,7 +152,7 @@ void GpsStringDecoder::nextString(std::string const &s) {
     } else if (type == "GPRMC") {
 
     } else {
-      std::cout << "[proxy-gpsstringdecoder] WARNING: Unknown packet type." << std::endl;
+      std::cout << "[proxy-gpsstringdecoder] WARNING: Unknown packet type. " << type << std::endl;
     }
   }
 
