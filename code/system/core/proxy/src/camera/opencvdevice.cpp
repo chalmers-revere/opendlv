@@ -54,8 +54,6 @@ OpenCvDevice::OpenCvDevice(std::string const &a_name,
     + ":" + a_password + "@" + a_port + "/axis-cgi/mjpg/video.cgi?user=" 
     + a_username + "&password=" + a_password + "&channel=0&.mjpg";
 
-  //videoStreamAddress = "/home/plankton/Videos/GCDC_videos/testrun_gbg.mkv";
-
   std::cout<< videoStreamAddress;
   m_capture.reset(new cv::VideoCapture(videoStreamAddress));
 
@@ -65,7 +63,7 @@ OpenCvDevice::OpenCvDevice(std::string const &a_name,
     m_capture->set(CV_CAP_PROP_FRAME_HEIGHT, a_height);
   }
   else {
-    std::cerr << "[proxy-camera] Could not open camera '" << a_name
+    std::cerr << "[proxy-camera] Could not open camera: " << a_name
               << std::endl;
   }
 
@@ -123,9 +121,8 @@ bool OpenCvDevice::CopyImageTo(char *a_destination, const uint32_t &a_size)
     // std::cout << "a_size: " << a_size << std::endl;
     ::memcpy(a_destination, m_image.data, a_size);
 
-    cv::imshow("Camera feed", m_image);
-    cv::waitKey(10);
-
+    // cv::imshow("Camera feed", m_image);
+    // cv::waitKey(10);
     retVal = true;
   }
 

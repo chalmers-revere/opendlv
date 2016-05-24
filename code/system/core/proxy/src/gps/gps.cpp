@@ -23,6 +23,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <iomanip>      // std::setprecision
 
 #include <opendavinci/odcore/base/KeyValueConfiguration.h>
 #include <opendavinci/odcore/data/Container.h>
@@ -51,6 +52,7 @@ Gps::Gps(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(a_argc, a_argv, "proxy-gps")
     , m_device()
     , m_trimble()
+    , m_gpsStringDecoder()
 {
 }
 
@@ -85,10 +87,15 @@ void Gps::setUp()
     string RECEIVER = kv.getValue<std::string>("proxy-gps.trimble.ip");
     uint32_t PORT = kv.getValue<uint32_t>("proxy-gps.trimble.port");
 
+    // Separated string decoding from GPS messages from this class.
+    // Therefore, we need to pass the getConference() reference to the other instance so that it can send containers.
+    m_gpsStringDecoder = std::unique_ptr<GpsStringDecoder>(new GpsStringDecoder(getConference()));
+
     try {
         m_trimble = shared_ptr<TCPConnection>(TCPFactory::createTCPConnectionTo(RECEIVER, PORT));
         m_trimble->setRaw(true);
-        m_trimble->setStringListener(this);
+        // The other instance is handling strings.
+        m_trimble->setStringListener(m_gpsStringDecoder.get());
         m_trimble->start();
     }
     catch(string &exception) {
@@ -99,133 +106,7 @@ void Gps::setUp()
 
 void Gps::tearDown()
 {
-}
-
-void Gps::nextString(std::string const &s) {
-
-
-  double timestamp;
-  double latitude;
-  double longitude;
-  float altitude;
-  float northHeading;
-  float speed;
-  uint8_t latitudeDirection;
-  uint8_t longitudeDirection;
-  uint8_t satelliteCount;
-  bool hasHeading;
-  bool hasRtk;
-
-  bool gotGpgga = false;
-  bool gotGpvtg = false;
-  bool gotGphdt = false;
-
-  std::vector<std::string> messages;
-
-  std::istringstream ss1(s);
-  std::string msg;
-  while(std::getline(ss1, msg, '$')) {
-    messages.push_back(msg);
-  }
-
-  if (messages.empty()) {
-    return;
-  }
-
-  for (auto message : messages) {
-
-    if (message.empty()) {
-      continue;
-    }
-
-    std::vector<std::string> fields;
-
-    std::istringstream ss2(message);
-    std::string field;
-    while(std::getline(ss2, field, ',')) {
-      fields.push_back(field);
-    }
-
-    if (fields.empty()) {
-      continue;
-    }
-
-    std::string type = fields.at(0);
-
-    if (type == "GPGGA") {
-      gotGpgga = true;
-
-      timestamp = std::stod(fields.at(1));
-      
-      latitude = std::stod(fields.at(2));
-      latitudeDirection = fields.at(3)[0];
-      
-      longitude = std::stod(fields.at(4));
-      longitudeDirection = fields.at(5)[0];
-
-      // 0: Non valid, 1: GPS fix, 2: DGPS fix, 4: RTK fix int, 5: RTK float int
-      int gpsQuality = std::stoi(fields.at(6));
-      if (gpsQuality == 4 || gpsQuality == 5) {
-        hasRtk = true;
-      } else {
-        hasRtk = false;
-      }
-
-      satelliteCount = std::stoi(fields.at(7));
-
-   //   float hdop = std::stof(fields.at(8));
-
-      altitude = std::stof(fields.at(9));
-      //std::string altitudeUnit = fields.at(10);
-
-  //    float geoidSeparation = std::stof(fields.at(11));
-  //    std::string geodSeparationUnit = fields.at(12);
-
-    } else if (type == "GPVTG") {
-      gotGpvtg = true;
-
-      // Convert to m/s.
-      speed = std::stof(fields.at(7)) / 3.6f;
-
-    } else if (type == "GPHDT") {
-      gotGphdt = true;
-
-      std::string headingStr = fields.at(1);
-      if (headingStr.empty()) {
-        northHeading = 0.0f;
-        hasHeading = false;
-      } else {
-        northHeading = std::stof(headingStr);
-        hasHeading = true;
-      }
-
-    } else if (type == "GPRMC") {
-
-    } else {
-      std::cout << "[proxy-gps] WARNING: Unknown packet type." << std::endl;
-    }
-  }
-
-  // according to the page 11 of this guide http://www2.etown.edu/wunderbot/DOWNLOAD/AgGPS114/NMEA_Messages_RevA_Guide_ENG.pdf
-  // the GPS out data with the following format dd mm,mmmm
-  // convert to deg befor sending
-  latitude=latitude/100;
-  longitude=longitude/100;
-
-  // just a check before sending the signal!
-  // std::cout << " GPS reading signals : LAT   " << latitude << "  LONG    " << longitude << std::endl;
-
-
-  if (gotGpgga && gotGpvtg && gotGphdt) {
-    opendlv::proxy::GpsReading nextGps(timestamp, latitude, longitude,
-        altitude, northHeading, speed, latitudeDirection, longitudeDirection,
-        satelliteCount, hasHeading, hasRtk);
-    odcore::data::Container c(nextGps);
-    getConference().send(c);
-  }
-
-
-  // Send opendlv::proxy::Wgs84Gps
+  m_trimble->setStringListener(NULL);
 }
 
 void Gps::nextContainer(odcore::data::Container &c) {

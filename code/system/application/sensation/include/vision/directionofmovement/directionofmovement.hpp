@@ -21,9 +21,14 @@
 #define VISION_DIRECTIONOFMOVEMENT_DIRECTIONOFMOVEMENT_HPP_
 
 #include <memory>
+#include <Eigen/Dense>
 
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
+
+#include "opencv2/video/tracking.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/highgui/highgui.hpp"
 
 namespace opendlv {
 namespace sensation {
@@ -45,6 +50,15 @@ class DirectionOfMovement
  private:
   void setUp();
   void tearDown();
+
+  void SendContainer();
+
+  Eigen::VectorXd m_foePix;
+  Eigen::VectorXd m_foeWorld;
+  Eigen::MatrixXd m_pixel2World;
+  cv::Mat m_image;
+
+
 };
 
 } // directionofmovement

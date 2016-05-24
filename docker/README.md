@@ -16,12 +16,303 @@ The binaries will be installed at opendlv.
 A Docker image containing the most recent binaries is created and tagged
 as latest automatically.
 
-Next, you can run a software distribution using docker-compose.
 
-    $ make run-example1
 
-Press Ctrl-C once you are finished testing your binaries.
 
-    $ make docker-cleanup
 
-The final call will remove recently exited containers.
+# Run all OpenDLV components with docker
+[Example output]:http://i.imgur.com/eWsbz4m.jpg
+
+
+Make sure to be located in the opendlv/docker/run folder before running. The components will use the `configuration` file located in this directory.
+
+**Start everything (-d flag sets detached mode):**
+````
+docker-compose up -d
+````
+
+
+
+**Stop everything:**
+````
+docker-compose down
+````
+
+
+
+**Show all (exited and current) docker containers (processes):**
+````
+docker ps -a
+````
+Example output from running `docker ps -a`:
+![Example output][Example output]
+
+As you can see everything is running except for two containers. Far right the name suggests it is the *camera* and *v2v*. To see the log for these failed containers you can run: 
+````
+docker logs [CONTAINER ID]
+````
+
+**Get log from running container. The name of service is found in the *docker-compose.yaml* file:**
+````
+docker-compose logs [NAME OF SERVICE]
+````
+*Example:*
+````
+docker-compose logs opendlv-system-application-perception-detectvehicle
+````
+
+
+### *docker-compose.yaml* file
+```YAML
+# Please note that docker-compose does not prescribe a startup order
+
+
+version: "2"
+services:
+  odsupercomponent:
+    image: revere/opendlv:latest
+    volumes:
+    - .:/opt/data
+    working_dir: "/opt/data"
+    environment:
+    - LD_LIBRARY_PATH=/opt/od/lib
+    - PATH=/opt/od/bin
+    command: "odsupercomponent --cid=111"
+
+
+
+  # Proxy
+
+  opendlv-system-core-proxy-can:
+    image: revere/opendlv:latest
+    volumes:
+    - .:/opt/data
+    working_dir: "/opt/data"
+    depends_on:
+      - odsupercomponent
+    environment:
+    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
+    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    command: "opendlv-system-core-proxy-can --cid=111 --freq=100"
+
+
+  opendlv-system-core-proxy-camera-0:
+    image: revere/opendlv:latest
+    volumes:
+    - .:/opt/data
+    working_dir: "/opt/data"
+    depends_on:
+      - odsupercomponent
+    environment:
+    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
+    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    command: "opendlv-system-core-proxy-camera --cid=111 --freq=10 --id=0"
+
+  opendlv-system-core-proxy-camera-1:
+    image: revere/opendlv:latest
+    volumes:
+    - .:/opt/data
+    working_dir: "/opt/data"
+    depends_on:
+      - odsupercomponent
+    environment:
+    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
+    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    command: "opendlv-system-core-proxy-camera --cid=111 --freq=10 --id=1"
+
+
+  opendlv-system-core-proxy-v2v:
+    image: revere/opendlv:latest
+    volumes:
+    - .:/opt/data
+    working_dir: "/opt/data"
+    depends_on:
+      - odsupercomponent
+    environment:
+    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
+    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    command: "opendlv-system-core-proxy-camera --cid=111 --freq=1"
+
+
+  opendlv-system-core-proxy-gps:
+    image: revere/opendlv:latest
+    volumes:
+    - .:/opt/data
+    working_dir: "/opt/data"
+    depends_on:
+      - odsupercomponent
+    environment:
+    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
+    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    command: "opendlv-system-core-proxy-gps --cid=111 --freq=1"
+
+
+
+  # Sensation
+
+  opendlv-system-application-sensation-audition:
+    image: revere/opendlv:latest
+    volumes:
+    - .:/opt/data
+    working_dir: "/opt/data"
+    depends_on:
+      - odsupercomponent
+    environment:
+    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
+    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    command: "opendlv-system-application-sensation-audition --cid=111 --freq=1"
+    
+
+
+  # Perception
+
+  opendlv-system-application-perception-detectlane:
+    image: revere/opendlv:latest
+    volumes:
+    - .:/opt/data
+    working_dir: "/opt/data"
+    depends_on:
+      - odsupercomponent
+    environment:
+    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
+    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    command: "opendlv-system-application-perception-detectlane --cid=111 --freq=1"
+    
+    
+  opendlv-system-application-perception-detectvehicle:
+    image: revere/opendlv:latest
+    volumes:
+    - .:/opt/data
+    working_dir: "/opt/data"
+    depends_on:
+      - odsupercomponent
+    environment:
+    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
+    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    command: "opendlv-system-application-perception-detectvehicle --cid=111 --freq=1"
+
+
+
+  # Knowledge
+
+  opendlv-system-application-knowledge-gcdc16-v2viclcm:
+    image: revere/opendlv:latest
+    volumes:
+    - .:/opt/data
+    working_dir: "/opt/data"
+    depends_on:
+      - odsupercomponent
+    environment:
+    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
+    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    command: "opendlv-system-application-knowledge-gcdc16-v2viclcm --cid=111 --freq=25"
+    
+    
+  opendlv-system-application-knowledge-linguistics-v2vcam:
+    image: revere/opendlv:latest
+    volumes:
+    - .:/opt/data
+    working_dir: "/opt/data"
+    depends_on:
+      - odsupercomponent
+    environment:
+    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
+    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    command: "opendlv-system-application-knowledge-linguistics-v2vcam --cid=111 --freq=25"
+    
+    
+  opendlv-system-application-knowledge-linguistics-v2vdenm:
+    image: revere/opendlv:latest
+    volumes:
+    - .:/opt/data
+    working_dir: "/opt/data"
+    depends_on:
+      - odsupercomponent
+    environment:
+    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
+    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    command: "opendlv-system-application-knowledge-linguistics-v2vdenm --cid=111 --freq=25"
+    
+    
+    
+  # Action
+
+  opendlv-system-application-action-act:
+    image: revere/opendlv:latest
+    volumes:
+    - .:/opt/data
+    working_dir: "/opt/data"
+    depends_on:
+      - odsupercomponent
+    environment:
+    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
+    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    command: "opendlv-system-application-action-act --cid=111 --freq=100"
+
+
+  opendlv-system-application-action-communicate:
+    image: revere/opendlv:latest
+    volumes:
+    - .:/opt/data
+    working_dir: "/opt/data"
+    depends_on:
+      - odsupercomponent
+    environment:
+    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
+    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    command: "opendlv-system-application-action-communicate --cid=111"
+    
+    
+  opendlv-system-application-action-keepobjectsize:
+    image: revere/opendlv:latest
+    volumes:
+    - .:/opt/data
+    working_dir: "/opt/data"
+    depends_on:
+      - odsupercomponent
+    environment:
+    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
+    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    command: "opendlv-system-application-action-keepobjectsize --cid=111"
+
+
+  opendlv-system-application-action-keepobjectalignment:
+    image: revere/opendlv:latest
+    volumes:
+    - .:/opt/data
+    working_dir: "/opt/data"
+    depends_on:
+      - odsupercomponent
+    environment:
+    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
+    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    command: "opendlv-system-application-action-keepobjectalignment --cid=111"
+    
+
+  opendlv-system-application-action-setopticalflow:
+    image: revere/opendlv:latest
+    volumes:
+    - .:/opt/data
+    working_dir: "/opt/data"
+    depends_on:
+      - odsupercomponent
+    environment:
+    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
+    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    command: "opendlv-system-application-action-setopticalflow --cid=111"
+
+
+
+  opendlv-new-component:
+    image: revere/opendlv:latest
+    volumes:
+    - .:/opt/data
+    working_dir: "/opt/data"
+    depends_on:
+      - odsupercomponent
+    environment:
+    - LD_LIBRARY_PATH=/opt/od/lib:/opt/odlv/lib
+    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/odlv/bin
+    command: "opendlv-system-application-action-setopticalflow --cid=111"
+
+```

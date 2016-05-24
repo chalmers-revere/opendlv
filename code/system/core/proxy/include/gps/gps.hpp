@@ -26,6 +26,8 @@
 #include <opendavinci/odcore/data/Container.h>
 #include <opendavinci/odcore/io/tcp/TCPConnection.h>
 
+#include "gps/gpsstringdecoder.hpp"
+
 namespace opendlv {
 namespace proxy {
 namespace gps {
@@ -35,8 +37,7 @@ class Device;
 /**
  * This class provides...
  */
-class Gps : public odcore::base::module::DataTriggeredConferenceClientModule,
-            public odcore::io::StringListener {
+class Gps : public odcore::base::module::DataTriggeredConferenceClientModule {
  public:
   Gps(int32_t const &, char **);
   Gps(Gps const &) = delete;
@@ -44,7 +45,6 @@ class Gps : public odcore::base::module::DataTriggeredConferenceClientModule,
   virtual ~Gps();
 
   virtual void nextContainer(odcore::data::Container &c);
-  virtual void nextString(const std::string &s);
 
  private:
   void setUp();
@@ -53,6 +53,7 @@ class Gps : public odcore::base::module::DataTriggeredConferenceClientModule,
  private:
   std::unique_ptr<Device> m_device;
   std::shared_ptr<odcore::io::tcp::TCPConnection> m_trimble;
+  std::unique_ptr<GpsStringDecoder> m_gpsStringDecoder;
 };
 
 } // gps

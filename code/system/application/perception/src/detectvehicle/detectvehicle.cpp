@@ -108,7 +108,7 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
 
   std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(
       odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(
-      mySharedImg.getName()));
+          mySharedImg.getName()));
   
   const uint32_t nrChannels = mySharedImg.getBytesPerPixel();
   const uint32_t imgWidth = mySharedImg.getWidth();
@@ -147,25 +147,55 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   for (uint32_t i=0; i<detections.size(); i++) {
     cv::Rect currentBoundingBox = detections.at(i);
 
-    std::vector<opendlv::perception::ObjectProperty> properties;
     odcore::data::TimeStamp lastSeen = timeStampOfImage;
+    
     std::string type = "vehicle";
+    float typeConfidence = 0.8f;
+
     float headingOfXmin = this->PixelPosToHeading(currentBoundingBox.x);
     float headingOfXmax = this->PixelPosToHeading(currentBoundingBox.x + currentBoundingBox.width);
-    float size = headingOfXmin - headingOfXmax;
-    float angle = headingOfXmin - size/2; //midpoint of box
-    uint16_t objectIndex = i;
+    float angularSize = headingOfXmin - headingOfXmax;
+    float angularSizeConfidence = 0.8f;
 
-    opendlv::perception::Object detectedObject(properties, lastSeen, type, angle, size, objectIndex);
+    float azimuth = headingOfXmin - angularSize / 2.0f; //midpoint of box
+    float zenith = 0.0f;
+    opendlv::model::Direction direction(azimuth, zenith);
+    float directionConfidence = 1.0f;
+
+    float azimuthRate = 0.0f;
+    float zenithRate = 0.0f;
+    opendlv::model::Direction directionRate(azimuthRate, zenithRate);
+    float directionRateConfidence = -1.0f;
+
+    float distance = 0.0f;
+    float distanceConfidence = -1.0;
+
+    float angularSizeRate = 0.0f;
+    float angularSizeRateConfidence = -1.0f;
+
+    float confidence = 0.8f;
+    uint16_t sources = 1;
+
+    std::vector<std::string> properties;
+
+    uint16_t objectId = -1;
+
+    opendlv::perception::Object detectedObject(lastSeen, type, typeConfidence,
+        direction, directionConfidence, directionRate, directionRateConfidence,
+        distance, distanceConfidence, angularSize, angularSizeConfidence,
+        angularSizeRate, angularSizeRateConfidence, confidence, sources,
+        properties, objectId);
     odcore::data::Container objectContainer(detectedObject);
     getConference().send(objectContainer);
 
-    std::cout << "    type:        " << type << std::endl;
-    std::cout << "    angle:       " << angle << std::endl;
-    std::cout << "    size:        " << size << std::endl;
-    std::cout << "    angle (deg): " << (angle*(float)opendlv::Constants::RAD2DEG) << std::endl;
-    std::cout << "    size (deg):  " << (size*(float)opendlv::Constants::RAD2DEG) << std::endl;
-    std::cout << "    objectIndex: " << objectIndex << std::endl;
+    std::cout << "    type:          " << type << std::endl;
+    std::cout << "    angle:         " << angle << std::endl;
+    std::cout << "    size:          " << size << std::endl;
+    std::cout << "    angle (deg):   " << (angle*(float)opendlv::Constants::RAD2DEG) << std::endl;
+    std::cout << "    size (deg):    " << (size*(float)opendlv::Constants::RAD2DEG) << std::endl;
+    std::cout << "    objectIndex:   " << objectIndex << std::endl;
+    std::cout << "    azimuth:       " << azimuth << std::endl;
+    std::cout << "    angular size:  " << angularSize << std::endl;
   }
 
   /*

@@ -150,7 +150,7 @@ void Can::tearDown()
 
   opendlv::proxy::reverefh16::AccelerationRequest accelerationRequest;
   accelerationRequest.setEnableRequest(false);
-  accelerationRequest.setAcceleration(0.0);
+  accelerationRequest.setAccelerationPedalPosition(0.0);
   odcore::data::Container accelerationRequestContainer(accelerationRequest);
 
   canmapping::opendlv::proxy::reverefh16::AccelerationRequest 

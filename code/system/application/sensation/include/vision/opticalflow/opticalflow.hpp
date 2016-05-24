@@ -20,10 +20,18 @@
 #ifndef VISION_OPTICALFLOW_OPTICALFLOW_HPP_
 #define VISION_OPTICALFLOW_OPTICALFLOW_HPP_
 
+#include <Eigen/Dense>
 #include <memory>
+
+#include "opencv2/video/tracking.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/highgui/highgui.hpp"
 
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
+#include "opendavinci/odcore/wrapper/SharedMemory.h"
+#include "opendavinci/GeneratedHeaders_OpenDaVINCI.h"
+
 
 namespace opendlv {
 namespace sensation {
@@ -31,7 +39,8 @@ namespace vision {
 namespace opticalflow {
 
 /**
- * This class provides...
+ * This class provides the optical flow of a series of images, namely by 
+ * comparing the current image to the previous one.
  */
 class OpticalFlow
 : public odcore::base::module::DataTriggeredConferenceClientModule {
@@ -42,11 +51,30 @@ class OpticalFlow
   virtual ~OpticalFlow();
   virtual void nextContainer(odcore::data::Container &);
 
+  std::string m_name;
+  uint32_t m_size;
+
  private:
   void setUp();
   void tearDown();
-};
 
+  void SendContainer();
+
+  cv::TermCriteria m_termcrit;
+  cv::Size m_searchSize;
+  uint32_t m_maxLevel;
+  double m_minEigThreshold;
+  uint32_t m_nAxisPoints;
+  cv::Mat m_grayImage;
+  cv::Mat m_prevGrayImage;
+  cv::Mat m_image;
+  cv::Mat m_flow;
+  std::vector<cv::Point2f> m_staticImagePoints;
+  std::vector<cv::Point2f> m_endImagePoints;
+  odcore::data::image::SharedImage m_outputSharedImage;
+  std::shared_ptr<odcore::wrapper::SharedMemory> m_sharedMemory;
+
+};
 } // opticalflow
 } // vision
 } // sensation

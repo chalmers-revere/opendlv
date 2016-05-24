@@ -54,9 +54,9 @@ V2vIclcm::V2vIclcm(int32_t const &a_argc, char **a_argv)
     m_receiveLog()
 {
   struct stat st;
-  if (stat("var/application/knowledge/gcdc16/v2viclcm", &st) == -1) {
-    system("mkdir -p ./var/application/knowledge/gcdc16/v2viclcm");
-    // std::cout<<"Created dir"<<std::endl;
+  if (::stat("var/application/knowledge/gcdc16/v2viclcm", &st) == -1) {
+    ::system("mkdir -p ./var/application/knowledge/gcdc16/v2viclcm");
+    std::cout<<"Created dir"<<std::endl;
   }
   odcore::data::TimeStamp nu;
 
@@ -268,40 +268,40 @@ void V2vIclcm::nextContainer(odcore::data::Container &c)
       int32_t counter = inIterator->ReadInteger();
 
 
-      // std::string output = "*** Iclcm object ***\n";
+      std::string output = "*** Iclcm object ***\n";
   
-      // output += "Message Id: " + std::to_string(messageId) + "\n";
-      // output += "Container mask: " + std::to_string(containerMask) + "\n";
-      // output += "low frequency mask: " + std::to_string(lowFrequencyMask) + "\n";
-      // output += "StationId: " + std::to_string(stationId) + "\n";
-      // output += "Rear axle location: " + std::to_string(rearAxleLocation) + "\n";
-      // output += "Controller type: " + std::to_string(controllerType) + "\n";
-      // output += "Response time constant: " + std::to_string(responseTimeConstant) + "\n";
-      // output += "Response time delay: " + std::to_string(responseTimeDelay) + "\n";
-      // output += "Target long acc: " + std::to_string(targetLongAcc) + "\n";
-      // output += "Time headway: " + std::to_string(timeHeadway) + "\n";
-      // output += "Cruise speed: " + std::to_string(cruiseSpeed) + "\n";
-      // output += "Participants ready: " + std::to_string(participantsReady) + "\n";
-      // output += "Start platoon: " + std::to_string(startPlatoon) + "\n";
-      // output += "End of scenario: " + std::to_string(endOfScenario) + "\n";
-      // output += "Mio Id: " + std::to_string(mioId) + "\n";
-      // output += "Mio range: " + std::to_string(mioRange) + "\n";
-      // output += "Mio bearing" + std::to_string(mioBearing) + "\n";
-      // output += "Mio range rate: " + std::to_string(mioRangeRate) + "\n";
-      // output += "Lane: " + std::to_string(lane) + "\n";
-      // output += "Forward Id: " + std::to_string(forwardId) + "\n";
-      // output += "Backward Id: " + std::to_string(backwardId) + "\n";
-      // output += "Merge request: " + std::to_string(mergeRequest) + "\n";
-      // output += "Safe to merge: " + std::to_string(safeToMerge) + "\n";
-      // output += "Flag: " + std::to_string(flag) + "\n";
-      // output += "Flag tail: " + std::to_string(flagTail) + "\n";
-      // output += "Flag head: " + std::to_string(flagHead) + "\n";
-      // output += "Platoon Id: " + std::to_string(platoonId) + "\n";
-      // output += "Distance travelled cz: " + std::to_string(distanceTravelledCz) + "\n";
-      // output += "Intention: " + std::to_string(intention) + "\n";
-      // output += "Counter: " + std::to_string(counter) + "\n";
+      output += "Message Id: " + std::to_string(messageId) + "\n";
+      output += "Container mask: " + std::to_string(containerMask) + "\n";
+      output += "low frequency mask: " + std::to_string(lowFrequencyMask) + "\n";
+      output += "StationId: " + std::to_string(stationId) + "\n";
+      output += "Rear axle location: " + std::to_string(rearAxleLocation) + "\n";
+      output += "Controller type: " + std::to_string(controllerType) + "\n";
+      output += "Response time constant: " + std::to_string(responseTimeConstant) + "\n";
+      output += "Response time delay: " + std::to_string(responseTimeDelay) + "\n";
+      output += "Target long acc: " + std::to_string(targetLongAcc) + "\n";
+      output += "Time headway: " + std::to_string(timeHeadway) + "\n";
+      output += "Cruise speed: " + std::to_string(cruiseSpeed) + "\n";
+      output += "Participants ready: " + std::to_string(participantsReady) + "\n";
+      output += "Start platoon: " + std::to_string(startPlatoon) + "\n";
+      output += "End of scenario: " + std::to_string(endOfScenario) + "\n";
+      output += "Mio Id: " + std::to_string(mioId) + "\n";
+      output += "Mio range: " + std::to_string(mioRange) + "\n";
+      output += "Mio bearing: " + std::to_string(mioBearing) + "\n";
+      output += "Mio range rate: " + std::to_string(mioRangeRate) + "\n";
+      output += "Lane: " + std::to_string(lane) + "\n";
+      output += "Forward Id: " + std::to_string(forwardId) + "\n";
+      output += "Backward Id: " + std::to_string(backwardId) + "\n";
+      output += "Merge request: " + std::to_string(mergeRequest) + "\n";
+      output += "Safe to merge: " + std::to_string(safeToMerge) + "\n";
+      output += "Flag: " + std::to_string(flag) + "\n";
+      output += "Flag tail: " + std::to_string(flagTail) + "\n";
+      output += "Flag head: " + std::to_string(flagHead) + "\n";
+      output += "Platoon Id: " + std::to_string(platoonId) + "\n";
+      output += "Distance travelled cz: " + std::to_string(distanceTravelledCz) + "\n";
+      output += "Intention: " + std::to_string(intention) + "\n";
+      output += "Counter: " + std::to_string(counter) + "\n";
 
-      // std::cout<<output<<std::endl;
+      std::cout<<output<<std::endl;
 
       m_receiveLog << std::to_string(messageId)+ //messageId
           + "," + std::to_string(stationId)+ //stationId

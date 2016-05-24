@@ -20,11 +20,14 @@
 #ifndef LINGUISTICS_V2VCAM_V2VCAM_HPP_
 #define LINGUISTICS_V2VCAM_V2VCAM_HPP_
 
+#include <ctime>
 #include <fstream>
 #include <memory>
 
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
+
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 namespace opendlv {
 namespace knowledge {
@@ -48,31 +51,59 @@ class V2vCam
   void tearDown();
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
+  void ReadDynamicState(opendlv::model::DynamicState const &);
+  void ReadGeolocation(opendlv::sensation::Geolocation const &);
+  void ReadVoice(opendlv::sensation::Voice const &);
+  void SendWGS84Coordinate();
+
+  unsigned char GetMessageId() const;
+  int32_t GetStationId() const;
+  int32_t GenerateGenerationDeltaTime();
+  unsigned char GetContainerMask() const;
+  int32_t GetStationType() const;
+  int32_t GetLatitude() const;
+  int32_t GetLongitude() const;
+  int32_t GetSemiMajorConfidence() const;
+  int32_t GetSemiMinorConfidence() const;
+  int32_t GetSemiMajorOrientation() const;
+  int32_t GetAltitude() const;
+  int32_t GetHeading() const;
+  int32_t GetHeadingConfidence() const;
+  int32_t GetSpeed() const;
+  int32_t GetSpeedConfidence() const;
+  int32_t GetVehicleLength() const;
+  int32_t GetVehicleWidth() const;
+  int32_t GetLongitudinalAcc() const;
+  int32_t GetLongitudinalAccConf() const;
+  int32_t GetYawRateValue() const;
+  int32_t GetYawRateConfidence() const;
+  int32_t GetVehicleRole() const;
+
   std::ofstream m_sendLog;
   std::ofstream m_receiveLog;
+  std::time_t m_timeType2004;
 
   unsigned char const m_messageId = 2;
   int32_t m_stationId = 115;
-  // Generation time of the (CAM) message in milliseconds
   int32_t m_generationDeltaTime = 0; 
   unsigned char m_containerMask = 128;
   int32_t m_stationType = 8;
-  int32_t m_latitude = 900000001;
-  int32_t m_longitude = 1800000001;
+  double m_latitude = 90.0000001;
+  double m_longitude = 180.0000001;
   int32_t m_semiMajorConfidence = 4095;
   int32_t m_semiMinorConfidence = 4095;
   int32_t m_semiMajorOrientation = 3601;
-  int32_t m_altitude = 800001;
-  int32_t m_heading = 3601;
-  int32_t m_headingConfidence = 127;
-  int32_t m_speed = 16383; //
-  int32_t m_speedConfidence = 127;
+  double m_altitude = 8000.01;
+  double m_heading = 360.1*opendlv::Constants::DEG2RAD;
+  double m_headingConfidence = 127;
+  double m_speed = 163.83; //
+  double m_speedConfidence = 127;
   int32_t m_vehicleLength = 73;
   int32_t m_vehicleWidth = 25;
-  int32_t m_longitudinalAcc = 161;
-  int32_t m_longitudinalAccConf = 102;
-  int32_t m_yawRateValue = 32767;
-  int32_t m_yawRateConfidence = 8;
+  double m_longitudinalAcc = 161;
+  double m_longitudinalAccConf = 102;
+  double m_yawRateValue = 32767;
+  double m_yawRateConfidence = 8;
   int32_t m_vehicleRole = 0;
 };
 

@@ -19,6 +19,7 @@
 
 #include <iostream>
 
+#include <opendavinci/odcore/base/Lock.h>
 #include <opendavinci/odcore/data/Container.h>
 #include <automotivedata/generated/automotive/GenericCANMessage.h>
 #include <odcantools/CANDevice.h>
@@ -33,12 +34,15 @@ namespace can {
 CanMessageDataStore::CanMessageDataStore(
 std::shared_ptr<automotive::odcantools::CANDevice> canDevice)
     : automotive::odcantools::MessageToCANDataStore(canDevice),
+    m_dataStoreMutex(),
     m_enabled(false)
 {
 }
 
 void CanMessageDataStore::add(odcore::data::Container const &a_container)
 {
+  odcore::base::Lock l(m_dataStoreMutex);
+
   // TODO: Kids, do not try this at home. Issue: #19.
   odcore::data::Container &container = const_cast<odcore::data::Container &>(
       a_container);
@@ -47,19 +51,20 @@ void CanMessageDataStore::add(odcore::data::Container const &a_container)
     opendlv::proxy::ControlState controlState
       = container.getData<opendlv::proxy::ControlState>();
 
-    m_enabled = controlState.getAllowAutonomous();
+    m_enabled = controlState.getIsAutonomous();
 
-  } else if (container.getDataType() == opendlv::proxy::Actuation::ID()){
-    opendlv::proxy::Actuation actuation 
-      = container.getData<opendlv::proxy::Actuation>();
+  } else if (container.getDataType() 
+      == opendlv::proxy::ActuationRequest::ID()) {
+    opendlv::proxy::ActuationRequest actuationRequest 
+      = container.getData<opendlv::proxy::ActuationRequest>();
 
-    bool isValid = actuation.getIsValid();
+    bool isValid = actuationRequest.getIsValid();
     if (!isValid) {
       return;
     }
 
-    float acceleration = actuation.getAcceleration();
-    float steering = actuation.getSteering();
+    float acceleration = actuationRequest.getAcceleration();
+    float steering = actuationRequest.getSteering();
 
     if (acceleration < 0.0f) {
       opendlv::proxy::reverefh16::BrakeRequest brakeRequest;
@@ -76,7 +81,10 @@ void CanMessageDataStore::add(odcore::data::Container const &a_container)
     } else {
       opendlv::proxy::reverefh16::AccelerationRequest accelerationRequest;
       accelerationRequest.setEnableRequest(m_enabled);
-      accelerationRequest.setAcceleration(acceleration);
+
+// TODO: map requested acceleration value to acceleration pedal position
+
+      accelerationRequest.setAccelerationPedalPosition(acceleration);
       odcore::data::Container accelerationRequestContainer(accelerationRequest);
 
       canmapping::opendlv::proxy::reverefh16::AccelerationRequest 
@@ -92,7 +100,7 @@ void CanMessageDataStore::add(odcore::data::Container const &a_container)
     // Must be -33.535 to disable deltatorque.
     steeringRequest.setSteeringDeltaTorque(33.535); 
     odcore::data::Container steeringRequestContainer(steeringRequest);
-
+    
     canmapping::opendlv::proxy::reverefh16::SteeringRequest 
         steeringRequestMapping;
     automotive::GenericCANMessage genericCanMessage 

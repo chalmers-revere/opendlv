@@ -69,7 +69,7 @@ void V2v::nextPacket(const odcore::io::Packet &p)
          // << " bytes containing '"
          // << p.getData() << "'" 
          << std::endl;
-    opendlv::proxy::V2vInbound nextMessage;
+    opendlv::proxy::V2vReading nextMessage;
     nextMessage.setSize(p.getData().length());
     const std::string packetString = p.getData();
     // std::vector<unsigned char> data(packetString.begin(), packetString.end());
@@ -89,14 +89,14 @@ void V2v::nextPacket(const odcore::io::Packet &p)
 
   void V2v::nextContainer(odcore::data::Container &c)
   {
-    if(c.getDataType() == opendlv::proxy::V2vOutbound::ID()){
+    if(c.getDataType() == opendlv::proxy::V2vRequest::ID()){
       // std::cout << "Got an outbound message" << std::endl;
-      opendlv::proxy::V2vOutbound message = 
-      c.getData<opendlv::proxy::V2vOutbound>();
+      opendlv::proxy::V2vRequest message = 
+      c.getData<opendlv::proxy::V2vRequest>();
       std::string data = message.getData();
 
       try {
-
+        // std::cout<< "Message sent." << std::endl;
         m_udpsender->send(data);
       }
       catch(string &exception) {
