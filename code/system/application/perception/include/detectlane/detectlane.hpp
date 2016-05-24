@@ -58,6 +58,9 @@ class DetectLane
       std::string a_fileName);
   void ReadInputWindowSize(std::string a_stringStream);
   void ReadOutputWindowSize(std::string a_stringStream);
+  void GetGrouping(std::vector<cv::Vec2f> &groups,
+      std::vector<cv::Vec2f> &lines);
+
 
 
   bool m_setup;
@@ -69,6 +72,7 @@ class DetectLane
   int m_minRow;
   int m_midRegion;
   int m_threshold;
+  int m_houghThreshold;
   
   double m_standardLaneWidth;  
   bool m_initialized;

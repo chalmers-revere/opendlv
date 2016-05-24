@@ -64,6 +64,7 @@ DetectLane::DetectLane(int32_t const &a_argc, char **a_argv)
     m_minRow(200),
     m_midRegion(),
     m_threshold(180),
+    m_houghThreshold(100),
     m_standardLaneWidth(3.75),
     m_initialized(false),
     m_regions(),
@@ -131,9 +132,11 @@ void DetectLane::nextContainer(odcore::data::Container &c)
     myIplImage = cvCreateImage(cvSize(imgWidth, imgHeight),
         IPL_DEPTH_8U, nrChannels);
     cv::Mat src(myIplImage);
-    cv::Mat test;
+    cv::Mat color_dst;
 
     if (!sharedMem->isValid()) {
+      cvReleaseImage(&myIplImage);
+      std::cout<<"Invalid memory\n";
       return;
     }
     
@@ -143,14 +146,126 @@ void DetectLane::nextContainer(odcore::data::Container &c)
           imgWidth*imgHeight*nrChannels);
     }
     sharedMem->unlock();
+    
+    cv::resize(src,src,cv::Size(m_outputWidth,m_outputHeight));
+
+    if(true){
+      cv::inRange(src, cv::Scalar(m_threshold, m_threshold, m_threshold), cv::Scalar(255, 255, 255), src);
+    } else {
+      cv::Canny(src,src,100,150,3);
+    }
+    
+    // Make output image into a 3 channel BGR image
+    cvtColor( src, color_dst, CV_GRAY2BGR );
+    
         
     // From this point implement lane detection algorithm
+  
+    // Vector holder for each line (rho,theta)
+    vector<Vec2f> lines;
+    
+    //TODO: It is possible to filter out lines with certain theta angles. Thus we know that our lane will
+    //      consist of lines that will probably look like: // | \\ but not ---
+    HoughLines( src, lines, 1, CV_PI/180, m_houghThreshold );
+  
+    // Print how many lines were found  
+    //TODO: With this parameter we can specify how many groups of lines we want. When we run the grouping 
+    //      algorithm and if we get more groups than maxGroups we should remove the group with the least
+    //      number of lines?
+   
+    // Holder for the mean (rho,theta) for each group
+    vector<Vec2f> groups;
+    if(lines.size() != 0){
+      GetGrouping(groups,lines);
+    }
+    // Draw all of the lines found in red
+    for( size_t i = 0; i < groups.size(); i++ )
+    {
+      float rho = lines[i][0];
+      float theta = lines[i][1];
+      
+      float a = cos(theta), b = sin(theta);
+      float x0 = a*rho, y0 = b*rho;
+      Point pt1(cvRound(x0 + 1000*(-b)),
+                cvRound(y0 + 1000*(a)));
+      Point pt2(cvRound(x0 - 1000*(-b)),
+                cvRound(y0 - 1000*(a)));
+      line( color_dst, pt1, pt2, Scalar(0,0,255), 3, 8 );
+    }
+
+    // Use the mean of each group to draw a single line.
+    std::cout<<"Group size " << groups.size() << std::endl;
+
+    for(size_t i = 0; i <  groups.size();i++)
+    {
+      std::cout<<"Group rho " << groups[i][0]  << "theta " << groups[i][1]<<std::endl;
+      float rho = groups[i][0];
+      float theta = groups[i][1];
+      float thetaDeg = theta * 180.0f / 3.14f;
+      if((thetaDeg < 30  && thetaDeg > -30) || (thetaDeg > (-30+90) && thetaDeg > 30+90))
+      {
+        std::cout<<"Theta " << thetaDeg << " i : " << i << std::endl;
+      float a = cos(theta), b = sin(theta);
+      float x0 = a*rho, y0 = b*rho;
+      Point pt1(cvRound(x0 + 1000*(-b)),
+                cvRound(y0 + 1000*(a)));
+      Point pt2(cvRound(x0 - 1000*(-b)),
+                cvRound(y0 - 1000*(a)));
+      line( color_dst, pt1, pt2, Scalar(0,255,0), 3, 8 );
+    }
+  
+    }
+    // Display results
+    char key = waitKey(1);
+    if(key == 'w')
+      m_threshold +=10;
+    else if(key == 's')
+      m_threshold -=10;
+    else if(key == 'i')
+      m_houghThreshold +=10;
+    else if(key == 'k')
+      m_houghThreshold = std::max(m_houghThreshold-10,10);
+
+    
+    //-----------------------------
+    // Show image
+    //-----------------------------
+    namedWindow( "Source", 1 );
+    imshow( "Source", src );
+
+    namedWindow( "Detected Lines", 1 );
+    imshow( "Detected Lines", color_dst );
+
+    waitKey(1);
+    cvReleaseImage(&myIplImage);
+
+
+    /*
+    for(size_t i = 0; i <  groups.size();i++)
+    {
+      std::cout<<"Group rho " << groups[i][0]  << "theta " << groups[i][1]<<std::endl;
+      float rho = groups[i][0];
+      float theta = groups[i][1];
+      float thetaDeg = theta * 180.0 / 3.14;
+      if((thetaDeg < 30  && thetaDeg > -30) || (thetaDeg > (-30+90) && thetaDeg > 30+90))
+      {
+        std::cout<<"Theta " << thetaDeg << " i : " << i << std::endl;
+      double a = cos(theta), b = sin(theta);
+      double x0 = a*rho, y0 = b*rho;
+      Point pt1(cvRound(x0 + 1000*(-b)),
+                cvRound(y0 + 1000*(a)));
+      Point pt2(cvRound(x0 - 1000*(-b)),
+                cvRound(y0 - 1000*(a)));
+      line( color_dst, pt1, pt2, Scalar(0,255,0), 3, 8 );
+    }
+    */
     //-----------------------------
     // Definitions for the video choice
     //-----------------------------
-    m_initialized = false;
-    //cv::resize(src,src,cv::Size(m_outputWidth,m_outputHeight));
-    if(mySharedImg.getName() == "front-left"){
+
+    // m_initialized = false;
+    // cv::resize(src,src,cv::Size(m_outputWidth,m_outputHeight));
+    // if(mySharedImg.getName() == "front-left"){
       /* OLD CODE 
       m_leftIpm->ApplyHomography(src,src);
 
@@ -164,9 +279,9 @@ void DetectLane::nextContainer(odcore::data::Container &c)
       // m_regions = m_leftCameraRegions;
       // m_lines = m_leftLines;
       // m_transformationMatrix = m_leftTransformationMatrix;
-      // m_initialized = true;
-    }
-    if(mySharedImg.getName() == "front-right"){
+    //    m_initialized = true;
+    // }
+    // if(mySharedImg.getName() == "front-right"){
       /* OLD CODE
       m_rightIpm->ApplyHomography(src,src);
 
@@ -180,17 +295,16 @@ void DetectLane::nextContainer(odcore::data::Container &c)
       // m_regions = m_rightCameraRegions;
       // m_lines = m_rightLines;
       // m_transformationMatrix = m_rightTransformationMatrix;
-      // m_initialized = true;
-    }
+    //    m_initialized = true;
+    // }
     
+    // imshow("1", src);
+    // cv::waitKey(1);
     
-    cvReleaseImage(&myIplImage);
-
-
+    /*
     if(!m_initialized){
       return;
     }
-    
     // Holds the k and m values for the region lines
     m_k = m_lines.col(0);
     m_m = m_lines.col(1);
@@ -291,6 +405,7 @@ void DetectLane::nextContainer(odcore::data::Container &c)
 
   		}
     }
+    
     char key = waitKey(1);
     if(key == 'w')
       m_threshold +=10;
@@ -300,9 +415,11 @@ void DetectLane::nextContainer(odcore::data::Container &c)
     //-----------------------------
     // Show image
     //-----------------------------
+    
     imshow("1", src);
     imshow("2", image);
     waitKey(1);
+    */
   }
 }
 
@@ -672,6 +789,52 @@ double DetectLane::GetLaneOffset(double kLeft,double mLeft, double kRight,
     return (leftPoint(1) + rightPoint(1)) / 2.0;
   }
 }
+
+void DetectLane::GetGrouping(std::vector<cv::Vec2f> &groups, std::vector<cv::Vec2f> &lines)
+{
+  std::vector< std::vector<cv::Vec2f> > group;
+  std::vector<cv::Vec2f> groupMean, groupSum;
+  std::vector<cv::Vec2f> tmp;
+  group.push_back(tmp);
+  group.at(0).push_back(lines.at(0));
+  groupMean.push_back(group.at(0).at(0));
+  groupSum.push_back(group.at(0).at(0));
+  cout<<groupMean[0][0]<<" " << groupMean[0][1]<<endl;
+  
+  double radius = 100;
+  
+  for(uint i = 1; i < lines.size(); i++)
+  {
+    bool groupAssigned = false;
+    for(uint j = 0; j < group.size(); j++)
+    {
+      double xDiff = lines[i][0] - groupMean[j][0];
+      double yDiff = lines[i][1] - groupMean[j][1];
+      double absDiff = sqrt(pow(xDiff,2) + pow(yDiff,2));
+
+      if( absDiff <= radius)
+      {
+        group.at(j).push_back(lines.at(i));
+        groupSum.at(j) += lines.at(i);
+        groupMean.at(j)[0] = groupSum.at(j)[0] / group.at(j).size();
+        groupMean.at(j)[1] = groupSum.at(j)[1] / group.at(j).size();
+        groupAssigned = true;
+        break;
+      }
+      
+    }
+    if(!groupAssigned)
+    {
+      group.push_back(tmp);
+      group.at(group.size()-1).push_back(lines.at(i));
+      groupMean.push_back(lines.at(i));
+      groupSum.push_back(lines.at(i));
+    }
+  }
+  groups = groupMean;
+    
+}
+
 
 
 

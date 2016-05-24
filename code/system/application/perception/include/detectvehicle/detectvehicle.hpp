@@ -22,9 +22,12 @@
 
 #include <memory>
 #include <vector>
+#include <cmath>
 
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
+ 
+#include <Eigen/Dense>
 
 #include "detectvehicle/vehicledetectionsystem.hpp"
 #include "detectvehicle/detectedvehicle.hpp"
@@ -56,6 +59,14 @@ class DetectVehicle
   void setUp();
   void tearDown();
 
+  Eigen::MatrixXd ReadMatrix(std::string fileName,int nRows,
+      int nCols);
+  void TransformPointToGlobalFrame(Eigen::Vector3d &point, 
+      Eigen::Matrix3d transformationMatrix);
+  void sendObjectInformation(std::vector<cv::Rect>* detections, 
+      odcore::data::TimeStamp timeStampOfImage, 
+      Eigen::Matrix3d transformationMatrix);
+
   float PixelPosToHeading(float pixelPosX);
 
   std::shared_ptr<VehicleDetectionSystem> m_vehicleDetectionSystem;
@@ -63,6 +74,8 @@ class DetectVehicle
   std::shared_ptr<VehicleMemorySystem> m_vehicleMemorySystem;
 
   std::shared_ptr<ConvNeuralNet> m_convNeuralNet;
+
+  Eigen::Vector3d m_scale;
 };
 
 } // detectvehicle

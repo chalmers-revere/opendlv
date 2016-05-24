@@ -60,7 +60,6 @@ void GpsStringDecoder::nextString(std::string const &s) {
 
   bool gotGpgga = false;
   bool gotGpvtg = false;
-  bool gotGphdt = false;
 
   std::vector<std::string> messages;
 
@@ -93,6 +92,9 @@ void GpsStringDecoder::nextString(std::string const &s) {
     }
 
     std::string type = fields.at(0);
+    // for(auto qq : fields){
+    //   std::cout << qq << ", ";
+    // }
 
     if (type == "GPGGA") {
       gotGpgga = true;
@@ -105,6 +107,13 @@ void GpsStringDecoder::nextString(std::string const &s) {
       longitude = std::stod(fields.at(4));
       longitudeDirection = fields.at(5)[0];
 
+      // Convert from format dd mm,mmmm
+      latitude=latitude / 100.0;
+      longitude=longitude / 100.0;
+      latitude = static_cast<int>(latitude) 
+          + (latitude - static_cast<int>(latitude)) * 100.0 / 60.0;
+      longitude = static_cast<int>(longitude) 
+          + (longitude - static_cast<int>(longitude)) * 100.0 / 60.0;
 
       // std::cout << "[proxy-gpsstringdecoder] GPS received signals : Latitude : " << std::setprecision(19) << latitude
       //              << " Longitude : " << std::setprecision(19) << longitude << std::endl;
@@ -131,43 +140,34 @@ void GpsStringDecoder::nextString(std::string const &s) {
     } else if (type == "GPVTG") {
       gotGpvtg = true;
 
-      // Convert to m/s.
-      speed = std::stof(fields.at(7)) / 3.6f;
+      std::string headingStr = fields.at(3);
 
-    } else if (type == "GPHDT") {
-      gotGphdt = true;
-
-      std::string headingStr = fields.at(1);
       if (headingStr.empty()) {
         northHeading = 0.0f;
         hasHeading = false;
       } else {
-        northHeading = std::stof(headingStr);
+        double pi = static_cast<double>(opendlv::Constants::PI);
+        northHeading = std::stod(headingStr) * pi / 180.0;
         hasHeading = true;
       }
+
+      // Convert to m/s.
+      speed = std::stof(fields.at(7)) / 3.6f;
+
+    } else if (type == "GPHDT") {
 
     } else if (type == "GPRMC") {
 
     } else {
-      std::cout << "[proxy-gpsstringdecoder] WARNING: Unknown packet type." << std::endl;
+      std::cout << "[proxy-gpsstringdecoder] WARNING: Unknown packet type. " << type << std::endl;
     }
   }
 
-  // according to the page 11 of this guide http://www2.etown.edu/wunderbot/DOWNLOAD/AgGPS114/NMEA_Messages_RevA_Guide_ENG.pdf
-  // the GPS out data with the following format dd mm,mmmm
-  // convert to deg befor sending
-  latitude=latitude/100.0;
-  longitude=longitude/100.0;
-  latitude = int(latitude) + (latitude - int(latitude))*100/60.0;
-  longitude = int(longitude) + (longitude - int(longitude))*100/60.0;
-
-  // just a check before sending the signal!
   std::cout << "[proxy-gpsstringdecoder] GPS sending signals : Latitude : " << latitude << std::setprecision(19)
-               << " Longitude : " << std::setprecision(19) << longitude << std::endl;
+               << " Longitude : " << std::setprecision(19) << longitude << " Heading: " << northHeading << " hasRtk: " << hasRtk << std::endl;
 
 
-
-  if (gotGpgga && gotGpvtg && gotGphdt) {
+  if (gotGpgga && gotGpvtg) {
     opendlv::proxy::GpsReading nextGps(timestamp, latitude, longitude,
         altitude, northHeading, speed, latitudeDirection, longitudeDirection,
         satelliteCount, hasHeading, hasRtk);

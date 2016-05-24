@@ -152,9 +152,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vIclcm::body()
     std::vector<unsigned char> bytes = outBuffer->GetBytes();
     std::string bytesString(bytes.begin(),bytes.end());
     // std::cout<< bytesString << std::endl;
-    opendlv::knowledge::Message nextMessage(bytesString.size(),bytesString);
-    odcore::data::Container c(nextMessage);
-    getConference().send(c);
+    // opendlv::knowledge::Message nextMessage(bytesString.size(),bytesString);
+    // odcore::data::Container c(nextMessage);
+    // getConference().send(c);
 
 
 
@@ -216,15 +216,6 @@ void V2vIclcm::nextContainer(odcore::data::Container &c)
       std::shared_ptr<Buffer::Iterator> inIterator = buffer->GetIterator();
       //Long and little endian reverser
       inIterator->ItReversed();
-      
-      //Print the information 
-      // std::vector<unsigned char> const bytes = v;
-      // std::stringstream ss;
-      // for (uint i = 0; i < bytes.size(); i++) {
-      //     ss << std::to_string(bytes.at(i));
-      //     ss << "|";
-      // }
-      // std::cout<<ss.str()<<std::endl;
 
 
       unsigned char messageId = inIterator->ReadByte();

@@ -62,7 +62,7 @@ class V2vIclcm
   int32_t m_targetLongAcc = 10;
   int32_t m_timeHeadway = 1;
   int32_t m_cruiseSpeed = 3;
-  int32_t m_participantsReady = 1;
+  int32_t m_participantsReady = 0;
   int32_t m_startPlatoon = 0;
   int32_t m_endOfScenario = 0;
   int32_t m_mioId = 255;

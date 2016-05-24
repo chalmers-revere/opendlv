@@ -139,35 +139,61 @@ void ConvNeuralNet::Update(const cv::Mat* a_imageFrame)
 
   cv::Mat spatialMap = this->ImageToMat(out_img, 1);
 
+  // Extract the "non-vehicle" feature
+  cv::Rect nonVehicleRegion(1, 1, spatialMap.cols/2-1, spatialMap.rows-2);
+  cv::Mat nonVehicleMap = spatialMap(nonVehicleRegion);
+
+
+
   // Pick only the "vehicle" (not the "non-vehicle") feature
   cv::Rect roi(spatialMap.cols/2+1, 1, spatialMap.cols-1, spatialMap.rows-1);
   roi.width -= roi.x;
   roi.height -= roi.y;
   spatialMap = spatialMap(roi);
+
+
   
   // Draw black lines along the edges to
   // get rid of the edge effects...
-  cv::line(spatialMap, cv::Point(0, 0), cv::Point(0, spatialMap.rows-1), 
-      cv::Scalar(0, 0, 0), 1, 8);
-  cv::line(spatialMap, cv::Point(0, 0), cv::Point(spatialMap.cols-1, 0), 
-      cv::Scalar(0, 0, 0), 1, 8);
-  cv::line(spatialMap, cv::Point(spatialMap.cols-1, spatialMap.rows-1), 
-      cv::Point(0, spatialMap.rows-1), cv::Scalar(0, 0, 0), 1, 8);
-  cv::line(spatialMap, cv::Point(spatialMap.cols-1, spatialMap.rows-1), 
-      cv::Point(spatialMap.cols-1, 0), cv::Scalar(0, 0, 0), 1, 8);
+  cv::line(spatialMap, cv::Point(0, 0), cv::Point(0, spatialMap.rows-1), cv::Scalar(0, 0, 0), 1, 8);
+  cv::line(spatialMap, cv::Point(0, 0), cv::Point(spatialMap.cols-1, 0), cv::Scalar(0, 0, 0), 1, 8);
+  cv::line(spatialMap, cv::Point(spatialMap.cols-1, spatialMap.rows-1), cv::Point(0, spatialMap.rows-1), cv::Scalar(0, 0, 0), 1, 8);
+  cv::line(spatialMap, cv::Point(spatialMap.cols-1, spatialMap.rows-1), cv::Point(spatialMap.cols-1, 0), cv::Scalar(0, 0, 0), 1, 8);
+  // Draw black lines along the edges to
+  // get rid of the edge effects...
+  cv::line(nonVehicleMap, cv::Point(0, 0), cv::Point(0, nonVehicleMap.rows-1), cv::Scalar(0, 0, 0), 1, 8);
+  cv::line(nonVehicleMap, cv::Point(0, 0), cv::Point(nonVehicleMap.cols-1, 0), cv::Scalar(0, 0, 0), 1, 8);
+  cv::line(nonVehicleMap, cv::Point(nonVehicleMap.cols-1, nonVehicleMap.rows-1), cv::Point(0, nonVehicleMap.rows-1), cv::Scalar(0, 0, 0), 1, 8);
+  cv::line(nonVehicleMap, cv::Point(nonVehicleMap.cols-1, nonVehicleMap.rows-1), cv::Point(nonVehicleMap.cols-1, 0), cv::Scalar(0, 0, 0), 1, 8);
   
+
+
+  //GaussianBlur(spatialMap, spatialMap, cv::Size(5,5), 1);
+  //GaussianBlur(nonVehicleMap, nonVehicleMap, cv::Size(5,5), 1);
+  //std::cout << "spatialMap size: " << spatialMap.rows << " " << spatialMap.cols << std::endl;
+  //std::cout << "nonVehicleMap size: " << nonVehicleMap.rows << " " << nonVehicleMap.cols << std::endl;
+  cv::Mat mapDifference;
+  cv::subtract(spatialMap, nonVehicleMap, mapDifference);
+
 
   int32_t resizeFactor = 4;
   cv::resize(spatialMap, spatialMap, cv::Size(), resizeFactor, resizeFactor, 
+      cv::INTER_AREA);
+  cv::resize(nonVehicleMap, nonVehicleMap, cv::Size(), resizeFactor, resizeFactor, 
+      cv::INTER_AREA);
+  cv::resize(mapDifference, mapDifference, cv::Size(), resizeFactor, resizeFactor, 
       cv::INTER_AREA);
 
   cv::Mat thresholdedImg;
   cv::Mat thresholdedImgBinary;
 
-  double thresh = 70;
+
+  GaussianBlur(mapDifference, mapDifference, cv::Size(15,15), 1);
+
+  double thresh = 50;
   double maxval = 255;
-  cv::threshold(spatialMap, thresholdedImg, thresh, maxval, cv::THRESH_TOZERO);
-  cv::threshold(spatialMap, thresholdedImgBinary, thresh, maxval, 
+  cv::threshold(mapDifference, thresholdedImg, thresh, maxval, cv::THRESH_TOZERO);
+  cv::threshold(mapDifference, thresholdedImgBinary, thresh, maxval, 
       cv::THRESH_BINARY);
 
   // Find connected components in thresholded image
@@ -208,7 +234,42 @@ void ConvNeuralNet::Update(const cv::Mat* a_imageFrame)
   }
 
 
+  { //Testing stuff with histograms
+    int32_t histSize = 64; //from 0 to 255
+    float range[] = { 1, 256 } ; //the upper boundary is exclusive
+    const float* histRange = { range };
+    bool uniform = true;
+    bool accumulate = false;
+    cv::Mat hist;
+    cv::calcHist(&mapDifference, 1, 0, cv::Mat(), hist, 1, &histSize, 
+        &histRange, uniform, accumulate);
+    int32_t hist_w = 512; 
+    int32_t hist_h = 400;
+    int32_t bin_w = cvRound((double) hist_w/histSize);
+    cv::Mat histImage( hist_h, hist_w, CV_8UC3, cv::Scalar( 0,0,0));
+    normalize(hist, hist, 0, histImage.rows, cv::NORM_MINMAX, -1, cv::Mat());
+
+    cv::line(
+        histImage, 
+        cv::Point(hist_w * (thresh/255), hist_h),
+        cv::Point(hist_w * (thresh/255), 0),
+        cv::Scalar( 0, 0, 200), 
+        2, 8, 0);
+    for( int32_t i = 1; i < histSize; i++ ) {
+      cv::line(
+          histImage, 
+          cv::Point(bin_w*(i-1), hist_h - cvRound(hist.at<float>(i-1))),
+          cv::Point(bin_w*(i), hist_h - cvRound(hist.at<float>(i))),
+          cv::Scalar( 255, 0, 0), 
+          2, 8, 0);
+    }
+    cv::imshow("calcHist Demo", histImage);
+  }
+
+
   cv::imshow("Final spatial map", spatialMap);
+  cv::imshow("Non-vehicle spatial map", nonVehicleMap);
+  cv::imshow("DIFF spatial map", mapDifference);
   cv::imshow("Thresholded spatial map", thresholdedImg);
   cv::imshow("CNN Output", workingImage);
   std::cout << "CNN output width: " << workingImage.cols << std::endl;
