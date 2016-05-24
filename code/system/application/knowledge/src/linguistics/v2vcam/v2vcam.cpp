@@ -536,7 +536,7 @@ int32_t V2vCam::GetSemiMajorConfidence() const
     return 1;
   }
   else if(val > 4093){
-    return 4094
+    return 4094;
   }
   else{
     return static_cast<int32_t>(std::round(val));
@@ -554,7 +554,7 @@ int32_t V2vCam::GetSemiMinorConfidence() const
     return 1;
   }
   else if(val > 4093){
-    return 4094
+    return 4094;
   }
   else{
     return static_cast<int32_t>(std::round(val));
