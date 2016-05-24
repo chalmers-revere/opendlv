@@ -165,7 +165,7 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   std::vector<cv::Rect> detections;
   m_convNeuralNet->GetDetectedVehicles(&detections);
 
-  sendObjectInformation(&detections, timeStampOfImage);
+  sendObjectInformation(&detections, timeStampOfImage, transformationMatrix);
 
 
 
@@ -255,11 +255,28 @@ Eigen::MatrixXd DetectVehicle::ReadMatrix(std::string fileName, int nRows,
   return matrix;
 }
 
-void DetectVehicle::sendObjectInformation(std::vector<cv::Rect>* detections, 
-    odcore::data::TimeStamp timeStampOfImage)
+void DetectVehicle::TransformPointToGlobalFrame(Eigen::Vector3d &point, 
+    Eigen::Matrix3d transformationMatrix)
 {
-  std::cout << "Sending info about " << detections->size() 
-      << " objects..." << std::endl;
+  // std::cout<<"point before \n";
+  // std::cout<<point<<std::endl;
+  // point = point.cwiseProduct(m_scale); // should not be needed...
+  // std::cout<<"point after 1\n";
+  // std::cout<<point<<std::endl;
+  point = transformationMatrix * point;
+
+  // std::cout<<"point final before \n";
+  // std::cout<<point<<std::endl;
+
+  point = point / point(2);
+  // std::cout<<"point final \n";
+  // std::cout<<point<<std::endl;
+}
+
+void DetectVehicle::sendObjectInformation(std::vector<cv::Rect>* detections, 
+    odcore::data::TimeStamp timeStampOfImage, 
+    Eigen::Matrix3d transformationMatrix)
+{
   for (uint32_t i=0; i<detections->size(); i++) {
     
     cv::Rect currentBoundingBox = detections->at(i);
@@ -269,29 +286,46 @@ void DetectVehicle::sendObjectInformation(std::vector<cv::Rect>* detections,
     std::string type = "vehicle";
     float typeConfidence = 1.0f;
 
+    Eigen::Vector3d pointBottomLeft(
+        currentBoundingBox.x, 
+        currentBoundingBox.y + currentBoundingBox.height, 
+        1);
+    TransformPointToGlobalFrame(pointBottomLeft, transformationMatrix);
+    
+    Eigen::Vector3d pointBottomRight(
+        currentBoundingBox.x + currentBoundingBox.width, 
+        currentBoundingBox.y + currentBoundingBox.height, 
+        1);
+    TransformPointToGlobalFrame(pointBottomRight, transformationMatrix);
 
-    float headingOfXmin = this->PixelPosToHeading(currentBoundingBox.x);
-    float headingOfXmax = this->PixelPosToHeading(currentBoundingBox.x + currentBoundingBox.width);
-    float angularSize = headingOfXmin - headingOfXmax;
+    Eigen::Vector3d pointBottomMid(
+        currentBoundingBox.x + currentBoundingBox.width / 2.0f, 
+        currentBoundingBox.y + currentBoundingBox.height, 
+        1);
+    TransformPointToGlobalFrame(pointBottomMid, transformationMatrix);
+
+    float headingOfBottomLeft = std::atan2(pointBottomLeft(1), pointBottomLeft(0));
+    float headingOfBottomRight = std::atan2(pointBottomRight(1), pointBottomRight(0));
+    float angularSize = headingOfBottomLeft - headingOfBottomRight;
     float angularSizeConfidence = -1.0f;
 
 
-    float azimuth = headingOfXmin - angularSize / 2.0f; //midpoint of box
-    float zenith = 0.0f;
+    float azimuth = headingOfBottomRight + angularSize / 2.0f; //midpoint of box
+    float zenith = -1.0f;
     opendlv::model::Direction direction(azimuth, zenith);
-    float directionConfidence = -1.0f;
+    float directionConfidence = 0.1f;
 
-    float azimuthRate = 0.0f;
-    float zenithRate = 0.0f;
+    float azimuthRate = -1.0f;
+    float zenithRate = -1.0f;
     opendlv::model::Direction directionRate(azimuthRate, zenithRate);
     float directionRateConfidence = -1.0f;
 
 
-    float distance = 0.0f;
-    float distanceConfidence = -1.0;
+    float distance = (float) sqrt(pow(pointBottomMid(0),2) + pow(pointBottomMid(1),2));
+    float distanceConfidence = 0.1;
 
 
-    float angularSizeRate = 0.0f;
+    float angularSizeRate = -1.0f;
     float angularSizeRateConfidence = -1.0f;
 
 
@@ -302,6 +336,10 @@ void DetectVehicle::sendObjectInformation(std::vector<cv::Rect>* detections,
 
     uint16_t objectId = -1;
 
+    if (angularSize < 0) {
+      continue;
+    }
+
     opendlv::perception::Object detectedObject(lastSeen, type, typeConfidence,
         direction, directionConfidence, directionRate, directionRateConfidence,
         distance, distanceConfidence, angularSize, angularSizeConfidence,
@@ -310,10 +348,14 @@ void DetectVehicle::sendObjectInformation(std::vector<cv::Rect>* detections,
     odcore::data::Container objectContainer(detectedObject);
     getConference().send(objectContainer);
 
-    std::cout << "DetectedObject:"     << type << std::endl;
+    std::cout << "Sending DetectedObject:"     << type << std::endl;
     std::cout << "    type:          " << type << std::endl;
+    std::cout << "    azimuth:       " << azimuth << std::endl;
+    std::cout << "    azimuth (deg): " << (azimuth*(float)opendlv::Constants::RAD2DEG) << std::endl;
+    std::cout << "    angularSize:   " << angularSize << std::endl;
+    std::cout << "    angSize (deg): " << (angularSize*(float)opendlv::Constants::RAD2DEG) << std::endl;
+    std::cout << "    distance (m):  " << distance << std::endl;
     /*
-    std::cout << "    angle:         " << angle << std::endl;
     std::cout << "    size:          " << size << std::endl;
     std::cout << "    angle (deg):   " << (angle*(float)opendlv::Constants::RAD2DEG) << std::endl;
     std::cout << "    size (deg):    " << (size*(float)opendlv::Constants::RAD2DEG) << std::endl;
