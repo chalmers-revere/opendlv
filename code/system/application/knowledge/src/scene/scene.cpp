@@ -118,6 +118,7 @@ void Scene::nextContainer(odcore::data::Container &a_container)
       m_objectCounter++;
       savedObjects.push_back(unpackedObject);
       }
+      std::cout << "Number of IDs: " << savedObjects.size() << std::endl << std::endl;
 
 	 }
   }
