@@ -45,6 +45,7 @@ class Echolocation
   void setUp();
   void tearDown();
   double PointDistance(float, double, float, double);
+  bool Contains(uint32_t, std::vector<uint32_t>);
 
   std::vector<float> m_angles;
   std::vector<double> m_distances;

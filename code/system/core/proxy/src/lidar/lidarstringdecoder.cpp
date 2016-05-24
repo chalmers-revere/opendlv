@@ -210,7 +210,9 @@ void LidarStringDecoder::ConvertToDistances()
 
 void LidarStringDecoder::nextString(std::string const &a_string) 
 {
-  std::string alpha = "0123456789ABCDEF";
+  //For debugging
+  //std::string alpha = "0123456789ABCDEF";
+
   const uint32_t stringLength = a_string.length();
 
   for(uint32_t i = 0; i < stringLength; i++) {
@@ -225,8 +227,8 @@ void LidarStringDecoder::nextString(std::string const &a_string)
     m_buffer[m_bufferSize-1] = byte;
 
     
-
-    std::cout << alpha[(int)byte/16] << alpha[(int)byte%16] << ' ';
+    //For debugging
+    //std::cout << alpha[(int)byte/16] << alpha[(int)byte%16] << ' ';
 
     
   
@@ -245,6 +247,7 @@ void LidarStringDecoder::nextString(std::string const &a_string)
     else if(CheckForMeasurementHeader()) {
       if(m_firstHeader) {
         m_firstHeader = false;
+        std::cout << "Configuration done, output started" << std::endl;
       }
       else {
         ConvertToDistances();
