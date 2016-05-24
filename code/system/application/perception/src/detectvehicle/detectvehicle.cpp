@@ -335,12 +335,16 @@ void DetectVehicle::sendObjectInformation(std::vector<cv::Rect>* detections,
     std::vector<std::string> properties;
 
     uint16_t objectId = -1;
-/*
+
     float detectionWidth = (float) 
         sqrt(pow(pointBottomRight(0) - pointBottomLeft(0),2) + 
         pow(pointBottomRight(1) - pointBottomLeft(1),2));
-*/
-    if (angularSize < 0 || distance > 150) {
+
+    //std::cout << "Object width: " << detectionWidth << " m" << std::endl;
+    if (angularSize < 0 
+        || distance > 150 
+        || detectionWidth < 0.5f 
+        || detectionWidth > 10) {
       // Something fishy with this detection
       continue;
     }
@@ -360,6 +364,7 @@ void DetectVehicle::sendObjectInformation(std::vector<cv::Rect>* detections,
     std::cout << "    angularSize:   " << angularSize << std::endl;
     std::cout << "    angSize (deg): " << (angularSize*(float)opendlv::Constants::RAD2DEG) << std::endl;
     std::cout << "    distance (m):  " << distance << std::endl;
+    std::cout << "    width (m):     " << detectionWidth << std::endl;
     /*
     std::cout << "    size:          " << size << std::endl;
     std::cout << "    angle (deg):   " << (angle*(float)opendlv::Constants::RAD2DEG) << std::endl;
