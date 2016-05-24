@@ -65,16 +65,18 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
 
   odcore::data::TimeStamp now;
 
-  odcore::data::TimeStamp diffStamp = now - m_times.back(); //Remove old data
-  double diffSeconds = diffStamp.toMicroseconds() / 1000000.0;
+  if(m_times.size() > 0) {
+	  odcore::data::TimeStamp diffStamp = now - m_times.back(); //Remove old data
+	  double diffSeconds = diffStamp.toMicroseconds() / 1000000.0;
 
-  while(diffSeconds < 1.05) {
-  	m_times.pop_back();
-  	m_angles.pop_back();
-  	m_distances.pop_back();
-  	diffStamp = now - m_times.back();
-  	diffSeconds = diffStamp.toMicroseconds() / 1000000.0;
-  }
+	  while(diffSeconds < 1.05) {
+	  	m_times.pop_back();
+	  	m_angles.pop_back();
+	  	m_distances.pop_back();
+	  	diffStamp = now - m_times.back();
+	  	diffSeconds = diffStamp.toMicroseconds() / 1000000.0;
+	  }
+	}
 
 
   opendlv::proxy::EchoReading reading = a_c.getData<opendlv::proxy::EchoReading>(); //Read new data
@@ -101,6 +103,8 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
   
   uint32_t nPoints = m_angles.size();
   uint32_t objectCounter = 0;
+
+  std::cout << "Before algorithm" << std::endl;
 
 	for(uint32_t k = 0; k < nPoints; k++) {
 		pointCloud.clear();
