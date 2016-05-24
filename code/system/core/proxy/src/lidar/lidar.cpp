@@ -122,7 +122,7 @@ void Lidar::setUp()
     cerr << "[" << getName() << "] Could not connect to Sickan: " << exception << endl;
   }
 
-  Status();
+  //Status();
 
   std::cout << "Connected to Sickan, please wait for configuration" << std::endl;
 

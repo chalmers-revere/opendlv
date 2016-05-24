@@ -153,6 +153,7 @@ bool LidarStringDecoder::CheckForSettingsResponse()
   }
 
   m_counter = 0;
+  m_settingsDone = true;
 
   return true;
 }
@@ -243,7 +244,9 @@ void LidarStringDecoder::nextString(std::string const &a_string)
       if(m_settingsDone) {
         m_startConfirmed = CheckForStartResponse();
       }
-      m_settingsMode = CheckForSettingsResponse(); //Happens to be identical to startresponse
+      else {
+        m_settingsMode = CheckForSettingsResponse(); //Happens to be identical to startresponse
+      }
       m_centimeterMode = CheckForCentimeterResponse();
 
     }
