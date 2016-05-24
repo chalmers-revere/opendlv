@@ -190,17 +190,20 @@ void LidarStringDecoder::ConvertToDistances()
     byte1 = (int)m_measurements[i*2];
     byte2 = (int)m_measurements[i*2+1];
     distance = byte1 + (byte2%32)*256; //Integer centimeters in local polar coordinates
-    cartesian[0] = distance * sin(PI * i /360) / 100; //Local cartesian coordinates in meters (rotated coordinate system)
-    cartesian[1] = distance * (-cos(PI * i /360)) / 100;
-    cartesian[0] += m_position[0]; //Truck cartesian coordinates
-    cartesian[1] += m_position[1];
 
-    
-    double radius = sqrt(pow(cartesian[0],2) + pow(cartesian[1],2));
-    float angle = atan(cartesian[1]/cartesian[0]) - PI/2;
-    opendlv::model::Direction direction(angle,0);
-    m_directions.push_back(direction);
-    m_radii.push_back(radius);
+    if(distance < 8000) { //We don't send max range responses
+      cartesian[0] = distance * sin(PI * i /360) / 100; //Local cartesian coordinates in meters (rotated coordinate system)
+      cartesian[1] = distance * (-cos(PI * i /360)) / 100;
+      cartesian[0] += m_position[0]; //Truck cartesian coordinates
+      cartesian[1] += m_position[1];
+
+      
+      double radius = sqrt(pow(cartesian[0],2) + pow(cartesian[1],2));
+      float angle = atan(cartesian[1]/cartesian[0]) - PI/2;
+      opendlv::model::Direction direction(angle,0);
+      m_directions.push_back(direction);
+      m_radii.push_back(radius);
+    }
   }
 
   m_latestReading.setListOfDirections(m_directions);
