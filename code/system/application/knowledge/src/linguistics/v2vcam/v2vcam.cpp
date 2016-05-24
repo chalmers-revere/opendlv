@@ -256,7 +256,7 @@ void V2vCam::ReadDynamicState(
   m_speedConfidence = a_dynamicState.getVelocityConfidence().getX();
   // std::cout << a_dynamicState.getVelocityConfidence().getX() << std::endl;
   // m_yawRateValue = a_dynamicState.getAngularVelocity().getZ();
-  std::cout << a_dynamicState.getAngularVelocity().getZ() << std::endl;
+  // std::cout << a_dynamicState.getAngularVelocity().getZ() << std::endl;
   // m_yawRateConfidence = a_dynamicState.getAngularVelocityConfidence().getZ();
   // m_longitudinalAcc = a_dynamicState.getAcceleration().getX();
   // m_longitudinalAccConf = a_dynamicState.getAccelerationConfidence().getX();
@@ -440,47 +440,105 @@ int32_t V2vCam::GetStationType() const
 int32_t V2vCam::GetLatitude() const
 {
   int32_t scale = std::pow(10,7);
-  return static_cast<int32_t>(std::round(m_latitude*scale));
+  double val = m_latitude*scale;
+  if(val < -900000000 || val > 900000000){
+    return 900000001;
+  }
+  else {    
+    return static_cast<int32_t>(std::round(val));
+  }
 }
 
 int32_t V2vCam::GetLongitude() const
 {
   int32_t scale = std::pow(10,7);
-  return static_cast<int32_t>(std::round(m_longitude*scale));
+  double val = m_longitude*scale;
+  if(val< -1800000000 || val > 1800000000){
+    return 1800000001;
+  }
+  else{
+    return static_cast<int32_t>(std::round(val));
+  }
 }
 
 int32_t V2vCam::GetSemiMajorConfidence() const
 {
-  return m_semiMajorConfidence;
+  int32_t scale = std::pow(10,2);
+  double val = m_semiMajorConfidence*scale;
+  if(val < 0){
+    return 4095;
+  }
+  else if(val < 1){
+    return 1;
+  }
+  else if(val > 4093){
+    return 4094
+  }
+  else{
+    return static_cast<int32_t>(std::round(val));
+  }
 }
 
 int32_t V2vCam::GetSemiMinorConfidence() const
 {
-  return m_semiMinorConfidence;
+  int32_t scale = std::pow(10,2);
+  double val = m_semiMinorConfidence*scale;
+  if(val < 0){
+    return 4095;
+  }
+  else if(val < 1){
+    return 1;
+  }
+  else if(val > 4093){
+    return 4094
+  }
+  else{
+    return static_cast<int32_t>(std::round(val));
+  }
 }
 
 int32_t V2vCam::GetSemiMajorOrientation() const
 {
-  return m_semiMajorOrientation;
+  double conversion = opendlv::Constants::RAD2DEG;
+  int32_t scale = std::pow(10,2);
+  double val = m_semiMajorOrientation*scale*conversion;
+  if(val < 0 || val > 3600){
+    return 3601;
+  }
+  else {
+    return static_cast<int32_t>(std::round(val));
+  }
 }
 
 int32_t V2vCam::GetAltitude() const
 {
   int32_t scale = std::pow(10,2);
-  return static_cast<int32_t>(std::round(m_altitude*scale));
+  double val = m_altitude*scale;
+  if(val < -100000 || val > 800000){
+    return 800001;
+  }
+  else{
+    return static_cast<int32_t>(std::round(val));
+  }
 }
 
 int32_t V2vCam::GetHeading() const
 {
-  double scale = std::pow(10,1)*opendlv::Constants::RAD2DEG;
-  double val = static_cast<double>(m_heading);
-  return static_cast<int32_t>(std::round(val*scale));
+  double conversion = opendlv::Constants::RAD2DEG;
+  int32_t scale = std::pow(10,1);
+  double val = m_heading*scale*conversion;
+  if(val < 0 || val > 3600){
+    return 3601;
+  }
+  else {
+    return static_cast<int32_t>(std::round(val));
+  }
 }
 
 int32_t V2vCam::GetHeadingConfidence() const
 {
   double conversion = opendlv::Constants::RAD2DEG;
-  double scale = std::pow(10,1);
+  int32_t scale = std::pow(10,1);
   double val = m_headingConfidence*scale*conversion;
   // std::cout << val << std::endl;
   if(val < 0){
