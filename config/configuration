@@ -198,7 +198,7 @@ knowledge-linguistics-v2vcam.stationId = 110
 knowledge-linguistics-v2vcam.stationType = 8 #heavy truck
 knowledge-linguistics-v2vcam.vehicleLength = 47
 knowledge-linguistics-v2vcam.vehicleWidth = 23 
-knowledge-linguistics-v2vcam.vehicleRole = 3 #dangerous goods
+knowledge-linguistics-v2vcam.vehicleRole = 0
 knowledge-linguistics-v2vcam.rearAxleLocation = 430
 
 knowledge-linguistics-v2vdenm.stationId = 110

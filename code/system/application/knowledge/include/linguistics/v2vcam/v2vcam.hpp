@@ -86,7 +86,7 @@ class V2vCam
   unsigned char const m_messageId = 2;
   int32_t m_stationId = 115;
   int32_t m_generationDeltaTime = 0; 
-  unsigned char m_containerMask = 128;
+  unsigned char m_containerMask = 0;
   int32_t m_stationType = 8;
   double m_latitude = 90.0000001;
   double m_longitude = 180.0000001;
