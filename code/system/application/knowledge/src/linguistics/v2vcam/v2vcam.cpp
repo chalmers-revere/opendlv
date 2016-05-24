@@ -376,8 +376,8 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
     opendlv::data::environment::WGS84Coordinate::EAST);
 
     opendlv::data::environment::WGS84Coordinate currentLocation(
-    latitude, opendlv::data::environment::WGS84Coordinate::NORTH,
-    longitude, opendlv::data::environment::WGS84Coordinate::EAST);
+    latitude/std::pow(10,7), opendlv::data::environment::WGS84Coordinate::NORTH,
+    longitude/std::pow(10,7), opendlv::data::environment::WGS84Coordinate::EAST);
 
     opendlv::data::environment::Point3 currentObjectCartesianLocation =
     gpsReference.transform(currentLocation);
@@ -536,7 +536,7 @@ int32_t V2vCam::GetSemiMajorConfidence() const
     return 1;
   }
   else if(val > 4093){
-    return 4094
+    return 4094;
   }
   else{
     return static_cast<int32_t>(std::round(val));
@@ -554,7 +554,7 @@ int32_t V2vCam::GetSemiMinorConfidence() const
     return 1;
   }
   else if(val > 4093){
-    return 4094
+    return 4094;
   }
   else{
     return static_cast<int32_t>(std::round(val));
