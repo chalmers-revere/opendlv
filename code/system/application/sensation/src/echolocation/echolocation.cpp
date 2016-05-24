@@ -104,7 +104,7 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
   uint32_t nPoints = m_angles.size();
   uint32_t objectCounter = 0;
 
-  std::cout << "Before algorithm" << std::endl;
+  std::cout << "Before algorithm, new points: " << nNewPointsoints << std::endl;
 
 	for(uint32_t k = 0; k < nPoints; k++) {
 		pointCloud.clear();
@@ -141,13 +141,15 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
 						maxAngle = m_angles[pointCloud[i]];
 					}
 				}
+
+				std::cout << "Setting object!" << std::endl;
 				//Set Object
 				//TODO: Dynamic confidence
 				float dynConfidence = std::sqrt(static_cast<float>(pointCloud.size()))/3.0f;
 				if(dynConfidence > 1) {
 					dynConfidence = 1;
 				}
-				identifiedObjects[objectCounter] = opendlv::perception::Object();
+				identifiedObjects.push_back(opendlv::perception::Object());
 				identifiedObjects[objectCounter].setIdentified(now);
 				identifiedObjects[objectCounter].setTypeConfidence(-1.0f);
 				identifiedObjects[objectCounter].setDistance(minDist);
