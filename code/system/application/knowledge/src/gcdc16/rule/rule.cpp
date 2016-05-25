@@ -82,31 +82,58 @@ bool Rule::euclideanDistance(double measuredDistance)
 
 void Rule::nextContainer(odcore::data::Container &a_container)
 {
+  odcore::base::KeyValueConfiguration kv1 = getKeyValueConfiguration();
+  std::string mio1 = kv1.getValue<std::string>("knowledge-gcdc16-rule.mio_1");
+
+  odcore::base::KeyValueConfiguration kv2 = getKeyValueConfiguration();
+  std::string mio2 = kv2.getValue<std::string>("knowledge-gcdc16-rule.mio_2");
+
+  odcore::base::KeyValueConfiguration kv3 = getKeyValueConfiguration();
+  std::string backwardId = kv3.getValue<std::string>("knowledge-gcdc16-rule.backward_id");
+  
+  odcore::base::KeyValueConfiguration kv4 = getKeyValueConfiguration();
+  std::string initialLane = kv4.getValue<std::string>("knowledge-gcdc16-rule.initial_lane");
+
+  odcore::base::KeyValueConfiguration kv5 = getKeyValueConfiguration();
+  std::string isTail = kv5.getValue<std::string>("knowledge-gcdc16-rule.is_tail");
+
+  odcore::base::KeyValueConfiguration kv6 = getKeyValueConfiguration();
+  std::string platoonId = kv6.getValue<std::string>("knowledge-gcdc16-rule.platoon_id");
+
   if (a_container.getDataType() == opendlv::proxy::ControlState::ID()) {
     opendlv::proxy::ControlState isAutonomous = a_container.getData<opendlv::proxy::ControlState>();
 
     bool autonomous = isAutonomous.getIsAutonomous();
     if (autonomous) {
       odcore::data::TimeStamp timestamp;
-      opendlv::knowledge::Insight eventOut(timestamp, "mergeScenario");
-      odcore::data::Container objectContainer(eventOut);
-      getConference().send(objectContainer);
 
-/*
-      knowledge-gcdc16-rule:0.mio_1 = 0
-      knowledge-gcdc16-rule:0.mio_2 = 0
-      knowledge-gcdc16-rule:0.backward_id = 0
-      knowledge-gcdc16-rule:0.initial_lane = 4
-      knowledge-gcdc16-rule:0.is_tail = false
-      knowledge-gcdc16-rule:0.platoon_id = 3
+      opendlv::knowledge::Insight scenarioOut(timestamp, "mergeScenario");
+      odcore::data::Container objectContainer1(scenarioOut);
+      getConference().send(objectContainer1);
+
+      opendlv::knowledge::Insight mioOut(timestamp, "mio = " + mio1);
+      odcore::data::Container objectContainer2(mioOut);
+      getConference().send(objectContainer2);
+
+      opendlv::knowledge::Insight backwardOut(timestamp, "backwardId = " + backwardId);
+      odcore::data::Container objectContainer3(backwardOut);
+      getConference().send(objectContainer3);
+
+      opendlv::knowledge::Insight laneOut(timestamp, "initialLane = " + initialLane);
+      odcore::data::Container objectContainer4(laneOut);
+      getConference().send(objectContainer4);
+
+      opendlv::knowledge::Insight tailOut(timestamp, "isTail = " + isTail);
+      odcore::data::Container objectContainer5(tailOut);
+      getConference().send(objectContainer5);
+
+      opendlv::knowledge::Insight platoonOut(timestamp, "platoonId = " + platoonId);
+      odcore::data::Container objectContainer6(platoonOut);
+      getConference().send(objectContainer6);
+
 
       //TODO: STOM, MergeFlag, Ask about Intention messages, distancetravelledCZ
       //TODO: use rsuEvent -> merging should commence
-
-
-
-
-*/
 
 
     } else if (a_container.getDataType() == opendlv::perception::Object::ID()) {
