@@ -42,7 +42,8 @@ odsupercomponent.pulsetimeack.exclude = odcockpit
 ###############################################################################
 ###############################################################################
 
-action-setopticalrotation.gain_heading = 0.5
+action-setopticalrotation.gain_heading = 1.5
+action-setopticalrotation.heading_tolerance = 0.05
 
 ###############################################################################
 ###############################################################################

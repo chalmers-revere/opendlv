@@ -46,7 +46,9 @@ class SetOpticalRotation
  private:
   void setUp();
   void tearDown();
-
+  
+  float m_desiredAzimuth;
+  float m_currentAzimuth;
   std::ofstream m_logRotation;
 };
 

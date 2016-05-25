@@ -222,7 +222,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
       output += "Yaw rate confidence: " 
           + std::to_string(GetYawRateConfidence()) + "\n";
       output += "Vehicle role: " + std::to_string(GetVehicleRole()) + "\n";
-      std::cout << output;
+      //std::cout << output;
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
@@ -344,7 +344,7 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
     output += "Yaw rate confidence: " 
         + std::to_string(yawRateConfidence) + "\n";
     output += "Vehicle role: " + std::to_string(vehicleRole) + "\n";
-    // std::cout << output;
+    std::cout << output;
 
     m_receiveLog << std::to_string(GenerateGenerationTime()) +  
         + "+" + std::to_string(messageId) +
@@ -371,6 +371,8 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
         + "," + std::to_string(vehicleRole);
         m_receiveLog << std::endl; 
 
+
+    //This is where the objects are constructed whihc are to be sent out
     opendlv::data::environment::WGS84Coordinate gpsReference;
 
     gpsReference = opendlv::data::environment::WGS84Coordinate(

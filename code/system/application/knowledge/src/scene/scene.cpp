@@ -95,12 +95,14 @@ void Scene::nextContainer(odcore::data::Container &a_container)
       TimeCheck();
       bool objectExists =false;
       for (uint32_t i = 0; i < savedObjects.size(); i++) {
+        //std::cout << "Debug0: " << std::endl;
 
         if (m_properties.size() > 0 && savedObjects[i].getListOfProperties().size() > 0) {
         
           std::string stationId = savedObjects[i].getListOfProperties()[0];
           if (m_properties[0] == stationId){
             MergeObjects(unpackedObject, i);
+           //std::cout << "Debug1: " << std::endl;
             objectExists = true;
             break;
           }
@@ -108,16 +110,19 @@ void Scene::nextContainer(odcore::data::Container &a_container)
         double betweenObjects = PointDistance(m_azimuth, m_distance, savedObjects[i].getDirection().getAzimuth(), savedObjects[i].getDistance());
         if (betweenObjects < 2.0) {
           MergeObjects(unpackedObject, i);
+          //std::cout << "Debug2: " << std::endl;
           objectExists = true;
           break;
         }
       }
 
       if (!objectExists) {
-      unpackedObject.setObjectId(m_objectCounter);
-      m_objectCounter++;
-      savedObjects.push_back(unpackedObject);
+        //std::cout << "Debug3: " << std::endl;
+        unpackedObject.setObjectId(m_objectCounter);//TODO: Modulus to Object ID
+        m_objectCounter++;
+        savedObjects.push_back(unpackedObject);
       }
+      //std::cout << "Debug4: " << std::endl;
       std::cout << "Number of IDs: " << savedObjects.size() << std::endl << std::endl;
 
 	 }
@@ -194,9 +199,12 @@ void Scene::TimeCheck()
 {
   odcore::data::TimeStamp nowTimeStamp;
   for (uint32_t i = 0; i < savedObjects.size(); i++) {
-    double objectTimeStamp = (nowTimeStamp - savedObjects[i].getIdentified()).toMicroseconds() / 1000000;
+    double objectTimeStamp = (nowTimeStamp - savedObjects[i].getIdentified()).toMicroseconds() / 1000000.0;
+    //std::cout << "Timestamp" << savedObjects[i].getIdentified().toMicroseconds() / 1000000.0 << std::endl;
+    //std::cout << "Debug time: " << objectTimeStamp << std::endl;
     if (objectTimeStamp > 1) { //TODO: Change to config parameter
      savedObjects.erase(savedObjects.begin() + i);
+     std::cout << "Removed object" << std::endl;
      i--;
     }
   }
