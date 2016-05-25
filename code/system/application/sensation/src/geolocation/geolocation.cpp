@@ -73,21 +73,21 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
   m_ekf.init(state);
 
   KinematicObservationModel<double> kinematicObservationModel(
-      0.0, 0.0,  0.0, 0.0);
+      0.0, 0.0,  0.0);//, 0.0);
 
 
   // To dump data structures into a CSV file, you create an output file first.
   // std::ofstream fout("../Exp_data/output.csv");
-  bool   saveToFile = false;
+  bool   saveToFile = true;
   std::ofstream fout_ekfState("./output_ekf.csv");
   fout_ekfState
       << "%HEADER: Output of the Extended Kalman Filter, data format : \n"
       << "%timestamp (s), ground truth: x (m),  y (m), theta (rad), "
       << "theta_dot(rad/s), commands : velocity (m/s) steering angle (rad), "
-      << "noisy data: x (m), y (m), theta (rad), theta_dot (rad/s), "
+      << "noisy data: x (m), y (m), theta (rad) "
       << "ekf estimation vector: x (m), x_dot (m/s), y (m), y_dot (ms), "
       << "theta (rad), theta_dot(rad/s)  \n"
-      << "%t lat long yaw long_vel wheels_angle Z_x Z_y Z_theta Z_theta_dot "
+      << "%t lat long yaw long_vel wheels_angle Z_x Z_y Z_theta "
       << "HAS_DATA X_x X_x_dot X_y X_y_dot X_theta X_theta_dot sent_lat "
       << "sent_long sent_alt sent_heading positionConfidence headingConfidence yawRateConfidence"
       << endl;
@@ -100,8 +100,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
         getKeyValueDataStore().get(opendlv::proxy::GpsReading::ID());
     auto gpsReading = gpsReadingContainer.getData<opendlv::proxy::GpsReading>();
 
-    std::cout << getName() << "\tLatitude  =  " << gpsReading.getLatitude()
-        << "  Longitude  =  " << gpsReading.getLongitude() << std::endl;
+    //std::cout << getName() << "\tLatitude  =  " << gpsReading.getLatitude()
+    //    << "  Longitude  =  " << gpsReading.getLongitude() << std::endl;
 
     if (gpsReadingContainer.getReceivedTimeStamp().toMicroseconds() > 0) {
       if (!hasGpsReference) {
@@ -138,9 +138,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
           control.v() = 0.0;
       // if we don't get any data from the CAN,
       // we try to fill the speed from GPS data
-        auto gpsSpeed = gpsReading.getSpeed();
-        if (gpsSpeed > 1.0 ){
-        control.v() = gpsSpeed;}
+        //auto gpsSpeed = gpsReading.getSpeed();
+        //if (gpsSpeed > 1.0 ){
+        //control.v() = gpsSpeed;}
       }
 
       std::cout << "The vehicle speed is : " << gpsReading.getSpeed() << endl;
@@ -149,15 +149,15 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       auto steering = steeringContainer.getData<
           opendlv::proxy::reverefh16::Steering>();
 
-      auto vehicleStateContainer = getKeyValueDataStore().get(
-                  opendlv::proxy::reverefh16::VehicleState::ID());
-      auto vehicleState = vehicleStateContainer.getData<
-              opendlv::proxy::reverefh16::VehicleState>();
-      double vehicleYawRate = vehicleState.getYawRate();
+      //auto vehicleStateContainer = getKeyValueDataStore().get(
+      //            opendlv::proxy::reverefh16::VehicleState::ID());
+      //auto vehicleState = vehicleStateContainer.getData<
+      //        opendlv::proxy::reverefh16::VehicleState>();
+      //double vehicleYawRate = vehicleState.getYawRate();
 
 
       if (steeringContainer.getReceivedTimeStamp().getSeconds() > 0) {
-        control.phi() = steering.getSteeringwheelangle()/m_steeringToWheelRatio;
+        control.phi() = steering.getRoadwheelangle()/m_steeringToWheelRatio;
       }
 
       std::cout   << getName() << "\t" << "timestamp="
@@ -195,8 +195,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       else {
         observationVector.Z_theta() = state.theta();
       }
-      observationVector.Z_theta_dot() = vehicleYawRate;
-//       // TODO: Put yaw rate here...
+      //observationVector.Z_theta_dot() = vehicleYawRate;
+      // TODO: Put yaw rate here...
 
 
       double deltaTime = duration.toMicroseconds() / 1000000.0;
@@ -216,12 +216,11 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       if (gpsReadingContainer.getReceivedTimeStamp().toMicroseconds() >
           previousDataTimestamp.toMicroseconds()) {
 
-        // std::cout << "\nobservation vector "
-        //           << observationVector.Z_x() << " "
-        //           << observationVector.Z_y() << " "
-        //           << observationVector.Z_theta() << " "
-        //           << observationVector.Z_theta_dot() << " "
-        //           << endl;
+         std::cout << "\nobservation vector "
+                   << observationVector.Z_x() << " "
+                   << observationVector.Z_y() << " "
+                   << observationVector.Z_theta() << " "
+                   << endl;
         state = m_ekf.update(kinematicObservationModel, observationVector);
         previousDataTimestamp = gpsReadingContainer.getReceivedTimeStamp();
         gpsHasData = true;
@@ -244,7 +243,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       opendlv::data::environment::WGS84Coordinate currentWGS84CoordinateEstimation;
       bool ekfSuccess=true;
       // if one of the coordinates is nan, it gives the last GPS available measure
-      if (!std::isnan(state.x()) && !std::isnan(state.y()) )
+      if (   std::isfinite(state.x()) 
+          && std::isfinite(state.y()) )
       {
         // Build the proper GPS coordinates to send
         opendlv::data::environment::Point3 currentStateEstimation
@@ -262,14 +262,22 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
        ekfSuccess = false;
       }
 
-      double heading;
-      if (!std::isnan(state.theta()))
+      double heading = 0.0;
+      if (std::isfinite(state.theta()) )
       {
-        heading = std::asin(std::sin(state.theta()));  // asin(sin(theta)) make sure that the heading is in [-pi,+pi]
+        heading = state.theta() - 
+                  std::ceil((state.theta()-M_PI/2)/(M_PI)) * (M_PI);  // make sure that the heading is in [-pi,+pi]
       }
       else
       {
-        heading = gpsReading.getNorthHeading();
+       filterReset( currentCartesianLocation, gpsReading);
+       state = m_ekf.getState();
+        if (std::isfinite(gpsReading.getNorthHeading())) {
+           heading = state.theta() - 
+                  std::ceil((gpsReading.getNorthHeading()-M_PI/2)/(M_PI)) * (M_PI);  // make sure that the heading is in [-pi,+pi]
+        }
+	else {
+           heading = 0.0;} 
         ekfSuccess = false;
       }
 
@@ -303,7 +311,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
                                                             currentWGS84CoordinateEstimation.getLongitude(),
                                                             positionConfidence,
                                                             gpsReading.getAltitude(),
-                                                            fmod(state.theta()*opendlv::Constants::DEG2RAD,(2*opendlv::Constants::PI)),
+                                                            heading,  
                                                             headingConfidence
                                                             );
       
@@ -356,7 +364,6 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
           << observationVector.Z_x() << " "
           << observationVector.Z_y() << " "
           << observationVector.Z_theta() << " "
-          << observationVector.Z_theta_dot() << " "
           << gpsHasData << " "
           << state.x() << " "
           << state.x_dot() << " "
