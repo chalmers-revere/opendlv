@@ -259,11 +259,11 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 
 
       std::cout   << getName() << "\t" << "timestamp="
-          << timestamp << "\t "
+          << timestamp << "\t " << std::setprecision(19)
           << "\tlat=" << currentWGS84CoordinateEstimation.getLatitude()
           << ", long="
           << currentWGS84CoordinateEstimation.getLongitude()
-          << ", northHeading =" << heading << std::endl;
+          << ", northHeading =" << heading << "\n" << std::endl;
 
       // Send the message
       opendlv::sensation::Geolocation geoLocationEstimation(currentWGS84CoordinateEstimation.getLatitude(),
