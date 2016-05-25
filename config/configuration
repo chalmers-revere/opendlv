@@ -203,19 +203,14 @@ sensation-vision-opticalflow.nAxisPoints = 15
 
 ###############################################################################
 ###############################################################################
-# V2V
-knowledge-linguistics-v2vcam.stationId = 110
-knowledge-linguistics-v2vcam.stationType = 8 #heavy truck
-knowledge-linguistics-v2vcam.vehicleLength = 7.3
-knowledge-linguistics-v2vcam.vehicleWidth = 2.55 
-knowledge-linguistics-v2vcam.vehicleRole = 0
-knowledge-linguistics-v2vcam.rearAxleLocation = 4.30
+# Identity
+knowledge-identity.stationId = 110
+knowledge-identity.stationType = 8 #heavy truck
+knowledge-identity.vehicleLength = 7.3
+knowledge-identity.vehicleWidth = 2.55 
+knowledge-identity.vehicleRole = 0
+knowledge-identity.rearAxleLocation = 4.30
 
-knowledge-linguistics-v2vdenm.stationId = 110
-knowledge-linguistics-v2vdenm.stationType = 8 #heavy truck
-
-knowledge-gcdc16-v2viclcm.stationId = 110
-knowledge-gcdc16-v2viclcm.rearAxleLocation = 4.30
 
 ###############################################################################
 ###############################################################################

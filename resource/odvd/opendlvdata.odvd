@@ -207,7 +207,7 @@ message opendlv.perception.Surface [id = 184] {
   bool traversable [id = 6];
 
   float confidence [id = 7];
-  uint16 sources [id = 8];
+  list<string> sources [id = 8];
 
   list<string> properties [id = 9];
 
@@ -222,9 +222,9 @@ message opendlv.knowledge.Message [id = 185] {
   string data [id = 2];
 }
 
-message opendlv.knowledge.Event [id = 187] {
-  odcore::data::TimeStamp eventTime [id = 1];
-  string event [id = 2];
+message opendlv.knowledge.Insight [id = 187] {
+  odcore::data::TimeStamp InsightTime [id = 1];
+  string Insight [id = 2];
 }
 
 message opendlv.action.Correction [id = 186] {

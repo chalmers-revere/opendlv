@@ -664,7 +664,7 @@ int32_t V2vCam::GetSpeedConfidence() const
   else if(val < 1){
     return 1;
   }
-  else if(m_speedConfidence > 125){
+  else if(val > 125){
     return 126;
   }
   else{
