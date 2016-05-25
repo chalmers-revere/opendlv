@@ -25,6 +25,8 @@
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
 
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
+
 namespace opendlv {
 namespace knowledge {
 namespace gcdc16 {
@@ -44,13 +46,16 @@ class Rule : public odcore::base::module::DataTriggeredConferenceClientModule {
  private:
   void setUp();
   void tearDown();
-  double getDistances(double);
-  bool euclideanDistance(double);
+  //double getDistances(double);
+  //bool euclideanDistance(double);
 
  private:
-  double standstillDistance;
-  double headway;
-  double minimumEuclideanDistance;
+
+  std::unique_ptr<opendlv::perception::Object> m_object;
+  float m_desiredAzimuth;
+  //double standstillDistance;
+  //double headway;
+  //double minimumEuclideanDistance;
 };
 
 } // rule

@@ -43,9 +43,11 @@ namespace rule {
 Rule::Rule(int32_t const &a_argc, char **a_argv)
 : DataTriggeredConferenceClientModule(
 	a_argc, a_argv, "knowledge-gcdc16-rule"),
-	standstillDistance(6), //TODO: Get actual value at GCDC in meters
-	headway(1), //TODO: Get actual value at GCDC in seconds
-	minimumEuclideanDistance(5) //TODO: Get actual value at GCDC in meters
+  m_object(),
+  m_desiredAzimuth(0.0f)
+	//standstillDistance(6), //TODO: Get actual value at GCDC in meters
+	//headway(1), //TODO: Get actual value at GCDC in seconds
+	//minimumEuclideanDistance(5) //TODO: Get actual value at GCDC in meters
 {
 }
 
@@ -57,6 +59,7 @@ Rule::~Rule()
 * Receives .
 * Sends .
 */
+/*
 double Rule::getDistances(double hostVelocity)
 {
 	double desiredDistance = standstillDistance + headway * hostVelocity;
@@ -75,9 +78,43 @@ bool Rule::euclideanDistance(double measuredDistance)
 	return false;
 
 }
-void Rule::nextContainer(odcore::data::Container &)
+*/
+
+void Rule::nextContainer(odcore::data::Container &a_container)
 {
+	if(a_container.getDataType() == opendlv::perception::Object::ID()) {
+    opendlv::perception::Object unpackedObject =
+    a_container.getData<opendlv::perception::Object>();
+
+    int16_t id = unpackedObject.getObjectId();
+
+    if (id != -1) {
+      return;
+    }
+
+    opendlv::model::Direction direction = unpackedObject.getDirection();
+    float azimuth = direction.getAzimuth();
+
+    if (std::abs(azimuth) < 0.22f) {
+      if (m_object == nullptr) {
+        m_object.reset(new opendlv::perception::Object(unpackedObject));
+      } else {
+        if (unpackedObject.getDistance() < m_object->getDistance())
+          m_object.reset(new opendlv::perception::Object(unpackedObject));
+      }
+    }
+    m_desiredAzimuth = m_object->getDirection().getAzimuth();
+    opendlv::model::Direction objectDirection(m_desiredAzimuth, 0.0f);
+    opendlv::sensation::DesiredDirectionOfMovement desiredDirection(objectDirection);
+    odcore::data::Container objectContainer(desiredDirection);
+    getConference().send(objectContainer);
+  }
 }
+
+
+
+
+
 
 void Rule::setUp()
 {
