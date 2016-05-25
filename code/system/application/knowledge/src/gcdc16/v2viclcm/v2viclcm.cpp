@@ -56,7 +56,7 @@ V2vIclcm::V2vIclcm(int32_t const &a_argc, char **a_argv)
   struct stat st;
   if (::stat("var/application/knowledge/gcdc16/v2viclcm", &st) == -1) {
     ::system("mkdir -p ./var/application/knowledge/gcdc16/v2viclcm");
-    // std::cout<<"Created dir"<<std::endl;
+    std::cout<<"Created dir"<<std::endl;
   }
   odcore::data::TimeStamp nu;
 

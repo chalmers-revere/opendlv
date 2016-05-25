@@ -15,13 +15,17 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-# Date: 2016-03-05
+# Date: 2016-05-20
 
 FROM seresearch/odsimulation:latest
-MAINTAINER Christian Berger "christian.berger@gu.se"
 
 # Set locale (fix the locale warnings)
 RUN localedef -v -c -i en_US -f UTF-8 en_US.UTF-8 || :
 
-ADD opendlv /opt/opendlv
+RUN apt-get install -y libpopt-dev opendavinci-odcandatastructuregenerator opendavinci-oddatastructuregenerator opendavinci-odcantools
 
+ADD ./ /opt/data
+
+WORKDIR /opt/data
+
+RUN mkdir -p build-docker && cd build-docker && PATH=$PATH:/usr/bin cmake -D CMAKE_INSTALL_PREFIX=/opt/odlv -D OPENDAVINCI_DIR=/usr/ .. && make

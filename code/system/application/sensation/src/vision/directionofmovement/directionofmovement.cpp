@@ -103,18 +103,19 @@ void DirectionOfMovement::nextContainer(odcore::data::Container &a_c)
   if(a_c.getDataType() == opendlv::sensation::OpticalFlow::ID()){
     opendlv::sensation::OpticalFlow message = 
         a_c.getData<opendlv::sensation::OpticalFlow>();
-    std::vector<float> x,y,u,v;
-    uint16_t nPoints = message.getNPoint();
-    x = message.getListOfX();
-    y = message.getListOfY();
-    u = message.getListOfU();
-    v = message.getListOfV();
+
+    uint16_t nPoints = message.getNumberOfPoints();
+    std::vector<opendlv::model::Direction> directions = 
+        message.getListOfDirections();
+    std::vector<float> u = message.getListOfU();
+    std::vector<float> v = message.getListOfV();
 
     Eigen::MatrixXd flow(nPoints, 4);
     Eigen::MatrixXd A(nPoints,2);
     Eigen::MatrixXd B(nPoints,1);
     for(uint8_t i = 0; i < nPoints; ++i){
-      flow.row(i) << x[i],y[i],u[i],v[i];
+      flow.row(i) << directions[i].getAzimuth(), directions[i].getZenith(), 
+          u[i], v[i];
     }
     A.col(0) = flow.col(3);
     A.col(1) = -flow.col(2);
@@ -149,9 +150,8 @@ void DirectionOfMovement::nextContainer(odcore::data::Container &a_c)
 }
 void DirectionOfMovement::SendContainer()
 {
-  float v[3] = {0,0,1};
-  opendlv::coordinate::Spherical3 spherical3Message(v);
-  opendlv::sensation::DirectionOfMovement nextMessage(spherical3Message);
+  opendlv::model::Direction direction(0.0f, 0.0f);
+  opendlv::sensation::DirectionOfMovement nextMessage(direction);
   odcore::data::Container c(nextMessage);
   getConference().send(c);
 }

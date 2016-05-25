@@ -297,23 +297,49 @@ std::cout << "\n\n the vehicle speed is : " << gpsReading.getSpeed() << endl;
 
       // Send the message
       opendlv::sensation::Geolocation geoLocationEstimation(currentWGS84CoordinateEstimation.getLatitude(),
+                                                            positionConfidence,
                                                             currentWGS84CoordinateEstimation.getLongitude(),
                                                             positionConfidence,
                                                             gpsReading.getAltitude(),
                                                             heading,
-                                                            headingConfidence,
-                                                            control.v(),
-                                                            speedConfidence,
-                                                            yawRate,
-                                                            yawRateConfidence,
-                                                            longitudinalAcceleration,
-                                                            longitudinalAccelerationConfidence
+                                                            headingConfidence
                                                             );
-
-
-
+      
       odcore::data::Container msg(geoLocationEstimation);
       getConference().send(msg);
+
+
+
+      // TODO: This should be sent from another module = sensation/geolocation 
+      // should be split in two as discussed previously
+      opendlv::model::Cartesian3 velocity(control.v(), 0.0f, 0.0f);
+      opendlv::model::Cartesian3 velocityConfidence(speedConfidence, 0.0f, 
+          0.0f);
+
+      opendlv::model::Cartesian3 acceleration(longitudinalAcceleration, 0.0f, 
+          0.0f);
+      opendlv::model::Cartesian3 accelerationConfidence(
+          longitudinalAccelerationConfidence, 0.0f, 0.0f);
+      
+      opendlv::model::Cartesian3 angularVelocity(0.0f, 0.0f, yawRate);
+      opendlv::model::Cartesian3 angularVelocityConfidence(0.0f, 0.0f,
+          yawRateConfidence);
+
+      opendlv::model::Cartesian3 angularAcceleration(0.0f, 0.0f, 0.0f);
+      opendlv::model::Cartesian3 angularAccelerationConfidence(0.0f, 0.0f,
+          0.0f);
+
+      int16_t frameId = 0;
+
+      opendlv::model::DynamicState dynamicState(velocity, velocityConfidence,
+          acceleration, accelerationConfidence, angularVelocity,
+          angularVelocityConfidence, angularAcceleration,
+          angularAccelerationConfidence, frameId);
+
+      odcore::data::Container dynamicStateContainer(dynamicState);
+      getConference().send(dynamicStateContainer);
+
+
 
       //save data to file
       if (  saveToFile){

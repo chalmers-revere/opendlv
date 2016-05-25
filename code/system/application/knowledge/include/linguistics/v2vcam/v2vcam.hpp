@@ -51,8 +51,9 @@ class V2vCam
   void tearDown();
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
-  void ReadGeolocation(opendlv::sensation::Geolocation &);
-  void ReadVoice(opendlv::sensation::Voice &);
+  void ReadDynamicState(opendlv::model::DynamicState const &);
+  void ReadGeolocation(opendlv::sensation::Geolocation const &);
+  void ReadVoice(opendlv::sensation::Voice const &);
   void SendWGS84Coordinate();
 
   unsigned char GetMessageId() const;

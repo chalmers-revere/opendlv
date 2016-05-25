@@ -59,10 +59,11 @@ void Audition::nextContainer(odcore::data::Container &c)
   //     << " sent at " << c.getSentTimeStamp().getYYYYMMDD_HHMMSSms() 
   //     <<" received at " << c.getReceivedTimeStamp().getYYYYMMDD_HHMMSSms()
   //     << endl;
-  if(c.getDataType() == opendlv::proxy::V2vInbound::ID()){
+  if(c.getDataType() == opendlv::proxy::V2vReading::ID()){
     // std::cout << "Received a message of type ."
-    opendlv::proxy::V2vInbound message = c.getData<opendlv::proxy::V2vInbound>();
-    std::string dataString = message.getData();
+    opendlv::proxy::V2vReading v2vReading = 
+        c.getData<opendlv::proxy::V2vReading>();
+    std::string dataString = v2vReading.getData();
     std::vector<unsigned char> data(dataString.begin(), dataString.end());
     
     // string value = message.getValue();
@@ -103,7 +104,8 @@ void Audition::nextContainer(odcore::data::Container &c)
     if(!v2vMsgType.empty())
     {
       // std::cout<<"Sorted and sending to next layer.\n";
-      opendlv::sensation::Voice nextMessage(v2vMsgType, message.getSize(), dataString);
+      opendlv::sensation::Voice nextMessage(v2vMsgType, v2vReading.getSize(), 
+          dataString);
       odcore::data::Container container(nextMessage);
       getConference().send(container);
     }
