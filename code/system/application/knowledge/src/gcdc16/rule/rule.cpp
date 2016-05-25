@@ -82,7 +82,19 @@ bool Rule::euclideanDistance(double measuredDistance)
 
 void Rule::nextContainer(odcore::data::Container &a_container)
 {
-	if(a_container.getDataType() == opendlv::perception::Object::ID()) {
+	if (a_container.getDataType() == opendlv::proxy::ControlState::ID()) {
+    opendlv::proxy::ControlState controlState =
+    a_container.getData<opendlv::proxy::ControlState>();
+
+    if (controlState.getIsAutonomous()) {
+      odcore::data::TimeStamp timestamp;
+      opendlv::knowledge::Event event(timestamp, "gcdcReady");
+    
+      odcore::data::Container objectContainer(event);
+      getConference().send(objectContainer);
+    }
+
+  } else if (a_container.getDataType() == opendlv::perception::Object::ID()) {
     opendlv::perception::Object unpackedObject =
     a_container.getData<opendlv::perception::Object>();
 

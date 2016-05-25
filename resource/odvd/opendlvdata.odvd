@@ -222,6 +222,11 @@ message opendlv.knowledge.Message [id = 185] {
   string data [id = 2];
 }
 
+message opendlv.knowledge.Event [id = 187] {
+  odcore::data::TimeStamp eventTime [id = 1];
+  string event [id = 2];
+}
+
 message opendlv.action.Correction [id = 186] {
   odcore::data::TimeStamp startTime [id = 1];
   string type [id = 2];
