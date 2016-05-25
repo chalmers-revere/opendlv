@@ -17,6 +17,8 @@
  * USA.
  */
 
+#include <fstream>
+
 #include "relay/gpiodevice.hpp"
 
 namespace opendlv {
@@ -28,28 +30,79 @@ namespace relay {
  *
  */
 GpioDevice::GpioDevice(std::vector<bool> a_initialValues, 
-    std::vector<uint16_t> a_pins, std::string const &a_deviceNode):
+    std::vector<uint16_t> a_pins):
   Device(a_initialValues),
-  m_device() 
+  m_pins(a_pins)
 {
-  (void)a_pins;
-  (void)a_deviceNode;
+  std::string path = std::string("/sys/class/gpio/");
+  std::string filename = path + "export";
+  std::ofstream exportFile(filename, std::ofstream::out);
+  
+  for (uint16_t i = 0; i < a_pins.size(); i++) {
+
+    uint16_t pin = a_pins[i];
+    bool initialValue = a_initialValues[i];
+
+    exportFile << pin;
+
+    std::string gpioDir = path + "gpio" + std::to_string(pin) + "/";
+    std::string gpioDirectionFilename = gpioDir + "direction";
+    std::string gpioValueFilename = gpioDir + "value";
+
+    std::ofstream gpioDirectionFile(gpioDirectionFilename, std::ofstream::out);
+    gpioDirectionFile << "out";
+
+    std::ofstream gpioValueFile(gpioValueFilename, std::ofstream::out);
+    gpioDirectionFile << static_cast<uint16_t>(initialValue);
+
+    gpioDirectionFile.close();
+    gpioValueFile.close();
+  }
+
+  exportFile.close();
 }
 
 GpioDevice::~GpioDevice()
 {
+  std::string path = std::string("/sys/class/gpio/");
+  std::string filename = path + "unexport";
+  std::ofstream unexportFile(filename, std::ofstream::out);
+  
+  for (uint16_t pin : m_pins) {
+    unexportFile << pin;
+  }
+
+  unexportFile.close();
 }
 
 bool GpioDevice::IsActive(uint16_t const a_index) const
 {
-  (void) a_index;
-  return false;
+  uint16_t pin = m_pins[a_index];
+
+  std::string filename = std::string("/sys/class/gpio/gpio" 
+      + std::to_string(pin) + "/value");
+  std::ifstream file(filename, std::ifstream::in);
+  
+  std::string line;
+  std::getline(file, line);
+  bool value = std::stoi(line);
+
+  file.close();
+
+  return value;
 }
 
 void GpioDevice::SetValue(uint16_t const a_index, bool const a_value)
 {
-  (void) a_index;
-  (void) a_value;
+  uint16_t pin = m_pins[a_index];
+
+  std::string filename = std::string("/sys/class/gpio/gpio" 
+      + std::to_string(pin) + "/value");
+  std::ofstream file(filename, std::ofstream::out);
+  
+  file << a_value;
+
+  file.close();
 }
 
 } // relay

@@ -32,7 +32,7 @@ namespace relay {
 
 class GpioDevice : public Device {
  public:
-  GpioDevice(std::vector<bool>, std::vector<uint16_t>, std::string const &);
+  GpioDevice(std::vector<bool>, std::vector<uint16_t>);
   GpioDevice(GpioDevice const &) = delete;
   GpioDevice &operator=(GpioDevice const &) = delete;
   virtual ~GpioDevice();
@@ -40,7 +40,7 @@ class GpioDevice : public Device {
   void SetValue(uint16_t const, bool const);
 
  private:
-  int16_t m_device;
+  std::vector<uint16_t> m_pins;
 };
 
 } // relay

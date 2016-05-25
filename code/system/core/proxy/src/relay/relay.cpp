@@ -52,8 +52,23 @@ Relay::~Relay()
 {
 }
 
-void Relay::nextContainer(odcore::data::Container &)
+void Relay::nextContainer(odcore::data::Container &a_container)
 {
+  if (a_container.getDataType() == opendlv::proxy::RelayRequest::ID()) {
+    opendlv::proxy::RelayRequest request = 
+    a_container.getData<opendlv::proxy::RelayRequest>();
+
+    std::string deviceId = request.getDeviceId();
+
+    if (deviceId != getIdentifier()) {
+      return;
+    }
+
+    bool relayValue = request.getRelayValue();
+    uint8_t relayIndex = request.getRelayIndex();
+
+    m_device->SetValue(relayIndex, relayValue);
+  }
 }
 
 void Relay::setUp()
@@ -75,9 +90,6 @@ void Relay::setUp()
   }
 
   if (type.compare("gpio") == 0) {
-    std::string const deviceNode = 
-        kv.getValue<std::string>("proxy-relay.gpio.device_node");
-
     std::string const pinsString = 
         kv.getValue<std::string>("proxy-relay.gpio.pins");
 
@@ -90,8 +102,7 @@ void Relay::setUp()
       pins.push_back(pin);
     }
 
-     m_device = std::unique_ptr<Device>(new GpioDevice(values, pins,
-         deviceNode));
+     m_device = std::unique_ptr<Device>(new GpioDevice(values, pins));
   }
 
   if (m_device.get() == nullptr) {
