@@ -82,24 +82,34 @@ bool Rule::euclideanDistance(double measuredDistance)
 
 void Rule::nextContainer(odcore::data::Container &a_container)
 {
-  if (a_container.getDataType() == opendlv::knowledge::Event::ID()) {
-    opendlv::knowledge::Event eventIn =
-        a_container.getData<opendlv::knowledge::Event>();
+  if (a_container.getDataType() == opendlv::proxy::ControlState::ID()) {
+    opendlv::proxy::ControlState isAutonomous = a_container.getData<opendlv::proxy::ControlState>();
 
-    std::string eventName = eventIn.getEvent();
-    if (eventName == "") {
+    bool autonomous = isAutonomous.getIsAutonomous();
+    if (autonomous) {
       odcore::data::TimeStamp timestamp;
-      opendlv::knowledge::Event eventOut(timestamp, "platoonDrive");
-   
-      // TODO: DRIVE AND SEND MIO.
-
+      opendlv::knowledge::Insight eventOut(timestamp, "mergeScenario");
       odcore::data::Container objectContainer(eventOut);
       getConference().send(objectContainer);
-    } else if (eventName == "") {
-      
-    }
 
-  } else if (a_container.getDataType() == opendlv::perception::Object::ID()) {
+/*
+      knowledge-gcdc16-rule:0.mio_1 = 0
+      knowledge-gcdc16-rule:0.mio_2 = 0
+      knowledge-gcdc16-rule:0.backward_id = 0
+      knowledge-gcdc16-rule:0.initial_lane = 4
+      knowledge-gcdc16-rule:0.is_tail = false
+      knowledge-gcdc16-rule:0.platoon_id = 3
+
+      //TODO: STOM, MergeFlag, Ask about Intention messages, distancetravelledCZ
+      //TODO: use rsuEvent -> merging should commence
+
+
+
+
+*/
+
+
+    } else if (a_container.getDataType() == opendlv::perception::Object::ID()) {
     opendlv::perception::Object unpackedObject =
     a_container.getData<opendlv::perception::Object>();
 
@@ -125,6 +135,7 @@ void Rule::nextContainer(odcore::data::Container &a_container)
     opendlv::sensation::DesiredDirectionOfMovement desiredDirection(objectDirection);
     odcore::data::Container objectContainer(desiredDirection);
     getConference().send(objectContainer);
+    }
   }
 }
 

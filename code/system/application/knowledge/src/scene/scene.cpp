@@ -44,7 +44,7 @@ namespace scene {
   */
 Scene::Scene(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(a_argc, a_argv, "knowledge-scene")
-    , savedSurfaces()
+    , m_savedSurfaces()
     , m_savedObjects()
     , m_objectCounter(0)
 {
@@ -129,9 +129,10 @@ void Scene::nextContainer(odcore::data::Container &a_container)
 	 }
   }
   else if(a_container.getDataType() == opendlv::perception::Surface::ID()) {
-    opendlv::perception::Object unpackedObject =
+    opendlv::perception::Surface unpackedObject =
     a_container.getData<opendlv::perception::Surface>();
   }
+  SendObjects();
 }
 
 void Scene::SendObjects()
