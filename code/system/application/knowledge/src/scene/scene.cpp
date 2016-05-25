@@ -129,6 +129,14 @@ void Scene::nextContainer(odcore::data::Container &a_container)
   }
 }
 
+void Scene::SendObjects()
+{
+  for(uint32_t i = 0; i < savedObjects.size(); i++) {
+    odcore::data::Container objectContainer(savedObjects[i]);
+    getConference().send(objectContainer);
+  }
+}
+
 double Scene::PointDistance(float a_angle1, double a_dist1, float a_angle2, double a_dist2)
 {
     double x1 = std::cos(static_cast<double>(a_angle1))*a_dist1;
@@ -155,12 +163,12 @@ void Scene::MergeObjects(opendlv::perception::Object a_object, uint32_t a_index)
     confidenceModifierDirection = 1.25f;
   }
   savedObjects[a_index].setDirection(a_object.getDirection());  
-  if (savedObjects[a_index].getDirectionConfidence() <= a_object.getDirectionConfidence()) {
+  if (savedObjects[a_index].getDirectionConfidence() <= a_object.getDirectionConfidence()) { //Borde inte confidence höjas oavsett? /MS
     float confidenceDirection = confidenceModifierDirection * a_object.getDirectionConfidence();
     confidenceDirection = confidenceDirection > 1 ? 1 : confidenceDirection;
     savedObjects[a_index].setDirectionConfidence(confidenceDirection);
   }
-  if (savedObjects[a_index].getDirectionRateConfidence() < a_object.getDirectionConfidence()) {
+  if (savedObjects[a_index].getDirectionRateConfidence() < a_object.getDirectionRateConfidence()) { //Skulle vi inte alltid ta nya? /MS
     savedObjects[a_index].setDirectionRate(a_object.getDirectionRate());
     savedObjects[a_index].setDirectionRateConfidence(a_object.getDirectionRateConfidence());
   }
@@ -168,24 +176,24 @@ void Scene::MergeObjects(opendlv::perception::Object a_object, uint32_t a_index)
   if (std::abs(savedObjects[a_index].getDistance() - a_object.getDistance()) < 0.5f) {
     confidenceModifierDistance = 1.25f;
   }
-  savedObjects[a_index].setDistance(a_object.getDistance());
+  savedObjects[a_index].setDistance(a_object.getDistance()); //Samma här, borde den inte öka oavsett? /MS
   if (savedObjects[a_index].getDistanceConfidence() < a_object.getDistanceConfidence()) {
     float confidenceDistance = confidenceModifierDistance * a_object.getDistanceConfidence();
     confidenceDistance = confidenceDistance > 1 ? 1 : confidenceDistance;
     savedObjects[a_index].setDistanceConfidence(confidenceDistance);
   }
-  if (savedObjects[a_index].getAngularSizeConfidence() < a_object.getAngularSizeConfidence()) {
+  if (savedObjects[a_index].getAngularSizeConfidence() < a_object.getAngularSizeConfidence()) { //Inte nya alltså? /MS
     savedObjects[a_index].setAngularSize(a_object.getAngularSize());
     savedObjects[a_index].setAngularSizeConfidence(a_object.getAngularSizeConfidence());
   }
-  if (savedObjects[a_index].getAngularSizeRateConfidence() < a_object.getAngularSizeRateConfidence()) {
+  if (savedObjects[a_index].getAngularSizeRateConfidence() < a_object.getAngularSizeRateConfidence()) { //Inte nya? /MS
     savedObjects[a_index].setAngularSizeRate(a_object.getAngularSizeRate());
     savedObjects[a_index].setAngularSizeRateConfidence(a_object.getAngularSizeRateConfidence());
   }
   auto sourceSearch = std::find(std::begin(savedObjects[a_index].getListOfSources()), std::end(savedObjects[a_index].getListOfSources()), a_object.getListOfSources()[0]);
-  if (sourceSearch == std::end(savedObjects[a_index].getListOfSources())) {
+  if (sourceSearch == std::end(savedObjects[a_index].getListOfSources())) { //Är det inte tvärtom? /MS
     savedObjects[a_index].getListOfSources().push_back(a_object.getListOfSources()[0]);
-    savedObjects[a_index].setConfidence(savedObjects[a_index].getConfidence() + (a_object.getConfidence() / 2));
+    savedObjects[a_index].setConfidence(savedObjects[a_index].getConfidence() + (a_object.getConfidence() / 2)); //Kan bli för högt? /MS
   }
   for (uint32_t i = 0; i < a_object.getListOfProperties().size(); i++) {
     auto propertySearch = std::find(std::begin(savedObjects[a_index].getListOfProperties()), std::end(savedObjects[a_index].getListOfProperties()), a_object.getListOfProperties()[i]);
