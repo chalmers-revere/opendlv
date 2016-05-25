@@ -21,6 +21,15 @@
 #define SCENE_SCENE_HPP_
 
 #include <memory>
+#include <ctype.h>
+#include <cstring>
+#include <cmath>
+#include <iostream>
+#include <algorithm>
+
+#include "opendavinci/odcore/data/Container.h"
+#include "opendavinci/odcore/data/TimeStamp.h"
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
@@ -43,6 +52,12 @@ class Scene : public odcore::base::module::DataTriggeredConferenceClientModule {
  private:
   void setUp();
   void tearDown();
+  double PointDistance(float a_angle1, double a_dist1, float a_angle2, double a_dist2);
+  void MergeObjects(opendlv::perception::Object a_object, uint32_t a_index);
+  void TimeCheck();
+
+  std::vector<opendlv::perception::Object> savedObjects;
+  uint32_t m_objectCounter;
 };
 
 } // scene
