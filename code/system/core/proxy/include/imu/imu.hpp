@@ -22,7 +22,7 @@
 
 #include <memory>
 
-#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
 
 namespace opendlv {
@@ -34,14 +34,13 @@ class Device;
 /**
  * This class provides...
  */
-class Imu
-: public odcore::base::module::DataTriggeredConferenceClientModule {
+class Imu : public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
   Imu(int32_t const &, char **);
   Imu(Imu const &) = delete;
   Imu &operator=(Imu const &) = delete;
   virtual ~Imu();
-  virtual void nextContainer(odcore::data::Container &);
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
  private:
   void setUp();

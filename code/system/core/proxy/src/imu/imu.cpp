@@ -42,7 +42,7 @@ namespace imu {
   * @param a_argv Command line arguments.
   */
 Imu::Imu(int32_t const &a_argc, char **a_argv)
-    : DataTriggeredConferenceClientModule(
+    : TimeTriggeredConferenceClientModule(
       a_argc, a_argv, "proxy-imu")
     , m_device()
 {
@@ -52,8 +52,21 @@ Imu::~Imu()
 {
 }
 
-void Imu::nextContainer(odcore::data::Container &)
+odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Imu::body()
 {
+  while (getModuleStateAndWaitForRemainingTimeInTimeslice() 
+      == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+
+    auto gyroscopeReading = m_device->ReadGyroscope();
+    odcore::data::Container gyroscopeContainer(gyroscopeReading);
+    getConference().send(gyroscopeContainer);
+
+    auto accelerometerReading = m_device->ReadAccelerometer();
+    odcore::data::Container accelerometerContainer(accelerometerReading);
+    getConference().send(accelerometerContainer);
+  }
+
+  return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
 void Imu::setUp()
