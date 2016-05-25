@@ -83,17 +83,17 @@ bool Rule::euclideanDistance(double measuredDistance)
 void Rule::nextContainer(odcore::data::Container &a_container)
 {
   if (a_container.getDataType() == opendlv::knowledge::Event::ID()) {
-    opendlv::knowledge::Event event =
-      a_container.getData<opendlv::knowledge::Event>();
+    opendlv::knowledge::Event eventIn =
+        a_container.getData<opendlv::knowledge::Event>();
 
-    std::string eventName = event.getEvent();
+    std::string eventName = eventIn.getEvent();
     if (eventName == "") {
       odcore::data::TimeStamp timestamp;
-      opendlv::knowledge::Event event(timestamp, "platoonDrive");
+      opendlv::knowledge::Event eventOut(timestamp, "platoonDrive");
    
       // TODO: DRIVE AND SEND MIO.
 
-      odcore::data::Container objectContainer(event);
+      odcore::data::Container objectContainer(eventOut);
       getConference().send(objectContainer);
     } else if (eventName == "") {
       
