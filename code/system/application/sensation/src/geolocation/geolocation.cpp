@@ -78,7 +78,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 
   // To dump data structures into a CSV file, you create an output file first.
   // std::ofstream fout("../Exp_data/output.csv");
-  bool   saveToFile = false;
+  bool   saveToFile = true;
      std::ofstream fout_ekfState("./output_ekf.csv");
      if (  saveToFile){
      fout_ekfState
@@ -90,7 +90,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
         << "theta (rad), theta_dot(rad/s)  \n"
         << "%t lat long yaw long_vel wheels_angle Z_x Z_y Z_theta "
         << "HAS_DATA X_x X_x_dot X_y X_y_dot X_theta X_theta_dot sent_lat "
-        << "sent_long sent_alt sent_heading positionConfidence headingConfidence yawRateConfidence"
+        << "sent_long sent_alt sent_heading positionConfidence velocityConfidence headingConfidence yawRateConfidence"
         << endl;
     }
   cout << getName() << " Geolocation module started " << endl;
@@ -139,12 +139,11 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
           control.v() = 0.0;
       // if we don't get any data from the CAN,
       // we try to fill the speed from GPS data
-        //auto gpsSpeed = gpsReading.getSpeed();
-        //if (gpsSpeed > 1.0 ){
-        //control.v() = gpsSpeed;}
+        auto gpsSpeed = gpsReading.getSpeed();
+        if (gpsSpeed > 1.0 ){
+        control.v() = gpsSpeed;}
       }
 
-      std::cout << "The vehicle speed is : " << gpsReading.getSpeed() << endl;
       auto steeringContainer = getKeyValueDataStore().get(
           opendlv::proxy::reverefh16::Steering::ID());
       auto steering = steeringContainer.getData<
@@ -264,7 +263,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
           << "\tlat=" << currentWGS84CoordinateEstimation.getLatitude()
           << ", long="
           << currentWGS84CoordinateEstimation.getLongitude()
-          << ", theta=" << state.theta() << std::endl;
+          << ", northHeading =" << heading << std::endl;
 
       // Send the message
       opendlv::sensation::Geolocation geoLocationEstimation(currentWGS84CoordinateEstimation.getLatitude(),
@@ -337,6 +336,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
           << gpsReading.getAltitude() << " "
           << heading << " "
           << positionConfidence << " "
+          << speedConfidence << " "
           << headingConfidence << " "
           << yawRateConfidence << " "
           << endl;
@@ -365,10 +365,13 @@ double Geolocation::calculatePositionConfidence(bool a_filterSuccess)
   }
   auto covSR = m_ekf.getCovariance();
 
-  double positionConfidence_x = std::sqrt(covSR(0,0)*covSR(0,0));
-  double positionConfidence_y = std::sqrt(covSR(2,2)*covSR(2,2));
-  return std::max(std::sqrt(positionConfidence_x),
-                  std::sqrt(positionConfidence_y));
+  double positionConfidence_x = std::sqrt(std::abs(covSR(0,0)));
+  double positionConfidence_y = std::sqrt(std::abs(covSR(2,2)));
+//  return std::max(std::sqrt(positionConfidence_x),
+//                  std::sqrt(positionConfidence_y));
+  double confidence = std::sqrt(positionConfidence_x * positionConfidence_x +
+                                positionConfidence_y * positionConfidence_y);
+  return confidence;
 }
 
 double Geolocation::calculateHeadingConfidence(bool a_filterSuccess)
@@ -377,7 +380,7 @@ double Geolocation::calculateHeadingConfidence(bool a_filterSuccess)
       return -1;
   }
   auto covSR = m_ekf.getCovariance();
-  double confidence = std::sqrt(covSR(4,4)*covSR(4,4));
+  double confidence = std::abs(covSR(4,4));
   return std::sqrt(confidence);
 }
 
@@ -387,7 +390,7 @@ double Geolocation::calculateHeadingRateConfidence(bool a_filterSuccess)
       return -1;
   }
   auto covSR = m_ekf.getCovariance();
-  double confidence = std::sqrt(covSR(5,5)*covSR(5,5));
+  double confidence = std::abs(covSR(5,5));
   return std::sqrt(confidence);
 }
 
@@ -396,7 +399,12 @@ double Geolocation::calculateSpeedConfidence(bool a_filterSuccess)
   if (!a_filterSuccess){
       return -1;
   }
-  return -1; // if information is not available
+  auto covSR = m_ekf.getCovariance();
+  double speedConfidence_x = std::sqrt(std::abs(covSR(1,1)));
+  double speedConfidence_y = std::sqrt(std::abs(covSR(3,3)));
+  double confidence = std::sqrt(speedConfidence_x * speedConfidence_x +
+                                speedConfidence_y * speedConfidence_y);
+  return confidence;
 }
 
 
