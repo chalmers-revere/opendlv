@@ -176,7 +176,7 @@ public:
     struct vehicleParams {
       double wheelbase;   ///--> distance between the front axle and the rear axle of a vechicle
 
-      vehicleParams() : wheelbase(defaultWheelbase) {}
+      vehicleParams() : wheelbase(3.4) {}
 
       /**
        * @brief Espose the wheelbase to be set by the user
@@ -230,7 +230,7 @@ public:
         x_p.y() = x.y() + delta_t * x.y_dot();
         x_p.y_dot() = u.v() * std::sin (x.theta());
         x_p.theta() = x.theta() + delta_t * x.theta_dot();
-        //x_p.theta_dot() = (u.v() / wheelbase) * std::tan(u.phi());
+        //x_p.theta_dot() = (u.v() / 3.4) * std::tan(u.phi());
         x_p.theta_dot() = (u.v() / m_vehicleParams.wheelbase ) * std::tan(u.phi());
 
         // Return transitioned state vector

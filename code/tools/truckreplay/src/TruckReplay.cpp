@@ -66,7 +66,7 @@ namespace revere {
         const uint32_t MAX_LINE_LENGTH = 2000;
         char buffer[MAX_LINE_LENGTH];
 
-        double failure_probability = 0.02;   //this means 2% of possible failures
+        double failure_probability = 0.0;//0.02;   //this means 2% of possible failures
         double fail = 1;
         int counter_failure_lenght = 0;
         int MAX_NUMBER_OF_FAILURES = 40; // at 20hz it corresponds to 2secs
@@ -115,7 +115,7 @@ namespace revere {
                 gpsData.setTimestamp(Z_time);
                 gpsData.setLatitude(Z_lat);
                 gpsData.setLongitude(Z_long);
-                gpsData.setAltitude(Z_yawRate);  //this is just a trick I use for test purposes ! TODO: take it out !
+                gpsData.setAltitude(0);  //this is just a trick I use for test purposes ! TODO: take it out !
                 gpsData.setNorthHeading(Z_yaw);
                 gpsData.setHasHeading(true);
 
