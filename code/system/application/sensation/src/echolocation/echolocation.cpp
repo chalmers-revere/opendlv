@@ -170,7 +170,7 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
   }
 
   for(uint32_t i = 0; i < nNewPoints; i++) {
-  	std::cout << "Dist: " distances[i] << " Angle: " << angles[i] << std::endl;
+  	std::cout << "Dist: " << distances[i] << " Angle: " << angles[i] << std::endl;
   }
 
 
