@@ -51,7 +51,8 @@ V2vIclcm::V2vIclcm(int32_t const &a_argc, char **a_argv)
     : TimeTriggeredConferenceClientModule(
       a_argc, a_argv, "knowledge-gcdc16-v2viclcm"),
     m_sendLog(),
-    m_receiveLog()
+    m_receiveLog(),
+    m_timeType2004()
 {
   struct stat st;
   if (::stat("var/application/knowledge/gcdc16/v2viclcm", &st) == -1) {
@@ -70,7 +71,8 @@ V2vIclcm::V2vIclcm(int32_t const &a_argc, char **a_argv)
   m_receiveLog.open("var/application/knowledge/gcdc16/v2viclcm" 
     + filenameReceive.str(), std::ios::out | std::ios::app);
 
-  std::string header = "messageId, \
+  std::string header = "#time, \
+      messageId, \
       stationId, \
       containerMask, \
       rearAxleLocation, \
@@ -103,6 +105,22 @@ V2vIclcm::V2vIclcm(int32_t const &a_argc, char **a_argv)
 
   m_sendLog << header << std::endl;
   m_receiveLog << header << std::endl;
+
+  std::tm tm = {
+      0, // tm_sec
+      0, // tm_min
+      0, // tm_hour
+      1, // tm_mday
+      0, // tm_mon
+      2004 -1900, // tm_year
+      4, // tm_wday
+      0, // tm_yday
+      -1, // tm_isdst
+      0, // tm_gmtoff (NOTE: only in glibc)
+      nullptr // time zone (NOTE: only in glibc)
+      };
+
+  m_timeType2004 = timegm(&tm);
 }
 
 V2vIclcm::~V2vIclcm()
@@ -152,13 +170,14 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vIclcm::body()
     std::vector<unsigned char> bytes = outBuffer->GetBytes();
     std::string bytesString(bytes.begin(),bytes.end());
     // std::cout<< bytesString << std::endl;
-    // opendlv::knowledge::Message nextMessage(bytesString.size(),bytesString);
-    // odcore::data::Container c(nextMessage);
-    // getConference().send(c);
+    opendlv::knowledge::Message nextMessage(bytesString.size(),bytesString);
+    odcore::data::Container c(nextMessage);
+    getConference().send(c);
 
 
 
-    m_sendLog << std::to_string(m_messageId)+ //messageId
+    m_sendLog << std::to_string(GenerateGenerationTime())+
+        + "," + std::to_string(m_messageId)+ //messageId
         + "," + std::to_string(m_stationId)+ //stationId
         + "," + std::to_string(m_containerMask)+ //containerMask
         + "," + std::to_string(m_rearAxleLocation)+ //rearAxleLocation
@@ -294,7 +313,8 @@ void V2vIclcm::nextContainer(odcore::data::Container &c)
 
       std::cout<<output<<std::endl;
 
-      m_receiveLog << std::to_string(messageId)+ //messageId
+      m_receiveLog << std::to_string(GenerateGenerationTime())+
+          + "," + std::to_string(messageId)+ //messageId
           + "," + std::to_string(stationId)+ //stationId
           + "," + std::to_string(containerMask)+ //containerMask
           + "," + std::to_string(rearAxleLocation)+ //rearAxleLocation
@@ -340,6 +360,18 @@ void V2vIclcm::setUp()
 
 void V2vIclcm::tearDown()
 {
+}
+
+
+uint32_t V2vIclcm::GenerateGenerationTime() const
+{
+  std::chrono::system_clock::time_point start2004TimePoint = 
+      std::chrono::system_clock::from_time_t(m_timeType2004);
+  uint32_t millisecondsSince2004Epoch =
+      std::chrono::system_clock::now().time_since_epoch() /
+      std::chrono::milliseconds(1) 
+      - start2004TimePoint.time_since_epoch() / std::chrono::milliseconds(1);
+  return millisecondsSince2004Epoch;
 }
 
 } // v2viclcm
