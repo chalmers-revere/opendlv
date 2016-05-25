@@ -317,6 +317,11 @@ void DetectLane::nextContainer(odcore::data::Container &c)
             surfaceId,
             connectedWidth,
             traversableTo);
+
+
+        odcore::data::Container objectContainer(detectedSurface);
+        getConference().send(objectContainer);
+
       
       }
       namedWindow( "Tmp", 3 );
