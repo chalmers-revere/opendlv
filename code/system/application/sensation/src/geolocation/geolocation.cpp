@@ -303,7 +303,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
                                                             currentWGS84CoordinateEstimation.getLongitude(),
                                                             positionConfidence,
                                                             gpsReading.getAltitude(),
-                                                            fmod(heading,(2*opendlv::Constants::PI)),
+                                                            fmod(state.theta()*opendlv::Constants::DEG2RAD,(2*opendlv::Constants::PI)),
                                                             headingConfidence
                                                             );
       

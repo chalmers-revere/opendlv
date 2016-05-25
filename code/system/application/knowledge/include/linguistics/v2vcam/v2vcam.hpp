@@ -21,6 +21,7 @@
 #define LINGUISTICS_V2VCAM_V2VCAM_HPP_
 
 #include <ctime>
+#include <cmath>
 #include <fstream>
 #include <memory>
 
@@ -58,6 +59,7 @@ class V2vCam
 
   unsigned char GetMessageId() const;
   int32_t GetStationId() const;
+  uint32_t GenerateGenerationTime() const;
   int32_t GenerateGenerationDeltaTime();
   unsigned char GetContainerMask() const;
   int32_t GetStationType() const;
@@ -94,15 +96,15 @@ class V2vCam
   double m_semiMinorConfidence = -1;
   double m_semiMajorOrientation = -1;
   double m_altitude = 8000.01;
-  double m_heading = 360.1*opendlv::Constants::DEG2RAD;
+  double m_heading = -1;
   double m_headingConfidence = -1;
-  double m_speed = 163.83; //
+  double m_speed = -1; //
   double m_speedConfidence = -1;
   int32_t m_vehicleLength = 73;
   int32_t m_vehicleWidth = 25;
   double m_longitudinalAcc = 16.1;
   double m_longitudinalAccConf = 10.2;
-  double m_yawRateValue = 327.67*opendlv::Constants::DEG2RAD;
+  double m_yawRateValue = 0;
   double m_yawRateConfidence = -1;
   int32_t m_vehicleRole = 0;
 };
