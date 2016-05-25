@@ -24,12 +24,12 @@
 
 #include "opendavinci/odcore/base/KeyValueConfiguration.h"
 #include "opendavinci/odcore/data/Container.h"
-#include "opendavinci/odcore/data/TimeStamp.h"
+#include "opendavinci/odcore/strings/StringToolbox.h"
 
 #include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 #include "sonararray/sonararray.hpp"
-#include "sonararray/device.hpp"
+#include "sonararray/maxdevice.hpp"
 
 namespace opendlv {
 namespace proxy {
@@ -42,7 +42,7 @@ namespace sonararray {
   * @param a_argv Command line arguments.
   */
 SonarArray::SonarArray(int32_t const &a_argc, char **a_argv)
-    : TimeTriggeredConferenceClientModule(
+    : DataTriggeredConferenceClientModule(
       a_argc, a_argv, "proxy-sonararray")
     , m_device()
 {
@@ -52,23 +52,57 @@ SonarArray::~SonarArray()
 {
 }
 
-// This method will do the main data processing job.
-odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SonarArray::body()
+void SonarArray::nextContainer(odcore::data::Container &a_container)
 {
-  // Send opendlv::proxy::CartesianTimeOfFlight
+  if (a_container.getDataType() == opendlv::proxy::SonarArrayRequest::ID()) {
+    opendlv::proxy::SonarArrayRequest request = 
+    a_container.getData<opendlv::proxy::SonarArrayRequest>();
 
-  return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
+    std::string deviceId = request.getDeviceId();
+
+    if (deviceId != getIdentifier()) {
+      return;
+    }
+
+    bool sonararrayValue = request.getSonarArrayValue();
+    uint8_t sonararrayIndex = request.getSonarArrayIndex();
+
+    m_device->SetValue(sonararrayIndex, sonararrayValue);
+  }
 }
 
 void SonarArray::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
-  std::string const type =
-  kv.getValue<std::string>("proxy-sonararray.type");
+  std::string const type = kv.getValue<std::string>("proxy-sonararray.type");
 
-  if (type.compare("maxsonar") == 0) {
-    //      m_device = std::unique_ptr<Device>(new MaxSonarDevice());
+  std::string const valuesString = 
+      kv.getValue<std::string>("proxy-sonararray.values");
+
+  std::vector<bool> values;
+
+  std::vector<std::string> valuesVector = 
+      odcore::strings::StringToolbox::split(valuesString, ',');
+  for (auto valueString : valuesVector) {
+    bool value = static_cast<bool>(std::stoi(valueString));
+    values.push_back(value);
+  }
+
+  if (type.compare("max") == 0) {
+    std::string const pinsString = 
+        kv.getValue<std::string>("proxy-sonararray.max.pins");
+
+    std::vector<uint16_t> pins;
+
+    std::vector<std::string> pinsVector = 
+        odcore::strings::StringToolbox::split(pinsString, ',');
+    for (auto pinString : pinsVector) {
+      uint16_t pin = std::stoi(pinString);
+      pins.push_back(pin);
+    }
+
+     m_device = std::unique_ptr<Device>(new MaxDevice(values, pins));
   }
 
   if (m_device.get() == nullptr) {

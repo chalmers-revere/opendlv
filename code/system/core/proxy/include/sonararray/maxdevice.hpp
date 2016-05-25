@@ -17,37 +17,30 @@
  * USA.
  */
 
-#ifndef SONARARRAY_SONARARRAY_HPP_
-#define SONARARRAY_SONARARRAY_HPP_
+#ifndef SONARARRAY_GPIODEVICE_HPP_
+#define SONARARRAY_GPIODEVICE_HPP_
 
-#include <memory>
+#include <cstdint>
+#include <iostream>
+#include <string>
 
-#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
-#include "opendavinci/odcore/data/Container.h"
+#include "sonararray/device.hpp"
 
 namespace opendlv {
 namespace proxy {
 namespace sonararray {
 
-class Device;
-
-/**
- * This class provides...
- */
-class SonarArray
-: public odcore::base::module::DataTriggeredConferenceClientModule {
+class MaxDevice : public Device {
  public:
-  SonarArray(int32_t const &, char **);
-  SonarArray(SonarArray const &) = delete;
-  SonarArray &operator=(SonarArray const &) = delete;
-  virtual ~SonarArray();
-  virtual void nextContainer(odcore::data::Container &);
+  MaxDevice(std::vector<bool>, std::vector<uint16_t>);
+  MaxDevice(MaxDevice const &) = delete;
+  MaxDevice &operator=(MaxDevice const &) = delete;
+  virtual ~MaxDevice();
+  bool IsActive(uint16_t const) const;
+  void SetValue(uint16_t const, bool const);
 
  private:
-  void setUp();
-  void tearDown();
-
-  std::unique_ptr<Device> m_device;
+  std::vector<uint16_t> m_pins;
 };
 
 } // sonararray

@@ -29,12 +29,24 @@ namespace sonararray {
  * Constructor.
  *
  */
-Device::Device()
+Device::Device(std::vector<bool> a_initialValues):
+    m_initialValues(a_initialValues),
+    m_values(a_initialValues)
 {
+  Reset();
 }
 
 Device::~Device()
 {
+}
+
+void Device::Reset()
+{
+  uint16_t i = 0;
+  for (bool initialValue : m_initialValues) {
+    SetValue(i, initialValue);
+    i++;
+  }
 }
 
 } // sonararray

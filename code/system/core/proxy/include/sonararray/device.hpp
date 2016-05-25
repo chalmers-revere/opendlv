@@ -20,16 +20,24 @@
 #ifndef SONARARRAY_DEVICE_HPP_
 #define SONARARRAY_DEVICE_HPP_
 
+#include <vector>
+
 namespace opendlv {
 namespace proxy {
 namespace sonararray {
 
 class Device {
  public:
-  Device();
+  Device(std::vector<bool>);
   Device(Device const &) = delete;
   Device &operator=(Device const &) = delete;
   virtual ~Device();
+  std::vector<float> Reset();
+  virtual void SetValue(uint16_t const, bool const) = 0;
+
+ private:
+  std::vector<bool> m_initialValues;
+  std::vector<bool> m_values;
 };
 
 } // sonararray
