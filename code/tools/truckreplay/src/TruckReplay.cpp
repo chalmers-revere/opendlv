@@ -69,7 +69,7 @@ namespace revere {
         double failure_probability = 0.0;//0.02;   //this means 2% of possible failures
         double fail = 1;
         int counter_failure_lenght = 0;
-        int MAX_NUMBER_OF_FAILURES = 40; // at 20hz it corresponds to 2secs
+        int MAX_NUMBER_OF_FAILURES = 50; // at 20hz it corresponds to 2secs
         while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
 
             //odcore::data::Container getPropulsionShaftVehicleSpeedData = getKeyValueDataStore().get(opendlv::proxy::reverefh16::Propulsion::ID());
