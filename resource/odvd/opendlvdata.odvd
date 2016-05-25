@@ -223,8 +223,8 @@ message opendlv.knowledge.Message [id = 185] {
 }
 
 message opendlv.knowledge.Insight [id = 187] {
-  odcore::data::TimeStamp InsightTime [id = 1];
-  string Insight [id = 2];
+  odcore::data::TimeStamp insightTime [id = 1];
+  string insight [id = 2];
 }
 
 message opendlv.action.Correction [id = 186] {
