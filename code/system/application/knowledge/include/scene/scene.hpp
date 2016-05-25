@@ -57,7 +57,8 @@ class Scene : public odcore::base::module::DataTriggeredConferenceClientModule {
   void MergeObjects(opendlv::perception::Object a_object, uint32_t a_index);
   void TimeCheck();
 
-  std::vector<opendlv::perception::Object> savedObjects;
+  std::vector<opendlv::perception::Surface> m_savedSurfaces;
+  std::vector<opendlv::perception::Object> m_savedObjects;
   uint32_t m_objectCounter;
 };
 
