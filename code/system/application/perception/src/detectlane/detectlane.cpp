@@ -89,7 +89,8 @@ DetectLane::DetectLane(int32_t const &a_argc, char **a_argv)
     m_transformationMatrix(),
     m_leftTransformationMatrix(),
     m_rightTransformationMatrix(),
-    m_scale()
+    m_scale(),
+    m_sourceName()
 
 {
 }
@@ -119,6 +120,16 @@ void DetectLane::nextContainer(odcore::data::Container &c)
   {
     odcore::data::image::SharedImage mySharedImg = 
         c.getData<odcore::data::image::SharedImage>();
+
+
+    std::string cameraName = mySharedImg.getName();
+    //std::cout << "Received image from camera " << cameraName  << "!" << std::endl;
+
+    if (m_sourceName.compare(cameraName) != 0) {
+      // Received image from a source that this instance should not care about
+      //std::cout << "Received image came from wrong source. Expected " << m_sourceName << std::endl;
+      return;
+    }
 
     std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(
           odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(
@@ -483,6 +494,9 @@ void DetectLane::setUp()
 {
 
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+
+  m_sourceName = kv.getValue<std::string>("perception-detectlane.source");
+  std::cout << "This DetectLane instance will receive images from " << m_sourceName << "." << std::endl;
 
   std::string inputSizeString = kv.getValue<std::string>("perception-detectlane.inputSize");
   ReadInputWindowSize(inputSizeString);
