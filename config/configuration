@@ -229,6 +229,10 @@ tools-can-simplecansender.devicenode = /dev/pcan1   # PEAK CAN device.
 perception-detectlane.inputSize = 640,480
 perception-detectlane.outputSize = 640,480
 
+
+perception-detectvehicle:0.source = front-left
+perception-detectvehicle:1.source = front-right
+
 ###############################################################################
 ###############################################################################
 # Diagnostics

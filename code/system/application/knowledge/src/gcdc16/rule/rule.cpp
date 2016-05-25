@@ -82,16 +82,21 @@ bool Rule::euclideanDistance(double measuredDistance)
 
 void Rule::nextContainer(odcore::data::Container &a_container)
 {
-	if (a_container.getDataType() == opendlv::proxy::ControlState::ID()) {
-    opendlv::proxy::ControlState controlState =
-    a_container.getData<opendlv::proxy::ControlState>();
+  if (a_container.getDataType() == opendlv::knowledge::Event::ID()) {
+    opendlv::knowledge::Event eventIn =
+        a_container.getData<opendlv::knowledge::Event>();
 
-    if (controlState.getIsAutonomous()) {
+    std::string eventName = eventIn.getEvent();
+    if (eventName == "") {
       odcore::data::TimeStamp timestamp;
-      opendlv::knowledge::Event event(timestamp, "gcdcReady");
-    
-      odcore::data::Container objectContainer(event);
+      opendlv::knowledge::Event eventOut(timestamp, "platoonDrive");
+   
+      // TODO: DRIVE AND SEND MIO.
+
+      odcore::data::Container objectContainer(eventOut);
       getConference().send(objectContainer);
+    } else if (eventName == "") {
+      
     }
 
   } else if (a_container.getDataType() == opendlv::perception::Object::ID()) {
