@@ -56,7 +56,7 @@ OpenCvDevice::OpenCvDevice(std::string const &a_name,
 
   //videoStreamAddress = std::string("http://") + a_username + ":" + a_password + "@" + a_port + "/mjpg/video.mjpg";
 
-  //videoStreamAddress = "/home/plankton/Videos/GCDC_videos/testrun_gbg.mkv";
+  videoStreamAddress = "/home/plankton/Videos/GCDC_videos/testrun_gbg.mkv";
   //videoStreamAddress = "/home/plankton/Downloads/from_elvis_cam_24may/20060826_201443_20060826_205808.mkv";
 
   std::cout << videoStreamAddress << std::endl;
