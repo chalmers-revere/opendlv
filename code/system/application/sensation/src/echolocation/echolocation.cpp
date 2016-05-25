@@ -121,7 +121,7 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
 					}
 				}
 		  }
-		  if(pointCloud.size() > 10) { //TODO: evaluate parameter and move to config
+		  if(pointCloud.size() > 5) { //TODO: evaluate parameter and move to config
 		  	//std::cout << "Nytt object!" << std::endl;
 		  	
 				double minDist = m_distances[pointCloud[0]];
@@ -167,6 +167,10 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
 				objectCounter++;
 		  }
 	  }
+  }
+
+  for(uint32_t i = 0; i < nNewPoints; i++) {
+  	std::cout << "Dist: " distances[i] << " Angle: " << angles[i] << std::endl;
   }
 
 
