@@ -52,11 +52,13 @@ class Scene : public odcore::base::module::DataTriggeredConferenceClientModule {
  private:
   void setUp();
   void tearDown();
+  void SendObjects();
   double PointDistance(float a_angle1, double a_dist1, float a_angle2, double a_dist2);
   void MergeObjects(opendlv::perception::Object a_object, uint32_t a_index);
   void TimeCheck();
 
-  std::vector<opendlv::perception::Object> savedObjects;
+  std::vector<opendlv::perception::Surface> m_savedSurfaces;
+  std::vector<opendlv::perception::Object> m_savedObjects;
   uint32_t m_objectCounter;
 };
 
