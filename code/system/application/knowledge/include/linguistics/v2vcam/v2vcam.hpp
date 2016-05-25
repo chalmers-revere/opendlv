@@ -100,8 +100,8 @@ class V2vCam
   double m_headingConfidence = -1;
   double m_speed = -1; //
   double m_speedConfidence = -1;
-  int32_t m_vehicleLength = 73;
-  int32_t m_vehicleWidth = 25;
+  double m_vehicleLength = -1;
+  double m_vehicleWidth = -1;
   double m_longitudinalAcc = 16.1;
   double m_longitudinalAccConf = 10.2;
   double m_yawRateValue = 0;

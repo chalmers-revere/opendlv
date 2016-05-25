@@ -222,7 +222,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
       output += "Yaw rate confidence: " 
           + std::to_string(GetYawRateConfidence()) + "\n";
       output += "Vehicle role: " + std::to_string(GetVehicleRole()) + "\n";
-      //std::cout << output;
+      std::cout << output;
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
@@ -260,11 +260,11 @@ void V2vCam::ReadDynamicState(
   // std::cout << a_dynamicState.getVelocity().getX() << std::endl;
   m_speedConfidence = a_dynamicState.getVelocityConfidence().getX();
   // std::cout << a_dynamicState.getVelocityConfidence().getX() << std::endl;
-  // m_yawRateValue = a_dynamicState.getAngularVelocity().getZ();
+  m_yawRateValue = a_dynamicState.getAngularVelocity().getZ();
   // std::cout << a_dynamicState.getAngularVelocity().getZ() << std::endl;
-  // m_yawRateConfidence = a_dynamicState.getAngularVelocityConfidence().getZ();
-  // m_longitudinalAcc = a_dynamicState.getAcceleration().getX();
-  // m_longitudinalAccConf = a_dynamicState.getAccelerationConfidence().getX();
+  m_yawRateConfidence = a_dynamicState.getAngularVelocityConfidence().getZ();
+  m_longitudinalAcc = a_dynamicState.getAcceleration().getX();
+  m_longitudinalAccConf = a_dynamicState.getAccelerationConfidence().getX();
 }
 
 void V2vCam::ReadGeolocation(
@@ -274,7 +274,7 @@ void V2vCam::ReadGeolocation(
   m_longitude = a_geolocation.getLongitude();
   m_altitude = a_geolocation.getAltitude();
   m_heading = a_geolocation.getHeading();
-  std::cout << a_geolocation.getHeading() << std::endl;
+  // std::cout << a_geolocation.getHeading() << std::endl;
   m_headingConfidence = a_geolocation.getHeadingConfidence();
   // std::cout << a_geolocation.getHeadingConfidence() << std::endl;
 }
@@ -344,7 +344,7 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
     output += "Yaw rate confidence: " 
         + std::to_string(yawRateConfidence) + "\n";
     output += "Vehicle role: " + std::to_string(vehicleRole) + "\n";
-    std::cout << output;
+    // std::cout << output;
 
     m_receiveLog << std::to_string(GenerateGenerationTime()) +  
         + "+" + std::to_string(messageId) +
@@ -463,9 +463,9 @@ void V2vCam::setUp()
   m_stationType = 
       kv.getValue<int32_t>("knowledge-linguistics-v2vcam.stationType");
   m_vehicleLength = 
-      kv.getValue<int32_t>("knowledge-linguistics-v2vcam.vehicleLength");
+      kv.getValue<double>("knowledge-linguistics-v2vcam.vehicleLength");
   m_vehicleWidth = 
-      kv.getValue<int32_t>("knowledge-linguistics-v2vcam.vehicleWidth");
+      kv.getValue<double>("knowledge-linguistics-v2vcam.vehicleWidth");
   m_vehicleRole = 
       kv.getValue<int32_t>("knowledge-linguistics-v2vcam.vehicleRole");
   
@@ -609,7 +609,7 @@ int32_t V2vCam::GetHeading() const
   double conversion = opendlv::Constants::RAD2DEG;
   int32_t scale = std::pow(10,1);
   double val = m_heading*scale*conversion;
-  if(val < 0 || val > 3600){
+  if(val < 0 || val > 3600 || std::isnan(val)){
     return 3601;
   }
   else {
@@ -674,12 +674,33 @@ int32_t V2vCam::GetSpeedConfidence() const
 
 int32_t V2vCam::GetVehicleLength() const
 {
-  return m_vehicleLength;
+  int32_t scale = std::pow(10,1);
+  double val = m_vehicleLength*scale;
+  if(val < 0){
+    return 1023;
+  }
+  else if( val > 1022){
+    return 1022;
+  }
+  else{
+    return static_cast<int32_t> (std::round(val));
+  }
 }
 
 int32_t V2vCam::GetVehicleWidth() const
 {
-  return m_vehicleWidth;
+  int32_t scale = std::pow(10,1);
+  double val = m_vehicleWidth*scale;
+  if(val < 0){
+    return 62;
+  }
+  else if( val > 61){
+    return 61;
+  }
+  else{
+    return static_cast<int32_t> (std::round(val));
+  }
+
 }
 
 int32_t V2vCam::GetLongitudinalAcc() const
