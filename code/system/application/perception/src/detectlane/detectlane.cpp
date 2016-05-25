@@ -114,7 +114,7 @@ void DetectLane::nextContainer(odcore::data::Container &c)
 //      " sent at " <<   c.getSentTimeStamp().getYYYYMMDD_HHMMSSms() << 
 //      " received at " << c.getReceivedTimeStamp().getYYYYMMDD_HHMMSSms() << 
 //      std::endl;
-  
+    
   if(m_setup == true)
   {
     odcore::data::image::SharedImage mySharedImg = 
@@ -222,11 +222,18 @@ void DetectLane::nextContainer(odcore::data::Container &c)
       float row1 = 100, row2 = 480;
       GetPointsOnLine(xPoints,yPoints,X,Y,p,m,row1,row2);
     
-      std::cout<<"X : " << xPoints[0][1] << " Y : " << yPoints[0][1]<<std::endl;
       // Pair up lines to form a surface
       std::vector<cv::Vec2i> groupIds;
       GetLinePairs(xPoints,yPoints,groupIds);
 
+
+      int leftLane =  groupIds[0][0];
+      int rightLane = groupIds[0][1];
+
+      std::cout << "Leftlane\n" << X[leftLane][1] << " " << Y[leftLane][1]<<std::endl;
+      std::cout<< X[leftLane][0] << " " << Y[leftLane][0] << std::endl;
+      std::cout << "Rightlane\n" << X[rightLane][1] << " " << Y[rightLane][1]<<std::endl;
+      std::cout << X[rightLane][0] << " " << Y[rightLane][0]<<std::endl;
       cv::Mat tmp;
       color_dst.copyTo(tmp);
 
@@ -260,6 +267,56 @@ void DetectLane::nextContainer(odcore::data::Container &c)
         line( tmp, p4, p1, Scalar(255,0,255), 3, 8 );
     
         //waitKey(0);
+
+        
+
+        odcore::data::TimeStamp imageTimeStamp = c.getSentTimeStamp();
+        std::string type = "surface";
+        float typeConfidence = 1;
+
+        std::vector<opendlv::model::Cartesian3> edges;
+
+        float xBotLeft = X[groupIds[i][0]][1];
+        float xBotRight = X[groupIds[i][1]][1];
+        float xTopRight = X[groupIds[i][1]][0];
+        float xTopLeft = X[groupIds[i][0]][0];
+
+        float yBotLeft = Y[groupIds[i][0]][1];
+        float yBotRight = Y[groupIds[i][1]][1];
+        float yTopRight = Y[groupIds[i][1]][0];
+        float yTopLeft = Y[groupIds[i][0]][0];
+
+        edges.push_back(opendlv::model::Cartesian3(xBotLeft,yBotLeft,1));
+        edges.push_back(opendlv::model::Cartesian3(xBotRight,yBotRight,1));
+        edges.push_back(opendlv::model::Cartesian3(xTopRight,yTopRight,1));
+        edges.push_back(opendlv::model::Cartesian3(xTopLeft,yTopLeft,1));
+
+        float edgesConfidence = 1;
+
+        bool traversable = true;
+        float confidence = 1;
+        std::vector<std::string> sources;
+        sources.push_back(mySharedImg.getName());
+
+        std::vector<std::string> properties;
+
+        int16_t surfaceId = i;
+
+        std::vector<int16_t> connectedWidth;
+        std::vector<int16_t> traversableTo;
+
+        opendlv::perception::Surface detectedSurface(imageTimeStamp,
+            type,
+            typeConfidence,
+            edges,
+            edgesConfidence,
+            traversable,
+            confidence,
+            sources,
+            properties,
+            surfaceId,
+            connectedWidth,
+            traversableTo);
       
       }
       namedWindow( "Tmp", 3 );
@@ -267,11 +324,12 @@ void DetectLane::nextContainer(odcore::data::Container &c)
     
     }
 
+
     char key = cv::waitKey(1);
     if( key == 'w')
       m_threshold += 10;
     else if( key == 's')
-      m_threshold -= std::max(10,m_threshold-10);
+      m_threshold = std::max(10,m_threshold-10);
     else if( key == 'p')
       m_cannyThresholdTrue *= -1;
     else if( key == 'i')
