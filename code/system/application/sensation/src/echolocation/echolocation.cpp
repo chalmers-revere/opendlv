@@ -162,7 +162,7 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
 				identifiedObjects[objectCounter].setAngularSizeConfidence(0.5f);
 				identifiedObjects[objectCounter].setAngularSizeRateConfidence(-1.0f);
 				identifiedObjects[objectCounter].setConfidence(dynConfidence);
-				identifiedObjects[objectCounter].setSources(1.0f);
+				// identifiedObjects[objectCounter].setSources(1.0f);
 
 				objectCounter++;
 		  }

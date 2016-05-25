@@ -47,7 +47,7 @@ action-setopticalrotation.gain_heading = 0.5
 ###############################################################################
 ###############################################################################
 ### Proxy
-proxy-can.devicenode = /dev/pcan2          # PEAK CAN device.
+proxy-can.devicenode = /dev/pcan1          # PEAK CAN device.
 proxy-can.record_gcm = 1                   # Set to 1 to dump received CAN data into a .rec file.
 proxy-can.record_mapped_data = 1           # Set to 1 to dump mapped data from a CAN message into a .rec file.
 
@@ -127,29 +127,38 @@ proxy-gps.mount.z = 3.5
 proxy-gps.trimble.ip = 10.42.42.112
 proxy-gps.trimble.port = 9999
 
-proxy-imu.type = pololu
-proxy-imu.port = /dev/ttyUSB2
-proxy-imu.mount.x = 0.0
-proxy-imu.mount.y = 0.0
-proxy-imu.mount.z = 0.3
-proxy-imu.mount.roll = 0.0
-proxy-imu.mount.pitch = 0.0
-proxy-imu.mount.yaw = 0.0
+proxy-imu:0.type = pololu
+proxy-imu:0.port = /dev/ttyUSB2
+proxy-imu:0.mount.x = 0.0
+proxy-imu:0.mount.y = 0.0
+proxy-imu:0.mount.z = 0.3
+proxy-imu:0.mount.roll = 0.0
+proxy-imu:0.mount.pitch = 0.0
+proxy-imu:0.mount.yaw = 0.0
 
 proxy-imu:1.type = pololu
 proxy-imu:1.port = /dev/ttyUSB3
-proxy-imu:1.mount.x = 2.0
+proxy-imu:1.mount.x = -2.55
 proxy-imu:1.mount.y = 0.0
-proxy-imu:1.mount.z = 0.3
+proxy-imu:1.mount.z = 0.79
 proxy-imu:1.mount.roll = 0.0
 proxy-imu:1.mount.pitch = 0.0
 proxy-imu:1.mount.yaw = 0.0
 
+proxy-imu:2.type = pololu
+proxy-imu:2.port = /dev/ttyUSB4
+proxy-imu:2.mount.x = -5.37
+proxy-imu:2.mount.y = 0.0
+proxy-imu:2.mount.z = 0.68
+proxy-imu:2.mount.roll = 0.0
+proxy-imu:2.mount.pitch = 0.0
+proxy-imu:2.mount.yaw = 0.0
+
 proxy-lidar.type = sick
 proxy-lidar.port = /dev/ttyS1
-proxy-lidar.mount.x = 4.0
+proxy-lidar.mount.x = 1.54
 proxy-lidar.mount.y = 0.0
-proxy-lidar.mount.z = 0.3
+proxy-lidar.mount.z = 0.85
 proxy-lidar.mount.roll = 0.0
 proxy-lidar.mount.pitch = 0.0
 proxy-lidar.mount.yaw = 0.0
@@ -157,7 +166,7 @@ proxy-lidar.mount.yaw = 0.0
 proxy-sonararray.type = maxsonar
 proxy-sonararray.port = /dev/ttyUSB0
 proxy-sonararray.size = 8
-proxy-sonararray.mount.x = 3.0,3.0,2.0,2.0,1.0,1.0,0.8,0.8
+proxy-sonararray.mount.x = -0.805,-2.77,-5.52,-5.69,-5.69,-5.52,-2.79,-1.59
 proxy-sonararray.mount.y = 1.2,-1.2,1.2,-1.2,1.2,-1.2,1.2,-1.2
 proxy-sonararray.mount.z = 0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3
 proxy-sonararray.mount.pitch = 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
@@ -210,10 +219,10 @@ knowledge-gcdc16-v2viclcm.rearAxleLocation = 430
 ###############################################################################
 ###############################################################################
 # Tools
-tools-can-joystick.devicenode = /dev/pcan2   # PEAK CAN device.
+tools-can-joystick.devicenode = /dev/pcan1   # PEAK CAN device.
 tools-can-joystick.joystickdevicenode = /dev/input/js2   # Gamepad.
-tools-can-keyboard.devicenode = /dev/pcan2   # PEAK CAN device.
-tools-can-simplecansender.devicenode = /dev/pcan2   # PEAK CAN device.
+tools-can-keyboard.devicenode = /dev/pcan1   # PEAK CAN device.
+tools-can-simplecansender.devicenode = /dev/pcan1   # PEAK CAN device.
 
 # Perception
 perception-detectlane.inputSize = 640,480
