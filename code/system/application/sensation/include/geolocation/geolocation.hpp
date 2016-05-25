@@ -80,7 +80,8 @@ class Geolocation
                     opendlv::proxy::GpsReading a_currentWGS84Location );
 
 
-   Kalman::ExtendedKalmanFilter<opendlv::sensation::geolocation::State<double>> 
+
+   Kalman::ExtendedKalmanFilter<opendlv::sensation::geolocation::State<double>>
        m_ekf;
 
 

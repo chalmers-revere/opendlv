@@ -26,6 +26,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <math.h>
  
 #include "opendavinci/odcore/base/KeyValueConfiguration.h"
 #include "opendlv/data/environment/WGS84Coordinate.h"
@@ -74,7 +75,8 @@ V2vCam::V2vCam(int32_t const &a_argc, char **a_argv)
   m_receiveLog.open("var/application/knowledge/linguistics/v2vcam" 
     + filenameReceive.str(), std::ios::out | std::ios::app);
 
-  std::string header = "#message id, \
+  std::string header = "#time, \
+      message id, \
       station id, \
       generation delta time, \
       container mask,\
@@ -163,7 +165,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
     odcore::data::Container c(nextMessage);
     getConference().send(c);
 
-    m_sendLog << std::to_string(GetMessageId()) +
+    m_sendLog << std::to_string(GenerateGenerationTime()) +
+        + "," + std::to_string(GetMessageId()) +
         + "," + std::to_string(GetStationId()) +
         + "," + std::to_string(GenerateGenerationDeltaTime()) +
         + "," + std::to_string(GetContainerMask()) +
@@ -219,7 +222,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
       output += "Yaw rate confidence: " 
           + std::to_string(GetYawRateConfidence()) + "\n";
       output += "Vehicle role: " + std::to_string(GetVehicleRole()) + "\n";
-      std::cout << output;
+      //std::cout << output;
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
@@ -271,7 +274,7 @@ void V2vCam::ReadGeolocation(
   m_longitude = a_geolocation.getLongitude();
   m_altitude = a_geolocation.getAltitude();
   m_heading = a_geolocation.getHeading();
-  // std::cout << a_geolocation.getHeading() << std::endl;
+  std::cout << a_geolocation.getHeading() << std::endl;
   m_headingConfidence = a_geolocation.getHeadingConfidence();
   // std::cout << a_geolocation.getHeadingConfidence() << std::endl;
 }
@@ -341,9 +344,10 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
     output += "Yaw rate confidence: " 
         + std::to_string(yawRateConfidence) + "\n";
     output += "Vehicle role: " + std::to_string(vehicleRole) + "\n";
-    // std::cout << output;
+    std::cout << output;
 
-    m_receiveLog << std::to_string(messageId) +
+    m_receiveLog << std::to_string(GenerateGenerationTime()) +  
+        + "+" + std::to_string(messageId) +
         + "," + std::to_string(stationId) +
         + "," + std::to_string(generationDeltaTime) +
         + "," + std::to_string(containerMask) +
@@ -367,6 +371,8 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
         + "," + std::to_string(vehicleRole);
         m_receiveLog << std::endl; 
 
+
+    //This is where the objects are constructed whihc are to be sent out
     opendlv::data::environment::WGS84Coordinate gpsReference;
 
     gpsReference = opendlv::data::environment::WGS84Coordinate(
@@ -376,8 +382,8 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
     opendlv::data::environment::WGS84Coordinate::EAST);
 
     opendlv::data::environment::WGS84Coordinate currentLocation(
-    latitude/std::pow(10,7), opendlv::data::environment::WGS84Coordinate::NORTH,
-    longitude/std::pow(10,7), opendlv::data::environment::WGS84Coordinate::EAST);
+    latitude / std::pow(10,7), opendlv::data::environment::WGS84Coordinate::NORTH,
+    longitude / std::pow(10,7), opendlv::data::environment::WGS84Coordinate::EAST);
 
     opendlv::data::environment::Point3 currentObjectCartesianLocation =
     gpsReference.transform(currentLocation);
@@ -399,7 +405,7 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
         m_azimuth = 3.14159 / 2.0;
       }
     } else {
-      m_azimuth = std::atan(m_xOffset/m_yOffset);
+      m_azimuth = std::atan2(m_yOffset, m_xOffset);
     }
 
     odcore::data::TimeStamp now;
@@ -416,7 +422,8 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
     float m_angularSizeRate = 0.0f;
     float m_angularSizeRateConfidence = -1.0f;
     float m_confidence = 1.0f;
-    uint16_t m_sources = 1;
+    std::vector<std::string> m_sources;
+    m_sources.push_back("v2vcam");
     std::vector<std::string> m_properties;
     m_properties.push_back("Station Id: " + std::to_string(stationId));
     m_properties.push_back("Vehicle length: " + std::to_string(vehicleLength));
@@ -479,15 +486,26 @@ int32_t V2vCam::GetStationId() const
   return m_stationId;
 }
 
-int32_t V2vCam::GenerateGenerationDeltaTime()
+uint32_t V2vCam::GenerateGenerationTime() const
 {
   std::chrono::system_clock::time_point start2004TimePoint = 
       std::chrono::system_clock::from_time_t(m_timeType2004);
-  unsigned long millisecondsSince2004Epoch =
+  uint32_t millisecondsSince2004Epoch =
       std::chrono::system_clock::now().time_since_epoch() /
       std::chrono::milliseconds(1) 
       - start2004TimePoint.time_since_epoch() / std::chrono::milliseconds(1);
-  m_generationDeltaTime = millisecondsSince2004Epoch%65536;
+  return millisecondsSince2004Epoch;
+}
+
+int32_t V2vCam::GenerateGenerationDeltaTime()
+{
+  // std::chrono::system_clock::time_point start2004TimePoint = 
+  //     std::chrono::system_clock::from_time_t(m_timeType2004);
+  // unsigned long millisecondsSince2004Epoch =
+  //     std::chrono::system_clock::now().time_since_epoch() /
+  //     std::chrono::milliseconds(1) 
+  //     - start2004TimePoint.time_since_epoch() / std::chrono::milliseconds(1);
+  m_generationDeltaTime = GenerateGenerationTime()%65536;
   return m_generationDeltaTime;
 }
 
@@ -623,27 +641,34 @@ int32_t V2vCam::GetHeadingConfidence() const
 int32_t V2vCam::GetSpeed() const
 {
   int32_t scale = std::pow(10,2);
-  return static_cast<int32_t>(std::round(m_speed*scale));
+  double val = m_speed*scale;
+  if(val < 0){
+    return 16383;
+  }
+  else if(val > 16382){
+    return 16382;
+  }
+  else {
+    return static_cast<int32_t>(std::round(val));
+  }
 }
 
 int32_t V2vCam::GetSpeedConfidence() const
 {
   // std::cout << m_speedConfidence << std::endl;
-
-  if(m_speedConfidence < 0){
+  int32_t scale = std::pow(10,2);
+  double val = m_speedConfidence*scale;
+  if(val < 0){
     return 127;
   }
-  else if(m_speedConfidence < 0.01){
+  else if(val < 1){
     return 1;
   }
-  else if(m_heading > 1.25){
+  else if(m_speedConfidence > 125){
     return 126;
   }
   else{
-
-    int32_t scale = std::pow(10,2);
-    return static_cast<int32_t>(std::round(m_speedConfidence*scale));
-
+    return static_cast<int32_t>(std::round(val));
   }
 }
 
@@ -660,20 +685,46 @@ int32_t V2vCam::GetVehicleWidth() const
 int32_t V2vCam::GetLongitudinalAcc() const
 {
   int32_t scale = std::pow(10,1);
-  return static_cast<int32_t> (m_longitudinalAcc*scale);
+  double val = m_longitudinalAcc*scale;
+  if(m_longitudinalAccConf < 0){
+    return 161;
+  }
+  else if(val < - 160){
+    return -160;
+  }
+  else if(val > 160){
+    return 160;
+  }
+  else{
+    return static_cast<int32_t> (std::round(val));
+  }
 }
+
+int32_t V2vCam::GetYawRateValue() const
+{
+  if(m_yawRateConfidence < 0){
+    return 32767;
+  }
+  int32_t scale = std::pow(10,2);
+  double conversion = opendlv::Constants::RAD2DEG;
+  double val = m_yawRateValue*scale*conversion;
+  if(val < -32766){
+    return -32766;
+  }
+  else if(val > 32766){
+    return 32766;
+  }
+  else{
+    return static_cast<int32_t> (std::round(val));
+  }
+}
+
+
 
 int32_t V2vCam::GetLongitudinalAccConf() const
 {
   int32_t scale = std::pow(10,1);
   return static_cast<int32_t> (m_longitudinalAccConf*scale);
-}
-
-int32_t V2vCam::GetYawRateValue() const
-{
-  int32_t scale = std::pow(10,2);
-  double conversion = opendlv::Constants::RAD2DEG;
-  return static_cast<int32_t> (m_yawRateValue*scale*conversion);
 }
 
 int32_t V2vCam::GetYawRateConfidence() const

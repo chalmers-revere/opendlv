@@ -21,32 +21,47 @@
 #define LIDAR_LIDAR_HPP_
 
 #include <memory>
+#include <list>
 
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
+#include "opendavinci/odcore/wrapper/SerialPort.h"
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
+
+#include "lidar/lidarstringdecoder.hpp"
 
 namespace opendlv {
 namespace proxy {
 namespace lidar {
 
-class Device;
-
 /**
  * This class provides...
  */
-class Lidar : public odcore::base::module::TimeTriggeredConferenceClientModule {
+class Lidar : public odcore::base::module::TimeTriggeredConferenceClientModule 
+{
  public:
   Lidar(int32_t const &, char **);
   Lidar(Lidar const &) = delete;
   Lidar &operator=(Lidar const &) = delete;
   virtual ~Lidar();
+
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+  virtual void nextContainer(odcore::data::Container &c);
 
  private:
   void setUp();
   void tearDown();
+  void SendData();
+  void Status();
+  void StartScan();
+  void StopScan();
+  void SetBaud9600();
+  void SetBaud38400();
+  void SettingsMode();
+  void SetCentimeterMode();
 
-  std::unique_ptr<Device> m_device;
+  std::shared_ptr<odcore::wrapper::SerialPort> m_sick;
+  std::unique_ptr<LidarStringDecoder> m_lidarStringDecoder;
 };
 
 } // lidar

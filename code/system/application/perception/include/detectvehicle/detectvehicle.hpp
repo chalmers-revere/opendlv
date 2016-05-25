@@ -65,7 +65,8 @@ class DetectVehicle
       Eigen::Matrix3d transformationMatrix);
   void sendObjectInformation(std::vector<cv::Rect>* detections, 
       odcore::data::TimeStamp timeStampOfImage, 
-      Eigen::Matrix3d transformationMatrix);
+      Eigen::Matrix3d transformationMatrix,
+      std::string cameraName);
 
   float PixelPosToHeading(float pixelPosX);
 
@@ -74,6 +75,8 @@ class DetectVehicle
   std::shared_ptr<VehicleMemorySystem> m_vehicleMemorySystem;
 
   std::shared_ptr<ConvNeuralNet> m_convNeuralNet;
+
+  Eigen::Vector3d m_scale;
 };
 
 } // detectvehicle

@@ -224,7 +224,7 @@ void ConvNeuralNet::Update(const cv::Mat* a_imageFrame)
     m_detectedVehicles.push_back(bRect);
 
     // Draw bounding boxes in red
-    cv::rectangle(workingImage, bRect, cv::Scalar(0, 0, 255));
+    cv::rectangle(workingImage, bRect, cv::Scalar(0, 0, 255), 2);
 
     std::ostringstream mySs;
     mySs << "ID " << i;
