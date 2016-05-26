@@ -81,40 +81,34 @@ void KeepObjectSize::nextContainer(odcore::data::Container &)
 
     m_angularSize = unpackedObject.getAngularSize();
 
-    if (m_angularSize > 0.075f) {
+    if (m_angularSize < 0.075f) {
+
+    float angularSizeRatio = -(m_angularSize - 0.075f) / 0.075f;
+
+    float speedCorrection = (angularSizeRatio * 10); //TODO: Fix gain parameter in config!
+
+    std::cout << "speedCorrection: " << speedCorrection << std::endl << std::endl;
 
     odcore::data::TimeStamp t0;
-    opendlv::action::Correction correction(t0, "steering", false, steeringAmplitude);
-    odcore::data::Container container(correction);
+    opendlv::action::Correction correction1(t0, "acceleration", false, speedCorrection);
+    odcore::data::Container container(correction1);
     getConference().send(container);
 
     }
 
+    if (m_angularSize > 0.075f) {
 
+    float angularSizeRatio = -(m_angularSize - 0.075f) / 0.075f;
 
+    float speedCorrection = (angularSizeRatio * 10); //TODO: Fix gain parameter in config!;
+    std::cout << "speedCorrection: " << speedCorrection << std::endl << std::endl;
 
+    odcore::data::TimeStamp t0;
+    opendlv::action::Correction correction2(t0, "acceleration", false, speedCorrection);
+    odcore::data::Container container(correction2);
+    getConference().send(container);
 
-
-
-
-
-
-
-
-
-    m_desiredAzimuth = m_object->getDirection().getAzimuth();
-
-
-    opendlv::model::Direction objectDirection(m_desiredAzimuth, 0.0f);
-    opendlv::sensation::DesiredDirectionOfMovement desiredDirection(objectDirection);
-    odcore::data::Container objectContainer(desiredDirection);
-    getConference().send(objectContainer);
-
-
-
-
-
-
+    }
   }
 }
 
