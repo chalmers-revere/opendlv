@@ -52,7 +52,9 @@ class Scene : public odcore::base::module::DataTriggeredConferenceClientModule {
  private:
   void setUp();
   void tearDown();
-  void SendObjects();
+  opendlv::model::Cartesian3 CrossingPoint(std::vector<opendlv::model::Cartesian3>);
+  bool IsInRektangle(opendlv::model::Cartesian3, std::vector<opendlv::model::Cartesian3>);
+  void SendStuff();
   double PointDistance(float a_angle1, double a_dist1, float a_angle2, double a_dist2);
   void MergeObjects(opendlv::perception::Object a_object, uint32_t a_index);
   void TimeCheck();
