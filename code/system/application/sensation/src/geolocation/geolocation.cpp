@@ -130,7 +130,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
           opendlv::proxy::reverefh16::Propulsion>();
 
       if (propulsionContainer.getReceivedTimeStamp().getSeconds() > 0) {
-        control.v() = propulsion.getPropulsionShaftVehicleSpeed();
+        control.v() = propulsion.getPropulsionShaftVehicleSpeed()/3.6;
         // TODO: to m/s --- get the message in si unit
       }
 
@@ -234,7 +234,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       if (std::isfinite(state.theta()) )
       {
         heading = state.theta() - 
-                  std::ceil((state.theta()-M_PI/2)/(M_PI)) * (M_PI);  // make sure that the heading is in [-pi,+pi]
+                  std::ceil((state.theta()-M_PI)/(M_PI)) * (M_PI);  // make sure that the heading is in [-pi,+pi]
       }
       else
       {
@@ -242,7 +242,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
        state = m_ekf.getState();
         if (std::isfinite(gpsReading.getNorthHeading())) {
            heading = state.theta() - 
-                  std::ceil((gpsReading.getNorthHeading()-M_PI/2)/(M_PI)) * (M_PI);  // make sure that the heading is in [-pi,+pi]
+                  std::ceil((gpsReading.getNorthHeading()-M_PI)/(M_PI)) * (M_PI);  // make sure that the heading is in [-pi,+pi]
         }
 	else {
            heading = 0.0;} 
