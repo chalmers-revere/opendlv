@@ -41,7 +41,7 @@ namespace rule {
 * @param a_argv Command line arguments.
 */
 Rule::Rule(int32_t const &a_argc, char **a_argv)
-: DataTriggeredConferenceClientModule(
+: TimeTriggeredConferenceClientModule(
 	a_argc, a_argv, "knowledge-gcdc16-rule"),
   m_object(),
   m_desiredAzimuth(0.0f)
@@ -53,6 +53,48 @@ Rule::Rule(int32_t const &a_argc, char **a_argv)
 
 Rule::~Rule()
 {
+}
+odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Rule::body()
+{
+  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+  std::string mio1 = kv.getValue<std::string>("knowledge-gcdc16-rule.mio_1");
+  std::string mio2 = kv.getValue<std::string>("knowledge-gcdc16-rule.mio_2");
+  std::string backwardId = kv.getValue<std::string>("knowledge-gcdc16-rule.backward_id");
+  std::string initialLane = kv.getValue<std::string>("knowledge-gcdc16-rule.initial_lane");
+  std::string isTail = kv.getValue<std::string>("knowledge-gcdc16-rule.is_tail");
+  std::string platoonId = kv.getValue<std::string>("knowledge-gcdc16-rule.platoon_id");
+
+  while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
+      odcore::data::dmcp::ModuleStateMessage::RUNNING){
+      odcore::data::TimeStamp timestamp;
+
+      opendlv::knowledge::Insight scenarioOut(timestamp, "mergeScenario");
+      odcore::data::Container objectContainer1(scenarioOut);
+      getConference().send(objectContainer1);
+
+      opendlv::knowledge::Insight mioOut(timestamp, "mio=" + mio1);
+      odcore::data::Container objectContainer2(mioOut);
+      getConference().send(objectContainer2);
+
+      opendlv::knowledge::Insight backwardOut(timestamp, "backwardId=" + backwardId);
+      odcore::data::Container objectContainer3(backwardOut);
+      getConference().send(objectContainer3);
+
+      opendlv::knowledge::Insight laneOut(timestamp, "initialLane=" + initialLane);
+      odcore::data::Container objectContainer4(laneOut);
+      getConference().send(objectContainer4);
+
+      opendlv::knowledge::Insight tailOut(timestamp, "isTail=" + isTail);
+      odcore::data::Container objectContainer5(tailOut);
+      getConference().send(objectContainer5);
+
+      opendlv::knowledge::Insight platoonOut(timestamp, "platoonId=" + platoonId);
+      odcore::data::Container objectContainer6(platoonOut);
+      getConference().send(objectContainer6);
+
+  } 
+  return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
+   
 }
 
 /**
@@ -82,54 +124,13 @@ bool Rule::euclideanDistance(double measuredDistance)
 
 void Rule::nextContainer(odcore::data::Container &a_container)
 {
-  odcore::base::KeyValueConfiguration kv1 = getKeyValueConfiguration();
-  std::string mio1 = kv1.getValue<std::string>("knowledge-gcdc16-rule.mio_1");
-
-  odcore::base::KeyValueConfiguration kv2 = getKeyValueConfiguration();
-  std::string mio2 = kv2.getValue<std::string>("knowledge-gcdc16-rule.mio_2");
-
-  odcore::base::KeyValueConfiguration kv3 = getKeyValueConfiguration();
-  std::string backwardId = kv3.getValue<std::string>("knowledge-gcdc16-rule.backward_id");
   
-  odcore::base::KeyValueConfiguration kv4 = getKeyValueConfiguration();
-  std::string initialLane = kv4.getValue<std::string>("knowledge-gcdc16-rule.initial_lane");
-
-  odcore::base::KeyValueConfiguration kv5 = getKeyValueConfiguration();
-  std::string isTail = kv5.getValue<std::string>("knowledge-gcdc16-rule.is_tail");
-
-  odcore::base::KeyValueConfiguration kv6 = getKeyValueConfiguration();
-  std::string platoonId = kv6.getValue<std::string>("knowledge-gcdc16-rule.platoon_id");
-
   if (a_container.getDataType() == opendlv::proxy::ControlState::ID()) {
     opendlv::proxy::ControlState isAutonomous = a_container.getData<opendlv::proxy::ControlState>();
 
     bool autonomous = isAutonomous.getIsAutonomous();
     if (autonomous) {
-      odcore::data::TimeStamp timestamp;
-
-      opendlv::knowledge::Insight scenarioOut(timestamp, "mergeScenario");
-      odcore::data::Container objectContainer1(scenarioOut);
-      getConference().send(objectContainer1);
-
-      opendlv::knowledge::Insight mioOut(timestamp, "mio = " + mio1);
-      odcore::data::Container objectContainer2(mioOut);
-      getConference().send(objectContainer2);
-
-      opendlv::knowledge::Insight backwardOut(timestamp, "backwardId = " + backwardId);
-      odcore::data::Container objectContainer3(backwardOut);
-      getConference().send(objectContainer3);
-
-      opendlv::knowledge::Insight laneOut(timestamp, "initialLane = " + initialLane);
-      odcore::data::Container objectContainer4(laneOut);
-      getConference().send(objectContainer4);
-
-      opendlv::knowledge::Insight tailOut(timestamp, "isTail = " + isTail);
-      odcore::data::Container objectContainer5(tailOut);
-      getConference().send(objectContainer5);
-
-      opendlv::knowledge::Insight platoonOut(timestamp, "platoonId = " + platoonId);
-      odcore::data::Container objectContainer6(platoonOut);
-      getConference().send(objectContainer6);
+    
 
 
       //TODO: STOM, MergeFlag, Ask about Intention messages, distancetravelledCZ

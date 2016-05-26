@@ -32,7 +32,6 @@
 #include "opendavinci/odcore/data/TimeStamp.h"
 #include "opendavinci/odcore/strings/StringToolbox.h"
 
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 #include "linguistics/v2vcam/buffer.hpp"
 #include "gcdc16/v2viclcm/v2viclcm.hpp"
@@ -176,8 +175,13 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vIclcm::body()
     odcore::data::Container c(nextMessage);
     getConference().send(c);
 
-    // std::cout << m_stationId << std::endl;
-    // std::cout << m_rearAxleLocation << std::endl;
+    std::cout << m_stationId << std::endl;
+    std::cout << m_rearAxleLocation << std::endl;
+    std::cout << m_mioId << std::endl;
+    std::cout << m_backwardId << std::endl;
+    std::cout << m_lane << std::endl;
+    std::cout << m_flagTail << std::endl;
+    std::cout << m_platoonId << std::endl;
 
 
 
@@ -219,6 +223,30 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vIclcm::body()
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
+void V2vIclcm::ReadInsight(opendlv::knowledge::Insight &a_insight)
+{
+  std::cout<< "Read "<< std::endl;
+  std::string str = a_insight.getInsight();
+  std::vector<std::string> information = odcore::strings::StringToolbox::split(str,'=');
+  if(information[0] == "stationId"){
+    m_stationId = std::stoi(information[1]);
+  } else if(information[0] == "rearAxleLocation"){
+    m_rearAxleLocation = std::stod(information[1]);
+  } else if (information[0] == "mergeScenario") {
+    m_scenario = "mergeScenario";
+  } else if (information[0] == "mio") {
+    m_mioId = std::stoi(information[1]);
+    m_forwardId = std::stoi(information[1]);
+  } else if (information[0] == "backwardId") {
+    m_backwardId = std::stoi(information[1]);
+  } else if (information[0] == "initialLane") {
+    m_lane = std::stoi(information[1]);
+  } else if (information[0] == "isTail") {
+    m_flagTail = 1;
+  } else if (information[0] == "platoonId"){
+    m_platoonId = std::stoi(information[1]);
+  }
+}
 
 /**
  * Receives .
@@ -229,14 +257,8 @@ void V2vIclcm::nextContainer(odcore::data::Container &a_c)
   if (a_c.getDataType() == opendlv::knowledge::Insight::ID()){
     opendlv::knowledge::Insight insight = 
         a_c.getData<opendlv::knowledge::Insight>();
-    std::string str = insight.getInsight();
-    std::vector<std::string> information = odcore::strings::StringToolbox::split(str,'=');
-    if(information[0] == "stationId"){
-      m_stationId = std::stoi(information[1]);
-    } else if(information[0] == "rearAxleLocation"){
-      m_rearAxleLocation = std::stod(information[1]);
-    }
 
+    ReadInsight(insight);
   } else if (a_c.getDataType() == opendlv::proxy::ControlState::ID()) {
     opendlv::proxy::ControlState controlState =
         a_c.getData<opendlv::proxy::ControlState>(); 
@@ -331,29 +353,32 @@ void V2vIclcm::nextContainer(odcore::data::Container &a_c)
     output += "Intention: " + std::to_string(intention) + "\n";
     output += "Counter: " + std::to_string(counter) + "\n";
 
-    if((stationId < 100)){
-      std::cout << output << std::endl;
-    }
-
-    if(participantsReady == 1 && (stationId < 100)){
-      odcore::data::TimeStamp now;
-      opendlv::knowledge::Insight eventScenario(now,"scenarioReady");
-      odcore::data::Container containerScenario(eventScenario);
-      getConference().send(containerScenario);
+    // if((stationId < 100)){
+    //   std::cout << output << std::endl;
+    // }
+    odcore::data::TimeStamp now;
+    if (participantsReady == 1 && (stationId < 100)){
+      opendlv::knowledge::Insight eventScenarioStart(now,"scenarioReady");
+      odcore::data::Container containerScenarioStart(eventScenarioStart);
+      getConference().send(containerScenarioStart);
       std::cout<< "Got participantsReady flag from "<< stationId << std::endl;
 
-      // if(){
-
-      // }
-      // else{
-
-      // }
-
     }
-    if(mergeRequest == 1 && (stationId < 5)){
+
+    if (mergeRequest == 1 && (stationId < 100)){
       std::cout<< "Got mergeRequest flag from "<< stationId << std::endl;
+      opendlv::knowledge::Insight eventMergeReq(now,"mergeRequest");
+      odcore::data::Container containerMergeReq(eventMergeReq);
+      getConference().send(containerMergeReq);
     }
 
+    if (endOfScenario == 1 && stationId < 100){
+      std::cout << "Got end of scenario message from " << stationId << std::endl;
+      opendlv::knowledge::Insight eventScenarioEnd(now,"scenarioEnd");
+      odcore::data::Container containerScenarioEnd(eventScenarioEnd);
+      getConference().send(containerScenarioEnd);
+    }
+ 
 
     m_receiveLog << std::to_string(GenerateGenerationTime())+
         + "," + std::to_string(messageId)+ //messageId
