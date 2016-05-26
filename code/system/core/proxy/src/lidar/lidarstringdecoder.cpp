@@ -185,7 +185,7 @@ void LidarStringDecoder::ConvertToDistances()
   double cartesian[2];
   double PI = 3.14159265;
 
-  std::vector<opendlv::model::Direction> directions // m_directions.clear();
+  std::vector<opendlv::model::Direction> directions; // m_directions.clear();
   std::vector<double> radii; // m_radii.clear();
 
   for(uint32_t i = 0; i < 361; i++) {
