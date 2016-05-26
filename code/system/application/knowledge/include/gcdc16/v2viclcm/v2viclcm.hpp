@@ -28,6 +28,8 @@
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
 
+
+
 namespace opendlv {
 namespace knowledge {
 namespace gcdc16 {
@@ -56,15 +58,16 @@ class V2vIclcm
   std::ofstream m_sendLog;
   std::ofstream m_receiveLog;
   std::time_t m_timeType2004;
+  std::string m_scenario;
 
   unsigned char m_messageId = 10;
   unsigned char m_containerMask = 0;
   unsigned char m_lowFrequencyMask = 0;
   int32_t m_stationId = 0;
-  int32_t m_rearAxleLocation = 450;
+  int32_t m_rearAxleLocation = 4095;
   int32_t m_controllerType = 0;
-  int32_t m_responseTimeConstant = 1001;
-  int32_t m_responseTimeDelay = 1001;
+  int32_t m_responseTimeConstant = 50;
+  int32_t m_responseTimeDelay = 50;
   int32_t m_targetLongAcc = 1001;
   int32_t m_timeHeadway = 361;
   int32_t m_cruiseSpeed = 5001;

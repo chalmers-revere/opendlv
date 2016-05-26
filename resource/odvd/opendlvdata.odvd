@@ -110,7 +110,9 @@ message opendlv.proxy.LedRequest [id = 169] {
 }
 
 message opendlv.proxy.RelayRequest [id = 170] {
-  list<bool> relayState [id = 1];
+  bool relayValue [id = 1];
+  uint8 relayIndex [id = 2];
+  string deviceId [id = 3];
 }
 
 message opendlv.proxy.V2vReading [id = 171] {
@@ -207,7 +209,7 @@ message opendlv.perception.Surface [id = 184] {
   bool traversable [id = 6];
 
   float confidence [id = 7];
-  uint16 sources [id = 8];
+  list<string> sources [id = 8];
 
   list<string> properties [id = 9];
 

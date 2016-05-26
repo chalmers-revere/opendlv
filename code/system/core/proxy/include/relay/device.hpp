@@ -17,40 +17,31 @@
  * USA.
  */
 
-#ifndef TOGGELER_TOGGELER_HPP_
-#define TOGGELER_TOGGELER_HPP_
+#ifndef RELAY_DEVICE_HPP_
+#define RELAY_DEVICE_HPP_
 
-#include <memory>
-
-#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
-#include "opendavinci/odcore/data/Container.h"
+#include <vector>
 
 namespace opendlv {
 namespace proxy {
-namespace toggeler {
+namespace relay {
 
-class Device;
-
-/**
- * This class provides...
- */
-class Toggeler
-: public odcore::base::module::DataTriggeredConferenceClientModule {
+class Device {
  public:
-  Toggeler(int32_t const &, char **);
-  Toggeler(Toggeler const &) = delete;
-  Toggeler &operator=(Toggeler const &) = delete;
-  virtual ~Toggeler();
-  virtual void nextContainer(odcore::data::Container &);
+  Device(std::vector<bool>);
+  Device(Device const &) = delete;
+  Device &operator=(Device const &) = delete;
+  virtual ~Device();
+  virtual bool IsActive(uint16_t const) const = 0;
+  void Reset();
+  virtual void SetValue(uint16_t const, bool const) = 0;
 
  private:
-  void setUp();
-  void tearDown();
-
-  std::unique_ptr<Device> m_device;
+  std::vector<bool> m_initialValues;
+  std::vector<bool> m_values;
 };
 
-} // toggeler
+} // relay
 } // proxy
 } // opendlv
 

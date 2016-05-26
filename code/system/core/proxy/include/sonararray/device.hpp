@@ -20,16 +20,26 @@
 #ifndef SONARARRAY_DEVICE_HPP_
 #define SONARARRAY_DEVICE_HPP_
 
+#include <vector>
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
+
 namespace opendlv {
 namespace proxy {
 namespace sonararray {
 
 class Device {
  public:
-  Device();
+  Device(std::vector<opendlv::model::Cartesian3>, 
+      std::vector<opendlv::model::Direction>);
   Device(Device const &) = delete;
   Device &operator=(Device const &) = delete;
   virtual ~Device();
+  opendlv::proxy::EchoReading GetEchoReadings();
+  virtual std::vector<float> GetSonarReadings() = 0;
+
+ private:
+  std::vector<opendlv::model::Direction> m_directions;
+  std::vector<opendlv::model::Cartesian3> m_positions;
 };
 
 } // sonararray
