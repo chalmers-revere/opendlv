@@ -75,14 +75,11 @@ void ManualOverride::nextContainer(odcore::data::Container &a_container)
     double brakePedalPosition = manualControl.getBrakePedalPosition();
     double torsionBarTorque = manualControl.getTorsionBarTorque();
     
-    std::cout << "Torsion bar: " << torsionBarTorque << std::endl;
+    std::cout << "S: " << torsionBarTorque << "\t" << accelerationPedalPosition << "\t" << brakePedalPosition << std::endl;
  
-    std::cout << "Pedals: " << accelerationPedalPosition << " (acc.ped.) " <<
-        brakePedalPosition << " (brake ped.) " << std::endl;
-
     if (accelerationPedalPosition > m_accelerationPedalPositionThreshold) {
-      std::cout << "Acceleration pedal override (" 
-          << accelerationPedalPosition << ")" << std::endl;
+    //  std::cout << "Acceleration pedal override (" 
+    //      << accelerationPedalPosition << ")" << std::endl;
 
       opendlv::proxy::ControlState controlState(false);
       odcore::data::Container c(controlState);
@@ -90,8 +87,8 @@ void ManualOverride::nextContainer(odcore::data::Container &a_container)
     }
     
     if (brakePedalPosition > m_brakePedalPositionThreshold) {
-      std::cout << "Brake pedal override (" 
-          << brakePedalPosition << ")" << std::endl;
+    //  std::cout << "Brake pedal override (" 
+    //      << brakePedalPosition << ")" << std::endl;
 
       opendlv::proxy::ControlState controlState(false);
       odcore::data::Container c(controlState);
@@ -99,8 +96,8 @@ void ManualOverride::nextContainer(odcore::data::Container &a_container)
     }
     
     if (torsionBarTorque > m_torsionBarTorqueThreshold) {
-      std::cout << "Steering wheel override (" 
-          << torsionBarTorque << ")" << std::endl;
+    //  std::cout << "Steering wheel override (" 
+    //      << torsionBarTorque << ")" << std::endl;
 
       opendlv::proxy::ControlState controlState(false);
       odcore::data::Container c(controlState);
