@@ -162,6 +162,10 @@ message opendlv.sensation.DesiredDirectionOfMovement [id = 180] {
   opendlv.model.Direction direction [id = 1];
 }
 
+message opendlv.sensation.DesiredOpticalFlow [id = 174] {
+  float desiredOpticalFlow [id =1];
+}
+
 message opendlv.perception.Object [id = 181] {
   odcore::data::TimeStamp identified [id = 1];
   string type [id = 2];

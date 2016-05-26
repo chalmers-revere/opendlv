@@ -54,6 +54,7 @@ class Rule : public odcore::base::module::TimeTriggeredConferenceClientModule {
 
   std::unique_ptr<opendlv::perception::Object> m_object;
   float m_desiredAzimuth;
+  bool m_isAutonomous;
   //double standstillDistance;
   //double headway;
   //double minimumEuclideanDistance;

@@ -44,7 +44,8 @@ Rule::Rule(int32_t const &a_argc, char **a_argv)
 : TimeTriggeredConferenceClientModule(
 	a_argc, a_argv, "knowledge-gcdc16-rule"),
   m_object(),
-  m_desiredAzimuth(0.0f)
+  m_desiredAzimuth(0.0f),
+  m_isAutonomous(false)
 	//standstillDistance(6), //TODO: Get actual value at GCDC in meters
 	//headway(1), //TODO: Get actual value at GCDC in seconds
 	//minimumEuclideanDistance(5) //TODO: Get actual value at GCDC in meters
@@ -67,6 +68,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Rule::body()
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
       odcore::data::dmcp::ModuleStateMessage::RUNNING){
       odcore::data::TimeStamp timestamp;
+
+      opendlv::sensation::DesiredOpticalFlow desired(35.0f/3.6f);
+      odcore::data::Container objectContainer0(desired);
+      getConference().send(objectContainer0);
 
       // opendlv::knowledge::Insight scenarioOut(timestamp, "mergeScenario");
       // odcore::data::Container objectContainer1(scenarioOut);
@@ -130,14 +135,17 @@ void Rule::nextContainer(odcore::data::Container &a_container)
 
     bool autonomous = isAutonomous.getIsAutonomous();
     if (autonomous) {
-    
+      m_isAutonomous = true;
+    }
+  } else if (m_isAutonomous && a_container.getDataType() == opendlv::knowledge::Insight::ID()) {
 
-
+    opendlv::knowledge::Insight unpackedObject =
+    a_container.getData<opendlv::knowledge::Insight>();
+    std::string insightMessage = unpackedObject.getInsight();
+  }
       //TODO: STOM, MergeFlag, Ask about Intention messages, distancetravelledCZ
       //TODO: use rsuEvent -> merging should commence
-
-
-    } 
+} 
 
     /*else if (a_container.getDataType() == opendlv::perception::Object::ID()) {
     opendlv::perception::Object unpackedObject =
@@ -166,8 +174,6 @@ void Rule::nextContainer(odcore::data::Container &a_container)
     odcore::data::Container objectContainer(desiredDirection);
     getConference().send(objectContainer);
     }*/
-  }
-}
 
 
 

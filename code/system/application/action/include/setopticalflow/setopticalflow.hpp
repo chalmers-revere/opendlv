@@ -46,6 +46,7 @@ class SetOpticalFlow
   void tearDown();
 
   float m_maxSpeed;
+  float m_speed;
 };
 
 } // setopticalflow

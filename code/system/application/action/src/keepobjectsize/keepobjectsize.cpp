@@ -69,6 +69,7 @@ void KeepObjectSize::nextContainer(odcore::data::Container &a_container)
 
     opendlv::model::Direction direction = unpackedObject.getDirection();
     float azimuth = direction.getAzimuth();
+    float speedCorrection = 0;
 
     if (std::abs(azimuth) < 0.22f) {
       if (m_object == nullptr) {
@@ -83,11 +84,11 @@ void KeepObjectSize::nextContainer(odcore::data::Container &a_container)
       if (m_angularSize < 0.070f) {
 
         float angularSizeRatio = 0.075f / m_angularSize;
-        float speedCorrection = angularSizeRatio - 1;
+        speedCorrection = angularSizeRatio - 1;
       }
       else if (m_angularSize > 0.080f) {
         float angularSizeRatio = 0.075f / m_angularSize;
-        float speedCorrection = -angularSizeRatio*2 + 1; 
+        speedCorrection = -angularSizeRatio*2 + 1; 
       }
       else {
         speedCorrection = 0;
