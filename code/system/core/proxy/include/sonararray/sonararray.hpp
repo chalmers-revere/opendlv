@@ -22,7 +22,7 @@
 
 #include <memory>
 
-#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
 
 namespace opendlv {
@@ -35,13 +35,13 @@ class Device;
  * This class provides...
  */
 class SonarArray
-: public odcore::base::module::DataTriggeredConferenceClientModule {
+  : public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
   SonarArray(int32_t const &, char **);
   SonarArray(SonarArray const &) = delete;
   SonarArray &operator=(SonarArray const &) = delete;
   virtual ~SonarArray();
-  virtual void nextContainer(odcore::data::Container &);
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
  private:
   void setUp();

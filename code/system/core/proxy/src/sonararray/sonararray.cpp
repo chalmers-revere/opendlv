@@ -42,7 +42,7 @@ namespace sonararray {
   * @param a_argv Command line arguments.
   */
 SonarArray::SonarArray(int32_t const &a_argc, char **a_argv)
-    : DataTriggeredConferenceClientModule(
+    : TimeTriggeredConferenceClientModule(
       a_argc, a_argv, "proxy-sonararray")
     , m_device()
 {
@@ -52,23 +52,17 @@ SonarArray::~SonarArray()
 {
 }
 
-void SonarArray::nextContainer(odcore::data::Container &a_container)
+odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SonarArray::body()
 {
-  if (a_container.getDataType() == opendlv::proxy::SonarArrayRequest::ID()) {
-    opendlv::proxy::SonarArrayRequest request = 
-    a_container.getData<opendlv::proxy::SonarArrayRequest>();
+  while (getModuleStateAndWaitForRemainingTimeInTimeslice() 
+      == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
 
-    std::string deviceId = request.getDeviceId();
-
-    if (deviceId != getIdentifier()) {
-      return;
-    }
-
-    bool sonararrayValue = request.getSonarArrayValue();
-    uint8_t sonararrayIndex = request.getSonarArrayIndex();
-
-    m_device->SetValue(sonararrayIndex, sonararrayValue);
+    auto sonarReadings = m_device->GetEchoReadings();
+    odcore::data::Container sonarReadingContainer(sonarReadings);
+    getConference().send(sonarReadingContainer);
   }
+
+  return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
 void SonarArray::setUp()
@@ -77,32 +71,63 @@ void SonarArray::setUp()
 
   std::string const type = kv.getValue<std::string>("proxy-sonararray.type");
 
-  std::string const valuesString = 
-      kv.getValue<std::string>("proxy-sonararray.values");
+  std::string const xsString = 
+      kv.getValue<std::string>("proxy-sonararray.mount.x");
+  std::vector<std::string> xsVector = 
+      odcore::strings::StringToolbox::split(xsString, ',');
+  std::string const ysString = 
+      kv.getValue<std::string>("proxy-sonararray.mount.y");
+  std::vector<std::string> ysVector = 
+      odcore::strings::StringToolbox::split(ysString, ',');
+  std::string const zsString = 
+      kv.getValue<std::string>("proxy-sonararray.mount.z");
+  std::vector<std::string> zsVector = 
+      odcore::strings::StringToolbox::split(zsString, ',');
+  std::string const azimuthsString = 
+      kv.getValue<std::string>("proxy-sonararray.mount.azimuth");
+  std::vector<std::string> azimuthsVector = 
+      odcore::strings::StringToolbox::split(azimuthsString, ',');
+  std::string const zenithsString = 
+      kv.getValue<std::string>("proxy-sonararray.mount.zenith");
+  std::vector<std::string> zenithsVector = 
+      odcore::strings::StringToolbox::split(zenithsString, ',');
 
-  std::vector<bool> values;
-
-  std::vector<std::string> valuesVector = 
-      odcore::strings::StringToolbox::split(valuesString, ',');
-  for (auto valueString : valuesVector) {
-    bool value = static_cast<bool>(std::stoi(valueString));
-    values.push_back(value);
+  uint16_t length = xsVector.size();
+  if (length != ysVector.size() || length != zsVector.size()
+      || length != azimuthsVector.size() || length != zenithsVector.size()) {
+    std::cerr << "[proxy-sonararray] Vector size mismatch." << std::endl;
   }
 
+  std::vector<opendlv::model::Cartesian3> positions;
+  std::vector<opendlv::model::Direction> directions;
+  for (uint16_t i = 0; i < length; i++) {
+    float x = std::stof(xsVector[i]);
+    float y = std::stof(ysVector[i]);
+    float z = std::stof(zsVector[i]);
+    opendlv::model::Cartesian3 position(x, y, z);
+    positions.push_back(position);
+
+    float azimuth = std::stof(azimuthsVector[i]);
+    float zenith = std::stof(zenithsVector[i]);
+    opendlv::model::Direction direction(azimuth, zenith);
+    directions.push_back(direction);
+  }
+  
   if (type.compare("max") == 0) {
-    std::string const pinsString = 
-        kv.getValue<std::string>("proxy-sonararray.max.pins");
-
     std::vector<uint16_t> pins;
-
+    std::string const pinsString = 
+        kv.getValue<std::string>("proxy-sonararray.max.pin");
     std::vector<std::string> pinsVector = 
         odcore::strings::StringToolbox::split(pinsString, ',');
     for (auto pinString : pinsVector) {
       uint16_t pin = std::stoi(pinString);
       pins.push_back(pin);
     }
+    
+    float scaleValue = kv.getValue<float>("proxy-sonararray.max.scale_value");
 
-     m_device = std::unique_ptr<Device>(new MaxDevice(values, pins));
+    m_device = std::unique_ptr<Device>(new MaxDevice(positions, directions,
+        pins, scaleValue));
   }
 
   if (m_device.get() == nullptr) {

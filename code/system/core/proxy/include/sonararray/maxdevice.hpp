@@ -32,15 +32,17 @@ namespace sonararray {
 
 class MaxDevice : public Device {
  public:
-  MaxDevice(std::vector<bool>, std::vector<uint16_t>);
+  MaxDevice(std::vector<opendlv::model::Cartesian3>, 
+      std::vector<opendlv::model::Direction>, std::vector<uint16_t>, 
+      float);
   MaxDevice(MaxDevice const &) = delete;
   MaxDevice &operator=(MaxDevice const &) = delete;
   virtual ~MaxDevice();
-  bool IsActive(uint16_t const) const;
-  void SetValue(uint16_t const, bool const);
+  std::vector<float> GetSonarReadings();
 
  private:
   std::vector<uint16_t> m_pins;
+  float m_scaleValue;
 };
 
 } // sonararray

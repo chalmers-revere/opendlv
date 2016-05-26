@@ -29,80 +29,48 @@ namespace sonararray {
  * Constructor.
  *
  */
-MaxDevice::MaxDevice(std::vector<bool> a_initialValues, 
-    std::vector<uint16_t> a_pins):
-  Device(a_initialValues),
-  m_pins(a_pins)
+MaxDevice::MaxDevice(std::vector<opendlv::model::Cartesian3> a_positions, 
+    std::vector<opendlv::model::Direction> a_directions,
+    std::vector<uint16_t> a_pins, float a_scaleValue):
+  Device(a_positions, a_directions),
+  m_pins(a_pins),
+  m_scaleValue(a_scaleValue)
 {
-  std::string path = std::string("/sys/class/max/");
-  std::string filename = path + "export";
-  std::ofstream exportFile(filename, std::ofstream::out);
-  
-  for (uint16_t i = 0; i < a_pins.size(); i++) {
-
-    uint16_t pin = a_pins[i];
-    bool initialValue = a_initialValues[i];
-
-    exportFile << pin;
-
-    std::string maxDir = path + "max" + std::to_string(pin) + "/";
-    std::string maxDirectionFilename = maxDir + "direction";
-    std::string maxValueFilename = maxDir + "value";
-
-    std::ofstream maxDirectionFile(maxDirectionFilename, std::ofstream::out);
-    maxDirectionFile << "out";
-
-    std::ofstream maxValueFile(maxValueFilename, std::ofstream::out);
-    maxDirectionFile << static_cast<uint16_t>(initialValue);
-
-    maxDirectionFile.close();
-    maxValueFile.close();
-  }
-
+  std::string path = std::string("/sys/devices/platform/bone_capemgr/slots");
+  std::ofstream exportFile(path, std::ofstream::out);
+  exportFile << "BB-ADC";
   exportFile.close();
 }
 
 MaxDevice::~MaxDevice()
 {
-  std::string path = std::string("/sys/class/max/");
-  std::string filename = path + "unexport";
-  std::ofstream unexportFile(filename, std::ofstream::out);
-  
+}
+
+std::vector<float> MaxDevice::GetSonarReadings()
+{
+  std::vector<float> distances;
+
   for (uint16_t pin : m_pins) {
-    unexportFile << pin;
+
+    // d = A * 0.0012
+
+    std::string path = std::string("/sys/bus/iio/devices/iio:device0/"); 
+    std::string filename = path + "in_voltage" + std::to_string(pin) + "_raw";
+
+    std::ifstream file(filename, std::ifstream::in);
+    
+    std::string line;
+    std::getline(file, line);
+    int value = std::stoi(line);
+
+    float distance = static_cast<float>(value) * m_scaleValue;
+
+    distances.push_back(distance);
+
+    file.close();
   }
 
-  unexportFile.close();
-}
-
-bool MaxDevice::IsActive(uint16_t const a_index) const
-{
-  uint16_t pin = m_pins[a_index];
-
-  std::string filename = std::string("/sys/class/max/max" 
-      + std::to_string(pin) + "/value");
-  std::ifstream file(filename, std::ifstream::in);
-  
-  std::string line;
-  std::getline(file, line);
-  bool value = std::stoi(line);
-
-  file.close();
-
-  return value;
-}
-
-void MaxDevice::SetValue(uint16_t const a_index, bool const a_value)
-{
-  uint16_t pin = m_pins[a_index];
-
-  std::string filename = std::string("/sys/class/max/max" 
-      + std::to_string(pin) + "/value");
-  std::ofstream file(filename, std::ofstream::out);
-  
-  file << a_value;
-
-  file.close();
+  return distances;
 }
 
 } // sonararray

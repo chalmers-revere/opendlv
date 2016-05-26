@@ -154,14 +154,23 @@ proxy-lidar.mount.roll = 0.0
 proxy-lidar.mount.pitch = 0.0
 proxy-lidar.mount.yaw = 0.0
 
-proxy-sonararray.type = maxsonar
-proxy-sonararray.port = /dev/ttyUSB0
-proxy-sonararray.size = 8
-proxy-sonararray.mount.x = 3.0,3.0,2.0,2.0,1.0,1.0,0.8,0.8
-proxy-sonararray.mount.y = 1.2,-1.2,1.2,-1.2,1.2,-1.2,1.2,-1.2
-proxy-sonararray.mount.z = 0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3
-proxy-sonararray.mount.pitch = 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-proxy-sonararray.mount.yaw = 1.57,-1.57,1.57,-1.57,1.57,-1.57,2.36,-2.36
+proxy-sonararray:0.type = max
+proxy-sonararray:0.mount.x = 3.0,3.0,2.0,2.0
+proxy-sonararray:0.mount.y = 1.2,-1.2,1.2,-1.2
+proxy-sonararray:0.mount.z = 0.3,0.3,0.3,0.3
+proxy-sonararray:0.mount.azimuth = 1.57,-1.57,1.57,-1.57
+proxy-sonararray:0.mount.zenith = 0.0,0.0,0.0,0.0
+proxy-sonararray:0.max.pin = 0,1,2,3
+proxy-sonararray:0.max.scale_value = 0.0012
+
+proxy-sonararray:1.type = max
+proxy-sonararray:1.mount.x = 3.0,3.0,2.0,2.0
+proxy-sonararray:1.mount.y = 1.2,-1.2,1.2,-1.2
+proxy-sonararray:1.mount.z = 0.3,0.3,0.3,0.3
+proxy-sonararray:1.mount.azimuth = 1.57,-1.57,2.57,-2.57
+proxy-sonararray:1.mount.zenith = 0.0,0.0,0.0,0.0
+proxy-sonararray:1.max.pin = 0,1,2,3
+proxy-sonararray:1.max.scale_value = 0.0012
 
 proxy-v2v.type = geonetworking-dual
 proxy-v2v.comboxIp = 10.42.42.61
