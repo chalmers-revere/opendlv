@@ -70,7 +70,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Rule::body()
       odcore::data::TimeStamp timestamp;
 
       opendlv::sensation::DesiredOpticalFlow desired(35.0f/3.6f);
-      odcore::data::Container objectContainer0(desired);
+      odcore::data::Container objectContainer1ctContainer0(desired);
       getConference().send(objectContainer0);
 
       // opendlv::knowledge::Insight scenarioOut(timestamp, "mergeScenario");
@@ -140,8 +140,14 @@ void Rule::nextContainer(odcore::data::Container &a_container)
   } else if (m_isAutonomous && a_container.getDataType() == opendlv::knowledge::Insight::ID()) {
 
     opendlv::knowledge::Insight unpackedObject =
-    a_container.getData<opendlv::knowledge::Insight>();
+        a_container.getData<opendlv::knowledge::Insight>();
     std::string insightMessage = unpackedObject.getInsight();
+
+    if(insightMessage == "scenarioReady") {
+
+    } else if (insightMessage == "scenarioEnd") {
+
+    } else if (insightMessage == "")
   }
       //TODO: STOM, MergeFlag, Ask about Intention messages, distancetravelledCZ
       //TODO: use rsuEvent -> merging should commence
