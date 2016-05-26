@@ -358,11 +358,15 @@ void V2vIclcm::nextContainer(odcore::data::Container &a_c)
     // }
     odcore::data::TimeStamp now;
     if (participantsReady == 1 && (stationId < 100)){
+      std::cout<< "Got participantsReady flag from "<< stationId << std::endl;
+
+    }
+
+    if (startPlatoon == 1 && stationId < 100){
+      std::cout << "Got startPlatoon flag from " << stationId << std::endl;
       opendlv::knowledge::Insight eventScenarioStart(now,"scenarioReady");
       odcore::data::Container containerScenarioStart(eventScenarioStart);
       getConference().send(containerScenarioStart);
-      std::cout<< "Got participantsReady flag from "<< stationId << std::endl;
-
     }
 
     if (mergeRequest == 1 && (stationId < 100)){
