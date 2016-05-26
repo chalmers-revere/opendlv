@@ -51,10 +51,10 @@ class Identity
   void SendContainer(opendlv::knowledge::Insight  &);
 
   uint32_t m_stationId;
-  uint8_t m_stationType;
+  uint32_t m_stationType;
   double m_vehicleLength;
   double m_vehicleWidth;
-  uint8_t m_vehicleRole;
+  uint32_t m_vehicleRole;
   double m_rearAxleLocation;
 };
 

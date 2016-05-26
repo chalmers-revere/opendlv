@@ -82,6 +82,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Identity::body()
     
     opendlv::knowledge::Insight rearAxleLocationInsight(now,"rearAxleLocation="+std::to_string(m_rearAxleLocation));
     SendContainer(rearAxleLocationInsight);
+    std::cout << m_stationType << " " << m_vehicleRole << std::endl;
   
   }  
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
@@ -99,11 +100,12 @@ void Identity::setUp()
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
   m_stationId = kv.getValue<uint32_t>("knowledge-identity.stationId");
-  m_stationType = kv.getValue<uint8_t>("knowledge-identity.stationType");
+  m_stationType = kv.getValue<uint32_t>("knowledge-identity.stationType");
   m_vehicleLength = kv.getValue<double>("knowledge-identity.vehicleLength");
   m_vehicleWidth = kv.getValue<double>("knowledge-identity.vehicleWidth");
-  m_vehicleRole = kv.getValue<uint8_t>("knowledge-identity.vehicleRole");
+  m_vehicleRole = kv.getValue<uint32_t>("knowledge-identity.vehicleRole");
   m_rearAxleLocation = kv.getValue<double>("knowledge-identity.rearAxleLocation");
+
 
 }
 
