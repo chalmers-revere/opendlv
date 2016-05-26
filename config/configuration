@@ -44,6 +44,7 @@ odsupercomponent.pulsetimeack.exclude = odcockpit
 
 action-setopticalrotation.gain_heading = 1.5
 action-setopticalrotation.heading_tolerance = 0.05
+action-setopticalflow.max_speed = 30/3.6
 
 knowledge-gcdc16-rule:0.mio_1 = 0
 knowledge-gcdc16-rule:0.mio_2 = 0

@@ -78,7 +78,7 @@
   float const  azimuthTolerance = kv2.getValue<float>("action-setopticalrotation.heading_tolerance");
   float azimuthCorrection = m_desiredAzimuth - m_currentAzimuth; 
 
-  if ( fabs(azimuthCorrection) > azimuthTolerance ) {
+  if ( std:abs(azimuthCorrection) > azimuthTolerance ) {
     float steeringAmplitude = gainAzimuth * azimuthCorrection;
     //std::cout << "Stearing Amplitude: " << steeringAmplitude << std::endl;
     m_logRotation << steeringAmplitude << std::endl;

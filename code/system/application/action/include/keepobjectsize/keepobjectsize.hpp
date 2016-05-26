@@ -24,6 +24,7 @@
 
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 namespace opendlv {
 namespace action {

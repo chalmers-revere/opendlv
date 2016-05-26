@@ -55,8 +55,44 @@ SetOpticalFlow::~SetOpticalFlow()
  * Sends speed correction commands (throttle) and in rare cases a halt command
  * (brake) to Act.
  */
-void SetOpticalFlow::nextContainer(odcore::data::Container &)
+void SetOpticalFlow::nextContainer(odcore::data::Container &a_container)
 {
+  if (a_container.getDataType() == opendlv::model::DynamicState::ID()) {
+      opendlv::model::DynamicState dynamicState = a_container.getData<opendlv::model::DynamicState>();
+      opendlv::model::Cartesian3 velocity = dynamicState.getVelocity();
+      float speed = std::sqrt((velocity.getX() * velocity.getX()) +(velocity.getY()*velocity.getY()));
+      float speedCorrection;
+      float speedTolerance = 5.0f / 3.6f;
+
+      if (speed > m_maxSpeed) {
+        if (speed < m_maxSpeed + speedTolerance) {
+          float speedDiff = speed -m_maxSpeed;
+          speedCorrection = -10 * speedDiff/speedTolerance;
+
+        }
+        else {
+        speedCorrection = -10; //TODO: set parameter somewhere
+        }
+      
+      }
+      else {
+        speedCorrection = 0;
+      }
+        
+      odcore::data::TimeStamp t0;
+      opendlv::action::Correction correction1(t0, "acceleration", false, speedCorrection);
+      odcore::data::Container container(correction1);
+      getConference().send(container);
+    
+
+
+
+  }
+
+
+
+
+
 /*  if(c.getDataType() == opendlv::perception::DesiredOpticalFlow::ID()) {
     auto desiredOpticalFlow = 
         c.getData<opendlv::perception::DesiredOpticalFlow>();
@@ -69,7 +105,7 @@ void SetOpticalFlow::nextContainer(odcore::data::Container &)
   
     // TODO: Quick way.
     float error = (m_desiredOpticalFlow - flow) / m_desiredOpticalFlow;
- */
+ 
  //   if (std::abs(error) > 0.01f) {
       float amplitude = 3.0f;
       odcore::data::TimeStamp t0;
@@ -79,10 +115,13 @@ void SetOpticalFlow::nextContainer(odcore::data::Container &)
       getConference().send(container);
  //   } 
 //  }
+      */
 }
 
 void SetOpticalFlow::setUp()
 {
+  odcore::base::KeyValueConfiguration kv1 = getKeyValueConfiguration();
+  std::string m_maxSpeed = kv1.getValue<std::string>("action-setopticalflow.max_speed");
 }
 
 void SetOpticalFlow::tearDown()

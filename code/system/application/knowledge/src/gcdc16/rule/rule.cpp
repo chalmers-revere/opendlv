@@ -136,7 +136,9 @@ void Rule::nextContainer(odcore::data::Container &a_container)
       //TODO: use rsuEvent -> merging should commence
 
 
-    } else if (a_container.getDataType() == opendlv::perception::Object::ID()) {
+    } 
+
+    /*else if (a_container.getDataType() == opendlv::perception::Object::ID()) {
     opendlv::perception::Object unpackedObject =
     a_container.getData<opendlv::perception::Object>();
 
@@ -162,7 +164,7 @@ void Rule::nextContainer(odcore::data::Container &a_container)
     opendlv::sensation::DesiredDirectionOfMovement desiredDirection(objectDirection);
     odcore::data::Container objectContainer(desiredDirection);
     getConference().send(objectContainer);
-    }
+    }*/
   }
 }
 

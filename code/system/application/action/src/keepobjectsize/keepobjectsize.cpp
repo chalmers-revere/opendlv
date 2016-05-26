@@ -25,7 +25,7 @@
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
 
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
+
 
 #include "keepobjectsize/keepobjectsize.hpp"
 
@@ -57,7 +57,7 @@ KeepObjectSize::~KeepObjectSize()
  * current size, and desired size.
  * Sends speed correction commands (throttle) to Act.
  */
-void KeepObjectSize::nextContainer(odcore::data::Container &)
+void KeepObjectSize::nextContainer(odcore::data::Container &a_container)
 {
   if(a_container.getDataType() == opendlv::perception::Object::ID()) {
   opendlv::perception::Object unpackedObject =
@@ -76,38 +76,28 @@ void KeepObjectSize::nextContainer(odcore::data::Container &)
       } else {
         if (unpackedObject.getDistance() < m_object->getDistance())
           m_object.reset(new opendlv::perception::Object(unpackedObject));
+      }    
+
+      m_angularSize = unpackedObject.getAngularSize();
+
+      if (m_angularSize < 0.070f) {
+
+        float angularSizeRatio = 0.075f / m_angularSize;
+        float speedCorrection = angularSizeRatio - 1;
       }
-    }
-
-    m_angularSize = unpackedObject.getAngularSize();
-
-    if (m_angularSize < 0.075f) {
-
-    float angularSizeRatio = -(m_angularSize - 0.075f) / 0.075f;
-
-    float speedCorrection = (angularSizeRatio * 10); //TODO: Fix gain parameter in config!
-
-    std::cout << "speedCorrection: " << speedCorrection << std::endl << std::endl;
-
-    odcore::data::TimeStamp t0;
-    opendlv::action::Correction correction1(t0, "acceleration", false, speedCorrection);
-    odcore::data::Container container(correction1);
-    getConference().send(container);
-
-    }
-
-    if (m_angularSize > 0.075f) {
-
-    float angularSizeRatio = -(m_angularSize - 0.075f) / 0.075f;
-
-    float speedCorrection = (angularSizeRatio * 10); //TODO: Fix gain parameter in config!;
-    std::cout << "speedCorrection: " << speedCorrection << std::endl << std::endl;
-
-    odcore::data::TimeStamp t0;
-    opendlv::action::Correction correction2(t0, "acceleration", false, speedCorrection);
-    odcore::data::Container container(correction2);
-    getConference().send(container);
-
+      else if (m_angularSize > 0.080f) {
+        float angularSizeRatio = 0.075f / m_angularSize;
+        float speedCorrection = -angularSizeRatio*2 + 1; 
+      }
+      else {
+        speedCorrection = 0;
+      }
+      
+      std::cout << "speedCorrection: " << speedCorrection << std::endl << std::endl;
+      odcore::data::TimeStamp t0;
+      opendlv::action::Correction correction1(t0, "acceleration", false, speedCorrection);
+      odcore::data::Container container(correction1);
+      getConference().send(container);
     }
   }
 }
