@@ -45,8 +45,8 @@ LidarStringDecoder::LidarStringDecoder(odcore::io::conference::ContainerConferen
     , m_settingsDone(false)
     , m_counter(0)
     , m_bufferSize(44)
-    , m_directions()
-    , m_radii()
+    //, m_directions()
+    //, m_radii()
     , m_latestReading()
 {
   m_position[0] = a_x;
@@ -185,13 +185,19 @@ void LidarStringDecoder::ConvertToDistances()
   double cartesian[2];
   double PI = 3.14159265;
 
-  m_directions.clear();
-  m_radii.clear();
+  std::vector<opendlv::model::Direction> directions; // m_directions.clear();
+  std::vector<double> radii; // m_radii.clear();
 
   for(uint32_t i = 0; i < 361; i++) {
     byte1 = (int)m_measurements[i*2];
     byte2 = (int)m_measurements[i*2+1];
-    distance = byte1 + (byte2%32)*256; //Integer centimeters in local polar coordinates
+
+    if(i < 361) {
+      distance = byte1 + (byte2%32)*256; //Integer centimeters in local polar coordinates
+    }
+    else {
+      distance = byte2 + (byte1%32)*256; //Integer centimeters in local polar coordinates
+    }
 
     if(distance < 7500) { //We don't send max range responses
       cartesian[0] = distance * sin(PI * i /360.0) / 100.0; //Local cartesian coordinates in meters (rotated coordinate system)
@@ -203,16 +209,19 @@ void LidarStringDecoder::ConvertToDistances()
       double radius = std::sqrt(pow(cartesian[0],2) + std::pow(cartesian[1],2));
       float angle = static_cast<float>(std::atan2(cartesian[1],cartesian[0]));
       opendlv::model::Direction direction(angle,0);
-      m_directions.push_back(direction);
-      m_radii.push_back(radius);
+      directions.push_back(direction);
+      radii.push_back(radius);
     }
   }
 
  // std::lock_guard<std::mutex> guard(g_readingMutex);
 
-  m_latestReading.setListOfDirections(m_directions);
-  m_latestReading.setListOfRadii(m_radii);
-  m_latestReading.setNumberOfPoints(m_radii.size());
+  //std::cout << "radius: " << radii[0];
+
+  m_latestReading.setListOfDirections(directions);
+  m_latestReading.setListOfRadii(radii);
+  m_latestReading.setNumberOfPoints(radii.size());
+  //std::cout << " in latestreading: " << m_latestReading.getListOfRadii()[0] << std::endl;
 }
 
 void LidarStringDecoder::nextString(std::string const &a_string) 
@@ -259,7 +268,9 @@ void LidarStringDecoder::nextString(std::string const &a_string)
         std::cout << "Configuration done, output started" << std::endl;
       }
       else {
+        std::cout << "ConvertToDistances" << std::endl;
         ConvertToDistances();
+        m_counter = 0;
       }
     }
 
