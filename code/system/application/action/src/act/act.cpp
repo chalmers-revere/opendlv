@@ -112,7 +112,7 @@ void Act::nextContainer(odcore::data::Container &a_container)
 */
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
 {
-  int freq = getFrequency();
+  float freq = static_cast<float>(getFrequency());
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
     odcore::data::dmcp::ModuleStateMessage::RUNNING) {
