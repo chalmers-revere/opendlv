@@ -166,7 +166,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
     odcore::data::Container c(nextMessage);
     getConference().send(c);
 
-    m_sendLog << std::to_string(GenerateGenerationTime()) +
+    m_sendLog << std::setprecision(15) << std::to_string(GenerateGenerationTime()) +
         + "," + std::to_string(GetMessageId()) +
         + "," + std::to_string(GetStationId()) +
         + "," + std::to_string(GenerateGenerationDeltaTime()) +
@@ -372,7 +372,7 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
     output += "Vehicle role: " + std::to_string(vehicleRole) + "\n";
     // std::cout << output;
 
-    m_receiveLog << std::to_string(GenerateGenerationTime()) +  
+    m_receiveLog <<  std::setprecision(15) << std::to_string(GenerateGenerationTime()) +  
         + "+" + std::to_string(messageId) +
         + "," + std::to_string(stationId) +
         + "," + std::to_string(generationDeltaTime) +
@@ -512,11 +512,11 @@ int32_t V2vCam::GetStationId() const
   return m_stationId;
 }
 
-uint32_t V2vCam::GenerateGenerationTime() const
+uint64_t V2vCam::GenerateGenerationTime() const
 {
   std::chrono::system_clock::time_point start2004TimePoint = 
       std::chrono::system_clock::from_time_t(m_timeType2004);
-  uint32_t millisecondsSince2004Epoch =
+  uint64_t millisecondsSince2004Epoch =
       std::chrono::system_clock::now().time_since_epoch() /
       std::chrono::milliseconds(1) 
       - start2004TimePoint.time_since_epoch() / std::chrono::milliseconds(1);
@@ -733,6 +733,7 @@ int32_t V2vCam::GetLongitudinalAcc() const
 {
   int32_t scale = std::pow(10,1);
   double val = m_longitudinalAcc*scale;
+  std::cout << val << std::endl;
   if(m_longitudinalAccConf < 0){
     return 161;
   }

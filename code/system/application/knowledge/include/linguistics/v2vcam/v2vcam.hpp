@@ -60,7 +60,7 @@ class V2vCam
 
   unsigned char GetMessageId() const;
   int32_t GetStationId() const;
-  uint32_t GenerateGenerationTime() const;
+  uint64_t GenerateGenerationTime() const;
   int32_t GenerateGenerationDeltaTime();
   unsigned char GetContainerMask() const;
   int32_t GetStationType() const;
