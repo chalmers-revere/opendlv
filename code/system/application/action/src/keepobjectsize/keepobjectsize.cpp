@@ -41,7 +41,10 @@ namespace keepobjectsize {
   */
 KeepObjectSize::KeepObjectSize(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(
-      a_argc, a_argv, "action-keepobjectsize")
+      a_argc, a_argv, "action-keepobjectsize"),
+      m_object(),
+      m_desiredAzimuth(0.0f),
+      m_angularSize(0.0f)
 {
 }
 
@@ -56,6 +59,80 @@ KeepObjectSize::~KeepObjectSize()
  */
 void KeepObjectSize::nextContainer(odcore::data::Container &)
 {
+  if(a_container.getDataType() == opendlv::perception::Object::ID()) {
+  opendlv::perception::Object unpackedObject =
+  a_container.getData<opendlv::perception::Object>();
+
+  int16_t identity = unpackedObject.getObjectId();
+
+  if (identity != -1) {
+
+    opendlv::model::Direction direction = unpackedObject.getDirection();
+    float azimuth = direction.getAzimuth();
+
+    if (std::abs(azimuth) < 0.22f) {
+      if (m_object == nullptr) {
+        m_object.reset(new opendlv::perception::Object(unpackedObject));
+      } else {
+        if (unpackedObject.getDistance() < m_object->getDistance())
+          m_object.reset(new opendlv::perception::Object(unpackedObject));
+      }
+    }
+
+    m_angularSize = unpackedObject.getAngularSize();
+
+    if (m_angularSize > 0.075f) {
+
+    odcore::data::TimeStamp t0;
+    opendlv::action::Correction correction(t0, "steering", false, steeringAmplitude);
+    odcore::data::Container container(correction);
+    getConference().send(container);
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    m_desiredAzimuth = m_object->getDirection().getAzimuth();
+
+
+    opendlv::model::Direction objectDirection(m_desiredAzimuth, 0.0f);
+    opendlv::sensation::DesiredDirectionOfMovement desiredDirection(objectDirection);
+    odcore::data::Container objectContainer(desiredDirection);
+    getConference().send(objectContainer);
+
+
+
+
+
+
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   /*
   if(c.getDataType() == opendlv::perception::LeadVehicleSize::ID()){
     opendlv::perception::LeadVehicleSize leadVehicleSize = 
