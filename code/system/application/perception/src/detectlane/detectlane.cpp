@@ -65,6 +65,7 @@ DetectLane::DetectLane(int32_t const &a_argc, char **a_argv)
     m_midRegion(),
     m_threshold(180),
     m_houghThreshold(100),
+    m_cannyThresholdTrue(1),
     m_standardLaneWidth(3.75),
     m_initialized(false),
     m_regions(),
@@ -88,7 +89,8 @@ DetectLane::DetectLane(int32_t const &a_argc, char **a_argv)
     m_transformationMatrix(),
     m_leftTransformationMatrix(),
     m_rightTransformationMatrix(),
-    m_scale()
+    m_scale(),
+    m_sourceName()
 
 {
 }
@@ -113,11 +115,21 @@ void DetectLane::nextContainer(odcore::data::Container &c)
 //      " sent at " <<   c.getSentTimeStamp().getYYYYMMDD_HHMMSSms() << 
 //      " received at " << c.getReceivedTimeStamp().getYYYYMMDD_HHMMSSms() << 
 //      std::endl;
-  
+    
   if(m_setup == true)
   {
     odcore::data::image::SharedImage mySharedImg = 
         c.getData<odcore::data::image::SharedImage>();
+
+
+    std::string cameraName = mySharedImg.getName();
+    //std::cout << "Received image from camera " << cameraName  << "!" << std::endl;
+
+    if (m_sourceName.compare(cameraName) != 0) {
+      // Received image from a source that this instance should not care about
+      //std::cout << "Received image came from wrong source. Expected " << m_sourceName << std::endl;
+      return;
+    }
 
     std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(
           odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(
@@ -147,281 +159,286 @@ void DetectLane::nextContainer(odcore::data::Container &c)
     }
     sharedMem->unlock();
     
-    cv::resize(src,src,cv::Size(m_outputWidth,m_outputHeight));
-
-    if(true){
-      cv::inRange(src, cv::Scalar(m_threshold, m_threshold, m_threshold), cv::Scalar(255, 255, 255), src);
-    } else {
-      cv::Canny(src,src,100,150,3);
+    m_initialized = false;
+    if(mySharedImg.getName() == "front-left"){
+      m_transformationMatrix = m_leftTransformationMatrix;
+      m_leftIpm->ApplyHomography(src,src);
+      m_initialized = true;
+    } else if(mySharedImg.getName() == "front-right"){
+      m_transformationMatrix = m_rightTransformationMatrix;
+      m_rightIpm->ApplyHomography(src,src);
+      m_initialized = true;
     }
-    
+
+    if(!m_initialized){
+      cvReleaseImage(&myIplImage);
+      return;
+    }
+
+    if(m_cannyThresholdTrue == 1){
+      Canny(src,src,m_threshold,3*m_threshold,3);
+      //medianBlur(src,src,3);
+    }
+    else
+    {
+      cv::inRange(src, cv::Scalar(m_threshold, m_threshold, m_threshold), cv::Scalar(255, 255, 255), src);
+    }
+
     // Make output image into a 3 channel BGR image
     cvtColor( src, color_dst, CV_GRAY2BGR );
     
-        
-    // From this point implement lane detection algorithm
-  
     // Vector holder for each line (rho,theta)
     vector<Vec2f> lines;
+  
+    // OpenCV function that uses the Hough transform and finds the "strongest" lines in the transformation
     
     //TODO: It is possible to filter out lines with certain theta angles. Thus we know that our lane will
     //      consist of lines that will probably look like: // | \\ but not ---
-    HoughLines( src, lines, 1, CV_PI/180, m_houghThreshold );
-  
-    // Print how many lines were found  
-    //TODO: With this parameter we can specify how many groups of lines we want. When we run the grouping 
-    //      algorithm and if we get more groups than maxGroups we should remove the group with the least
-    //      number of lines?
-   
+    cv::HoughLines( src, lines, 1, CV_PI/180, m_houghThreshold );
+
     // Holder for the mean (rho,theta) for each group
     vector<Vec2f> groups;
     if(lines.size() != 0){
-      GetGrouping(groups,lines);
-    }
-    // Draw all of the lines found in red
-    for( size_t i = 0; i < groups.size(); i++ )
-    {
-      float rho = lines[i][0];
-      float theta = lines[i][1];
-      
-      float a = cos(theta), b = sin(theta);
-      float x0 = a*rho, y0 = b*rho;
-      Point pt1(cvRound(x0 + 1000*(-b)),
-                cvRound(y0 + 1000*(a)));
-      Point pt2(cvRound(x0 - 1000*(-b)),
-                cvRound(y0 - 1000*(a)));
-      line( color_dst, pt1, pt2, Scalar(0,0,255), 3, 8 );
-    }
 
-    // Use the mean of each group to draw a single line.
-    std::cout<<"Group size " << groups.size() << std::endl;
-
-    for(size_t i = 0; i <  groups.size();i++)
-    {
-      std::cout<<"Group rho " << groups[i][0]  << "theta " << groups[i][1]<<std::endl;
-      float rho = groups[i][0];
-      float theta = groups[i][1];
-      float thetaDeg = theta * 180.0f / 3.14f;
-      if((thetaDeg < 30  && thetaDeg > -30) || (thetaDeg > (-30+90) && thetaDeg > 30+90))
+      // Draw all of the lines found in red
+      for( size_t i = 0; i < lines.size(); i++ )
       {
-        std::cout<<"Theta " << thetaDeg << " i : " << i << std::endl;
-      float a = cos(theta), b = sin(theta);
-      float x0 = a*rho, y0 = b*rho;
-      Point pt1(cvRound(x0 + 1000*(-b)),
-                cvRound(y0 + 1000*(a)));
-      Point pt2(cvRound(x0 - 1000*(-b)),
-                cvRound(y0 - 1000*(a)));
-      line( color_dst, pt1, pt2, Scalar(0,255,0), 3, 8 );
-    }
-  
-    }
-    // Display results
-    char key = waitKey(1);
-    if(key == 'w')
-      m_threshold +=10;
-    else if(key == 's')
-      m_threshold -=10;
-    else if(key == 'i')
-      m_houghThreshold +=10;
-    else if(key == 'k')
-      m_houghThreshold = std::max(m_houghThreshold-10,10);
+        float rho = lines[i][0];
+        float theta = lines[i][1];
+      
+      
+        float a = cos(theta), b = sin(theta);
+        float x0 = a*rho, y0 = b*rho;
+        Point pt1(cvRound(x0 + 1000*(-b)),
+                  cvRound(y0 + 1000*(a)));
+        Point pt2(cvRound(x0 - 1000*(-b)),
+                  cvRound(y0 - 1000*(a)));
+        line( color_dst, pt1, pt2, Scalar(0,0,255), 3, 8 );
+      }
 
+
+
+
+      GetGrouping(groups,lines);   
+
+      std::cout<<"Group size " << groups.size()<<std::endl;
+      // Get parametric line representation
+      std::vector<cv::Vec2f> p, m;
+
+      GetParametricRepresentation(p,m,groups);    
     
-    //-----------------------------
-    // Show image
-    //-----------------------------
-    namedWindow( "Source", 1 );
-    imshow( "Source", src );
+      // Get points on lines
+      std::vector<cv::Vec2f> xPoints,yPoints;
+      std::vector<cv::Vec2f> X, Y;
+      float row1 = 100, row2 = 480;
+      GetPointsOnLine(xPoints,yPoints,X,Y,p,m,row1,row2);
+    
+      // Pair up lines to form a surface
+      std::vector<cv::Vec2i> groupIds;
+      GetLinePairs(xPoints,yPoints,groupIds);
 
-    namedWindow( "Detected Lines", 1 );
-    imshow( "Detected Lines", color_dst );
 
-    waitKey(1);
+      int leftLane =  groupIds[0][0];
+      int rightLane = groupIds[0][1];
+
+      std::cout << "Leftlane\n" << X[leftLane][1] << " " << Y[leftLane][1]<<std::endl;
+      std::cout<< X[leftLane][0] << " " << Y[leftLane][0] << std::endl;
+      std::cout << "Rightlane\n" << X[rightLane][1] << " " << Y[rightLane][1]<<std::endl;
+      std::cout << X[rightLane][0] << " " << Y[rightLane][0]<<std::endl;
+      cv::Mat tmp;
+      color_dst.copyTo(tmp);
+
+      for(uint i = 0; i < groups.size(); i++){
+
+        float rho = groups[i][0];
+        float theta = groups[i][1];
+      
+      
+        float a = cos(theta), b = sin(theta);
+        float x0 = a*rho, y0 = b*rho;
+        Point pt1(cvRound(x0 + 1000*(-b)),
+                  cvRound(y0 + 1000*(a)));
+        Point pt2(cvRound(x0 - 1000*(-b)),
+                  cvRound(y0 - 1000*(a)));
+        line( tmp, pt1, pt2, Scalar(0,255,0), 3, 8 );
+
+
+      }
+
+      for(uint i = 0; i < groupIds.size(); i++){
+    
+        Point p1(xPoints[groupIds[i][0]][1],yPoints[groupIds[i][0]][1]);
+        Point p2(xPoints[groupIds[i][1]][1],yPoints[groupIds[i][1]][1]);
+        Point p3(xPoints[groupIds[i][1]][0],yPoints[groupIds[i][1]][0]);
+        Point p4(xPoints[groupIds[i][0]][0],yPoints[groupIds[i][0]][0]);
+                
+        line( tmp, p1, p2, Scalar(255,0,255), 3, 8 );
+        line( tmp, p2, p3, Scalar(255,0,255), 3, 8 );
+        line( tmp, p3, p4, Scalar(255,0,255), 3, 8 );
+        line( tmp, p4, p1, Scalar(255,0,255), 3, 8 );
+    
+        //waitKey(0);
+
+        
+
+        odcore::data::TimeStamp imageTimeStamp = c.getSentTimeStamp();
+        std::string type = "surface";
+        float typeConfidence = 1;
+
+        std::vector<opendlv::model::Cartesian3> edges;
+
+        float xBotLeft = X[groupIds[i][0]][1];
+        float xBotRight = X[groupIds[i][1]][1];
+        float xTopRight = X[groupIds[i][1]][0];
+        float xTopLeft = X[groupIds[i][0]][0];
+
+        float yBotLeft = Y[groupIds[i][0]][1];
+        float yBotRight = Y[groupIds[i][1]][1];
+        float yTopRight = Y[groupIds[i][1]][0];
+        float yTopLeft = Y[groupIds[i][0]][0];
+
+        edges.push_back(opendlv::model::Cartesian3(xBotLeft,yBotLeft,1));
+        edges.push_back(opendlv::model::Cartesian3(xBotRight,yBotRight,1));
+        edges.push_back(opendlv::model::Cartesian3(xTopRight,yTopRight,1));
+        edges.push_back(opendlv::model::Cartesian3(xTopLeft,yTopLeft,1));
+
+        float edgesConfidence = 1;
+
+        bool traversable = true;
+        float confidence = 1;
+        std::vector<std::string> sources;
+        sources.push_back(mySharedImg.getName());
+
+        std::vector<std::string> properties;
+
+        int16_t surfaceId = i;
+
+        std::vector<int16_t> connectedWidth;
+        std::vector<int16_t> traversableTo;
+
+        opendlv::perception::Surface detectedSurface(imageTimeStamp,
+            type,
+            typeConfidence,
+            edges,
+            edgesConfidence,
+            traversable,
+            confidence,
+            sources,
+            properties,
+            surfaceId,
+            connectedWidth,
+            traversableTo);
+
+
+        odcore::data::Container objectContainer(detectedSurface);
+        getConference().send(objectContainer);
+
+      
+      }
+      namedWindow( "Tmp", 3 );
+      imshow("Tmp",tmp);
+    
+    }
+
+
+    char key = cv::waitKey(1);
+    if( key == 'w')
+      m_threshold += 10;
+    else if( key == 's')
+      m_threshold = std::max(10,m_threshold-10);
+    else if( key == 'p')
+      m_cannyThresholdTrue *= -1;
+    else if( key == 'i')
+      m_houghThreshold += 10;
+    else if( key == 'k')
+      m_houghThreshold = std::max(10,m_houghThreshold-10);
+
     cvReleaseImage(&myIplImage);
 
 
-    /*
-    for(size_t i = 0; i <  groups.size();i++)
-    {
-      std::cout<<"Group rho " << groups[i][0]  << "theta " << groups[i][1]<<std::endl;
-      float rho = groups[i][0];
-      float theta = groups[i][1];
-      float thetaDeg = theta * 180.0 / 3.14;
-      if((thetaDeg < 30  && thetaDeg > -30) || (thetaDeg > (-30+90) && thetaDeg > 30+90))
-      {
-        std::cout<<"Theta " << thetaDeg << " i : " << i << std::endl;
-      double a = cos(theta), b = sin(theta);
-      double x0 = a*rho, y0 = b*rho;
-      Point pt1(cvRound(x0 + 1000*(-b)),
-                cvRound(y0 + 1000*(a)));
-      Point pt2(cvRound(x0 - 1000*(-b)),
-                cvRound(y0 - 1000*(a)));
-      line( color_dst, pt1, pt2, Scalar(0,255,0), 3, 8 );
-    }
-    */
-    //-----------------------------
-    // Definitions for the video choice
-    //-----------------------------
-
-    // m_initialized = false;
-    // cv::resize(src,src,cv::Size(m_outputWidth,m_outputHeight));
-    // if(mySharedImg.getName() == "front-left"){
-      /* OLD CODE 
-      m_leftIpm->ApplyHomography(src,src);
-
-      m_regions = m_leftCameraRegions;
-      m_lines = m_leftLines;
-      m_transformationMatrix = m_leftTransformationMatrix;
-      m_initialized = true;
-      */
-
-      // New code
-      // m_regions = m_leftCameraRegions;
-      // m_lines = m_leftLines;
-      // m_transformationMatrix = m_leftTransformationMatrix;
-    //    m_initialized = true;
-    // }
-    // if(mySharedImg.getName() == "front-right"){
-      /* OLD CODE
-      m_rightIpm->ApplyHomography(src,src);
-
-      m_regions = m_rightCameraRegions;
-      m_lines = m_rightLines;
-      m_transformationMatrix = m_rightTransformationMatrix;
-      m_initialized = true;
-      //*/
-
-      // New code
-      // m_regions = m_rightCameraRegions;
-      // m_lines = m_rightLines;
-      // m_transformationMatrix = m_rightTransformationMatrix;
-    //    m_initialized = true;
-    // }
-    
-    // imshow("1", src);
-    // cv::waitKey(1);
-    
-    /*
-    if(!m_initialized){
-      return;
-    }
-    // Holds the k and m values for the region lines
-    m_k = m_lines.col(0);
-    m_m = m_lines.col(1);
-    
-    //-----------------------------
-    // Choose processing type
-    //-----------------------------
-    cv::inRange(src, cv::Scalar(m_threshold, m_threshold, m_threshold),
-        cv::Scalar(255, 255, 255), image);
-    medianBlur(image, image, 3);
-
      
-    //-----------------------------
-    // Local line search
-    //-----------------------------
-
-    ScanImage(&image, &m_lines, &m_recoveredPoints, m_nPoints, m_minRow, 
-        m_maxRow);
-
-
-    //-----------------------------
-    // Extract lines from points
-    //-----------------------------
-    ExtractLines(&m_recoveredPoints, &m_K, &m_M, m_nRegions, m_nPoints,
-        &m_pointsPerRegion);
-
-    m_laneLocation2 = Eigen::VectorXd::Zero(m_nRegions, 1);
-    
-    //-----------------------------
-    // Make decision based on lines
-    //-----------------------------
-    SelectLanesV2(m_pointsPerRegion, m_laneLocation2);
-    
-    if (fabs(m_pointsPerRegion.sum()) > 0.0001){
-      
-      SelectLaneOrientation(m_regionIndex,m_laneLocation2,
-          (int)m_recoveredPoints.cols());
-      int p1 = m_regionIndex(0,0);
-      int p2 = m_regionIndex(1,0);
-      
-      if(p1==p2){
-        return;
-      }
-      //-----------------------------
-      // Draw boarders/lines - VISUALIZATION
-      //-----------------------------
-      DrawBorders(&src,m_minRow, m_maxRow, m_K(p1,0), m_K(p2,0), m_M(p1,0),
-          m_M(p2,0));
-      //DrawTracks(&src, &K, &M,MINROW,MAXROW,Scalar(0,0,255));
-      DrawTracks(&src, &m_k, &m_m, m_minRow, Scalar(255,255,255));
-      
-      //-----------------------------
-      // Calculate lane offset
-      //-----------------------------
-
-      double laneOffset = GetLateralPosition(m_K(p1,0), m_M(p1,0),
-          m_K(p2,0), m_M(p2,0),
-          m_lines.col(0)(m_midRegion),
-          m_lines.col(1)(m_midRegion),
-          (m_minRow));
-
-
-      //-----------------------------
-      // Approximate heading angle
-      //-----------------------------
-      double d1 = GetLateralPosition(m_K(p1,0) ,m_M(p1,0),
-          m_K(p2,0), m_M(p2,0),
-          m_lines.col(0)(m_midRegion),
-          m_lines.col(1)(m_midRegion),
-          (m_maxRow));
-      double d2 = GetLateralPosition(m_K(p1,0) ,m_M(p1,0),
-          m_K(p2,0),m_M(p2,0),
-          m_lines.col(0)(m_midRegion),m_lines.col(1)(m_midRegion),
-          (m_minRow));
-      // Factor 4 is assumed length between minRow and Maxrow in real life
-      double theta = atan((d2-d1) / (double)15);
-
-      double newLaneOffset = GetLaneOffset(m_K(p1,0),
-          m_M(p1,0),m_K(p2,0), m_M(p2,0),m_maxRow,p1,p2);
-      double newHeadingAngle = GetHeadingAngle(m_K(p1,0),
-          m_M(p1,0),m_K(p2,0), m_M(p2,0),m_minRow,m_maxRow, p1,p2);
-
-      std::cout << "Offset: " << laneOffset << " Heading: " << theta 
-          << std::endl;
-
-      std::cout << "New offset: " << newLaneOffset << " New heading: "
-          << newHeadingAngle << std::endl << std::endl;
-
-      
-      if(std::isfinite(theta) && std::isfinite(laneOffset)){
-        // Send the message
-
-//      opendlv::perception::LanePosition lanePosition(laneOffset,laneOffset);
-//      odcore::data::Container msg(lanePosition);  
-//      getConference().send(msg);
-
-
-
-  		}
-    }
-    
-    char key = waitKey(1);
-    if(key == 'w')
-      m_threshold +=10;
-    else if(key == 's')
-      m_threshold -=10;
-    
-    //-----------------------------
-    // Show image
-    //-----------------------------
-    
-    imshow("1", src);
-    imshow("2", image);
-    waitKey(1);
-    */
   }
 }
+
+void DetectLane::GetLinePairs(std::vector<cv::Vec2f> &xPoints,std::vector<cv::Vec2f> &,std::vector<cv::Vec2i> &groupIds)
+{
+  for(uint i = 0; i <xPoints.size()-1; i++)
+  {
+    for(uint j= i+1; j < xPoints.size(); j++)
+    {
+      float leftId, rightId;
+      if(xPoints[i][1] < xPoints[j][1])
+        leftId = i, rightId = j;
+      else
+        leftId = j, rightId = i;
+      
+      // float xDiff1 = xPoints[rightId][0] - xPoints[leftId][0];
+      // float xDiff2 = xPoints[rightId][1] - xPoints[leftId][1];
+      // Lane width has to be  2 < w < 5 to be valid
+      //if( xDiff1 > 0 && xDiff1 < 10 && xDiff2 > 0 && xDiff2 < 10){
+          groupIds.push_back(cv::Vec2f(leftId,rightId));
+      //}
+    }
+  }
+}
+
+
+void DetectLane::GetParametricRepresentation(std::vector<cv::Vec2f> &p,std::vector<cv::Vec2f> &m,std::vector<cv::Vec2f> &groups)
+{
+  for(uint i = 0; i < groups.size(); i++){
+    float rho = groups[i][0];
+    float theta = groups[i][1];
+    
+    float heading = -((float)CV_PI / 2.0f - theta);
+    float a = cos(theta), b = sin(theta);
+    float x0 = a*rho, y0 = b*rho;
+    
+    p.push_back(cv::Vec2f(cos(heading),sin(heading)));
+    m.push_back(cv::Vec2f(x0,y0));
+
+  }
+  
+}
+
+void DetectLane::GetPointsOnLine(std::vector<cv::Vec2f> &xPoints,std::vector<cv::Vec2f> &yPoints,
+    std::vector<cv::Vec2f> &X, std::vector<cv::Vec2f> &Y,
+    std::vector<cv::Vec2f> &p,std::vector<cv::Vec2f> &m,float row1, float row2)
+{
+  for (uint i = 0; i < p.size(); i++)
+  {
+  
+    // y1 = t * sin(heading) + y0
+    // -> t = y1 - y0 / (sin(heading))
+    // x1 = t * cos(heading) + x0
+    
+    float t1,t2;
+    if(fabs(p[i][1]) > 0.000001f){
+      t1 = ( row1 - m[i][1]) / sin(p[i][1]);
+      t2 = ( row2 - m[i][1]) / sin(p[i][1]);
+    }
+    else {
+      t1 = 0;
+      t2 = 0;
+    }
+    Eigen::Vector3d point1, point2;
+    
+    float x1 = (t1 * p[i][0] + m[i][0]); 
+    point1 << x1, row1, 1;
+    TransformPointToGlobalFrame(point1);
+
+    float x2 = (t2 * p[i][0] + m[i][0]); 
+    point2 << x2, row2, 1;
+    TransformPointToGlobalFrame(point2);
+
+    X.push_back(cv::Vec2f(point1(0),point2(0)));
+    Y.push_back(cv::Vec2f(point1(1),point2(1)));
+
+    xPoints.push_back(cv::Vec2f(x1,x2));
+    yPoints.push_back(cv::Vec2f(row1,row2));
+    
+  }
+}
+
 
 void DetectLane::ReadWarpPointsMatrix(std::vector<cv::Point2f> & a_points,std::string a_fileName)
 {
@@ -478,6 +495,9 @@ void DetectLane::setUp()
 
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
+  m_sourceName = kv.getValue<std::string>("perception-detectlane.source");
+  std::cout << "This DetectLane instance will receive images from " << m_sourceName << "." << std::endl;
+
   std::string inputSizeString = kv.getValue<std::string>("perception-detectlane.inputSize");
   ReadInputWindowSize(inputSizeString);
 
@@ -488,10 +508,13 @@ void DetectLane::setUp()
 
   std::vector<cv::Point2f> leftRegionPoints(4);
   ReadWarpPointsMatrix(leftRegionPoints,"./share/opendlv/tools/vision/projection/leftCameraWarpPoints.csv");
-
+  std::cout<<"Left region warp points\n";
+  std::cout<<leftRegionPoints<<std::endl;
   std::vector<cv::Point2f> rightRegionPoints(4);
   ReadWarpPointsMatrix(rightRegionPoints, "./share/opendlv/tools/vision/projection/rightCameraWarpPoints.csv");
 
+  std::cout<<"Right region warp points\n";
+  std::cout<<rightRegionPoints<<std::endl;
   std::vector<cv::Point2f> outputPoints;
   cv::Size inputSize(m_width,m_height);
   cv::Size outputSize(m_outputWidth, m_outputHeight);
@@ -612,11 +635,11 @@ void DetectLane::setUp()
 
   // NEW CODE
   m_leftTransformationMatrix = ReadMatrix(
-          "/opt/opendlv/share/opendlv/tools/vision/projection/leftCameraTransformationMatrix.csv",3,3);
+          "/opt/opendlv/share/opendlv/tools/vision/projection/leftCameraTransformationMatrixWarped.csv",3,3);
   std::cout<<m_leftTransformationMatrix;
   std::cout<<"\n------\n----\n---\n";
   m_rightTransformationMatrix = ReadMatrix(
-          "/opt/opendlv/share/opendlv/tools/vision/projection/rightCameraTransformationMatrix.csv",3,3);
+          "/opt/opendlv/share/opendlv/tools/vision/projection/rightCameraTransformationMatrixWarped.csv",3,3);
   // --------------------------------
 
   m_scale << m_width / (double)m_outputWidth, m_height / (double)m_outputHeight, 1;
@@ -799,7 +822,6 @@ void DetectLane::GetGrouping(std::vector<cv::Vec2f> &groups, std::vector<cv::Vec
   group.at(0).push_back(lines.at(0));
   groupMean.push_back(group.at(0).at(0));
   groupSum.push_back(group.at(0).at(0));
-  cout<<groupMean[0][0]<<" " << groupMean[0][1]<<endl;
   
   double radius = 100;
   

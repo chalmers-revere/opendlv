@@ -45,6 +45,14 @@ odsupercomponent.pulsetimeack.exclude = odcockpit
 action-setopticalrotation.gain_heading = 1.5
 action-setopticalrotation.heading_tolerance = 0.05
 
+knowledge-gcdc16-rule:0.mio_1 = 0
+knowledge-gcdc16-rule:0.mio_2 = 0
+knowledge-gcdc16-rule:0.backward_id = 0
+knowledge-gcdc16-rule:0.initial_lane = 4
+knowledge-gcdc16-rule:0.is_tail = false
+knowledge-gcdc16-rule:0.platoon_id = 3
+
+
 ###############################################################################
 ###############################################################################
 ### Proxy
@@ -212,19 +220,14 @@ sensation-vision-opticalflow.nAxisPoints = 15
 
 ###############################################################################
 ###############################################################################
-# V2V
-knowledge-linguistics-v2vcam.stationId = 110
-knowledge-linguistics-v2vcam.stationType = 8 #heavy truck
-knowledge-linguistics-v2vcam.vehicleLength = 7.3
-knowledge-linguistics-v2vcam.vehicleWidth = 2.55 
-knowledge-linguistics-v2vcam.vehicleRole = 0
-knowledge-linguistics-v2vcam.rearAxleLocation = 4.30
+# Identity
+knowledge-identity.stationId = 110
+knowledge-identity.stationType = 8 #heavy truck
+knowledge-identity.vehicleLength = 7.3
+knowledge-identity.vehicleWidth = 2.55 
+knowledge-identity.vehicleRole = 0
+knowledge-identity.rearAxleLocation = 4.30
 
-knowledge-linguistics-v2vdenm.stationId = 110
-knowledge-linguistics-v2vdenm.stationType = 8 #heavy truck
-
-knowledge-gcdc16-v2viclcm.stationId = 110
-knowledge-gcdc16-v2viclcm.rearAxleLocation = 4.30
 
 ###############################################################################
 ###############################################################################
@@ -237,6 +240,8 @@ tools-can-simplecansender.devicenode = /dev/pcan1   # PEAK CAN device.
 # Perception
 perception-detectlane.inputSize = 640,480
 perception-detectlane.outputSize = 640,480
+perception-detectlane:0.source = front-left
+perception-detectlane:1.source = front-right
 
 
 perception-detectvehicle:0.source = front-left

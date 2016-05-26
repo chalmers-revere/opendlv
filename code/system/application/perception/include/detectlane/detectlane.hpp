@@ -60,6 +60,11 @@ class DetectLane
   void ReadOutputWindowSize(std::string a_stringStream);
   void GetGrouping(std::vector<cv::Vec2f> &groups,
       std::vector<cv::Vec2f> &lines);
+  void GetParametricRepresentation(std::vector<cv::Vec2f> &p,std::vector<cv::Vec2f> &m,std::vector<cv::Vec2f> &groups);
+  void GetPointsOnLine(std::vector<cv::Vec2f> &xPoints,std::vector<cv::Vec2f> &yPoints,
+    std::vector<cv::Vec2f> &X, std::vector<cv::Vec2f> &Y,
+    std::vector<cv::Vec2f> &p,std::vector<cv::Vec2f> &m,float row1, float row2);
+  void GetLinePairs(std::vector<cv::Vec2f> &xPoints,std::vector<cv::Vec2f> &yPoints,std::vector<cv::Vec2i> &groupIds);
 
 
 
@@ -73,6 +78,7 @@ class DetectLane
   int m_midRegion;
   int m_threshold;
   int m_houghThreshold;
+  int m_cannyThresholdTrue;
   
   double m_standardLaneWidth;  
   bool m_initialized;
@@ -119,6 +125,8 @@ class DetectLane
 
 
   Eigen::Vector3d m_scale;
+  
+  std::string m_sourceName;
 
 
 };
