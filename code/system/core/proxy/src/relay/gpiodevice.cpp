@@ -92,6 +92,15 @@ bool GpioDevice::IsActive(uint16_t const a_index) const
   return value;
 }
 
+void GpioDevice::Reset()
+{
+  uint16_t i = 0;
+  for (bool initialValue : m_initialValues) {
+    SetValue(i, initialValue);
+    i++;
+  }
+}
+
 void GpioDevice::SetValue(uint16_t const a_index, bool const a_value)
 {
   uint16_t pin = m_pins[a_index];

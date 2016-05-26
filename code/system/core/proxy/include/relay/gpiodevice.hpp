@@ -37,6 +37,7 @@ class GpioDevice : public Device {
   GpioDevice &operator=(GpioDevice const &) = delete;
   virtual ~GpioDevice();
   bool IsActive(uint16_t const) const;
+  void Reset();
   void SetValue(uint16_t const, bool const);
 
  private:
