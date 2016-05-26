@@ -25,6 +25,9 @@
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
 
+ 
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
+
 namespace opendlv {
 namespace knowledge {
 namespace identity {
@@ -39,13 +42,13 @@ class Identity
   Identity(Identity const &) = delete;
   Identity &operator=(Identity const &) = delete;
   virtual ~Identity();
-  virtual void nextContainer(odcore::data::Container &);
+  // virtual void nextContainer(odcore::data::Container &);
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
  private:
   void setUp();
   void tearDown();
-  void SendContainer(opendlv::knowledge::Insight const &) const;
+  void SendContainer(opendlv::knowledge::Insight  &);
 
   uint32_t m_stationId;
   uint8_t m_stationType;

@@ -143,7 +143,7 @@ void Scene::nextContainer(odcore::data::Container &a_container)
     */
     bool exists = false;
     opendlv::model::Cartesian3 cross = CrossingPoint(corners);
-    for(uint32_t = i = 0; i < m_savedSurfaces.size(); i++) {
+    for(uint32_t i = 0; i < m_savedSurfaces.size(); i++) {
       if(IsInRektangle(cross, m_savedSurfaces[i].getListOfEdges())) {
         //Merge
         exists = true;
@@ -158,52 +158,52 @@ void Scene::nextContainer(odcore::data::Container &a_container)
   SendStuff();
 }
 
-opendlv::model::Cartesian3 Scene::CrossingPoint(std::vector<opendlv::model::Cartesian3> linePoints)
+opendlv::model::Cartesian3 Scene::CrossingPoint(std::vector<opendlv::model::Cartesian3>)// linePoints)
 {
-  if(linePoints.size() == 4) {
-    float k1 = (linePoints[0].getY() - linePoints[2].getY())/(linePoints[0].getX() - linePoints[2].getX());
-    float k2 = (linePoints[1].getY() - linePoints[3].getY())/(linePoints[1].getX() - linePoints[3].getX());
-    float m1 = linePoints[0].getY() - k1 * linePoints[0].getX();
-    float m2 = linePoints[1].getY() - k2 * linePoints[1].getX();
+  // if(linePoints.size() == 4) {
+  //   float k1 = (linePoints[0].getY() - linePoints[2].getY())/(linePoints[0].getX() - linePoints[2].getX());
+  //   float k2 = (linePoints[1].getY() - linePoints[3].getY())/(linePoints[1].getX() - linePoints[3].getX());
+  //   float m1 = linePoints[0].getY() - k1 * linePoints[0].getX();
+  //   float m2 = linePoints[1].getY() - k2 * linePoints[1].getX();
 
-    if(k1 != k2) {
-      float x = (m2-m1)/(k1-k2);
-      float y = k1 * x + m1;
-      return opendlv::model::Cartesian3(x,y,0.0f);
-    }
-  }
+  //   // if(k1 != k2) {
+  //   //   float x = (m2-m1)/(k1-k2);
+  //   //   float y = k1 * x + m1;
+  //   //   return opendlv::model::Cartesian3(x,y,0.0f);
+  //   // }
+  // }
   return opendlv::model::Cartesian3(-1.0f,-1.0f,-1.0f);
 }
 
-bool Scene::IsInRektangle(opendlv::model::Cartesian3 point, std::vector<opendlv::model::Cartesian3> corners)
+bool Scene::IsInRektangle(opendlv::model::Cartesian3 , std::vector<opendlv::model::Cartesian3> )
 {
-  float x = point.getX();
-  float y = point.getY();
-  float xMin = x;
-  float xMax = x;
-  float yMin = y;
-  float yMax = y;
+  // float x = point.getX();
+  // float y = point.getY();
+  // float xMin = x;
+  // float xMax = x;
+  // float yMin = y;
+  // float yMax = y;
 
-  for(uint32_t = 0; i < 4; i++) {
-    float xTemp = corners[i].getX();
-    float yTemp = corners[i].getY();
-    if(xTemp < xMin) {
-      xMin = xTemp;
-    }
-    if(xTemp > xMax) {
-      xMax = xTemp;
-    }
-    if(yTemp < yMin) {
-      yMin = yTemp;
-    }
-    if(yTemp > yMax) {
-      yMax = yTemp;
-    }
-  }
-  if(x == xMax || x == xMin || y == yMin || y == yMax) {
-    return false;
-  }
-  SendObjects();
+  // for(uint32_t i = 0; i < 4; i++) {
+  //   float xTemp = corners[i].getX();
+  //   float yTemp = corners[i].getY();
+  //   if(xTemp < xMin) {
+  //     xMin = xTemp;
+  //   }
+  //   if(xTemp > xMax) {
+  //     xMax = xTemp;
+  //   }
+  //   if(yTemp < yMin) {
+  //     yMin = yTemp;
+  //   }
+  //   if(yTemp > yMax) {
+  //     yMax = yTemp;
+  //   }
+  // }
+  // if(x == xMax || x == xMin || y == yMin || y == yMax) {
+  //   return false;
+  // }
+  // SendObjects();
   return true;
 }
 

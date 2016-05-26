@@ -27,7 +27,6 @@
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
 
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 #include "identity/identity.hpp"
 
@@ -42,7 +41,7 @@ namespace identity {
   * @param a_argv Command line arguments.
   */
 Identity::Identity(int32_t const &a_argc, char **a_argv)
-    : DataTriggeredConferenceClientModule(a_argc, a_argv, "knowledge-identity"),
+    : TimeTriggeredConferenceClientModule(a_argc, a_argv, "knowledge-identity"),
     m_stationId(),
     m_stationType(),
     m_vehicleLength(),
@@ -60,34 +59,35 @@ Identity::~Identity()
  * Receives .
  * Sends .
  */
-odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vIclcm::body()
+odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Identity::body()
 {  
   
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
       odcore::data::dmcp::ModuleStateMessage::RUNNING){
     odcore::data::TimeStamp now;
-    opendlv::knowledge::Insight stationIdInsight(now,"stationId="+m_stationId);
+    opendlv::knowledge::Insight stationIdInsight(now,"stationId="+std::to_string(m_stationId));
     SendContainer(stationIdInsight);
 
-    opendlv::knowledge::Insight stationTypeInsight(now,"stationType="+m_stationType);
+    opendlv::knowledge::Insight stationTypeInsight(now,"stationType="+std::to_string(m_stationType));
     SendContainer(stationTypeInsight);
 
-    opendlv::knowledge::Insight vehicleLengthInsight(now,"vehicleLength="+m_vehicleLength);
+    opendlv::knowledge::Insight vehicleLengthInsight(now,"vehicleLength="+std::to_string(m_vehicleLength));
     SendContainer(vehicleLengthInsight);
     
-    opendlv::knowledge::Insight vehicleWidthInsight(now,"vehicleWidth="+m_vehicleWidth);
+    opendlv::knowledge::Insight vehicleWidthInsight(now,"vehicleWidth="+std::to_string(m_vehicleWidth));
     SendContainer(vehicleWidthInsight);
     
-    opendlv::knowledge::Insight vehicleRoleInsight(now,"vehicleRole="+m_vehicleRole);
+    opendlv::knowledge::Insight vehicleRoleInsight(now,"vehicleRole="+std::to_string(m_vehicleRole));
     SendContainer(vehicleRoleInsight);
     
-    opendlv::knowledge::Insight rearAxleLocationInsight(now,"rearAxleLocation="+m_rearAxleLocation);
+    opendlv::knowledge::Insight rearAxleLocationInsight(now,"rearAxleLocation="+std::to_string(m_rearAxleLocation));
     SendContainer(rearAxleLocationInsight);
+  
   }  
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
-void Identity::SendContainer(opendlv::knowledge::Insight a_insight) const
+void Identity::SendContainer(opendlv::knowledge::Insight &a_insight)
 {
   odcore::data::Container c(a_insight);
   getConference().send(c);

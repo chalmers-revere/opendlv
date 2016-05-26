@@ -230,13 +230,13 @@ void V2vIclcm::nextContainer(odcore::data::Container &a_c)
   } else if (a_c.getDataType() == opendlv::proxy::ControlState::ID()) {
     opendlv::proxy::ControlState controlState =
         a_c.getData<opendlv::proxy::ControlState>(); 
-    if (controlState.isAutonomous()){
+    if (controlState.getIsAutonomous()){
       m_controllerType = 3;
     } else {
       m_controllerType = 1;
     }
-  } else if (c.getDataType() == opendlv::sensation::Voice::ID()) {
-    opendlv::sensation::Voice message = c.getData<opendlv::sensation::Voice>();
+  } else if (a_c.getDataType() == opendlv::sensation::Voice::ID()) {
+    opendlv::sensation::Voice message = a_c.getData<opendlv::sensation::Voice>();
     // std::cout<<message.getType()<<std::endl;
     if(strcmp(message.getType().c_str(),"iclcm") != 0){
       return;
