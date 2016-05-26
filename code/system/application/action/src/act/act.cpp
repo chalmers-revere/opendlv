@@ -129,7 +129,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
           - t0.toMicroseconds()) / 1000000.0f;
 
       if (t1 < maxDuration) {
-        float deltaValue = amplitude * (t1 / maxDuration);
+        float deltaValue = amplitude / (100);
         m_accelerationValue += deltaValue;
 
         startTimesAccelerateToSave.push_back(t0);
@@ -149,7 +149,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
           - t0.toMicroseconds()) / 1000000.0f;
 
       if (t1 < maxDuration) {
-        float deltaValue = amplitude * (t1 / maxDuration);
+        float deltaValue = amplitude / (100);
         m_brakeValue += deltaValue;
 
         startTimesBrakeToSave.push_back(t0);
@@ -169,7 +169,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
           - t0.toMicroseconds()) / 1000000.0f;
 
       if (t1 < maxDuration) {
-        float deltaValue = amplitude * (t1 / maxDuration);
+        float deltaValue = amplitude / (100);
         m_steeringValue += deltaValue;
 
         startTimesSteeringToSave.push_back(t0);
