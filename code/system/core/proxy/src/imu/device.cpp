@@ -29,12 +29,18 @@ namespace imu {
  * Constructor.
  *
  */
-Device::Device()
+Device::Device():
+  m_initialized(false)
 {
 }
 
 Device::~Device()
 {
+}
+
+bool Device::IsInitialized() const
+{
+  return m_initialized;
 }
 
 } // imu

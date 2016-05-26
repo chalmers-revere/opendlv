@@ -128,7 +128,6 @@ void ManualOverride::nextContainer(odcore::data::Container &a_container)
       getConference().send(c);
     }
     
-
   }
 }
 

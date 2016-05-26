@@ -17,33 +17,35 @@
  * USA.
  */
 
-#ifndef IMU_DEVICE_HPP_
-#define IMU_DEVICE_HPP_
+#ifndef SONARARRAY_GPIODEVICE_HPP_
+#define SONARARRAY_GPIODEVICE_HPP_
 
-#include <vector>
+#include <cstdint>
+#include <iostream>
+#include <string>
 
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
+#include "sonararray/device.hpp"
 
 namespace opendlv {
 namespace proxy {
-namespace imu {
+namespace sonararray {
 
-class Device {
+class MaxDevice : public Device {
  public:
-  Device();
-  Device(Device const &) = delete;
-  Device &operator=(Device const &) = delete;
-  virtual ~Device();
+  MaxDevice(std::vector<opendlv::model::Cartesian3>, 
+      std::vector<opendlv::model::Direction>, std::vector<uint16_t>, 
+      float);
+  MaxDevice(MaxDevice const &) = delete;
+  MaxDevice &operator=(MaxDevice const &) = delete;
+  virtual ~MaxDevice();
+  std::vector<float> GetSonarReadings();
 
-  bool IsInitialized() const;
-  virtual opendlv::proxy::AccelerometerReading ReadAccelerometer() = 0;
-  virtual opendlv::proxy::GyroscopeReading ReadGyroscope() = 0;
-
- protected:
-  bool m_initialized;
+ private:
+  std::vector<uint16_t> m_pins;
+  float m_scaleValue;
 };
 
-} // imu
+} // sonararray
 } // proxy
 } // opendlv
 

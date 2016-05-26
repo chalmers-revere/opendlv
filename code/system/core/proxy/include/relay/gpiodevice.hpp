@@ -17,33 +17,33 @@
  * USA.
  */
 
-#ifndef IMU_DEVICE_HPP_
-#define IMU_DEVICE_HPP_
+#ifndef RELAY_GPIODEVICE_HPP_
+#define RELAY_GPIODEVICE_HPP_
 
-#include <vector>
+#include <cstdint>
+#include <iostream>
+#include <string>
 
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
+#include "relay/device.hpp"
 
 namespace opendlv {
 namespace proxy {
-namespace imu {
+namespace relay {
 
-class Device {
+class GpioDevice : public Device {
  public:
-  Device();
-  Device(Device const &) = delete;
-  Device &operator=(Device const &) = delete;
-  virtual ~Device();
+  GpioDevice(std::vector<bool>, std::vector<uint16_t>);
+  GpioDevice(GpioDevice const &) = delete;
+  GpioDevice &operator=(GpioDevice const &) = delete;
+  virtual ~GpioDevice();
+  bool IsActive(uint16_t const) const;
+  void SetValue(uint16_t const, bool const);
 
-  bool IsInitialized() const;
-  virtual opendlv::proxy::AccelerometerReading ReadAccelerometer() = 0;
-  virtual opendlv::proxy::GyroscopeReading ReadGyroscope() = 0;
-
- protected:
-  bool m_initialized;
+ private:
+  std::vector<uint16_t> m_pins;
 };
 
-} // imu
+} // relay
 } // proxy
 } // opendlv
 

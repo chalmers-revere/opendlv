@@ -17,33 +17,40 @@
  * USA.
  */
 
-#ifndef IMU_DEVICE_HPP_
-#define IMU_DEVICE_HPP_
+#ifndef RELAY_RELAY_HPP_
+#define RELAY_RELAY_HPP_
 
-#include <vector>
+#include <memory>
 
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
+#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/data/Container.h"
 
 namespace opendlv {
 namespace proxy {
-namespace imu {
+namespace relay {
 
-class Device {
+class Device;
+
+/**
+ * This class provides...
+ */
+class Relay
+: public odcore::base::module::DataTriggeredConferenceClientModule {
  public:
-  Device();
-  Device(Device const &) = delete;
-  Device &operator=(Device const &) = delete;
-  virtual ~Device();
+  Relay(int32_t const &, char **);
+  Relay(Relay const &) = delete;
+  Relay &operator=(Relay const &) = delete;
+  virtual ~Relay();
+  virtual void nextContainer(odcore::data::Container &);
 
-  bool IsInitialized() const;
-  virtual opendlv::proxy::AccelerometerReading ReadAccelerometer() = 0;
-  virtual opendlv::proxy::GyroscopeReading ReadGyroscope() = 0;
+ private:
+  void setUp();
+  void tearDown();
 
- protected:
-  bool m_initialized;
+  std::unique_ptr<Device> m_device;
 };
 
-} // imu
+} // relay
 } // proxy
 } // opendlv
 

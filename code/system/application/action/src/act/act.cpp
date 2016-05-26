@@ -159,7 +159,6 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
     m_logSteering << m_steeringCorrection << std::endl;
     
     if ( m_brakeCorrection < 0 ) {
-
       opendlv::proxy::ActuationRequest actuationRequest(m_brakeCorrection, m_steeringCorrection, false);
       odcore::data::Container actuationContainer(actuationRequest);
 
