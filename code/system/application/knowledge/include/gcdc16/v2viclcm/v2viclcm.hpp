@@ -64,7 +64,7 @@ class V2vIclcm
   unsigned char m_containerMask = 0;
   unsigned char m_lowFrequencyMask = 0;
   int32_t m_stationId = 0;
-  int32_t m_rearAxleLocation = 600;
+  int32_t m_rearAxleLocation = 4095;
   int32_t m_controllerType = 0;
   int32_t m_responseTimeConstant = 50;
   int32_t m_responseTimeDelay = 50;

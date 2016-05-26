@@ -30,6 +30,7 @@
 
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
+#include "opendavinci/odcore/strings/StringToolbox.h"
 
 #include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
@@ -175,6 +176,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vIclcm::body()
     odcore::data::Container c(nextMessage);
     getConference().send(c);
 
+    // std::cout << m_stationId << std::endl;
+    // std::cout << m_rearAxleLocation << std::endl;
+
 
 
     m_sendLog << std::to_string(GenerateGenerationTime())+
@@ -223,9 +227,15 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vIclcm::body()
 void V2vIclcm::nextContainer(odcore::data::Container &a_c)
 {
   if (a_c.getDataType() == opendlv::knowledge::Insight::ID()){
-    opendlv::knowledge::Insight eventMessage = 
+    opendlv::knowledge::Insight insight = 
         a_c.getData<opendlv::knowledge::Insight>();
-
+    std::string str = insight.getInsight();
+    std::vector<std::string> information = odcore::strings::StringToolbox::split(str,'=');
+    if(information[0] == "stationId"){
+      m_stationId = std::stoi(information[1]);
+    } else if(information[0] == "rearAxleLocation"){
+      m_rearAxleLocation = std::stod(information[1]);
+    }
 
   } else if (a_c.getDataType() == opendlv::proxy::ControlState::ID()) {
     opendlv::proxy::ControlState controlState =
