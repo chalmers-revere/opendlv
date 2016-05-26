@@ -179,6 +179,18 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
     m_startTimesSteering = startTimesSteeringToSave;
     m_amplitudesSteering = amplitudesSteeringToSave;
 
+
+    if (m_brakeValue > 0.0f) {
+      opendlv::proxy::ActuationRequest actuationRequest(m_brakeValue, 
+          m_steeringvalue, false);
+      odcore::data::Container actuationContainer(actuationRequest);
+      getConference().send(actuationContainer);
+    } else {
+      opendlv::proxy::ActuationRequest actuationRequest(m_accelerationValue, 
+          m_steeringvalue, false);
+      odcore::data::Container actuationContainer(actuationRequest);
+      getConference().send(actuationContainer);
+    }
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
