@@ -191,7 +191,7 @@ void LidarStringDecoder::ConvertToDistances()
   for(uint32_t i = 0; i < 361; i++) {
     byte1 = (int)m_measurements[i*2];
     byte2 = (int)m_measurements[i*2+1];
-    distance = byte2 + (byte1%32)*256; //Integer centimeters in local polar coordinates
+    distance = byte1 + (byte2%32)*256; //Integer centimeters in local polar coordinates
 
     if(distance < 7500) { //We don't send max range responses
       cartesian[0] = distance * sin(PI * i /360.0) / 100.0; //Local cartesian coordinates in meters (rotated coordinate system)
