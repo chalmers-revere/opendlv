@@ -192,7 +192,7 @@ void LidarStringDecoder::ConvertToDistances()
     byte1 = (int)m_measurements[i*2];
     byte2 = (int)m_measurements[i*2+1];
 
-    if(i < 181) {
+    if(i < 361) {
       distance = byte1 + (byte2%32)*256; //Integer centimeters in local polar coordinates
     }
     else {
