@@ -217,7 +217,7 @@ knowledge-identity.stationType = 8 #heavy truck
 knowledge-identity.vehicleLength = 7.3
 knowledge-identity.vehicleWidth = 2.55 
 knowledge-identity.vehicleRole = 0
-knowledge-identity.rearAxleLocation = 4.30
+knowledge-identity.rearAxleLocation = 5.0
 
 
 ###############################################################################
