@@ -210,12 +210,12 @@ void LidarStringDecoder::ConvertToDistances()
 
  // std::lock_guard<std::mutex> guard(g_readingMutex);
 
-  std::cout << "radius: " << radii[0];
+  //std::cout << "radius: " << radii[0];
 
-  m_latestReading.setListOfDirections(m_directions);
-  m_latestReading.setListOfRadii(m_radii);
-  m_latestReading.setNumberOfPoints(m_radii.size());
-  std::cout << " in latestreading: " << m_latestReading.getListOfRadii()[0] << std::endl;
+  m_latestReading.setListOfDirections(directions);
+  m_latestReading.setListOfRadii(radii);
+  m_latestReading.setNumberOfPoints(radii.size());
+  //std::cout << " in latestreading: " << m_latestReading.getListOfRadii()[0] << std::endl;
 }
 
 void LidarStringDecoder::nextString(std::string const &a_string) 

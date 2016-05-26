@@ -60,8 +60,8 @@ class LidarStringDecoder : public odcore::io::StringListener {
   bool m_settingsDone;
   uint32_t m_counter;
   uint32_t m_bufferSize;
-  std::vector<opendlv::model::Direction> m_directions;
-  std::vector<double> m_radii;
+  //std::vector<opendlv::model::Direction> m_directions;
+  //std::vector<double> m_radii;
   opendlv::proxy::EchoReading m_latestReading; 
   double m_position[3];
   unsigned char m_measurements[1000];
