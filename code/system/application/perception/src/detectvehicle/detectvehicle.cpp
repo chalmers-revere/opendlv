@@ -57,6 +57,7 @@ DetectVehicle::DetectVehicle(int32_t const &a_argc, char **a_argv)
     , m_vehicleMemorySystem()
     , m_convNeuralNet()
     , m_scale(1, 1, 1)
+    , m_sourceName()
 {
   /*
   m_vehicleDetectionSystem = std::shared_ptr<VehicleDetectionSystem>(
@@ -84,6 +85,9 @@ void DetectVehicle::setUp()
   m_convNeuralNet->SetUp();
   float scale = 1280.0f/800.0f;
   m_scale = Eigen::Vector3d(scale, scale, 1);
+  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+  m_sourceName = kv.getValue<std::string>("perception-detectvehicle.source");
+  std::cout << "This DetectVehicle instance will receive images from " << m_sourceName << "." << std::endl;
 }
 
 /**
@@ -105,6 +109,16 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
 
   odcore::data::image::SharedImage mySharedImg = 
       c.getData<odcore::data::image::SharedImage>();
+
+
+  std::string cameraName = mySharedImg.getName();
+  //std::cout << "Received image from camera " << cameraName  << "!" << std::endl;
+
+  if (m_sourceName.compare(cameraName) != 0) {
+    // Received image from a source that this instance should not care about
+    //std::cout << "Received image came from wrong source. Expected " << m_sourceName << std::endl;
+    return;
+  }
 
   // extract time stamp from container
   //odcore::data::TimeStamp timeStampOfImage = c.getSentTimeStamp();
@@ -149,9 +163,6 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   //std::cout << "timeStamp: " << timeStamp << std::endl;
 
   Eigen::Matrix3d transformationMatrix;
-
-  std::string cameraName = mySharedImg.getName();
-  std::cout << "Received image from camera \"" << cameraName  << "\"!" << std::endl;
 
   if (cameraName == "front-left") {
     transformationMatrix = ReadMatrix(

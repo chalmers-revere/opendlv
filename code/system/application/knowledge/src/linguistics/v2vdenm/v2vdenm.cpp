@@ -143,130 +143,131 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vDenm::body()
  * Receives .
  * Sends .
  */
-void V2vDenm::nextContainer(odcore::data::Container &c)
+void V2vDenm::nextContainer(odcore::data::Container &a_c)
 {
-  if(c.getDataType() == opendlv::sensation::Voice::ID())
+  if(a_c.getDataType() == opendlv::sensation::Voice::ID())
   {
-    opendlv::sensation::Voice message = c.getData<opendlv::sensation::Voice>();
-    if(strcmp(message.getType().c_str(),"denm") == 0)
+    opendlv::sensation::Voice message = a_c.getData<opendlv::sensation::Voice>();
+    if(strcmp(message.getType().c_str(),"denm") != 0)
     {
-      std::string dataString = message.getData();
-      std::vector<unsigned char> data(dataString.begin(), dataString.end());
-    
-      std::shared_ptr<Buffer const> buffer(new Buffer(data));
-      std::shared_ptr<Buffer::Iterator> inIterator = buffer->GetIterator();
-      //Long and little endian reverser
-      inIterator->ItReversed();
-
-
-      unsigned char messageId = inIterator->ReadByte();
-      int32_t stationId = inIterator->ReadInteger();
-      int32_t generationDeltaTime = inIterator->ReadInteger();
-      unsigned char containerMask =  inIterator->ReadByte();
-      unsigned char managementMask = inIterator->ReadByte();
-      int32_t detectionTime = inIterator->ReadInteger();
-      int32_t referenceTime = inIterator->ReadInteger();
-      int32_t termination = inIterator->ReadInteger();
-      int32_t latitude = inIterator->ReadInteger();
-      int32_t longitude = inIterator->ReadInteger();
-      int32_t semiMajorConfidence = inIterator->ReadInteger();
-      int32_t semiMinorConfidence = inIterator->ReadInteger();
-      int32_t semiMajorOrientation = inIterator->ReadInteger();
-      int32_t altitude = inIterator->ReadInteger();
-      int32_t relevanceDistance = inIterator->ReadInteger();
-      int32_t relevanceTrafficDirection = inIterator->ReadInteger();
-      int32_t validityDuration = inIterator->ReadInteger();
-      int32_t transmissionInterval = inIterator->ReadInteger();
-      int32_t stationType = inIterator->ReadInteger();
-      int32_t situationMask = inIterator->ReadByte();
-      int32_t informationQuality = inIterator->ReadInteger();
-      int32_t causeCode = inIterator->ReadInteger();
-      int32_t subCauseCode = inIterator->ReadInteger();
-      int32_t linkedCauseCode = inIterator->ReadInteger();
-      int32_t linkedSubCauseCode = inIterator->ReadInteger();
-      unsigned char alacarteMask = inIterator->ReadByte();
-      int32_t lanePosition = inIterator->ReadInteger();
-      int32_t temperature = inIterator->ReadInteger();
-      int32_t positioningSolutionType = inIterator->ReadInteger();
-
-
-
-      std::string output = "*** Denm object ***\n";
-      output += "Message Id: " + std::to_string(messageId) + "\n";
-      output += "Station Id: " + std::to_string(stationId) + "\n";
-      output += "Generation delta time: " + std::to_string(generationDeltaTime) + "\n";
-      output += "Container mask: " + std::to_string(containerMask) + "\n";
-      output += "Management mask: " + std::to_string(managementMask) + "\n";
-      output += "Situation mask: " + std::to_string(situationMask) + "\n";
-      output += "Alacarte mask: " + std::to_string(alacarteMask) + "\n";
-      output += "Detection time: " + std::to_string(detectionTime) + "\n";
-      output += "Reference time: " + std::to_string(referenceTime) + "\n";
-      output += "Termination: " + std::to_string(termination) + "\n";
-      output += "Latitude: " + std::to_string(latitude) + "\n";
-      output += "Longitude: " + std::to_string(longitude) + "\n";
-      output += "Semi major confidence: " + std::to_string(semiMajorConfidence) + "\n";
-      output += "Semi minor confidence: " + std::to_string(semiMinorConfidence) + "\n";
-      output += "Semi major orientation: " + std::to_string(semiMajorOrientation) + "\n";
-      output += "Altitude: " + std::to_string(altitude) + "\n";
-      output += "Relevance distance: " + std::to_string(relevanceDistance) + "\n";
-      output += "Relevance traffic direction: " + std::to_string(relevanceTrafficDirection) + "\n";
-      output += "Validity duration: " + std::to_string(validityDuration) + "\n";
-      output += "Transmission interval: " + std::to_string(transmissionInterval) + "\n";
-      output += "Station type: " + std::to_string(stationType) + "\n";
-      output += "Information quality: " + std::to_string(informationQuality) + "\n";
-      output += "Cause code: " + std::to_string(causeCode) + "\n";
-      output += "Sub cause code: " + std::to_string(subCauseCode) + "\n";
-      output += "Linked cause code: " + std::to_string(linkedCauseCode) + "\n";
-      output += "Linked sub cause code: " + std::to_string(linkedSubCauseCode) + "\n";
-      output += "Lane position: " + std::to_string(lanePosition) + "\n";
-      output += "Temperature: " + std::to_string(temperature) + "\n";
-      output += "Positioning solution type: " + std::to_string(positioningSolutionType) + "\n";
-      std::cout << output;
-
-
-      m_receiveLog<< std::to_string(GenerateGenerationTime())+
-          + "," + std::to_string(messageId)+ //messageId
-          + "," + std::to_string(stationId)+ //stationId
-          + "," + std::to_string(generationDeltaTime)+ //generationDeltaTime
-          + "," + std::to_string(containerMask)+ //containerMask
-          + "," + std::to_string(managementMask)+ //managementMask
-          + "," + std::to_string(detectionTime)+ //detectionTime
-          + "," + std::to_string(referenceTime)+ //referenceTime
-          + "," + std::to_string(termination)+ //termination
-          + "," + std::to_string(latitude)+ //latitude
-          + "," + std::to_string(longitude)+ //longitude
-          + "," + std::to_string(semiMajorConfidence)+ //semiMajorConfidence
-          + "," + std::to_string(semiMinorConfidence)+ //semiMinorConfidence
-          + "," + std::to_string(semiMajorOrientation)+ //semiMajorOrientation
-          + "," + std::to_string(altitude)+ //altitude
-          + "," + std::to_string(relevanceDistance)+ //relevanceDistance
-          + "," + std::to_string(relevanceTrafficDirection)+ //relevanceTrafficDirection
-          + "," + std::to_string(validityDuration)+ //validityDuration
-          + "," + std::to_string(transmissionInterval)+ //transmissionInterval
-          + "," + std::to_string(stationType)+ //stationType
-          + "," + std::to_string(situationMask)+ //situationMask
-          + "," + std::to_string(informationQuality)+ //informationQuality
-          + "," + std::to_string(causeCode)+ //causeCode
-          + "," + std::to_string(subCauseCode)+ //subCauseCode
-          + "," + std::to_string(linkedCauseCode)+ //linkedCauseCode
-          + "," + std::to_string(linkedSubCauseCode)+ //linkedSubCauseCode
-          + "," + std::to_string(alacarteMask)+ //alacarteMask
-          + "," + std::to_string(lanePosition)+ //lanePosition
-          + "," + std::to_string(temperature)+ //temperature
-          + "," + std::to_string(positioningSolutionType); //positioningSolutionType
-      m_receiveLog << std::endl; 
-
+      return;
     }
+    std::string dataString = message.getData();
+    std::vector<unsigned char> data(dataString.begin(), dataString.end());
+  
+    std::shared_ptr<Buffer const> buffer(new Buffer(data));
+    std::shared_ptr<Buffer::Iterator> inIterator = buffer->GetIterator();
+    //Long and little endian reverser
+    inIterator->ItReversed();
+
+
+    unsigned char messageId = inIterator->ReadByte();
+    int32_t stationId = inIterator->ReadInteger();
+    int32_t generationDeltaTime = inIterator->ReadInteger();
+    unsigned char containerMask =  inIterator->ReadByte();
+    unsigned char managementMask = inIterator->ReadByte();
+    int32_t detectionTime = inIterator->ReadInteger();
+    int32_t referenceTime = inIterator->ReadInteger();
+    int32_t termination = inIterator->ReadInteger();
+    int32_t latitude = inIterator->ReadInteger();
+    int32_t longitude = inIterator->ReadInteger();
+    int32_t semiMajorConfidence = inIterator->ReadInteger();
+    int32_t semiMinorConfidence = inIterator->ReadInteger();
+    int32_t semiMajorOrientation = inIterator->ReadInteger();
+    int32_t altitude = inIterator->ReadInteger();
+    int32_t relevanceDistance = inIterator->ReadInteger();
+    int32_t relevanceTrafficDirection = inIterator->ReadInteger();
+    int32_t validityDuration = inIterator->ReadInteger();
+    int32_t transmissionInterval = inIterator->ReadInteger();
+    int32_t stationType = inIterator->ReadInteger();
+    int32_t situationMask = inIterator->ReadByte();
+    int32_t informationQuality = inIterator->ReadInteger();
+    int32_t causeCode = inIterator->ReadInteger();
+    int32_t subCauseCode = inIterator->ReadInteger();
+    int32_t linkedCauseCode = inIterator->ReadInteger();
+    int32_t linkedSubCauseCode = inIterator->ReadInteger();
+    unsigned char alacarteMask = inIterator->ReadByte();
+    int32_t lanePosition = inIterator->ReadInteger();
+    int32_t temperature = inIterator->ReadInteger();
+    int32_t positioningSolutionType = inIterator->ReadInteger();
+
+
+
+    std::string output = "*** Denm object ***\n";
+    output += "Message Id: " + std::to_string(messageId) + "\n";
+    output += "Station Id: " + std::to_string(stationId) + "\n";
+    output += "Generation delta time: " + std::to_string(generationDeltaTime) + "\n";
+    output += "Container mask: " + std::to_string(containerMask) + "\n";
+    output += "Management mask: " + std::to_string(managementMask) + "\n";
+    output += "Situation mask: " + std::to_string(situationMask) + "\n";
+    output += "Alacarte mask: " + std::to_string(alacarteMask) + "\n";
+    output += "Detection time: " + std::to_string(detectionTime) + "\n";
+    output += "Reference time: " + std::to_string(referenceTime) + "\n";
+    output += "Termination: " + std::to_string(termination) + "\n";
+    output += "Latitude: " + std::to_string(latitude) + "\n";
+    output += "Longitude: " + std::to_string(longitude) + "\n";
+    output += "Semi major confidence: " + std::to_string(semiMajorConfidence) + "\n";
+    output += "Semi minor confidence: " + std::to_string(semiMinorConfidence) + "\n";
+    output += "Semi major orientation: " + std::to_string(semiMajorOrientation) + "\n";
+    output += "Altitude: " + std::to_string(altitude) + "\n";
+    output += "Relevance distance: " + std::to_string(relevanceDistance) + "\n";
+    output += "Relevance traffic direction: " + std::to_string(relevanceTrafficDirection) + "\n";
+    output += "Validity duration: " + std::to_string(validityDuration) + "\n";
+    output += "Transmission interval: " + std::to_string(transmissionInterval) + "\n";
+    output += "Station type: " + std::to_string(stationType) + "\n";
+    output += "Information quality: " + std::to_string(informationQuality) + "\n";
+    output += "Cause code: " + std::to_string(causeCode) + "\n";
+    output += "Sub cause code: " + std::to_string(subCauseCode) + "\n";
+    output += "Linked cause code: " + std::to_string(linkedCauseCode) + "\n";
+    output += "Linked sub cause code: " + std::to_string(linkedSubCauseCode) + "\n";
+    output += "Lane position: " + std::to_string(lanePosition) + "\n";
+    output += "Temperature: " + std::to_string(temperature) + "\n";
+    output += "Positioning solution type: " + std::to_string(positioningSolutionType) + "\n";
+    // std::cout << output;
+
+
+    m_receiveLog<< std::to_string(GenerateGenerationTime())+
+        + "," + std::to_string(messageId)+ //messageId
+        + "," + std::to_string(stationId)+ //stationId
+        + "," + std::to_string(generationDeltaTime)+ //generationDeltaTime
+        + "," + std::to_string(containerMask)+ //containerMask
+        + "," + std::to_string(managementMask)+ //managementMask
+        + "," + std::to_string(detectionTime)+ //detectionTime
+        + "," + std::to_string(referenceTime)+ //referenceTime
+        + "," + std::to_string(termination)+ //termination
+        + "," + std::to_string(latitude)+ //latitude
+        + "," + std::to_string(longitude)+ //longitude
+        + "," + std::to_string(semiMajorConfidence)+ //semiMajorConfidence
+        + "," + std::to_string(semiMinorConfidence)+ //semiMinorConfidence
+        + "," + std::to_string(semiMajorOrientation)+ //semiMajorOrientation
+        + "," + std::to_string(altitude)+ //altitude
+        + "," + std::to_string(relevanceDistance)+ //relevanceDistance
+        + "," + std::to_string(relevanceTrafficDirection)+ //relevanceTrafficDirection
+        + "," + std::to_string(validityDuration)+ //validityDuration
+        + "," + std::to_string(transmissionInterval)+ //transmissionInterval
+        + "," + std::to_string(stationType)+ //stationType
+        + "," + std::to_string(situationMask)+ //situationMask
+        + "," + std::to_string(informationQuality)+ //informationQuality
+        + "," + std::to_string(causeCode)+ //causeCode
+        + "," + std::to_string(subCauseCode)+ //subCauseCode
+        + "," + std::to_string(linkedCauseCode)+ //linkedCauseCode
+        + "," + std::to_string(linkedSubCauseCode)+ //linkedSubCauseCode
+        + "," + std::to_string(alacarteMask)+ //alacarteMask
+        + "," + std::to_string(lanePosition)+ //lanePosition
+        + "," + std::to_string(temperature)+ //temperature
+        + "," + std::to_string(positioningSolutionType); //positioningSolutionType
+    m_receiveLog << std::endl;
+
+    odcore::data::TimeStamp now;
+    opendlv::knowledge::Insight rsuEvent(now,"rsuEvent");
+    odcore::data::Container c(rsuEvent);
+    getConference().send(c);
+
   }
 }
 
 void V2vDenm::setUp()
 {
-  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
-
-  // m_stationId = kv.getValue<int32_t>("knowledge-linguistics-v2vdenm.stationId");
-  // m_stationType = kv.getValue<int32_t>("knowledge-linguistics-v2vdenm.stationType");
-
 }
 
 void V2vDenm::tearDown()

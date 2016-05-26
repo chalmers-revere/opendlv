@@ -17,40 +17,34 @@
  * USA.
  */
 
-#ifndef SETOPTICALFLOW_SETOPTICALFLOW_HPP_
-#define SETOPTICALFLOW_SETOPTICALFLOW_HPP_
+#ifndef RELAY_GPIODEVICE_HPP_
+#define RELAY_GPIODEVICE_HPP_
 
-#include <memory>
+#include <cstdint>
+#include <iostream>
+#include <string>
 
-#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
-#include "opendavinci/odcore/data/Container.h"
+#include "relay/device.hpp"
 
 namespace opendlv {
-namespace action {
-namespace setopticalflow {
+namespace proxy {
+namespace relay {
 
-/**
- * This class provides...
- */
-class SetOpticalFlow
-: public odcore::base::module::DataTriggeredConferenceClientModule {
+class GpioDevice : public Device {
  public:
-  SetOpticalFlow(int32_t const &, char **);
-  SetOpticalFlow(SetOpticalFlow const &) = delete;
-  SetOpticalFlow &operator=(SetOpticalFlow const &) = delete;
-  virtual ~SetOpticalFlow();
-  virtual void nextContainer(odcore::data::Container &);
+  GpioDevice(std::vector<bool>, std::vector<uint16_t>);
+  GpioDevice(GpioDevice const &) = delete;
+  GpioDevice &operator=(GpioDevice const &) = delete;
+  virtual ~GpioDevice();
+  bool IsActive(uint16_t const) const;
+  void SetValue(uint16_t const, bool const);
 
  private:
-  void setUp();
-  void tearDown();
-
-  float m_maxSpeed;
-  float m_speed;
+  std::vector<uint16_t> m_pins;
 };
 
-} // setopticalflow
-} // action
+} // relay
+} // proxy
 } // opendlv
 
 #endif

@@ -97,62 +97,72 @@ void GpsStringDecoder::nextString(std::string const &s) {
     // }
 
     if (type == "GPGGA") {
-      gotGpgga = true;
-
-      timestamp = std::stod(fields.at(1));
       
-      latitude = std::stod(fields.at(2));
-      latitudeDirection = fields.at(3)[0];
-      
-      longitude = std::stod(fields.at(4));
-      longitudeDirection = fields.at(5)[0];
+      // TODO: FIX AND REMOVE try.
+      try {
+        gotGpgga = true;
 
-      // Convert from format dd mm,mmmm
-      latitude=latitude / 100.0;
-      longitude=longitude / 100.0;
-      latitude = static_cast<int>(latitude) 
-          + (latitude - static_cast<int>(latitude)) * 100.0 / 60.0;
-      longitude = static_cast<int>(longitude) 
-          + (longitude - static_cast<int>(longitude)) * 100.0 / 60.0;
+        timestamp = std::stod(fields.at(1));
+        
+        latitude = std::stod(fields.at(2));
+        latitudeDirection = fields.at(3)[0];
+        
+        longitude = std::stod(fields.at(4));
+        longitudeDirection = fields.at(5)[0];
 
-      // std::cout << "[proxy-gpsstringdecoder] GPS received signals : Latitude : " << std::setprecision(19) << latitude
-      //              << " Longitude : " << std::setprecision(19) << longitude << std::endl;
+        // Convert from format dd mm,mmmm
+        latitude=latitude / 100.0;
+        longitude=longitude / 100.0;
+        latitude = static_cast<int>(latitude) 
+            + (latitude - static_cast<int>(latitude)) * 100.0 / 60.0;
+        longitude = static_cast<int>(longitude) 
+            + (longitude - static_cast<int>(longitude)) * 100.0 / 60.0;
+
+        // std::cout << "[proxy-gpsstringdecoder] GPS received signals : Latitude : " << std::setprecision(19) << latitude
+        //              << " Longitude : " << std::setprecision(19) << longitude << std::endl;
 
 
-      // 0: Non valid, 1: GPS fix, 2: DGPS fix, 4: RTK fix int, 5: RTK float int
-      int gpsQuality = std::stoi(fields.at(6));
-      if (gpsQuality == 4 || gpsQuality == 5) {
-        hasRtk = true;
-      } else {
-        hasRtk = false;
+        // 0: Non valid, 1: GPS fix, 2: DGPS fix, 4: RTK fix int, 5: RTK float int
+        int gpsQuality = std::stoi(fields.at(6));
+        if (gpsQuality == 4 || gpsQuality == 5) {
+          hasRtk = true;
+        } else {
+          hasRtk = false;
+        }
+
+        satelliteCount = std::stoi(fields.at(7));
+
+     //   float hdop = std::stof(fields.at(8));
+
+        altitude = std::stof(fields.at(9));
+        //std::string altitudeUnit = fields.at(10);
+
+    //    float geoidSeparation = std::stof(fields.at(11));
+    //    std::string geodSeparationUnit = fields.at(12);
+      } catch (...) {
+         std::cout << "WARNING: Read error for GPGGA." << std::endl;
       }
-
-      satelliteCount = std::stoi(fields.at(7));
-
-   //   float hdop = std::stof(fields.at(8));
-
-      altitude = std::stof(fields.at(9));
-      //std::string altitudeUnit = fields.at(10);
-
-  //    float geoidSeparation = std::stof(fields.at(11));
-  //    std::string geodSeparationUnit = fields.at(12);
 
     } else if (type == "GPVTG") {
-      gotGpvtg = true;
+      try {
+        gotGpvtg = true;
 
-      std::string headingStr = fields.at(3);
+        std::string headingStr = fields.at(3);
 
-      if (headingStr.empty()) {
-        northHeading = 0.0f;
-        hasHeading = false;
-      } else {
-        double pi = static_cast<double>(opendlv::Constants::PI);
-        northHeading = std::stod(headingStr) * pi / 180.0;
-        hasHeading = true;
+        if (headingStr.empty()) {
+          northHeading = 0.0f;
+          hasHeading = false;
+        } else {
+          double pi = static_cast<double>(opendlv::Constants::PI);
+          northHeading = std::stod(headingStr) * pi / 180.0;
+          hasHeading = true;
+        }
+
+        // Convert to m/s.
+        speed = std::stof(fields.at(7)) / 3.6f;
+      } catch (...) {
+         std::cout << "WARNING: Read error for GPVTG." << std::endl;
       }
-
-      // Convert to m/s.
-      speed = std::stof(fields.at(7)) / 3.6f;
 
     } else if (type == "GPHDT") {
 

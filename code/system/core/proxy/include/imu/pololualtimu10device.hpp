@@ -17,10 +17,36 @@
  * USA.
  */
 
-#include "toggeler/toggeler.hpp"
+#ifndef IMU_POLOLUALTIMU10DEVICE_HPP_
+#define IMU_POLOLUALTIMU10DEVICE_HPP_
 
-int32_t main(int32_t a_argc, char **a_argv)
-{
-  opendlv::proxy::toggeler::Toggeler toggeler(a_argc, a_argv);
-  return toggeler.runModule();
-}
+#include <cstdint>
+#include <iostream>
+#include <string>
+
+#include "imu/device.hpp"
+
+namespace opendlv {
+namespace proxy {
+namespace imu {
+
+class PololuAltImu10Device : public Device {
+ public:
+  PololuAltImu10Device(std::string const &);
+  PololuAltImu10Device(PololuAltImu10Device const &) = delete;
+  PololuAltImu10Device &operator=(PololuAltImu10Device const &) = delete;
+  virtual ~PololuAltImu10Device();
+  opendlv::proxy::AccelerometerReading ReadAccelerometer();
+  opendlv::proxy::GyroscopeReading ReadGyroscope();
+
+ private:
+  void I2cWriteRegister(uint8_t, uint8_t);
+
+  int16_t m_deviceFile;
+};
+
+} // imu
+} // proxy
+} // opendlv
+
+#endif

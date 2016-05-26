@@ -35,7 +35,7 @@ class Device;
  * This class provides...
  */
 class SonarArray
-: public odcore::base::module::TimeTriggeredConferenceClientModule {
+  : public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
   SonarArray(int32_t const &, char **);
   SonarArray(SonarArray const &) = delete;

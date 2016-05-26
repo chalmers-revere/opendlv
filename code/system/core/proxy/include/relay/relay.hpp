@@ -17,8 +17,8 @@
  * USA.
  */
 
-#ifndef SETOPTICALFLOW_SETOPTICALFLOW_HPP_
-#define SETOPTICALFLOW_SETOPTICALFLOW_HPP_
+#ifndef RELAY_RELAY_HPP_
+#define RELAY_RELAY_HPP_
 
 #include <memory>
 
@@ -26,31 +26,32 @@
 #include "opendavinci/odcore/data/Container.h"
 
 namespace opendlv {
-namespace action {
-namespace setopticalflow {
+namespace proxy {
+namespace relay {
+
+class Device;
 
 /**
  * This class provides...
  */
-class SetOpticalFlow
+class Relay
 : public odcore::base::module::DataTriggeredConferenceClientModule {
  public:
-  SetOpticalFlow(int32_t const &, char **);
-  SetOpticalFlow(SetOpticalFlow const &) = delete;
-  SetOpticalFlow &operator=(SetOpticalFlow const &) = delete;
-  virtual ~SetOpticalFlow();
+  Relay(int32_t const &, char **);
+  Relay(Relay const &) = delete;
+  Relay &operator=(Relay const &) = delete;
+  virtual ~Relay();
   virtual void nextContainer(odcore::data::Container &);
 
  private:
   void setUp();
   void tearDown();
 
-  float m_maxSpeed;
-  float m_speed;
+  std::unique_ptr<Device> m_device;
 };
 
-} // setopticalflow
-} // action
+} // relay
+} // proxy
 } // opendlv
 
 #endif

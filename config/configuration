@@ -44,6 +44,14 @@ odsupercomponent.pulsetimeack.exclude = odcockpit
 
 action-setopticalrotation.gain_heading = 1.5
 action-setopticalrotation.heading_tolerance = 0.05
+action-setopticalflow.max_speed = 30/3.6
+
+knowledge-gcdc16-rule:0.mio_1 = 1
+knowledge-gcdc16-rule:0.mio_2 = 2
+knowledge-gcdc16-rule:0.backward_id = 3
+knowledge-gcdc16-rule:0.initial_lane = 4
+knowledge-gcdc16-rule:0.is_tail = 1
+knowledge-gcdc16-rule:0.platoon_id = 3
 
 ###############################################################################
 ###############################################################################
@@ -164,14 +172,23 @@ proxy-lidar.mount.roll = 0.0
 proxy-lidar.mount.pitch = 0.0
 proxy-lidar.mount.yaw = 0.0
 
-proxy-sonararray.type = maxsonar
-proxy-sonararray.port = /dev/ttyUSB0
-proxy-sonararray.size = 8
-proxy-sonararray.mount.x = -0.805,-2.77,-5.52,-5.69,-5.69,-5.52,-2.79,-1.59
-proxy-sonararray.mount.y = 1.22,1.205,0.515,0.455,-0.455,-0.515,-1.115,-1.25
-proxy-sonararray.mount.z = 0.53,0.64,0.36,0.36,0.36,0.36,0.69,0.23
-proxy-sonararray.mount.pitch = 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-proxy-sonararray.mount.yaw = 1.57,1.57,1.57,1.96,-1.96,-1.57,-1.57,-1.57
+proxy-sonararray:0.type = max
+proxy-sonararray:0.mount.x = 3.0,3.0,2.0,2.0
+proxy-sonararray:0.mount.y = 1.2,-1.2,1.2,-1.2
+proxy-sonararray:0.mount.z = 0.3,0.3,0.3,0.3
+proxy-sonararray:0.mount.azimuth = 1.57,-1.57,1.57,-1.57
+proxy-sonararray:0.mount.zenith = 0.0,0.0,0.0,0.0
+proxy-sonararray:0.max.pin = 0,1,2,3
+proxy-sonararray:0.max.scale_value = 0.0012
+
+proxy-sonararray:1.type = max
+proxy-sonararray:1.mount.x = 3.0,3.0,2.0,2.0
+proxy-sonararray:1.mount.y = 1.2,-1.2,1.2,-1.2
+proxy-sonararray:1.mount.z = 0.3,0.3,0.3,0.3
+proxy-sonararray:1.mount.azimuth = 1.57,-1.57,2.57,-2.57
+proxy-sonararray:1.mount.zenith = 0.0,0.0,0.0,0.0
+proxy-sonararray:1.max.pin = 0,1,2,3
+proxy-sonararray:1.max.scale_value = 0.0012
 
 proxy-v2v.type = geonetworking-dual
 proxy-v2v.comboxIp = 10.42.42.61
@@ -203,19 +220,14 @@ sensation-vision-opticalflow.nAxisPoints = 15
 
 ###############################################################################
 ###############################################################################
-# V2V
-knowledge-linguistics-v2vcam.stationId = 110
-knowledge-linguistics-v2vcam.stationType = 8 #heavy truck
-knowledge-linguistics-v2vcam.vehicleLength = 7.3
-knowledge-linguistics-v2vcam.vehicleWidth = 2.55 
-knowledge-linguistics-v2vcam.vehicleRole = 0
-knowledge-linguistics-v2vcam.rearAxleLocation = 4.30
+# Identity
+knowledge-identity.stationId = 110
+knowledge-identity.stationType = 8 #heavy truck
+knowledge-identity.vehicleLength = 7.3
+knowledge-identity.vehicleWidth = 2.55 
+knowledge-identity.vehicleRole = 0
+knowledge-identity.rearAxleLocation = 5.0
 
-knowledge-linguistics-v2vdenm.stationId = 110
-knowledge-linguistics-v2vdenm.stationType = 8 #heavy truck
-
-knowledge-gcdc16-v2viclcm.stationId = 110
-knowledge-gcdc16-v2viclcm.rearAxleLocation = 4.30
 
 ###############################################################################
 ###############################################################################
@@ -228,6 +240,12 @@ tools-can-simplecansender.devicenode = /dev/pcan1   # PEAK CAN device.
 # Perception
 perception-detectlane.inputSize = 640,480
 perception-detectlane.outputSize = 640,480
+perception-detectlane:0.source = front-left
+perception-detectlane:1.source = front-right
+
+
+perception-detectvehicle:0.source = front-left
+perception-detectvehicle:1.source = front-right
 
 ###############################################################################
 ###############################################################################

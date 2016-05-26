@@ -17,40 +17,36 @@
  * USA.
  */
 
-#ifndef SETOPTICALFLOW_SETOPTICALFLOW_HPP_
-#define SETOPTICALFLOW_SETOPTICALFLOW_HPP_
+#ifndef SONARARRAY_GPIODEVICE_HPP_
+#define SONARARRAY_GPIODEVICE_HPP_
 
-#include <memory>
+#include <cstdint>
+#include <iostream>
+#include <string>
 
-#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
-#include "opendavinci/odcore/data/Container.h"
+#include "sonararray/device.hpp"
 
 namespace opendlv {
-namespace action {
-namespace setopticalflow {
+namespace proxy {
+namespace sonararray {
 
-/**
- * This class provides...
- */
-class SetOpticalFlow
-: public odcore::base::module::DataTriggeredConferenceClientModule {
+class MaxDevice : public Device {
  public:
-  SetOpticalFlow(int32_t const &, char **);
-  SetOpticalFlow(SetOpticalFlow const &) = delete;
-  SetOpticalFlow &operator=(SetOpticalFlow const &) = delete;
-  virtual ~SetOpticalFlow();
-  virtual void nextContainer(odcore::data::Container &);
+  MaxDevice(std::vector<opendlv::model::Cartesian3>, 
+      std::vector<opendlv::model::Direction>, std::vector<uint16_t>, 
+      float);
+  MaxDevice(MaxDevice const &) = delete;
+  MaxDevice &operator=(MaxDevice const &) = delete;
+  virtual ~MaxDevice();
+  std::vector<float> GetSonarReadings();
 
  private:
-  void setUp();
-  void tearDown();
-
-  float m_maxSpeed;
-  float m_speed;
+  std::vector<uint16_t> m_pins;
+  float m_scaleValue;
 };
 
-} // setopticalflow
-} // action
+} // sonararray
+} // proxy
 } // opendlv
 
 #endif
