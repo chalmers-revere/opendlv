@@ -28,6 +28,7 @@
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
 
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 
 namespace opendlv {
@@ -50,6 +51,7 @@ class V2vIclcm
  private:
   void setUp();
   void tearDown();
+  void ReadInsight(opendlv::knowledge::Insight &);
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
 
