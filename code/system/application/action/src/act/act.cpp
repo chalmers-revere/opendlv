@@ -112,6 +112,8 @@ void Act::nextContainer(odcore::data::Container &a_container)
 */
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
 {
+  int freq = getFrequency();
+
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
     odcore::data::dmcp::ModuleStateMessage::RUNNING) {
 
@@ -129,7 +131,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
           - t0.toMicroseconds()) / 1000000.0f;
 
       if (t1 < maxDuration) {
-        float deltaValue = amplitude / (100);
+        float deltaValue = amplitude / freq;
         m_accelerationValue += deltaValue;
 
         startTimesAccelerateToSave.push_back(t0);
@@ -149,7 +151,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
           - t0.toMicroseconds()) / 1000000.0f;
 
       if (t1 < maxDuration) {
-        float deltaValue = amplitude / (100);
+        float deltaValue = amplitude / freq;
         m_brakeValue += deltaValue;
 
         startTimesBrakeToSave.push_back(t0);
@@ -169,7 +171,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
           - t0.toMicroseconds()) / 1000000.0f;
 
       if (t1 < maxDuration) {
-        float deltaValue = amplitude / (100);
+        float deltaValue = amplitude / freq;
         m_steeringValue += deltaValue;
 
         startTimesSteeringToSave.push_back(t0);
@@ -179,6 +181,18 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
     m_startTimesSteering = startTimesSteeringToSave;
     m_amplitudesSteering = amplitudesSteeringToSave;
 
+
+    if (m_brakeValue > 0.0f) {
+      opendlv::proxy::ActuationRequest actuationRequest(m_brakeValue, 
+          m_steeringValue, false);
+      odcore::data::Container actuationContainer(actuationRequest);
+      getConference().send(actuationContainer);
+    } else {
+      opendlv::proxy::ActuationRequest actuationRequest(m_accelerationValue, 
+          m_steeringValue, false);
+      odcore::data::Container actuationContainer(actuationRequest);
+      getConference().send(actuationContainer);
+    }
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
