@@ -45,8 +45,8 @@ LidarStringDecoder::LidarStringDecoder(odcore::io::conference::ContainerConferen
     , m_settingsDone(false)
     , m_counter(0)
     , m_bufferSize(44)
-    , m_directions()
-    , m_radii()
+    //, m_directions()
+    //, m_radii()
     , m_latestReading()
 {
   m_position[0] = a_x;
