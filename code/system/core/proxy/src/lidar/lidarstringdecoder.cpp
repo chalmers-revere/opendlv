@@ -185,8 +185,8 @@ void LidarStringDecoder::ConvertToDistances()
   double cartesian[2];
   double PI = 3.14159265;
 
-  m_directions.clear();
-  m_radii.clear();
+  std::vector<opendlv::model::Direction> directions // m_directions.clear();
+  std::vector<double> radii; // m_radii.clear();
 
   for(uint32_t i = 0; i < 361; i++) {
     byte1 = (int)m_measurements[i*2];
@@ -203,8 +203,8 @@ void LidarStringDecoder::ConvertToDistances()
       double radius = std::sqrt(pow(cartesian[0],2) + std::pow(cartesian[1],2));
       float angle = static_cast<float>(std::atan2(cartesian[1],cartesian[0]));
       opendlv::model::Direction direction(angle,0);
-      m_directions.push_back(direction);
-      m_radii.push_back(radius);
+      directions.push_back(direction);
+      radii.push_back(radius);
     }
   }
 
