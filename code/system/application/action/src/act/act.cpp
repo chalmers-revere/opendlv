@@ -78,24 +78,24 @@ void Act::nextContainer(odcore::data::Container &a_container)
     
     if (type == "accelerate") {
       if (isInhibitory) {
-        m_startTimesAccelerate.empty();
-        m_amplitudesAccelerate.empty();
+        m_startTimesAccelerate.clear();
+        m_amplitudesAccelerate.clear();
       }
       
       m_startTimesAccelerate.push_back(startTime);
       m_amplitudesAccelerate.push_back(amplitude);
     } else if (type == "brake") {
       if (isInhibitory) {
-        m_startTimesBrake.empty();
-        m_amplitudesBrake.empty();
+        m_startTimesBrake.clear();
+        m_amplitudesBrake.clear();
       }
       
       m_startTimesBrake.push_back(startTime);
       m_amplitudesBrake.push_back(amplitude);
     } else if (type == "steering") {
       if (isInhibitory) {
-        m_startTimesSteering.empty();
-        m_amplitudesSteering.empty();
+        m_startTimesSteering.clear();
+        m_amplitudesSteering.clear();
       }
       
       m_startTimesSteering.push_back(startTime);

@@ -299,6 +299,10 @@ void V2vCam::ReadGeolocation(
   // std::cout << a_geolocation.getHeading() << std::endl;
   m_headingConfidence = a_geolocation.getHeadingConfidence();
   // std::cout << a_geolocation.getHeadingConfidence() << std::endl;
+
+  m_semiMajorConfidence = a_geolocation.getLatitudeConfidence();
+  m_semiMinorConfidence = a_geolocation.getLongitudeConfidence();
+  // m_semiMajorOrientation 
 }
 
 void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
