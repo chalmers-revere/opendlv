@@ -175,15 +175,48 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vIclcm::body()
     odcore::data::Container c(nextMessage);
     getConference().send(c);
 
-    std::cout << m_stationId << std::endl;
-    std::cout << m_rearAxleLocation << std::endl;
-    std::cout << m_mioId << std::endl;
-    std::cout << m_backwardId << std::endl;
-    std::cout << m_lane << std::endl;
-    std::cout << m_flagTail << std::endl;
-    std::cout << m_platoonId << std::endl;
+    // std::cout << m_stationId << std::endl;
+    // std::cout << m_rearAxleLocation << std::endl;
+    // std::cout << m_mioId << std::endl;
+    // std::cout << m_backwardId << std::endl;
+    // std::cout << m_lane << std::endl;
+    // std::cout << m_flagTail << std::endl;
+    // std::cout << m_platoonId << std::endl;
 
+    std::string output = "*** Iclcm object ***\n";
 
+    output += "Message Id: " + std::to_string(m_messageId) + "\n";
+    output += "Container mask: " + std::to_string(m_containerMask) + "\n";
+    output += "low frequency mask: " + std::to_string(m_lowFrequencyMask) + "\n";
+    output += "StationId: " + std::to_string(m_stationId) + "\n";
+    output += "Rear axle location: " + std::to_string(m_rearAxleLocation) + "\n";
+    output += "Controller type: " + std::to_string(m_controllerType) + "\n";
+    output += "Response time constant: " + std::to_string(m_responseTimeConstant) + "\n";
+    output += "Response time delay: " + std::to_string(m_responseTimeDelay) + "\n";
+    output += "Target long acc: " + std::to_string(m_targetLongAcc) + "\n";
+    output += "Time headway: " + std::to_string(m_timeHeadway) + "\n";
+    output += "Cruise speed: " + std::to_string(m_cruiseSpeed) + "\n";
+    output += "Participants ready: " + std::to_string(m_participantsReady) + "\n";
+    output += "Start platoon: " + std::to_string(m_startPlatoon) + "\n";
+    output += "End of scenario: " + std::to_string(m_endOfScenario) + "\n";
+    output += "Mio Id: " + std::to_string(m_mioId) + "\n";
+    output += "Mio range: " + std::to_string(m_mioRange) + "\n";
+    output += "Mio bearing: " + std::to_string(m_mioBearing) + "\n";
+    output += "Mio range rate: " + std::to_string(m_mioRangeRate) + "\n";
+    output += "Lane: " + std::to_string(m_lane) + "\n";
+    output += "Forward Id: " + std::to_string(m_forwardId) + "\n";
+    output += "Backward Id: " + std::to_string(m_backwardId) + "\n";
+    output += "Merge request: " + std::to_string(m_mergeRequest) + "\n";
+    output += "Safe to merge: " + std::to_string(m_safeToMerge) + "\n";
+    output += "Flag: " + std::to_string(m_flag) + "\n";
+    output += "Flag tail: " + std::to_string(m_flagTail) + "\n";
+    output += "Flag head: " + std::to_string(m_flagHead) + "\n";
+    output += "Platoon Id: " + std::to_string(m_platoonId) + "\n";
+    output += "Distance travelled cz: " + std::to_string(m_distanceTravelledCz) + "\n";
+    output += "Intention: " + std::to_string(m_intention) + "\n";
+    output += "Counter: " + std::to_string(m_counter) + "\n";
+
+    std::cout << output << std::endl;
 
     m_sendLog << std::to_string(GenerateGenerationTime())+
         + "," + std::to_string(m_messageId)+ //messageId
@@ -234,24 +267,37 @@ void V2vIclcm::ReadInsight(opendlv::knowledge::Insight &a_insight)
   
   if (information.size() == 0){
     if (str == "mergeScenario") {
-      m_scenario = "mergeScenario";
-    }
+      m_scenario = str;
+    } else if (str == "safeToMerge"){
+      m_safeToMerge = 1;
+    } 
   } else {
     if(information[0] == "stationId"){
       m_stationId = std::stoi(information[1]);
     } else if(information[0] == "rearAxleLocation"){
-      m_rearAxleLocation = std::stod(information[1]);
-    } else if (information[0] == "mio") {
+      m_rearAxleLocation = static_cast<int32_t>(std::stod(information[1])*100);
+    } else if (information[0] == "mioId") {
       m_mioId = std::stoi(information[1]);
+    } else if (information[0] == "mioRange"){
+      m_mioRange =  static_cast<int32_t>(std::stod(information[1])*100);
+    } else if (information[0] == "mioBearing"){
+      m_mioBearing = static_cast<int32_t>(std::stod(information[1])/0.002);
+    } else if (information[0] == "mioRangeRate") {
+      m_mioRangeRate = static_cast<int32_t>(std::stod(information[1])/0.01);
+    } else if (information[0] == "forwardId"){
       m_forwardId = std::stoi(information[1]);
     } else if (information[0] == "backwardId") {
       m_backwardId = std::stoi(information[1]);
     } else if (information[0] == "initialLane") {
       m_lane = std::stoi(information[1]);
+    } else if (information[0] == "isHead"){
+      m_flagHead = 1;
     } else if (information[0] == "isTail") {
       m_flagTail = 1;
     } else if (information[0] == "platoonId"){
       m_platoonId = std::stoi(information[1]);
+    } else if (information[0] == "intention"){
+      m_intention = std::stoi(information[1]);
     }
   }
 }
@@ -390,6 +436,10 @@ void V2vIclcm::nextContainer(odcore::data::Container &a_c)
       odcore::data::Container containerScenarioEnd(eventScenarioEnd);
       getConference().send(containerScenarioEnd);
     }
+
+    opendlv::knowledge::Insight platoonCruiseSpeed(now,"cruiseSpeed="+std::to_string(cruiseSpeed));
+    odcore::data::Container containerCruiseSpeed(platoonCruiseSpeed);
+    getConference().send(containerCruiseSpeed);
  
 
     m_receiveLog << std::to_string(GenerateGenerationTime())+

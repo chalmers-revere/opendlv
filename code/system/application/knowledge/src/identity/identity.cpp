@@ -82,7 +82,6 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Identity::body()
     
     opendlv::knowledge::Insight rearAxleLocationInsight(now,"rearAxleLocation="+std::to_string(m_rearAxleLocation));
     SendContainer(rearAxleLocationInsight);
-    std::cout << m_stationType << " " << m_vehicleRole << std::endl;
   
   }  
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;

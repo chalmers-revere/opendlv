@@ -27,6 +27,8 @@
 
 #include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
+#include "opendavinci/odcore/strings/StringToolbox.h"
+
 #include "gcdc16/rule/rule.hpp"
 
 namespace opendlv {
@@ -45,6 +47,8 @@ Rule::Rule(int32_t const &a_argc, char **a_argv)
 	a_argc, a_argv, "knowledge-gcdc16-rule"),
   m_object(),
   m_desiredAzimuth(0.0f),
+  m_cruiseSpeed(0.0),
+  m_speed(0.0),
   m_isAutonomous(false)
 	//standstillDistance(6), //TODO: Get actual value at GCDC in meters
 	//headway(1), //TODO: Get actual value at GCDC in seconds
@@ -69,23 +73,24 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Rule::body()
       odcore::data::dmcp::ModuleStateMessage::RUNNING){
       odcore::data::TimeStamp timestamp;
 
-      opendlv::sensation::DesiredOpticalFlow desired(35.0f/3.6f);
-      odcore::data::Container objectContainer0(desired);
-      getConference().send(objectContainer0);
-      //std::cout << "Debug: " << std::endl;
+
 
       opendlv::perception::ObjectDesiredAngularSize angularsize(0.075f, -1);
-      odcore::data::Container objectContainer1(angularsize);
-      getConference().send(objectContainer1);
-
-
-      opendlv::knowledge::Insight scenarioOut(timestamp, "mergeScenario");
-      odcore::data::Container objectContainer2(scenarioOut);
+      odcore::data::Container objectContainer2(angularsize);
       getConference().send(objectContainer2);
 
-      opendlv::knowledge::Insight mioOut(timestamp, "mio=" + mio1);
+
+      
+
+      opendlv::knowledge::Insight scenarioOut(timestamp, "mergeScenario");
+      odcore::data::Container objectContainer(scenarioOut);
+      getConference().send(objectContainer);
+
+
+      opendlv::knowledge::Insight mioOut(timestamp, "mioId=" + mio1);
       odcore::data::Container objectContainer3(mioOut);
       getConference().send(objectContainer3);
+
 
       opendlv::knowledge::Insight backwardOut(timestamp, "backwardId=" + backwardId);
       odcore::data::Container objectContainer4(backwardOut);
@@ -135,25 +140,70 @@ bool Rule::euclideanDistance(double measuredDistance)
 
 void Rule::nextContainer(odcore::data::Container &a_container)
 {
-  
- /* if (a_container.getDataType() == opendlv::proxy::ControlState::ID()) {
-    opendlv::proxy::ControlState isAutonomous = a_container.getData<opendlv::proxy::ControlState>();
 
-    bool autonomous = isAutonomous.getIsAutonomous();
-    if (autonomous) {
-      m_isAutonomous = true;
+  odcore::data::TimeStamp timestamp;
+
+  if (a_container.getDataType() == opendlv::knowledge::Insight::ID()) {
+    opendlv::knowledge::Insight insight = a_container.getData<opendlv::knowledge::Insight>();
+    std::string whatInsight = insight.getInsight();
+
+    std::vector<std::string> strVector = 
+        odcore::strings::StringToolbox::split(whatInsight, '=');
+
+    if (strVector.size() > 1) {
+      if (strVector[0] == "cruiseSpeed") {
+        m_cruiseSpeed = std::stof(strVector[1]);
+
+
+      }
+    } else {
+      if (whatInsight == "scenarioReady") {
+
+      //  opendlv::sensation::DesiredOpticalFlow desired(m_cruiseSpeed);
+      //  odcore::data::Container objectContainer0(desired);
+      //  getConference().send(objectContainer0);
+
+      }
+
+      if (whatInsight == "mergeRequest") {
+      
+        int forwardId = 152;
+        int backwardId = 153;
+
+        opendlv::knowledge::Insight mioForwardIdInsight(timestamp, "forwardId=" + forwardId);
+        odcore::data::Container mioForwardIdContainer(mioForwardIdInsight);
+        getConference().send(mioForwardIdContainer);
+
+        opendlv::knowledge::Insight mioBackwardIdInsight(timestamp, "backwardId=" + backwardId);
+        odcore::data::Container mioBackwardIdContainer(mioBackwardIdInsight);
+        getConference().send(mioBackwardIdContainer);
+
+        // Kolla om de som vi parat ihop med har parat ihop med oss
+
+        // Beräkna avstånd, om safe to merge.
+
+
+
+
+
+      //  opendlv::perception::ObjectDesiredAngularSize angularsize(0.075f, -1);
+      //  odcore::data::Container objectContainer1(angularsize);
+      //  getConference().send(objectContainer1);
+      
+      }
     }
-  } else if (m_isAutonomous && a_container.getDataType() == opendlv::knowledge::Insight::ID()) {
-
-    opendlv::knowledge::Insight unpackedObject =
-    a_container.getData<opendlv::knowledge::Insight>();
-    std::string insightMessage = unpackedObject.getInsight();
   }
-      //TODO: STOM, MergeFlag, Ask about Intention messages, distancetravelledCZ
-      //TODO: use rsuEvent -> merging should commence
-} */
 
-    if (a_container.getDataType() == opendlv::perception::Object::ID()) {
+
+  if (a_container.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
+    auto propulsion =
+      a_container.getData<opendlv::proxy::reverefh16::Propulsion>();
+    double speedKph = propulsion.getPropulsionShaftVehicleSpeed();
+    m_speed = speedKph / 3.6;
+  }
+
+
+  if (a_container.getDataType() == opendlv::perception::Object::ID()) {
     opendlv::perception::Object unpackedObject =
     a_container.getData<opendlv::perception::Object>();
 
@@ -174,14 +224,58 @@ void Rule::nextContainer(odcore::data::Container &a_container)
           m_object.reset(new opendlv::perception::Object(unpackedObject));
       }
     }
-    m_desiredAzimuth = m_object->getDirection().getAzimuth();
-    opendlv::model::Direction objectDirection(m_desiredAzimuth, 0.0f);
-    opendlv::sensation::DesiredDirectionOfMovement desiredDirection(objectDirection);
-    odcore::data::Container objectContainer(desiredDirection);
-    getConference().send(objectContainer);
-    }
-  }
 
+    float mioBearing = m_object->getDirection().getAzimuth();
+    float mioRangeRate = -1.0f;
+    float mioRange = m_object->getDistance();
+    float mioTimeHeadway = mioRange / static_cast<float>(m_speed);
+
+    opendlv::knowledge::Insight mioBearingInsight(timestamp, "mioBearing=" + std::to_string(mioBearing));
+    odcore::data::Container mioBearingContainer(mioBearingInsight);
+    getConference().send(mioBearingContainer);
+
+    opendlv::knowledge::Insight mioRangeInsight(timestamp, "mioRange=" + std::to_string(mioRange));
+    odcore::data::Container mioRangeContainer(mioRangeInsight);
+    getConference().send(mioRangeContainer);
+
+    opendlv::knowledge::Insight mioRangeRateInsight(timestamp, "mioRangeRate=" + std::to_string(mioRangeRate));
+    odcore::data::Container mioRangeRateContainer(mioRangeRateInsight);
+    getConference().send(mioRangeRateContainer);
+
+    opendlv::knowledge::Insight mioTimeHeadwayInsight(timestamp, "mioTimeHeadway=" + std::to_string(mioTimeHeadway));
+    odcore::data::Container mioTimeHeadwayContainer(mioTimeHeadwayInsight);
+    getConference().send(mioTimeHeadwayContainer);
+ 
+
+
+    //m_desiredAzimuth = m_object->getDirection().getAzimuth();
+    //opendlv::model::Direction objectDirection(m_desiredAzimuth, 0.0f);
+    //opendlv::sensation::DesiredDirectionOfMovement desiredDirection(objectDirection);
+    //odcore::data::Container objectContainer(desiredDirection);
+    //getConference().send(objectContainer);
+
+  } 
+
+}
+
+
+  
+ /* if (a_container.getDataType() == opendlv::proxy::ControlState::ID()) {
+    opendlv::proxy::ControlState isAutonomous = a_container.getData<opendlv::proxy::ControlState>();
+
+    bool autonomous = isAutonomous.getIsAutonomous();
+    if (autonomous) {
+      m_isAutonomous = true;
+    }
+  } else if (m_isAutonomous && a_container.getDataType() == opendlv::knowledge::Insight::ID()) {
+
+    opendlv::knowledge::Insight unpackedObject =
+    a_container.getData<opendlv::knowledge::Insight>();
+    std::string insightMessage = unpackedObject.getInsight();
+  }
+      //TODO: STOM, MergeFlag, Ask about Intention messages, distancetravelledCZ
+      //TODO: use rsuEvent -> merging should commence
+} */
 
 
 
