@@ -61,6 +61,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
   bool hasGpsReference = false;
 
   odcore::data::TimeStamp previousTimestep;
+  odcore::data::TimeStamp previousTimestepEkf;
   odcore::data::TimeStamp previousDataTimestamp;
   double timestamp = 0.0;
 
@@ -101,8 +102,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
         getKeyValueDataStore().get(opendlv::proxy::GpsReading::ID());
     auto gpsReading = gpsReadingContainer.getData<opendlv::proxy::GpsReading>();
 
-    //std::cout << getName() << "\tLatitude  =  " << gpsReading.getLatitude()
-    //    << "  Longitude  =  " << gpsReading.getLongitude() << std::endl;
+    std::cout << getName()
+              << "\tLatitude  =  " << gpsReading.getLatitude()
+              << "  Longitude  =  " << gpsReading.getLongitude()
+              << " north Heading = " << gpsReading.getNorthHeading() << std::endl;
 
     if (gpsReadingContainer.getReceivedTimeStamp().toMicroseconds() > 0) {
       if (!hasGpsReference) {
@@ -158,10 +161,12 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       //double lateralAcceleration = vehicleState.getAccelerationY();  //TODO: do we need lateral acceleration?
       double longitudinalAccelerationConfidence = -1;
 
-
       if (steeringContainer.getReceivedTimeStamp().getSeconds() > 0) {
         control.phi() = steering.getRoadwheelangle()/m_steeringToWheelRatio;
       }
+      std::cout << "control vector : vel = " << control.v()
+                << " steering = " << control.phi()
+                << std::endl;
 
       opendlv::data::environment::WGS84Coordinate currentLocation(
           gpsReading.getLatitude(),
@@ -177,19 +182,24 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
           kinematicObservationModel.h(state);
       observationVector.Z_x() = currentCartesianLocation.getX();
       observationVector.Z_y() = currentCartesianLocation.getY();
-      if (gpsReading.getHasHeading()) {
-        observationVector.Z_theta() = gpsReading.getNorthHeading();
-      }
-      else {
-        observationVector.Z_theta() = state.theta();
-      }
+      observationVector.Z_theta() = gpsReading.getNorthHeading();
+//      if (gpsReading.getHasHeading()) {
+//        observationVector.Z_theta() = gpsReading.getNorthHeading();
+//      }
+//      else {
+//        observationVector.Z_theta() = state.theta();
+//      }
+
+      std::cout << "observation vector : x = " << observationVector.Z_x()
+                << " y = " << observationVector.Z_y()
+                << " northHeading = " << observationVector.Z_theta() << std::endl;
 
       double deltaTime = duration.toMicroseconds() / 1000000.0;
       systemModel.updateDeltaT(deltaTime);
 
+      odcore::data::TimeStamp timeBeforEkf;
 
       state = m_ekf.predict(systemModel, control);
-
 
       bool gpsHasData = false;
       if (gpsReadingContainer.getReceivedTimeStamp().toMicroseconds() >
@@ -199,6 +209,11 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
         previousDataTimestamp = gpsReadingContainer.getReceivedTimeStamp();
         gpsHasData = true;
       }
+
+      odcore::data::TimeStamp ekfTimeElapsed = timeBeforEkf - previousTimestepEkf;
+      previousTimestepEkf = thisTimestep;
+
+      std::cout << " Ekf time elapsed " << ekfTimeElapsed << std::endl;
 
       timestamp += systemModel.getDeltaT();
 
@@ -232,7 +247,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       }
 
       double heading = 0.0;
-      if (std::isfinite(state.theta()) )
+  /*    if (std::isfinite(state.theta()) )
       {
         // heading = state.theta() - 
         //           std::ceil((state.theta()-M_PI)/(M_PI)) * (M_PI);  // make sure that the heading is in [0,2pi]
@@ -250,8 +265,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 	else {
            heading = 0.0;} 
         ekfSuccess = false;
-      }
-
+      }*/
+      heading = std::fmod(std::abs(gpsReading.getNorthHeading()),2*M_PI);
 
 
       double positionConfidence = calculatePositionConfidence(ekfSuccess);
@@ -266,12 +281,14 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
           << "\tlat=" << currentWGS84CoordinateEstimation.getLatitude()
           << ", long="
           << currentWGS84CoordinateEstimation.getLongitude()
-          << ", northHeading =" << heading << "\n" << std::endl;
+          << ", northHeading =" << heading << "\n\n" << std::endl;
 
       // Send the message
-      opendlv::sensation::Geolocation geoLocationEstimation(currentWGS84CoordinateEstimation.getLatitude(),
+      opendlv::sensation::Geolocation geoLocationEstimation(gpsReading.getLatitude(),
+                                                            //currentWGS84CoordinateEstimation.getLatitude(),
                                                             positionConfidence,
-                                                            currentWGS84CoordinateEstimation.getLongitude(),
+                                                            gpsReading.getLongitude(),
+                                                            //currentWGS84CoordinateEstimation.getLongitude(),
                                                             positionConfidence,
                                                             gpsReading.getAltitude(),
                                                             heading,  

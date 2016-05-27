@@ -418,13 +418,13 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
     double m_yOffset = currentObjectCartesianLocation.getY();
     float m_azimuth;
 
-    if (std::abs(m_yOffset) < 0.001){
+    if (std::fabs(m_yOffset) < 0.001){
       if (m_xOffset < 0.0){
         m_azimuth = 3.14159f;
       } else {
         m_azimuth = 0.0f;
       }
-    } else if (std::abs(m_xOffset) < 0.001){
+    } else if (std::fabs(m_xOffset) < 0.001){
       if (m_yOffset < 0.0){
         m_azimuth = -3.14159 / 2.0;
       } else {
@@ -433,6 +433,23 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
     } else {
       m_azimuth = std::atan2(m_yOffset, m_xOffset);
     }
+
+
+    double rearX = m_xOffset - (vehicleLength / 10.0);
+    double leftRearY = m_yOffset + (vehicleWidth / 20.0);
+    double rightRearY = m_yOffset - (vehicleWidth / 20.0);
+
+
+    double leftLength = sqrt(leftRearY*leftRearY + rearX*rearX);
+    double rightLength = sqrt(rightRearY*rightRearY + rearX*rearX);
+
+    // c² = a² + b²  - 2ab cos(alpha)
+    // alpha = cos⁻1 ((a²+b² - c²) / (2ab))
+
+    double alpha = acos( (leftLength*leftLength +rightLength*rightLength - vehicleWidth*vehicleWidth) / (2*leftLength*rightLength));
+
+
+
 
     odcore::data::TimeStamp now;
     std::string m_type = "vehicle";
@@ -443,7 +460,7 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
     float m_objectDirectionRateConfidence = -1.0f;
     float m_distance = std::sqrt((m_xOffset * m_xOffset) + (m_yOffset * m_yOffset));
     float m_distanceConfidence = 0.5f;
-    float m_angularSize = -1.0f;
+    float m_angularSize = (float)alpha;
     float m_angularSizeConfidence = -1.0f;
     float m_angularSizeRate = 0.0f;
     float m_angularSizeRateConfidence = -1.0f;

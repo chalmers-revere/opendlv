@@ -17,43 +17,57 @@
  * USA.
  */
 
-#ifndef KEEPOBJECTSIZE_KEEPOBJECTSIZE_HPP_
-#define KEEPOBJECTSIZE_KEEPOBJECTSIZE_HPP_
+#include <ctype.h>
+#include <cstring>
+#include <cmath>
+#include <iostream>
 
-#include <memory>
-
-#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
+#include "opendavinci/odcore/data/TimeStamp.h"
+
 #include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
+#include "proprioception/balance/balance.hpp"
+
 namespace opendlv {
-namespace action {
-namespace keepobjectsize {
+namespace sensation {
+namespace proprioception {
+namespace balance {
 
 /**
- * This class provides...
+  * Constructor.
+  *
+  * @param a_argc Number of command line arguments.
+  * @param a_argv Command line arguments.
+  */
+Balance::Balance(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "sensation-proprioception-balance")
+{
+}
+
+Balance::~Balance()
+{
+}
+
+/**
+ * Receives .
+ * Sends .
  */
-class KeepObjectSize
-: public odcore::base::module::DataTriggeredConferenceClientModule {
- public:
-  KeepObjectSize(int32_t const &, char **);
-  KeepObjectSize(KeepObjectSize const &) = delete;
-  KeepObjectSize &operator=(KeepObjectSize const &) = delete;
-  virtual ~KeepObjectSize();
-  virtual void nextContainer(odcore::data::Container &);
+void Balance::nextContainer(odcore::data::Container &)
+{
 
- private:
-  void setUp();
-  void tearDown();
+}
 
-  std::unique_ptr<opendlv::perception::Object> m_object;
-  float m_desiredAzimuth;
-  float m_angularSize;
-  float m_targetSize;
-};
+void Balance::setUp()
+{
+}
 
-} // keepobjectsize
-} // action
+void Balance::tearDown()
+{
+}
+
+} // orientation
+} // proprioception
+} // sensation
 } // opendlv
-
-#endif

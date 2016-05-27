@@ -17,43 +17,39 @@
  * USA.
  */
 
-#ifndef KEEPOBJECTSIZE_KEEPOBJECTSIZE_HPP_
-#define KEEPOBJECTSIZE_KEEPOBJECTSIZE_HPP_
+#ifndef PROPRIOCEPTION_BALANCE_BALANCE_HPP_
+#define PROPRIOCEPTION_BALANCE_BALANCE_HPP_
 
 #include <memory>
 
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 namespace opendlv {
-namespace action {
-namespace keepobjectsize {
+namespace sensation {
+namespace proprioception {
+namespace balance {
 
 /**
  * This class provides...
  */
-class KeepObjectSize
+class Balance
 : public odcore::base::module::DataTriggeredConferenceClientModule {
  public:
-  KeepObjectSize(int32_t const &, char **);
-  KeepObjectSize(KeepObjectSize const &) = delete;
-  KeepObjectSize &operator=(KeepObjectSize const &) = delete;
-  virtual ~KeepObjectSize();
+  Balance(int32_t const &, char **);
+  Balance(Balance const &) = delete;
+  Balance &operator=(Balance const &) = delete;
+  virtual ~Balance();
   virtual void nextContainer(odcore::data::Container &);
 
  private:
   void setUp();
   void tearDown();
-
-  std::unique_ptr<opendlv::perception::Object> m_object;
-  float m_desiredAzimuth;
-  float m_angularSize;
-  float m_targetSize;
 };
 
-} // keepobjectsize
-} // action
+} // balance
+} // proprioception
+} // sensation
 } // opendlv
 
 #endif

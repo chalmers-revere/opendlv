@@ -67,30 +67,22 @@ void ManualOverride::tearDown()
 void ManualOverride::nextContainer(odcore::data::Container &a_container)
 {
   // TODO: currently vehicle specific.
- if (a_container.getDataType() == opendlv::proxy::reverefh16::Steering::ID()) {
+  /*if (a_container.getDataType() == opendlv::proxy::reverefh16::Steering::ID()) {
 
-  auto steering = 
-        a_container.getData<opendlv::proxy::reverefh16::Steering>();
-      
-
-      double steeringwheelangle = steering.getSteeringwheelangle();
-
-      //std::cout << "Steeringwheel angle: " << steeringwheelangle << std::endl;
+    auto steering = a_container.getData<opendlv::proxy::reverefh16::Steering>();
+    double steeringwheelangle = steering.getSteeringwheelangle();
+    //std::cout << "Steeringwheel angle: " << steeringwheelangle << std::endl;
 
     if (std::abs(steeringwheelangle) > 0.3) {
-     // std::cout << "Steering wheel override (" 
-     //     << torsionBarTorque << ")" << std::endl;
+      // std::cout << "Steering wheel override (" 
+      //     << torsionBarTorque << ")" << std::endl;
       std::cout << "Steering Override!" << std::endl;
 
       opendlv::proxy::ControlState controlState(false);
       odcore::data::Container c(controlState);
       getConference().send(c);
     }
-
-}
-
-
-
+  }*/
 
 
 
@@ -112,22 +104,23 @@ void ManualOverride::nextContainer(odcore::data::Container &a_container)
        //   << accelerationPedalPosition << ")" << std::endl;
       std::cout << "Acceleration Override!" << std::endl;
 
-      opendlv::proxy::ControlState controlState(false);
+      opendlv::proxy::ControlOverrideState controlState(true);
       odcore::data::Container c(controlState);
       getConference().send(c);
-    }
-    
-    if (brakePedalPosition > 10.0 && brakePedalPosition < 102.0) {
+    } else if (brakePedalPosition > 10.0 && brakePedalPosition < 102.0) {
       //std::cout << "Brake pedal override (" 
       //    << brakePedalPosition << ")" << std::endl;
       std::cout << "Break Override!" << std::endl;
 
 
-      opendlv::proxy::ControlState controlState(false);
+      opendlv::proxy::ControlOverrideState controlState(true);
       odcore::data::Container c(controlState);
       getConference().send(c);
-    }
-    
+    } else {
+      opendlv::proxy::ControlOverrideState controlState(false);
+      odcore::data::Container c(controlState);
+      getConference().send(c);
+    }    
   }
 }
 
