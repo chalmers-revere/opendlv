@@ -175,13 +175,13 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vIclcm::body()
     odcore::data::Container c(nextMessage);
     getConference().send(c);
 
-    // std::cout << m_stationId << std::endl;
-    // std::cout << m_rearAxleLocation << std::endl;
-    // std::cout << m_mioId << std::endl;
-    // std::cout << m_backwardId << std::endl;
-    // std::cout << m_lane << std::endl;
-    // std::cout << m_flagTail << std::endl;
-    // std::cout << m_platoonId << std::endl;
+    std::cout << m_stationId << std::endl;
+    std::cout << m_rearAxleLocation << std::endl;
+    std::cout << m_mioId << std::endl;
+    std::cout << m_backwardId << std::endl;
+    std::cout << m_lane << std::endl;
+    std::cout << m_flagTail << std::endl;
+    std::cout << m_platoonId << std::endl;
 
 
 
@@ -230,24 +230,30 @@ void V2vIclcm::ReadInsight(opendlv::knowledge::Insight &a_insight)
 
   // std::cout<< str << std::endl;
   std::vector<std::string> information = odcore::strings::StringToolbox::split(str,'=');
-  // if(information[0] == "stationId"){
-  //   m_stationId = std::stoi(information[1]);
-  // } else if(information[0] == "rearAxleLocation"){
-  //   m_rearAxleLocation = std::stod(information[1]);
-  // } else if (information[0] == "mergeScenario") {
-  //   m_scenario = "mergeScenario";
-  // } else if (information[0] == "mio") {
-  //   m_mioId = std::stoi(information[1]);
-  //   m_forwardId = std::stoi(information[1]);
-  // } else if (information[0] == "backwardId") {
-  //   m_backwardId = std::stoi(information[1]);
-  // } else if (information[0] == "initialLane") {
-  //   m_lane = std::stoi(information[1]);
-  // } else if (information[0] == "isTail") {
-  //   m_flagTail = 1;
-  // } else if (information[0] == "platoonId"){
-  //   m_platoonId = std::stoi(information[1]);
-  // }
+  // std::cout<< information.size() << std::endl;
+  
+  if (information.size() == 0){
+    if (str == "mergeScenario") {
+      m_scenario = "mergeScenario";
+    }
+  } else {
+    if(information[0] == "stationId"){
+      m_stationId = std::stoi(information[1]);
+    } else if(information[0] == "rearAxleLocation"){
+      m_rearAxleLocation = std::stod(information[1]);
+    } else if (information[0] == "mio") {
+      m_mioId = std::stoi(information[1]);
+      m_forwardId = std::stoi(information[1]);
+    } else if (information[0] == "backwardId") {
+      m_backwardId = std::stoi(information[1]);
+    } else if (information[0] == "initialLane") {
+      m_lane = std::stoi(information[1]);
+    } else if (information[0] == "isTail") {
+      m_flagTail = 1;
+    } else if (information[0] == "platoonId"){
+      m_platoonId = std::stoi(information[1]);
+    }
+  }
 }
 
 /**

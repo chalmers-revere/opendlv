@@ -69,15 +69,15 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Rule::body()
       odcore::data::dmcp::ModuleStateMessage::RUNNING){
       odcore::data::TimeStamp timestamp;
 
-      // opendlv::sensation::DesiredOpticalFlow desired(35.0f/3.6f);
-      // odcore::data::Container objectContainer1ctContainer0(desired);
-      // getConference().send(objectContainer0);
-      // std::cout << "Debug: " << std::endl;
+      opendlv::sensation::DesiredOpticalFlow desired(35.0f/3.6f);
+      odcore::data::Container objectContainer0(desired);
+      getConference().send(objectContainer0);
+      std::cout << "Debug: " << std::endl;
 
 
-      // opendlv::knowledge::Insight scenarioOut(timestamp, "mergeScenario");
-      // odcore::data::Container objectContainer1(scenarioOut);
-      // getConference().send(objectContainer1);
+      opendlv::knowledge::Insight scenarioOut(timestamp, "mergeScenario");
+      odcore::data::Container objectContainer1(scenarioOut);
+      getConference().send(objectContainer1);
 
       opendlv::knowledge::Insight mioOut(timestamp, "mio=" + mio1);
       odcore::data::Container objectContainer2(mioOut);
