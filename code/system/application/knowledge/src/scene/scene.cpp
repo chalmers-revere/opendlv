@@ -304,10 +304,12 @@ void Scene::MergeObjects(opendlv::perception::Object a_object, uint32_t a_index)
   m_savedObjects[a_index].setAngularSizeRate(a_object.getAngularSizeRate());
   m_savedObjects[a_index].setAngularSizeRateConfidence(a_object.getAngularSizeRateConfidence());
 
-  auto sourceSearch = std::find(std::begin(m_savedObjects[a_index].getListOfSources()), std::end(m_savedObjects[a_index].getListOfSources()), a_object.getListOfSources()[0]);
-  if (sourceSearch == std::end(m_savedObjects[a_index].getListOfSources())) {
-    m_savedObjects[a_index].getListOfSources().push_back(a_object.getListOfSources()[0]);
-    m_savedObjects[a_index].setConfidence(m_savedObjects[a_index].getConfidence() + (a_object.getConfidence() / 2));
+  if(m_savedObjects[a_index].getListOfSources().size() > 0)
+    auto sourceSearch = std::find(std::begin(m_savedObjects[a_index].getListOfSources()), std::end(m_savedObjects[a_index].getListOfSources()), a_object.getListOfSources()[0]);
+    if (sourceSearch == std::end(m_savedObjects[a_index].getListOfSources())) {
+      m_savedObjects[a_index].getListOfSources().push_back(a_object.getListOfSources()[0]);
+      m_savedObjects[a_index].setConfidence(m_savedObjects[a_index].getConfidence() + (a_object.getConfidence() / 2));
+    }
   }
   for (uint32_t i = 0; i < a_object.getListOfProperties().size(); i++) {
     auto propertySearch = std::find(std::begin(m_savedObjects[a_index].getListOfProperties()), std::end(m_savedObjects[a_index].getListOfProperties()), a_object.getListOfProperties()[i]);
