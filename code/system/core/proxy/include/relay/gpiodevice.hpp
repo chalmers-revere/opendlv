@@ -17,40 +17,34 @@
  * USA.
  */
 
-#ifndef TOGGELER_TOGGELER_HPP_
-#define TOGGELER_TOGGELER_HPP_
+#ifndef RELAY_GPIODEVICE_HPP_
+#define RELAY_GPIODEVICE_HPP_
 
-#include <memory>
+#include <cstdint>
+#include <iostream>
+#include <string>
 
-#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
-#include "opendavinci/odcore/data/Container.h"
+#include "relay/device.hpp"
 
 namespace opendlv {
 namespace proxy {
-namespace toggeler {
+namespace relay {
 
-class Device;
-
-/**
- * This class provides...
- */
-class Toggeler
-: public odcore::base::module::DataTriggeredConferenceClientModule {
+class GpioDevice : public Device {
  public:
-  Toggeler(int32_t const &, char **);
-  Toggeler(Toggeler const &) = delete;
-  Toggeler &operator=(Toggeler const &) = delete;
-  virtual ~Toggeler();
-  virtual void nextContainer(odcore::data::Container &);
+  GpioDevice(std::vector<bool>, std::vector<uint16_t>);
+  GpioDevice(GpioDevice const &) = delete;
+  GpioDevice &operator=(GpioDevice const &) = delete;
+  virtual ~GpioDevice();
+  bool IsActive(uint16_t const) const;
+  void Reset();
+  void SetValue(uint16_t const, bool const);
 
  private:
-  void setUp();
-  void tearDown();
-
-  std::unique_ptr<Device> m_device;
+  std::vector<uint16_t> m_pins;
 };
 
-} // toggeler
+} // relay
 } // proxy
 } // opendlv
 

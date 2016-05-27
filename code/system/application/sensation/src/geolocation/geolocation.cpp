@@ -78,7 +78,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 
   // To dump data structures into a CSV file, you create an output file first.
   // std::ofstream fout("../Exp_data/output.csv");
-  bool   saveToFile = true;
+  bool   saveToFile = false;
      std::ofstream fout_ekfState("./output_ekf.csv");
      if (  saveToFile){
      fout_ekfState
@@ -130,7 +130,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
           opendlv::proxy::reverefh16::Propulsion>();
 
       if (propulsionContainer.getReceivedTimeStamp().getSeconds() > 0) {
-        control.v() = propulsion.getPropulsionShaftVehicleSpeed();
+        control.v() = propulsion.getPropulsionShaftVehicleSpeed()/3.6;
         // TODO: to m/s --- get the message in si unit
       }
 
@@ -234,7 +234,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       if (std::isfinite(state.theta()) )
       {
         heading = state.theta() - 
-                  std::ceil((state.theta()-M_PI/2)/(M_PI)) * (M_PI);  // make sure that the heading is in [-pi,+pi]
+                  std::ceil((state.theta()-M_PI)/(M_PI)) * (M_PI);  // make sure that the heading is in [-pi,+pi]
       }
       else
       {
@@ -242,7 +242,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
        state = m_ekf.getState();
         if (std::isfinite(gpsReading.getNorthHeading())) {
            heading = state.theta() - 
-                  std::ceil((gpsReading.getNorthHeading()-M_PI/2)/(M_PI)) * (M_PI);  // make sure that the heading is in [-pi,+pi]
+                  std::ceil((gpsReading.getNorthHeading()-M_PI)/(M_PI)) * (M_PI);  // make sure that the heading is in [-pi,+pi]
         }
 	else {
            heading = 0.0;} 
@@ -271,7 +271,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
                                                             currentWGS84CoordinateEstimation.getLongitude(),
                                                             positionConfidence,
                                                             gpsReading.getAltitude(),
-                                                            heading,  
+                                                            std::fmod(heading+opendlv::Constants::PI,2*opendlv::Constants::PI),  
                                                             headingConfidence
                                                             );
       
@@ -282,15 +282,15 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 
       // TODO: This should be sent from another module = sensation/geolocation 
       // should be split in two as discussed previously
-      opendlv::model::Cartesian3 velocity(control.v(), 0.0f, 0.0f);
+      opendlv::model::Cartesian3 velocity(control.v()/3.6, 0.0f, 0.0f);
       // opendlv::model::Cartesian3 velocity(gpsReading.getSpeed(), 0.0f, 0.0f);
       opendlv::model::Cartesian3 velocityConfidence(speedConfidence, 0.0f, 
           0.0f);
 
-      opendlv::model::Cartesian3 acceleration(longitudinalAcceleration, 0.0f, 
+      opendlv::model::Cartesian3 acceleration(longitudinalAcceleration/3.6, 0.0f, 
           0.0f);
       opendlv::model::Cartesian3 accelerationConfidence(
-          longitudinalAccelerationConfidence, 0.0f, 0.0f);
+          longitudinalAccelerationConfidence/3.6, 0.0f, 0.0f);
       
       opendlv::model::Cartesian3 angularVelocity(0.0f, 0.0f, yawRate);
       opendlv::model::Cartesian3 angularVelocityConfidence(0.0f, 0.0f,

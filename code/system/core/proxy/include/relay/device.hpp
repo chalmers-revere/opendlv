@@ -17,22 +17,30 @@
  * USA.
  */
 
-#ifndef TOGGELER_DEVICE_HPP_
-#define TOGGELER_DEVICE_HPP_
+#ifndef RELAY_DEVICE_HPP_
+#define RELAY_DEVICE_HPP_
+
+#include <vector>
 
 namespace opendlv {
 namespace proxy {
-namespace toggeler {
+namespace relay {
 
 class Device {
  public:
-  Device();
+  Device(std::vector<bool>);
   Device(Device const &) = delete;
   Device &operator=(Device const &) = delete;
   virtual ~Device();
+  virtual bool IsActive(uint16_t const) const = 0;
+  virtual void Reset() = 0;
+  virtual void SetValue(uint16_t const, bool const) = 0;
+
+ protected:
+  std::vector<bool> m_initialValues;
 };
 
-} // toggeler
+} // relay
 } // proxy
 } // opendlv
 

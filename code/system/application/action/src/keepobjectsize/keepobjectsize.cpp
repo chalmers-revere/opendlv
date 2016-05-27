@@ -25,7 +25,7 @@
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
 
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
+
 
 #include "keepobjectsize/keepobjectsize.hpp"
 
@@ -41,7 +41,10 @@ namespace keepobjectsize {
   */
 KeepObjectSize::KeepObjectSize(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(
-      a_argc, a_argv, "action-keepobjectsize")
+      a_argc, a_argv, "action-keepobjectsize"),
+      m_object(),
+      m_desiredAzimuth(0.0f),
+      m_angularSize(0.0f)
 {
 }
 
@@ -54,8 +57,67 @@ KeepObjectSize::~KeepObjectSize()
  * current size, and desired size.
  * Sends speed correction commands (throttle) to Act.
  */
-void KeepObjectSize::nextContainer(odcore::data::Container &)
+void KeepObjectSize::nextContainer(odcore::data::Container &a_container)
 {
+  if(a_container.getDataType() == opendlv::perception::Object::ID()) {
+  opendlv::perception::Object unpackedObject =
+  a_container.getData<opendlv::perception::Object>();
+
+  int16_t identity = unpackedObject.getObjectId();
+
+  if (identity != -1) {
+
+    opendlv::model::Direction direction = unpackedObject.getDirection();
+    float azimuth = direction.getAzimuth();
+    float speedCorrection = 0;
+
+    if (std::abs(azimuth) < 0.22f) {
+      if (m_object == nullptr) {
+        m_object.reset(new opendlv::perception::Object(unpackedObject));
+      } else {
+        if (unpackedObject.getDistance() < m_object->getDistance())
+          m_object.reset(new opendlv::perception::Object(unpackedObject));
+      }    
+
+      m_angularSize = unpackedObject.getAngularSize();
+
+      if (m_angularSize < 0.070f) {
+
+        float angularSizeRatio = 0.075f / m_angularSize;
+        speedCorrection = angularSizeRatio - 1;
+      }
+      else if (m_angularSize > 0.080f) {
+        float angularSizeRatio = 0.075f / m_angularSize;
+        speedCorrection = -angularSizeRatio*2 + 1; 
+      }
+      else {
+        speedCorrection = 0;
+      }
+      
+      std::cout << "speedCorrection: " << speedCorrection << std::endl << std::endl;
+      odcore::data::TimeStamp t0;
+      opendlv::action::Correction correction1(t0, "acceleration", false, speedCorrection);
+      odcore::data::Container container(correction1);
+      getConference().send(container);
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   /*
   if(c.getDataType() == opendlv::perception::LeadVehicleSize::ID()){
     opendlv::perception::LeadVehicleSize leadVehicleSize = 

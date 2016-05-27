@@ -17,10 +17,27 @@
  * USA.
  */
 
-#include "toggeler/toggeler.hpp"
+#include <iostream>
 
-int32_t main(int32_t a_argc, char **a_argv)
+#include "relay/device.hpp"
+
+namespace opendlv {
+namespace proxy {
+namespace relay {
+
+/**
+ * Constructor.
+ *
+ */
+Device::Device(std::vector<bool> a_initialValues):
+    m_initialValues(a_initialValues)
 {
-  opendlv::proxy::toggeler::Toggeler toggeler(a_argc, a_argv);
-  return toggeler.runModule();
 }
+
+Device::~Device()
+{
+}
+
+} // relay
+} // proxy
+} // opendlv

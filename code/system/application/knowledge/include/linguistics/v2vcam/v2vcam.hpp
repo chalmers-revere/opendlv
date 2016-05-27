@@ -55,11 +55,12 @@ class V2vCam
   void ReadDynamicState(opendlv::model::DynamicState const &);
   void ReadGeolocation(opendlv::sensation::Geolocation const &);
   void ReadVoice(opendlv::sensation::Voice const &);
+  void ReadInsight(opendlv::knowledge::Insight const &);
   void SendWGS84Coordinate();
 
   unsigned char GetMessageId() const;
   int32_t GetStationId() const;
-  uint32_t GenerateGenerationTime() const;
+  uint64_t GenerateGenerationTime() const;
   int32_t GenerateGenerationDeltaTime();
   unsigned char GetContainerMask() const;
   int32_t GetStationType() const;
@@ -86,10 +87,10 @@ class V2vCam
   std::time_t m_timeType2004;
 
   unsigned char const m_messageId = 2;
-  int32_t m_stationId = 115;
+  int32_t m_stationId = 0;
   int32_t m_generationDeltaTime = 0; 
   unsigned char m_containerMask = 0;
-  int32_t m_stationType = 8;
+  int32_t m_stationType = 0;
   double m_latitude = 90.0000001;
   double m_longitude = 180.0000001;
   double m_semiMajorConfidence = -1;
@@ -102,8 +103,8 @@ class V2vCam
   double m_speedConfidence = -1;
   double m_vehicleLength = -1;
   double m_vehicleWidth = -1;
-  double m_longitudinalAcc = 16.1;
-  double m_longitudinalAccConf = 10.2;
+  double m_longitudinalAcc = -1;
+  double m_longitudinalAccConf = -1;
   double m_yawRateValue = 0;
   double m_yawRateConfidence = -1;
   int32_t m_vehicleRole = 0;
