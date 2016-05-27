@@ -177,8 +177,12 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
           gpsReading.getLongitude(),
           opendlv::data::environment::WGS84Coordinate::EAST);
 
+      odcore::data::TimeStamp timeBeforeConversionGps2Point;
       opendlv::data::environment::Point3 currentCartesianLocation =
-          gpsReference.transform(currentLocation);
+        gpsReference.transform(currentLocation);
+      odcore::data::TimeStamp timeAfterConversionGps2Point;
+       odcore::data::TimeStamp durationAfterConversionGps2Point = timeAfterConversionGps2Point - timeBeforeConversionGps2Point;
+
 
       //kinematic kalman block
       KinematicObservationVector<double> observationVector =
@@ -194,7 +198,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 //      }
 
 
-      double deltaTime = duration.toMicroseconds() / 1000000.0;
+      double deltaTime = duration.toMicroseconds() / 1000000.0; //in sec
       systemModel.updateDeltaT(deltaTime);
 
       odcore::data::TimeStamp timeBeforeEkf;
@@ -221,6 +225,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 
       timestamp += systemModel.getDeltaT();
 
+      odcore::data::TimeStamp durationAfterConversionPoint2Gps;
       //TODO: convert here x and y to get the position of the rear axle
       opendlv::data::environment::WGS84Coordinate currentWGS84CoordinateEstimation;
       bool ekfSuccess=true;
@@ -233,7 +238,11 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
                 (state.x() + m_gpsToCoGDisplacement_x,
                  state.y() + m_gpsToCoGDisplacement_y,
                  currentCartesianLocation.getZ() + m_gpsToCoGDisplacement_z);
-//        currentWGS84CoordinateEstimation = gpsReference.transform(currentStateEstimation);
+
+      odcore::data::TimeStamp timeBeforeConversionPoint2Gps;
+        currentWGS84CoordinateEstimation = gpsReference.transform(currentStateEstimation);
+        odcore::data::TimeStamp timeAfterConversionPoint2Gps;
+        durationAfterConversionPoint2Gps = timeAfterConversionPoint2Gps - timeBeforeConversionPoint2Gps;
       }
       else
       {
@@ -244,8 +253,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
        ekfSuccess = false;
       }
 
-      odcore::data::TimeStamp timeAfterConversionStuff;
-      odcore::data::TimeStamp durationAfterConversionStuff = timeAfterConversionStuff - timeAtBegin;
+
 
       double heading = 0.0;
   /*    if (std::isfinite(state.theta()) )
@@ -260,7 +268,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
        state = m_ekf.getState();
         if (std::isfinite(gpsReading.getNorthHeading())) {
            // heading = gpsReading.getNorthHeading() - 
-           //        std::ceil((gpsReading.getNorthHeading()-M_PI)/(M_PI)) * (M_PI);  // make sure that the heading is in [-pi,+pi]
+           //        std::ceil((gpsReading.getNorthHeading()-M_PI)/(M_PI)) * (M_PI);  // make sure that the heading is in [0,+2pi]
           heading = std::fmod(std::abs(gpsReading.getNorthHeading()),2*M_PI);
         }
 	else {
@@ -353,11 +361,12 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
                 << "\n   northHeading = " << observationVector.Z_theta()
                 << "\n Timing: "
                 << "\nEkf time elapsed (microseconds) = " << ekfTimeElapsed.toMicroseconds()
-                << "\n   durationAfterGpsReading  = " << durationAfterGpsReading.toMicroseconds()
-                << "\n   durationAfterCanReading  = " << durationAfterCanReading.toMicroseconds()
-                << "\n   durationAfterConversionStuff = " << durationAfterConversionStuff.toMicroseconds()
                 << "\n   durationBeforeEkf = " << durationBeforeEkf.toMicroseconds()
                 << "\n   durationAfterEkf = " << durationAfterEkf.toMicroseconds()
+                << "\n   durationAfterGpsReading  = " << durationAfterGpsReading.toMicroseconds()
+                << "\n   durationAfterCanReading  = " << durationAfterCanReading.toMicroseconds()
+                << "\n   durationAfterConversionGps2Point  =  " << durationAfterConversionGps2Point.toMicroseconds()
+                << "\n   durationAfterConversionPoint2Gps  =  " << durationAfterConversionPoint2Gps.toMicroseconds()
                 << "\n   durationBeforeMessgeSending = " << durationBeforeMessgeSending.toMicroseconds()
                 << "\n   timeAfterMessgeSending  = " << durationAfterMessageSending.toMicroseconds()
                 << "\n   durationOfMessageSending  = " << durationOfMessageSending.toMicroseconds()
