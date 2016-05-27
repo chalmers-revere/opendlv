@@ -45,7 +45,9 @@ SetOpticalFlow::SetOpticalFlow(int32_t const &a_argc, char **a_argv)
     m_maxSpeed(0.0f),
     m_currentSpeed(0.0f),
     m_speedCorrection(0.0f),
-    m_desiredSpeed(0.0f)
+    m_desiredSpeed(0.0f),
+    m_currentEstimatedAcceleration(0.0f),
+    m_velocityMemory()
 {
 }
 
@@ -61,7 +63,23 @@ SetOpticalFlow::~SetOpticalFlow()
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SetOpticalFlow::body()
 {
-  while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING){
+  while (getModuleStateAndWaitForRemainingTimeInTimeslice() 
+      == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+
+    float deltaTime = 1.0f/static_cast<float>(getFrequency());
+    uint32_t nrAccAvg = 50; 
+    m_velocityMemory.push_back(m_currentSpeed);
+    if (m_velocityMemory.size() > nrAccAvg+1) {
+      m_velocityMemory.erase(m_velocityMemory.begin());
+
+      float sumAcc = 0;
+      for (uint32_t i=0; i<m_velocityMemory.size()-1; i++) {
+        sumAcc += (m_velocityMemory.at(i+1) - m_velocityMemory.at(i))/deltaTime;
+      }
+      m_currentEstimatedAcceleration = sumAcc/nrAccAvg;
+      std::cout << "Current estimated acceleration: " 
+          << m_currentEstimatedAcceleration << std::endl;
+    }
 
     std::cout << "Current speed: " << m_currentSpeed << std::endl;
     std::cout << "Desired speed: " << m_desiredSpeed << std::endl;
@@ -93,7 +111,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SetOpticalFlow::body()
 
     if (speedDiff > speedDiffEstimateLimit) {
       odcore::data::TimeStamp t0;
-      float estimateAmplitude = std::max(std::min(speedDiff*estimateAmplitudeSpeedFactor, 100.0f), 0.0f);
+      float estimateAmplitude = std::max(std::min(
+          speedDiff*estimateAmplitudeSpeedFactor, 100.0f), 0.0f);
       opendlv::action::Estimate estimate(t0, "accelerate", estimateAmplitude);
       odcore::data::Container container(estimate);
       getConference().send(container);
@@ -101,7 +120,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SetOpticalFlow::body()
     }
     else {
       odcore::data::TimeStamp t0;
-      opendlv::action::Correction correction1(t0, "accelerate", false, m_speedCorrection);
+      opendlv::action::Correction correction1(
+          t0, "accelerate", false, m_speedCorrection);
       odcore::data::Container container(correction1);
       getConference().send(container);
       std::cout << "Speed Correction: " << m_speedCorrection << std::endl;
@@ -116,13 +136,13 @@ void SetOpticalFlow::nextContainer(odcore::data::Container &a_container)
 {
   
   if (a_container.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
-    opendlv::proxy::reverefh16::Propulsion propulsion = a_container.getData<opendlv::proxy::reverefh16::Propulsion>();
+    opendlv::proxy::reverefh16::Propulsion propulsion = 
+        a_container.getData<opendlv::proxy::reverefh16::Propulsion>();
     
-    float currentSpeedKmh = static_cast<float>(propulsion.getPropulsionShaftVehicleSpeed());
+    float currentSpeedKmh = 
+        static_cast<float>(propulsion.getPropulsionShaftVehicleSpeed());
 
     m_currentSpeed = currentSpeedKmh / 3.6f;
-
-
   }
   else if (a_container.getDataType() == opendlv::sensation::DesiredOpticalFlow::ID()) {
 
