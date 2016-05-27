@@ -22,7 +22,7 @@
 
 #include <memory>
 
-#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
 
 namespace opendlv {
@@ -33,12 +33,13 @@ namespace setopticalflow {
  * This class provides...
  */
 class SetOpticalFlow
-: public odcore::base::module::DataTriggeredConferenceClientModule {
+: public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
   SetOpticalFlow(int32_t const &, char **);
   SetOpticalFlow(SetOpticalFlow const &) = delete;
   SetOpticalFlow &operator=(SetOpticalFlow const &) = delete;
   virtual ~SetOpticalFlow();
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
   virtual void nextContainer(odcore::data::Container &);
 
  private:
@@ -47,6 +48,7 @@ class SetOpticalFlow
 
   float m_maxSpeed;
   float m_speed;
+  float m_speedCorrection;
 };
 
 } // setopticalflow

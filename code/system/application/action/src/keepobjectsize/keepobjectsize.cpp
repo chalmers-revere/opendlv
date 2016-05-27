@@ -72,25 +72,30 @@ void KeepObjectSize::nextContainer(odcore::data::Container &a_container)
     float speedCorrection = 0;
 
     if (std::abs(azimuth) < 0.22f) {
+      std::cout << "Correct Angle" << std::endl;
       if (m_object == nullptr) {
         m_object.reset(new opendlv::perception::Object(unpackedObject));
       } else {
         if (unpackedObject.getDistance() < m_object->getDistance())
           m_object.reset(new opendlv::perception::Object(unpackedObject));
+          std::cout << "Closest object" << std::endl;
       }    
 
       m_angularSize = unpackedObject.getAngularSize();
 
       if (m_angularSize < 0.070f) {
+        std::cout << "Small enough: " << m_angularSize << std::endl;
 
         float angularSizeRatio = 0.075f / m_angularSize;
         speedCorrection = angularSizeRatio - 1;
       }
       else if (m_angularSize > 0.080f) {
+        std::cout << "Object too big" << std::endl;
         float angularSizeRatio = 0.075f / m_angularSize;
         speedCorrection = -angularSizeRatio*2 + 1; 
       }
       else {
+        std::cout << "zero correction" << std::endl;
         speedCorrection = 0;
       }
       

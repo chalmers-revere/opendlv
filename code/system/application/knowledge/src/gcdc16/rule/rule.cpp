@@ -132,7 +132,7 @@ bool Rule::euclideanDistance(double measuredDistance)
 void Rule::nextContainer(odcore::data::Container &a_container)
 {
   
-  if (a_container.getDataType() == opendlv::proxy::ControlState::ID()) {
+ /* if (a_container.getDataType() == opendlv::proxy::ControlState::ID()) {
     opendlv::proxy::ControlState isAutonomous = a_container.getData<opendlv::proxy::ControlState>();
 
     bool autonomous = isAutonomous.getIsAutonomous();
@@ -147,15 +147,15 @@ void Rule::nextContainer(odcore::data::Container &a_container)
   }
       //TODO: STOM, MergeFlag, Ask about Intention messages, distancetravelledCZ
       //TODO: use rsuEvent -> merging should commence
-} 
+} */
 
-    /*else if (a_container.getDataType() == opendlv::perception::Object::ID()) {
+    if (a_container.getDataType() == opendlv::perception::Object::ID()) {
     opendlv::perception::Object unpackedObject =
     a_container.getData<opendlv::perception::Object>();
 
     int16_t id = unpackedObject.getObjectId();
 
-    if (id != -1) {
+    if (id == -1) {
       return;
     }
 
@@ -175,7 +175,8 @@ void Rule::nextContainer(odcore::data::Container &a_container)
     opendlv::sensation::DesiredDirectionOfMovement desiredDirection(objectDirection);
     odcore::data::Container objectContainer(desiredDirection);
     getConference().send(objectContainer);
-    }*/
+    }
+  }
 
 
 
