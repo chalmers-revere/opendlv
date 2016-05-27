@@ -63,6 +63,30 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SetOpticalFlow::body()
 {
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING){
 
+    std::cout << "Current speed: " << m_currentSpeed << std::endl;
+    std::cout << "Desired speed: " << m_desiredSpeed << std::endl;
+    
+    // TODO hardcoded parameter...
+    float acceptableSpeedDeviation = 2.0f / 3.6f; // 2 km/h
+
+    if (m_currentSpeed < (m_desiredSpeed - acceptableSpeedDeviation)) {
+        
+      float speedDiff = m_desiredSpeed - m_currentSpeed;
+
+      // TODO magical number
+      m_speedCorrection = speedDiff / 10.0f;
+
+    } else if (m_currentSpeed > (m_desiredSpeed + acceptableSpeedDeviation)) {
+      
+      float speedDiff = m_desiredSpeed - m_currentSpeed;
+
+      // TODO magical number
+      m_speedCorrection = speedDiff / 10.0f;
+    
+    } else {
+      m_speedCorrection = 0.0f;
+    }
+
     odcore::data::TimeStamp t0;
     opendlv::action::Correction correction1(t0, "accelerate", false, m_speedCorrection);
     odcore::data::Container container(correction1);
@@ -84,33 +108,7 @@ void SetOpticalFlow::nextContainer(odcore::data::Container &a_container)
 
     m_currentSpeed = currentSpeedKmh / 3.6f;
 
-    std::cout << "Current speed: " << m_currentSpeed << std::endl;
-    std::cout << "Desired speed: " << m_desiredSpeed << std::endl;
     
-    // TODO hardcoded parameter...
-    float acceptableSpeedDeviation = 2.0f / 3.6f; // 2 km/h
-
-    if (m_currentSpeed < (m_desiredSpeed - acceptableSpeedDeviation)) {
-        
-      float speedDiff = m_desiredSpeed - m_currentSpeed;
-
-      // TODO magical number
-      m_speedCorrection = speedDiff / 10.0f;
-
-    } else if (m_currentSpeed > (m_desiredSpeed + acceptableSpeedDeviation)) {
-      
-      float speedDiff = m_desiredSpeed - m_currentSpeed;
-      m_speedCorrection = speedDiff / 10.0f;
-    
-    } else {
-      m_speedCorrection = 0.0f;
-    }
-      
-    odcore::data::TimeStamp t0;
-    opendlv::action::Correction correction1(t0, "acceleration", 
-        false, m_speedCorrection);
-    odcore::data::Container container(correction1);
-    getConference().send(container);
   }
   else if (a_container.getDataType() == opendlv::sensation::DesiredOpticalFlow::ID()) {
 
