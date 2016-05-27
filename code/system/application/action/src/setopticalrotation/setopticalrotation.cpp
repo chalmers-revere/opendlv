@@ -66,21 +66,25 @@
     opendlv::sensation::DesiredDirectionOfMovement desiredMovement = a_container.getData<opendlv::sensation::DesiredDirectionOfMovement>();
     opendlv::model::Direction desiredDirection = desiredMovement.getDirection();
     m_desiredAzimuth = desiredDirection.getAzimuth();
+
   } else if (a_container.getDataType() == opendlv::sensation::DirectionOfMovement::ID()) {
     opendlv::sensation::DirectionOfMovement directionMovement = a_container.getData<opendlv::sensation::DirectionOfMovement>();
     opendlv::model::Direction direction = directionMovement.getDirection();
     m_currentAzimuth = direction.getAzimuth();
   }
 
-  odcore::base::KeyValueConfiguration kv1 = getKeyValueConfiguration();
-  float const gainAzimuth = kv1.getValue<float>("action-setopticalrotation.gain_heading");
+  //odcore::base::KeyValueConfiguration kv1 = getKeyValueConfiguration();
+  //float const gainAzimuth = kv1.getValue<float>("action-setopticalrotation.gain_heading");
+  float gainAzimuth = 1.5f;
   odcore::base::KeyValueConfiguration kv2 = getKeyValueConfiguration();
-  float const  azimuthTolerance = kv2.getValue<float>("action-setopticalrotation.heading_tolerance");
+  //float const  azimuthTolerance = kv2.getValue<float>("action-setopticalrotation.heading_tolerance");
+  float azimuthTolerance = 0.05f;
   float azimuthCorrection = m_desiredAzimuth - m_currentAzimuth; 
 
-  if ( fabs(azimuthCorrection) > azimuthTolerance ) {
+
+  if ( std::abs(azimuthCorrection) > azimuthTolerance ) {
     float steeringAmplitude = gainAzimuth * azimuthCorrection;
-    //std::cout << "Stearing Amplitude: " << steeringAmplitude << std::endl;
+    std::cout << "Stearing Amplitude: " << steeringAmplitude << std::endl;
     m_logRotation << steeringAmplitude << std::endl;
     odcore::data::TimeStamp t0;
     opendlv::action::Correction correction(t0, "steering", false, steeringAmplitude);

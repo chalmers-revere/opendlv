@@ -32,7 +32,7 @@ set(LIBRARIES ${LIBRARIES} ${OpenCV_LIBS})
 file(GLOB_RECURSE thisproject-sources 
   "${CMAKE_CURRENT_SOURCE_DIR}/src/can/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/ledstrip/*.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/toggeler/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/relay/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/camera/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/gps/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/imu/*.cpp"
@@ -50,8 +50,8 @@ target_link_libraries(${PROJECT_NAME}-can ${PROJECT_NAME}lib-static ${LIBRARIES}
 add_executable(${PROJECT_NAME}-ledstrip "${CMAKE_CURRENT_SOURCE_DIR}/src/ledstrip/main.cpp")
 target_link_libraries(${PROJECT_NAME}-ledstrip ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
-add_executable(${PROJECT_NAME}-toggeler "${CMAKE_CURRENT_SOURCE_DIR}/src/toggeler/main.cpp")
-target_link_libraries(${PROJECT_NAME}-toggeler ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+add_executable(${PROJECT_NAME}-relay "${CMAKE_CURRENT_SOURCE_DIR}/src/relay/main.cpp")
+target_link_libraries(${PROJECT_NAME}-relay ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
 add_executable(${PROJECT_NAME}-camera "${CMAKE_CURRENT_SOURCE_DIR}/src/camera/main.cpp")
 target_link_libraries(${PROJECT_NAME}-camera ${PROJECT_NAME}lib-static ${LIBRARIES}) 
@@ -77,7 +77,7 @@ include(RunTests)
 # Install
 install(TARGETS ${PROJECT_NAME}-can RUNTIME DESTINATION bin COMPONENT system-core)
 install(TARGETS ${PROJECT_NAME}-ledstrip RUNTIME DESTINATION bin COMPONENT system-core)
-install(TARGETS ${PROJECT_NAME}-toggeler RUNTIME DESTINATION bin COMPONENT system-core)
+install(TARGETS ${PROJECT_NAME}-relay RUNTIME DESTINATION bin COMPONENT system-core)
 install(TARGETS ${PROJECT_NAME}-camera RUNTIME DESTINATION bin COMPONENT system-core)
 install(TARGETS ${PROJECT_NAME}-gps RUNTIME DESTINATION bin COMPONENT system-core)
 install(TARGETS ${PROJECT_NAME}-imu RUNTIME DESTINATION bin COMPONENT system-core)

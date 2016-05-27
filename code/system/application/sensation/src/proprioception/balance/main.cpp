@@ -17,34 +17,11 @@
  * USA.
  */
 
-#ifndef IMU_DEVICE_HPP_
-#define IMU_DEVICE_HPP_
+#include "proprioception/balance/balance.hpp"
 
-#include <vector>
-
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
-
-namespace opendlv {
-namespace proxy {
-namespace imu {
-
-class Device {
- public:
-  Device();
-  Device(Device const &) = delete;
-  Device &operator=(Device const &) = delete;
-  virtual ~Device();
-
-  bool IsInitialized() const;
-  virtual opendlv::proxy::AccelerometerReading ReadAccelerometer() = 0;
-  virtual opendlv::proxy::GyroscopeReading ReadGyroscope() = 0;
-
- protected:
-  bool m_initialized;
-};
-
-} // imu
-} // proxy
-} // opendlv
-
-#endif
+int32_t main(int32_t a_argc, char **a_argv)
+{
+  opendlv::sensation::proprioception::balance::Balance main(
+  a_argc, a_argv);
+  return main.runModule();
+}

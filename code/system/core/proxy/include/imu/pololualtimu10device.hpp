@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Chalmers REVERE
+ * Copyright (C) 2015 Chalmers REVERE
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,50 +17,35 @@
  * USA.
  */
 
-#ifndef CAN_CANMESSAGEDATASTORE_HPP_
-#define CAN_CANMESSAGEDATASTORE_HPP_
+#ifndef IMU_POLOLUALTIMU10DEVICE_HPP_
+#define IMU_POLOLUALTIMU10DEVICE_HPP_
 
-#include <memory>
+#include <cstdint>
+#include <iostream>
+#include <string>
 
-#include <opendavinci/odcore/base/Mutex.h>
-#include "odcantools/MessageToCANDataStore.h"
-
-namespace automotive {
-namespace odcantools {
-class CANDevice;
-}
-}
-
-namespace odcore {
-namespace data {
-class Container;
-}
-}
+#include "imu/device.hpp"
 
 namespace opendlv {
 namespace proxy {
-namespace can {
+namespace imu {
 
-/**
- * This class maps selected messages to CAN messages.
- */
-class CanMessageDataStore
-: public automotive::odcantools::MessageToCANDataStore {
+class PololuAltImu10Device : public Device {
  public:
-  CanMessageDataStore(
-  std::shared_ptr<automotive::odcantools::CANDevice> canDevice);
-  virtual void add(odcore::data::Container const &container);
-
-  bool IsAutonomousEnabled();
-  bool IsOverridden();
+  PololuAltImu10Device(std::string const &);
+  PololuAltImu10Device(PololuAltImu10Device const &) = delete;
+  PololuAltImu10Device &operator=(PololuAltImu10Device const &) = delete;
+  virtual ~PololuAltImu10Device();
+  opendlv::proxy::AccelerometerReading ReadAccelerometer();
+  opendlv::proxy::GyroscopeReading ReadGyroscope();
 
  private:
-  odcore::base::Mutex m_dataStoreMutex;
-  bool m_enabled;
-  bool m_overridden;
+  void I2cWriteRegister(uint8_t, uint8_t);
+
+  int16_t m_deviceFile;
 };
 
-} // can
+} // imu
 } // proxy
 } // opendlv
 

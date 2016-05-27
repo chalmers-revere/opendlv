@@ -43,30 +43,27 @@ namespace act {
 */
 Act::Act(int32_t const &a_argc, char **a_argv)
 : TimeTriggeredConferenceClientModule(a_argc, a_argv, "action-act"),
-m_accelerationCorrection(0.0f),
-m_brakeCorrection(0.0f),
-m_steeringCorrection(0.0f),
-m_startTimeVectorAccelerate(),
-m_startTimeVectorBrake(),
-m_startTimeVectorSteering(),
-m_amplitudeVectorAccelerate(),
-m_amplitudeVectorBrake(),
-m_amplitudeVectorSteering(),
-m_isInhibitory(false),
-m_amplitude(0),
-m_t0(""),
-m_type(""),
-m_logSteering()
+    m_maxDuration(0.5f),
+    m_startTimesAccelerate(),
+    m_startTimesBrake(),
+    m_startTimesSteering(),
+    m_amplitudesAccelerate(),
+    m_amplitudesBrake(),
+    m_amplitudesSteering(),
+    m_accelerationValue(0.0f),
+    m_brakeValue(0.0f),
+    m_steeringValue(0.0f),
+    m_hasEstimateAcc(false),
+    m_timeOfEstimateAcc(),
+    m_hasEstimateBrake(false),
+    m_timeOfEstimateBrake(),
+    m_hasEstimateSteer(false),
+    m_timeOfEstimateSteer()
 {
-  setUp();
-    odcore::data::TimeStamp now;
-    std::string filename("Steering" + now.getYYYYMMDD_HHMMSS() + ".log");
-    m_logSteering.open(filename, std::ios::out|std::ios::app);
 }
 
 Act::~Act()
 {
-  m_logSteering.close();
 }
 
 /**
@@ -77,17 +74,137 @@ Act::~Act()
 */
 void Act::nextContainer(odcore::data::Container &a_container)
 {
+  odcore::data::TimeStamp now;
 
-  if(a_container.getDataType() == opendlv::action::Correction::ID()) {
+
+  // Check if any estimates have expired
+  if (m_hasEstimateAcc) {
+    if ((now - m_timeOfEstimateAcc).toMicroseconds()/1000000.0f 
+        > m_maxDuration) {
+      m_hasEstimateAcc = false;
+      m_startTimesAccelerate.clear();
+      m_amplitudesAccelerate.clear();
+    }
+  }
+  if (m_hasEstimateBrake) {
+    if ((now - m_timeOfEstimateBrake).toMicroseconds()/1000000.0f 
+        > m_maxDuration) {
+      m_hasEstimateBrake = false;
+      m_startTimesBrake.clear();
+      m_amplitudesBrake.clear();
+    }
+  }
+  if (m_hasEstimateSteer) {
+    if ((now - m_timeOfEstimateSteer).toMicroseconds()/1000000.0f 
+        > m_maxDuration) {
+      m_hasEstimateSteer = false;
+      m_startTimesSteering.clear();
+      m_amplitudesSteering.clear();
+    }
+  }
+
+
+
+  // If we receive an estimate...
+  if (a_container.getDataType() == opendlv::action::Estimate::ID()) {
+    opendlv::action::Estimate estimate = 
+        a_container.getData<opendlv::action::Estimate>();
+
+    std::cout << "Received estimate..." << std::endl;
+
+
+    auto startTime = estimate.getStartTime();
+    std::string type = estimate.getType();
+    float amplitude = estimate.getAmplitude();
+
+    // If not already has estimate, add one and clear anything existing
+
+    if (type == "accelerate") {
+
+      m_startTimesAccelerate.clear();
+      m_amplitudesAccelerate.clear();
+      
+      m_startTimesAccelerate.push_back(startTime);
+      m_amplitudesAccelerate.push_back(amplitude);
+
+      m_hasEstimateAcc = true;
+      m_timeOfEstimateAcc = now;
+
+      m_accelerationValue = amplitude;
+
+    } else if (type == "brake") {
+      m_startTimesBrake.clear();
+      m_amplitudesBrake.clear();
+    
+      m_startTimesBrake.push_back(startTime);
+      m_amplitudesBrake.push_back(amplitude);
+
+      m_hasEstimateBrake = true;
+      m_timeOfEstimateBrake = now;
+
+      m_brakeValue = amplitude;
+
+    } else if (type == "steering") {
+      m_startTimesSteering.clear();
+      m_amplitudesSteering.clear();
+
+      m_startTimesSteering.push_back(startTime);
+      m_amplitudesSteering.push_back(amplitude);
+
+      m_hasEstimateSteer = true;
+      m_timeOfEstimateSteer = now;
+      
+      m_steeringValue = amplitude;
+      
+    }
+  }
+
+
+  // If we reeive a correction...
+  if (a_container.getDataType() == opendlv::action::Correction::ID()) {
     opendlv::action::Correction correction = 
-    a_container.getData<opendlv::action::Correction>();
+        a_container.getData<opendlv::action::Correction>();
 
-    m_t0 = correction.getStartTime();
-    m_type = correction.getType();
-    m_isInhibitory = correction.getIsInhibitory();
-    m_amplitude = correction.getAmplitude();
+    std::cout << "Received correction..." << std::endl;
 
-    std::cout << "m_amplitude:" << m_amplitude <<std::endl <<std::endl;
+    auto startTime = correction.getStartTime();
+    std::string type = correction.getType();
+    bool isInhibitory = correction.getIsInhibitory();
+    float amplitude = correction.getAmplitude();
+    
+    // If not already following an estimate, apply correction
+
+    if (type == "accelerate") {
+      if (!m_hasEstimateAcc) {
+        if (isInhibitory) {
+          m_startTimesAccelerate.clear();
+          m_amplitudesAccelerate.clear();
+        }
+        
+        m_startTimesAccelerate.push_back(startTime);
+        m_amplitudesAccelerate.push_back(amplitude);
+      }
+    } else if (type == "brake") {
+      if (!m_hasEstimateBrake) {
+        if (isInhibitory) {
+          m_startTimesBrake.clear();
+          m_amplitudesBrake.clear();
+        }
+        
+        m_startTimesBrake.push_back(startTime);
+        m_amplitudesBrake.push_back(amplitude);
+      }
+    } else if (type == "steering") {
+      if (!m_hasEstimateSteer) {
+        if (isInhibitory) {
+          m_startTimesSteering.clear();
+          m_amplitudesSteering.clear();
+        }
+        
+        m_startTimesSteering.push_back(startTime);
+        m_amplitudesSteering.push_back(amplitude);
+      }
+    }
   }
 }
 
@@ -99,121 +216,98 @@ void Act::nextContainer(odcore::data::Container &a_container)
 */
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
 {
-  odcore::data::TimeStamp previousTimestep;
+  float freq = static_cast<float>(getFrequency());
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
     odcore::data::dmcp::ModuleStateMessage::RUNNING) {
 
-    float sumOfAccelerate = 0.0f;
-    float sumOfBrake = 0.0f;
-    float sumOfSteering = 0.0f;
-    odcore::data::TimeStamp thisTimestep;
-    odcore::data::TimeStamp duration = thisTimestep - previousTimestep;
-    previousTimestep = thisTimestep;
-    float previousAmplitude = 0;
+    odcore::data::TimeStamp now;
 
-    if ( m_type == "accelerate" ) {
-      if ( !m_amplitudeVectorAccelerate.empty() ) {
-        previousAmplitude = m_amplitudeVectorAccelerate.at(m_amplitudeVectorAccelerate.size() - 1 );
+    if (!m_hasEstimateAcc) {
+      std::vector<odcore::data::TimeStamp> startTimesAccelerateToSave;
+      std::vector<float> amplitudesAccelerateToSave;
+      for (uint8_t i = 0; i < m_startTimesAccelerate.size(); i++) {
+        auto t0 = m_startTimesAccelerate[i];
+        auto amplitude = m_amplitudesAccelerate[i];
+
+        float t1 = static_cast<float>(now.toMicroseconds() 
+            - t0.toMicroseconds()) / 1000000.0f;
+
+        if (t1 < m_maxDuration) {
+          float deltaValue = amplitude / freq;
+          m_accelerationValue += deltaValue;
+
+          startTimesAccelerateToSave.push_back(t0);
+          amplitudesAccelerateToSave.push_back(amplitude);
+        }
       }
-      inhibitoryCheck(m_isInhibitory, m_startTimeVectorAccelerate, m_amplitudeVectorAccelerate);
-      if ( m_amplitude*previousAmplitude < 0 || fabs(m_amplitude) > fabs(previousAmplitude) ) {
-        m_startTimeVectorAccelerate.push_back(m_t0);
-        m_amplitudeVectorAccelerate.push_back(m_amplitude);
-        timeCheck(m_startTimeVectorAccelerate, m_amplitudeVectorAccelerate);
+
+      // stores a new list instead of the old one???
+      m_startTimesAccelerate = startTimesAccelerateToSave;
+      m_amplitudesAccelerate = amplitudesAccelerateToSave;
+    }
+        
+    if (!m_hasEstimateBrake) {
+      std::vector<odcore::data::TimeStamp> startTimesBrakeToSave;
+      std::vector<float> amplitudesBrakeToSave;
+      for (uint8_t i = 0; i < m_startTimesBrake.size(); i++) {
+        auto t0 = m_startTimesBrake[i];
+        auto amplitude = m_amplitudesBrake[i];
+
+        float t1 = static_cast<float>(now.toMicroseconds() 
+            - t0.toMicroseconds()) / 1000000.0f;
+
+        if (t1 < m_maxDuration) {
+          float deltaValue = amplitude / freq;
+          m_brakeValue += deltaValue;
+
+          startTimesBrakeToSave.push_back(t0);
+          amplitudesBrakeToSave.push_back(amplitude);
+        }
       }
-      sumOfAccelerate = std::accumulate(m_amplitudeVectorAccelerate.begin(), m_amplitudeVectorAccelerate.end(), 0.0 );
-    
-    } else if ( m_type == "brake" ) {
-      if ( !m_amplitudeVectorBrake.empty() ) {
-        previousAmplitude = m_amplitudeVectorBrake.at(m_amplitudeVectorBrake.size() -1 );
-      }
-      inhibitoryCheck(m_isInhibitory, m_startTimeVectorBrake, m_amplitudeVectorBrake);
-      if ( m_amplitude*previousAmplitude < 0 || fabs(m_amplitude) > fabs(previousAmplitude) ) {
-        m_startTimeVectorBrake.push_back(m_t0);
-        m_amplitudeVectorBrake.push_back(m_amplitude);
-        timeCheck(m_startTimeVectorBrake, m_amplitudeVectorBrake);
-      }
-      sumOfBrake = std::accumulate(m_amplitudeVectorBrake.begin(), m_amplitudeVectorBrake.end(), 0.0 );
-   
-    } else if ( m_type == "steering" ) {
-      if ( !m_amplitudeVectorSteering.empty() ) {
-        previousAmplitude = m_amplitudeVectorSteering.at(m_amplitudeVectorSteering.size() -1 );
-      }
-      inhibitoryCheck(m_isInhibitory, m_startTimeVectorSteering, m_amplitudeVectorSteering);
-      if ( m_amplitude*previousAmplitude < 0 || fabs(m_amplitude) > fabs(previousAmplitude) ) {
-        m_startTimeVectorSteering.push_back(m_t0);
-        m_amplitudeVectorSteering.push_back(m_amplitude);
-        timeCheck(m_startTimeVectorSteering, m_amplitudeVectorSteering);
-      }
-      sumOfSteering = std::accumulate(m_amplitudeVectorSteering.begin(), m_amplitudeVectorSteering.end(), 0.0 );
+
+      // stores a new list instead of the old one???
+      m_startTimesBrake = startTimesBrakeToSave;
+      m_amplitudesBrake = amplitudesBrakeToSave;
     }
 
-    double durationInSeconds = duration.toMicroseconds() / 1000000.0;
-    float freq = 1 / durationInSeconds;
-    m_accelerationCorrection = sumOfAccelerate / freq;
-    m_brakeCorrection  = -sumOfBrake / freq;
-    m_steeringCorrection = sumOfSteering / freq;
-    //std::cout << "Steering Correction : " << m_steeringCorrection <<std::endl;
-    //std::cout << "Acceleration Correction : " << m_accelerationCorrection+m_brakeCorrection <<std::endl;
-    m_logSteering << m_steeringCorrection << std::endl;
-    
-    if ( m_brakeCorrection < 0 ) {
+    if (!m_hasEstimateSteer) {
+      std::vector<odcore::data::TimeStamp> startTimesSteeringToSave;
+      std::vector<float> amplitudesSteeringToSave;
+      for (uint8_t i = 0; i < m_startTimesSteering.size(); i++) {
+        auto t0 = m_startTimesSteering[i];
+        auto amplitude = m_amplitudesSteering[i];
 
-      opendlv::proxy::ActuationRequest actuationRequest(m_brakeCorrection, m_steeringCorrection, false);
+        float t1 = static_cast<float>(now.toMicroseconds() 
+            - t0.toMicroseconds()) / 1000000.0f;
+
+        if (t1 < m_maxDuration) {
+          float deltaValue = amplitude / freq;
+          m_steeringValue += deltaValue;
+
+          startTimesSteeringToSave.push_back(t0);
+          amplitudesSteeringToSave.push_back(amplitude);
+        }
+      }
+
+      // stores a new list instead of the old one???
+      m_startTimesSteering = startTimesSteeringToSave;
+      m_amplitudesSteering = amplitudesSteeringToSave;
+    }
+
+    if (m_brakeValue > 0.0f) {
+      opendlv::proxy::ActuationRequest actuationRequest(m_brakeValue, 
+          m_steeringValue, false);
       odcore::data::Container actuationContainer(actuationRequest);
-
       getConference().send(actuationContainer);
-      std::cout << "Steering Correction 1: " << m_steeringCorrection << std::endl;
-    
     } else {
-
-      opendlv::proxy::ActuationRequest actuationRequest(m_accelerationCorrection, m_steeringCorrection, false);
+      opendlv::proxy::ActuationRequest actuationRequest(m_accelerationValue, 
+          m_steeringValue, false);
       odcore::data::Container actuationContainer(actuationRequest);
-
       getConference().send(actuationContainer);
-      std::cout << "Steering Correction 2: " << m_steeringCorrection << std::endl;      
-    }    
+    }
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
-}
-
-/**
-* Function to ensure that the first element of
-* the time vector is less than deltaTime seconds
-* ago. Truncates the vector if it is.
-*/
-void Act::timeCheck(std::vector<odcore::data::TimeStamp> &a_timeVector, std::vector<float> &a_amplitudeVector)
-{
-
-  if ( a_timeVector.size() == 0 ){
-    return;
-  }
-  double deltaTime = 1000000 * 0.5f; // 0.5 s in microseconds
-  odcore::data::TimeStamp nowTimeStamp;
-  double now = nowTimeStamp.toMicroseconds();
-  double firstTime = a_timeVector.at(0).toMicroseconds();
-  if ( now - firstTime >= deltaTime ) {
-    for ( uint32_t count = 0; count < a_timeVector.size() - 1; count++ ) {
-      a_timeVector.at(count) = a_timeVector.at(count + 1);
-      a_amplitudeVector.at(count) = a_amplitudeVector.at(count + 1);
-    }
-    a_timeVector.erase(a_timeVector.begin() + a_timeVector.size() - 1);
-    a_amplitudeVector.erase(a_amplitudeVector.begin() + a_amplitudeVector.size() - 1);
-  }
-}
-
-/**
-* Checks if an inhibitory signal is recieved
-* and if so clears the relevant time and m_amplitude
-* vectors prior to adding new corrections.
-*/
-void Act::inhibitoryCheck(bool a_isInhibitory, std::vector<odcore::data::TimeStamp> &a_timeVector, std::vector<float> &a_amplitudeVector)
-{
-  if ( a_isInhibitory ) {
-    a_timeVector.clear();
-    a_amplitudeVector.clear();    
-  }
 }
 
 void Act::setUp()

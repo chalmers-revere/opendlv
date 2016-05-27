@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Chalmers REVERE
+ * Copyright (C) 2015 Chalmers REVERE
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,51 +17,39 @@
  * USA.
  */
 
-#ifndef CAN_CANMESSAGEDATASTORE_HPP_
-#define CAN_CANMESSAGEDATASTORE_HPP_
+#ifndef PROPRIOCEPTION_BALANCE_BALANCE_HPP_
+#define PROPRIOCEPTION_BALANCE_BALANCE_HPP_
 
 #include <memory>
 
-#include <opendavinci/odcore/base/Mutex.h>
-#include "odcantools/MessageToCANDataStore.h"
-
-namespace automotive {
-namespace odcantools {
-class CANDevice;
-}
-}
-
-namespace odcore {
-namespace data {
-class Container;
-}
-}
+#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/data/Container.h"
 
 namespace opendlv {
-namespace proxy {
-namespace can {
+namespace sensation {
+namespace proprioception {
+namespace balance {
 
 /**
- * This class maps selected messages to CAN messages.
+ * This class provides...
  */
-class CanMessageDataStore
-: public automotive::odcantools::MessageToCANDataStore {
+class Balance
+: public odcore::base::module::DataTriggeredConferenceClientModule {
  public:
-  CanMessageDataStore(
-  std::shared_ptr<automotive::odcantools::CANDevice> canDevice);
-  virtual void add(odcore::data::Container const &container);
-
-  bool IsAutonomousEnabled();
-  bool IsOverridden();
+  Balance(int32_t const &, char **);
+  Balance(Balance const &) = delete;
+  Balance &operator=(Balance const &) = delete;
+  virtual ~Balance();
+  virtual void nextContainer(odcore::data::Container &);
 
  private:
-  odcore::base::Mutex m_dataStoreMutex;
-  bool m_enabled;
-  bool m_overridden;
+  void setUp();
+  void tearDown();
 };
 
-} // can
-} // proxy
+} // balance
+} // proprioception
+} // sensation
 } // opendlv
 
 #endif

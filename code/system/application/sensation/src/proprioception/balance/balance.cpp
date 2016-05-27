@@ -17,41 +17,57 @@
  * USA.
  */
 
-#ifndef TOGGELER_TOGGELER_HPP_
-#define TOGGELER_TOGGELER_HPP_
+#include <ctype.h>
+#include <cstring>
+#include <cmath>
+#include <iostream>
 
-#include <memory>
-
-#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
+#include "opendavinci/odcore/data/TimeStamp.h"
+
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
+
+#include "proprioception/balance/balance.hpp"
 
 namespace opendlv {
-namespace proxy {
-namespace toggeler {
-
-class Device;
+namespace sensation {
+namespace proprioception {
+namespace balance {
 
 /**
- * This class provides...
+  * Constructor.
+  *
+  * @param a_argc Number of command line arguments.
+  * @param a_argv Command line arguments.
+  */
+Balance::Balance(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(
+      a_argc, a_argv, "sensation-proprioception-balance")
+{
+}
+
+Balance::~Balance()
+{
+}
+
+/**
+ * Receives .
+ * Sends .
  */
-class Toggeler
-: public odcore::base::module::DataTriggeredConferenceClientModule {
- public:
-  Toggeler(int32_t const &, char **);
-  Toggeler(Toggeler const &) = delete;
-  Toggeler &operator=(Toggeler const &) = delete;
-  virtual ~Toggeler();
-  virtual void nextContainer(odcore::data::Container &);
+void Balance::nextContainer(odcore::data::Container &)
+{
 
- private:
-  void setUp();
-  void tearDown();
+}
 
-  std::unique_ptr<Device> m_device;
-};
+void Balance::setUp()
+{
+}
 
-} // toggeler
-} // proxy
+void Balance::tearDown()
+{
+}
+
+} // orientation
+} // proprioception
+} // sensation
 } // opendlv
-
-#endif

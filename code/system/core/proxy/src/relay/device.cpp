@@ -17,34 +17,27 @@
  * USA.
  */
 
-#ifndef IMU_DEVICE_HPP_
-#define IMU_DEVICE_HPP_
+#include <iostream>
 
-#include <vector>
-
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
+#include "relay/device.hpp"
 
 namespace opendlv {
 namespace proxy {
-namespace imu {
+namespace relay {
 
-class Device {
- public:
-  Device();
-  Device(Device const &) = delete;
-  Device &operator=(Device const &) = delete;
-  virtual ~Device();
+/**
+ * Constructor.
+ *
+ */
+Device::Device(std::vector<bool> a_initialValues):
+    m_initialValues(a_initialValues)
+{
+}
 
-  bool IsInitialized() const;
-  virtual opendlv::proxy::AccelerometerReading ReadAccelerometer() = 0;
-  virtual opendlv::proxy::GyroscopeReading ReadGyroscope() = 0;
+Device::~Device()
+{
+}
 
- protected:
-  bool m_initialized;
-};
-
-} // imu
+} // relay
 } // proxy
 } // opendlv
-
-#endif

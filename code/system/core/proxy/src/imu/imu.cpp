@@ -24,12 +24,12 @@
 
 #include "opendavinci/odcore/base/KeyValueConfiguration.h"
 #include "opendavinci/odcore/data/Container.h"
-#include "opendavinci/odcore/data/TimeStamp.h"
+#include "opendavinci/odcore/strings/StringToolbox.h"
 
 #include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 #include "imu/imu.hpp"
-#include "imu/device.hpp"
+#include "imu/pololualtimu10device.hpp"
 
 namespace opendlv {
 namespace proxy {
@@ -42,7 +42,8 @@ namespace imu {
   * @param a_argv Command line arguments.
   */
 Imu::Imu(int32_t const &a_argc, char **a_argv)
-    : TimeTriggeredConferenceClientModule(a_argc, a_argv, "proxy-imu")
+    : TimeTriggeredConferenceClientModule(
+      a_argc, a_argv, "proxy-imu")
     , m_device()
 {
 }
@@ -51,14 +52,19 @@ Imu::~Imu()
 {
 }
 
-// This method will do the main data processing job.
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Imu::body()
 {
+  while (getModuleStateAndWaitForRemainingTimeInTimeslice() 
+      == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
 
-  // Send opendlv::proxy::Compass
-  // Send opendlv::proxy::Gyroscope
-  // Send opendlv::proxy::Accelerometer
-  // Send opendlv::proxy::Altimeter
+    auto gyroscopeReading = m_device->ReadGyroscope();
+    odcore::data::Container gyroscopeContainer(gyroscopeReading);
+    getConference().send(gyroscopeContainer);
+
+    auto accelerometerReading = m_device->ReadAccelerometer();
+    odcore::data::Container accelerometerContainer(accelerometerReading);
+    getConference().send(accelerometerContainer);
+  }
 
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
@@ -68,14 +74,12 @@ void Imu::setUp()
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
   std::string const type = kv.getValue<std::string>("proxy-imu.type");
-  /*  std::string const port =
-    kv.getValue<std::string>("proxy-imu.port");
-    float const mountX = kv.getValue<float>("proxy-imu.mount.x");
-    float const mountY = kv.getValue<float>("proxy-imu.mount.y");
-    float const mountZ = kv.getValue<float>("proxy-imu.mount.z");
-  */
-  if (type.compare("pololu-10") == 0) {
-    //      m_device = std::unique_ptr<Device>(new Pololu10Device());
+
+  if (type.compare("pololu.altimu10") == 0) {
+    std::string const deviceNode = 
+        kv.getValue<std::string>("proxy-imu.pololu.altimu10.device_node");
+
+     m_device = std::unique_ptr<Device>(new PololuAltImu10Device(deviceNode));
   }
 
   if (m_device.get() == nullptr) {

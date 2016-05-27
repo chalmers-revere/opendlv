@@ -64,11 +64,38 @@ void CheckActuation::nextContainer(odcore::data::Container &a_container)
     opendlv::proxy::ActuationRequest actuationRequest 
         = a_container.getData<opendlv::proxy::ActuationRequest>();
     float acceleration = actuationRequest.getAcceleration();
+    float steering = actuationRequest.getSteering();
 
+
+    float steeringLimit = 0.2;
+    float accMaxLimit = 80;
+
+
+    // TODO if acceleration is negative it is m/s^2, if positive percent of acceleration pedal
+
+    // clamp steering
+    if (steering < -steeringLimit) {
+      steering = -steeringLimit;
+      std::cout << "steering request was capped to " << steering << std::endl;
+    }
+    else if (steering > steeringLimit) {
+      steering = steeringLimit;
+      std::cout << "steering request was capped to " << steering << std::endl;
+    }
+
+    // clamp acceleration
     if (acceleration < -m_maxAllowedDeceleration) {
       acceleration = -m_maxAllowedDeceleration;
-      actuationRequest.setAcceleration(acceleration);
+      std::cout << "acceleration request was capped to " << acceleration << std::endl;
     }
+    else if (acceleration > accMaxLimit) {
+      acceleration = accMaxLimit;
+      std::cout << "acceleration request was capped to " << acceleration << std::endl;
+    }
+
+
+    actuationRequest.setAcceleration(acceleration);
+    actuationRequest.setSteering(steering);
 
     actuationRequest.setIsValid(true);
     

@@ -34,6 +34,7 @@
 
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
+#include "opendavinci/odcore/strings/StringToolbox.h"
 
 #include "linguistics/v2vcam/buffer.hpp"
 #include "linguistics/v2vcam/v2vcam.hpp"
@@ -165,7 +166,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
     odcore::data::Container c(nextMessage);
     getConference().send(c);
 
-    m_sendLog << std::to_string(GenerateGenerationTime()) +
+    m_sendLog << std::setprecision(15) << std::to_string(GenerateGenerationTime()) +
         + "," + std::to_string(GetMessageId()) +
         + "," + std::to_string(GetStationId()) +
         + "," + std::to_string(GenerateGenerationDeltaTime()) +
@@ -222,7 +223,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
       output += "Yaw rate confidence: " 
           + std::to_string(GetYawRateConfidence()) + "\n";
       output += "Vehicle role: " + std::to_string(GetVehicleRole()) + "\n";
-      //std::cout << output;
+      std::cout << output;
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
@@ -231,25 +232,46 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
  * Receives geolocation-, voice containers.
  * Sends .
  */
-void V2vCam::nextContainer(odcore::data::Container &c)
+void V2vCam::nextContainer(odcore::data::Container &a_c)
 {
-
-  if (c.getDataType() == opendlv::sensation::Geolocation::ID()) {
+  if (a_c.getDataType() == opendlv::knowledge::Insight::ID()){
+    opendlv::knowledge::Insight insight = 
+        a_c.getData<opendlv::knowledge::Insight>();
+    ReadInsight(insight);
+  }
+  else if (a_c.getDataType() == opendlv::sensation::Geolocation::ID()) {
     opendlv::sensation::Geolocation geolocation = 
-        c.getData<opendlv::sensation::Geolocation>();
+        a_c.getData<opendlv::sensation::Geolocation>();
     ReadGeolocation(geolocation);
-  } else if (c.getDataType() == opendlv::model::DynamicState::ID()) {
+  } else if (a_c.getDataType() == opendlv::model::DynamicState::ID()) {
 
     opendlv::model::DynamicState dynamicState = 
-        c.getData<opendlv::model::DynamicState>();
+        a_c.getData<opendlv::model::DynamicState>();
     int16_t frameId = dynamicState.getFrameId();
     if (frameId == 0) {
       ReadDynamicState(dynamicState);
     }
-  } else if(c.getDataType() == opendlv::sensation::Voice::ID()) {
+  } else if(a_c.getDataType() == opendlv::sensation::Voice::ID()) {
 
-    opendlv::sensation::Voice voice = c.getData<opendlv::sensation::Voice>();
+    opendlv::sensation::Voice voice = a_c.getData<opendlv::sensation::Voice>();
     ReadVoice(voice);
+  }
+}
+
+void V2vCam::ReadInsight(opendlv::knowledge::Insight const &a_insight)
+{
+  std::string str = a_insight.getInsight();
+  std::vector<std::string> information = odcore::strings::StringToolbox::split(str,'=');
+  if (information[0] == "stationId") {
+    m_stationId = std::stoi(information[1]);
+  } else if (information[0] == "stationType") {
+    m_stationType = std::stoi(information[1]);
+  } else if (information[0] == "vehicleLength") {
+    m_vehicleLength = std::stod(information[1]);
+  } else if (information[0] == "vehicleWidth") {
+    m_vehicleWidth = std::stod(information[1]);
+  } else if (information [0] == "vehicleRole") {
+    m_vehicleRole = std::stoi(information[1]);
   }
 }
 
@@ -260,11 +282,11 @@ void V2vCam::ReadDynamicState(
   // std::cout << a_dynamicState.getVelocity().getX() << std::endl;
   m_speedConfidence = a_dynamicState.getVelocityConfidence().getX();
   // std::cout << a_dynamicState.getVelocityConfidence().getX() << std::endl;
-  // m_yawRateValue = a_dynamicState.getAngularVelocity().getZ();
+  m_yawRateValue = a_dynamicState.getAngularVelocity().getZ();
   // std::cout << a_dynamicState.getAngularVelocity().getZ() << std::endl;
-  // m_yawRateConfidence = a_dynamicState.getAngularVelocityConfidence().getZ();
-  // m_longitudinalAcc = a_dynamicState.getAcceleration().getX();
-  // m_longitudinalAccConf = a_dynamicState.getAccelerationConfidence().getX();
+  m_yawRateConfidence = a_dynamicState.getAngularVelocityConfidence().getZ();
+  m_longitudinalAcc = a_dynamicState.getAcceleration().getX();
+  m_longitudinalAccConf = a_dynamicState.getAccelerationConfidence().getX();
 }
 
 void V2vCam::ReadGeolocation(
@@ -274,9 +296,13 @@ void V2vCam::ReadGeolocation(
   m_longitude = a_geolocation.getLongitude();
   m_altitude = a_geolocation.getAltitude();
   m_heading = a_geolocation.getHeading();
-  std::cout << a_geolocation.getHeading() << std::endl;
+  // std::cout << a_geolocation.getHeading() << std::endl;
   m_headingConfidence = a_geolocation.getHeadingConfidence();
   // std::cout << a_geolocation.getHeadingConfidence() << std::endl;
+
+  m_semiMajorConfidence = a_geolocation.getLatitudeConfidence();
+  m_semiMinorConfidence = a_geolocation.getLongitudeConfidence();
+  // m_semiMajorOrientation 
 }
 
 void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
@@ -344,9 +370,9 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
     output += "Yaw rate confidence: " 
         + std::to_string(yawRateConfidence) + "\n";
     output += "Vehicle role: " + std::to_string(vehicleRole) + "\n";
-    std::cout << output;
+    // std::cout << output;
 
-    m_receiveLog << std::to_string(GenerateGenerationTime()) +  
+    m_receiveLog <<  std::setprecision(15) << std::to_string(GenerateGenerationTime()) +  
         + "+" + std::to_string(messageId) +
         + "," + std::to_string(stationId) +
         + "," + std::to_string(generationDeltaTime) +
@@ -392,13 +418,13 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
     double m_yOffset = currentObjectCartesianLocation.getY();
     float m_azimuth;
 
-    if (std::abs(m_yOffset) < 0.001){
+    if (std::fabs(m_yOffset) < 0.001){
       if (m_xOffset < 0.0){
         m_azimuth = 3.14159f;
       } else {
         m_azimuth = 0.0f;
       }
-    } else if (std::abs(m_xOffset) < 0.001){
+    } else if (std::fabs(m_xOffset) < 0.001){
       if (m_yOffset < 0.0){
         m_azimuth = -3.14159 / 2.0;
       } else {
@@ -407,6 +433,23 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
     } else {
       m_azimuth = std::atan2(m_yOffset, m_xOffset);
     }
+
+
+    double rearX = m_xOffset - (vehicleLength / 10.0);
+    double leftRearY = m_yOffset + (vehicleWidth / 20.0);
+    double rightRearY = m_yOffset - (vehicleWidth / 20.0);
+
+
+    double leftLength = sqrt(leftRearY*leftRearY + rearX*rearX);
+    double rightLength = sqrt(rightRearY*rightRearY + rearX*rearX);
+
+    // c² = a² + b²  - 2ab cos(alpha)
+    // alpha = cos⁻1 ((a²+b² - c²) / (2ab))
+
+    double alpha = acos( (leftLength*leftLength +rightLength*rightLength - vehicleWidth*vehicleWidth) / (2*leftLength*rightLength));
+
+
+
 
     odcore::data::TimeStamp now;
     std::string m_type = "vehicle";
@@ -417,7 +460,7 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
     float m_objectDirectionRateConfidence = -1.0f;
     float m_distance = std::sqrt((m_xOffset * m_xOffset) + (m_yOffset * m_yOffset));
     float m_distanceConfidence = 0.5f;
-    float m_angularSize = -1.0f;
+    float m_angularSize = (float)alpha;
     float m_angularSizeConfidence = -1.0f;
     float m_angularSizeRate = 0.0f;
     float m_angularSizeRateConfidence = -1.0f;
@@ -459,15 +502,15 @@ void V2vCam::setUp()
 
   // std::string const type = kv.getValue<std::string>("proxy-v2v.type");
   
-  m_stationId = kv.getValue<int32_t>("knowledge-linguistics-v2vcam.stationId");
-  m_stationType = 
-      kv.getValue<int32_t>("knowledge-linguistics-v2vcam.stationType");
-  m_vehicleLength = 
-      kv.getValue<int32_t>("knowledge-linguistics-v2vcam.vehicleLength");
-  m_vehicleWidth = 
-      kv.getValue<int32_t>("knowledge-linguistics-v2vcam.vehicleWidth");
-  m_vehicleRole = 
-      kv.getValue<int32_t>("knowledge-linguistics-v2vcam.vehicleRole");
+  // m_stationId = kv.getValue<int32_t>("knowledge-linguistics-v2vcam.stationId");
+  // m_stationType = 
+  //     kv.getValue<int32_t>("knowledge-linguistics-v2vcam.stationType");
+  // m_vehicleLength = 
+  //     kv.getValue<double>("knowledge-linguistics-v2vcam.vehicleLength");
+  // m_vehicleWidth = 
+  //     kv.getValue<double>("knowledge-linguistics-v2vcam.vehicleWidth");
+  // m_vehicleRole = 
+  //     kv.getValue<int32_t>("knowledge-linguistics-v2vcam.vehicleRole");
   
 }
 
@@ -486,11 +529,11 @@ int32_t V2vCam::GetStationId() const
   return m_stationId;
 }
 
-uint32_t V2vCam::GenerateGenerationTime() const
+uint64_t V2vCam::GenerateGenerationTime() const
 {
   std::chrono::system_clock::time_point start2004TimePoint = 
       std::chrono::system_clock::from_time_t(m_timeType2004);
-  uint32_t millisecondsSince2004Epoch =
+  uint64_t millisecondsSince2004Epoch =
       std::chrono::system_clock::now().time_since_epoch() /
       std::chrono::milliseconds(1) 
       - start2004TimePoint.time_since_epoch() / std::chrono::milliseconds(1);
@@ -609,7 +652,7 @@ int32_t V2vCam::GetHeading() const
   double conversion = opendlv::Constants::RAD2DEG;
   int32_t scale = std::pow(10,1);
   double val = m_heading*scale*conversion;
-  if(val < 0 || val > 3600){
+  if(val < 0 || val > 3600 || std::isnan(val)){
     return 3601;
   }
   else {
@@ -664,7 +707,7 @@ int32_t V2vCam::GetSpeedConfidence() const
   else if(val < 1){
     return 1;
   }
-  else if(m_speedConfidence > 125){
+  else if(val > 125){
     return 126;
   }
   else{
@@ -674,28 +717,67 @@ int32_t V2vCam::GetSpeedConfidence() const
 
 int32_t V2vCam::GetVehicleLength() const
 {
-  return m_vehicleLength;
+  int32_t scale = std::pow(10,1);
+  double val = m_vehicleLength*scale;
+  if(val < 0){
+    return 1023;
+  }
+  else if( val > 1022){
+    return 1022;
+  }
+  else{
+    return static_cast<int32_t> (std::round(val));
+  }
 }
 
 int32_t V2vCam::GetVehicleWidth() const
 {
-  return m_vehicleWidth;
+  int32_t scale = std::pow(10,1);
+  double val = m_vehicleWidth*scale;
+  if(val < 0){
+    return 62;
+  }
+  else if( val > 61){
+    return 61;
+  }
+  else{
+    return static_cast<int32_t> (std::round(val));
+  }
+
 }
 
 int32_t V2vCam::GetLongitudinalAcc() const
 {
   int32_t scale = std::pow(10,1);
   double val = m_longitudinalAcc*scale;
+  std::cout << val << std::endl;
   if(m_longitudinalAccConf < 0){
     return 161;
   }
-  else if(val < - 160){
+  else if(val < -160){
     return -160;
   }
   else if(val > 160){
     return 160;
   }
   else{
+    return static_cast<int32_t> (std::round(val));
+  }
+}
+
+
+int32_t V2vCam::GetLongitudinalAccConf() const
+{
+  int32_t scale = std::pow(10,1);
+  double val = m_longitudinalAccConf*scale;
+
+  if(val < 0){
+    return 102;
+  } else if (val < 1){
+    return 1;
+  } else if (val > 100){
+    return 101;
+  } else {
     return static_cast<int32_t> (std::round(val));
   }
 }
@@ -720,12 +802,6 @@ int32_t V2vCam::GetYawRateValue() const
 }
 
 
-
-int32_t V2vCam::GetLongitudinalAccConf() const
-{
-  int32_t scale = std::pow(10,1);
-  return static_cast<int32_t> (m_longitudinalAccConf*scale);
-}
 
 int32_t V2vCam::GetYawRateConfidence() const
 {

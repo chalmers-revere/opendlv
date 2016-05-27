@@ -24,6 +24,7 @@
 
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 namespace opendlv {
 namespace action {
@@ -44,6 +45,11 @@ class KeepObjectSize
  private:
   void setUp();
   void tearDown();
+
+  std::unique_ptr<opendlv::perception::Object> m_object;
+  float m_desiredAzimuth;
+  float m_angularSize;
+  float m_targetSize;
 };
 
 } // keepobjectsize

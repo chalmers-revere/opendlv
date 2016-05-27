@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Chalmers REVERE
+ * Copyright (C) 2015 Chalmers REVERE
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,50 +17,40 @@
  * USA.
  */
 
-#ifndef CAN_CANMESSAGEDATASTORE_HPP_
-#define CAN_CANMESSAGEDATASTORE_HPP_
+#ifndef RELAY_RELAY_HPP_
+#define RELAY_RELAY_HPP_
 
 #include <memory>
 
-#include <opendavinci/odcore/base/Mutex.h>
-#include "odcantools/MessageToCANDataStore.h"
-
-namespace automotive {
-namespace odcantools {
-class CANDevice;
-}
-}
-
-namespace odcore {
-namespace data {
-class Container;
-}
-}
+#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/data/Container.h"
 
 namespace opendlv {
 namespace proxy {
-namespace can {
+namespace relay {
+
+class Device;
 
 /**
- * This class maps selected messages to CAN messages.
+ * This class provides...
  */
-class CanMessageDataStore
-: public automotive::odcantools::MessageToCANDataStore {
+class Relay
+: public odcore::base::module::DataTriggeredConferenceClientModule {
  public:
-  CanMessageDataStore(
-  std::shared_ptr<automotive::odcantools::CANDevice> canDevice);
-  virtual void add(odcore::data::Container const &container);
-
-  bool IsAutonomousEnabled();
-  bool IsOverridden();
+  Relay(int32_t const &, char **);
+  Relay(Relay const &) = delete;
+  Relay &operator=(Relay const &) = delete;
+  virtual ~Relay();
+  virtual void nextContainer(odcore::data::Container &);
 
  private:
-  odcore::base::Mutex m_dataStoreMutex;
-  bool m_enabled;
-  bool m_overridden;
+  void setUp();
+  void tearDown();
+
+  std::unique_ptr<Device> m_device;
 };
 
-} // can
+} // relay
 } // proxy
 } // opendlv
 

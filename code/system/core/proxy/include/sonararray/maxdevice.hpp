@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Chalmers REVERE
+ * Copyright (C) 2015 Chalmers REVERE
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,50 +17,35 @@
  * USA.
  */
 
-#ifndef CAN_CANMESSAGEDATASTORE_HPP_
-#define CAN_CANMESSAGEDATASTORE_HPP_
+#ifndef SONARARRAY_GPIODEVICE_HPP_
+#define SONARARRAY_GPIODEVICE_HPP_
 
-#include <memory>
+#include <cstdint>
+#include <iostream>
+#include <string>
 
-#include <opendavinci/odcore/base/Mutex.h>
-#include "odcantools/MessageToCANDataStore.h"
-
-namespace automotive {
-namespace odcantools {
-class CANDevice;
-}
-}
-
-namespace odcore {
-namespace data {
-class Container;
-}
-}
+#include "sonararray/device.hpp"
 
 namespace opendlv {
 namespace proxy {
-namespace can {
+namespace sonararray {
 
-/**
- * This class maps selected messages to CAN messages.
- */
-class CanMessageDataStore
-: public automotive::odcantools::MessageToCANDataStore {
+class MaxDevice : public Device {
  public:
-  CanMessageDataStore(
-  std::shared_ptr<automotive::odcantools::CANDevice> canDevice);
-  virtual void add(odcore::data::Container const &container);
-
-  bool IsAutonomousEnabled();
-  bool IsOverridden();
+  MaxDevice(std::vector<opendlv::model::Cartesian3>, 
+      std::vector<opendlv::model::Direction>, std::vector<uint16_t>, 
+      float);
+  MaxDevice(MaxDevice const &) = delete;
+  MaxDevice &operator=(MaxDevice const &) = delete;
+  virtual ~MaxDevice();
+  std::vector<float> GetSonarReadings();
 
  private:
-  odcore::base::Mutex m_dataStoreMutex;
-  bool m_enabled;
-  bool m_overridden;
+  std::vector<uint16_t> m_pins;
+  float m_scaleValue;
 };
 
-} // can
+} // sonararray
 } // proxy
 } // opendlv
 
