@@ -169,7 +169,7 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
         std::string source = "echolocation";
         std::vector<std::string> sources;
         sources.push_back(source);
-				identifiedObjects[objectCounter].setSources(sources);
+				identifiedObjects[objectCounter].setListOfSources(sources);
 
 				objectCounter++;
 		  }

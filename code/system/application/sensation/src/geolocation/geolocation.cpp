@@ -307,7 +307,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       getConference().send(msg);
 
       odcore::data::TimeStamp now;
-      opendlv::knowledge::Insight msgTravelDistance(now, "travelDistance");
+      opendlv::knowledge::Insight msgTravelDistance(now, "distanceTravelled="+std::to_string(travelDistance));
           odcore::data::Container containerTravelDistance(msgTravelDistance);
           getConference().send(containerTravelDistance);
 

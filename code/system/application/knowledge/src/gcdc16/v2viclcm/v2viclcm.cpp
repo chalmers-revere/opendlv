@@ -22,9 +22,11 @@
 #include <cstring>
 #include <cmath>
 #include <iostream>
+#include <iomanip>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <math.h>
  
 #include "opendavinci/odcore/base/KeyValueConfiguration.h"
 
@@ -218,7 +220,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vIclcm::body()
 
     std::cout << output << std::endl;
 
-    m_sendLog << std::to_string(GenerateGenerationTime())+
+    m_sendLog <<  std::setprecision(15) << std::to_string(GenerateGenerationTime())+
         + "," + std::to_string(m_messageId)+ //messageId
         + "," + std::to_string(m_stationId)+ //stationId
         + "," + std::to_string(m_containerMask)+ //containerMask
@@ -268,9 +270,7 @@ void V2vIclcm::ReadInsight(opendlv::knowledge::Insight &a_insight)
   if (information.size() == 0){
     if (str == "mergeScenario") {
       m_scenario = str;
-    } else if (str == "safeToMerge"){
-      m_safeToMerge = 1;
-    } 
+    }  
   } else {
     if(information[0] == "stationId"){
       m_stationId = std::stoi(information[1]);
@@ -286,19 +286,21 @@ void V2vIclcm::ReadInsight(opendlv::knowledge::Insight &a_insight)
       m_mioRangeRate = static_cast<int32_t>(std::stod(information[1])/0.01);
     } else if (information[0] == "forwardId"){
       m_forwardId = std::stoi(information[1]);
-    } else if (information[0] == "backwardId") {
-      m_backwardId = std::stoi(information[1]);
     } else if (information[0] == "initialLane") {
       m_lane = std::stoi(information[1]);
     } else if (information[0] == "isHead"){
-      m_flagHead = 1;
+      m_flagHead = std::stoi(information[1]);
     } else if (information[0] == "isTail") {
-      m_flagTail = 1;
+      m_flagTail = std::stoi(information[1]);
     } else if (information[0] == "platoonId"){
       m_platoonId = std::stoi(information[1]);
     } else if (information[0] == "intention"){
       m_intention = std::stoi(information[1]);
-    }
+    } else if (information[0] == "safeToMerge"){
+      m_safeToMerge = std::stoi(information[1]);
+    } else if (information[0] == "distanceTravelled"){
+      m_distanceTravelledCz = static_cast<int32_t>(std::stod(information[1])/0.1);
+    } 
   }
 }
 
@@ -437,12 +439,16 @@ void V2vIclcm::nextContainer(odcore::data::Container &a_c)
       getConference().send(containerScenarioEnd);
     }
 
+    if (forwardId == 110){
+      m_backwardId = stationId;
+    }
+
     opendlv::knowledge::Insight platoonCruiseSpeed(now,"cruiseSpeed="+std::to_string(cruiseSpeed));
     odcore::data::Container containerCruiseSpeed(platoonCruiseSpeed);
     getConference().send(containerCruiseSpeed);
  
 
-    m_receiveLog << std::to_string(GenerateGenerationTime())+
+    m_receiveLog <<  std::setprecision(15) << std::to_string(GenerateGenerationTime())+
         + "," + std::to_string(messageId)+ //messageId
         + "," + std::to_string(stationId)+ //stationId
         + "," + std::to_string(containerMask)+ //containerMask

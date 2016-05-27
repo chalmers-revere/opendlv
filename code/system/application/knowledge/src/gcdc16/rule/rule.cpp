@@ -63,7 +63,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Rule::body()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
   std::string mio1 = kv.getValue<std::string>("knowledge-gcdc16-rule.mio_1");
-  std::string mio2 = kv.getValue<std::string>("knowledge-gcdc16-rule.mio_2");
+  std::string forwardId = kv.getValue<std::string>("knowledge-gcdc16-rule.forward_id");
   std::string backwardId = kv.getValue<std::string>("knowledge-gcdc16-rule.backward_id");
   std::string initialLane = kv.getValue<std::string>("knowledge-gcdc16-rule.initial_lane");
   std::string isTail = kv.getValue<std::string>("knowledge-gcdc16-rule.is_tail");
@@ -85,6 +85,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Rule::body()
       opendlv::knowledge::Insight scenarioOut(timestamp, "mergeScenario");
       odcore::data::Container objectContainer(scenarioOut);
       getConference().send(objectContainer);
+
+      opendlv::knowledge::Insight forwardOut(timestamp, "forwardId=" + forwardId);
+      odcore::data::Container objectContainer10(forwardOut);
+      getConference().send(objectContainer10);
 
 
       opendlv::knowledge::Insight mioOut(timestamp, "mioId=" + mio1);
