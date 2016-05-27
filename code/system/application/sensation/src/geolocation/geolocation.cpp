@@ -216,7 +216,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       opendlv::data::environment::Point3 locationNow (state.x(), state.y(), 0.0);
 
     double distanceP2P = locationNow.getDistanceTo(locationBefore);
-    travelDistance = distanceP2P;//travelDistance + distanceP2P;
+    travelDistance = travelDistance + distanceP2P;
+    locationBefore = locationNow;
 
       timestamp += systemModel.getDeltaT();
 
