@@ -83,12 +83,14 @@ void SetOpticalFlow::nextContainer(odcore::data::Container &a_container)
       }
         
       odcore::data::TimeStamp t0;
-      opendlv::action::Correction correction1(t0, "acceleration", false, speedCorrection);
+      opendlv::action::Correction correction1(
+          t0, "acceleration", false, speedCorrection);
       odcore::data::Container container(correction1);
       getConference().send(container);
   }
   else if (a_container.getDataType() == opendlv::sensation::DesiredOpticalFlow::ID()) {
-    opendlv::sensation::DesiredOpticalFlow flow = a_container.getData<opendlv::sensation::DesiredOpticalFlow>();
+    opendlv::sensation::DesiredOpticalFlow flow = 
+        a_container.getData<opendlv::sensation::DesiredOpticalFlow>();
     float desired = flow.getDesiredOpticalFlow();
     std::cout << "Flow: " << desired << std::endl;
     float speedDiff = desired - m_speed;

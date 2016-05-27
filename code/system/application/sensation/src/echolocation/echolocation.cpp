@@ -156,7 +156,7 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
 				identifiedObjects[objectCounter].setIdentified(now);
 				identifiedObjects[objectCounter].setTypeConfidence(-1.0f);
 				identifiedObjects[objectCounter].setDistance(minDist);
-				identifiedObjects[objectCounter].setDistanceConfidence(0.5f);
+				identifiedObjects[objectCounter].setDistanceConfidence(0.6f);
 				opendlv::model::Direction objectDirection = opendlv::model::Direction((maxAngle+minAngle)/2.0f, 0.0f);
 				identifiedObjects[objectCounter].setDirection(objectDirection);
 				identifiedObjects[objectCounter].setDirectionConfidence(0.5f);
@@ -165,6 +165,7 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
 				identifiedObjects[objectCounter].setAngularSizeConfidence(0.5f);
 				identifiedObjects[objectCounter].setAngularSizeRateConfidence(-1.0f);
 				identifiedObjects[objectCounter].setConfidence(dynConfidence);
+        identifiedObjects[objectCounter].setObjectId(-1);
 				// identifiedObjects[objectCounter].setSources(1.0f);
 
 				objectCounter++;
