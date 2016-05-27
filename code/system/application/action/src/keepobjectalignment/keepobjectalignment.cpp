@@ -77,7 +77,7 @@ void KeepObjectAlignment::nextContainer(odcore::data::Container &a_container)
       opendlv::model::Direction direction = unpackedObject.getDirection();
       float azimuth = direction.getAzimuth();
       float angleRateCorrection = 0.0f;
-      float gainCorrection = 0.5f;
+      float gainCorrection = 0.3f;
 
        
 
