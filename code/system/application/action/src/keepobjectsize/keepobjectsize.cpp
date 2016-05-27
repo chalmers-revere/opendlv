@@ -89,13 +89,13 @@ void KeepObjectSize::nextContainer(odcore::data::Container &a_container)
             std::cout << "Closest object" << std::endl;
         }    
 
-        m_angularSize = unpackedObject.getAngularSize();
+        m_angularSize = m_object->getAngularSize();
 
-        if (std::fabs(m_angularSize) < 0.070f) {
+        if (std::fabs(m_angularSize) < m_targetSize*0.9f) {
           std::cout << "Small enough: " << m_angularSize << std::endl;
           float angularSizeRatio = m_angularSize / m_targetSize ;
           speedCorrection = 1.0f - angularSizeRatio;
-        } else if (std::fabs(m_angularSize) > 0.080f) {
+        } else if (std::fabs(m_angularSize) > m_targetSize*1.1f) {
           std::cout << "Object too big" << std::endl;
           float angularSizeRatio = m_targetSize / m_angularSize;
           speedCorrection = angularSizeRatio - 1.0f; 
