@@ -26,6 +26,7 @@
 #include <reverefh16mapping/GeneratedHeaders_reverefh16mapping.h>
 
 #include "can/canmessagedatastore.hpp"
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 namespace opendlv {
 namespace proxy {
@@ -35,7 +36,8 @@ CanMessageDataStore::CanMessageDataStore(
 std::shared_ptr<automotive::odcantools::CANDevice> canDevice)
     : automotive::odcantools::MessageToCANDataStore(canDevice),
     m_dataStoreMutex(),
-    m_enabled(false)
+    m_enabled(false),
+    m_overridden(false)
 {
 }
 
@@ -46,19 +48,34 @@ void CanMessageDataStore::add(odcore::data::Container const &a_container)
   // TODO: Kids, do not try this at home. Issue: #19.
   odcore::data::Container &container = const_cast<odcore::data::Container &>(
       a_container);
- 
+
+
   if (container.getDataType() == opendlv::proxy::ControlState::ID()) {
     opendlv::proxy::ControlState controlState
-      = container.getData<opendlv::proxy::ControlState>();
+        = container.getData<opendlv::proxy::ControlState>();
 
     m_enabled = controlState.getIsAutonomous();
 
     std::cout << "Enable: " << m_enabled << std::endl;
 
-  } else if (container.getDataType() 
+  }
+  else if (container.getDataType() == opendlv::proxy::ControlOverrideState::ID()) {
+    opendlv::proxy::ControlOverrideState controlOverrideState
+        = container.getData<opendlv::proxy::ControlOverrideState>();
+
+    bool isOverridden = controlOverrideState.getIsOverridden();
+    if (isOverridden) {
+      // When override is once set to true, cannot be unset.
+      m_overridden = true;
+    }
+
+    std::cout << "Overridden: " << m_overridden << std::endl;
+  }
+  else if (container.getDataType() 
       == opendlv::proxy::ActuationRequest::ID()) {
+
     opendlv::proxy::ActuationRequest actuationRequest 
-      = container.getData<opendlv::proxy::ActuationRequest>();
+        = container.getData<opendlv::proxy::ActuationRequest>();
 
     bool isValid = actuationRequest.getIsValid();
     if (!isValid) {
@@ -109,6 +126,17 @@ void CanMessageDataStore::add(odcore::data::Container const &a_container)
         = steeringRequestMapping.encode(steeringRequestContainer);
     m_canDevice->write(genericCanMessage);
   }
+}
+
+
+bool CanMessageDataStore::IsAutonomousEnabled()
+{
+  return m_enabled;
+}
+
+bool CanMessageDataStore::IsOverridden()
+{
+  return m_overridden;
 }
 
 } // can
