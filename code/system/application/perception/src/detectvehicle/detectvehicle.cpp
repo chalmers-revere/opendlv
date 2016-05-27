@@ -346,14 +346,14 @@ void DetectVehicle::sendObjectInformation(std::vector<cv::Rect>* detections,
 
 
     float distance = (float) sqrt(pow(pointBottomMid(0),2) + pow(pointBottomMid(1),2));
-    float distanceConfidence = 0.1;
+    float distanceConfidence = 0.5f;
 
 
     float angularSizeRate = -1.0f;
     float angularSizeRateConfidence = -1.0f;
 
 
-    float confidence = 0.1f;
+    float confidence = 0.2f;
     std::vector<std::string> sources;
     sources.push_back(cameraName);
 
