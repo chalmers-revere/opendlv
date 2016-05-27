@@ -228,7 +228,7 @@ void V2vIclcm::ReadInsight(opendlv::knowledge::Insight &a_insight)
   // std::cout<< "Read "<< std::endl;
   std::string str = a_insight.getInsight();
 
-  std::cout<< str << std::endl;
+  // std::cout<< str << std::endl;
   std::vector<std::string> information = odcore::strings::StringToolbox::split(str,'=');
   // if(information[0] == "stationId"){
   //   m_stationId = std::stoi(information[1]);
