@@ -112,7 +112,7 @@ void Act::nextContainer(odcore::data::Container &a_container)
 
     std::cout << "Received estimate..." << std::endl;
 
-    
+
     auto startTime = estimate.getStartTime();
     std::string type = estimate.getType();
     float amplitude = estimate.getAmplitude();
@@ -120,42 +120,41 @@ void Act::nextContainer(odcore::data::Container &a_container)
     // If not already has estimate, add one and clear anything existing
 
     if (type == "accelerate") {
-      if (!m_hasEstimateAcc) {
 
-        m_startTimesAccelerate.clear();
-        m_amplitudesAccelerate.clear();
-        
-        m_startTimesAccelerate.push_back(startTime);
-        m_amplitudesAccelerate.push_back(amplitude);
+      m_startTimesAccelerate.clear();
+      m_amplitudesAccelerate.clear();
+      
+      m_startTimesAccelerate.push_back(startTime);
+      m_amplitudesAccelerate.push_back(amplitude);
 
-        m_hasEstimateAcc = true;
-        m_timeOfEstimateAcc = now;
+      m_hasEstimateAcc = true;
+      m_timeOfEstimateAcc = now;
 
-      }
+      m_accelerationValue = amplitude;
 
     } else if (type == "brake") {
-      if (!m_hasEstimateBrake) {
-        m_startTimesBrake.clear();
-        m_amplitudesBrake.clear();
-      
-        m_startTimesBrake.push_back(startTime);
-        m_amplitudesBrake.push_back(amplitude);
+      m_startTimesBrake.clear();
+      m_amplitudesBrake.clear();
+    
+      m_startTimesBrake.push_back(startTime);
+      m_amplitudesBrake.push_back(amplitude);
 
-        m_hasEstimateBrake = true;
-        m_timeOfEstimateBrake = now;
-      }
+      m_hasEstimateBrake = true;
+      m_timeOfEstimateBrake = now;
+
+      m_brakeValue = amplitude;
 
     } else if (type == "steering") {
-      if (!m_hasEstimateSteer) {
-        m_startTimesSteering.clear();
-        m_amplitudesSteering.clear();
+      m_startTimesSteering.clear();
+      m_amplitudesSteering.clear();
 
-        m_startTimesSteering.push_back(startTime);
-        m_amplitudesSteering.push_back(amplitude);
+      m_startTimesSteering.push_back(startTime);
+      m_amplitudesSteering.push_back(amplitude);
 
-        m_hasEstimateSteer = true;
-        m_timeOfEstimateSteer = now;
-      }
+      m_hasEstimateSteer = true;
+      m_timeOfEstimateSteer = now;
+      
+      m_steeringValue = amplitude;
       
     }
   }
@@ -224,72 +223,77 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
 
     odcore::data::TimeStamp now;
 
-    std::vector<odcore::data::TimeStamp> startTimesAccelerateToSave;
-    std::vector<float> amplitudesAccelerateToSave;
-    for (uint8_t i = 0; i < m_startTimesAccelerate.size(); i++) {
-      auto t0 = m_startTimesAccelerate[i];
-      auto amplitude = m_amplitudesAccelerate[i];
+    if (!m_hasEstimateAcc) {
+      std::vector<odcore::data::TimeStamp> startTimesAccelerateToSave;
+      std::vector<float> amplitudesAccelerateToSave;
+      for (uint8_t i = 0; i < m_startTimesAccelerate.size(); i++) {
+        auto t0 = m_startTimesAccelerate[i];
+        auto amplitude = m_amplitudesAccelerate[i];
 
-      float t1 = static_cast<float>(now.toMicroseconds() 
-          - t0.toMicroseconds()) / 1000000.0f;
+        float t1 = static_cast<float>(now.toMicroseconds() 
+            - t0.toMicroseconds()) / 1000000.0f;
 
-      if (t1 < m_maxDuration) {
-        float deltaValue = amplitude / freq;
-        m_accelerationValue += deltaValue;
+        if (t1 < m_maxDuration) {
+          float deltaValue = amplitude / freq;
+          m_accelerationValue += deltaValue;
 
-        startTimesAccelerateToSave.push_back(t0);
-        amplitudesAccelerateToSave.push_back(amplitude);
+          startTimesAccelerateToSave.push_back(t0);
+          amplitudesAccelerateToSave.push_back(amplitude);
+        }
       }
-    }
 
-    // stores a new list instead of the old one???
-    m_startTimesAccelerate = startTimesAccelerateToSave;
-    m_amplitudesAccelerate = amplitudesAccelerateToSave;
+      // stores a new list instead of the old one???
+      m_startTimesAccelerate = startTimesAccelerateToSave;
+      m_amplitudesAccelerate = amplitudesAccelerateToSave;
+    }
         
-    std::vector<odcore::data::TimeStamp> startTimesBrakeToSave;
-    std::vector<float> amplitudesBrakeToSave;
-    for (uint8_t i = 0; i < m_startTimesBrake.size(); i++) {
-      auto t0 = m_startTimesBrake[i];
-      auto amplitude = m_amplitudesBrake[i];
+    if (!m_hasEstimateBrake) {
+      std::vector<odcore::data::TimeStamp> startTimesBrakeToSave;
+      std::vector<float> amplitudesBrakeToSave;
+      for (uint8_t i = 0; i < m_startTimesBrake.size(); i++) {
+        auto t0 = m_startTimesBrake[i];
+        auto amplitude = m_amplitudesBrake[i];
 
-      float t1 = static_cast<float>(now.toMicroseconds() 
-          - t0.toMicroseconds()) / 1000000.0f;
+        float t1 = static_cast<float>(now.toMicroseconds() 
+            - t0.toMicroseconds()) / 1000000.0f;
 
-      if (t1 < m_maxDuration) {
-        float deltaValue = amplitude / freq;
-        m_brakeValue += deltaValue;
+        if (t1 < m_maxDuration) {
+          float deltaValue = amplitude / freq;
+          m_brakeValue += deltaValue;
 
-        startTimesBrakeToSave.push_back(t0);
-        amplitudesBrakeToSave.push_back(amplitude);
+          startTimesBrakeToSave.push_back(t0);
+          amplitudesBrakeToSave.push_back(amplitude);
+        }
       }
+
+      // stores a new list instead of the old one???
+      m_startTimesBrake = startTimesBrakeToSave;
+      m_amplitudesBrake = amplitudesBrakeToSave;
     }
 
-    // stores a new list instead of the old one???
-    m_startTimesBrake = startTimesBrakeToSave;
-    m_amplitudesBrake = amplitudesBrakeToSave;
-    
-    std::vector<odcore::data::TimeStamp> startTimesSteeringToSave;
-    std::vector<float> amplitudesSteeringToSave;
-    for (uint8_t i = 0; i < m_startTimesSteering.size(); i++) {
-      auto t0 = m_startTimesSteering[i];
-      auto amplitude = m_amplitudesSteering[i];
+    if (!m_hasEstimateSteer) {
+      std::vector<odcore::data::TimeStamp> startTimesSteeringToSave;
+      std::vector<float> amplitudesSteeringToSave;
+      for (uint8_t i = 0; i < m_startTimesSteering.size(); i++) {
+        auto t0 = m_startTimesSteering[i];
+        auto amplitude = m_amplitudesSteering[i];
 
-      float t1 = static_cast<float>(now.toMicroseconds() 
-          - t0.toMicroseconds()) / 1000000.0f;
+        float t1 = static_cast<float>(now.toMicroseconds() 
+            - t0.toMicroseconds()) / 1000000.0f;
 
-      if (t1 < m_maxDuration) {
-        float deltaValue = amplitude / freq;
-        m_steeringValue += deltaValue;
+        if (t1 < m_maxDuration) {
+          float deltaValue = amplitude / freq;
+          m_steeringValue += deltaValue;
 
-        startTimesSteeringToSave.push_back(t0);
-        amplitudesSteeringToSave.push_back(amplitude);
+          startTimesSteeringToSave.push_back(t0);
+          amplitudesSteeringToSave.push_back(amplitude);
+        }
       }
+
+      // stores a new list instead of the old one???
+      m_startTimesSteering = startTimesSteeringToSave;
+      m_amplitudesSteering = amplitudesSteeringToSave;
     }
-
-    // stores a new list instead of the old one???
-    m_startTimesSteering = startTimesSteeringToSave;
-    m_amplitudesSteering = amplitudesSteeringToSave;
-
 
     if (m_brakeValue > 0.0f) {
       opendlv::proxy::ActuationRequest actuationRequest(m_brakeValue, 
