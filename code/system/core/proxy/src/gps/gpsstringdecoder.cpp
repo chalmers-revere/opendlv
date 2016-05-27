@@ -147,7 +147,10 @@ void GpsStringDecoder::nextString(std::string const &s) {
       try {
         gotGpvtg = true;
 
-        std::string headingStr = fields.at(3);
+        std::string headingStr = fields.at(1);
+
+        std::cout << "HeadingStr: " << headingStr << std::endl;
+
 
         if (headingStr.empty()) {
           northHeading = 0.0f;
@@ -173,8 +176,8 @@ void GpsStringDecoder::nextString(std::string const &s) {
     }
   }
 
-  std::cout << "[proxy-gpsstringdecoder] GPS sending signals : Latitude : " << latitude << std::setprecision(19)
-               << " Longitude : " << std::setprecision(19) << longitude << " Heading: " << northHeading << " hasRtk: " << hasRtk << std::endl;
+  // std::cout << "[proxy-gpsstringdecoder] GPS sending signals : Latitude : " << latitude << std::setprecision(19)
+  //              << " Longitude : " << std::setprecision(19) << longitude << " Heading: " << northHeading << " hasRtk: " << hasRtk << std::endl;
 
 
   if (gotGpgga && gotGpvtg) {

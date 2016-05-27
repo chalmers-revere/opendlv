@@ -79,9 +79,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Rule::body()
       getConference().send(objectContainer1);
 
 
-      // opendlv::knowledge::Insight scenarioOut(timestamp, "mergeScenario");
-      // odcore::data::Container objectContainer1(scenarioOut);
-      // getConference().send(objectContainer1);
+      opendlv::knowledge::Insight scenarioOut(timestamp, "mergeScenario");
+      odcore::data::Container objectContainer1(scenarioOut);
+      getConference().send(objectContainer1);
 
       opendlv::knowledge::Insight mioOut(timestamp, "mio=" + mio1);
       odcore::data::Container objectContainer2(mioOut);
