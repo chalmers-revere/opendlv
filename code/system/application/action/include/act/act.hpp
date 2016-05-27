@@ -46,6 +46,8 @@ class Act : public odcore::base::module::TimeTriggeredConferenceClientModule {
   void setUp();
   void tearDown();
 
+  float m_maxDuration;
+
   std::vector<odcore::data::TimeStamp> m_startTimesAccelerate;
   std::vector<odcore::data::TimeStamp> m_startTimesBrake;
   std::vector<odcore::data::TimeStamp> m_startTimesSteering;
@@ -55,6 +57,13 @@ class Act : public odcore::base::module::TimeTriggeredConferenceClientModule {
   float m_accelerationValue;
   float m_brakeValue;
   float m_steeringValue;
+
+  bool m_hasEstimateAcc;
+  odcore::data::TimeStamp m_timeOfEstimateAcc;
+  bool m_hasEstimateBrake;
+  odcore::data::TimeStamp m_timeOfEstimateBrake;
+  bool m_hasEstimateSteer;
+  odcore::data::TimeStamp m_timeOfEstimateSteer;
 };
 
 } // act
