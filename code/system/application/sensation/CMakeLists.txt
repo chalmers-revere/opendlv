@@ -27,7 +27,7 @@ set(LIBRARIES ${LIBRARIES})
 file(GLOB_RECURSE thisproject-sources
   "${CMAKE_CURRENT_SOURCE_DIR}/src/audition/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/echolocation/*.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/geolocation/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proprioception/balance/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/proprioception/orientation/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/proprioception/wheel/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/vision/color/*.cpp"
@@ -49,6 +49,9 @@ target_link_libraries(${PROJECT_NAME}-echolocation ${PROJECT_NAME}lib-static ${L
 
 add_executable(${PROJECT_NAME}-geolocation "${CMAKE_CURRENT_SOURCE_DIR}/src/geolocation/main.cpp")
 target_link_libraries(${PROJECT_NAME}-geolocation ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+
+add_executable(${PROJECT_NAME}-proprioception-balance "${CMAKE_CURRENT_SOURCE_DIR}/src/proprioception/balance/main.cpp")
+target_link_libraries(${PROJECT_NAME}-proprioception-balance ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
 add_executable(${PROJECT_NAME}-proprioception-orientation "${CMAKE_CURRENT_SOURCE_DIR}/src/proprioception/orientation/main.cpp")
 target_link_libraries(${PROJECT_NAME}-proprioception-orientation ${PROJECT_NAME}lib-static ${LIBRARIES}) 
@@ -84,6 +87,7 @@ include(RunTests)
 install(TARGETS ${PROJECT_NAME}-audition RUNTIME DESTINATION bin COMPONENT system-application)
 install(TARGETS ${PROJECT_NAME}-echolocation RUNTIME DESTINATION bin COMPONENT system-application)
 install(TARGETS ${PROJECT_NAME}-geolocation RUNTIME DESTINATION bin COMPONENT system-application)
+install(TARGETS ${PROJECT_NAME}-proprioception-balance RUNTIME DESTINATION bin COMPONENT system-application)
 install(TARGETS ${PROJECT_NAME}-proprioception-orientation RUNTIME DESTINATION bin COMPONENT system-application)
 install(TARGETS ${PROJECT_NAME}-proprioception-wheel RUNTIME DESTINATION bin COMPONENT system-application)
 install(TARGETS ${PROJECT_NAME}-vision-color RUNTIME DESTINATION bin COMPONENT system-application)
