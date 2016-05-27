@@ -24,7 +24,8 @@
 
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
-
+#include <opendavinci/odcore/wrapper/SerialPort.h>
+#include <opendavinci/odcore/wrapper/SerialPortFactory.h>
 namespace opendlv {
 namespace proxy {
 namespace ledstrip {
@@ -46,6 +47,8 @@ class Ledstrip
  private:
   void setUp();
   void tearDown();
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+
 
   std::unique_ptr<Device> m_device;
 };

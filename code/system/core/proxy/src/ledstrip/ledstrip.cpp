@@ -35,6 +35,13 @@ namespace opendlv {
 namespace proxy {
 namespace ledstrip {
 
+
+using namespace std;
+
+// We add some of OpenDaVINCI's namespaces for the sake of readability.
+using namespace odcore;
+using namespace odcore::wrapper;
+
 /**
   * Constructor.
   *
@@ -50,6 +57,32 @@ Ledstrip::Ledstrip(int32_t const &a_argc, char **a_argv)
 
 Ledstrip::~Ledstrip()
 {
+}
+
+// This method will do the main data processing job.
+odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Ledstrip::body()
+{
+
+  while (getModuleStateAndWaitForRemainingTimeInTimeslice() 
+      == odcore::data::dmcp::ModuleStateMessage::RUNNING) { 
+
+    const string SERIAL_PORT = "/dev/ttyACM0";
+    const uint32_t BAUD_RATE = 9600;
+
+    // We are using OpenDaVINCI's std::shared_ptr to automatically
+    // release any acquired resources.
+    try {
+        std::shared_ptr<SerialPort> serial(SerialPortFactory::createSerialPort(SERIAL_PORT, BAUD_RATE));
+
+        serial->send("Hello World\r\n");
+    }
+    catch(string &exception) {
+        cerr << "Serial port could not be created: " << exception << endl;
+    }
+
+  }
+
+  return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
 
 void Ledstrip::nextContainer(odcore::data::Container &)
@@ -69,10 +102,10 @@ void Ledstrip::setUp()
     //      m_device = std::unique_ptr<Device>(new VictorDevice());
   }
 
-  if (m_device.get() == nullptr) {
-    std::cerr << "[proxy-ledstrip] No valid device driver defined."
-              << std::endl;
-  }
+  // if (m_device.get() == nullptr) {
+  //   std::cerr << "[proxy-ledstrip] No valid device driver defined."
+  //             << std::endl;
+  // }
 }
 
 void Ledstrip::tearDown()
