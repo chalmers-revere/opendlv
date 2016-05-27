@@ -49,6 +49,7 @@ class KeepObjectSize
   std::unique_ptr<opendlv::perception::Object> m_object;
   float m_desiredAzimuth;
   float m_angularSize;
+  float m_targetSize;
 };
 
 } // keepobjectsize

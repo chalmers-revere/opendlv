@@ -107,7 +107,8 @@ void Scene::nextContainer(odcore::data::Container &a_container)
             objectExists = true;
             break;
           }
-        }    
+        } 
+
         double betweenObjects = PointDistance(azimuth, distance, m_savedObjects[i].getDirection().getAzimuth(), m_savedObjects[i].getDistance());
         if (betweenObjects < 2.0) {
           MergeObjects(unpackedObject, i);
@@ -125,9 +126,10 @@ void Scene::nextContainer(odcore::data::Container &a_container)
       }
       //std::cout << "Debug4: " << std::endl;
       std::cout << "Number of IDs: " << m_savedObjects.size() << std::endl << std::endl;
-
 	 }
   }
+
+  
   else if(a_container.getDataType() == opendlv::perception::Surface::ID()) {
     opendlv::perception::Surface unpackedObject =
     a_container.getData<opendlv::perception::Surface>();
@@ -227,33 +229,86 @@ double Scene::PointDistance(float a_angle1, double a_dist1, float a_angle2, doub
 
 void Scene::MergeObjects(opendlv::perception::Object a_object, uint32_t a_index) //TODO: Check angular size to get rate, direction for direction rate
 {
-  m_savedObjects[a_index].setIdentified(a_object.getIdentified());
+  m_savedObjects[a_index].setIdentified(a_object.getIdentified()); //Sets the saved objects timestamp to the new timestamp
+
+
+  m_savedObjects[a_index].setDirection(a_object.getDirection());
+  m_savedObjects[a_index].setDirectionConfidence(a_object.getDirectionConfidence());
+  m_savedObjects[a_index].setAngularSize(a_object.getAngularSize());
+  m_savedObjects[a_index].setAngularSizeConfidence(a_object.getAngularSizeConfidence());
+  m_savedObjects[a_index].setDistance(a_object.getDistance());
+  m_savedObjects[a_index].setDistanceConfidence(a_object.getDistanceConfidence());
+  m_savedObjects[a_index].setType(a_object.getType());
+  m_savedObjects[a_index].setTypeConfidence(a_object.getTypeConfidence());
+  m_savedObjects[a_index].setDirectionRate(a_object.getDirectionRate());
+  m_savedObjects[a_index].setDirectionRateConfidence(a_object.getDirectionRateConfidence());
+  m_savedObjects[a_index].setAngularSizeRate(a_object.getAngularSizeRate());
+  m_savedObjects[a_index].setAngularSizeRateConfidence(a_object.getAngularSizeRateConfidence());
+
+  auto sourceSearch = std::find(std::begin(m_savedObjects[a_index].getListOfSources()), std::end(m_savedObjects[a_index].getListOfSources()), a_object.getListOfSources()[0]);
+  if (sourceSearch == std::end(m_savedObjects[a_index].getListOfSources())) {
+    m_savedObjects[a_index].getListOfSources().push_back(a_object.getListOfSources()[0]);
+    m_savedObjects[a_index].setConfidence(m_savedObjects[a_index].getConfidence() + (a_object.getConfidence() / 2));
+  }
+  for (uint32_t i = 0; i < a_object.getListOfProperties().size(); i++) {
+    auto propertySearch = std::find(std::begin(m_savedObjects[a_index].getListOfProperties()), std::end(m_savedObjects[a_index].getListOfProperties()), a_object.getListOfProperties()[i]);
+    if (propertySearch == std::end(m_savedObjects[a_index].getListOfProperties())) {
+      m_savedObjects[a_index].getListOfProperties().push_back(a_object.getListOfProperties()[i]);
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+/*
+
   
-  /*if (m_savedObjects[a_index].getType().empty()) {
-    m_savedObjects[a_index].setType(a_object.getType());
-  }*/
   if (m_savedObjects[a_index].getTypeConfidence() < a_object.getTypeConfidence()) {
     m_savedObjects[a_index].setType(a_object.getType());
     m_savedObjects[a_index].setTypeConfidence(a_object.getTypeConfidence());
   }
+
   float confidenceModifierDirection = 1.0f;
-  if (std::abs(m_savedObjects[a_index].getDirection().getAzimuth() - a_object.getDirection().getAzimuth()) < 0.07f) {
+
+  if (std::fabs(m_savedObjects[a_index].getDirection().getAzimuth() - a_object.getDirection().getAzimuth()) < 0.07f) {
     confidenceModifierDirection = 1.25f;
   }
-  m_savedObjects[a_index].setDirection(a_object.getDirection());  
+  m_savedObjects[a_index].setDirection(a_object.getDirection());
+
+
+  confidenceDirection = confidenceDirection > 1 ? 1 : confidenceDirection;
+  m_savedObjects[a_index].setDirectionConfidence(confidenceDirection); 
+
+
+
+
+
   if (m_savedObjects[a_index].getDirectionConfidence() <= a_object.getDirectionConfidence()) { //Borde inte confidence höjas oavsett? /MS
     float confidenceDirection = confidenceModifierDirection * a_object.getDirectionConfidence();
-    confidenceDirection = confidenceDirection > 1 ? 1 : confidenceDirection;
-    m_savedObjects[a_index].setDirectionConfidence(confidenceDirection);
+    
+    
   }
+
   if (m_savedObjects[a_index].getDirectionRateConfidence() < a_object.getDirectionRateConfidence()) { //Skulle vi inte alltid ta nya? /MS
     m_savedObjects[a_index].setDirectionRate(a_object.getDirectionRate());
     m_savedObjects[a_index].setDirectionRateConfidence(a_object.getDirectionRateConfidence());
   }
+
+
   float confidenceModifierDistance = 1.0f;
-  if (std::abs(m_savedObjects[a_index].getDistance() - a_object.getDistance()) < 0.5f) {
+  if (std::fabs(m_savedObjects[a_index].getDistance() - a_object.getDistance()) < 0.5f) {
     confidenceModifierDistance = 1.25f;
   }
+
+
   m_savedObjects[a_index].setDistance(a_object.getDistance()); //Samma här, borde den inte öka oavsett? /MS
   if (m_savedObjects[a_index].getDistanceConfidence() < a_object.getDistanceConfidence()) {
     float confidenceDistance = confidenceModifierDistance * a_object.getDistanceConfidence();
@@ -280,6 +335,7 @@ void Scene::MergeObjects(opendlv::perception::Object a_object, uint32_t a_index)
     }
   }
 }
+*/
 
 void Scene::TimeCheck()
 {
@@ -288,7 +344,7 @@ void Scene::TimeCheck()
     double objectTimeStamp = (nowTimeStamp - m_savedObjects[i].getIdentified()).toMicroseconds() / 1000000.0;
     //std::cout << "Timestamp" << m_savedObjects[i].getIdentified().toMicroseconds() / 1000000.0 << std::endl;
     //std::cout << "Debug time: " << objectTimeStamp << std::endl;
-    if (objectTimeStamp > 1) { //TODO: Change to config parameter
+    if (objectTimeStamp > 1.0) { //TODO: Change to config parameter
      m_savedObjects.erase(m_savedObjects.begin() + i);
      std::cout << "Removed object" << std::endl;
      i--;

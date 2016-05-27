@@ -72,7 +72,11 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Rule::body()
       opendlv::sensation::DesiredOpticalFlow desired(35.0f/3.6f);
       odcore::data::Container objectContainer0(desired);
       getConference().send(objectContainer0);
-      std::cout << "Debug: " << std::endl;
+      //std::cout << "Debug: " << std::endl;
+
+      opendlv::perception::ObjectDesiredAngularSize angularsize(0.075f, -1);
+      odcore::data::Container objectContainer1(angularsize);
+      getConference().send(objectContainer1);
 
 
       // opendlv::knowledge::Insight scenarioOut(timestamp, "mergeScenario");
