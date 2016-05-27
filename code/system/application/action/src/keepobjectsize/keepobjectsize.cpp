@@ -96,7 +96,7 @@ void KeepObjectSize::nextContainer(odcore::data::Container &a_container)
             std::cout << "Too close: " << m_angularSize << std::endl;
             float distanceRatio = distance / m_targetSize ;
             speedCorrection = 1.0f - distanceRatio;
-          } else if (distance > m_targetSize*(1.0f+tolerance) && m_crossingScenario) {
+          } else if (distance > m_targetSize*(1.0f+tolerance) && !m_crossingScenario) {
             std::cout << "Too far" << std::endl;
             float distanceRatio = m_targetSize / distance;
             speedCorrection = distanceRatio - 1.0f; 
@@ -131,7 +131,7 @@ void KeepObjectSize::nextContainer(odcore::data::Container &a_container)
           std::cout << "Too close: " << m_angularSize << std::endl;
           float distanceRatio = distance / m_targetSize ;
           speedCorrection = 1.0f - distanceRatio;
-        } else if (distance > m_targetSize*(1.0f+tolerance) && m_crossingScenario) {
+        } else if (distance > m_targetSize*(1.0f+tolerance) && !m_crossingScenario) {
           std::cout << "Too far" << std::endl;
           float distanceRatio = m_targetSize / distance;
           speedCorrection = distanceRatio - 1.0f; 
