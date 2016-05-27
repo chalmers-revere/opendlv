@@ -53,6 +53,8 @@ void CanMessageDataStore::add(odcore::data::Container const &a_container)
 
     m_enabled = controlState.getIsAutonomous();
 
+    std::cout << "Enable: " << m_enabled << std::endl;
+
   } else if (container.getDataType() 
       == opendlv::proxy::ActuationRequest::ID()) {
     opendlv::proxy::ActuationRequest actuationRequest 

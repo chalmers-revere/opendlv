@@ -22,6 +22,9 @@
 #include <cmath>
 #include <iostream>
 
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
 
@@ -121,7 +124,7 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
 					}
 				}
 		  }
-		  if(pointCloud.size() > 10) { //TODO: evaluate parameter and move to config
+		  if(pointCloud.size() > 5) { //TODO: evaluate parameter and move to config
 		  	//std::cout << "Nytt object!" << std::endl;
 		  	
 				double minDist = m_distances[pointCloud[0]];
@@ -169,6 +172,10 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
 	  }
   }
 
+  for(uint32_t i = 0; i < nNewPoints; i++) {
+  	std::cout << "Dist: " << distances[i] << " Angle: " << angles[i] << std::endl;
+  }
+
 
 	for(uint32_t i = 0; i < objectCounter; i++) {
   	odcore::data::Container c(identifiedObjects[i]);
@@ -176,6 +183,29 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
   	std::cout << "Object sent with distance: " << identifiedObjects[i].getDistance() << " and angle:"  << 
   			identifiedObjects[i].getDirection().getAzimuth() << "and angular size: " << 
   			identifiedObjects[i].getAngularSize() << std::endl;
+	}
+
+	{
+		int32_t height = 512;
+		int32_t width = 800;
+		cv::Mat lidarImage(height, width, CV_8UC3, cv::Scalar(0, 0, 0));
+		cv::Point origo(800/2, 512);
+		double scale = 512/90.0;
+
+		for (uint32_t i=0; i<nNewPoints; i++) {
+			cv::Point endPoint(
+				origo.x - scale*distances[i]*std::sin(static_cast<double>(angles[i])),
+				origo.y - scale*distances[i]*std::cos(static_cast<double>(angles[i])));
+			cv::line(
+				lidarImage,
+				origo,
+				endPoint,
+				cv::Scalar(0, 0, 200),
+				2, 8, 0);
+		}
+
+		cv::imshow("LIDAR debug", lidarImage);
+		cv::waitKey(10);
 	}
 
 }

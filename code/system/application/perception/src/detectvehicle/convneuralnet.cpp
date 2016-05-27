@@ -121,7 +121,7 @@ void ConvNeuralNet::Update(const cv::Mat* a_imageFrame)
       m_normAvgG, m_normStdG, m_normAvgB, m_normStdB);
 
   // For displaying (each pixel increased in size)
-  double myTestFactor = 4;
+  double myTestFactor = 6;
   cv::resize(workingImage, workingImage, 
       cv::Size(m_inputWidth*myTestFactor, m_inputHeight*myTestFactor), 0, 0, 
       cv::INTER_CUBIC);

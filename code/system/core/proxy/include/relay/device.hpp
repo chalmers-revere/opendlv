@@ -33,12 +33,11 @@ class Device {
   Device &operator=(Device const &) = delete;
   virtual ~Device();
   virtual bool IsActive(uint16_t const) const = 0;
-  void Reset();
+  virtual void Reset() = 0;
   virtual void SetValue(uint16_t const, bool const) = 0;
 
- private:
+ protected:
   std::vector<bool> m_initialValues;
-  std::vector<bool> m_values;
 };
 
 } // relay
