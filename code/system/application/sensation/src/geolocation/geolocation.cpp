@@ -130,18 +130,18 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
           opendlv::proxy::reverefh16::Propulsion>();
 
       if (propulsionContainer.getReceivedTimeStamp().getSeconds() > 0) {
-        control.v() = propulsion.getPropulsionShaftVehicleSpeed()/3.6;
+        control.v() = propulsion.getPropulsionShaftVehicleSpeed();
         // TODO: to m/s --- get the message in si unit
       }
 
 
-      if (propulsion.getPropulsionShaftVehicleSpeed() < 0.001) {
+      if (propulsion.getPropulsionShaftVehicleSpeed() < 0.1) {
           control.v() = 0.0;
       // if we don't get any data from the CAN,
       // we try to fill the speed from GPS data
-        auto gpsSpeed = gpsReading.getSpeed();
-        if (gpsSpeed > 1.0 ){
-        control.v() = gpsSpeed;}
+        // auto gpsSpeed = gpsReading.getSpeed();
+        // if (gpsSpeed > 1.0 ){
+        // control.v() = gpsSpeed;}
       }
 
       auto steeringContainer = getKeyValueDataStore().get(
@@ -153,9 +153,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
                   opendlv::proxy::reverefh16::VehicleState::ID());
       auto vehicleState = vehicleStateContainer.getData<
               opendlv::proxy::reverefh16::VehicleState>();
-      double longitudinalAcceleration = vehicleState.getAccelerationX();
+      // double longitudinalAcceleration = vehicleState.getAccelerationX();
+      double longitudinalAcceleration = 0.0;
       //double lateralAcceleration = vehicleState.getAccelerationY();  //TODO: do we need lateral acceleration?
-      double longitudinalAccelerationConfidence = 0.0;
+      double longitudinalAccelerationConfidence = -1;
 
 
       if (steeringContainer.getReceivedTimeStamp().getSeconds() > 0) {
@@ -233,16 +234,18 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       double heading = 0.0;
       if (std::isfinite(state.theta()) )
       {
-        heading = state.theta() - 
-                  std::ceil((state.theta()-M_PI)/(M_PI)) * (M_PI);  // make sure that the heading is in [-pi,+pi]
+        // heading = state.theta() - 
+        //           std::ceil((state.theta()-M_PI)/(M_PI)) * (M_PI);  // make sure that the heading is in [0,2pi]
+        heading = std::fmod(std::abs(state.theta()),2*M_PI);
       }
       else
       {
        filterReset( currentCartesianLocation, gpsReading);
        state = m_ekf.getState();
         if (std::isfinite(gpsReading.getNorthHeading())) {
-           heading = state.theta() - 
-                  std::ceil((gpsReading.getNorthHeading()-M_PI)/(M_PI)) * (M_PI);  // make sure that the heading is in [-pi,+pi]
+           // heading = gpsReading.getNorthHeading() - 
+           //        std::ceil((gpsReading.getNorthHeading()-M_PI)/(M_PI)) * (M_PI);  // make sure that the heading is in [-pi,+pi]
+          heading = std::fmod(std::abs(gpsReading.getNorthHeading()),2*M_PI);
         }
 	else {
            heading = 0.0;} 
@@ -271,7 +274,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
                                                             currentWGS84CoordinateEstimation.getLongitude(),
                                                             positionConfidence,
                                                             gpsReading.getAltitude(),
-                                                            std::fmod(heading+opendlv::Constants::PI,2*opendlv::Constants::PI),  
+                                                            heading,  
                                                             headingConfidence
                                                             );
       
