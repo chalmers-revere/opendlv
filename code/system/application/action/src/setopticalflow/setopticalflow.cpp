@@ -66,11 +66,15 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SetOpticalFlow::body()
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() 
       == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
 
+
+    m_desiredSpeed = 8.0f;
+
+
     // TODO hardcoded parameter...
     float acceptableSpeedDeviation = 2.0f / 3.6f; // 2 km/h
-    float speedCorrectionFactor = 10.0f;
-    float speedDiffEstimateLimit = 5.0f;
-    float estimateAmplitudeSpeedFactor = 1.8f;
+    float speedCorrectionFactor = 5.0f;
+ //   float speedDiffEstimateLimit = 0.5f;
+   // float estimateAmplitudeSpeedFactor = 25.0f;
     float accelerationPredictionTime = 0.5f;
 
 
@@ -117,16 +121,43 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SetOpticalFlow::body()
       m_speedCorrection = 0.0f;
     }
 
-    if (speedDiff > speedDiffEstimateLimit) {
+
+    std::cout << speedDiff << std::endl;
+
+
+
+    if (predictedVelocity < 0.4f * m_desiredSpeed) {
+      std::cout << "Mode 1" << std::endl;
       odcore::data::TimeStamp t0;
-      float estimateAmplitude = std::max(std::min(
-          speedDiff*estimateAmplitudeSpeedFactor, 100.0f), 0.0f);
+      float estimateAmplitude = 60.0f;
+      opendlv::action::Estimate estimate(t0, "accelerate", estimateAmplitude);
+      odcore::data::Container container(estimate);
+      getConference().send(container);
+      std::cout << "Speed Estimate: " << estimateAmplitude << std::endl;
+    }
+    else if (predictedVelocity > 0.4f * m_desiredSpeed && predictedVelocity < 0.8f * m_desiredSpeed) {
+      std::cout << "Mode 2" << std::endl;
+      odcore::data::TimeStamp t0;
+      float estimateAmplitude = 30.0f;
+      opendlv::action::Estimate estimate(t0, "accelerate", estimateAmplitude);
+      odcore::data::Container container(estimate);
+      getConference().send(container);
+      std::cout << "Speed Estimate: " << estimateAmplitude << std::endl;
+    }
+    else if (predictedVelocity > 0.8f * m_desiredSpeed && predictedVelocity < 0.9f * m_desiredSpeed) {
+      std::cout << "Mode 3" << std::endl;
+      odcore::data::TimeStamp t0;
+      float estimateAmplitude = 20.0f;
       opendlv::action::Estimate estimate(t0, "accelerate", estimateAmplitude);
       odcore::data::Container container(estimate);
       getConference().send(container);
       std::cout << "Speed Estimate: " << estimateAmplitude << std::endl;
     }
     else {
+      
+      std::cout << "CORRECTION MODE CORRECTION MODE CORRECTION MODE!!!!!" << std::endl;
+
+
       odcore::data::TimeStamp t0;
       opendlv::action::Correction correction1(
           t0, "accelerate", false, m_speedCorrection);
