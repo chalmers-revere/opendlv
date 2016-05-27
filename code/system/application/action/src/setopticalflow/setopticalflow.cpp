@@ -67,9 +67,6 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SetOpticalFlow::body()
       == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
 
 
-    m_desiredSpeed = 8.0f;
-
-
     // TODO hardcoded parameter...
     float acceptableSpeedDeviation = 2.0f / 3.6f; // 2 km/h
     float speedCorrectionFactor = 5.0f;
