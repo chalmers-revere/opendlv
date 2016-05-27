@@ -66,6 +66,15 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SetOpticalFlow::body()
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() 
       == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
 
+    // TODO hardcoded parameter...
+    float acceptableSpeedDeviation = 2.0f / 3.6f; // 2 km/h
+    float speedCorrectionFactor = 10.0f;
+    float speedDiffEstimateLimit = 5.0f;
+    float estimateAmplitudeSpeedFactor = 1.8f;
+    float accelerationPredictionTime = 0.5f;
+
+
+
     float deltaTime = 1.0f/static_cast<float>(getFrequency());
     uint32_t nrAccAvg = 50; 
     m_velocityMemory.push_back(m_currentSpeed);
@@ -80,27 +89,26 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SetOpticalFlow::body()
       std::cout << "Current estimated acceleration: " 
           << m_currentEstimatedAcceleration << std::endl;
     }
+    float predictedVelocity = m_currentSpeed + 
+        m_currentEstimatedAcceleration*accelerationPredictionTime;
 
     std::cout << "Current speed: " << m_currentSpeed << std::endl;
     std::cout << "Desired speed: " << m_desiredSpeed << std::endl;
+    std::cout << "Predicted speed " << accelerationPredictionTime 
+        << " seconds ahead: " << predictedVelocity << std::endl;
     
-    // TODO hardcoded parameter...
-    float acceptableSpeedDeviation = 2.0f / 3.6f; // 2 km/h
-    float speedCorrectionFactor = 10.0f;
-    float speedDiffEstimateLimit = 5.0f;
-    float estimateAmplitudeSpeedFactor = 1.8f;
 
     float speedDiff = 0;
     if (m_currentSpeed < (m_desiredSpeed - acceptableSpeedDeviation)) {
         
-      speedDiff = m_desiredSpeed - m_currentSpeed;
+      speedDiff = m_desiredSpeed - predictedVelocity;
 
       // TODO magical number
       m_speedCorrection = speedDiff / speedCorrectionFactor;
 
     } else if (m_currentSpeed > (m_desiredSpeed + acceptableSpeedDeviation)) {
       
-      speedDiff = m_desiredSpeed - m_currentSpeed;
+      speedDiff = m_desiredSpeed - predictedVelocity;
 
       // TODO magical number
       m_speedCorrection = speedDiff / speedCorrectionFactor;
@@ -158,7 +166,7 @@ void SetOpticalFlow::nextContainer(odcore::data::Container &a_container)
           << "). Corrected." << std::endl;
     }
 
-    std::cout << "Desired speed is now: " << m_desiredSpeed << std::endl;
+    //std::cout << "Desired speed is now: " << m_desiredSpeed << std::endl;
   }
 
 }
