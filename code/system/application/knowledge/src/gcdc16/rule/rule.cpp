@@ -74,18 +74,22 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Rule::body()
       odcore::data::TimeStamp timestamp;
 
 
-      //std::cout << "Debug: " << std::endl;
+
+      opendlv::perception::ObjectDesiredAngularSize angularsize(0.075f, -1);
+      odcore::data::Container objectContainer2(angularsize);
+      getConference().send(objectContainer2);
+
 
       
 
       opendlv::knowledge::Insight scenarioOut(timestamp, "mergeScenario");
-      odcore::data::Container objectContainer2(scenarioOut);
-      getConference().send(objectContainer2);
+      odcore::data::Container objectContainer(scenarioOut);
+      getConference().send(objectContainer);
 
 
       opendlv::knowledge::Insight mioOut(timestamp, "mioId=" + mio1);
-      odcore::data::Container objectContainer2(mioOut);
-      getConference().send(objectContainer2);
+      odcore::data::Container objectContainer3(mioOut);
+      getConference().send(objectContainer3);
 
 
       opendlv::knowledge::Insight backwardOut(timestamp, "backwardId=" + backwardId);
