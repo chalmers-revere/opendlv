@@ -62,6 +62,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 
   odcore::data::TimeStamp previousTimestep;
   odcore::data::TimeStamp previousDataTimestamp;
+  double velocityBefore = 0.0;
 
   opendlv::data::environment::Point3 locationBefore (0.0, 0.0, 0.0);
 
@@ -275,6 +276,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       double yawRateConfidence = calculateHeadingConfidence(ekfSuccess);
 
 
+      longitudinalAcceleration = (control.v() - velocityBefore)/systemModel.getDeltaT();
+      velocityBefore = control.v();
+
       odcore::data::TimeStamp timeBeforeMessgeSending;
       odcore::data::TimeStamp durationBeforeMessgeSending = timeBeforeMessgeSending - timeAtBegin;
 
@@ -367,7 +371,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
                 << "\n   timestamp = " << timestamp << "\t " << std::setprecision(19)
                 << "\n   latitude = " << currentWGS84CoordinateEstimation.getLatitude()
                 << "\n   longitude = " << currentWGS84CoordinateEstimation.getLongitude()
-                << "\n   northHeading =" << heading << "\n\n" << std::endl;
+                << "\n   northHeading =" << heading
+                << "\n   longitudinalAcceleration " << longitudinalAcceleration
+                << "\n\n" <<  std::endl;
 
 
       //save data to file
