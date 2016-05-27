@@ -110,6 +110,9 @@ void Act::nextContainer(odcore::data::Container &a_container)
     opendlv::action::Estimate estimate = 
         a_container.getData<opendlv::action::Estimate>();
 
+    std::cout << "Received estimate..." << std::endl;
+
+    
     auto startTime = estimate.getStartTime();
     std::string type = estimate.getType();
     float amplitude = estimate.getAmplitude();
@@ -162,6 +165,8 @@ void Act::nextContainer(odcore::data::Container &a_container)
   if (a_container.getDataType() == opendlv::action::Correction::ID()) {
     opendlv::action::Correction correction = 
         a_container.getData<opendlv::action::Correction>();
+
+    std::cout << "Received correction..." << std::endl;
 
     auto startTime = correction.getStartTime();
     std::string type = correction.getType();
