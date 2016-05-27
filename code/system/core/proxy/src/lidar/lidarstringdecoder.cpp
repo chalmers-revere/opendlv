@@ -173,7 +173,7 @@ bool LidarStringDecoder::CheckForStartResponse()
   return true;
 }
 
-opendlv::proxy::EchoReading LidarStringDecoder::GetLatestReading() const
+opendlv::proxy::EchoReading LidarStringDecoder::GetLatestReading()
 {
   odcore::base::Lock l(m_latestReadingMutex);
   return m_latestReading;

@@ -39,7 +39,7 @@ class LidarStringDecoder : public odcore::io::StringListener {
   virtual ~LidarStringDecoder();
 
   virtual void nextString(const std::string &);
-  opendlv::proxy::EchoReading GetLatestReading() const;
+  opendlv::proxy::EchoReading GetLatestReading();
   bool IsCentimeterMode() const;
   bool IsRunning() const;
   bool IsSettingsMode() const;
