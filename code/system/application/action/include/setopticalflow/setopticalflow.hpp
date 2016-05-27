@@ -47,8 +47,12 @@ class SetOpticalFlow
   void tearDown();
 
   float m_maxSpeed;
-  float m_speed;
+  float m_currentSpeed;
   float m_speedCorrection;
+  float m_desiredSpeed;
+  float m_currentEstimatedAcceleration;
+
+  std::vector<float> m_velocityMemory;
 };
 
 } // setopticalflow

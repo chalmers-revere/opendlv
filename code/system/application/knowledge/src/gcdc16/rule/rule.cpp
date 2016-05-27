@@ -79,28 +79,30 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Rule::body()
       
 
       opendlv::knowledge::Insight scenarioOut(timestamp, "mergeScenario");
-      odcore::data::Container objectContainer1(scenarioOut);
-      getConference().send(objectContainer1);
+      odcore::data::Container objectContainer2(scenarioOut);
+      getConference().send(objectContainer2);
+
 
       opendlv::knowledge::Insight mioOut(timestamp, "mioId=" + mio1);
       odcore::data::Container objectContainer2(mioOut);
       getConference().send(objectContainer2);
 
-      opendlv::knowledge::Insight backwardOut(timestamp, "backwardId=" + backwardId);
-      odcore::data::Container objectContainer3(backwardOut);
-      getConference().send(objectContainer3);
 
-      opendlv::knowledge::Insight laneOut(timestamp, "initialLane=" + initialLane);
-      odcore::data::Container objectContainer4(laneOut);
+      opendlv::knowledge::Insight backwardOut(timestamp, "backwardId=" + backwardId);
+      odcore::data::Container objectContainer4(backwardOut);
       getConference().send(objectContainer4);
 
-      opendlv::knowledge::Insight tailOut(timestamp, "isTail=" + isTail);
-      odcore::data::Container objectContainer5(tailOut);
+      opendlv::knowledge::Insight laneOut(timestamp, "initialLane=" + initialLane);
+      odcore::data::Container objectContainer5(laneOut);
       getConference().send(objectContainer5);
 
-      opendlv::knowledge::Insight platoonOut(timestamp, "platoonId=" + platoonId);
-      odcore::data::Container objectContainer6(platoonOut);
+      opendlv::knowledge::Insight tailOut(timestamp, "isTail=" + isTail);
+      odcore::data::Container objectContainer6(tailOut);
       getConference().send(objectContainer6);
+
+      opendlv::knowledge::Insight platoonOut(timestamp, "platoonId=" + platoonId);
+      odcore::data::Container objectContainer7(platoonOut);
+      getConference().send(objectContainer7);
 
   } 
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
