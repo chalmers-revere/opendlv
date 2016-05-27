@@ -101,14 +101,12 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
       odcore::data::dmcp::ModuleStateMessage::RUNNING) {
 
+      odcore::data::TimeStamp timeAtBegin;
+
+
     auto gpsReadingContainer =
         getKeyValueDataStore().get(opendlv::proxy::GpsReading::ID());
     auto gpsReading = gpsReadingContainer.getData<opendlv::proxy::GpsReading>();
-
-    std::cout << getName()
-              << "\n   Latitude  =  " << gpsReading.getLatitude()
-              << "\n   Longitude  =  " << gpsReading.getLongitude()
-              << "\n   North Heading = " << gpsReading.getNorthHeading() << std::endl;
 
     if (gpsReadingContainer.getReceivedTimeStamp().toMicroseconds() > 0) {
       if (!hasGpsReference) {
@@ -129,6 +127,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       odcore::data::TimeStamp duration = thisTimestep - previousTimestep;
       previousTimestep = thisTimestep;
 
+      odcore::data::TimeStamp timeAfterGpsReading;
+      odcore::data::TimeStamp durationAfterGpsReading = timeAfterGpsReading - timeAtBegin;
 
       auto propulsionContainer = getKeyValueDataStore().get(
           opendlv::proxy::reverefh16::Propulsion::ID());
@@ -136,7 +136,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
           opendlv::proxy::reverefh16::Propulsion>();
 
       if (propulsionContainer.getReceivedTimeStamp().getSeconds() > 0) {
-        control.v() = propulsion.getPropulsionShaftVehicleSpeed();
+        control.v() = propulsion.getPropulsionShaftVehicleSpeed()/3.6;
         // TODO: to m/s --- get the message in si unit
       }
 
@@ -155,10 +155,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       auto steering = steeringContainer.getData<
           opendlv::proxy::reverefh16::Steering>();
 
-      auto vehicleStateContainer = getKeyValueDataStore().get(
-                  opendlv::proxy::reverefh16::VehicleState::ID());
-      auto vehicleState = vehicleStateContainer.getData<
-              opendlv::proxy::reverefh16::VehicleState>();
+      //auto vehicleStateContainer = getKeyValueDataStore().get(
+      //            opendlv::proxy::reverefh16::VehicleState::ID());
+      //auto vehicleState = vehicleStateContainer.getData<
+      //        opendlv::proxy::reverefh16::VehicleState>();
       // double longitudinalAcceleration = vehicleState.getAccelerationX();
       double longitudinalAcceleration = 0.0;
       //double lateralAcceleration = vehicleState.getAccelerationY();  //TODO: do we need lateral acceleration?
@@ -167,9 +167,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       if (steeringContainer.getReceivedTimeStamp().getSeconds() > 0) {
         control.phi() = steering.getRoadwheelangle()/m_steeringToWheelRatio;
       }
-      std::cout << "control vector : \n   vel = " << control.v()
-                << "\n   steering = " << control.phi()
-                << std::endl;
+      odcore::data::TimeStamp timeAfterCanReading;
+      odcore::data::TimeStamp durationAfterCanReading = timeAfterCanReading - timeAtBegin;
 
       opendlv::data::environment::WGS84Coordinate currentLocation(
           gpsReading.getLatitude(),
@@ -179,9 +178,6 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 
       opendlv::data::environment::Point3 currentCartesianLocation =
           gpsReference.transform(currentLocation);
-
-
-
 
       //kinematic kalman block
       KinematicObservationVector<double> observationVector =
@@ -196,14 +192,12 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 //        observationVector.Z_theta() = state.theta();
 //      }
 
-      std::cout << "observation vector : \n   x = " << observationVector.Z_x()
-                << "\n   y = " << observationVector.Z_y()
-                << "\n   northHeading = " << observationVector.Z_theta() << std::endl;
 
       double deltaTime = duration.toMicroseconds() / 1000000.0;
       systemModel.updateDeltaT(deltaTime);
 
-      odcore::data::TimeStamp timeBeforEkf;
+      odcore::data::TimeStamp timeBeforeEkf;
+      odcore::data::TimeStamp durationBeforeEkf = timeBeforeEkf - timeAtBegin;
 
       state = m_ekf.predict(systemModel, control);
 
@@ -216,29 +210,20 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
         gpsHasData = true;
       }
       odcore::data::TimeStamp timeAfterEkf;
-      odcore::data::TimeStamp ekfTimeElapsed = timeBeforEkf - timeAfterEkf;
-
-      std::cout << "Ekf time elapsed (microseconds) = " << ekfTimeElapsed.toMicroseconds() << std::endl;
+      odcore::data::TimeStamp durationAfterEkf = timeAfterEkf - timeAtBegin;
 
       opendlv::data::environment::Point3 locationNow (state.x(), state.y(), 0.0);
 
     double distanceP2P = locationNow.getDistanceTo(locationBefore);
-    travelDistance = travelDistance + distanceP2P;
+    travelDistance = distanceP2P;//travelDistance + distanceP2P;
 
       timestamp += systemModel.getDeltaT();
-
-      std::cout   << getName() << "\t estimation "
-                  << "\n   timestamp = " << timestamp
-                  << "\n   hasData = " << gpsHasData
-                  << "\n   x = " << state.x()
-                  << "\n   y = " << state.y()
-                  << "\n   theta = " << state.theta() << std::endl;
 
       //TODO: convert here x and y to get the position of the rear axle
       opendlv::data::environment::WGS84Coordinate currentWGS84CoordinateEstimation;
       bool ekfSuccess=true;
       // if one of the coordinates is nan, it gives the last GPS available measure
-      if (   std::isfinite(state.x()) 
+      if (   std::isfinite(state.x())
           && std::isfinite(state.y()) )
       {
         // Build the proper GPS coordinates to send
@@ -246,7 +231,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
                 (state.x() + m_gpsToCoGDisplacement_x,
                  state.y() + m_gpsToCoGDisplacement_y,
                  currentCartesianLocation.getZ() + m_gpsToCoGDisplacement_z);
-        currentWGS84CoordinateEstimation = gpsReference.transform(currentStateEstimation);
+//        currentWGS84CoordinateEstimation = gpsReference.transform(currentStateEstimation);
       }
       else
       {
@@ -256,6 +241,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
        state = m_ekf.getState();
        ekfSuccess = false;
       }
+
+      odcore::data::TimeStamp timeAfterConversionStuff;
+      odcore::data::TimeStamp durationAfterConversionStuff = timeAfterConversionStuff - timeAtBegin;
 
       double heading = 0.0;
   /*    if (std::isfinite(state.theta()) )
@@ -287,11 +275,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       double yawRateConfidence = calculateHeadingConfidence(ekfSuccess);
 
 
-      std::cout   << getName() << "\t sent message "
-                  << "\n   timestamp = " << timestamp << "\t " << std::setprecision(19)
-                  << "\n   latitude = " << currentWGS84CoordinateEstimation.getLatitude()
-                  << "\n   longitude = " << currentWGS84CoordinateEstimation.getLongitude()
-                  << "\n   northHeading =" << heading << "\n\n" << std::endl;
+      odcore::data::TimeStamp timeBeforeMessgeSending;
+      odcore::data::TimeStamp durationBeforeMessgeSending = timeBeforeMessgeSending - timeAtBegin;
 
       // Send the message
       opendlv::sensation::Geolocation geoLocationEstimation(gpsReading.getLatitude(),
@@ -316,7 +301,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 
       // TODO: This should be sent from another module = sensation/geolocation 
       // should be split in two as discussed previously
-      opendlv::model::Cartesian3 velocity(control.v()/3.6, 0.0f, 0.0f);
+      opendlv::model::Cartesian3 velocity(control.v(), 0.0f, 0.0f);
       // opendlv::model::Cartesian3 velocity(gpsReading.getSpeed(), 0.0f, 0.0f);
       opendlv::model::Cartesian3 velocityConfidence(speedConfidence, 0.0f, 
           0.0f);
@@ -324,7 +309,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       opendlv::model::Cartesian3 acceleration(longitudinalAcceleration/3.6, 0.0f, 
           0.0f);
       opendlv::model::Cartesian3 accelerationConfidence(
-          longitudinalAccelerationConfidence/3.6, 0.0f, 0.0f);
+          longitudinalAccelerationConfidence, 0.0f, 0.0f);
       
       opendlv::model::Cartesian3 angularVelocity(0.0f, 0.0f, yawRate);
       opendlv::model::Cartesian3 angularVelocityConfidence(0.0f, 0.0f,
@@ -344,6 +329,45 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       odcore::data::Container dynamicStateContainer(dynamicState);
       getConference().send(dynamicStateContainer);
 
+      odcore::data::TimeStamp timeAfterMessgeSending;
+      odcore::data::TimeStamp durationOfMessageSending = timeAfterMessgeSending - timeBeforeMessgeSending;
+      odcore::data::TimeStamp durationAfterMessageSending = timeAfterMessgeSending - timeAtBegin;
+
+      odcore::data::TimeStamp ekfTimeElapsed = timeAfterEkf - timeBeforeEkf;
+
+
+
+      std::cout << getName()
+                << "\n   Latitude  =  " << gpsReading.getLatitude()
+                << "\n   Longitude  =  " << gpsReading.getLongitude()
+                << "\n   North Heading = " << gpsReading.getNorthHeading()
+                << "\nControl vector : \n   vel = " << control.v()
+                << "\n   steering = " << control.phi()
+                << "\nObservation vector : \n   x = " << observationVector.Z_x()
+                << "\n   y = " << observationVector.Z_y()
+                << "\n   northHeading = " << observationVector.Z_theta()
+                << "\n Timing: "
+                << "\nEkf time elapsed (microseconds) = " << ekfTimeElapsed.toMicroseconds()
+                << "\n   durationAfterGpsReading  = " << durationAfterGpsReading.toMicroseconds()
+                << "\n   durationAfterCanReading  = " << durationAfterCanReading.toMicroseconds()
+                << "\n   durationAfterConversionStuff = " << durationAfterConversionStuff.toMicroseconds()
+                << "\n   durationBeforeEkf = " << durationBeforeEkf.toMicroseconds()
+                << "\n   durationAfterEkf = " << durationAfterEkf.toMicroseconds()
+                << "\n   durationBeforeMessgeSending = " << durationBeforeMessgeSending.toMicroseconds()
+                << "\n   timeAfterMessgeSending  = " << durationAfterMessageSending.toMicroseconds()
+                << "\n   durationOfMessageSending  = " << durationOfMessageSending.toMicroseconds()
+                << "\nTravel distance = " << travelDistance
+                << "\nEstimation "
+                << "\n   timestamp = " << timestamp
+                << "\n   hasData = " << gpsHasData
+                << "\n   x = " << state.x()
+                << "\n   y = " << state.y()
+                << "\n   theta = " << state.theta()
+                << "\nSent message "
+                << "\n   timestamp = " << timestamp << "\t " << std::setprecision(19)
+                << "\n   latitude = " << currentWGS84CoordinateEstimation.getLatitude()
+                << "\n   longitude = " << currentWGS84CoordinateEstimation.getLongitude()
+                << "\n   northHeading =" << heading << "\n\n" << std::endl;
 
 
       //save data to file
