@@ -52,22 +52,10 @@ namespace detectvehicle {
 DetectVehicle::DetectVehicle(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(
       a_argc, a_argv, "perception-detectvehicle")
-    , m_vehicleDetectionSystem()
-    , m_verifiedVehicles()
-    , m_vehicleMemorySystem()
     , m_convNeuralNet()
     , m_scale(1, 1, 1)
     , m_sourceName()
 {
-  /*
-  m_vehicleDetectionSystem = std::shared_ptr<VehicleDetectionSystem>(
-      new VehicleDetectionSystem);
-  m_verifiedVehicles = 
-      std::shared_ptr<std::vector<std::shared_ptr<DetectedVehicle>>>(
-      new std::vector<std::shared_ptr<DetectedVehicle>>);
-  m_vehicleMemorySystem = std::shared_ptr<VehicleMemorySystem>(
-      new VehicleMemorySystem);
-  */
   m_convNeuralNet = std::shared_ptr<ConvNeuralNet>(
       new ConvNeuralNet);
 
@@ -81,7 +69,6 @@ DetectVehicle::~DetectVehicle()
 void DetectVehicle::setUp()
 {
   std::cout << "DetectVehicle::setUp()" << std::endl;
-  //m_vehicleDetectionSystem->setUp();
   m_convNeuralNet->SetUp();
   float scale = 1280.0f/800.0f;
   m_scale = Eigen::Vector3d(scale, scale, 1);
@@ -191,68 +178,12 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
 
 
 
-  // Old stuff below
-  
-
-  /*
-  m_verifiedVehicles->clear();
-  m_vehicleDetectionSystem->update(&myImage, m_verifiedVehicles, timeStamp);
-
-
-  m_vehicleMemorySystem->UpdateMemory(m_verifiedVehicles, timeStamp);
-
-
-  
-  //  ***   plot stuff ***
-  cv::Mat outputImg(myImage.size(),myImage.type());
-  myImage.copyTo(outputImg);
-  //cv::Mat outputImg = myImage.clone();
-
-  int32_t windowWidth = 640;
-  int32_t windowHeight = 480;
-
-
-  cv::resize(outputImg, outputImg, cv::Size(windowWidth, windowHeight), 0, 0, cv::INTER_CUBIC);
-  */
-
-  /*
-  std::vector<std::shared_ptr<RememberedVehicle>> memorized;
-  m_vehicleMemorySystem->GetMemorizedVehicles(&memorized);
-  for (uint32_t i=0; i<memorized.size(); i++) {
-    // Show memory of vehicles
-    for (int32_t j=0; j<memorized.at(i)->GetNrMemories(); j++) {
-      std::vector<std::shared_ptr<DetectedVehicle>> memOverTime;
-      memorized.at(i)->GetMemoryOverTime(&memOverTime);
-      std::shared_ptr<DetectedVehicle> vehRect = memOverTime.at(j);
-      cv::rectangle(outputImg, vehRect->GetDetectionRectangle(), memorized.at(i)->GetDummyColor());
-    }
-  }
-  for (uint32_t i=0; i<m_verifiedVehicles->size(); i++) {
-    // Show vehicles that were verified this frame (green)
-    //cv::rectangle(outputImg, m_verifiedVehicles.at(i)->GetDetectionRectangle(), cv::Scalar(0,255,0));
-  }
-  */
-
-  /*
-  //std::cout << "Nr of memorized vehicles: " << m_vehicleMemorySystem->GetNrMemorizedVehicles() << std::endl;
-  //std::cout << "Total nr of vehicle rectangles: " << m_vehicleMemorySystem->GetTotalNrVehicleRects() << std::endl;
-  cv::imshow("VehicleDetection", outputImg);
-  cv::moveWindow("VehicleDetection", 100, 100);
-  cv::waitKey(10);
-
-  outputImg.release();
-  */
-
-  
-  // end of plot stuff
-  //myImage->release();
   cvReleaseImage(&myIplImage);
 }
 
 void DetectVehicle::tearDown()
 {
   std::cout << "DetectVehicle::tearDown()" << std::endl;
-  //m_vehicleDetectionSystem->tearDown();
   m_convNeuralNet->TearDown();
 }
 
@@ -401,26 +332,6 @@ void DetectVehicle::sendObjectInformation(std::vector<cv::Rect>* detections,
   }
 }
 
-
-float DetectVehicle::PixelPosToHeading(float pixelPosX)
-{
-  float assumedImageWidth = 800;
-  float midPoint = assumedImageWidth/2;
-  float assumedFov = opendlv::Constants::DEG2RAD*60;
-  float pixelsPerRadian = assumedImageWidth/assumedFov;
-
-  /*
-  std::cout << "pixelPosX:          " << pixelPosX << std::endl;
-  std::cout << "midPoint:           " << midPoint << std::endl;
-  std::cout << "assumedFov:         " << assumedFov << std::endl;
-  std::cout << "pixelsPerRadian:    " << pixelsPerRadian << std::endl;
-  std::cout << "midPoint-pixelPosX: " << (midPoint-pixelPosX) << std::endl;
-  std::cout << "(midPoint-pixelPosX)/pixelsPerRadian: " << ((midPoint-pixelPosX)/pixelsPerRadian) << std::endl;
-  */
-  float heading = (midPoint-pixelPosX)/pixelsPerRadian;
-  //std::cout << "heading: " << heading << std::endl;
-  return heading;
-}
 
 } // detectvehicle
 } // perception

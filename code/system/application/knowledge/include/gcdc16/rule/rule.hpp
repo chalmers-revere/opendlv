@@ -58,7 +58,7 @@ class Rule : public odcore::base::module::TimeTriggeredConferenceClientModule {
   opendlv::perception::Object m_mostInterestingObject;
   float m_desiredAzimuth;
   float m_cruiseSpeed;
-  double m_speed;
+  float m_speed;
   bool m_isAutonomous;
   std::string m_platoonId;
   std::string m_currentLane;

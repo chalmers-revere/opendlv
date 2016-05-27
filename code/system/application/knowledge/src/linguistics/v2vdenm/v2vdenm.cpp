@@ -22,6 +22,7 @@
 #include <cstring>
 #include <cmath>
 #include <iostream>
+#include <iomanip>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -226,7 +227,7 @@ void V2vDenm::nextContainer(odcore::data::Container &a_c)
     // std::cout << output;
 
 
-    m_receiveLog<< std::to_string(GenerateGenerationTime())+
+    m_receiveLog <<  std::setprecision(15) << std::to_string(GenerateGenerationTime())+
         + "," + std::to_string(messageId)+ //messageId
         + "," + std::to_string(stationId)+ //stationId
         + "," + std::to_string(generationDeltaTime)+ //generationDeltaTime
