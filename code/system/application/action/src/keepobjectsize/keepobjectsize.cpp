@@ -101,7 +101,7 @@ void KeepObjectSize::nextContainer(odcore::data::Container &a_container)
           speedCorrection = angularSizeRatio - 1.0f; 
         } else {
           std::cout << "zero correction" << std::endl;
-          speedCorrection = 0;
+          speedCorrection = 0.0f;
         }
 
         speedCorrection *= gainCorrection;
