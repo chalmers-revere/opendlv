@@ -129,39 +129,33 @@ bool Rule::euclideanDistance(double measuredDistance)
 }
 */
 
-void Rule::nextContainer(odcore::data::Container &)
-{}
+void Rule::nextContainer(odcore::data::Container &a_container)
+{
   
-//   if (a_container.getDataType() == opendlv::proxy::ControlState::ID()) {
-//     opendlv::proxy::ControlState isAutonomous = a_container.getData<opendlv::proxy::ControlState>();
+ /* if (a_container.getDataType() == opendlv::proxy::ControlState::ID()) {
+    opendlv::proxy::ControlState isAutonomous = a_container.getData<opendlv::proxy::ControlState>();
 
-//     bool autonomous = isAutonomous.getIsAutonomous();
-//     if (autonomous) {
-//       m_isAutonomous = true;
-//     }
-//   } else if (m_isAutonomous && a_container.getDataType() == opendlv::knowledge::Insight::ID()) {
+    bool autonomous = isAutonomous.getIsAutonomous();
+    if (autonomous) {
+      m_isAutonomous = true;
+    }
+  } else if (m_isAutonomous && a_container.getDataType() == opendlv::knowledge::Insight::ID()) {
 
-//     opendlv::knowledge::Insight unpackedObject =
-//         a_container.getData<opendlv::knowledge::Insight>();
-//     std::string insightMessage = unpackedObject.getInsight();
+    opendlv::knowledge::Insight unpackedObject =
+    a_container.getData<opendlv::knowledge::Insight>();
+    std::string insightMessage = unpackedObject.getInsight();
+  }
+      //TODO: STOM, MergeFlag, Ask about Intention messages, distancetravelledCZ
+      //TODO: use rsuEvent -> merging should commence
+} */
 
-//     if(insightMessage == "scenarioReady") {
-
-//     } else if (insightMessage == "scenarioEnd") {
-
-//     } else if (insightMessage == "")
-//   }
-//       //TODO: STOM, MergeFlag, Ask about Intention messages, distancetravelledCZ
-//       //TODO: use rsuEvent -> merging should commence
-// } 
-
-    /*else if (a_container.getDataType() == opendlv::perception::Object::ID()) {
+    if (a_container.getDataType() == opendlv::perception::Object::ID()) {
     opendlv::perception::Object unpackedObject =
     a_container.getData<opendlv::perception::Object>();
 
     int16_t id = unpackedObject.getObjectId();
 
-    if (id != -1) {
+    if (id == -1) {
       return;
     }
 
@@ -181,7 +175,8 @@ void Rule::nextContainer(odcore::data::Container &)
     opendlv::sensation::DesiredDirectionOfMovement desiredDirection(objectDirection);
     odcore::data::Container objectContainer(desiredDirection);
     getConference().send(objectContainer);
-    }*/
+    }
+  }
 
 
 

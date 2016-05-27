@@ -40,10 +40,11 @@ namespace setopticalflow {
   * @param a_argv Command line arguments.
   */
 SetOpticalFlow::SetOpticalFlow(int32_t const &a_argc, char **a_argv)
-    : DataTriggeredConferenceClientModule(
+    : TimeTriggeredConferenceClientModule(
       a_argc, a_argv, "action-setopticalflow"),
     m_maxSpeed(0.0f),
-    m_speed(0.0f)
+    m_speed(0.0f),
+    m_speedCorrection(0.0f)
 {
 }
 
@@ -56,52 +57,62 @@ SetOpticalFlow::~SetOpticalFlow()
  * Sends speed correction commands (throttle) and in rare cases a halt command
  * (brake) to Act.
  */
+
+odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SetOpticalFlow::body()
+{
+  while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING){
+
+    odcore::data::TimeStamp t0;
+    opendlv::action::Correction correction1(t0, "accelerate", false, m_speedCorrection);
+    odcore::data::Container container(correction1);
+    getConference().send(container);
+    std::cout << "Speed Correction: " << m_speedCorrection << std::endl;
+  }
+  return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
+}
+
+
+
+
+
 void SetOpticalFlow::nextContainer(odcore::data::Container &a_container)
 {
-  float speedCorrection = 0.0f;
-  if (a_container.getDataType() == opendlv::model::DynamicState::ID()) {
-      opendlv::model::DynamicState dynamicState = a_container.getData<opendlv::model::DynamicState>();
-      opendlv::model::Cartesian3 velocity = dynamicState.getVelocity();
-      m_speed = std::sqrt((velocity.getX() * velocity.getX()) +(velocity.getY()*velocity.getY()));
+  
+  if (a_container.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
+      opendlv::proxy::reverefh16::Propulsion propulsion = a_container.getData<opendlv::proxy::reverefh16::Propulsion>();
+      m_speed = static_cast<float>(propulsion.getPropulsionShaftVehicleSpeed()) / 3.6f;
+      //m_speed = std::sqrt((velocity.getX() * velocity.getX()) +(velocity.getY()*velocity.getY()));
       std::cout << "Speed: " << m_speed << std::endl;
+      std::cout << "Max Speed: " << m_maxSpeed << std::endl;
       
       float speedTolerance = 5.0f / 3.6f;
 
-      if (m_speed > m_maxSpeed) {
-        if (m_speed < m_maxSpeed + speedTolerance) {
-          float speedDiff = m_speed -m_maxSpeed;
-          speedCorrection = -10.0f * speedDiff/speedTolerance;
+      if (m_speed < (m_maxSpeed - speedTolerance)) {
+          
+        float speedDiff = m_maxSpeed - m_speed;
+        m_speedCorrection = speedDiff / 10.0f;
 
-        }
-        else {
-        speedCorrection = -10.0f; //TODO: set parameter somewhere
-        }
+      } else if (m_speed > (m_maxSpeed + speedTolerance)) {
+        
+        float speedDiff = m_maxSpeed - m_speed;
+        m_speedCorrection = speedDiff / 10.0f;
       
-      }
-      else {
-        speedCorrection = 0.0f;
+      } else {
+        m_speedCorrection = 0.0f;
       }
         
       odcore::data::TimeStamp t0;
-      opendlv::action::Correction correction1(t0, "acceleration", false, speedCorrection);
+      opendlv::action::Correction correction1(t0, "acceleration", false, m_speedCorrection);
       odcore::data::Container container(correction1);
       getConference().send(container);
   }
   else if (a_container.getDataType() == opendlv::sensation::DesiredOpticalFlow::ID()) {
     opendlv::sensation::DesiredOpticalFlow flow = a_container.getData<opendlv::sensation::DesiredOpticalFlow>();
     float desired = flow.getDesiredOpticalFlow();
-    std::cout << "Flow: " << desired << std::endl;
+    //std::cout << "Flow: " << desired << std::endl;
     float speedDiff = desired - m_speed;
-    speedCorrection = speedDiff/5.0f; //TODO: Evaluate parameter
+    m_speedCorrection = speedDiff; //TODO: Evaluate parameter
   }
-
-  std::cout << "Speed Correction: " << speedCorrection << std::endl;
-
-  odcore::data::TimeStamp t0;
-  opendlv::action::Correction correction1(t0, "acceleration", false, speedCorrection);
-  odcore::data::Container container(correction1);
-  getConference().send(container);
-
 
 
 
