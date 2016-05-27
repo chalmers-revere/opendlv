@@ -56,6 +56,7 @@ Balance::~Balance()
  */
 void Balance::nextContainer(odcore::data::Container &)
 {
+
 }
 
 void Balance::setUp()

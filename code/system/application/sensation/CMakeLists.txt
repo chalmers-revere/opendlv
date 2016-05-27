@@ -27,6 +27,7 @@ set(LIBRARIES ${LIBRARIES})
 file(GLOB_RECURSE thisproject-sources
   "${CMAKE_CURRENT_SOURCE_DIR}/src/audition/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/echolocation/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/geolocation/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/proprioception/balance/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/proprioception/orientation/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/proprioception/wheel/*.cpp"
