@@ -55,7 +55,7 @@ class V2vDenm
   std::time_t m_timeType2004;
 
   
-  uint32_t GenerateGenerationTime() const;
+  uint64_t GenerateGenerationTime() const;
 
   // unsigned char const m_messageId = 1;
   // int32_t m_stationId = 0;
