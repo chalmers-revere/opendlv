@@ -21,8 +21,17 @@
 #define SCENE_SCENE_HPP_
 
 #include <memory>
+#include <ctype.h>
+#include <cstring>
+#include <cmath>
+#include <iostream>
+#include <algorithm>
 
-#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/data/Container.h"
+#include "opendavinci/odcore/data/TimeStamp.h"
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
+
+#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
 
 namespace opendlv {
@@ -32,7 +41,7 @@ namespace scene {
 /**
  * This class provides...
  */
-class Scene : public odcore::base::module::DataTriggeredConferenceClientModule {
+class Scene : public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
   Scene(int32_t const &, char **);
   Scene(Scene const &) = delete;
@@ -41,8 +50,22 @@ class Scene : public odcore::base::module::DataTriggeredConferenceClientModule {
   virtual void nextContainer(odcore::data::Container &);
 
  private:
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
   void setUp();
   void tearDown();
+  void MergeSurfaces(opendlv::perception::Surface, uint32_t);
+  std::vector<opendlv::model::Cartesian3> MergePoints(std::vector<opendlv::model::Cartesian3>, std::vector<opendlv::model::Cartesian3>, float);
+  opendlv::model::Cartesian3 CrossingPoint(std::vector<opendlv::model::Cartesian3>);
+  bool IsInRectangle(opendlv::model::Cartesian3, std::vector<opendlv::model::Cartesian3>);
+  void SendStuff();
+  double PointDistance(float a_angle1, double a_dist1, float a_angle2, double a_dist2);
+  void MergeObjects(opendlv::perception::Object a_object, uint32_t a_index);
+  void TimeCheck();
+
+  std::vector<opendlv::perception::Surface> m_savedSurfaces;
+  std::vector<opendlv::perception::Object> m_savedObjects;
+  uint32_t m_objectCounter;
+  uint32_t m_surfaceCounter;
 };
 
 } // scene

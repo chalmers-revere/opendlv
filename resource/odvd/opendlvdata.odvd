@@ -110,7 +110,9 @@ message opendlv.proxy.LedRequest [id = 169] {
 }
 
 message opendlv.proxy.RelayRequest [id = 170] {
-  list<bool> relayState [id = 1];
+  bool relayValue [id = 1];
+  uint8 relayIndex [id = 2];
+  string deviceId [id = 3];
 }
 
 message opendlv.proxy.V2vReading [id = 171] {
@@ -160,6 +162,10 @@ message opendlv.sensation.DesiredDirectionOfMovement [id = 180] {
   opendlv.model.Direction direction [id = 1];
 }
 
+message opendlv.sensation.DesiredOpticalFlow [id = 174] {
+  float desiredOpticalFlow [id =1];
+}
+
 message opendlv.perception.Object [id = 181] {
   odcore::data::TimeStamp identified [id = 1];
   string type [id = 2];
@@ -179,11 +185,16 @@ message opendlv.perception.Object [id = 181] {
   float angularSizeRateConfidence [id = 13];
 
   float confidence [id = 14];
-  uint16 sources [id = 15];
+  list<string> sources [id = 15];
 
   list<string> properties [id = 16];
 
   int16 objectId [id = 17];
+}
+
+message opendlv.perception.Environment [id = 189] {
+  odcore::data::TimeStamp validUntil [id = 1];
+  list<opendlv.perception.Object> objects [id = 2];
 }
 
 message opendlv.perception.ObjectDesiredDirection [id = 182] {
@@ -207,7 +218,7 @@ message opendlv.perception.Surface [id = 184] {
   bool traversable [id = 6];
 
   float confidence [id = 7];
-  uint16 sources [id = 8];
+  list<string> sources [id = 8];
 
   list<string> properties [id = 9];
 
@@ -222,11 +233,22 @@ message opendlv.knowledge.Message [id = 185] {
   string data [id = 2];
 }
 
+message opendlv.knowledge.Insight [id = 187] {
+  odcore::data::TimeStamp insightTime [id = 1];
+  string insight [id = 2];
+}
+
 message opendlv.action.Correction [id = 186] {
   odcore::data::TimeStamp startTime [id = 1];
   string type [id = 2];
   bool isInhibitory [id = 3];
   float amplitude [id = 4];
+}
+
+message opendlv.action.Estimate [id = 188] {
+  odcore::data::TimeStamp startTime [id = 1];
+  string type [id = 2];
+  float amplitude [id = 3];
 }
 
 

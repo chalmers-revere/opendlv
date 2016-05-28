@@ -38,10 +38,10 @@ namespace geolocation {
  * @param T Numeric scalar type
  */
 template<typename T>
-class KinematicObservationVector : public Kalman::Vector<T, 4>
+class KinematicObservationVector : public Kalman::Vector<T, 3>
 {
 public:
-    KALMAN_VECTOR(KinematicObservationVector, T, 4)
+    KALMAN_VECTOR(KinematicObservationVector, T, 3)
 
     //! position along x axis
     static constexpr size_t Z_X = 0;
@@ -52,18 +52,14 @@ public:
     //! heading of the vehicle yaw
     static constexpr size_t Z_THETA = 2;
 
-    //! yaw rate of the vehicle
-    static constexpr size_t Z_THETA_DOT = 3;
 
     T Z_x()          const { return (*this)[ Z_X ]; }
     T Z_y()          const { return (*this)[ Z_Y ]; }
     T Z_theta()      const { return (*this)[ Z_THETA ]; }
-    T Z_theta_dot()  const { return (*this)[ Z_THETA_DOT ]; }
 
     T& Z_x()          { return (*this)[ Z_X ]; }
     T& Z_y()          { return (*this)[ Z_Y ]; }
     T& Z_theta()        { return (*this)[ Z_THETA ]; }
-    T& Z_theta_dot()    { return (*this)[ Z_THETA_DOT ]; }
 };
 
 
@@ -108,13 +104,12 @@ public :
      * @param _x The x-position of the truck along x direction in meters
      * @param _y The y-position of the truck along y direction in meters
      * @param _theta The heading of the truck in rad
-     * @param _theta_dot The rotational velocity of the truck in rad/sec
      */
-    KinematicObservationModel(T _x, T _y, T _theta, T _theta_rate):
+    KinematicObservationModel(T _x, T _y, T _theta):
         Z_k()
     {
         // Save landmark positions
-        Z_k << _x, _y, _theta, _theta_rate;
+        Z_k << _x, _y, _theta;//, _theta_rate;
 
         // Setup noise jacobian. As this one is static, we can define it once
         // and do not need to update it dynamically
@@ -144,14 +139,13 @@ public :
         measurement.Z_x() = _x(0);         // position along the x axis
         measurement.Z_y() = _x(2);         // position along the y axis
         measurement.Z_theta() = _x(4);     // heading of the vehicle
-        measurement.Z_theta_dot() = _x(5); // yaw rate, i.e. rotational velocity of the vehicle
 
         return measurement;
     }
 
 protected:
     //! Measurement vector (x,y,theta,theta_dot)-measurement
-    Kalman::Vector<T, 4> Z_k;
+    Kalman::Vector<T, 3> Z_k;
 
 protected:
 
@@ -191,8 +185,6 @@ protected:
 
         // partial derivative of meas.d1() w.r.t. x.x()
         this->H( M::Z_THETA, S::THETA ) = 1;//_x(4);//1;//delta2[0] / d2;
-        // partial derivative of meas.d1() w.r.t. x.y()
-        this->H( M::Z_THETA_DOT, S::THETA_DOT ) = 1;//_x(5);//1;//delta2[1] / d2;
     }
 
 

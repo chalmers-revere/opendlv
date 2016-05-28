@@ -22,8 +22,10 @@
 
 #include <memory>
 
-#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
+
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 namespace opendlv {
 namespace knowledge {
@@ -33,24 +35,44 @@ namespace rule {
 /**
  * This class provides...
  */
-class Rule : public odcore::base::module::DataTriggeredConferenceClientModule {
+class Rule : public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
   Rule(int32_t const &, char **);
   Rule(Rule const &) = delete;
   Rule &operator=(Rule const &) = delete;
   virtual ~Rule();
   virtual void nextContainer(odcore::data::Container &);
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
  private:
   void setUp();
   void tearDown();
-  double getDistances(double);
-  bool euclideanDistance(double);
+  //double getDistances(double);
+  //bool euclideanDistance(double);
 
  private:
-  double standstillDistance;
-  double headway;
-  double minimumEuclideanDistance;
+
+  std::unique_ptr<opendlv::perception::Object> m_object;
+  opendlv::perception::Object m_closestObject;
+  opendlv::perception::Object m_secondClosestObject;
+  opendlv::perception::Object m_mostInterestingObject;
+  float m_desiredAzimuth;
+  float m_cruiseSpeed;
+  float m_desiredAngularSize;
+  float m_speed;
+  bool m_isAutonomous;
+  std::string m_platoonId;
+  std::string m_currentLane;
+  std::string m_isTail;
+  bool m_hasMerged;
+  bool m_isInitialized;
+  bool m_scenarioIsReady;
+  bool m_isLeader;
+  std::string m_scenarioType;
+  bool m_hasSetupBeenRun;
+  //double standstillDistance;
+  //double headway;
+  //double minimumEuclideanDistance;
 };
 
 } // rule

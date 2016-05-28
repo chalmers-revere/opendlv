@@ -24,6 +24,7 @@
 
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 namespace opendlv {
 namespace action {
@@ -44,6 +45,9 @@ class KeepObjectAlignment
  private:
   void setUp();
   void tearDown();
+
+  float m_targetAzimuth;
+  int16_t m_targetId;
 };
 
 } // keepobjectalignment

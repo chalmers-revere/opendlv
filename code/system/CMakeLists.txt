@@ -83,8 +83,6 @@ add_subdirectory(core)
 add_subdirectory(application)
 
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../config/configuration DESTINATION . COMPONENT system)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/system/application/perception/detectvehicle/trainedAnn.xml DESTINATION ./share/opendlv/system/application/perception/detectvehicle/ COMPONENT system)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/system/application/perception/detectvehicle/haar_cars3.xml DESTINATION ./share/opendlv/system/application/perception/detectvehicle/ COMPONENT system)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/system/application/perception/detectvehicle/trained_cnn DESTINATION ./share/opendlv/system/application/perception/detectvehicle/ COMPONENT system)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/system/application/perception/detectvehicle/normalization_constants DESTINATION ./share/opendlv/system/application/perception/detectvehicle/ COMPONENT system)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/tools/vision/projection/leftCameraTransformationMatrix.csv DESTINATION ./share/opendlv/tools/vision/projection/ COMPONENT system)

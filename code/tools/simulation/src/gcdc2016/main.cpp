@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 Chalmers REVERE
+ * Copyright (C) 2016 Chalmers REVERE
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,23 +17,11 @@
  * USA.
  */
 
-#ifndef TOGGELER_DEVICE_HPP_
-#define TOGGELER_DEVICE_HPP_
+#include "gcdc2016/gcdc2016.hpp"
 
-namespace opendlv {
-namespace proxy {
-namespace toggeler {
-
-class Device {
- public:
-  Device();
-  Device(Device const &) = delete;
-  Device &operator=(Device const &) = delete;
-  virtual ~Device();
-};
-
-} // toggeler
-} // proxy
-} // opendlv
-
-#endif
+int32_t main(int32_t a_argc, char **a_argv)
+{
+  opendlv::tools::simulation::gcdc2016::Gcdc2016 gcdc2016(
+      a_argc, a_argv);
+  return gcdc2016.runModule();
+}

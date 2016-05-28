@@ -17,26 +17,35 @@
  * USA.
  */
 
-#include <iostream>
+#ifndef RELAY_GPIODEVICE_HPP_
+#define RELAY_GPIODEVICE_HPP_
 
-#include "toggeler/device.hpp"
+#include <cstdint>
+#include <iostream>
+#include <string>
+
+#include "relay/device.hpp"
 
 namespace opendlv {
 namespace proxy {
-namespace toggeler {
+namespace relay {
 
-/**
- * Constructor.
- *
- */
-Device::Device()
-{
-}
+class GpioDevice : public Device {
+ public:
+  GpioDevice(std::vector<bool>, std::vector<uint16_t>);
+  GpioDevice(GpioDevice const &) = delete;
+  GpioDevice &operator=(GpioDevice const &) = delete;
+  virtual ~GpioDevice();
+  bool IsActive(uint16_t const) const;
+  void Reset();
+  void SetValue(uint16_t const, bool const);
 
-Device::~Device()
-{
-}
+ private:
+  std::vector<uint16_t> m_pins;
+};
 
-} // toggeler
+} // relay
 } // proxy
 } // opendlv
+
+#endif

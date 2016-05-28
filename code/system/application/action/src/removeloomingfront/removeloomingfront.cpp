@@ -77,7 +77,7 @@
       opendlv::action::Correction correction(t1, "brake", false, m_brakeAmplitude);
       odcore::data::Container container(correction);
       getConference().send(container);
-      std::cout<< "Braking!: " << m_size << std::endl<<std::endl;
+      std::cout<< "Brakeing!: " << m_size << std::endl<<std::endl;
     }
   }
   */

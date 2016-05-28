@@ -51,9 +51,13 @@ class CanMessageDataStore
   std::shared_ptr<automotive::odcantools::CANDevice> canDevice);
   virtual void add(odcore::data::Container const &container);
 
+  bool IsAutonomousEnabled();
+  bool IsOverridden();
+
  private:
   odcore::base::Mutex m_dataStoreMutex;
   bool m_enabled;
+  bool m_overridden;
 };
 
 } // can

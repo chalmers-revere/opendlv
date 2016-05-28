@@ -25,6 +25,7 @@
 
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 namespace opendlv {
 namespace action {
@@ -45,24 +46,32 @@ class Act : public odcore::base::module::TimeTriggeredConferenceClientModule {
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
   void setUp();
   void tearDown();
-  void timeCheck(std::vector<odcore::data::TimeStamp> &, std::vector<float> &);
-  void inhibitoryCheck(bool, std::vector<odcore::data::TimeStamp> &, std::vector<float> &);
 
-  float m_accelerationCorrection;
-  float m_brakeCorrection;
-  float m_steeringCorrection;
-  std::vector<odcore::data::TimeStamp> m_startTimeVectorAccelerate;
-  std::vector<odcore::data::TimeStamp> m_startTimeVectorBrake;
-  std::vector<odcore::data::TimeStamp> m_startTimeVectorSteering;
-  std::vector<float> m_amplitudeVectorAccelerate;
-  std::vector<float> m_amplitudeVectorBrake;
-  std::vector<float> m_amplitudeVectorSteering;
-  bool m_isInhibitory;
-  float m_amplitude;
-  odcore::data::TimeStamp m_t0;
-  std::string m_type;
-  std::ofstream m_logSteering;
+  float m_maxDuration;
 
+  std::vector<odcore::data::TimeStamp> m_startTimesAccelerate;
+  std::vector<odcore::data::TimeStamp> m_startTimesBrake;
+  std::vector<odcore::data::TimeStamp> m_startTimesSteering;
+  std::vector<float> m_amplitudesAccelerate;
+  std::vector<float> m_amplitudesBrake;
+  std::vector<float> m_amplitudesSteering;
+  float m_accelerationValue;
+  float m_brakeValue;
+  float m_steeringValue;
+
+  bool m_hasEstimateAcc;
+  odcore::data::TimeStamp m_timeOfEstimateAcc;
+  bool m_hasEstimateBrake;
+  odcore::data::TimeStamp m_timeOfEstimateBrake;
+  bool m_hasEstimateSteer;
+  odcore::data::TimeStamp m_timeOfEstimateSteer;
+
+
+  float m_targetDistance;
+  int32_t m_targetObjectId;
+  opendlv::perception::Object m_targetObject;
+  float m_desiredSpeed;
+  float m_currentSpeed;
 };
 
 } // act

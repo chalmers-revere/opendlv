@@ -21,6 +21,7 @@
 #define LINGUISTICS_V2VCAM_V2VCAM_HPP_
 
 #include <ctime>
+#include <cmath>
 #include <fstream>
 #include <memory>
 
@@ -54,10 +55,12 @@ class V2vCam
   void ReadDynamicState(opendlv::model::DynamicState const &);
   void ReadGeolocation(opendlv::sensation::Geolocation const &);
   void ReadVoice(opendlv::sensation::Voice const &);
+  void ReadInsight(opendlv::knowledge::Insight const &);
   void SendWGS84Coordinate();
 
   unsigned char GetMessageId() const;
   int32_t GetStationId() const;
+  uint64_t GenerateGenerationTime() const;
   int32_t GenerateGenerationDeltaTime();
   unsigned char GetContainerMask() const;
   int32_t GetStationType() const;
@@ -84,26 +87,26 @@ class V2vCam
   std::time_t m_timeType2004;
 
   unsigned char const m_messageId = 2;
-  int32_t m_stationId = 115;
+  int32_t m_stationId = 0;
   int32_t m_generationDeltaTime = 0; 
-  unsigned char m_containerMask = 128;
-  int32_t m_stationType = 8;
+  unsigned char m_containerMask = 0;
+  int32_t m_stationType = 0;
   double m_latitude = 90.0000001;
   double m_longitude = 180.0000001;
-  int32_t m_semiMajorConfidence = 4095;
-  int32_t m_semiMinorConfidence = 4095;
-  int32_t m_semiMajorOrientation = 3601;
+  double m_semiMajorConfidence = -1;
+  double m_semiMinorConfidence = -1;
+  double m_semiMajorOrientation = -1;
   double m_altitude = 8000.01;
-  double m_heading = 360.1*opendlv::Constants::DEG2RAD;
-  double m_headingConfidence = 127;
-  double m_speed = 163.83; //
-  double m_speedConfidence = 127;
-  int32_t m_vehicleLength = 73;
-  int32_t m_vehicleWidth = 25;
-  double m_longitudinalAcc = 161;
-  double m_longitudinalAccConf = 102;
-  double m_yawRateValue = 32767;
-  double m_yawRateConfidence = 8;
+  double m_heading = -1;
+  double m_headingConfidence = -1;
+  double m_speed = -1; //
+  double m_speedConfidence = -1;
+  double m_vehicleLength = -1;
+  double m_vehicleWidth = -1;
+  double m_longitudinalAcc = -1;
+  double m_longitudinalAccConf = -1;
+  double m_yawRateValue = 0;
+  double m_yawRateConfidence = -1;
   int32_t m_vehicleRole = 0;
 };
 

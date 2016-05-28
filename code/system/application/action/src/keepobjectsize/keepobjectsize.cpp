@@ -25,7 +25,7 @@
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
 
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
+
 
 #include "keepobjectsize/keepobjectsize.hpp"
 
@@ -41,7 +41,13 @@ namespace keepobjectsize {
   */
 KeepObjectSize::KeepObjectSize(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(
-      a_argc, a_argv, "action-keepobjectsize")
+      a_argc, a_argv, "action-keepobjectsize"),
+      m_object(),
+      m_desiredAzimuth(0.0f),
+      m_angularSize(0.0f),
+      m_targetSize(0.1f),
+      m_targetObject(-2),
+      m_crossingScenario(false)
 {
 }
 
@@ -54,8 +60,130 @@ KeepObjectSize::~KeepObjectSize()
  * current size, and desired size.
  * Sends speed correction commands (throttle) to Act.
  */
-void KeepObjectSize::nextContainer(odcore::data::Container &)
+void KeepObjectSize::nextContainer(odcore::data::Container &a_container)
 {
+  if(a_container.getDataType() == opendlv::perception::ObjectDesiredAngularSize::ID()) {
+    opendlv::perception::ObjectDesiredAngularSize desiredAngularSize =
+    a_container.getData<opendlv::perception::ObjectDesiredAngularSize>();
+    m_targetSize = desiredAngularSize.getDesiredAngularSize();
+    if(desiredAngularSize.getObjectId() >= 0) {
+      m_targetObject = desiredAngularSize.getObjectId();
+    }
+  } 
+
+  if(a_container.getDataType() == opendlv::perception::Object::ID()) {
+    opendlv::perception::Object unpackedObject =
+    a_container.getData<opendlv::perception::Object>();
+
+    int16_t identity = unpackedObject.getObjectId();
+
+    if (identity != -1) {
+
+      opendlv::model::Direction direction = unpackedObject.getDirection();
+      float azimuth = direction.getAzimuth();
+      float speedCorrection = 0.0f;
+      float gainCorrection = 5.0f;
+      float tolerance = 0.1f;
+
+      if (m_targetObject >= 0) { //Target objectID is known
+        if(unpackedObject.getObjectId() == m_targetObject)
+        {
+          m_object.reset(new opendlv::perception::Object(unpackedObject));
+
+          float distance = m_object->getDistance(); //Using distance instead of angularsize for GCDC
+
+          if (distance < m_targetSize*(1.0f-tolerance)) {
+            std::cout << "Too close: " << m_angularSize << std::endl;
+            float distanceRatio = distance / m_targetSize ;
+            speedCorrection = 1.0f - distanceRatio;
+          } else if (distance > m_targetSize*(1.0f+tolerance) && !m_crossingScenario) {
+            std::cout << "Too far" << std::endl;
+            float distanceRatio = m_targetSize / distance;
+            speedCorrection = distanceRatio - 1.0f; 
+          } else {
+            std::cout << "zero correction" << std::endl;
+            speedCorrection = 0.0f;
+          }
+
+          speedCorrection *= gainCorrection;
+        
+          std::cout << "speedCorrection: " << speedCorrection << std::endl << std::endl;
+          odcore::data::TimeStamp t0;
+          opendlv::action::Correction correction1(t0, "accelerate", false, speedCorrection);
+          odcore::data::Container container(correction1);
+          getConference().send(container);
+        }
+
+      }
+      else if (std::fabs(azimuth) < 0.22f) { //If target objectID isn't known
+        std::cout << "Correct Angle" << std::endl;
+        if (m_object == nullptr) {
+          m_object.reset(new opendlv::perception::Object(unpackedObject));
+        } else {
+          if (unpackedObject.getDistance() < m_object->getDistance())
+            m_object.reset(new opendlv::perception::Object(unpackedObject));
+            std::cout << "Closest object" << std::endl;
+        }    
+
+        float distance = m_object->getDistance();       //Using distance instead of angularsize for GCDC
+
+        if (distance < m_targetSize*(1.0f-tolerance)) {
+          std::cout << "Too close: " << m_angularSize << std::endl;
+          float distanceRatio = distance / m_targetSize ;
+          speedCorrection = 1.0f - distanceRatio;
+        } else if (distance > m_targetSize*(1.0f+tolerance) && !m_crossingScenario) {
+          std::cout << "Too far" << std::endl;
+          float distanceRatio = m_targetSize / distance;
+          speedCorrection = distanceRatio - 1.0f; 
+        } else {
+          std::cout << "zero correction" << std::endl;
+          speedCorrection = 0.0f;
+        }
+
+        /*
+        m_angularSize = m_object->getAngularSize();
+
+
+        if (std::fabs(m_angularSize) < m_targetSize*0.9f) {
+          std::cout << "Small enough: " << m_angularSize << std::endl;
+          float angularSizeRatio = m_angularSize / m_targetSize ;
+          speedCorrection = 1.0f - angularSizeRatio;
+        } else if (std::fabs(m_angularSize) > m_targetSize*1.1f) {
+          std::cout << "Object too big" << std::endl;
+          float angularSizeRatio = m_targetSize / m_angularSize;
+          speedCorrection = angularSizeRatio - 1.0f; 
+        } else {
+          std::cout << "zero correction" << std::endl;
+          speedCorrection = 0.0f;
+        }
+        */
+
+        speedCorrection *= gainCorrection;
+        
+        std::cout << "speedCorrection: " << speedCorrection << std::endl << std::endl;
+        odcore::data::TimeStamp t0;
+        opendlv::action::Correction correction1(t0, "accelerate", false, speedCorrection);
+        odcore::data::Container container(correction1);
+        getConference().send(container);
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   /*
   if(c.getDataType() == opendlv::perception::LeadVehicleSize::ID()){
     opendlv::perception::LeadVehicleSize leadVehicleSize = 
@@ -84,7 +212,7 @@ void KeepObjectSize::nextContainer(odcore::data::Container &)
     }
   }
   */
-}
+
 
 void KeepObjectSize::setUp()
 {

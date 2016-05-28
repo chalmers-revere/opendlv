@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 Chalmers REVERE
+ * Copyright (C) 2016 Chalmers REVERE
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,41 +17,43 @@
  * USA.
  */
 
-#ifndef TOGGELER_TOGGELER_HPP_
-#define TOGGELER_TOGGELER_HPP_
+#ifndef GCDC2016_GCDC2016_HPP_
+#define GCDC2016_GCDC2016_HPP_
 
 #include <memory>
 
-#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
-#include "opendavinci/odcore/data/Container.h"
+#include <opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h>
+#include <opendavinci/odcore/data/Container.h>
 
 namespace opendlv {
-namespace proxy {
-namespace toggeler {
+namespace tools {
+namespace simulation {
+namespace gcdc2016 {
 
-class Device;
+class Vehicle;
 
-/**
- * This class provides...
- */
-class Toggeler
-: public odcore::base::module::DataTriggeredConferenceClientModule {
+class Gcdc2016 :
+    public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
-  Toggeler(int32_t const &, char **);
-  Toggeler(Toggeler const &) = delete;
-  Toggeler &operator=(Toggeler const &) = delete;
-  virtual ~Toggeler();
+  Gcdc2016(int32_t const &, char **);
+  Gcdc2016(Gcdc2016 const &) = delete;
+  Gcdc2016 &operator=(Gcdc2016 const &) = delete;
+  virtual ~Gcdc2016();
+
   virtual void nextContainer(odcore::data::Container &);
 
  private:
   void setUp();
   void tearDown();
 
-  std::unique_ptr<Device> m_device;
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+
+  std::unique_ptr<Vehicle> m_vehicle;
 };
 
-} // toggeler
-} // proxy
+} // lanekeeping
+} // simulation
+} // tools
 } // opendlv
 
 #endif

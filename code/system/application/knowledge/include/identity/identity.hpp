@@ -22,8 +22,11 @@
 
 #include <memory>
 
-#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
+
+ 
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 namespace opendlv {
 namespace knowledge {
@@ -33,17 +36,26 @@ namespace identity {
  * This class provides...
  */
 class Identity
-: public odcore::base::module::DataTriggeredConferenceClientModule {
+: public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
   Identity(int32_t const &, char **);
   Identity(Identity const &) = delete;
   Identity &operator=(Identity const &) = delete;
   virtual ~Identity();
-  virtual void nextContainer(odcore::data::Container &);
+  // virtual void nextContainer(odcore::data::Container &);
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
  private:
   void setUp();
   void tearDown();
+  void SendContainer(opendlv::knowledge::Insight  &);
+
+  uint32_t m_stationId;
+  uint32_t m_stationType;
+  double m_vehicleLength;
+  double m_vehicleWidth;
+  uint32_t m_vehicleRole;
+  double m_rearAxleLocation;
 };
 
 } // identity

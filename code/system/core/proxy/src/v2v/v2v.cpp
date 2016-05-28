@@ -130,16 +130,18 @@ void V2v::setUp()
 
   const std::string RECEIVER = "0.0.0.0";
   const uint32_t RECEIVERPORT = kv.getValue<uint32_t>("proxy-v2v.listenPort");
-  std::cout<< RECEIVERPORT << std::endl;
-  std::cout << "Trying to receive UDP on port " << RECEIVERPORT << "." << std::endl;
-  try
-  {
-    m_udpreceiver = std::shared_ptr<odcore::io::udp::UDPReceiver>(odcore::io::udp::UDPFactory::createUDPReceiver(RECEIVER, RECEIVERPORT));
+  std::cout << RECEIVERPORT << std::endl;
+  std::cout << "Trying to receive UDP on port " << RECEIVERPORT << "." 
+      << std::endl;
+  try {
+    m_udpreceiver = 
+        std::shared_ptr<odcore::io::udp::UDPReceiver>
+        (odcore::io::udp::UDPFactory::createUDPReceiver(
+            RECEIVER, RECEIVERPORT));
     m_udpreceiver->setPacketListener(this);
     m_udpreceiver->start();
   }
-  catch(std::string &exception)
-  {
+  catch(std::string &exception) {
     std::cerr << "Error while creating UDP receiver:  " << exception 
         << std::endl;
   }
@@ -148,19 +150,20 @@ void V2v::setUp()
 
   const string TARGET = kv.getValue<std::string>("proxy-v2v.comboxIp");
   const uint32_t TARGETPORT =  kv.getValue<uint32_t>("proxy-v2v.comboxPort");;
-  std::cout << "Trying to send UDP on " << TARGET << ":" << TARGETPORT << "." << std::endl;
+  std::cout << "Trying to send UDP on " << TARGET << ":" << TARGETPORT << "." 
+      << std::endl;
   
   try {
-    m_udpsender = std::shared_ptr<odcore::io::udp::UDPSender>(odcore::io::udp::UDPFactory::createUDPSender(TARGET, TARGETPORT));
+    m_udpsender = std::shared_ptr<odcore::io::udp::UDPSender>
+        (odcore::io::udp::UDPFactory::createUDPSender(TARGET, TARGETPORT));
   }
-  catch(string &exception) {
-    cerr << "Error while creating UDP sender: " << exception << endl;
+  catch(std::string &exception) {
+    std::cerr << "Error while creating UDP sender: " << exception << std::endl;
   }
 }
 
 void V2v::tearDown()
 {
-
     m_udpreceiver->stop();
     m_udpreceiver->setPacketListener(NULL);
 }
