@@ -282,11 +282,12 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
 
     float minThreshold = 20;
     float maxThreshold = 50;
-    float velocityCorrectionFactor = 5.0f;
+    float velocityCorrectionFactor = 0.5f;
     float distanceCorrectionFactor = 3.0f;
 
 
     float speedCorrection = 0;
+
 
     if (distanceToObject < minThreshold) {
       // Want to brake
@@ -296,11 +297,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
       // Too far away
 
       // Correct according to desired velocity
-
       float speedDiff = m_desiredSpeed - m_currentSpeed;
-
       speedCorrection = speedDiff*velocityCorrectionFactor;
-
     }
     else {
       // In the interval
@@ -311,8 +309,15 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
 
       // Correct according to vehicle in front
     }
-    m_accelerationValue = speedCorrection;
+    m_accelerationValue += speedCorrection;
+    if (m_accelerationValue < 0.001f)
+    {
+        m_accelerationValue = 0.0;
+    }
 
+    std::cout << "\n\n distance to objects " << distanceToObject
+              << "\n desired speed" << m_desiredSpeed
+              << "\n speedCorrection " << speedCorrection << std::endl;
 
 
     
