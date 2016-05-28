@@ -102,6 +102,8 @@ void Act::nextContainer(odcore::data::Container &a_container)
     if (identity == m_targetObjectId) {
       m_targetObject = object;
       m_timeSinceLastObjectDetection = now;
+
+      std::cout << "\n Front car distance : " << m_targetObject.getDistance() << std::endl;
     }
   }
 
@@ -116,7 +118,7 @@ void Act::nextContainer(odcore::data::Container &a_container)
 
     
 
-    //std::cout << "Desired speed is now: " << m_desiredSpeed << std::endl;
+    std::cout << "\n Desired speed is now: " << m_desiredSpeed << std::endl;
   }
 
   if (a_container.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
