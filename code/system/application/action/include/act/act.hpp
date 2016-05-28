@@ -25,6 +25,7 @@
 
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 namespace opendlv {
 namespace action {
@@ -64,6 +65,13 @@ class Act : public odcore::base::module::TimeTriggeredConferenceClientModule {
   odcore::data::TimeStamp m_timeOfEstimateBrake;
   bool m_hasEstimateSteer;
   odcore::data::TimeStamp m_timeOfEstimateSteer;
+
+
+  float m_targetDistance;
+  int32_t m_targetObjectId;
+  opendlv::perception::Object m_targetObject;
+  float m_desiredSpeed;
+  float m_currentSpeed;
 };
 
 } // act

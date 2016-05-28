@@ -266,6 +266,12 @@ bool Scene::IsInRectangle(opendlv::model::Cartesian3 point, std::vector<opendlv:
 
 void Scene::SendStuff()
 {
+  odcore::data::TimeStamp validUntil;
+  opendlv::perception::Environment environment(validUntil, m_savedObjects);
+
+  odcore::data::Container objectContainerEnvironment(environment);
+  getConference().send(objectContainerEnvironment);
+
   for(uint32_t i = 0; i < m_savedObjects.size(); i++) {
     odcore::data::Container objectContainer(m_savedObjects[i]);
     getConference().send(objectContainer);
