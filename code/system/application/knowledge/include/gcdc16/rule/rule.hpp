@@ -69,6 +69,7 @@ class Rule : public odcore::base::module::TimeTriggeredConferenceClientModule {
   bool m_scenarioIsReady;
   bool m_isLeader;
   std::string m_scenarioType;
+  bool m_hasSetupBeenRun;
   //double standstillDistance;
   //double headway;
   //double minimumEuclideanDistance;
