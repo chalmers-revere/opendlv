@@ -286,8 +286,12 @@ void V2vIclcm::ReadInsight(opendlv::knowledge::Insight &a_insight)
   if (information.size() == 0){
     if (str == "mergeScenario") {
       m_scenario = str;
-    }  
-  } else {
+    }
+    else if (str == "intersectionScenario") {
+      m_scenario = str;
+    }
+  }
+  else {
     if(information[0] == "stationId"){
       m_stationId = std::stoi(information[1]);
     } else if(information[0] == "rearAxleLocation"){
