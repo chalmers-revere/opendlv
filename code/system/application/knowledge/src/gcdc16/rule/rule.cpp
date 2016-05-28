@@ -154,9 +154,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Rule::body()
       std::cout << "DEBUG 9" << std::endl;
 
 
-      //if (m_scenarioIsReady)
+      if (m_scenarioIsReady)
       {
-          m_cruiseSpeed = 10.0;
+      //    m_cruiseSpeed = 10.0;
         opendlv::sensation::DesiredOpticalFlow desired(m_cruiseSpeed);
         odcore::data::Container objectContainerDesiredOpticalFlow(desired);
         getConference().send(objectContainerDesiredOpticalFlow);
