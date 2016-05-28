@@ -371,7 +371,7 @@ void Rule::nextContainer(odcore::data::Container &a_container)
 
   odcore::data::TimeStamp timestamp;
 
-  if (a_container.getDataType() == opendlv::knowledge::Insight::ID()) {
+  if (a_container.getDataType() == (opendlv::knowledge::Insight::ID() + 300)) {
     opendlv::knowledge::Insight insight = a_container.getData<opendlv::knowledge::Insight>();
     std::string whatInsight = insight.getInsight();
 
@@ -506,7 +506,7 @@ void Rule::nextContainer(odcore::data::Container &a_container)
     if (autonomous) {
       m_isAutonomous = true;
     }
-  } else if (m_isAutonomous && a_container.getDataType() == opendlv::knowledge::Insight::ID()) {
+  } else if (m_isAutonomous && a_container.getDataType() == (opendlv::knowledge::Insight::ID() + 300)) {
 
     opendlv::knowledge::Insight unpackedObject =
     a_container.getData<opendlv::knowledge::Insight>();
