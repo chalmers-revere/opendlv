@@ -389,6 +389,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
       m_amplitudesSteering = amplitudesSteeringToSave;
     }
 
+/*
+  // Old code.
     if (m_brakeValue > 0.0f) {
       opendlv::proxy::ActuationRequest actuationRequest(m_brakeValue, 
           m_steeringValue, false);
@@ -399,6 +401,55 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
           m_steeringValue, false);
       odcore::data::Container actuationContainer(actuationRequest);
       getConference().send(actuationContainer);
+    }
+*/
+    {
+        opendlv::proxy::ActuationRequest actuationRequest;
+        if (m_brakeValue > 0.0f) {
+          actuationRequest = opendlv::proxy::ActuationRequest(m_brakeValue, m_steeringValue, false);
+        } else {
+          actuationRequest = opendlv::proxy::ActuationRequest(m_accelerationValue, m_steeringValue, false);
+        }
+
+        // Former code from checkActuation.
+        float acceleration = actuationRequest.getAcceleration();
+        float steering = actuationRequest.getSteering();
+
+        float m_maxAllowedDeceleration = 3;
+        float steeringLimit = 0.2;
+        float accMaxLimit = 80;
+
+
+        // TODO if acceleration is negative it is m/s^2, if positive percent of acceleration pedal
+
+        // clamp steering
+        if (steering < -steeringLimit) {
+          steering = -steeringLimit;
+          std::cout << "steering request was capped to " << steering << std::endl;
+        }
+        else if (steering > steeringLimit) {
+          steering = steeringLimit;
+          std::cout << "steering request was capped to " << steering << std::endl;
+        }
+
+        // clamp acceleration
+        if (acceleration < -m_maxAllowedDeceleration) {
+          acceleration = -m_maxAllowedDeceleration;
+          std::cout << "acceleration request was capped to " << acceleration << std::endl;
+        }
+        else if (acceleration > accMaxLimit) {
+          acceleration = accMaxLimit;
+          std::cout << "acceleration request was capped to " << acceleration << std::endl;
+        }
+
+
+        actuationRequest.setAcceleration(acceleration);
+        actuationRequest.setSteering(steering);
+
+        actuationRequest.setIsValid(true);
+
+        odcore::data::Container actuationContainer(actuationRequest);
+        getConference().send(actuationContainer);
     }
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
