@@ -49,6 +49,7 @@ Rule::Rule(int32_t const &a_argc, char **a_argv)
   m_closestObject(),
   m_secondClosestObject(),
   m_mostInterestingObject(),
+  m_intersection_mostInterestingObject(0),
   m_desiredAzimuth(0.0f),
   m_cruiseSpeed(0.0),
   m_desiredAngularSize(30.0f),
@@ -364,19 +365,61 @@ void Rule::receivedContainerMergeScenario(odcore::data::Container &a_container)
 
 void Rule::receivedContainerIntersectionScenario(odcore::data::Container &a_container)
 {
+
+  odcore::data::TimeStamp timestamp;
+
   if (a_container.getDataType() == opendlv::perception::Environment::ID()) {
     opendlv::perception::Environment receivedEnvironment =
         a_container.getData<opendlv::perception::Environment>();
 
+    std::vector<opendlv::perception::Object> objects = receivedEnvironment.getListOfObjects();
+
+    if (objects.size() < 1) {
+      std::cout << "ERROR: rule.cpp only received info about " << objects.size() << " objects..." << std::endl;
+    }
+
+    float closestDistance = 99999;
+    opendlv::perception::Object* closestObject = 0;
+
+    for (uint32_t i=0; i<objects.size(); i++) {
+      opendlv::perception::Object object = objects.at(i);
+      std::vector<std::string> properties = object.getListOfProperties();
+      if (properties.size() > 1) { 
+        std::vector<std::string> strVector = 
+            odcore::strings::StringToolbox::split(properties.at(0), ' ');
+        if (strVector.size() == 3 && strVector.at(0) == "Station") {
+          std::stringstream sstr;
+          sstr << strVector.at(2);
+          int stationId;
+          sstr >> stationId;
+          float distanceToObject = object.getDistance();
+
+          if (stationId < 100 && distanceToObject < closestDistance) {
+            closestDistance = distanceToObject;
+            *closestObject = object; 
+          }
+        }
+      }
+    }
+
+    if (closestObject != 0) {
+      // We have found a closest object with stationID smaller than 100
+      m_intersection_mostInterestingObject = closestObject;
+
+    }
   }
 
+  if (a_container.getDataType() == (opendlv::knowledge::Insight::ID() + 300)) {
+    opendlv::knowledge::Insight insight = a_container.getData<opendlv::knowledge::Insight>();
+    std::string whatInsight = insight.getInsight();
 
-  //m_speed = 7; // hardcoded for testing
 
-  if (a_container.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
-    auto propulsion = a_container.getData<opendlv::proxy::reverefh16::Propulsion>();
-    double speedKph = propulsion.getPropulsionShaftVehicleSpeed();
-    m_speed = (float) speedKph / 3.6f;
+    if (whatInsight == "scenarioReady") {
+      opendlv::sensation::DesiredOpticalFlow desired(30/3.6f);
+      odcore::data::Container objectContainerDesiredOpticalFlow(desired);
+      getConference().send(objectContainerDesiredOpticalFlow);
+
+    }
   }
 
 }
@@ -525,7 +568,7 @@ void Rule::bodyMergeScenario()
 
 
   float mioBearing = m_mostInterestingObject.getDirection().getAzimuth();
-  float mioRangeRate = -1.0f;
+  float mioRangeRate = 100000.0f;
   float mioRange = m_mostInterestingObject.getDistance();
   float mioTimeHeadway = mioRange / static_cast<float>(m_speed);
 
@@ -550,6 +593,42 @@ void Rule::bodyMergeScenario()
 
 void Rule::bodyIntersectionScenario()
 {
+  odcore::data::TimeStamp timestamp;
+  if (m_intersection_mostInterestingObject != 0) {
+
+    float mioBearing = m_mostInterestingObject.getDirection().getAzimuth();
+    float mioRangeRate = 100000.0f;
+    float mioRange = m_mostInterestingObject.getDistance();
+    float mioTimeHeadway = mioRange / static_cast<float>(m_speed);
+
+    opendlv::knowledge::Insight mioBearingInsight(timestamp, "mioBearing=" + std::to_string(mioBearing));
+    odcore::data::Container mioBearingContainer(mioBearingInsight);
+    getConference().send(mioBearingContainer);
+
+    opendlv::knowledge::Insight mioRangeInsight(timestamp, "mioRange=" + std::to_string(mioRange));
+    odcore::data::Container mioRangeContainer(mioRangeInsight);
+    getConference().send(mioRangeContainer);
+
+    opendlv::knowledge::Insight mioRangeRateInsight(timestamp, "mioRangeRate=" + std::to_string(mioRangeRate));
+    odcore::data::Container mioRangeRateContainer(mioRangeRateInsight);
+    getConference().send(mioRangeRateContainer);
+
+    opendlv::knowledge::Insight mioTimeHeadwayInsight(timestamp, "mioTimeHeadway=" + std::to_string(mioTimeHeadway));
+    odcore::data::Container mioTimeHeadwayContainer(mioTimeHeadwayInsight);
+    getConference().send(mioTimeHeadwayContainer);
+
+
+    float euclideanDistance = 15;
+
+    opendlv::perception::ObjectDesiredAngularSize angularsize((euclideanDistance + 5), -1);
+    odcore::data::Container objectContainer0(angularsize);
+    getConference().send(objectContainer0); 
+
+    
+  }
+
+
+
 
 }
 

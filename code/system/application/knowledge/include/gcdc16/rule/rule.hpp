@@ -61,6 +61,7 @@ class Rule : public odcore::base::module::TimeTriggeredConferenceClientModule {
   opendlv::perception::Object m_closestObject;
   opendlv::perception::Object m_secondClosestObject;
   opendlv::perception::Object m_mostInterestingObject;
+  opendlv::perception::Object * m_intersection_mostInterestingObject;
   float m_desiredAzimuth;
   float m_cruiseSpeed;
   float m_desiredAngularSize;
