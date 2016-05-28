@@ -189,6 +189,7 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
   			identifiedObjects[i].getAngularSize() << std::endl;
 	}
 
+/*
 	{
 		int32_t height = 512;
 		int32_t width = 800;
@@ -211,7 +212,7 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
 		cv::imshow("LIDAR debug", lidarImage);
 		cv::waitKey(10);
 	}
-
+*/
 }
 
 bool Echolocation::Contains(uint32_t a_point, std::vector<uint32_t> a_cloud)

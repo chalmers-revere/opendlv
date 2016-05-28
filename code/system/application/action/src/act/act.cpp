@@ -59,6 +59,7 @@ Act::Act(int32_t const &a_argc, char **a_argv)
     m_timeOfEstimateBrake(),
     m_hasEstimateSteer(false),
     m_timeOfEstimateSteer(),
+    m_timeSinceLastObjectDetection(),
     m_targetDistance(0),
     m_targetObjectId(-1),
     m_targetObject(),
@@ -98,8 +99,9 @@ void Act::nextContainer(odcore::data::Container &a_container)
 
     int16_t identity = object.getObjectId();
 
-    if (identity != m_targetObjectId) {
+    if (identity == m_targetObjectId) {
       m_targetObject = object;
+      m_timeSinceLastObjectDetection = now;
     }
   }
 
@@ -277,8 +279,16 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
 
     odcore::data::TimeStamp now;
 
-
     float distanceToObject = m_targetObject.getDistance();
+
+    odcore::data::TimeStamp timeElapsed = now - m_timeSinceLastObjectDetection;
+     double timeMemoryLimit = 5.0; // sec
+
+    if (timeElapsed.toMicroseconds()/1000000.0 > timeMemoryLimit)
+    {
+        distanceToObject = 1000.0;
+    }
+
 
     float minThreshold = 20;
     float maxThreshold = 50;
@@ -288,6 +298,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
 
     float speedCorrection = 0;
 
+
     if (distanceToObject < minThreshold) {
       // Want to brake
       speedCorrection = 0;
@@ -296,11 +307,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
       // Too far away
 
       // Correct according to desired velocity
-
       float speedDiff = m_desiredSpeed - m_currentSpeed;
-
       speedCorrection = speedDiff*velocityCorrectionFactor;
-
     }
     else {
       // In the interval
@@ -311,8 +319,16 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
 
       // Correct according to vehicle in front
     }
-    m_accelerationValue = speedCorrection;
+    m_accelerationValue += speedCorrection;
+    if (m_accelerationValue < 0.001f)
+    {
+        m_accelerationValue = 0.0;
+    }
 
+    std::cout << "\n\n distance to objects " << distanceToObject
+              << "\n desired speed" << m_desiredSpeed
+              << "\n speedCorrection " << speedCorrection
+              << "\n acceleration value " << m_accelerationValue << std::endl;
 
 
     
@@ -389,6 +405,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
       m_amplitudesSteering = amplitudesSteeringToSave;
     }
 
+/*
+  // Old code.
     if (m_brakeValue > 0.0f) {
       opendlv::proxy::ActuationRequest actuationRequest(m_brakeValue, 
           m_steeringValue, false);
@@ -399,6 +417,55 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
           m_steeringValue, false);
       odcore::data::Container actuationContainer(actuationRequest);
       getConference().send(actuationContainer);
+    }
+*/
+    {
+        opendlv::proxy::ActuationRequest actuationRequest;
+        if (m_brakeValue > 0.0f) {
+          actuationRequest = opendlv::proxy::ActuationRequest(m_brakeValue, m_steeringValue, false);
+        } else {
+          actuationRequest = opendlv::proxy::ActuationRequest(m_accelerationValue, m_steeringValue, false);
+        }
+
+        // Former code from checkActuation.
+        float acceleration = actuationRequest.getAcceleration();
+        float steering = actuationRequest.getSteering();
+
+        float m_maxAllowedDeceleration = 3;
+        float steeringLimit = 0.2;
+        float accMaxLimit = 80;
+
+
+        // TODO if acceleration is negative it is m/s^2, if positive percent of acceleration pedal
+
+        // clamp steering
+        if (steering < -steeringLimit) {
+          steering = -steeringLimit;
+          std::cout << "steering request was capped to " << steering << std::endl;
+        }
+        else if (steering > steeringLimit) {
+          steering = steeringLimit;
+          std::cout << "steering request was capped to " << steering << std::endl;
+        }
+
+        // clamp acceleration
+        if (acceleration < -m_maxAllowedDeceleration) {
+          acceleration = -m_maxAllowedDeceleration;
+          std::cout << "acceleration request was capped to " << acceleration << std::endl;
+        }
+        else if (acceleration > accMaxLimit) {
+          acceleration = accMaxLimit;
+          std::cout << "acceleration request was capped to " << acceleration << std::endl;
+        }
+
+
+        actuationRequest.setAcceleration(acceleration);
+        actuationRequest.setSteering(steering);
+
+        actuationRequest.setIsValid(true);
+
+        odcore::data::Container actuationContainer(actuationRequest);
+        getConference().send(actuationContainer);
     }
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;

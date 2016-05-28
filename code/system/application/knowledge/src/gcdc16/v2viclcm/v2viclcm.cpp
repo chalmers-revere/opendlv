@@ -57,7 +57,8 @@ V2vIclcm::V2vIclcm(int32_t const &a_argc, char **a_argv)
     m_timeType2004(),
     m_scenario(),
     m_mioBeenLeader(false),
-    m_hasMerged(false)
+    m_hasMerged(false),
+    m_counterMerge()
 {
   struct stat st;
   if (::stat("var/application/knowledge/gcdc16/v2viclcm", &st) == -1) {
@@ -227,6 +228,13 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vIclcm::body()
       odcore::data::Container containerIsLeader(eventIsLeader);
       getConference().send(containerIsLeader);
     }
+    if(m_flag == 1){
+      m_counterMerge++;
+    }
+    if(m_hasMerged == false && m_counterMerge > (30*25)){
+      m_hasMerged = true;
+      m_flag = 0;
+    }
 
     m_sendLog <<  std::setprecision(15) << std::to_string(GenerateGenerationTime())+
         + "," + std::to_string(m_messageId)+ //messageId
@@ -317,13 +325,14 @@ void V2vIclcm::ReadInsight(opendlv::knowledge::Insight &a_insight)
       m_safeToMerge = std::stoi(information[1]);
     } else if (information[0] == "mergeFlag") {
       m_flag = std::stoi(information[1]);
-      if(m_flag == 1){
+      if(m_flagHead == 1 && m_flag == 1){
         m_flagHead = 0;
+        m_intention = 3;
       }
     } else if (information[0] == "intersectionVehicleCounter") {
       m_counter = std::stoi(information[1]);
     } else if (information[0] == "distanceTravelled"){
-      m_distanceTravelledCz = static_cast<int32_t>(std::stod(information[1])/0.1);
+      m_distanceTravelledCz = static_cast<int32_t>(std::stod(information[1])/0.1)%10000;
     } else if (information[0] == "timeHeadway"){
       m_timeHeadway = static_cast<int32_t>(std::stod(information[1])/0.1);
       if(m_timeHeadway < 0 || m_timeHeadway > 360){
@@ -425,31 +434,29 @@ void V2vIclcm::ReadVoice(opendlv::sensation::Voice &a_message){
     if (participantsReady == 1){
       std::cout<< "Got participantsReady flag from "<< stationId << std::endl;
     }
+    if (startPlatoon == 1) {
+      std::cout << "Got startPlatoon flag from " << stationId << std::endl;
+      opendlv::knowledge::Insight eventScenarioStart(now,"scenarioReady");
+      odcore::data::Container containerScenarioStart(eventScenarioStart);
+      getConference().send(containerScenarioStart);
+    }
+
+    if (mergeRequest == 1) {
+      std::cout<< "Got mergeRequest flag from "<< stationId << std::endl;
+      opendlv::knowledge::Insight eventMergeReq(now,"mergeRequest");
+      odcore::data::Container containerMergeReq(eventMergeReq);
+      getConference().send(containerMergeReq);
+    }
+
+    if (endOfScenario == 1) {
+      std::cout << "Got end of scenario message from " << stationId << std::endl;
+      opendlv::knowledge::Insight eventScenarioEnd(now,"scenarioEnd");
+      odcore::data::Container containerScenarioEnd(eventScenarioEnd);
+      getConference().send(containerScenarioEnd);
+    }
   }
   if(m_scenario == "mergeScenario" && m_hasMerged == false){
     if(m_lane == 2){
-      if(stationId < 100){
-        if (startPlatoon == 1) {
-          std::cout << "Got startPlatoon flag from " << stationId << std::endl;
-          opendlv::knowledge::Insight eventScenarioStart(now,"scenarioReady");
-          odcore::data::Container containerScenarioStart(eventScenarioStart);
-          getConference().send(containerScenarioStart);
-        }
-
-        if (mergeRequest == 1) {
-          std::cout<< "Got mergeRequest flag from "<< stationId << std::endl;
-          opendlv::knowledge::Insight eventMergeReq(now,"mergeRequest");
-          odcore::data::Container containerMergeReq(eventMergeReq);
-          getConference().send(containerMergeReq);
-        }
-
-        if (endOfScenario == 1) {
-          std::cout << "Got end of scenario message from " << stationId << std::endl;
-          opendlv::knowledge::Insight eventScenarioEnd(now,"scenarioEnd");
-          odcore::data::Container containerScenarioEnd(eventScenarioEnd);
-          getConference().send(containerScenarioEnd);
-        }
-      }
 
       if (forwardId == 110 && m_flagHead == 1){
         std::cout << "Backward partner found: " << stationId << "." << std::endl;
@@ -461,26 +468,42 @@ void V2vIclcm::ReadVoice(opendlv::sensation::Voice &a_message){
           getConference().send(containerSafe2Merge);
         }
       }
-    }
+      if(stationId == m_mioId){
+        if(flagHead == 1){
+          std::cout << "Mio became leader." << std::endl;
+          m_mioBeenLeader = true;
 
-    if(stationId == m_mioId){
-      if(flagHead == 1){
-        std::cout << "Mio became leader." << std::endl;
-        m_mioBeenLeader = true;
+        }
+        if(m_mioBeenLeader && (flagHead == 0 || lane == 1 || platoonId == 2)){
+          std::cout << "Mio has merged." << std::endl;
 
+          opendlv::knowledge::Insight eventIsLeader(now,"isLeader");
+          odcore::data::Container containerIsLeader(eventIsLeader);
+          getConference().send(containerIsLeader);
+
+          m_flagHead = 1;
+        }
       }
-      if(m_mioBeenLeader && (flagHead == 0 || lane == 1 || platoonId == 2)){
-        std::cout << "Mio has merged." << std::endl;
-
-        opendlv::knowledge::Insight eventIsLeader(now,"isLeader");
-        odcore::data::Container containerIsLeader(eventIsLeader);
-        getConference().send(containerIsLeader);
-
-        m_flagHead = 1;
+    }
+    if(lane == 1){
+      if((m_mioId == stationId || backwardId == 110) && flagHead){
+        std::cout << "Forward partner found: " << stationId << "." << std::endl;
+        m_forwardId = stationId;
+      }
+      if(forwardId == 110){
+        std::cout << "Backward partner found: " << stationId << "." << std::endl;
+        m_backwardId = stationId;
+      }
+      if(m_forwardId == stationId && flagHead == 1){
+        opendlv::knowledge::Insight eventCreateDistance(now,"createDistance");
+        odcore::data::Container containerCreateDistance(eventCreateDistance);
+        getConference().send(containerCreateDistance);
+      }
+      if(stationId == m_forwardId && flag == 1){
+        std::cout << "Forward parther should be merging: " << stationId << "." << std::endl;
       }
     }
   }
-
 
 
 
