@@ -50,6 +50,11 @@ class Rule : public odcore::base::module::TimeTriggeredConferenceClientModule {
   //double getDistances(double);
   //bool euclideanDistance(double);
 
+  void receivedContainerMergeScenario();
+  void receivedContainerIntersectionScenario();
+  void bodyMergeScenario();
+  void bodyIntersectionScenario();
+
  private:
 
   std::unique_ptr<opendlv::perception::Object> m_object;

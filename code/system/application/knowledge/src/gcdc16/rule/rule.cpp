@@ -98,6 +98,12 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Rule::body()
         getConference().send(objectContainer1);
       }
 
+      if (m_scenarioType == "intersectionScenario") {
+        opendlv::knowledge::Insight scenarioOut(timestamp, "intersectionScenario");
+        odcore::data::Container objectContainer1(scenarioOut);
+        getConference().send(objectContainer1);
+      }
+
       std::cout << "DEBUG 4" << std::endl;
       if (m_isInitialized) {
         if (m_hasMerged) {
@@ -494,6 +500,27 @@ void Rule::nextContainer(odcore::data::Container &a_container)
     //getConference().send(objectContainer);
 
   } 
+
+}
+
+
+void Rule::receivedContainerMergeScenario()
+{
+
+}
+
+void Rule::receivedContainerIntersectionScenario()
+{
+
+}
+
+void Rule::bodyMergeScenario()
+{
+
+}
+
+void Rule::bodyIntersectionScenario()
+{
 
 }
 
