@@ -282,7 +282,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
 
     float minThreshold = 20;
     float maxThreshold = 50;
-    float velocityCorrectionFactor = 0.5f;
+    float velocityCorrectionFactor = 5.0f;
     float distanceCorrectionFactor = 3.0f;
 
 
