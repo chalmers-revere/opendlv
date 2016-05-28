@@ -145,7 +145,7 @@ void Scene::nextContainer(odcore::data::Container &a_container)
   
   else if(a_container.getDataType() == opendlv::perception::Surface::ID()) {
     opendlv::perception::Surface unpackedSurface =
-    a_container.getData<opendlv::perception::Surface>();
+        a_container.getData<opendlv::perception::Surface>();
     std::vector<opendlv::model::Cartesian3> corners = unpackedSurface.getListOfEdges();
 
     TimeCheck();
