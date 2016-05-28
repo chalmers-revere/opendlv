@@ -56,6 +56,7 @@ Rule::Rule(int32_t const &a_argc, char **a_argv)
   m_isAutonomous(false),
   m_platoonId(),
   m_currentLane(),
+  m_isTail(),
   m_hasMerged(false),
   m_isInitialized(false),
   m_scenarioIsReady(false),
@@ -74,11 +75,6 @@ Rule::~Rule()
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Rule::body()
 {
-  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
-  m_currentLane = kv.getValue<std::string>("knowledge-gcdc16-rule.initial_lane");
-  std::string isTail = kv.getValue<std::string>("knowledge-gcdc16-rule.is_tail");
-  m_platoonId = kv.getValue<std::string>("knowledge-gcdc16-rule.platoon_id");
-  m_scenarioType = kv.getValue<std::string>("knowledge-gcdc16-rule.scenario");
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
       odcore::data::dmcp::ModuleStateMessage::RUNNING) {
@@ -429,6 +425,11 @@ void Rule::nextContainer(odcore::data::Container &a_container)
 
 void Rule::setUp()
 {
+  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+  m_currentLane = kv.getValue<std::string>("knowledge-gcdc16-rule.initial_lane");
+  m_isTail = kv.getValue<std::string>("knowledge-gcdc16-rule.is_tail");
+  m_platoonId = kv.getValue<std::string>("knowledge-gcdc16-rule.platoon_id");
+  m_scenarioType = kv.getValue<std::string>("knowledge-gcdc16-rule.scenario");
 }
 
 void Rule::tearDown()

@@ -63,6 +63,7 @@ class Rule : public odcore::base::module::TimeTriggeredConferenceClientModule {
   bool m_isAutonomous;
   std::string m_platoonId;
   std::string m_currentLane;
+  std::string m_isTail;
   bool m_hasMerged;
   bool m_isInitialized;
   bool m_scenarioIsReady;
