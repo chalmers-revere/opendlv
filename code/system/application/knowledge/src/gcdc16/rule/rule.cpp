@@ -62,8 +62,9 @@ Rule::Rule(int32_t const &a_argc, char **a_argv)
   m_scenarioIsReady(false),
   m_isLeader(false),
   m_scenarioType(),
-  m_hasSetupBeenRun(false)
-	//standstillDistance(6), //TODO: Get actual value at GCDC in meters
+  m_hasSetupBeenRun(false),
+  m_isCreatingGap(false)
+	//standstillDistance(6), ,//TODO: Get actual value at GCDC in meters
 	//headway(1), //TODO: Get actual value at GCDC in seconds
 	//minimumEuclideanDistance(5) //TODO: Get actual value at GCDC in meters
 {
@@ -159,29 +160,73 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Rule::body()
         odcore::data::Container objectContainerDesiredOpticalFlow(desired);
         getConference().send(objectContainerDesiredOpticalFlow);
 
-      std::cout << "DEBUG 10" << std::endl;
+        
+        std::cout << "DEBUG 10" << std::endl;
+
+        if (m_isCreatingGap) {
+
+          std::vector<std::string> properties = m_closestObject.getListOfProperties();
+          if (properties.size() > 2) {
+            std::vector<std::string> strVector = 
+                odcore::strings::StringToolbox::split(properties.at(1), ' ');
+            if (strVector.size() == 3) {
+              std::stringstream sstr;
+              sstr << strVector.at(2);
+              float vehicleLength;
+              sstr >> vehicleLength;
+
+              float gapSize = m_secondClosestObject.getDistance();
+              float gapLimit = 1.4f*(10 + 0.9f*m_speed) + vehicleLength;
+              if (gapSize > gapLimit) {
+                opendlv::knowledge::Insight stomInsight(timestamp, "safeToMerge=1");
+                odcore::data::Container stomContainer(stomInsight);
+                getConference().send(stomContainer);
+              }
+            }
+            else {
+              std::cout << "Error: Object properties did not contain correct vehicle length" << std::endl;
+              // Error
+            }
+          }
+          else {
+            std::cout << "Error: Object did not have enough properties to contain vehicle length" << std::endl;
+            // Error
+          }
+
+        }
 
         if (m_isLeader) {
           m_desiredAzimuth = 0.0f;
           m_desiredAngularSize = 10 + 0.9f*m_speed;
-          int16_t objectId = m_secondClosestObject.getObjectId();
+          int16_t objectId = m_closestObject.getObjectId();
           opendlv::perception::ObjectDesiredAngularSize desiredAngularSize(m_desiredAngularSize, objectId);
-        }
-        else {
+          odcore::data::Container objectContainerDistance(desiredAngularSize);
+          getConference().send(objectContainerDistance);
+        } else if (m_isCreatingGap) {
+          m_desiredAzimuth = m_secondClosestObject.getDirection().getAzimuth();
+          m_desiredAngularSize = 10 + 0.9f*m_speed;
+          int16_t objectId = m_closestObject.getObjectId();
+          opendlv::perception::ObjectDesiredAngularSize desiredAngularSize(m_desiredAngularSize, objectId);
+          odcore::data::Container objectContainerDistance(desiredAngularSize);
+          getConference().send(objectContainerDistance);
+        } else {
           m_desiredAzimuth = m_mostInterestingObject.getDirection().getAzimuth();
+          m_desiredAngularSize = 10 + 0.9f*m_speed;
+          int16_t objectId = m_mostInterestingObject.getObjectId();
+          opendlv::perception::ObjectDesiredAngularSize desiredAngularSize(m_desiredAngularSize, objectId);
+          odcore::data::Container objectContainerDistance(desiredAngularSize);
+          getConference().send(objectContainerDistance);
         }
         
         std::cout << "DEBUG 11" << std::endl;
         opendlv::model::Direction objectDirection(m_desiredAzimuth, 0.0f);
         opendlv::sensation::DesiredDirectionOfMovement desiredDirection(objectDirection);
+        
         odcore::data::Container objectContainerDirection(desiredDirection);
         getConference().send(objectContainerDirection);
 
 
         std::cout << "DEBUG 12" << std::endl;
-        m_desiredAngularSize = 10 + 0.9f*m_speed;
-        int16_t objectId = m_mostInterestingObject.getObjectId();
-        opendlv::perception::ObjectDesiredAngularSize desiredAngularSize(m_desiredAngularSize, objectId);
       }
 
 
@@ -332,8 +377,6 @@ void Rule::nextContainer(odcore::data::Container &a_container)
     std::string whatInsight = insight.getInsight();
 
 
-    std::string activeScenario = "A"; // We start in the left lane
-    //std.:string activeScenario = "B"; // We start in the right lane
 
     std::vector<std::string> strVector = 
         odcore::strings::StringToolbox::split(whatInsight, '=');
@@ -351,10 +394,21 @@ void Rule::nextContainer(odcore::data::Container &a_container)
       }
 
 
-      if (whatInsight == "mergeRequest") {
+      if (whatInsight == "mergeRequest" && m_platoonId == "2") {
+        
+        std::vector<std::string> properties = m_closestObject.getListOfProperties();
+        if (properties.empty()) {
+          std::cout << "ERROR: closestObject did not have any properties" << std::endl;
+        } else {
+          strVector = odcore::strings::StringToolbox::split(properties.at(0), ' ');
 
-
-      
+          if (!strVector.empty()) {
+            opendlv::knowledge::Insight forwardIdInsight(timestamp, "forwardId=" + strVector.at(2));
+            odcore::data::Container objectContainerForwardId(forwardIdInsight);
+            getConference().send(objectContainerForwardId);
+          }
+        }
+        m_isCreatingGap = true;      
       }
 
 
@@ -365,13 +419,14 @@ void Rule::nextContainer(odcore::data::Container &a_container)
         std::vector<std::string> properties = m_closestObject.getListOfProperties();
         if (properties.empty()) {
           std::cout << "ERROR: closestObject did not have any properties" << std::endl;
-        }
-        strVector = odcore::strings::StringToolbox::split(properties.at(0), ' ');
+        } else {
+          strVector = odcore::strings::StringToolbox::split(properties.at(0), ' ');
 
-        if (!strVector.empty()) {
-          opendlv::knowledge::Insight forwardIdInsight(timestamp, "forwardId=" + strVector.at(2));
-          odcore::data::Container objectContainerForwardId(forwardIdInsight);
-          getConference().send(objectContainerForwardId);
+          if (!strVector.empty()) {
+            opendlv::knowledge::Insight forwardIdInsight(timestamp, "forwardId=" + strVector.at(2));
+            odcore::data::Container objectContainerForwardId(forwardIdInsight);
+            getConference().send(objectContainerForwardId);
+          }
         }
       }
 
@@ -396,9 +451,6 @@ void Rule::nextContainer(odcore::data::Container &a_container)
 
       }
 
-      if (whatInsight == "mergeFinished" && activeScenario == "A") {
-        // Keep the same pace as FWD MIOR
-      }
     }
 
       std::cout << "DEBUG 72" << std::endl;
