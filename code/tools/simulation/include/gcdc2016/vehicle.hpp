@@ -36,12 +36,17 @@ class Vehicle {
     double GetHeading() const;
     double GetLateralPosition() const;
     double GetYawRate() const;
+    double GetSpeed() const;
     void SetHeading(double);
+    void SetRoadVheelAngle(double a_roadWheelAngle);
+    void SetThrottlePedalPosition(double a_throttlePedalPosition);
+    void SetDeceleraionRequest(double a_deceleraionRequest);
     void SetLateralPosition(double);
-    void SetSpeed(double);
-    void Update(double, double);
+    void Update(double);
 
   private:
+    void SetSpeed(double a_throttlePedalPosition, double a_deceleraionRequest, double a_dt);
+
     double const m_cmToFront;
     double const m_cmToRear;
     double const m_corneringStiffnessFront;
@@ -54,6 +59,10 @@ class Vehicle {
     double m_longitudinalPosition;
     double m_speed;
     double m_yawRate;
+    double m_roadWheelAngle;
+    double m_throttlePedalPosition;
+    double m_deceleraionRequest;
+
 };
 
 } // gcdc2016
