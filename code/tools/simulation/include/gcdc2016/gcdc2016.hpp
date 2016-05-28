@@ -49,7 +49,6 @@ class Gcdc2016 :
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
   std::unique_ptr<Vehicle> m_vehicle;
-  double m_steering;
 };
 
 } // lanekeeping

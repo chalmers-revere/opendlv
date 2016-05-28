@@ -19,7 +19,10 @@ Vehicle::Vehicle():
     m_lateralVelocity(0.0f),
     m_longitudinalPosition(0.0f),
     m_speed(0.0f),
-    m_yawRate(0.0f)
+    m_yawRate(0.0f),
+    m_roadWheelAngle(0.0),
+    m_throttlePedalPosition(0.0),
+    m_deceleraionRequest(0.0)
 {
 }
 
@@ -42,6 +45,11 @@ double Vehicle::GetYawRate() const
   return m_yawRate;
 }
 
+double Vehicle::GetSpeed() const
+{
+  return m_speed;
+}
+
 void Vehicle::SetHeading(double a_heading)
 {
   m_heading = a_heading;
@@ -52,18 +60,47 @@ void Vehicle::SetLateralPosition(double a_lateralPosition)
   m_lateralPosition = a_lateralPosition;
 }
 
-void Vehicle::SetSpeed(double a_speed)
+void Vehicle::SetRoadVheelAngle(double a_roadWheelAngle)
 {
-  m_speed = a_speed;
+m_roadWheelAngle = a_roadWheelAngle;
+
 }
 
-void Vehicle::Update(double a_theta, double a_dt)
+void Vehicle::SetThrottlePedalPosition(double a_throttlePedalPosition)
 {
-  a_theta = -a_theta;
+m_throttlePedalPosition = a_throttlePedalPosition;
+
+}
+
+void Vehicle::SetDeceleraionRequest(double a_deceleraionRequest)
+{
+m_deceleraionRequest = a_deceleraionRequest;
+}
+
+void Vehicle::SetSpeed(double a_throttlePedalPosition, double a_deceleraionRequest, double a_dt)
+{
+m_speed = m_speed;
+   if (a_throttlePedalPosition > 0)
+   {
+        m_speed = m_speed + a_throttlePedalPosition*0.1*a_dt - std::pow(M_E, -20.0/m_speed )*std::atan(0.1*m_speed);
+   }
+    else
+   {
+        m_speed = m_speed - a_deceleraionRequest*0.1*a_dt;
+   }
+
+}
+
+void Vehicle::Update(double a_dt)
+{
   double const a = m_cmToFront;
   double const b = m_cmToRear;
   double const cF = m_corneringStiffnessFront;
   double const cR = m_corneringStiffnessRear;
+
+
+  this->SetSpeed(m_throttlePedalPosition, m_deceleraionRequest, a_dt);
+
 
   double psi = m_heading;
   double y = m_lateralPosition;
@@ -78,13 +115,13 @@ void Vehicle::Update(double a_theta, double a_dt)
   double vdot = (
       cR * motionAngleRear +
       cF * motionAngleFront +
-      cF * a_theta
+      cF * m_roadWheelAngle
       ) / m_mass - u * r;
 
   double rdot = (
       -b * cR * motionAngleRear +
       a * cF * motionAngleFront +
-      a * cF * a_theta
+      a * cF * m_roadWheelAngle
       ) / m_inertia;
 
   v = v + vdot * a_dt;
