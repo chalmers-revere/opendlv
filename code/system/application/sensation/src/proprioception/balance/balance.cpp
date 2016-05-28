@@ -21,6 +21,7 @@
 #include <cstring>
 #include <cmath>
 #include <iostream>
+#include <numeric>
 
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
@@ -54,8 +55,55 @@ Balance::~Balance()
  * Receives .
  * Sends .
  */
-void Balance::nextContainer(odcore::data::Container &)
+void Balance::nextContainer(odcore::data::Container &a_accContainer)//, odcore::data::Container &a_gyroContainer)
 {
+ float *accelerometerValue;
+ float gyroscopeValue = 0.0;
+
+    if (a_accContainer.getDataType() == opendlv::proxy::AccelerometerReading::ID()) {
+      opendlv::proxy::AccelerometerReading accelerometerReading =
+      a_accContainer.getData<opendlv::proxy::AccelerometerReading>();
+
+
+
+      accelerometerValue = accelerometerReading.getAcceleration();
+
+    }
+
+
+  /*  if (a_gyroContainer.getDataType() == opendlv::proxy::AccelerometerReading::ID()) {
+      opendlv::proxy::GyroscopeReading GyroscopeReading =
+      a_container.getData<opendlv::proxy::GyroscopeReading>();
+
+      std::string deviceId = GyroscopeReading.getDeviceId();
+
+      if (deviceId != getIdentifier()) {
+        return;
+      }
+
+      gyroscopeValue = GyroscopeReading.getOrientation();
+
+    }*/
+
+
+
+// TODO - this does not work
+//    auto magnetometerReadingContainer =
+//        getKeyValueDataStore().get(opendlv::proxy::MagnetometerReading::ID());
+//    auto magnetometerReading = gyroscopeReadingContainer.getData<opendlv::proxy::MagnetometerReading>();
+
+
+    std::cout << getName()
+             << "\n acceleration value " << &accelerometerValue
+             << "\n gyroscope value " << gyroscopeValue <<  std::endl;
+
+
+}
+
+double Balance::moving_average (std::vector<double> _signal)
+{
+double sum = std::accumulate(_signal.begin(), _signal.end(), 0.0);
+return sum/_signal.size();
 
 }
 

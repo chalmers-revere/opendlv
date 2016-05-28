@@ -262,16 +262,18 @@ void V2vCam::ReadInsight(opendlv::knowledge::Insight const &a_insight)
 {
   std::string str = a_insight.getInsight();
   std::vector<std::string> information = odcore::strings::StringToolbox::split(str,'=');
-  if (information[0] == "stationId") {
-    m_stationId = std::stoi(information[1]);
-  } else if (information[0] == "stationType") {
-    m_stationType = std::stoi(information[1]);
-  } else if (information[0] == "vehicleLength") {
-    m_vehicleLength = std::stod(information[1]);
-  } else if (information[0] == "vehicleWidth") {
-    m_vehicleWidth = std::stod(information[1]);
-  } else if (information [0] == "vehicleRole") {
-    m_vehicleRole = std::stoi(information[1]);
+  if(information.size() > 0){
+    if (information[0] == "stationId") {
+      m_stationId = std::stoi(information[1]);
+    } else if (information[0] == "stationType") {
+      m_stationType = std::stoi(information[1]);
+    } else if (information[0] == "vehicleLength") {
+      m_vehicleLength = std::stod(information[1]);
+    } else if (information[0] == "vehicleWidth") {
+      m_vehicleWidth = std::stod(information[1]);
+    } else if (information [0] == "vehicleRole") {
+      m_vehicleRole = std::stoi(information[1]);
+    }
   }
 }
 

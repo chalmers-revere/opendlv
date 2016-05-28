@@ -50,6 +50,8 @@ class KeepObjectSize
   float m_desiredAzimuth;
   float m_angularSize;
   float m_targetSize;
+  int16_t m_targetObject;
+  bool m_crossingScenario;
 };
 
 } // keepobjectsize
