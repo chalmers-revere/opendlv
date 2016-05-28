@@ -52,6 +52,7 @@ class V2vIclcm
   void setUp();
   void tearDown();
   void ReadInsight(opendlv::knowledge::Insight &);
+  void ReadVoice(opendlv::sensation::Voice &);
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
 
@@ -61,6 +62,9 @@ class V2vIclcm
   std::ofstream m_receiveLog;
   std::time_t m_timeType2004;
   std::string m_scenario;
+
+  bool m_mioBeenLeader;
+  bool m_hasMerged;
 
   unsigned char m_messageId = 10;
   unsigned char m_containerMask = 0;

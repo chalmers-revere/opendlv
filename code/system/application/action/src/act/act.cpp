@@ -58,7 +58,12 @@ Act::Act(int32_t const &a_argc, char **a_argv)
     m_hasEstimateBrake(false),
     m_timeOfEstimateBrake(),
     m_hasEstimateSteer(false),
-    m_timeOfEstimateSteer()
+    m_timeOfEstimateSteer(),
+    m_targetDistance(0),
+    m_targetObjectId(-1),
+    m_targetObject(),
+    m_desiredSpeed(0),
+    m_currentSpeed(0)
 {
 }
 
@@ -77,6 +82,53 @@ void Act::nextContainer(odcore::data::Container &a_container)
   odcore::data::TimeStamp now;
 
 
+  if(a_container.getDataType() == opendlv::perception::ObjectDesiredAngularSize::ID()) {
+    // This is really a desired distance
+    opendlv::perception::ObjectDesiredAngularSize desiredAngularSize =
+        a_container.getData<opendlv::perception::ObjectDesiredAngularSize>();
+    m_targetDistance = desiredAngularSize.getDesiredAngularSize();
+    if(desiredAngularSize.getObjectId() >= 0) {
+      m_targetObjectId = desiredAngularSize.getObjectId();
+    }
+  } 
+
+  if(a_container.getDataType() == opendlv::perception::Object::ID()) {
+    opendlv::perception::Object object =
+        a_container.getData<opendlv::perception::Object>();
+
+    int16_t identity = object.getObjectId();
+
+    if (identity != m_targetObjectId) {
+      m_targetObject = object;
+    }
+  }
+
+  if (a_container.getDataType() == opendlv::sensation::DesiredOpticalFlow::ID()) {
+
+    // This is really a desired velocity
+
+    opendlv::sensation::DesiredOpticalFlow flow = 
+        a_container.getData<opendlv::sensation::DesiredOpticalFlow>();
+
+    m_desiredSpeed = flow.getDesiredOpticalFlow();
+
+    
+
+    //std::cout << "Desired speed is now: " << m_desiredSpeed << std::endl;
+  }
+
+  if (a_container.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
+    opendlv::proxy::reverefh16::Propulsion propulsion = 
+        a_container.getData<opendlv::proxy::reverefh16::Propulsion>();
+    
+    float currentSpeedKmh = 
+        static_cast<float>(propulsion.getPropulsionShaftVehicleSpeed());
+
+    m_currentSpeed = currentSpeedKmh / 3.6f;
+  }
+
+  
+  /*
   // Check if any estimates have expired
   if (m_hasEstimateAcc) {
     if ((now - m_timeOfEstimateAcc).toMicroseconds()/1000000.0f 
@@ -86,6 +138,7 @@ void Act::nextContainer(odcore::data::Container &a_container)
       m_amplitudesAccelerate.clear();
     }
   }
+  */
   if (m_hasEstimateBrake) {
     if ((now - m_timeOfEstimateBrake).toMicroseconds()/1000000.0f 
         > m_maxDuration) {
@@ -118,7 +171,7 @@ void Act::nextContainer(odcore::data::Container &a_container)
     float amplitude = estimate.getAmplitude();
 
     // If not already has estimate, add one and clear anything existing
-
+    /*
     if (type == "accelerate") {
 
       m_startTimesAccelerate.clear();
@@ -132,7 +185,7 @@ void Act::nextContainer(odcore::data::Container &a_container)
 
       m_accelerationValue = amplitude;
 
-    } else if (type == "brake") {
+    } else  */if (type == "brake") {
       m_startTimesBrake.clear();
       m_amplitudesBrake.clear();
     
@@ -174,6 +227,7 @@ void Act::nextContainer(odcore::data::Container &a_container)
     
     // If not already following an estimate, apply correction
 
+    /*
     if (type == "accelerate") {
       if (!m_hasEstimateAcc) {
         if (isInhibitory) {
@@ -184,7 +238,7 @@ void Act::nextContainer(odcore::data::Container &a_container)
         m_startTimesAccelerate.push_back(startTime);
         m_amplitudesAccelerate.push_back(amplitude);
       }
-    } else if (type == "brake") {
+    } else */if (type == "brake") {
       if (!m_hasEstimateBrake) {
         if (isInhibitory) {
           m_startTimesBrake.clear();
@@ -223,6 +277,46 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
 
     odcore::data::TimeStamp now;
 
+
+    float distanceToObject = m_targetObject.getDistance();
+
+    float minThreshold = 20;
+    float maxThreshold = 50;
+    float velocityCorrectionFactor = 0.5f;
+    float distanceCorrectionFactor = 3.0f;
+
+
+    float speedCorrection = 0;
+
+    if (distanceToObject < minThreshold) {
+      // Want to brake
+      speedCorrection = 0;
+    }
+    else if (distanceToObject > maxThreshold) {
+      // Too far away
+
+      // Correct according to desired velocity
+
+      float speedDiff = m_desiredSpeed - m_currentSpeed;
+
+      speedCorrection = speedDiff*velocityCorrectionFactor;
+
+    }
+    else {
+      // In the interval
+      float distanceRatio = m_targetDistance / distanceToObject ;
+      speedCorrection = 1.0f - distanceRatio;
+
+      speedCorrection *= distanceCorrectionFactor;
+
+      // Correct according to vehicle in front
+    }
+    m_accelerationValue = speedCorrection;
+
+
+
+    
+    /*
     if (!m_hasEstimateAcc) {
       std::vector<odcore::data::TimeStamp> startTimesAccelerateToSave;
       std::vector<float> amplitudesAccelerateToSave;
@@ -246,7 +340,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
       m_startTimesAccelerate = startTimesAccelerateToSave;
       m_amplitudesAccelerate = amplitudesAccelerateToSave;
     }
-        
+    */
     if (!m_hasEstimateBrake) {
       std::vector<odcore::data::TimeStamp> startTimesBrakeToSave;
       std::vector<float> amplitudesBrakeToSave;

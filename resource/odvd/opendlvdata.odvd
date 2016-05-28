@@ -192,6 +192,11 @@ message opendlv.perception.Object [id = 181] {
   int16 objectId [id = 17];
 }
 
+message opendlv.perception.Environment [id = 189] {
+  odcore::data::TimeStamp validUntil [id = 1];
+  list<opendlv.perception.Object> objects [id = 2];
+}
+
 message opendlv.perception.ObjectDesiredDirection [id = 182] {
   opendlv.model.Direction desiredDirection [id = 1];
   int16 objectId [id = 2];

@@ -166,7 +166,10 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
 				identifiedObjects[objectCounter].setAngularSizeRateConfidence(-1.0f);
 				identifiedObjects[objectCounter].setConfidence(dynConfidence);
         identifiedObjects[objectCounter].setObjectId(-1);
-				// identifiedObjects[objectCounter].setSources(1.0f);
+        std::string source = "echolocation";
+        std::vector<std::string> sources;
+        sources.push_back(source);
+				identifiedObjects[objectCounter].setListOfSources(sources);
 
 				objectCounter++;
 		  }

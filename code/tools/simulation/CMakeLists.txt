@@ -25,17 +25,20 @@ include_directories(include)
 # Build
 file(GLOB_RECURSE thisproject-sources 
   "${CMAKE_CURRENT_SOURCE_DIR}/src/lanekeeping/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/gcdc2016/*.cpp"
   )
 
 
 add_library(${PROJECT_NAME}lib-static STATIC ${thisproject-sources})
 
 add_executable(${PROJECT_NAME}-lanekeeping "${CMAKE_CURRENT_SOURCE_DIR}/src/lanekeeping/main.cpp")
+add_executable(${PROJECT_NAME}-gcdc2016 "${CMAKE_CURRENT_SOURCE_DIR}/src/gcdc2016/main.cpp")
 target_link_libraries(${PROJECT_NAME}-lanekeeping ${PROJECT_NAME}lib-static ${LIBRARIES}) 
-
+target_link_libraries(${PROJECT_NAME}-gcdc2016 ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
 # Test
 include(RunTests)
 
 # Install
 install(TARGETS ${PROJECT_NAME}-lanekeeping RUNTIME DESTINATION bin COMPONENT tools)
+install(TARGETS ${PROJECT_NAME}-gcdc2016 RUNTIME DESTINATION bin COMPONENT tools)

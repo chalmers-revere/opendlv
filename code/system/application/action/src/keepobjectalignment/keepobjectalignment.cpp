@@ -42,6 +42,8 @@ namespace keepobjectalignment {
 KeepObjectAlignment::KeepObjectAlignment(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(
       a_argc, a_argv, "action-keepobjectalignment")
+    , m_targetAzimuth(0.0f)
+    , m_targetId(-2)
 {
 }
 
@@ -54,8 +56,53 @@ KeepObjectAlignment::~KeepObjectAlignment()
  * current size, and desired angle.
  * Sends speed correction commands (throttle) to Act.
  */
-void KeepObjectAlignment::nextContainer(odcore::data::Container &)
+void KeepObjectAlignment::nextContainer(odcore::data::Container &a_container)
 {
+  if(a_container.getDataType() == opendlv::perception::ObjectDesiredDirection::ID()) {
+    opendlv::perception::ObjectDesiredDirection desiredDirection =
+    a_container.getData<opendlv::perception::ObjectDesiredDirection>();
+    opendlv::model::Direction targetDirection = desiredDirection.getDesiredDirection();
+    m_targetAzimuth = targetDirection.getAzimuth();
+    m_targetId = desiredDirection.getObjectId();
+  } 
+
+  if(a_container.getDataType() == opendlv::perception::Object::ID()) {
+    opendlv::perception::Object unpackedObject =
+    a_container.getData<opendlv::perception::Object>();
+
+    int16_t identity = unpackedObject.getObjectId();
+
+    if (identity == m_targetId) {
+
+      opendlv::model::Direction direction = unpackedObject.getDirection();
+      float azimuth = direction.getAzimuth();
+      float angleRateCorrection = 0.0f;
+      float gainCorrection = 0.3f;
+
+       
+
+        
+        float angularDiff = azimuth-m_targetAzimuth;
+        if ((angularDiff) < -0.05f) {
+          std::cout << "To the right: " << angularDiff << std::endl;
+          angleRateCorrection = angularDiff;
+        } else if ((angularDiff) > 0.05f) {
+          std::cout << "Object to the left:" << angularDiff << std::endl;
+          angleRateCorrection = angularDiff; 
+        } else {
+          std::cout << "zero correction" << std::endl;
+        }
+
+        angleRateCorrection *= gainCorrection;
+        
+        std::cout << "angleRateCorrection: " << angleRateCorrection << std::endl << std::endl;
+        odcore::data::TimeStamp t0;
+        opendlv::action::Correction correction1(t0, "steering", false, angleRateCorrection);
+        odcore::data::Container container(correction1);
+        getConference().send(container);
+      }
+    
+  }
   /*
   if(c.getDataType() == opendlv::perception::LanePosition::ID()){
     opendlv::perception::LanePosition lanePosition = 

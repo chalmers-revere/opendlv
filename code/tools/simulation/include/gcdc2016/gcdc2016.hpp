@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 Chalmers REVERE
+ * Copyright (C) 2016 Chalmers REVERE
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,40 +17,43 @@
  * USA.
  */
 
-#ifndef PROPRIOCEPTION_BALANCE_BALANCE_HPP_
-#define PROPRIOCEPTION_BALANCE_BALANCE_HPP_
+#ifndef GCDC2016_GCDC2016_HPP_
+#define GCDC2016_GCDC2016_HPP_
 
 #include <memory>
 
-#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
-#include "opendavinci/odcore/data/Container.h"
+#include <opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h>
+#include <opendavinci/odcore/data/Container.h>
 
 namespace opendlv {
-namespace sensation {
-namespace proprioception {
-namespace balance {
+namespace tools {
+namespace simulation {
+namespace gcdc2016 {
 
-/**
- * This class provides...
- */
-class Balance
-: public odcore::base::module::DataTriggeredConferenceClientModule {
+class Vehicle;
+
+class Gcdc2016 :
+    public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
-  Balance(int32_t const &, char **);
-  Balance(Balance const &) = delete;
-  Balance &operator=(Balance const &) = delete;
-  virtual ~Balance();
-  virtual void nextContainer(odcore::data::Container &a_accContainer);//, odcore::data::Container &a_gyroContainer);
+  Gcdc2016(int32_t const &, char **);
+  Gcdc2016(Gcdc2016 const &) = delete;
+  Gcdc2016 &operator=(Gcdc2016 const &) = delete;
+  virtual ~Gcdc2016();
+
+  virtual void nextContainer(odcore::data::Container &);
 
  private:
-  double moving_average (std::vector<double> _signal);
   void setUp();
   void tearDown();
+
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+
+  std::unique_ptr<Vehicle> m_vehicle;
 };
 
-} // balance
-} // proprioception
-} // sensation
+} // lanekeeping
+} // simulation
+} // tools
 } // opendlv
 
 #endif

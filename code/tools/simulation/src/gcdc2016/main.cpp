@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 Chalmers REVERE
+ * Copyright (C) 2016 Chalmers REVERE
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,38 +17,11 @@
  * USA.
  */
 
-#include "detectvehicle/detectedvehicle.hpp"
+#include "gcdc2016/gcdc2016.hpp"
 
-// TODO add documentation
-
-
-namespace opendlv {
-namespace perception {
-namespace detectvehicle {
-
-DetectedVehicle::DetectedVehicle(cv::Rect a_detectionRectangle, double a_timeStamp) :
-  m_detectionRectangle(a_detectionRectangle),
-  m_timeStamp(a_timeStamp)
+int32_t main(int32_t a_argc, char **a_argv)
 {
+  opendlv::tools::simulation::gcdc2016::Gcdc2016 gcdc2016(
+      a_argc, a_argv);
+  return gcdc2016.runModule();
 }
-
-DetectedVehicle::~DetectedVehicle()
-{
-  //std::cout << "DetectedVehicle::~DetectedVehicle()" << std::endl;
-}
-
-
-
-cv::Rect DetectedVehicle::GetDetectionRectangle()
-{
-  return m_detectionRectangle;
-}
-
-double DetectedVehicle::GetTimeStamp()
-{
-  return m_timeStamp;
-}
-
-} // detectvehicle
-} // perception
-} // opendlv
