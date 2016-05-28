@@ -33,9 +33,8 @@ namespace gcdc2016 {
 
 Gcdc2016::Gcdc2016(int32_t const &a_argc, char **a_argv)
     : odcore::base::module::TimeTriggeredConferenceClientModule(
-      a_argc, a_argv, "tools-simulation-lanekeeping"),
-    m_vehicle(new Vehicle),
-    m_steering(0.0f)
+      a_argc, a_argv, "tools-simulation-gcdc2016"),
+    m_vehicle(new Vehicle)
 {
 }
 
@@ -45,10 +44,7 @@ Gcdc2016::~Gcdc2016()
 
 void Gcdc2016::setUp()
 {
-  m_vehicle->SetSpeed(9.0f);
-  m_vehicle->SetHeading(0.2f);
 
-  std::cout << "Set up" << std::endl;
 }
 
 void Gcdc2016::tearDown()
@@ -60,7 +56,25 @@ void Gcdc2016::nextContainer(odcore::data::Container &a_c)
 {
   if(a_c.getDataType() == opendlv::proxy::ActuationRequest::ID()){
     auto actuationRequest = a_c.getData<opendlv::proxy::ActuationRequest>();
-    m_steering = actuationRequest.getSteering();
+
+    if (actuationRequest.getIsValid())
+    {
+       double braking = 0.0;
+       double acceleration = 0.0;
+        double roadWheelAngle = actuationRequest.getSteering();
+        if (actuationRequest.getAcceleration() > 0)
+        {
+          acceleration = actuationRequest.getAcceleration();
+        }
+        else
+        {
+          braking = actuationRequest.getAcceleration();
+        }
+       m_vehicle->SetRoadVheelAngle(roadWheelAngle+0.1);
+       m_vehicle->SetDeceleraionRequest(braking);
+       m_vehicle->SetThrottlePedalPosition(acceleration+1);
+
+    }
   }
 }
 
@@ -76,17 +90,20 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Gcdc2016::body()
     previousTimestep = thisTimestep;
 
 
-    std::cout << "m_steering: " << m_steering << std::endl;
+    //std::cout << "vehicle heading: " << m_vehicle->GetHeading() << std::endl;
     double deltaTime = duration.toMicroseconds() / 1000000.0;
     //std::cout << "deltaTime: " << deltaTime << std::endl; 
-    m_vehicle->Update(m_steering, deltaTime);
+    m_vehicle->Update(deltaTime);
 
-    double lateralPosition = m_vehicle->GetLateralPosition();
-    double heading = m_vehicle->GetHeading();
+m_vehicle->SetThrottlePedalPosition(30.0);
 
-    std::cout << "Heading: " << heading << std::endl;
-    std::cout << "Heading (degrees): " << (heading * 57.295779513) << std::endl;
-    std::cout << "Lateral position: " << lateralPosition << std::endl;
+//    double lateralPosition = m_vehicle->GetLateralPosition();
+//    double heading = m_vehicle->GetHeading();
+    double speed = m_vehicle->GetSpeed();
+
+    std::cout << "velocity: " << speed << std::endl;
+//    std::cout << "Heading (degrees): " << (heading * 57.295779513) << std::endl;
+//    std::cout << "Lateral position: " << lateralPosition << std::endl;
 
 // TODO: Use Surface instead.
 //    opendlv::perception::LanePosition lanePosition(lateralPosition, heading);
