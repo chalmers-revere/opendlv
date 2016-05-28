@@ -59,6 +59,7 @@ Act::Act(int32_t const &a_argc, char **a_argv)
     m_timeOfEstimateBrake(),
     m_hasEstimateSteer(false),
     m_timeOfEstimateSteer(),
+    m_timeSinceLastObjectDetection(),
     m_targetDistance(0),
     m_targetObjectId(-1),
     m_targetObject(),
@@ -98,8 +99,9 @@ void Act::nextContainer(odcore::data::Container &a_container)
 
     int16_t identity = object.getObjectId();
 
-    if (identity != m_targetObjectId) {
+    if (identity == m_targetObjectId) {
       m_targetObject = object;
+      m_timeSinceLastObjectDetection = now;
     }
   }
 
@@ -277,8 +279,16 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
 
     odcore::data::TimeStamp now;
 
-
     float distanceToObject = m_targetObject.getDistance();
+
+    odcore::data::TimeStamp timeElapsed = now - m_timeSinceLastObjectDetection;
+     double timeMemoryLimit = 5.0; // sec
+
+    if (timeElapsed.toMicroseconds()/1000000.0 > timeMemoryLimit)
+    {
+        distanceToObject = 1000.0;
+    }
+
 
     float minThreshold = 20;
     float maxThreshold = 50;
@@ -317,7 +327,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
 
     std::cout << "\n\n distance to objects " << distanceToObject
               << "\n desired speed" << m_desiredSpeed
-              << "\n speedCorrection " << speedCorrection << std::endl;
+              << "\n speedCorrection " << speedCorrection
+              << "\n acceleration value " << m_accelerationValue << std::endl;
 
 
     

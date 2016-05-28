@@ -66,6 +66,7 @@ class Act : public odcore::base::module::TimeTriggeredConferenceClientModule {
   bool m_hasEstimateSteer;
   odcore::data::TimeStamp m_timeOfEstimateSteer;
 
+  odcore::data::TimeStamp m_timeSinceLastObjectDetection;
 
   float m_targetDistance;
   int32_t m_targetObjectId;
