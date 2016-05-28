@@ -46,9 +46,26 @@ action-setopticalrotation.gain_heading = 1.5
 action-setopticalrotation.heading_tolerance = 0.05
 action-setopticalflow.max_speed = 30/3.6
 
+
 knowledge-gcdc16-rule:0.initial_lane = 2
-knowledge-gcdc16-rule:0.is_tail = 1
-knowledge-gcdc16-rule:0.platoon_id = 3
+knowledge-gcdc16-rule:0.is_tail = 0
+knowledge-gcdc16-rule:0.platoon_id = 2
+knowledge-gcdc16-rule:0.scenario = platooning
+
+knowledge-gcdc16-rule:1.initial_lane = 2
+knowledge-gcdc16-rule:1.is_tail = 1
+knowledge-gcdc16-rule:1.platoon_id = 2
+knowledge-gcdc16-rule:1.scenario = platooning
+
+knowledge-gcdc16-rule:2.initial_lane = 1
+knowledge-gcdc16-rule:2.is_tail = 0
+knowledge-gcdc16-rule:2.platoon_id = 1
+knowledge-gcdc16-rule:2.scenario = platooning
+
+knowledge-gcdc16-rule:3.initial_lane = 1
+knowledge-gcdc16-rule:3.is_tail = 1
+knowledge-gcdc16-rule:3.platoon_id = 1
+knowledge-gcdc16-rule:3.scenario = platooning
 
 ###############################################################################
 ###############################################################################
