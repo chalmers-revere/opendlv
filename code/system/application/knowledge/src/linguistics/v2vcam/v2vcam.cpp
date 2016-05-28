@@ -234,7 +234,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
  */
 void V2vCam::nextContainer(odcore::data::Container &a_c)
 {
-  if (a_c.getDataType() == opendlv::knowledge::Insight::ID()){
+  if (a_c.getDataType() == (opendlv::knowledge::Insight::ID() + 300)){
     opendlv::knowledge::Insight insight = 
         a_c.getData<opendlv::knowledge::Insight>();
     ReadInsight(insight);
@@ -428,18 +428,18 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
         }
       } else if (std::fabs(m_xOffset) < 0.001){
         if (m_yOffset < 0.0){
-          m_azimuth = -3.14159 / 2.0;
+          m_azimuth = -3.14159f / 2.0f;
         } else {
-          m_azimuth = 3.14159 / 2.0;
+          m_azimuth = 3.14159f / 2.0f;
         }
       } else {
         m_azimuth = std::atan2(m_yOffset, m_xOffset) - m_heading;
-        if(m_azimuth > 3.14159) {
-          m_azimuth -= 2 * 3.14159;
+        if(m_azimuth > 3.14159f) {
+          m_azimuth -= 2 * 3.14159f;
         } 
-        else if (m_azimuth < -3.14159)
+        else if (m_azimuth < -3.14159f)
         {
-          m_azimuth += 2*3.14159;
+          m_azimuth += 2*3.14159f;
         }
       }
 

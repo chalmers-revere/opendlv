@@ -274,10 +274,10 @@ void Scene::SendStuff()
   getConference().send(objectContainerEnvironment);
 
   std::cout << "=====================================" << std::endl;
-  std::cout << "Objects sent: " << std::endl
+  std::cout << "Objects sent: " << std::endl;
 
   for(uint32_t i = 0; i < m_savedObjects.size(); i++) {
-    odcore::data::Container objectContainer(m_savedObjects[i]);
+    odcore::data::Container objectContainer(m_savedObjects[i], opendlv::perception::Object::ID() + 300);
     getConference().send(objectContainer);
     std::cout << "ID: "<< m_savedObjects[i].getObjectId() << std::endl;
     std::cout << "Angle: "<< m_savedObjects[i].getDirection().getAzimuth() << std::endl;

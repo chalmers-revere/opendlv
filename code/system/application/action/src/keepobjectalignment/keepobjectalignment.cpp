@@ -66,7 +66,7 @@ void KeepObjectAlignment::nextContainer(odcore::data::Container &a_container)
     m_targetId = desiredDirection.getObjectId();
   } 
 
-  if(a_container.getDataType() == opendlv::perception::Object::ID()) {
+  if(a_container.getDataType() == (opendlv::perception::Object::ID() + 300)) {
     opendlv::perception::Object unpackedObject =
     a_container.getData<opendlv::perception::Object>();
 
