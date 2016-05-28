@@ -119,8 +119,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Rule::body()
         std::vector<std::string> strVector = 
             odcore::strings::StringToolbox::split(properties.at(0), ' ');
 
-        if (!strVector.empty() && strVector.at(0) == "Station") {
-          opendlv::knowledge::Insight mioOut(timestamp, "mioId=" + strVector.at(2));
+        if (strVector.size() > 0 && strVector[0] == "Station") {
+          opendlv::knowledge::Insight mioOut(timestamp, "mioId=" + strVector[2]);
           odcore::data::Container objectContainerMio(mioOut);
           getConference().send(objectContainerMio);
         }
@@ -132,9 +132,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Rule::body()
 
       std::cout << "DEBUG 6" << std::endl;
       std::cout << "DEBUG: m_currentLane - " << m_currentLane << std::endl;
-      opendlv::knowledge::Insight laneOut(timestamp, "currentLane=" + m_currentLane);
-      odcore::data::Container objectContainerLane(laneOut);
-      getConference().send(objectContainerLane);
+      // opendlv::knowledge::Insight laneOut(timestamp, "currentLane=" + m_currentLane);
+      // odcore::data::Container objectContainerLane(laneOut);
+      // getConference().send(objectContainerLane);
 
       std::cout << "DEBUG 7" << std::endl;
       if (m_hasMerged) {

@@ -293,11 +293,11 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       odcore::data::TimeStamp durationBeforeMessgeSending = timeBeforeMessgeSending - timeAtBegin;
 
       // Send the message
-      opendlv::sensation::Geolocation geoLocationEstimation(gpsReading.getLatitude(),
-                                                            //currentWGS84CoordinateEstimation.getLatitude(),
+      opendlv::sensation::Geolocation geoLocationEstimation(//gpsReading.getLatitude(),
+                                                            currentWGS84CoordinateEstimation.getLatitude(),
                                                             positionConfidence,
-                                                            gpsReading.getLongitude(),
-                                                            //currentWGS84CoordinateEstimation.getLongitude(),
+                                                            //gpsReading.getLongitude(),
+                                                            currentWGS84CoordinateEstimation.getLongitude(),
                                                             positionConfidence,
                                                             gpsReading.getAltitude(),
                                                             heading,  

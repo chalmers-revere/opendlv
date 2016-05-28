@@ -332,7 +332,7 @@ void V2vIclcm::ReadInsight(opendlv::knowledge::Insight &a_insight)
     } else if (information[0] == "intersectionVehicleCounter") {
       m_counter = std::stoi(information[1]);
     } else if (information[0] == "distanceTravelled"){
-      m_distanceTravelledCz = static_cast<int32_t>(std::stod(information[1])/0.1);
+      m_distanceTravelledCz = static_cast<int32_t>(std::stod(information[1])/0.1)%10000;
     } else if (information[0] == "timeHeadway"){
       m_timeHeadway = static_cast<int32_t>(std::stod(information[1])/0.1);
       if(m_timeHeadway < 0 || m_timeHeadway > 360){
@@ -486,7 +486,7 @@ void V2vIclcm::ReadVoice(opendlv::sensation::Voice &a_message){
       }
     }
     if(lane == 1){
-      if((m_mioId == station || backwardId == 110) && isHead){
+      if((m_mioId == stationId || backwardId == 110) && flagHead){
         std::cout << "Forward partner found: " << stationId << "." << std::endl;
         m_forwardId = stationId;
       }
@@ -494,7 +494,7 @@ void V2vIclcm::ReadVoice(opendlv::sensation::Voice &a_message){
         std::cout << "Backward partner found: " << stationId << "." << std::endl;
         m_backwardId = stationId;
       }
-      if(m_forwardId == stationId && isHead == 1){
+      if(m_forwardId == stationId && flagHead == 1){
         opendlv::knowledge::Insight eventCreateDistance(now,"createDistance");
         odcore::data::Container containerCreateDistance(eventCreateDistance);
         getConference().send(containerCreateDistance);
