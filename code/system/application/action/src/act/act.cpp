@@ -294,6 +294,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
     float maxThreshold = 50;
     float velocityCorrectionFactor = 0.5f;
     float distanceCorrectionFactor = 3.0f;
+    float releasePedalFactor = 3.0f;
 
 
     float speedCorrection = 0;
@@ -301,7 +302,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
 
     if (distanceToObject < minThreshold) {
       // Want to brake
-      speedCorrection = 0;
+      speedCorrection = - releasePedalFactor * minThreshold/distanceToObject;
     }
     else if (distanceToObject > maxThreshold) {
       // Too far away
