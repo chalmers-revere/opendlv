@@ -94,12 +94,15 @@ void Act::nextContainer(odcore::data::Container &a_container)
   } 
 
   if(a_container.getDataType() == (opendlv::perception::Object::ID() + 300)) {
+
+    std::cout << std::endl << "Act: Received Object" << std::endl;
     opendlv::perception::Object object =
         a_container.getData<opendlv::perception::Object>();
 
     int16_t identity = object.getObjectId();
 
     if (identity == m_targetObjectId) {
+      std::cout << "Act: identity == m_targetObjectId" << std::endl;
       m_targetObject = object;
       m_timeSinceLastObjectDetection = now;
     }

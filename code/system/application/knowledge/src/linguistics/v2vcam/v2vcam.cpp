@@ -399,22 +399,22 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
         + "," + std::to_string(vehicleRole);
         m_receiveLog << std::endl; 
 
-    if(latitude != 900000001 && longitude != 900000001) { //Dont make object if position is unavailable
+    if(latitude != 900000001 && longitude != 1800000001) { //Dont make object if position is unavailable
       //This is where the objects are constructed which are to be sent out
       opendlv::data::environment::WGS84Coordinate gpsReference;
 
       gpsReference = opendlv::data::environment::WGS84Coordinate(
-      m_latitude,
-      opendlv::data::environment::WGS84Coordinate::NORTH,
-      m_longitude,
-      opendlv::data::environment::WGS84Coordinate::EAST);
+          m_latitude,
+          opendlv::data::environment::WGS84Coordinate::NORTH,
+          m_longitude,
+          opendlv::data::environment::WGS84Coordinate::EAST);
 
       opendlv::data::environment::WGS84Coordinate currentLocation(
-      latitude / std::pow(10,7), opendlv::data::environment::WGS84Coordinate::NORTH,
-      longitude / std::pow(10,7), opendlv::data::environment::WGS84Coordinate::EAST);
+          latitude / std::pow(10,7), opendlv::data::environment::WGS84Coordinate::NORTH,
+          longitude / std::pow(10,7), opendlv::data::environment::WGS84Coordinate::EAST);
 
       opendlv::data::environment::Point3 currentObjectCartesianLocation =
-      gpsReference.transform(currentLocation);
+          gpsReference.transform(currentLocation);
 
       double m_xOffset = currentObjectCartesianLocation.getX();
       double m_yOffset = currentObjectCartesianLocation.getY();
@@ -483,7 +483,7 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
       uint16_t m_objectId = -1;
       
       opendlv::perception::Object detectedObject(now, m_type, m_typeConfidence, m_objectDirection, m_objectDirectionConfidence, m_objectDirectionRate, m_objectDirectionRateConfidence,
-      m_distance, m_distanceConfidence, m_angularSize, m_angularSizeConfidence, m_angularSizeRate, m_angularSizeRateConfidence, m_confidence, m_sources, m_properties, m_objectId);
+          m_distance, m_distanceConfidence, m_angularSize, m_angularSizeConfidence, m_angularSizeRate, m_angularSizeRateConfidence, m_confidence, m_sources, m_properties, m_objectId);
       odcore::data::Container objectContainer(detectedObject);
       getConference().send(objectContainer);
    }
