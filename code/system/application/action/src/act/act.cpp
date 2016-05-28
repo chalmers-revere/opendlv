@@ -92,7 +92,7 @@ void Act::nextContainer(odcore::data::Container &a_container)
     }
   } 
 
-  if(a_container.getDataType() == opendlv::perception::Object::ID()) {
+  if(a_container.getDataType() == (opendlv::perception::Object::ID() + 300)) {
     opendlv::perception::Object object =
         a_container.getData<opendlv::perception::Object>();
 

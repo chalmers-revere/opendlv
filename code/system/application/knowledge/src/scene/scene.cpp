@@ -273,7 +273,7 @@ void Scene::SendStuff()
   getConference().send(objectContainerEnvironment);
 
   for(uint32_t i = 0; i < m_savedObjects.size(); i++) {
-    odcore::data::Container objectContainer(m_savedObjects[i]);
+    odcore::data::Container objectContainer(m_savedObjects[i], opendlv::perception::Object::ID() + 300);
     getConference().send(objectContainer);
   }
   for(uint32_t i = 0; i < m_savedSurfaces.size(); i++) {
