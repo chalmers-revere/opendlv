@@ -297,7 +297,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
 
     float minThreshold = 20;
     float maxThreshold = 50;
-    float velocityCorrectionFactor = 0.5f;
+    float velocityCorrectionFactor =  5.0f;
     float distanceCorrectionFactor = 3.0f;
     float releasePedalFactor = 3.0f;
 
@@ -323,7 +323,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
 
       // Correct according to vehicle in front
     }
-    m_accelerationValue += speedCorrection;
+    m_accelerationValue = speedCorrection;
     if (m_accelerationValue < 0.001f)
     {
         m_accelerationValue = 0.0;
@@ -426,8 +426,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
     {
         opendlv::proxy::ActuationRequest actuationRequest;
         if (m_brakeValue > 0.0f) {
+          std::cout << "braking: " << m_brakeValue << std::endl; 
           actuationRequest = opendlv::proxy::ActuationRequest(m_brakeValue, m_steeringValue, false);
         } else {
+          std::cout << "accelerating: " << m_accelerationValue << std::endl; 
           actuationRequest = opendlv::proxy::ActuationRequest(m_accelerationValue, m_steeringValue, false);
         }
 

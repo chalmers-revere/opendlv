@@ -70,6 +70,13 @@ knowledge-gcdc16-rule:3.is_tail = 1
 knowledge-gcdc16-rule:3.platoon_id = 2
 knowledge-gcdc16-rule:3.scenario = mergeScenario
 
+
+# first three below never used...
+knowledge-gcdc16-rule:4.initial_lane = 1
+knowledge-gcdc16-rule:4.is_tail = 1
+knowledge-gcdc16-rule:4.platoon_id = 2
+knowledge-gcdc16-rule:4.scenario = intersectionScenario
+
 ###############################################################################
 ###############################################################################
 ### Proxy

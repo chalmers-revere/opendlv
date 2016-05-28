@@ -82,7 +82,6 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Rule::body()
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
       odcore::data::dmcp::ModuleStateMessage::RUNNING) {
 
-    std::cout << "DEBUG 1" << std::endl;
     if (m_hasSetupBeenRun) {
 
       odcore::data::TimeStamp timestamp;
@@ -466,42 +465,59 @@ void Rule::receivedContainerMergeScenario(odcore::data::Container &a_container)
 
 void Rule::receivedContainerIntersectionScenario(odcore::data::Container &a_container)
 {
+  std::cout << "receivedContainerIntersectionScenario" << std::endl;
 
   odcore::data::TimeStamp timestamp;
 
   if (a_container.getDataType() == opendlv::perception::Environment::ID()) {
+    std::cout << "received environment object" << std::endl;
     opendlv::perception::Environment receivedEnvironment =
         a_container.getData<opendlv::perception::Environment>();
+    std::cout << "Debug 1" << std::endl;
 
     std::vector<opendlv::perception::Object> objects = receivedEnvironment.getListOfObjects();
 
+    std::cout << "Debug 2" << std::endl;
     if (objects.size() < 1) {
       std::cout << "ERROR: rule.cpp only received info about " << objects.size() << " objects..." << std::endl;
     }
 
+    std::cout << "Debug 3" << std::endl;
     float closestDistance = 99999;
     opendlv::perception::Object* closestObject = 0;
 
+    std::cout << "Debug 4" << std::endl;
     for (uint32_t i=0; i<objects.size(); i++) {
       opendlv::perception::Object object = objects.at(i);
       std::vector<std::string> properties = object.getListOfProperties();
+
+      std::cout << "Debug 4.1" << std::endl;
       if (properties.size() > 1) { 
+        std::cout << "Debug 4.2" << std::endl;
         std::vector<std::string> strVector = 
             odcore::strings::StringToolbox::split(properties.at(0), ' ');
+        std::cout << "Debug 4.3" << std::endl;
         if (strVector.size() == 3 && strVector.at(0) == "Station") {
+          std::cout << "Debug 4.4" << std::endl;
           std::stringstream sstr;
           sstr << strVector.at(2);
           int stationId;
           sstr >> stationId;
+          std::cout << "Debug 4.5" << std::endl;
           float distanceToObject = object.getDistance();
 
           if (stationId < 100 && distanceToObject < closestDistance) {
+            std::cout << "Debug 4.6" << std::endl;
             closestDistance = distanceToObject;
-            *closestObject = object; 
+            closestObject = &object; 
           }
         }
+            std::cout << "Debug 4.7" << std::endl;
       }
+            std::cout << "Debug 4.8" << std::endl;
     }
+
+    std::cout << "Debug 5" << std::endl;
 
     if (closestObject != 0) {
       // We have found a closest object with stationID smaller than 100
@@ -509,6 +525,7 @@ void Rule::receivedContainerIntersectionScenario(odcore::data::Container &a_cont
 
     }
   }
+  std::cout << "Debug 6" << std::endl;
 
   if (a_container.getDataType() == (opendlv::knowledge::Insight::ID() + 300)) {
     opendlv::knowledge::Insight insight = a_container.getData<opendlv::knowledge::Insight>();
@@ -522,6 +539,7 @@ void Rule::receivedContainerIntersectionScenario(odcore::data::Container &a_cont
 
     }
   }
+  std::cout << "Debug 7" << std::endl;
 
 }
 
@@ -685,7 +703,7 @@ void Rule::bodyMergeScenario()
   odcore::data::Container mioRangeRateContainer(mioRangeRateInsight);
   getConference().send(mioRangeRateContainer);
 
-  opendlv::knowledge::Insight mioTimeHeadwayInsight(timestamp, "mioTimeHeadway=" + std::to_string(mioTimeHeadway));
+  opendlv::knowledge::Insight mioTimeHeadwayInsight(timestamp, "timeHeadway=" + std::to_string(mioTimeHeadway));
   odcore::data::Container mioTimeHeadwayContainer(mioTimeHeadwayInsight);
   getConference().send(mioTimeHeadwayContainer);
 
@@ -694,6 +712,22 @@ void Rule::bodyMergeScenario()
 
 void Rule::bodyIntersectionScenario()
 {
+
+  bool debuggingSpeed = false;
+  if (debuggingSpeed) {
+
+    std::cout << "DEBUGGING SPEED!!!!" << std::endl;
+
+    opendlv::sensation::DesiredOpticalFlow desired(10.0f);
+    odcore::data::Container objectContainerDesiredOpticalFlow(desired);
+    getConference().send(objectContainerDesiredOpticalFlow);
+
+
+    return;
+  }
+
+
+  std::cout << "bodyIntersectionScenario" << std::endl;
   odcore::data::TimeStamp timestamp;
   if (m_intersection_mostInterestingObject != 0) {
 
@@ -714,7 +748,7 @@ void Rule::bodyIntersectionScenario()
     odcore::data::Container mioRangeRateContainer(mioRangeRateInsight);
     getConference().send(mioRangeRateContainer);
 
-    opendlv::knowledge::Insight mioTimeHeadwayInsight(timestamp, "mioTimeHeadway=" + std::to_string(mioTimeHeadway));
+    opendlv::knowledge::Insight mioTimeHeadwayInsight(timestamp, "timeHeadway=" + std::to_string(mioTimeHeadway));
     odcore::data::Container mioTimeHeadwayContainer(mioTimeHeadwayInsight);
     getConference().send(mioTimeHeadwayContainer);
 
@@ -727,6 +761,7 @@ void Rule::bodyIntersectionScenario()
 
     
   }
+
 
 
 
