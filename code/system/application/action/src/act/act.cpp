@@ -99,7 +99,7 @@ void Act::nextContainer(odcore::data::Container &a_container)
 
     int16_t identity = object.getObjectId();
 
-    if (identity != m_targetObjectId) {
+    if (identity == m_targetObjectId) {
       m_targetObject = object;
       m_timeSinceLastObjectDetection = now;
     }
