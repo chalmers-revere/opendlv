@@ -225,7 +225,7 @@ void Can::nextGenericCANMessage(const automotive::GenericCANMessage &gcm)
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Can::body()
 {
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
-  odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+      odcore::data::dmcp::ModuleStateMessage::RUNNING) {
     // Record GenericCANMessages.
     if (m_recorderGenericCanMessages.get()) {
       const uint32_t ENTRIES = m_fifoGenericCanMessages.getSize();
@@ -249,45 +249,42 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Can::body()
     }
 
 
-
-  // Send messages to the beacon relays
-  if (m_canMessageDataStore->IsAutonomousEnabled() && !m_canMessageDataStore->IsOverridden()) {
-    // Activate green
-    std::string deviceIdGreen = "0";
-    uint32_t relayIndexGreen = 0;
-    bool relayValueGreen = false;
-    opendlv::proxy::RelayRequest relayRequestGreen(relayValueGreen, relayIndexGreen, deviceIdGreen);
-    odcore::data::Container objectContainerGreen(relayRequestGreen);
-    getConference().send(objectContainerGreen);
-
-
-    std::string deviceIdRed = "0";
-    uint32_t relayIndexRed = 1;
-    bool relayValueRed = true;
-    opendlv::proxy::RelayRequest relayRequestRed(relayValueRed, relayIndexRed, deviceIdRed);
-    odcore::data::Container objectContainerRed(relayRequestRed);
-    getConference().send(objectContainerRed);
-
-  }
-  else {
-    // Activate red
-    std::string deviceIdGreen = "0";
-    uint32_t relayIndexGreen = 0;
-    bool relayValueGreen = true;
-    opendlv::proxy::RelayRequest relayRequestGreen(relayValueGreen, relayIndexGreen, deviceIdGreen);
-    odcore::data::Container objectContainerGreen(relayRequestGreen);
-    getConference().send(objectContainerGreen);
+    // Send messages to the beacon relays
+    if (m_canMessageDataStore->IsAutonomousEnabled() && !m_canMessageDataStore->IsOverridden()) {
+      // Activate green
+      std::string deviceIdGreen = "0";
+      uint32_t relayIndexGreen = 0;
+      bool relayValueGreen = false;
+      opendlv::proxy::RelayRequest relayRequestGreen(relayValueGreen, relayIndexGreen, deviceIdGreen);
+      odcore::data::Container objectContainerGreen(relayRequestGreen);
+      getConference().send(objectContainerGreen);
 
 
-    std::string deviceIdRed = "0";
-    uint32_t relayIndexRed = 1;
-    bool relayValueRed = false;
-    opendlv::proxy::RelayRequest relayRequestRed(relayValueRed, relayIndexRed, deviceIdRed);
-    odcore::data::Container objectContainerRed(relayRequestRed);
-    getConference().send(objectContainerRed);
-  }
+      std::string deviceIdRed = "0";
+      uint32_t relayIndexRed = 1;
+      bool relayValueRed = true;
+      opendlv::proxy::RelayRequest relayRequestRed(relayValueRed, relayIndexRed, deviceIdRed);
+      odcore::data::Container objectContainerRed(relayRequestRed);
+      getConference().send(objectContainerRed);
+
+    }
+    else {
+      // Activate red
+      std::string deviceIdGreen = "0";
+      uint32_t relayIndexGreen = 0;
+      bool relayValueGreen = true;
+      opendlv::proxy::RelayRequest relayRequestGreen(relayValueGreen, relayIndexGreen, deviceIdGreen);
+      odcore::data::Container objectContainerGreen(relayRequestGreen);
+      getConference().send(objectContainerGreen);
 
 
+      std::string deviceIdRed = "0";
+      uint32_t relayIndexRed = 1;
+      bool relayValueRed = false;
+      opendlv::proxy::RelayRequest relayRequestRed(relayValueRed, relayIndexRed, deviceIdRed);
+      odcore::data::Container objectContainerRed(relayRequestRed);
+      getConference().send(objectContainerRed);
+    }
 
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;

@@ -58,6 +58,7 @@ class CanMessageDataStore
   odcore::base::Mutex m_dataStoreMutex;
   bool m_enabled;
   bool m_overridden;
+  bool m_overrideToggleStatus;
 };
 
 } // can
