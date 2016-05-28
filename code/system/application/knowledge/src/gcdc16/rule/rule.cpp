@@ -80,20 +80,24 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Rule::body()
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
       odcore::data::dmcp::ModuleStateMessage::RUNNING) {
 
+    std::cout << "DEBUG 1" << std::endl;
     if (m_hasSetupBeenRun) {
       odcore::data::TimeStamp timestamp;
 
+      std::cout << "DEBUG 2" << std::endl;
 
       opendlv::perception::ObjectDesiredAngularSize angularsize(0.075f, -1);
       odcore::data::Container objectContainer0(angularsize);
       getConference().send(objectContainer0);      
 
-      if (m_scenarioType == "platooning") {
+      std::cout << "DEBUG 3" << std::endl;
+      if (m_scenarioType == "mergeScenario") {
         opendlv::knowledge::Insight scenarioOut(timestamp, "mergeScenario");
         odcore::data::Container objectContainer1(scenarioOut);
         getConference().send(objectContainer1);
       }
 
+      std::cout << "DEBUG 4" << std::endl;
       if (m_isInitialized) {
         if (m_hasMerged) {
           m_mostInterestingObject = m_closestObject;
@@ -102,27 +106,37 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Rule::body()
           m_mostInterestingObject = m_secondClosestObject;
         }
 
+        std::cout << "DEBUG 5" << std::endl;
         std::vector<std::string> properties = m_mostInterestingObject.getListOfProperties();
         if (properties.empty()) {
+          std::cout << "getSize_ListOfSources(): " << m_mostInterestingObject.getSize_ListOfSources() << std::endl;
+          for (auto qq:properties) {
+            std::cout << "qq " << qq << std::endl;
+          }
           std::cout << "ERROR: WHAT THE FML" << std::endl;
         }
-        std::vector<std::string> strVector = 
-            odcore::strings::StringToolbox::split(properties.at(0), ' ');
-
-        if (strVector.at(0) == "Station") {
-          opendlv::knowledge::Insight mioOut(timestamp, "mioId=" + strVector.at(2));
-          odcore::data::Container objectContainerMio(mioOut);
-          getConference().send(objectContainerMio);
-        }
         else {
-          std::cout << "ERROR: mostInterestingObject had no station ID?..." << std::endl;
+          std::vector<std::string> strVector = 
+              odcore::strings::StringToolbox::split(properties.at(0), ' ');
+
+          if (!strVector.empty() && strVector.at(0) == "Station") {
+            opendlv::knowledge::Insight mioOut(timestamp, "mioId=" + strVector.at(2));
+            odcore::data::Container objectContainerMio(mioOut);
+            getConference().send(objectContainerMio);
+          }
+          else {
+            std::cout << "ERROR: mostInterestingObject had no station ID?..." << std::endl;
+          }
         }
       }
 
+      std::cout << "DEBUG 6" << std::endl;
+      std::cout << "DEBUG: m_currentLane - " << m_currentLane << std::endl;
       opendlv::knowledge::Insight laneOut(timestamp, "currentLane=" + m_currentLane);
       odcore::data::Container objectContainerLane(laneOut);
       getConference().send(objectContainerLane);
 
+      std::cout << "DEBUG 7" << std::endl;
       if (m_hasMerged) {
         m_isTail = "0";
       }
@@ -130,12 +144,14 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Rule::body()
       odcore::data::Container objectContainer5(tailOut);
       getConference().send(objectContainer5);
 
+      std::cout << "DEBUG 8" << std::endl;
       opendlv::knowledge::Insight platoonOut(timestamp, "platoonId=" + m_platoonId);
       odcore::data::Container objectContainer6(platoonOut);
       getConference().send(objectContainer6);
 
 
 
+      std::cout << "DEBUG 9" << std::endl;
 
 
       if (m_scenarioIsReady) {
@@ -143,6 +159,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Rule::body()
         odcore::data::Container objectContainerDesiredOpticalFlow(desired);
         getConference().send(objectContainerDesiredOpticalFlow);
 
+      std::cout << "DEBUG 10" << std::endl;
 
         if (m_isLeader) {
           m_desiredAzimuth = 0.0f;
@@ -154,20 +171,43 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Rule::body()
           m_desiredAzimuth = m_mostInterestingObject.getDirection().getAzimuth();
         }
         
+        std::cout << "DEBUG 11" << std::endl;
         opendlv::model::Direction objectDirection(m_desiredAzimuth, 0.0f);
         opendlv::sensation::DesiredDirectionOfMovement desiredDirection(objectDirection);
         odcore::data::Container objectContainerDirection(desiredDirection);
         getConference().send(objectContainerDirection);
 
 
+        std::cout << "DEBUG 12" << std::endl;
         m_desiredAngularSize = 10 + 0.9f*m_speed;
         int16_t objectId = m_mostInterestingObject.getObjectId();
         opendlv::perception::ObjectDesiredAngularSize desiredAngularSize(m_desiredAngularSize, objectId);
       }
 
+
+
+      float mioBearing = m_mostInterestingObject.getDirection().getAzimuth();
+      float mioRangeRate = -1.0f;
+      float mioRange = m_mostInterestingObject.getDistance();
+      float mioTimeHeadway = mioRange / static_cast<float>(m_speed);
+
+      opendlv::knowledge::Insight mioBearingInsight(timestamp, "mioBearing=" + std::to_string(mioBearing));
+      odcore::data::Container mioBearingContainer(mioBearingInsight);
+      getConference().send(mioBearingContainer);
+
+      opendlv::knowledge::Insight mioRangeInsight(timestamp, "mioRange=" + std::to_string(mioRange));
+      odcore::data::Container mioRangeContainer(mioRangeInsight);
+      getConference().send(mioRangeContainer);
+
+      opendlv::knowledge::Insight mioRangeRateInsight(timestamp, "mioRangeRate=" + std::to_string(mioRangeRate));
+      odcore::data::Container mioRangeRateContainer(mioRangeRateInsight);
+      getConference().send(mioRangeRateContainer);
+
+      opendlv::knowledge::Insight mioTimeHeadwayInsight(timestamp, "mioTimeHeadway=" + std::to_string(mioTimeHeadway));
+      odcore::data::Container mioTimeHeadwayContainer(mioTimeHeadwayInsight);
+      getConference().send(mioTimeHeadwayContainer);
+
     }
-
-
 
 
   } 
@@ -202,6 +242,12 @@ bool Rule::euclideanDistance(double measuredDistance)
 
 void Rule::nextContainer(odcore::data::Container &a_container)
 {
+  if (!m_hasSetupBeenRun) {
+    return;
+  }
+
+
+  std::cout << "DEBUG 42" << std::endl;
 
   if (a_container.getDataType() == opendlv::perception::Environment::ID()) {
     opendlv::perception::Environment receivedEnvironment =
@@ -218,6 +264,7 @@ void Rule::nextContainer(odcore::data::Container &a_container)
     float closestDistance = 99999;
     opendlv::perception::Object secondClosestObject;
     float secondClosestDistance = 99999;
+    bool foundSomething = false;
 
     for (uint32_t i=0; i<objects.size(); i++) {
       opendlv::perception::Object currentObject = objects.at(i);
@@ -230,7 +277,7 @@ void Rule::nextContainer(odcore::data::Container &a_container)
       }
       std::vector<std::string> strVector = 
           odcore::strings::StringToolbox::split(properties.at(0), ' ');
-      if (azimuth > -pi/2.0f && azimuth < pi/2.0f && strVector.at(0) == "Station") {
+      if (azimuth > -pi/2.0f && azimuth < pi/2.0f && !strVector.empty() && strVector.at(0) == "Station") {
         // Object is in front of us and ha station ID
 
         if (distance < closestDistance) {
@@ -239,10 +286,12 @@ void Rule::nextContainer(odcore::data::Container &a_container)
 
           closestDistance = distance;
           closestObject = currentObject;
+          foundSomething = true;
         }
         else if (distance < secondClosestDistance) {
           secondClosestDistance = distance;
           secondClosestObject = currentObject;
+          foundSomething = true;
         }
       }
     }
@@ -254,10 +303,14 @@ void Rule::nextContainer(odcore::data::Container &a_container)
       std::cout << "UNEXPECTED: closestObject has smaller azimuth than secondClosestObject..." <<  std::endl;
     }
 
-    m_closestObject = closestObject;
-    m_secondClosestObject = secondClosestObject;
-    m_isInitialized = true;
+    if (foundSomething) {
+      m_closestObject = closestObject;
+      m_secondClosestObject = secondClosestObject;
+      m_isInitialized = true;
+    }
   }
+
+  std::cout << "DEBUG 52" << std::endl;
 
 
   //m_speed = 7; // hardcoded for testing
@@ -269,6 +322,7 @@ void Rule::nextContainer(odcore::data::Container &a_container)
   }
 
 
+      std::cout << "DEBUG6 2" << std::endl;
 
 
   odcore::data::TimeStamp timestamp;
@@ -314,9 +368,11 @@ void Rule::nextContainer(odcore::data::Container &a_container)
         }
         strVector = odcore::strings::StringToolbox::split(properties.at(0), ' ');
 
-        opendlv::knowledge::Insight forwardIdInsight(timestamp, "forwardId=" + strVector.at(2));
-        odcore::data::Container objectContainerForwardId(forwardIdInsight);
-        getConference().send(objectContainerForwardId);
+        if (!strVector.empty()) {
+          opendlv::knowledge::Insight forwardIdInsight(timestamp, "forwardId=" + strVector.at(2));
+          odcore::data::Container objectContainerForwardId(forwardIdInsight);
+          getConference().send(objectContainerForwardId);
+        }
       }
 
       if (whatInsight == "safeToMerge" && m_platoonId == "1" /* scenario A */) {
@@ -345,6 +401,7 @@ void Rule::nextContainer(odcore::data::Container &a_container)
       }
     }
 
+      std::cout << "DEBUG 72" << std::endl;
 /*
   if (a_container.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
     auto propulsion = a_container.getData<opendlv::proxy::reverefh16::Propulsion>();
@@ -375,26 +432,7 @@ void Rule::nextContainer(odcore::data::Container &a_container)
       }
     }*/
 
-    float mioBearing = m_object->getDirection().getAzimuth();
-    float mioRangeRate = -1.0f;
-    float mioRange = m_object->getDistance();
-    float mioTimeHeadway = mioRange / static_cast<float>(m_speed);
-
-    opendlv::knowledge::Insight mioBearingInsight(timestamp, "mioBearing=" + std::to_string(mioBearing));
-    odcore::data::Container mioBearingContainer(mioBearingInsight);
-    getConference().send(mioBearingContainer);
-
-    opendlv::knowledge::Insight mioRangeInsight(timestamp, "mioRange=" + std::to_string(mioRange));
-    odcore::data::Container mioRangeContainer(mioRangeInsight);
-    getConference().send(mioRangeContainer);
-
-    opendlv::knowledge::Insight mioRangeRateInsight(timestamp, "mioRangeRate=" + std::to_string(mioRangeRate));
-    odcore::data::Container mioRangeRateContainer(mioRangeRateInsight);
-    getConference().send(mioRangeRateContainer);
-
-    opendlv::knowledge::Insight mioTimeHeadwayInsight(timestamp, "mioTimeHeadway=" + std::to_string(mioTimeHeadway));
-    odcore::data::Container mioTimeHeadwayContainer(mioTimeHeadwayInsight);
-    getConference().send(mioTimeHeadwayContainer);
+      
  
 
 
