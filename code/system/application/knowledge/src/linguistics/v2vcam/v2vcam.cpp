@@ -399,87 +399,94 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
         + "," + std::to_string(vehicleRole);
         m_receiveLog << std::endl; 
 
+    if(latitude != 900000001 && longitude != 900000001) { //Dont make object if position is unavailable
+      //This is where the objects are constructed which are to be sent out
+      opendlv::data::environment::WGS84Coordinate gpsReference;
 
-    //This is where the objects are constructed whihc are to be sent out
-    opendlv::data::environment::WGS84Coordinate gpsReference;
+      gpsReference = opendlv::data::environment::WGS84Coordinate(
+      m_latitude,
+      opendlv::data::environment::WGS84Coordinate::NORTH,
+      m_longitude,
+      opendlv::data::environment::WGS84Coordinate::EAST);
 
-    gpsReference = opendlv::data::environment::WGS84Coordinate(
-    m_latitude,
-    opendlv::data::environment::WGS84Coordinate::NORTH,
-    m_longitude,
-    opendlv::data::environment::WGS84Coordinate::EAST);
+      opendlv::data::environment::WGS84Coordinate currentLocation(
+      latitude / std::pow(10,7), opendlv::data::environment::WGS84Coordinate::NORTH,
+      longitude / std::pow(10,7), opendlv::data::environment::WGS84Coordinate::EAST);
 
-    opendlv::data::environment::WGS84Coordinate currentLocation(
-    latitude / std::pow(10,7), opendlv::data::environment::WGS84Coordinate::NORTH,
-    longitude / std::pow(10,7), opendlv::data::environment::WGS84Coordinate::EAST);
+      opendlv::data::environment::Point3 currentObjectCartesianLocation =
+      gpsReference.transform(currentLocation);
 
-    opendlv::data::environment::Point3 currentObjectCartesianLocation =
-    gpsReference.transform(currentLocation);
+      double m_xOffset = currentObjectCartesianLocation.getX();
+      double m_yOffset = currentObjectCartesianLocation.getY();
+      float m_azimuth;
 
-    double m_xOffset = currentObjectCartesianLocation.getX();
-    double m_yOffset = currentObjectCartesianLocation.getY();
-    float m_azimuth;
-
-    if (std::fabs(m_yOffset) < 0.001){
-      if (m_xOffset < 0.0){
-        m_azimuth = 3.14159f;
+      if (std::fabs(m_yOffset) < 0.001){
+        if (m_xOffset < 0.0){
+          m_azimuth = 3.14159f;
+        } else {
+          m_azimuth = 0.0f;
+        }
+      } else if (std::fabs(m_xOffset) < 0.001){
+        if (m_yOffset < 0.0){
+          m_azimuth = -3.14159 / 2.0;
+        } else {
+          m_azimuth = 3.14159 / 2.0;
+        }
       } else {
-        m_azimuth = 0.0f;
+        m_azimuth = std::atan2(m_yOffset, m_xOffset) - m_heading;
+        if(m_azimuth > 3.14159) {
+          m_azimuth -= 2 * 3.14159;
+        } 
+        else if (m_azimuth < -3.14159)
+        {
+          m_azimuth += 2*3.14159;
+        }
       }
-    } else if (std::fabs(m_xOffset) < 0.001){
-      if (m_yOffset < 0.0){
-        m_azimuth = -3.14159 / 2.0;
-      } else {
-        m_azimuth = 3.14159 / 2.0;
-      }
-    } else {
-      m_azimuth = std::atan2(m_yOffset, m_xOffset);
-    }
 
 
-    double rearX = m_xOffset - (vehicleLength / 10.0);
-    double leftRearY = m_yOffset + (vehicleWidth / 20.0);
-    double rightRearY = m_yOffset - (vehicleWidth / 20.0);
+      double rearX = m_xOffset - (vehicleLength / 10.0);
+      double leftRearY = m_yOffset + (vehicleWidth / 20.0);
+      double rightRearY = m_yOffset - (vehicleWidth / 20.0);
 
 
-    double leftLength = sqrt(leftRearY*leftRearY + rearX*rearX);
-    double rightLength = sqrt(rightRearY*rightRearY + rearX*rearX);
+      double leftLength = sqrt(leftRearY*leftRearY + rearX*rearX);
+      double rightLength = sqrt(rightRearY*rightRearY + rearX*rearX);
 
-    // c² = a² + b²  - 2ab cos(alpha)
-    // alpha = cos⁻1 ((a²+b² - c²) / (2ab))
+      // c² = a² + b²  - 2ab cos(alpha)
+      // alpha = cos⁻1 ((a²+b² - c²) / (2ab))
 
-    double alpha = acos( (leftLength*leftLength +rightLength*rightLength - vehicleWidth*vehicleWidth) / (2*leftLength*rightLength));
+      double alpha = acos( (leftLength*leftLength +rightLength*rightLength - vehicleWidth*vehicleWidth) / (2*leftLength*rightLength));
 
 
 
 
-    odcore::data::TimeStamp now;
-    std::string m_type = "vehicle";
-    float m_typeConfidence = 1.0f;
-    opendlv::model::Direction m_objectDirection(m_azimuth, 0.0f);
-    float m_objectDirectionConfidence = 0.5f;
-    opendlv::model::Direction m_objectDirectionRate(0.0f, 0.0f);
-    float m_objectDirectionRateConfidence = -1.0f;
-    float m_distance = std::sqrt((m_xOffset * m_xOffset) + (m_yOffset * m_yOffset));
-    float m_distanceConfidence = 0.5f;
-    float m_angularSize = (float)alpha;
-    float m_angularSizeConfidence = -1.0f;
-    float m_angularSizeRate = 0.0f;
-    float m_angularSizeRateConfidence = -1.0f;
-    float m_confidence = 1.0f;
-    std::vector<std::string> m_sources;
-    m_sources.push_back("v2vcam");
-    std::vector<std::string> m_properties;
-    m_properties.push_back("Station Id: " + std::to_string(stationId));
-    m_properties.push_back("Vehicle length: " + std::to_string(vehicleLength));
-    m_properties.push_back("Vehicle width: " + std::to_string(vehicleWidth));
-    uint16_t m_objectId = -1;
-    
-    opendlv::perception::Object detectedObject(now, m_type, m_typeConfidence, m_objectDirection, m_objectDirectionConfidence, m_objectDirectionRate, m_objectDirectionRateConfidence,
-    m_distance, m_distanceConfidence, m_angularSize, m_angularSizeConfidence, m_angularSizeRate, m_angularSizeRateConfidence, m_confidence, m_sources, m_properties, m_objectId);
-    odcore::data::Container objectContainer(detectedObject);
-    getConference().send(objectContainer);
-
+      odcore::data::TimeStamp now;
+      std::string m_type = "vehicle";
+      float m_typeConfidence = 1.0f;
+      opendlv::model::Direction m_objectDirection(m_azimuth, 0.0f);
+      float m_objectDirectionConfidence = 0.5f;
+      opendlv::model::Direction m_objectDirectionRate(0.0f, 0.0f);
+      float m_objectDirectionRateConfidence = -1.0f;
+      float m_distance = std::sqrt((m_xOffset * m_xOffset) + (m_yOffset * m_yOffset));
+      float m_distanceConfidence = 0.5f;
+      float m_angularSize = (float)alpha;
+      float m_angularSizeConfidence = -1.0f;
+      float m_angularSizeRate = 0.0f;
+      float m_angularSizeRateConfidence = -1.0f;
+      float m_confidence = 1.0f;
+      std::vector<std::string> m_sources;
+      m_sources.push_back("v2vcam");
+      std::vector<std::string> m_properties;
+      m_properties.push_back("Station Id: " + std::to_string(stationId));
+      m_properties.push_back("Vehicle length: " + std::to_string(vehicleLength));
+      m_properties.push_back("Vehicle width: " + std::to_string(vehicleWidth));
+      uint16_t m_objectId = -1;
+      
+      opendlv::perception::Object detectedObject(now, m_type, m_typeConfidence, m_objectDirection, m_objectDirectionConfidence, m_objectDirectionRate, m_objectDirectionRateConfidence,
+      m_distance, m_distanceConfidence, m_angularSize, m_angularSizeConfidence, m_angularSizeRate, m_angularSizeRateConfidence, m_confidence, m_sources, m_properties, m_objectId);
+      odcore::data::Container objectContainer(detectedObject);
+      getConference().send(objectContainer);
+   }
 
   } else {
     // std::cout << "Message type not CAM." << std::endl;
