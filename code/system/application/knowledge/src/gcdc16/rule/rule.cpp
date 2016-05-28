@@ -146,6 +146,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Rule::body()
 
         if (m_isLeader) {
           m_desiredAzimuth = 0.0f;
+          m_desiredAngularSize = 10 + 0.9f*m_speed;
+          int16_t objectId = m_secondClosestObject.getObjectId();
+          opendlv::perception::ObjectDesiredAngularSize desiredAngularSize(m_desiredAngularSize, objectId);
         }
         else {
           m_desiredAzimuth = m_mostInterestingObject.getDirection().getAzimuth();
@@ -257,6 +260,7 @@ void Rule::nextContainer(odcore::data::Container &a_container)
   }
 
 
+  //m_speed = 7; // hardcoded for testing
 
   if (a_container.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
     auto propulsion = a_container.getData<opendlv::proxy::reverefh16::Propulsion>();
