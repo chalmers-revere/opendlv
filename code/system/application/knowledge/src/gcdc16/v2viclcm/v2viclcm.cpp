@@ -57,7 +57,8 @@ V2vIclcm::V2vIclcm(int32_t const &a_argc, char **a_argv)
     m_timeType2004(),
     m_scenario(),
     m_mioBeenLeader(false),
-    m_hasMerged(false)
+    m_hasMerged(false),
+    m_counterMerge()
 {
   struct stat st;
   if (::stat("var/application/knowledge/gcdc16/v2viclcm", &st) == -1) {
@@ -227,6 +228,13 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vIclcm::body()
       odcore::data::Container containerIsLeader(eventIsLeader);
       getConference().send(containerIsLeader);
     }
+    if(m_flag == 1){
+      m_counterMerge++;
+    }
+    if(m_hasMerged == false && m_counterMerge > (30*25)){
+      m_hasMerged = true;
+      m_flag = 0;
+    }
 
     m_sendLog <<  std::setprecision(15) << std::to_string(GenerateGenerationTime())+
         + "," + std::to_string(m_messageId)+ //messageId
@@ -317,8 +325,9 @@ void V2vIclcm::ReadInsight(opendlv::knowledge::Insight &a_insight)
       m_safeToMerge = std::stoi(information[1]);
     } else if (information[0] == "mergeFlag") {
       m_flag = std::stoi(information[1]);
-      if(m_flag == 1){
+      if(m_flagHead == 1 && m_flag == 1){
         m_flagHead = 0;
+        m_intention = 3;
       }
     } else if (information[0] == "intersectionVehicleCounter") {
       m_counter = std::stoi(information[1]);

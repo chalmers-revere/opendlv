@@ -65,6 +65,7 @@ class V2vIclcm
 
   bool m_mioBeenLeader;
   bool m_hasMerged;
+  uint32_t m_counterMerge = 0;
 
   unsigned char m_messageId = 10;
   unsigned char m_containerMask = 0;

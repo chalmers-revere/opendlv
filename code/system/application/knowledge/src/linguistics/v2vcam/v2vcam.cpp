@@ -752,7 +752,7 @@ int32_t V2vCam::GetLongitudinalAcc() const
 {
   int32_t scale = std::pow(10,1);
   double val = m_longitudinalAcc*scale;
-  std::cout << val << std::endl;
+  // std::cout << val << std::endl;
   if(m_longitudinalAccConf < 0){
     return 161;
   }

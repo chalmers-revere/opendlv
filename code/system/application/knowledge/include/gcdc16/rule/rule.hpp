@@ -53,10 +53,23 @@ class Rule : public odcore::base::module::TimeTriggeredConferenceClientModule {
  private:
 
   std::unique_ptr<opendlv::perception::Object> m_object;
+  opendlv::perception::Object m_closestObject;
+  opendlv::perception::Object m_secondClosestObject;
+  opendlv::perception::Object m_mostInterestingObject;
   float m_desiredAzimuth;
   float m_cruiseSpeed;
-  double m_speed;
+  float m_desiredAngularSize;
+  float m_speed;
   bool m_isAutonomous;
+  std::string m_platoonId;
+  std::string m_currentLane;
+  std::string m_isTail;
+  bool m_hasMerged;
+  bool m_isInitialized;
+  bool m_scenarioIsReady;
+  bool m_isLeader;
+  std::string m_scenarioType;
+  bool m_hasSetupBeenRun;
   //double standstillDistance;
   //double headway;
   //double minimumEuclideanDistance;
