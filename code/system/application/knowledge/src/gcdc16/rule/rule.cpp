@@ -125,6 +125,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Rule::body()
         }
         else {
           std::cout << "ERROR: mostInterestingObject had no station ID?..." << std::endl;
+
         }
       }
 
