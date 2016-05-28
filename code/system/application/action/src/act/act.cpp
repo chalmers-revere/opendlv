@@ -306,10 +306,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
       // Want to brake
       speedCorrection = - releasePedalFactor * minThreshold/distanceToObject;
     }
-    else if (distanceToObject > maxThreshold) {
-      // Too far away
-
-      // Correct according to desired velocity
+    else if ((m_desiredSpeed - m_currentSpeed) < 0.0f || distanceToObject > maxThreshold ){  
+      
       float speedDiff = m_desiredSpeed - m_currentSpeed;
       speedCorrection = speedDiff*velocityCorrectionFactor;
     }
