@@ -24,6 +24,9 @@
 
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
+#include <opendavinci/odcore/wrapper/SerialPort.h>
+#include <opendavinci/odcore/wrapper/SerialPortFactory.h>
+#include <opendavinci/odcore/data/TimeStamp.h>
 
 namespace opendlv {
 namespace proxy {
@@ -46,8 +49,15 @@ class Ledstrip
  private:
   void setUp();
   void tearDown();
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+
+
 
   std::unique_ptr<Device> m_device;
+  float m_angle;
+  bool m_tooClose;
+  uint8_t m_R,m_G,m_B;
+  odcore::data::TimeStamp m_timeStamp;
 };
 
 } // ledstrip
