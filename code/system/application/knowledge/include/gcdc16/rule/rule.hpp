@@ -50,8 +50,8 @@ class Rule : public odcore::base::module::TimeTriggeredConferenceClientModule {
   //double getDistances(double);
   //bool euclideanDistance(double);
 
-  void receivedContainerMergeScenario();
-  void receivedContainerIntersectionScenario();
+  void receivedContainerMergeScenario(odcore::data::Container &a_container);
+  void receivedContainerIntersectionScenario(odcore::data::Container &a_container);
   void bodyMergeScenario();
   void bodyIntersectionScenario();
 

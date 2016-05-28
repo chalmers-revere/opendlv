@@ -83,180 +83,24 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Rule::body()
 
     std::cout << "DEBUG 1" << std::endl;
     if (m_hasSetupBeenRun) {
+
       odcore::data::TimeStamp timestamp;
 
-      std::cout << "DEBUG 2" << std::endl;
-
-      opendlv::perception::ObjectDesiredAngularSize angularsize(0.075f, -1);
-      odcore::data::Container objectContainer0(angularsize);
-      getConference().send(objectContainer0);      
-
-      std::cout << "DEBUG 3" << std::endl;
       if (m_scenarioType == "mergeScenario") {
         opendlv::knowledge::Insight scenarioOut(timestamp, "mergeScenario");
         odcore::data::Container objectContainer1(scenarioOut);
         getConference().send(objectContainer1);
+
+        bodyMergeScenario();
       }
 
       if (m_scenarioType == "intersectionScenario") {
         opendlv::knowledge::Insight scenarioOut(timestamp, "intersectionScenario");
         odcore::data::Container objectContainer1(scenarioOut);
         getConference().send(objectContainer1);
+
+        bodyIntersectionScenario();
       }
-
-      std::cout << "DEBUG 4" << std::endl;
-      if (m_isInitialized) {
-        if (m_hasMerged) {
-          m_mostInterestingObject = m_closestObject;
-        }
-        else {
-          m_mostInterestingObject = m_secondClosestObject;
-        }
-
-        std::cout << "DEBUG 5" << std::endl;
-        std::vector<std::string> properties = m_mostInterestingObject.getListOfProperties();
-        if (properties.empty()) {
-          std::cout << "getSize_ListOfSources(): " << m_mostInterestingObject.getSize_ListOfSources() << std::endl;
-          for (auto qq:properties) {
-            std::cout << "qq " << qq << std::endl;
-          }
-          std::cout << "ERROR: WHAT THE FML" << std::endl;
-        }
-        std::vector<std::string> strVector = 
-            odcore::strings::StringToolbox::split(properties.at(0), ' ');
-
-        if (strVector.size() > 0 && strVector[0] == "Station") {
-          opendlv::knowledge::Insight mioOut(timestamp, "mioId=" + strVector[2]);
-          odcore::data::Container objectContainerMio(mioOut);
-          getConference().send(objectContainerMio);
-        }
-        else {
-          std::cout << "ERROR: mostInterestingObject had no station ID?..." << std::endl;
-
-        }
-      }
-
-      std::cout << "DEBUG 6" << std::endl;
-      std::cout << "DEBUG: m_currentLane - " << m_currentLane << std::endl;
-      // opendlv::knowledge::Insight laneOut(timestamp, "currentLane=" + m_currentLane);
-      // odcore::data::Container objectContainerLane(laneOut);
-      // getConference().send(objectContainerLane);
-
-      std::cout << "DEBUG 7" << std::endl;
-      if (m_hasMerged) {
-        m_isTail = "0";
-      }
-      opendlv::knowledge::Insight tailOut(timestamp, "isTail=" + m_isTail);
-      odcore::data::Container objectContainer5(tailOut);
-      getConference().send(objectContainer5);
-
-      std::cout << "DEBUG 8" << std::endl;
-      opendlv::knowledge::Insight platoonOut(timestamp, "platoonId=" + m_platoonId);
-      odcore::data::Container objectContainer6(platoonOut);
-      getConference().send(objectContainer6);
-
-
-
-      std::cout << "DEBUG 9" << std::endl;
-
-
-      if (m_scenarioIsReady) {
-        opendlv::sensation::DesiredOpticalFlow desired(m_cruiseSpeed);
-        odcore::data::Container objectContainerDesiredOpticalFlow(desired);
-        getConference().send(objectContainerDesiredOpticalFlow);
-
-        
-        std::cout << "DEBUG 10" << std::endl;
-
-        if (m_isCreatingGap) {
-
-          std::vector<std::string> properties = m_closestObject.getListOfProperties();
-          if (properties.size() > 2) {
-            std::vector<std::string> strVector = 
-                odcore::strings::StringToolbox::split(properties.at(1), ' ');
-            if (strVector.size() == 3) {
-              std::stringstream sstr;
-              sstr << strVector.at(2);
-              float vehicleLength;
-              sstr >> vehicleLength;
-
-              float gapSize = m_secondClosestObject.getDistance();
-              float gapLimit = 1.4f*(10 + 0.9f*m_speed) + vehicleLength;
-              if (gapSize > gapLimit) {
-                opendlv::knowledge::Insight stomInsight(timestamp, "safeToMerge=1");
-                odcore::data::Container stomContainer(stomInsight);
-                getConference().send(stomContainer);
-              }
-            }
-            else {
-              std::cout << "Error: Object properties did not contain correct vehicle length" << std::endl;
-              // Error
-            }
-          }
-          else {
-            std::cout << "Error: Object did not have enough properties to contain vehicle length" << std::endl;
-            // Error
-          }
-
-        }
-
-        if (m_isLeader) {
-          m_desiredAzimuth = 0.0f;
-          m_desiredAngularSize = 10 + 0.9f*m_speed;
-          int16_t objectId = m_closestObject.getObjectId();
-          opendlv::perception::ObjectDesiredAngularSize desiredAngularSize(m_desiredAngularSize, objectId);
-          odcore::data::Container objectContainerDistance(desiredAngularSize);
-          getConference().send(objectContainerDistance);
-        } else if (m_isCreatingGap) {
-          m_desiredAzimuth = m_secondClosestObject.getDirection().getAzimuth();
-          m_desiredAngularSize = 10 + 0.9f*m_speed;
-          int16_t objectId = m_closestObject.getObjectId();
-          opendlv::perception::ObjectDesiredAngularSize desiredAngularSize(m_desiredAngularSize, objectId);
-          odcore::data::Container objectContainerDistance(desiredAngularSize);
-          getConference().send(objectContainerDistance);
-        } else {
-          m_desiredAzimuth = m_mostInterestingObject.getDirection().getAzimuth();
-          m_desiredAngularSize = 10 + 0.9f*m_speed;
-          int16_t objectId = m_mostInterestingObject.getObjectId();
-          opendlv::perception::ObjectDesiredAngularSize desiredAngularSize(m_desiredAngularSize, objectId);
-          odcore::data::Container objectContainerDistance(desiredAngularSize);
-          getConference().send(objectContainerDistance);
-        }
-        
-        std::cout << "DEBUG 11" << std::endl;
-        opendlv::model::Direction objectDirection(m_desiredAzimuth, 0.0f);
-        opendlv::sensation::DesiredDirectionOfMovement desiredDirection(objectDirection);
-        
-        odcore::data::Container objectContainerDirection(desiredDirection);
-        getConference().send(objectContainerDirection);
-
-
-        std::cout << "DEBUG 12" << std::endl;
-      }
-
-
-
-      float mioBearing = m_mostInterestingObject.getDirection().getAzimuth();
-      float mioRangeRate = -1.0f;
-      float mioRange = m_mostInterestingObject.getDistance();
-      float mioTimeHeadway = mioRange / static_cast<float>(m_speed);
-
-      opendlv::knowledge::Insight mioBearingInsight(timestamp, "mioBearing=" + std::to_string(mioBearing));
-      odcore::data::Container mioBearingContainer(mioBearingInsight);
-      getConference().send(mioBearingContainer);
-
-      opendlv::knowledge::Insight mioRangeInsight(timestamp, "mioRange=" + std::to_string(mioRange));
-      odcore::data::Container mioRangeContainer(mioRangeInsight);
-      getConference().send(mioRangeContainer);
-
-      opendlv::knowledge::Insight mioRangeRateInsight(timestamp, "mioRangeRate=" + std::to_string(mioRangeRate));
-      odcore::data::Container mioRangeRateContainer(mioRangeRateInsight);
-      getConference().send(mioRangeRateContainer);
-
-      opendlv::knowledge::Insight mioTimeHeadwayInsight(timestamp, "mioTimeHeadway=" + std::to_string(mioTimeHeadway));
-      odcore::data::Container mioTimeHeadwayContainer(mioTimeHeadwayInsight);
-      getConference().send(mioTimeHeadwayContainer);
-
     }
 
 
@@ -296,6 +140,22 @@ void Rule::nextContainer(odcore::data::Container &a_container)
     return;
   }
 
+
+  if (m_scenarioType == "mergeScenario") {
+
+    receivedContainerMergeScenario(a_container);
+  }
+
+  if (m_scenarioType == "intersectionScenario") {
+
+    receivedContainerIntersectionScenario(a_container);
+  } 
+
+}
+
+
+void Rule::receivedContainerMergeScenario(odcore::data::Container &a_container)
+{
 
   std::cout << "DEBUG 42" << std::endl;
 
@@ -499,23 +359,192 @@ void Rule::nextContainer(odcore::data::Container &a_container)
     //odcore::data::Container objectContainer(desiredDirection);
     //getConference().send(objectContainer);
 
-  } 
-
+  }
 }
 
-
-void Rule::receivedContainerMergeScenario()
+void Rule::receivedContainerIntersectionScenario(odcore::data::Container &a_container)
 {
+  if (a_container.getDataType() == opendlv::perception::Environment::ID()) {
+    opendlv::perception::Environment receivedEnvironment =
+        a_container.getData<opendlv::perception::Environment>();
 
-}
+  }
 
-void Rule::receivedContainerIntersectionScenario()
-{
+
+  //m_speed = 7; // hardcoded for testing
+
+  if (a_container.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
+    auto propulsion = a_container.getData<opendlv::proxy::reverefh16::Propulsion>();
+    double speedKph = propulsion.getPropulsionShaftVehicleSpeed();
+    m_speed = (float) speedKph / 3.6f;
+  }
 
 }
 
 void Rule::bodyMergeScenario()
 {
+  odcore::data::TimeStamp timestamp;
+  std::cout << "DEBUG 2" << std::endl;
+
+  opendlv::perception::ObjectDesiredAngularSize angularsize(0.075f, -1);
+  odcore::data::Container objectContainer0(angularsize);
+  getConference().send(objectContainer0);      
+
+  std::cout << "DEBUG 3" << std::endl;
+
+  std::cout << "DEBUG 4" << std::endl;
+  if (m_isInitialized) {
+    if (m_hasMerged) {
+      m_mostInterestingObject = m_closestObject;
+    }
+    else {
+      m_mostInterestingObject = m_secondClosestObject;
+    }
+
+    std::cout << "DEBUG 5" << std::endl;
+    std::vector<std::string> properties = m_mostInterestingObject.getListOfProperties();
+    if (properties.empty()) {
+      std::cout << "getSize_ListOfSources(): " << m_mostInterestingObject.getSize_ListOfSources() << std::endl;
+      for (auto qq:properties) {
+        std::cout << "qq " << qq << std::endl;
+      }
+      std::cout << "ERROR: WHAT THE FML" << std::endl;
+    }
+    std::vector<std::string> strVector = 
+        odcore::strings::StringToolbox::split(properties.at(0), ' ');
+
+    if (strVector.size() > 0 && strVector[0] == "Station") {
+      opendlv::knowledge::Insight mioOut(timestamp, "mioId=" + strVector[2]);
+      odcore::data::Container objectContainerMio(mioOut);
+      getConference().send(objectContainerMio);
+    }
+    else {
+      std::cout << "ERROR: mostInterestingObject had no station ID?..." << std::endl;
+
+    }
+  }
+
+  std::cout << "DEBUG 6" << std::endl;
+  std::cout << "DEBUG: m_currentLane - " << m_currentLane << std::endl;
+  // opendlv::knowledge::Insight laneOut(timestamp, "currentLane=" + m_currentLane);
+  // odcore::data::Container objectContainerLane(laneOut);
+  // getConference().send(objectContainerLane);
+
+  std::cout << "DEBUG 7" << std::endl;
+  if (m_hasMerged) {
+    m_isTail = "0";
+  }
+  opendlv::knowledge::Insight tailOut(timestamp, "isTail=" + m_isTail);
+  odcore::data::Container objectContainer5(tailOut);
+  getConference().send(objectContainer5);
+
+  std::cout << "DEBUG 8" << std::endl;
+  opendlv::knowledge::Insight platoonOut(timestamp, "platoonId=" + m_platoonId);
+  odcore::data::Container objectContainer6(platoonOut);
+  getConference().send(objectContainer6);
+
+
+
+  std::cout << "DEBUG 9" << std::endl;
+
+
+  if (m_scenarioIsReady) {
+    opendlv::sensation::DesiredOpticalFlow desired(m_cruiseSpeed);
+    odcore::data::Container objectContainerDesiredOpticalFlow(desired);
+    getConference().send(objectContainerDesiredOpticalFlow);
+
+    
+    std::cout << "DEBUG 10" << std::endl;
+
+    if (m_isCreatingGap) {
+
+      std::vector<std::string> properties = m_closestObject.getListOfProperties();
+      if (properties.size() > 2) {
+        std::vector<std::string> strVector = 
+            odcore::strings::StringToolbox::split(properties.at(1), ' ');
+        if (strVector.size() == 3) {
+          std::stringstream sstr;
+          sstr << strVector.at(2);
+          float vehicleLength;
+          sstr >> vehicleLength;
+
+          float gapSize = m_secondClosestObject.getDistance();
+          float gapLimit = 1.4f*(10 + 0.9f*m_speed) + vehicleLength;
+          if (gapSize > gapLimit) {
+            opendlv::knowledge::Insight stomInsight(timestamp, "safeToMerge=1");
+            odcore::data::Container stomContainer(stomInsight);
+            getConference().send(stomContainer);
+          }
+        }
+        else {
+          std::cout << "Error: Object properties did not contain correct vehicle length" << std::endl;
+          // Error
+        }
+      }
+      else {
+        std::cout << "Error: Object did not have enough properties to contain vehicle length" << std::endl;
+        // Error
+      }
+
+    }
+
+    if (m_isLeader) {
+      m_desiredAzimuth = 0.0f;
+      m_desiredAngularSize = 10 + 0.9f*m_speed;
+      int16_t objectId = m_closestObject.getObjectId();
+      opendlv::perception::ObjectDesiredAngularSize desiredAngularSize(m_desiredAngularSize, objectId);
+      odcore::data::Container objectContainerDistance(desiredAngularSize);
+      getConference().send(objectContainerDistance);
+    } else if (m_isCreatingGap) {
+      m_desiredAzimuth = m_secondClosestObject.getDirection().getAzimuth();
+      m_desiredAngularSize = 10 + 0.9f*m_speed;
+      int16_t objectId = m_closestObject.getObjectId();
+      opendlv::perception::ObjectDesiredAngularSize desiredAngularSize(m_desiredAngularSize, objectId);
+      odcore::data::Container objectContainerDistance(desiredAngularSize);
+      getConference().send(objectContainerDistance);
+    } else {
+      m_desiredAzimuth = m_mostInterestingObject.getDirection().getAzimuth();
+      m_desiredAngularSize = 10 + 0.9f*m_speed;
+      int16_t objectId = m_mostInterestingObject.getObjectId();
+      opendlv::perception::ObjectDesiredAngularSize desiredAngularSize(m_desiredAngularSize, objectId);
+      odcore::data::Container objectContainerDistance(desiredAngularSize);
+      getConference().send(objectContainerDistance);
+    }
+    
+    std::cout << "DEBUG 11" << std::endl;
+    opendlv::model::Direction objectDirection(m_desiredAzimuth, 0.0f);
+    opendlv::sensation::DesiredDirectionOfMovement desiredDirection(objectDirection);
+    
+    odcore::data::Container objectContainerDirection(desiredDirection);
+    getConference().send(objectContainerDirection);
+
+
+    std::cout << "DEBUG 12" << std::endl;
+  }
+
+
+
+  float mioBearing = m_mostInterestingObject.getDirection().getAzimuth();
+  float mioRangeRate = -1.0f;
+  float mioRange = m_mostInterestingObject.getDistance();
+  float mioTimeHeadway = mioRange / static_cast<float>(m_speed);
+
+  opendlv::knowledge::Insight mioBearingInsight(timestamp, "mioBearing=" + std::to_string(mioBearing));
+  odcore::data::Container mioBearingContainer(mioBearingInsight);
+  getConference().send(mioBearingContainer);
+
+  opendlv::knowledge::Insight mioRangeInsight(timestamp, "mioRange=" + std::to_string(mioRange));
+  odcore::data::Container mioRangeContainer(mioRangeInsight);
+  getConference().send(mioRangeContainer);
+
+  opendlv::knowledge::Insight mioRangeRateInsight(timestamp, "mioRangeRate=" + std::to_string(mioRangeRate));
+  odcore::data::Container mioRangeRateContainer(mioRangeRateInsight);
+  getConference().send(mioRangeRateContainer);
+
+  opendlv::knowledge::Insight mioTimeHeadwayInsight(timestamp, "mioTimeHeadway=" + std::to_string(mioTimeHeadway));
+  odcore::data::Container mioTimeHeadwayContainer(mioTimeHeadwayInsight);
+  getConference().send(mioTimeHeadwayContainer);
+
 
 }
 
