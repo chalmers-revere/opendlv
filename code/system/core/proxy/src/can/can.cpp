@@ -182,6 +182,14 @@ void Can::tearDown()
 
 void Can::nextGenericCANMessage(const automotive::GenericCANMessage &gcm)
 {
+  static int counter = 0;
+  const int CAN_MESSAGES_TO_IGNORE = 10;
+  counter++;
+  if (counter < CAN_MESSAGES_TO_IGNORE) {
+    return;
+  }
+  counter = 0;
+
   // Map CAN message to high-level data structure.
   vector<odcore::data::Container> result = m_revereFh16CanMessageMapping.mapNext(gcm);
 
