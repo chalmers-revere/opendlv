@@ -25,6 +25,7 @@
 #include <cmath>
 
 #include <opendavinci/odcore/data/Container.h>
+ #include <opendavinci/odcore/base/Lock.h>
 
 #include "opendavinci/odcore/base/KeyValueConfiguration.h"
 
@@ -47,6 +48,7 @@ LidarStringDecoder::LidarStringDecoder(odcore::io::conference::ContainerConferen
     , m_bufferSize(44)
     //, m_directions()
     //, m_radii()
+    , m_latestReadingMutex()
     , m_latestReading()
 {
   m_position[0] = a_x;
@@ -171,9 +173,9 @@ bool LidarStringDecoder::CheckForStartResponse()
   return true;
 }
 
-opendlv::proxy::EchoReading LidarStringDecoder::GetLatestReading() const
+opendlv::proxy::EchoReading LidarStringDecoder::GetLatestReading()
 {
-//  std::lock_guard<std::mutex> guard(g_readingMutex);
+  odcore::base::Lock l(m_latestReadingMutex);
   return m_latestReading;
 }
 
@@ -214,10 +216,9 @@ void LidarStringDecoder::ConvertToDistances()
     }
   }
 
- // std::lock_guard<std::mutex> guard(g_readingMutex);
-
   //std::cout << "radius: " << radii[0];
 
+  odcore::base::Lock l(m_latestReadingMutex);
   m_latestReading.setListOfDirections(directions);
   m_latestReading.setListOfRadii(radii);
   m_latestReading.setNumberOfPoints(radii.size());
