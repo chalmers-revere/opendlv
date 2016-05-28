@@ -56,7 +56,7 @@ class V2vIclcm
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
 
-  uint32_t GenerateGenerationTime() const;
+  uint64_t GenerateGenerationTime() const;
 
   std::ofstream m_sendLog;
   std::ofstream m_receiveLog;

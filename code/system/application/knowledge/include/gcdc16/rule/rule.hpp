@@ -50,12 +50,18 @@ class Rule : public odcore::base::module::TimeTriggeredConferenceClientModule {
   //double getDistances(double);
   //bool euclideanDistance(double);
 
+  void receivedContainerMergeScenario(odcore::data::Container &a_container);
+  void receivedContainerIntersectionScenario(odcore::data::Container &a_container);
+  void bodyMergeScenario();
+  void bodyIntersectionScenario();
+
  private:
 
   std::unique_ptr<opendlv::perception::Object> m_object;
   opendlv::perception::Object m_closestObject;
   opendlv::perception::Object m_secondClosestObject;
   opendlv::perception::Object m_mostInterestingObject;
+  opendlv::perception::Object * m_intersection_mostInterestingObject;
   float m_desiredAzimuth;
   float m_cruiseSpeed;
   float m_desiredAngularSize;

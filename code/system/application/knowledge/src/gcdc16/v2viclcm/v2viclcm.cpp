@@ -286,8 +286,12 @@ void V2vIclcm::ReadInsight(opendlv::knowledge::Insight &a_insight)
   if (information.size() == 0){
     if (str == "mergeScenario") {
       m_scenario = str;
-    }  
-  } else {
+    }
+    else if (str == "intersectionScenario") {
+      m_scenario = str;
+    }
+  }
+  else {
     if(information[0] == "stationId"){
       m_stationId = std::stoi(information[1]);
     } else if(information[0] == "rearAxleLocation"){
@@ -601,11 +605,11 @@ void V2vIclcm::tearDown()
 }
 
 
-uint32_t V2vIclcm::GenerateGenerationTime() const
+uint64_t V2vIclcm::GenerateGenerationTime() const
 {
   std::chrono::system_clock::time_point start2004TimePoint = 
       std::chrono::system_clock::from_time_t(m_timeType2004);
-  uint32_t millisecondsSince2004Epoch =
+  uint64_t millisecondsSince2004Epoch =
       std::chrono::system_clock::now().time_since_epoch() /
       std::chrono::milliseconds(1) 
       - start2004TimePoint.time_since_epoch() / std::chrono::milliseconds(1);
