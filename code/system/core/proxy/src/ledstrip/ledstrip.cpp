@@ -109,15 +109,15 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Ledstrip::body()
     int nSegments = 0;
 
 
-    if(std::fabs(m_angle) > 0.418f){
+    if(std::fabs(m_angle) > 0.402f){
       if(m_angle >= 0.0f){
-        m_angle = 0.418f;
+        m_angle = 0.402f;
       } else {
-        m_angle = -0.418f;
+        m_angle = -0.402f;
       }
     }
 
-    int midPoint = (int)(147.0f/2.0f -(m_angle / 0.418f * 147.0f / 2.0f) ) ;
+    int midPoint = (int)(147.0f/2.0f -(m_angle / 0.402f * 147.0f / 2.0f) ) ;
     std::cout<<"Mid point " << midPoint << std::endl;
 
     std::vector<int> leftMostSegment; 
