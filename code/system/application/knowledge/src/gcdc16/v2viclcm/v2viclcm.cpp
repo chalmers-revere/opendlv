@@ -504,7 +504,23 @@ void V2vIclcm::ReadVoice(opendlv::sensation::Voice &a_message){
       }
     }
   }
+  if(m_scenario == "intersectionScenario"){
+    if(stationId < 100) {
+      if(platoonId == 2){
+        std::cout << "Got startPlatoon flag from " << stationId << std::endl;
+        opendlv::knowledge::Insight eventScenarioStart(now,"scenarioReady");
+        odcore::data::Container containerScenarioStart(eventScenarioStart, opendlv::knowledge::Insight::ID() + 300);
+        getConference().send(containerScenarioStart);
+      }
+      if(endOfScenario == 1){
+        std::cout << "Got end of scenario message from " << stationId << std::endl;
+        opendlv::knowledge::Insight eventScenarioEnd(now,"scenarioEnd");
+        odcore::data::Container containerScenarioEnd(eventScenarioEnd, opendlv::knowledge::Insight::ID() + 300);
+        getConference().send(containerScenarioEnd);
 
+      }
+    } 
+  } 
 
 
   m_receiveLog <<  std::setprecision(15) << std::to_string(GenerateGenerationTime())+
