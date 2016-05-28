@@ -234,7 +234,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
  */
 void V2vCam::nextContainer(odcore::data::Container &a_c)
 {
-  if (a_c.getDataType() == (opendlv::knowledge::Insight::ID() + 300)){
+  if (a_c.getDataType() == (opendlv::knowledge::Insight::ID() + 400)){
     opendlv::knowledge::Insight insight = 
         a_c.getData<opendlv::knowledge::Insight>();
     ReadInsight(insight);

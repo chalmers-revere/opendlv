@@ -26,6 +26,7 @@
 
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
+#include "opendavinci/odcore/base/Thread.h"
 
 
 #include "identity/identity.hpp"
@@ -91,6 +92,13 @@ void Identity::SendContainer(opendlv::knowledge::Insight &a_insight)
 {
   odcore::data::Container c(a_insight);
   getConference().send(c);
+
+  // Allow sending packets.
+  odcore::base::Thread::usleepFor(100);
+
+  // Resend to v2vcam
+  odcore::data::Container c2(a_insight, opendlv::knowledge::Insight::ID() + 400);
+  getConference().send(c2);
 }
 
 void Identity::setUp()

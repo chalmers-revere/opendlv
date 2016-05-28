@@ -160,7 +160,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Rule::body()
         getConference().send(objectContainerDesiredOpticalFlow);
 
         
-        std::cout << "DEBUG 10" << std::endl;
+        std::cout << "DEBUG 10 \n Cruise speeed " << m_cruiseSpeed << std::endl;
 
         if (m_isCreatingGap) {
 
