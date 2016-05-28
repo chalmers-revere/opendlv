@@ -124,6 +124,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
         previousTimestep = gpsReadingContainer.getReceivedTimeStamp();
       }
 
+
       odcore::data::TimeStamp thisTimestep;
       odcore::data::TimeStamp duration = thisTimestep - previousTimestep;
       previousTimestep = thisTimestep;

@@ -173,8 +173,8 @@ proxy-imu:2.mount.yaw = 0.0
 
 proxy-lidar.type = sick
 proxy-lidar.port = /dev/ttyS0
-proxy-lidar.baudrate = 38400;
-proxy-lidar.mount.x = 1.45
+proxy-lidar.baudrate = 38400
+proxy-lidar.mount.x = 1.25
 proxy-lidar.mount.y = 0.0
 proxy-lidar.mount.z = 1.0
 proxy-lidar.mount.roll = 0.0
