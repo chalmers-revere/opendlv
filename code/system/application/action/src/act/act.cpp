@@ -297,7 +297,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
 
     float minThreshold = 20;
     float maxThreshold = 50;
-    float velocityCorrectionFactor =  5.0f;
+    float velocityCorrectionFactor =  100.0f;
     float distanceCorrectionFactor = 3.0f;
     float releasePedalFactor = 3.0f;
 
@@ -323,7 +323,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
 
       // Correct according to vehicle in front
     }
-    m_accelerationValue = speedCorrection;
+    m_accelerationValue = std::max(speedCorrection, 30.0f);
     if (m_accelerationValue < 0.001f)
     {
         m_accelerationValue = 0.0;
