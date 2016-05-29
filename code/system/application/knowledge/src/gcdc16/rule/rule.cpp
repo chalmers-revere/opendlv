@@ -508,7 +508,6 @@ void Rule::receivedContainerIntersectionScenario(odcore::data::Container &a_cont
 
     if (objects.size() < 1) {
       std::cout << "ERROR: rule.cpp only received info about " << objects.size() << " objects..." << std::endl;
-    } else {
       return;
     }
 
@@ -589,9 +588,31 @@ void Rule::bodyIntersectionScenario()
   odcore::data::TimeStamp timestamp;
   if (m_intersection_mostInterestingObject != 0) {
 
-    float mioBearing = m_mostInterestingObject.getDirection().getAzimuth();
+    std::vector<std::string> properties = m_intersection_mostInterestingObject->getListOfProperties();
+    if (properties.empty()) {
+      std::cout << "getSize_ListOfSources(): " << m_intersection_mostInterestingObject->getSize_ListOfSources() << std::endl;
+      // for (auto qq:properties) {
+      //   std::cout << "qq " << qq << std::endl;
+      // }
+      std::cout << "ERROR: WHAT THE FML" << std::endl;
+    }
+    else {
+      std::vector<std::string> strVector = 
+          odcore::strings::StringToolbox::split(properties.at(0), ' ');
+
+      if (strVector.size() > 2 && strVector[0] == "Station") {
+        opendlv::knowledge::Insight mioOut(timestamp, "mioId=" + strVector[2]);
+        odcore::data::Container objectContainerMio(mioOut);
+        getConference().send(objectContainerMio);
+      }
+      else {
+        std::cout << "ERROR: mostInterestingObject had no valid station ID?..." << std::endl;
+      }
+    }
+
+    float mioBearing = m_intersection_mostInterestingObject->getDirection().getAzimuth();
     float mioRangeRate = 100000.0f;
-    float mioRange = m_mostInterestingObject.getDistance();
+    float mioRange = m_intersection_mostInterestingObject->getDistance();
     float mioTimeHeadway = mioRange / static_cast<float>(m_speed);
 
     opendlv::knowledge::Insight mioBearingInsight(timestamp, "mioBearing=" + std::to_string(mioBearing));
