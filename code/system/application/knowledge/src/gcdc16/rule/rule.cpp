@@ -487,7 +487,6 @@ void Rule::bodyMergeScenario()
 
 void Rule::receivedContainerIntersectionScenario(odcore::data::Container &a_container)
 {
-  std::cout << "receivedContainerIntersectionScenario" << std::endl;
 
   odcore::data::TimeStamp timestamp;
 
@@ -549,6 +548,7 @@ void Rule::receivedContainerIntersectionScenario(odcore::data::Container &a_cont
 
 
     if (whatInsight == "scenarioReady") {
+      // set desired speed of 30 km/h
       opendlv::sensation::DesiredOpticalFlow desired(30/3.6f);
       odcore::data::Container objectContainerDesiredOpticalFlow(desired);
       getConference().send(objectContainerDesiredOpticalFlow);
@@ -561,7 +561,7 @@ void Rule::receivedContainerIntersectionScenario(odcore::data::Container &a_cont
 
 void Rule::bodyIntersectionScenario()
 {
-
+  /*
   bool debuggingSpeed = false;
   if (debuggingSpeed) {
 
@@ -574,9 +574,9 @@ void Rule::bodyIntersectionScenario()
 
     return;
   }
+  */
 
 
-  std::cout << "bodyIntersectionScenario" << std::endl;
   odcore::data::TimeStamp timestamp;
   if (m_intersection_mostInterestingObject != 0) {
 
