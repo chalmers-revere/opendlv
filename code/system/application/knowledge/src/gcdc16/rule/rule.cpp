@@ -247,7 +247,8 @@ void Rule::receivedContainerMergeScenario(odcore::data::Container &a_container)
 
     if (strVector.size() > 1) {
       if (strVector[0] == "cruiseSpeed") {
-        m_cruiseSpeed = std::stof(strVector[1]);
+        // assuming recieving is km/h
+        m_cruiseSpeed = std::stof(strVector[1]) / 3.6f;
 
 
       }
