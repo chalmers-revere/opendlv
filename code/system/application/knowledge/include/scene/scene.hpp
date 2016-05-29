@@ -29,6 +29,7 @@
 
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
+#include "opendavinci/odcore/base/Mutex.h"
 #include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
@@ -66,6 +67,7 @@ class Scene : public odcore::base::module::TimeTriggeredConferenceClientModule {
   std::vector<opendlv::perception::Object> m_savedObjects;
   uint32_t m_objectCounter;
   uint32_t m_surfaceCounter;
+  odcore::base::Mutex m_mutex;
 };
 
 } // scene

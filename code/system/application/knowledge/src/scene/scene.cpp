@@ -285,10 +285,10 @@ void Scene::SendStuff()
   }
   std::cout << "=====================================" << std::endl;
   
-  for(uint32_t i = 0; i < m_savedSurfaces.size(); i++) {
-    odcore::data::Container surfaceContainer(m_savedSurfaces[i]);
-    getConference().send(surfaceContainer);
-  }
+  //for(uint32_t i = 0; i < m_savedSurfaces.size(); i++) {
+  //  odcore::data::Container surfaceContainer(m_savedSurfaces[i]);
+  //  getConference().send(surfaceContainer);
+  //}
 }
 
 double Scene::PointDistance(float a_angle1, double a_dist1, float a_angle2, double a_dist2)
