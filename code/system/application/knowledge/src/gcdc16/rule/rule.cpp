@@ -506,7 +506,7 @@ void Rule::bodyMergeScenario()
         if (strVector.size() == 3) {
           std::stringstream sstr;
           sstr << strVector.at(2);
-          float vehicleLength = 5;
+          float vehicleLength = 5; // vehicle length of closest vehicle
           try {
             sstr >> vehicleLength;
           }
@@ -517,7 +517,7 @@ void Rule::bodyMergeScenario()
 
           // THIS ASSUMES THAT THE SECOND CLOSEST OBJECT EXISTS
           float gapSize = m_secondClosestObject.getDistance();
-          float gapLimit = 1.5f*(10 + timeHeadway*m_speed) + vehicleLength;
+          float gapLimit = 1.5f*(10 + timeHeadway*m_speed) + vehicleLength; 
           if (gapSize > gapLimit) {
             opendlv::knowledge::Insight stomInsight(timestamp, "safeToMerge=1");
             odcore::data::Container stomContainer(stomInsight);
@@ -525,34 +525,34 @@ void Rule::bodyMergeScenario()
           }
         }
         else {
-          std::cout << "Error: Object properties did not contain correct vehicle length" << std::endl;
           // Error
+          std::cout << "Error: Object properties did not contain correct vehicle length" << std::endl;
         }
       }
       else {
-        std::cout << "Error: Object did not have enough properties to contain vehicle length" << std::endl;
         // Error
+        std::cout << "Error: Object did not have enough properties to contain vehicle length" << std::endl;
       }
 
     }
 
     if (m_isLeader) {
-      m_desiredAzimuth = 0.0f;
-      m_desiredAngularSize = 10 + timeHeadway*m_speed;
+      m_desiredAzimuth = 0.0f; // could be dangerous, really want to follow road.
+      m_desiredAngularSize = 10 + timeHeadway*m_speed; // desired distance
       int16_t objectId = m_closestObject.getObjectId();
       opendlv::perception::ObjectDesiredAngularSize desiredAngularSize(m_desiredAngularSize, objectId);
       odcore::data::Container objectContainerDistance(desiredAngularSize);
       getConference().send(objectContainerDistance);
     } else if (m_isCreatingGap) {
       m_desiredAzimuth = m_secondClosestObject.getDirection().getAzimuth();
-      m_desiredAngularSize = 10 + timeHeadway*m_speed;
+      m_desiredAngularSize = 10 + timeHeadway*m_speed; // desired distance
       int16_t objectId = m_closestObject.getObjectId();
       opendlv::perception::ObjectDesiredAngularSize desiredAngularSize(m_desiredAngularSize, objectId);
       odcore::data::Container objectContainerDistance(desiredAngularSize);
       getConference().send(objectContainerDistance);
     } else {
       m_desiredAzimuth = m_mostInterestingObject.getDirection().getAzimuth();
-      m_desiredAngularSize = 10 + timeHeadway*m_speed;
+      m_desiredAngularSize = 10 + timeHeadway*m_speed; // desired distance
       int16_t objectId = m_mostInterestingObject.getObjectId();
       opendlv::perception::ObjectDesiredAngularSize desiredAngularSize(m_desiredAngularSize, objectId);
       odcore::data::Container objectContainerDistance(desiredAngularSize);
@@ -561,11 +561,8 @@ void Rule::bodyMergeScenario()
     
     opendlv::model::Direction objectDirection(m_desiredAzimuth, 0.0f);
     opendlv::sensation::DesiredDirectionOfMovement desiredDirection(objectDirection);
-    
     odcore::data::Container objectContainerDirection(desiredDirection);
     getConference().send(objectContainerDirection);
-
-
   }
 
 
