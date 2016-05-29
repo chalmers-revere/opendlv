@@ -56,7 +56,7 @@ void Relay::nextContainer(odcore::data::Container &a_container)
 {
   if (a_container.getDataType() == opendlv::proxy::RelayRequest::ID()) {
     opendlv::proxy::RelayRequest request = 
-    a_container.getData<opendlv::proxy::RelayRequest>();
+        a_container.getData<opendlv::proxy::RelayRequest>();
 
     std::string deviceId = request.getDeviceId();
 

@@ -37,7 +37,8 @@ std::shared_ptr<automotive::odcantools::CANDevice> canDevice)
     : automotive::odcantools::MessageToCANDataStore(canDevice),
     m_dataStoreMutex(),
     m_enabled(false),
-    m_overridden(false)
+    m_overridden(false),
+    m_overrideToggleStatus(true)
 {
 }
 
@@ -53,8 +54,14 @@ void CanMessageDataStore::add(odcore::data::Container const &a_container)
   if (container.getDataType() == opendlv::proxy::ControlState::ID()) {
     opendlv::proxy::ControlState controlState
         = container.getData<opendlv::proxy::ControlState>();
+    bool enabledPrevious = m_enabled;
 
     m_enabled = controlState.getIsAutonomous();
+
+    if (m_overridden && !m_enabled && enabledPrevious) {
+      m_overridden = false;
+      std::cout << "Reset override flag" << std::endl;
+    }
 
     std::cout << "Enable: " << m_enabled << std::endl;
 
@@ -65,7 +72,7 @@ void CanMessageDataStore::add(odcore::data::Container const &a_container)
 
     bool isOverridden = controlOverrideState.getIsOverridden();
     if (isOverridden) {
-      // When override is once set to true, cannot be unset.
+      // When override is once set to true, can only be reset when receiving certain ControlState
       m_overridden = true;
     }
 
