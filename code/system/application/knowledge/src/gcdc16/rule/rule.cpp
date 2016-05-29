@@ -587,7 +587,7 @@ void Rule::bodyIntersectionScenario()
 
 
   odcore::data::TimeStamp timestamp;
-  if (m_mostInterestingObject.getSize_ListOfSources() > 0) {
+  if (m_mostInterestingObject.getListOfProperties() > 0) {
 
     std::vector<std::string> properties = m_mostInterestingObject.getListOfProperties();
     if (properties.empty()) {
