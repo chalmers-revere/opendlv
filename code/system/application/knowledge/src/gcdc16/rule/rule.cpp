@@ -434,6 +434,8 @@ void Rule::bodyMergeScenario()
 {
   odcore::data::TimeStamp timestamp;
 
+  float timeHeadway = 0.9f;
+
   //opendlv::perception::ObjectDesiredAngularSize angularsize(0.075f, -1);
   //odcore::data::Container objectContainer0(angularsize);
   //getConference().send(objectContainer0);      
@@ -453,19 +455,20 @@ void Rule::bodyMergeScenario()
       //   std::cout << "qq " << qq << std::endl;
       // }
       std::cout << "ERROR: WHAT THE FML" << std::endl;
-      return;
-    }
-    std::vector<std::string> strVector = 
-        odcore::strings::StringToolbox::split(properties.at(0), ' ');
-
-    if (strVector.size() > 0 && strVector[0] == "Station") {
-      opendlv::knowledge::Insight mioOut(timestamp, "mioId=" + strVector[2]);
-      odcore::data::Container objectContainerMio(mioOut);
-      getConference().send(objectContainerMio);
     }
     else {
-      std::cout << "ERROR: mostInterestingObject had no station ID?..." << std::endl;
+      std::vector<std::string> strVector = 
+          odcore::strings::StringToolbox::split(properties.at(0), ' ');
 
+      if (strVector.size() > 2 && strVector[0] == "Station") {
+        opendlv::knowledge::Insight mioOut(timestamp, "mioId=" + strVector[2]);
+        odcore::data::Container objectContainerMio(mioOut);
+        getConference().send(objectContainerMio);
+      }
+      else {
+        std::cout << "ERROR: mostInterestingObject had no valid station ID?..." << std::endl;
+
+      }
     }
   }
 
@@ -476,6 +479,7 @@ void Rule::bodyMergeScenario()
   if (m_hasMerged) {
     m_isTail = "0";
   }
+
   opendlv::knowledge::Insight tailOut(timestamp, "isTail=" + m_isTail);
   odcore::data::Container objectContainer5(tailOut);
   getConference().send(objectContainer5);
@@ -502,11 +506,18 @@ void Rule::bodyMergeScenario()
         if (strVector.size() == 3) {
           std::stringstream sstr;
           sstr << strVector.at(2);
-          float vehicleLength;
-          sstr >> vehicleLength;
+          float vehicleLength = 5;
+          try {
+            sstr >> vehicleLength;
+          }
+          catch(...) {
+            // if we can't cast to float, set default to 5 meters
+            vehicleLength = 5;
+          }
 
+          // THIS ASSUMES THAT THE SECOND CLOSEST OBJECT EXISTS
           float gapSize = m_secondClosestObject.getDistance();
-          float gapLimit = 1.5f*(10 + 0.9f*m_speed) + vehicleLength;
+          float gapLimit = 1.5f*(10 + timeHeadway*m_speed) + vehicleLength;
           if (gapSize > gapLimit) {
             opendlv::knowledge::Insight stomInsight(timestamp, "safeToMerge=1");
             odcore::data::Container stomContainer(stomInsight);
@@ -527,21 +538,21 @@ void Rule::bodyMergeScenario()
 
     if (m_isLeader) {
       m_desiredAzimuth = 0.0f;
-      m_desiredAngularSize = 10 + 0.9f*m_speed;
+      m_desiredAngularSize = 10 + timeHeadway*m_speed;
       int16_t objectId = m_closestObject.getObjectId();
       opendlv::perception::ObjectDesiredAngularSize desiredAngularSize(m_desiredAngularSize, objectId);
       odcore::data::Container objectContainerDistance(desiredAngularSize);
       getConference().send(objectContainerDistance);
     } else if (m_isCreatingGap) {
       m_desiredAzimuth = m_secondClosestObject.getDirection().getAzimuth();
-      m_desiredAngularSize = 10 + 0.9f*m_speed;
+      m_desiredAngularSize = 10 + timeHeadway*m_speed;
       int16_t objectId = m_closestObject.getObjectId();
       opendlv::perception::ObjectDesiredAngularSize desiredAngularSize(m_desiredAngularSize, objectId);
       odcore::data::Container objectContainerDistance(desiredAngularSize);
       getConference().send(objectContainerDistance);
     } else {
       m_desiredAzimuth = m_mostInterestingObject.getDirection().getAzimuth();
-      m_desiredAngularSize = 10 + 0.9f*m_speed;
+      m_desiredAngularSize = 10 + timeHeadway*m_speed;
       int16_t objectId = m_mostInterestingObject.getObjectId();
       opendlv::perception::ObjectDesiredAngularSize desiredAngularSize(m_desiredAngularSize, objectId);
       odcore::data::Container objectContainerDistance(desiredAngularSize);
