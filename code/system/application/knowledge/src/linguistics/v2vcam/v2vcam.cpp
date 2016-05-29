@@ -486,7 +486,7 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
       m_properties.push_back("Vehicle length: " + std::to_string(vehicleLength));
       m_properties.push_back("Vehicle width: " + std::to_string(vehicleWidth));
       uint16_t m_objectId = -1;
-      std::cout << "Object send" << std::endl;
+      // std::cout << "Object send" << std::endl;
       opendlv::perception::Object detectedObject(now, m_type, m_typeConfidence, m_objectDirection, m_objectDirectionConfidence, m_objectDirectionRate, m_objectDirectionRateConfidence,
           m_distance, m_distanceConfidence, m_angularSize, m_angularSizeConfidence, m_angularSizeRate, m_angularSizeRateConfidence, m_confidence, m_sources, m_properties, m_objectId);
       odcore::data::Container objectContainer(detectedObject);
