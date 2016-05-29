@@ -91,6 +91,8 @@ void Act::nextContainer(odcore::data::Container &a_container)
     if(desiredAngularSize.getObjectId() >= 0) {
       m_targetObjectId = desiredAngularSize.getObjectId();
     }
+
+
   } 
 
   if(a_container.getDataType() == (opendlv::perception::Object::ID() + 300)) {
@@ -289,7 +291,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
     odcore::data::TimeStamp timeElapsed = now - m_timeSinceLastObjectDetection;
      double timeMemoryLimit = 5.0; // sec
 
-    if (timeElapsed.toMicroseconds()/1000000.0 > timeMemoryLimit)
+    if (timeElapsed.toMicroseconds()/1000000.0 > timeMemoryLimit
+      || m_targetObjectId == 5798) // Emergency spoof for interection scneario, secret handshake
     {
         distanceToObject = 1000.0;
     }

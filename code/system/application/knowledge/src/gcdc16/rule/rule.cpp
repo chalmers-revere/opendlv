@@ -585,65 +585,138 @@ void Rule::bodyIntersectionScenario()
   }
   */
 
-
   odcore::data::TimeStamp timestamp;
-  if (m_mostInterestingObject.getListOfProperties().size() > 0) {
 
-    std::vector<std::string> properties = m_mostInterestingObject.getListOfProperties();
-    if (properties.empty()) {
-      std::cout << "getSize_ListOfSources(): " << m_mostInterestingObject.getSize_ListOfSources() << std::endl;
-      // for (auto qq:properties) {
-      //   std::cout << "qq " << qq << std::endl;
-      // }
-      std::cout << "ERROR: WHAT THE FML" << std::endl;
-    }
-    else {
-      std::vector<std::string> strVector = 
-          odcore::strings::StringToolbox::split(properties.at(0), ' ');
 
-      if (strVector.size() > 2 && strVector[0] == "Station") {
-        opendlv::knowledge::Insight mioOut(timestamp, "mioId=" + strVector[2]);
-        odcore::data::Container objectContainerMio(mioOut);
-        getConference().send(objectContainerMio);
+  bool intersectionToLeft = true; // THIS MUST BE SET
+
+
+
+  if (intersectionToLeft) {
+
+    if (m_mostInterestingObject.getListOfProperties().size() > 0) {
+
+      std::vector<std::string> properties = m_mostInterestingObject.getListOfProperties();
+      if (properties.empty()) {
+        std::cout << "getSize_ListOfSources(): " << m_mostInterestingObject.getSize_ListOfSources() << std::endl;
+        // for (auto qq:properties) {
+        //   std::cout << "qq " << qq << std::endl;
+        // }
+        std::cout << "ERROR: WHAT THE FML" << std::endl;
       }
       else {
-        std::cout << "ERROR: mostInterestingObject had no valid station ID?..." << std::endl;
+        std::vector<std::string> strVector = 
+            odcore::strings::StringToolbox::split(properties.at(0), ' ');
+
+        if (strVector.size() > 2 && strVector[0] == "Station") {
+          opendlv::knowledge::Insight mioOut(timestamp, "mioId=" + strVector[2]);
+          odcore::data::Container objectContainerMio(mioOut);
+          getConference().send(objectContainerMio);
+        }
+        else {
+          std::cout << "ERROR: mostInterestingObject had no valid station ID?..." << std::endl;
+        }
       }
+
+      float mioBearing = m_mostInterestingObject.getDirection().getAzimuth();
+      float mioRangeRate = 100000.0f;
+      float mioRange = m_mostInterestingObject.getDistance();
+      float mioTimeHeadway = mioRange / static_cast<float>(m_speed);
+
+      opendlv::knowledge::Insight mioBearingInsight(timestamp, "mioBearing=" + std::to_string(mioBearing));
+      odcore::data::Container mioBearingContainer(mioBearingInsight);
+      getConference().send(mioBearingContainer);
+
+      opendlv::knowledge::Insight mioRangeInsight(timestamp, "mioRange=" + std::to_string(mioRange));
+      odcore::data::Container mioRangeContainer(mioRangeInsight);
+      getConference().send(mioRangeContainer);
+
+      opendlv::knowledge::Insight mioRangeRateInsight(timestamp, "mioRangeRate=" + std::to_string(mioRangeRate));
+      odcore::data::Container mioRangeRateContainer(mioRangeRateInsight);
+      getConference().send(mioRangeRateContainer);
+
+      opendlv::knowledge::Insight mioTimeHeadwayInsight(timestamp, "timeHeadway=" + std::to_string(mioTimeHeadway));
+      odcore::data::Container mioTimeHeadwayContainer(mioTimeHeadwayInsight);
+      getConference().send(mioTimeHeadwayContainer);
+
+
+      float euclideanDistance = 15;
+
+      opendlv::perception::ObjectDesiredAngularSize angularsize((euclideanDistance + 5), m_mostInterestingObject.getObjectId());
+      odcore::data::Container objectContainer0(angularsize);
+      getConference().send(objectContainer0); 
+
+      
     }
 
-    float mioBearing = m_mostInterestingObject.getDirection().getAzimuth();
-    float mioRangeRate = 100000.0f;
-    float mioRange = m_mostInterestingObject.getDistance();
-    float mioTimeHeadway = mioRange / static_cast<float>(m_speed);
-
-    opendlv::knowledge::Insight mioBearingInsight(timestamp, "mioBearing=" + std::to_string(mioBearing));
-    odcore::data::Container mioBearingContainer(mioBearingInsight);
-    getConference().send(mioBearingContainer);
-
-    opendlv::knowledge::Insight mioRangeInsight(timestamp, "mioRange=" + std::to_string(mioRange));
-    odcore::data::Container mioRangeContainer(mioRangeInsight);
-    getConference().send(mioRangeContainer);
-
-    opendlv::knowledge::Insight mioRangeRateInsight(timestamp, "mioRangeRate=" + std::to_string(mioRangeRate));
-    odcore::data::Container mioRangeRateContainer(mioRangeRateInsight);
-    getConference().send(mioRangeRateContainer);
-
-    opendlv::knowledge::Insight mioTimeHeadwayInsight(timestamp, "timeHeadway=" + std::to_string(mioTimeHeadway));
-    odcore::data::Container mioTimeHeadwayContainer(mioTimeHeadwayInsight);
-    getConference().send(mioTimeHeadwayContainer);
-
-
-    float euclideanDistance = 15;
-
-    opendlv::perception::ObjectDesiredAngularSize angularsize((euclideanDistance + 5), -1);
-    odcore::data::Container objectContainer0(angularsize);
-    getConference().send(objectContainer0); 
-
-    
   }
+  else { // if intersection is to the right
+
+    if (m_mostInterestingObject.getListOfProperties().size() > 0) {
+
+      std::vector<std::string> properties = m_mostInterestingObject.getListOfProperties();
+      if (properties.empty()) {
+        std::cout << "getSize_ListOfSources(): " << m_mostInterestingObject.getSize_ListOfSources() << std::endl;
+        // for (auto qq:properties) {
+        //   std::cout << "qq " << qq << std::endl;
+        // }
+        std::cout << "ERROR: WHAT THE FML" << std::endl;
+      }
+      else {
+        std::vector<std::string> strVector = 
+            odcore::strings::StringToolbox::split(properties.at(0), ' ');
+
+        if (strVector.size() > 2 && strVector[0] == "Station") {
+          opendlv::knowledge::Insight mioOut(timestamp, "mioId=" + strVector[2]);
+          odcore::data::Container objectContainerMio(mioOut);
+          getConference().send(objectContainerMio);
+        }
+        else {
+          std::cout << "ERROR: mostInterestingObject had no valid station ID?..." << std::endl;
+        }
+      }
+
+      float mioBearing = m_mostInterestingObject.getDirection().getAzimuth();
+      float mioRangeRate = 100000.0f;
+      float mioRange = m_mostInterestingObject.getDistance();
+      float mioTimeHeadway = mioRange / static_cast<float>(m_speed);
+
+      opendlv::knowledge::Insight mioBearingInsight(timestamp, "mioBearing=" + std::to_string(mioBearing));
+      odcore::data::Container mioBearingContainer(mioBearingInsight);
+      getConference().send(mioBearingContainer);
+
+      opendlv::knowledge::Insight mioRangeInsight(timestamp, "mioRange=" + std::to_string(mioRange));
+      odcore::data::Container mioRangeContainer(mioRangeInsight);
+      getConference().send(mioRangeContainer);
+
+      opendlv::knowledge::Insight mioRangeRateInsight(timestamp, "mioRangeRate=" + std::to_string(mioRangeRate));
+      odcore::data::Container mioRangeRateContainer(mioRangeRateInsight);
+      getConference().send(mioRangeRateContainer);
+
+      opendlv::knowledge::Insight mioTimeHeadwayInsight(timestamp, "timeHeadway=" + std::to_string(mioTimeHeadway));
+      odcore::data::Container mioTimeHeadwayContainer(mioTimeHeadwayInsight);
+      getConference().send(mioTimeHeadwayContainer);
 
 
 
+      if (mioBearing > 0.1f) { // ~ 5 degrees to left
+
+        // spoofing the hell out of act
+        opendlv::perception::ObjectDesiredAngularSize angularsize(20, 5798); // secret id with act.cpp
+        odcore::data::Container objectContainer0(angularsize);
+        getConference().send(objectContainer0); 
+      }
+      else {
+
+        // mio OCV vehicle is to the right, we should care about it
+        float euclideanDistance = 15;
+        opendlv::perception::ObjectDesiredAngularSize angularsize((euclideanDistance + 5), m_mostInterestingObject.getObjectId());
+        odcore::data::Container objectContainer0(angularsize);
+        getConference().send(objectContainer0); 
+      }
+      
+    }
+  }
 
 
 }
