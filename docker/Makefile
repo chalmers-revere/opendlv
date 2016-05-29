@@ -38,7 +38,7 @@ OPENDLV_HOST_PATH=$(shell dirname $(shell pwd))
 #
 # Watch example2: make watch-example2
 
-build-and-run-and-watch-example2: build-incremental run-example2 watch-example2
+build-and-run-gcdc-rule0: build-incremental run-gcdc-rule0 watch-gcdc-rule0
 
 docker-update-opendavinci:
 	docker pull $(shell awk '/^FROM/ { print $$2; exit }' Dockerfile)
@@ -60,7 +60,7 @@ build-incremental: create-builder
 	docker run --rm=true -ti -v $(OPENDLV_HOST_PATH):/opt/opendlv-sources $(REPOSITORY)/$(PRODUCT):$(VERSION) /build.sh INCREMENTAL
 
 
-
+# Example2:
 run-example2:
 	cd example2 && docker-compose up -d && cd ..
 
@@ -69,6 +69,20 @@ watch-example2:
 
 stop-example2:
 	cd example2 && docker-compose stop && cd ..
+
+
+# GCDC modules:
+run-gcdc-rule0:
+	cd gcdc-rule0 && docker-compose up -d && cd ..
+
+watch-gcdc-rule0:
+	cd gcdc-rule0 && watch -n1 docker-compose ps && cd ..
+
+stop-gcdc-rule0:
+	cd gcdc-rule0 && docker-compose stop && cd ..
+
+remove-containers-gcdc-rule0:
+	cd gcdc-rule0 && docker-compose rm -f && cd ..
 
 
 
