@@ -570,7 +570,7 @@ void V2vIclcm::nextContainer(odcore::data::Container &a_c)
 void V2vIclcm::SendInsight(std::string const &a_msg){
   odcore::data::TimeStamp now;
   opendlv::knowledge::Insight insight(now,a_msg);
-  odcore::data::Container c(insight);
+  odcore::data::Container c(insight, opendlv::knowledge::Insight::ID()+300 );
   getConference().send(c);
 }
 
