@@ -51,7 +51,7 @@ clean: docker-cleanup-exited-containers
 
 create-builder:
 	cd builder && docker build -f Dockerfile -t $(REPOSITORY)/$(PRODUCT):$(VERSION) . | tee $(BUILDLOG) || exit 1
-	docker images | grep $$(tail -1 builder/$(BUILDLOG) | cut -f3 -d" ") | grep "latest" && exit 0 || docker tag $(shell tail -1 builder/$(BUILDLOG) | cut -f3 -d" ") $(REPOSITORY)/$(PRODUCT):latest
+	docker images | grep $$(tail -1 builder/$(BUILDLOG) | cut -f3 -d" ") | grep "latest" && exit 0 || docker tag -f $(shell tail -1 builder/$(BUILDLOG) | cut -f3 -d" ") $(REPOSITORY)/$(PRODUCT):latest
 
 build-fresh: create-builder
 	docker run --rm=true -ti -v $(OPENDLV_HOST_PATH):/opt/opendlv-sources $(REPOSITORY)/$(PRODUCT):$(VERSION) /build.sh FRESH
@@ -68,7 +68,7 @@ watch-example2:
 	cd example2 && watch -n1 docker-compose ps && cd ..
 
 stop-example2:
-	cd example2 && docker-compose stop && cd ..
+	cd example2 && docker-compose stop && docker-compose rm -f && cd ..
 
 
 # GCDC modules:
@@ -79,10 +79,7 @@ watch-gcdc-rule0:
 	cd gcdc-rule0 && watch -n1 docker-compose ps && cd ..
 
 stop-gcdc-rule0:
-	cd gcdc-rule0 && docker-compose stop && cd ..
-
-remove-containers-gcdc-rule0:
-	cd gcdc-rule0 && docker-compose rm -f && cd ..
+	cd gcdc-rule0 && docker-compose stop && docker-compose rm -f && cd ..
 
 
 
