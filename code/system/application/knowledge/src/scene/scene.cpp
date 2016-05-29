@@ -108,7 +108,7 @@ void Scene::nextContainer(odcore::data::Container &a_container)
 
 
       TimeCheck();
-      bool objectExists =false;
+      bool objectExists = false;
       for (uint32_t i = 0; i < m_savedObjects.size(); i++) {
         //std::cout << "Debug0: " << std::endl;
 
@@ -303,7 +303,27 @@ double Scene::PointDistance(float a_angle1, double a_dist1, float a_angle2, doub
 
 void Scene::MergeObjects(opendlv::perception::Object a_object, uint32_t a_index) //TODO: Check angular size to get rate, direction for direction rate
 {
+  if (a_index < 0 || a_index >= m_savedObjects.size()) {
+    // the index is not valid...
+    std::cout << "ERROR: index sent into MergeObjects() was not valid: " << a_index << std::endl;
+    return;
+  }
+
   m_savedObjects[a_index].setIdentified(a_object.getIdentified()); //Sets the saved objects timestamp to the new timestamp
+
+  // if both objects have station IDs, and the station IDs are different, should NOT MERGE!!!
+  std::vector<std::string> props1 = a_object.getListOfProperties();
+  std::vector<std::string> props2 = m_savedObjects[a_index].getListOfProperties();
+  if (props1.size() > 0 props2.size()) {
+    // both have properties
+
+    // TODO we assume that station ID is always the first property....
+    if (props1.at(0) != props2.at(0)) {
+      // So, both vehicles had a station ID, and they were not the same.
+      // We should therefore NOT merge the objects...
+      return;
+    }
+  }
 
 
   m_savedObjects[a_index].setDirection(a_object.getDirection());
