@@ -453,19 +453,20 @@ void Rule::bodyMergeScenario()
       //   std::cout << "qq " << qq << std::endl;
       // }
       std::cout << "ERROR: WHAT THE FML" << std::endl;
-      return;
-    }
-    std::vector<std::string> strVector = 
-        odcore::strings::StringToolbox::split(properties.at(0), ' ');
-
-    if (strVector.size() > 0 && strVector[0] == "Station") {
-      opendlv::knowledge::Insight mioOut(timestamp, "mioId=" + strVector[2]);
-      odcore::data::Container objectContainerMio(mioOut);
-      getConference().send(objectContainerMio);
     }
     else {
-      std::cout << "ERROR: mostInterestingObject had no station ID?..." << std::endl;
+      std::vector<std::string> strVector = 
+          odcore::strings::StringToolbox::split(properties.at(0), ' ');
 
+      if (strVector.size() > 2 && strVector[0] == "Station") {
+        opendlv::knowledge::Insight mioOut(timestamp, "mioId=" + strVector[2]);
+        odcore::data::Container objectContainerMio(mioOut);
+        getConference().send(objectContainerMio);
+      }
+      else {
+        std::cout << "ERROR: mostInterestingObject had no valid station ID?..." << std::endl;
+
+      }
     }
   }
 
@@ -476,6 +477,7 @@ void Rule::bodyMergeScenario()
   if (m_hasMerged) {
     m_isTail = "0";
   }
+  
   opendlv::knowledge::Insight tailOut(timestamp, "isTail=" + m_isTail);
   odcore::data::Container objectContainer5(tailOut);
   getConference().send(objectContainer5);
