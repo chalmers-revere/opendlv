@@ -321,113 +321,7 @@ void Rule::receivedContainerMergeScenario(odcore::data::Container &a_container)
 
     }
 
-/*
-  if (a_container.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
-    auto propulsion = a_container.getData<opendlv::proxy::reverefh16::Propulsion>();
-    double speedKph = propulsion.getPropulsionShaftVehicleSpeed();
-    m_speed = speedKph / 3.6;
   }
-
-
-  if (a_container.getDataType() == (opendlv::perception::Object::ID() + 300)) {
-    opendlv::perception::Object unpackedObject =
-    a_container.getData<opendlv::perception::Object>();
-
-    int16_t id = unpackedObject.getObjectId();
-
-    if (id == -1) {
-      return;
-    }
-
-    opendlv::model::Direction direction = unpackedObject.getDirection();
-    float azimuth = direction.getAzimuth();
-
-    if (std::abs(azimuth) < 0.22f) { //TODO: mio front left or front right
-      if (m_object == nullptr) {
-        m_object.reset(new opendlv::perception::Object(unpackedObject));
-      } else {
-        if (unpackedObject.getDistance() < m_object->getDistance())
-          m_object.reset(new opendlv::perception::Object(unpackedObject));
-      }
-    }*/
-
-      
- 
-
-
-    //m_desiredAzimuth = m_object->getDirection().getAzimuth();
-    //opendlv::model::Direction objectDirection(m_desiredAzimuth, 0.0f);
-    //opendlv::sensation::DesiredDirectionOfMovement desiredDirection(objectDirection);
-    //odcore::data::Container objectContainer(desiredDirection);
-    //getConference().send(objectContainer);
-
-  }
-}
-
-void Rule::receivedContainerIntersectionScenario(odcore::data::Container &a_container)
-{
-  std::cout << "receivedContainerIntersectionScenario" << std::endl;
-
-  odcore::data::TimeStamp timestamp;
-
-  if (a_container.getDataType() == opendlv::perception::Environment::ID()) {
-    std::cout << "received environment object" << std::endl;
-    opendlv::perception::Environment receivedEnvironment =
-        a_container.getData<opendlv::perception::Environment>();
-
-    std::vector<opendlv::perception::Object> objects = receivedEnvironment.getListOfObjects();
-
-    if (objects.size() < 1) {
-      std::cout << "ERROR: rule.cpp only received info about " << objects.size() << " objects..." << std::endl;
-    } else {
-      return;
-    }
-
-    float closestDistance = 99999;
-    opendlv::perception::Object* closestObject = 0;
-
-    for (uint32_t i=0; i<objects.size(); i++) {
-      opendlv::perception::Object object = objects.at(i);
-      std::vector<std::string> properties = object.getListOfProperties();
-
-      if (properties.size() > 1) { 
-        std::vector<std::string> strVector = 
-            odcore::strings::StringToolbox::split(properties.at(0), ' ');
-        if (strVector.size() == 3 && strVector.at(0) == "Station") {
-          std::stringstream sstr;
-          sstr << strVector.at(2);
-          int stationId;
-          sstr >> stationId;
-          float distanceToObject = object.getDistance();
-
-          if (stationId < 100 && distanceToObject < closestDistance) {
-            closestDistance = distanceToObject;
-            closestObject = &object; 
-          }
-        }
-      }
-    }
-
-    if (closestObject != 0) {
-      // We have found a closest object with stationID smaller than 100
-      m_intersection_mostInterestingObject = closestObject;
-
-    }
-  }
-
-  if (a_container.getDataType() == (opendlv::knowledge::Insight::ID() + 300)) {
-    opendlv::knowledge::Insight insight = a_container.getData<opendlv::knowledge::Insight>();
-    std::string whatInsight = insight.getInsight();
-
-
-    if (whatInsight == "scenarioReady") {
-      opendlv::sensation::DesiredOpticalFlow desired(30/3.6f);
-      odcore::data::Container objectContainerDesiredOpticalFlow(desired);
-      getConference().send(objectContainerDesiredOpticalFlow);
-
-    }
-  }
-
 }
 
 void Rule::bodyMergeScenario()
@@ -590,6 +484,80 @@ void Rule::bodyMergeScenario()
 
 
 }
+
+void Rule::receivedContainerIntersectionScenario(odcore::data::Container &a_container)
+{
+  std::cout << "receivedContainerIntersectionScenario" << std::endl;
+
+  odcore::data::TimeStamp timestamp;
+
+  if (a_container.getDataType() == opendlv::perception::Environment::ID()) {
+    std::cout << "received environment object" << std::endl;
+    opendlv::perception::Environment receivedEnvironment =
+        a_container.getData<opendlv::perception::Environment>();
+
+    std::vector<opendlv::perception::Object> objects = receivedEnvironment.getListOfObjects();
+
+    if (objects.size() < 1) {
+      std::cout << "ERROR: rule.cpp only received info about " << objects.size() << " objects..." << std::endl;
+    } else {
+      return;
+    }
+
+    float closestDistance = 99999;
+    opendlv::perception::Object* closestObject = 0;
+
+    for (uint32_t i=0; i<objects.size(); i++) {
+      opendlv::perception::Object object = objects.at(i);
+      std::vector<std::string> properties = object.getListOfProperties();
+
+      if (properties.size() > 1) { 
+        std::vector<std::string> strVector = 
+            odcore::strings::StringToolbox::split(properties.at(0), ' ');
+        if (strVector.size() == 3 && strVector.at(0) == "Station") {
+          std::stringstream sstr;
+          sstr << strVector.at(2);
+
+          try {
+            int stationId;
+            sstr >> stationId;
+            float distanceToObject = object.getDistance();
+
+            if (stationId < 100 && distanceToObject < closestDistance) {
+              closestDistance = distanceToObject;
+              closestObject = &object; 
+            }
+          }
+          catch(...) {
+            // well, we didn't manage to cast to int... so don't do anything
+            std::cout << "ERROR: failed to cast stationID to int" << std::endl;
+          }
+        }
+      }
+    }
+
+    if (closestObject != 0) {
+      // We have found a closest object with stationID smaller than 100
+      m_intersection_mostInterestingObject = closestObject;
+
+    }
+  }
+
+  if (a_container.getDataType() == (opendlv::knowledge::Insight::ID() + 300)) {
+    opendlv::knowledge::Insight insight = a_container.getData<opendlv::knowledge::Insight>();
+    std::string whatInsight = insight.getInsight();
+
+
+    if (whatInsight == "scenarioReady") {
+      opendlv::sensation::DesiredOpticalFlow desired(30/3.6f);
+      odcore::data::Container objectContainerDesiredOpticalFlow(desired);
+      getConference().send(objectContainerDesiredOpticalFlow);
+
+    }
+  }
+
+}
+
 
 void Rule::bodyIntersectionScenario()
 {
