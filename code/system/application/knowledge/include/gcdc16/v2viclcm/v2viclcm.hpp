@@ -52,6 +52,7 @@ class V2vIclcm
   void setUp();
   void tearDown();
   void ReadInsight(opendlv::knowledge::Insight &);
+  void SendInsight(std::string const &);
   void ReadVoice(opendlv::sensation::Voice &);
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
