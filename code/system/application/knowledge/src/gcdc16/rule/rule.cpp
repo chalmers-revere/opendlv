@@ -162,11 +162,11 @@ void Rule::receivedContainerMergeScenario(odcore::data::Container &a_container)
     opendlv::perception::Environment receivedEnvironment =
         a_container.getData<opendlv::perception::Environment>();
 
+
     std::vector<opendlv::perception::Object> objects = receivedEnvironment.getListOfObjects();
 
     if (objects.size() < 2) {
       std::cout << "ERROR: rule.cpp only received info about " << objects.size() << " objects..." << std::endl;
-    } else {
       return;
     }
 
@@ -270,12 +270,15 @@ void Rule::receivedContainerMergeScenario(odcore::data::Container &a_container)
         } else {
           strVector = odcore::strings::StringToolbox::split(properties.at(0), ' ');
 
-          if (!strVector.empty()) {
+          if (strVector.size() > 2) {
             opendlv::knowledge::Insight forwardIdInsight(timestamp, "forwardId=" + strVector.at(2));
             odcore::data::Container objectContainerForwardId(forwardIdInsight);
             getConference().send(objectContainerForwardId);
           }
-        }              
+          else {
+            std::cout << "ERROR: closestObject had no valid station ID?..." << std::endl;
+          }
+        }
       }
 
       if (whatInsight == "createDistance" && m_platoonId == "2") {
@@ -294,10 +297,13 @@ void Rule::receivedContainerMergeScenario(odcore::data::Container &a_container)
         } else {
           strVector = odcore::strings::StringToolbox::split(properties.at(0), ' ');
 
-          if (!strVector.empty()) {
+          if (strVector.size() > 2) {
             opendlv::knowledge::Insight forwardIdInsight(timestamp, "forwardId=" + strVector.at(2));
             odcore::data::Container objectContainerForwardId(forwardIdInsight);
             getConference().send(objectContainerForwardId);
+          }
+          else {
+            std::cout << "ERROR: closestObject had no valid station ID?..." << std::endl;
           }
         }
       }
@@ -365,7 +371,6 @@ void Rule::bodyMergeScenario()
       }
       else {
         std::cout << "ERROR: mostInterestingObject had no valid station ID?..." << std::endl;
-
       }
     }
   }
