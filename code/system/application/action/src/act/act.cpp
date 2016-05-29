@@ -301,6 +301,18 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
     float distanceCorrectionFactor = 3.0f;
     float releasePedalFactor = 3.0f;
 
+    // this actually override the butto to activate the autonomous mode
+    // use this only for test purposes
+    {
+    bool m_started = true;
+    m_desiredSpeed = 30/3.6;
+    if (m_started)
+    {
+    opendlv::proxy::ControlState cs(m_started);
+    odcore::data::Container c(cs);
+    getConference().send(c);
+    }
+    }
 
     float speedCorrection = 0;
 
