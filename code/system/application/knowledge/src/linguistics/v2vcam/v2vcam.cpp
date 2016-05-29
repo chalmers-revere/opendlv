@@ -252,9 +252,13 @@ void V2vCam::nextContainer(odcore::data::Container &a_c)
       ReadDynamicState(dynamicState);
     }
   } else if(a_c.getDataType() == opendlv::sensation::Voice::ID()) {
-
-    opendlv::sensation::Voice voice = a_c.getData<opendlv::sensation::Voice>();
-    ReadVoice(voice);
+      static int counter = 0;
+      counter++;
+      if (counter > 10) {
+        opendlv::sensation::Voice voice = a_c.getData<opendlv::sensation::Voice>();
+        ReadVoice(voice);
+        counter = 0;
+      }
   }
 }
 
