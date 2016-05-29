@@ -1,4 +1,5 @@
 build
+build.from.docker
 install
 *.swp
 *.swo

@@ -15,48 +15,63 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-# COMMAND FOR BUILDING INSIDE IMAGE:
-# docker run --name build_container \
-# 			-v $(OPENDLV_HOST_PATH):/opt/data \
-# 			-w /opt/data \
-# 			-e "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:"$(OPENDAVINCI_PATH)"/bin" \
-# 			-e "LD_LIBRARY_PATH="$(OPENDAVINCI_PATH)"/lib" \
-# 			-it $(REPOSITORY)/$(PRODUCT):latest \
-# 			sh -c "mkdir -p build && cd build && cmake -D CMAKE_INSTALL_PREFIX="$(OPENDLV_PATH)" -D OPENDAVINCI_DIR="$(OPENDAVINCI_PATH)" .. && make clean && make"
-
 PRODUCT=opendlv
 GITVERSION=$(shell git describe --abbrev=0 --tags | head -n1)
 GITHASH=$(shell git rev-parse --short HEAD)
 GITUNCOMMITTEDCHANGES=$(shell if [ "`git ls-files -m ..`" != "" ]; then echo "-modified"; else echo ""; fi)
 VERSION="$(GITVERSION)-$(GITHASH)$(GITUNCOMMITTEDCHANGES)"
 REPOSITORY=chalmersrevere
-DOCKER_BUILD_NAME=build_container
 BUILDLOG=build.log
 OPENDLV_HOST_PATH=$(shell dirname $(shell pwd))
 
-all: docker-update-image build/Makefile
+# Workflow:
+#
+# Once or after change to OpenDaVINCI: make docker-update-opendavinci
+#
+# Initial build: make build-fresh
+#
+# Incremental building: make build-incremental
+#
+# Run example2: make run-example2
+#
+# Stop example2: make stop-example2
+#
+# Watch example2: make watch-example2
 
-build/Makefile:
-	cd .. && docker build -f docker/Dockerfile -t $(REPOSITORY)/$(PRODUCT):$(VERSION) . | tee docker/$(BUILDLOG) || exit 1
+build-and-run-and-watch-example2: build-incremental run-example2 watch-example2
 
-clean:
-	rm -f $(BUILDLOG)
-	rm -fr ../build-docker
+docker-update-opendavinci:
+	docker pull $(shell awk '/^FROM/ { print $$2; exit }' Dockerfile)
+
+docker-cleanup-exited-containers:
+	docker rm $$(docker ps -a -q)
+
+clean: docker-cleanup-exited-containers
+	cd builder && rm -f $(BUILDLOG) && cd ..
+
+create-builder:
+	cd builder && docker build -f Dockerfile -t $(REPOSITORY)/$(PRODUCT):$(VERSION) . | tee $(BUILDLOG) || exit 1
+	docker images | grep $$(tail -1 builder/$(BUILDLOG) | cut -f3 -d" ") | grep "latest" && exit 0 || docker tag $(shell tail -1 builder/$(BUILDLOG) | cut -f3 -d" ") $(REPOSITORY)/$(PRODUCT):latest
+
+build-fresh: create-builder
+	docker run --rm=true -ti -v $(OPENDLV_HOST_PATH):/opt/opendlv-sources $(REPOSITORY)/$(PRODUCT):$(VERSION) /build.sh FRESH
+
+build-incremental: create-builder
+	docker run --rm=true -ti -v $(OPENDLV_HOST_PATH):/opt/opendlv-sources $(REPOSITORY)/$(PRODUCT):$(VERSION) /build.sh INCREMENTAL
+
+
+
+run-example2:
+	cd example2 && docker-compose up -d && cd ..
+
+watch-example2:
+	cd example2 && watch -n1 docker-compose ps && cd ..
+
+stop-example2:
+	cd example2 && docker-compose stop && cd ..
+
+
 
 docker-push: docker-tag-latest
 	docker push $(REPOSITORY)/$(PRODUCT):latest
 
-docker-update-image:
-	docker pull $(shell awk '/^FROM/ { print $$2; exit }' Dockerfile)
-
-docker-tag-latest:
-	docker tag $(shell tail -1 $(BUILDLOG) | cut -f3 -d" ") $(REPOSITORY)/$(PRODUCT):latest
-
-docker-cleanup:
-	docker rm $$(docker ps -a -q)
-
-run-example1: docker-tag-latest
-	cd example1 && docker-compose up
-
-run-all: docker-tag-latest
-	cd run && docker-compose up -d
