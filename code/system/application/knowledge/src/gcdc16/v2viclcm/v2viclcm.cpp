@@ -448,7 +448,7 @@ void V2vIclcm::ReadVoice(opendlv::sensation::Voice &a_message){
   }
   if(m_scenario == "mergeScenario" && m_hasMerged == false){
     if ((startPlatoon == 0 && m_platoonId == 1) || (startPlatoon == 1 && m_platoonId == 2) ) {
-      SendInsight("scenarioEnd");
+      SendInsight("scenarioReady");
       std::cout << "Got startPlatoon flag from " << stationId << std::endl;
     }
     if(lane == 1){
