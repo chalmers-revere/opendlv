@@ -420,8 +420,8 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
 
       double m_xOffset = currentObjectCartesianLocation.getY();
       double m_yOffset = -currentObjectCartesianLocation.getX();
-      std::cout << "x: "<< m_xOffset << std::endl;
-      std::cout << "y: "<< m_yOffset << std::endl;
+      // std::cout << "x: "<< m_xOffset << std::endl;
+      // std::cout << "y: "<< m_yOffset << std::endl;
       float m_azimuth;
 
       if (std::fabs(m_yOffset) < 0.001){
@@ -447,7 +447,7 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
         }
       }
       m_azimuth = m_azimuth - static_cast<float> (m_heading);
-      std::cout << "m_azimuth: " << m_azimuth << std::endl;
+      // std::cout << "m_azimuth: " << m_azimuth << std::endl;
 
       double rearX = m_xOffset - (vehicleLength / 10.0);
       double leftRearY = m_yOffset + (vehicleWidth / 20.0);
@@ -486,7 +486,7 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
       m_properties.push_back("Vehicle length: " + std::to_string(vehicleLength));
       m_properties.push_back("Vehicle width: " + std::to_string(vehicleWidth));
       uint16_t m_objectId = -1;
-      std::cout << "Object send" << std::endl;
+      // std::cout << "Object send" << std::endl;
       opendlv::perception::Object detectedObject(now, m_type, m_typeConfidence, m_objectDirection, m_objectDirectionConfidence, m_objectDirectionRate, m_objectDirectionRateConfidence,
           m_distance, m_distanceConfidence, m_angularSize, m_angularSizeConfidence, m_angularSizeRate, m_angularSizeRateConfidence, m_confidence, m_sources, m_properties, m_objectId);
       odcore::data::Container objectContainer(detectedObject);

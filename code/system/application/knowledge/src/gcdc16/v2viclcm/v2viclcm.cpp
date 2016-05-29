@@ -447,8 +447,8 @@ void V2vIclcm::ReadVoice(opendlv::sensation::Voice &a_message){
     }
   }
   if(m_scenario == "mergeScenario" && m_hasMerged == false){
-    if ((startPlatoon == 0 && m_platoonId == 1) || (startPlatoon == 1 && m_platoonId == 2) ) {
-      SendInsight("scenarioEnd");
+    if ((stationId < 100) &&( (startPlatoon == 0 && m_platoonId == 1) || (startPlatoon == 1 && m_platoonId == 2))) {
+      SendInsight("scenarioReady");
       std::cout << "Got startPlatoon flag from " << stationId << std::endl;
     }
     if(lane == 1){
@@ -570,7 +570,7 @@ void V2vIclcm::nextContainer(odcore::data::Container &a_c)
 void V2vIclcm::SendInsight(std::string const &a_msg){
   odcore::data::TimeStamp now;
   opendlv::knowledge::Insight insight(now,a_msg);
-  odcore::data::Container c(insight);
+  odcore::data::Container c(insight, opendlv::knowledge::Insight::ID()+300 );
   getConference().send(c);
 }
 
