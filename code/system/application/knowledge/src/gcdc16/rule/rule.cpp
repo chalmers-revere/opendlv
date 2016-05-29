@@ -189,7 +189,7 @@ void Rule::receivedContainerMergeScenario(odcore::data::Container &a_container)
       std::vector<std::string> strVector = 
           odcore::strings::StringToolbox::split(properties.at(0), ' ');
       if (azimuth > -pi/2.0f && azimuth < pi/2.0f && !strVector.empty() && strVector.at(0) == "Station") {
-        // Object is in front of us and ha station ID
+        // Object is in front of us and has a station ID
 
         if (distance < closestDistance) {
           secondClosestDistance = closestDistance;
@@ -204,6 +204,9 @@ void Rule::receivedContainerMergeScenario(odcore::data::Container &a_container)
           secondClosestObject = currentObject;
           foundSomething = true;
         }
+      }
+      else if (!strVector.empty() && strVector.at(0) == "Station") {
+        std::cout << "Found vehicle WITH stationID (" << properties.at(0)  << ") that is NOT in front of us." << std::endl;
       }
     }
 
