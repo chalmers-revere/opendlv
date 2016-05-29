@@ -166,7 +166,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
     odcore::data::Container c(nextMessage);
     getConference().send(c);
 
-    m_sendLog << std::setprecision(15) << std::to_string(GenerateGenerationTime()) +
+    m_sendLog << std::setprecision(15) 
+        << std::to_string(GenerateGenerationTime()) +
         + "," + std::to_string(GetMessageId()) +
         + "," + std::to_string(GetStationId()) +
         + "," + std::to_string(GenerateGenerationDeltaTime()) +
@@ -223,7 +224,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
       output += "Yaw rate confidence: " 
           + std::to_string(GetYawRateConfidence()) + "\n";
       output += "Vehicle role: " + std::to_string(GetVehicleRole()) + "\n";
-      std::cout << output;
+      // std::cout << output;
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
@@ -238,8 +239,7 @@ void V2vCam::nextContainer(odcore::data::Container &a_c)
     opendlv::knowledge::Insight insight = 
         a_c.getData<opendlv::knowledge::Insight>();
     ReadInsight(insight);
-  }
-  else if (a_c.getDataType() == opendlv::sensation::Geolocation::ID()) {
+  } else if (a_c.getDataType() == opendlv::sensation::Geolocation::ID()) {
     opendlv::sensation::Geolocation geolocation = 
         a_c.getData<opendlv::sensation::Geolocation>();
     ReadGeolocation(geolocation);
@@ -261,7 +261,8 @@ void V2vCam::nextContainer(odcore::data::Container &a_c)
 void V2vCam::ReadInsight(opendlv::knowledge::Insight const &a_insight)
 {
   std::string str = a_insight.getInsight();
-  std::vector<std::string> information = odcore::strings::StringToolbox::split(str,'=');
+  std::vector<std::string> information = 
+      odcore::strings::StringToolbox::split(str,'=');
   if(information.size() > 0){
     if (information[0] == "stationId") {
       m_stationId = std::stoi(information[1]);
@@ -372,10 +373,11 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
     output += "Yaw rate confidence: " 
         + std::to_string(yawRateConfidence) + "\n";
     output += "Vehicle role: " + std::to_string(vehicleRole) + "\n";
-    // std::cout << output;
+    std::cout << output;
 
-    m_receiveLog <<  std::setprecision(15) << std::to_string(GenerateGenerationTime()) +  
-        + "+" + std::to_string(messageId) +
+    m_receiveLog <<  std::setprecision(15) 
+        << std::to_string(GenerateGenerationTime()) +  
+        + "," + std::to_string(messageId) +
         + "," + std::to_string(stationId) +
         + "," + std::to_string(generationDeltaTime) +
         + "," + std::to_string(containerMask) +
@@ -397,7 +399,7 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
         + "," + std::to_string(yawRateValue) +
         + "," + std::to_string(yawRateConfidence) +
         + "," + std::to_string(vehicleRole);
-        m_receiveLog << std::endl; 
+    m_receiveLog << std::endl; 
 
     if(latitude != 900000001 && longitude != 1800000001) { //Dont make object if position is unavailable
       //This is where the objects are constructed which are to be sent out
@@ -416,8 +418,9 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
       opendlv::data::environment::Point3 currentObjectCartesianLocation =
           gpsReference.transform(currentLocation);
 
-      double m_xOffset = currentObjectCartesianLocation.getX();
-      double m_yOffset = currentObjectCartesianLocation.getY();
+      double m_xOffset = currentObjectCartesianLocation.getY();
+      double m_yOffset = -currentObjectCartesianLocation.getX();
+      
       float m_azimuth;
 
       if (std::fabs(m_yOffset) < 0.001){
@@ -481,7 +484,7 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
       m_properties.push_back("Vehicle length: " + std::to_string(vehicleLength));
       m_properties.push_back("Vehicle width: " + std::to_string(vehicleWidth));
       uint16_t m_objectId = -1;
-      
+      std::cout << "Object send" << std::endl;
       opendlv::perception::Object detectedObject(now, m_type, m_typeConfidence, m_objectDirection, m_objectDirectionConfidence, m_objectDirectionRate, m_objectDirectionRateConfidence,
           m_distance, m_distanceConfidence, m_angularSize, m_angularSizeConfidence, m_angularSizeRate, m_angularSizeRateConfidence, m_confidence, m_sources, m_properties, m_objectId);
       odcore::data::Container objectContainer(detectedObject);
@@ -507,20 +510,6 @@ void V2vCam::SendWGS84Coordinate()
 
 void V2vCam::setUp()
 {
-  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
-
-  // std::string const type = kv.getValue<std::string>("proxy-v2v.type");
-  
-  // m_stationId = kv.getValue<int32_t>("knowledge-linguistics-v2vcam.stationId");
-  // m_stationType = 
-  //     kv.getValue<int32_t>("knowledge-linguistics-v2vcam.stationType");
-  // m_vehicleLength = 
-  //     kv.getValue<double>("knowledge-linguistics-v2vcam.vehicleLength");
-  // m_vehicleWidth = 
-  //     kv.getValue<double>("knowledge-linguistics-v2vcam.vehicleWidth");
-  // m_vehicleRole = 
-  //     kv.getValue<int32_t>("knowledge-linguistics-v2vcam.vehicleRole");
-  
 }
 
 void V2vCam::tearDown()
@@ -551,12 +540,6 @@ uint64_t V2vCam::GenerateGenerationTime() const
 
 int32_t V2vCam::GenerateGenerationDeltaTime()
 {
-  // std::chrono::system_clock::time_point start2004TimePoint = 
-  //     std::chrono::system_clock::from_time_t(m_timeType2004);
-  // unsigned long millisecondsSince2004Epoch =
-  //     std::chrono::system_clock::now().time_since_epoch() /
-  //     std::chrono::milliseconds(1) 
-  //     - start2004TimePoint.time_since_epoch() / std::chrono::milliseconds(1);
   m_generationDeltaTime = GenerateGenerationTime()%65536;
   return m_generationDeltaTime;
 }
@@ -662,7 +645,7 @@ int32_t V2vCam::GetHeading() const
   int32_t scale = std::pow(10,1);
   double val = m_heading*scale*conversion;
   if(val < 0 || val > 3600 || std::isnan(val)){
-    return 3601;
+    return 0;
   }
   else {
     return static_cast<int32_t>(std::round(val));

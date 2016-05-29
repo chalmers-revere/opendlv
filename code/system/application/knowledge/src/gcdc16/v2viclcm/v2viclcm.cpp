@@ -135,9 +135,10 @@ V2vIclcm::~V2vIclcm()
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vIclcm::body()
 {  
-  
+  uint8_t counter = 0;
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
       odcore::data::dmcp::ModuleStateMessage::RUNNING){
+    counter = (counter+1)%25;
     std::shared_ptr<opendlv::Buffer> outBuffer(new opendlv::Buffer());
   
     outBuffer->Reversed();
@@ -220,13 +221,12 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vIclcm::body()
     output += "Distance travelled cz: " + std::to_string(m_distanceTravelledCz) + "\n";
     output += "Intention: " + std::to_string(m_intention) + "\n";
     output += "Counter: " + std::to_string(m_counter) + "\n";
-
-    std::cout << output << std::endl;
+    if(counter == 1){
+      std::cout << output << std::endl;
+    }
     odcore::data::TimeStamp now;
     if(m_flagHead == 1){
-      opendlv::knowledge::Insight eventIsLeader(now,"isLeader");
-      odcore::data::Container containerIsLeader(eventIsLeader, opendlv::knowledge::Insight::ID() + 300);
-      getConference().send(containerIsLeader);
+      SendInsight("isLeader");
     }
     if(m_flag == 1){
       m_counterMerge++;
@@ -429,49 +429,43 @@ void V2vIclcm::ReadVoice(opendlv::sensation::Voice &a_message){
   // if((stationId < 100)){
   //   std::cout << output << std::endl;
   // }
-  odcore::data::TimeStamp now;
   if(stationId < 100){
-    opendlv::knowledge::Insight platoonCruiseSpeed(now,"cruiseSpeed="+std::to_string(cruiseSpeed/100.0));
-    odcore::data::Container containerCruiseSpeed(platoonCruiseSpeed, opendlv::knowledge::Insight::ID() + 300);
-    getConference().send(containerCruiseSpeed);
-  
+    SendInsight("cruiseSpeed="+std::to_string(cruiseSpeed/100.0));
     if (participantsReady == 1){
       std::cout<< "Got participantsReady flag from "<< stationId << std::endl;
     }
-    if (startPlatoon == 1) {
-      std::cout << "Got startPlatoon flag from " << stationId << std::endl;
-      opendlv::knowledge::Insight eventScenarioStart(now,"scenarioReady");
-      odcore::data::Container containerScenarioStart(eventScenarioStart, opendlv::knowledge::Insight::ID() + 300);
-      getConference().send(containerScenarioStart);
-    }
+  
 
     if (mergeRequest == 1) {
+      SendInsight("mergeRequest");
       std::cout<< "Got mergeRequest flag from "<< stationId << std::endl;
-      opendlv::knowledge::Insight eventMergeReq(now,"mergeRequest");
-      odcore::data::Container containerMergeReq(eventMergeReq, opendlv::knowledge::Insight::ID() + 300);
-      getConference().send(containerMergeReq);
     }
 
     if (endOfScenario == 1) {
+      SendInsight("scenarioEnd");
       std::cout << "Got end of scenario message from " << stationId << std::endl;
-      opendlv::knowledge::Insight eventScenarioEnd(now,"scenarioEnd");
-      odcore::data::Container containerScenarioEnd(eventScenarioEnd, opendlv::knowledge::Insight::ID() + 300);
-      getConference().send(containerScenarioEnd);
     }
   }
   if(m_scenario == "mergeScenario" && m_hasMerged == false){
-    if(m_lane == 2){
-
-      if (forwardId == 110 && m_flagHead == 1){
+    if ((startPlatoon == 0 && m_platoonId == 1) || (startPlatoon == 1 && m_platoonId == 2) ) {
+      SendInsight("scenarioEnd");
+      std::cout << "Got startPlatoon flag from " << stationId << std::endl;
+    }
+    if(lane == 1){
+      if(forwardId == 110){
         std::cout << "Backward partner found: " << stationId << "." << std::endl;
         m_backwardId = stationId;
-        if(m_platoonId == 1 && safeToMerge == 1){
-          std::cout << "Backward partner says safe to merge." << std::endl;
-          opendlv::knowledge::Insight eventSafe2Merge(now,"safeToMerge");
-          odcore::data::Container containerSafe2Merge(eventSafe2Merge, opendlv::knowledge::Insight::ID() + 300);
-          getConference().send(containerSafe2Merge);
-        }
       }
+      if(m_forwardId == stationId && flagHead == 1){
+        std::cout << "Creating distance for station: " << stationId << std::endl;
+        SendInsight("createDistance");
+      }
+      if(stationId == m_forwardId && flag == 1){
+        std::cout << "Forward parther should be merging: " << stationId << "." << std::endl;
+      }
+    }
+    if(m_lane == 2){
+
       if(stationId == m_mioId){
         if(flagHead == 1){
           std::cout << "Mio became leader." << std::endl;
@@ -480,31 +474,16 @@ void V2vIclcm::ReadVoice(opendlv::sensation::Voice &a_message){
         }
         if(m_mioBeenLeader && (flagHead == 0 || lane == 1 || platoonId == 2)){
           std::cout << "Mio has merged." << std::endl;
-
-          opendlv::knowledge::Insight eventIsLeader(now,"isLeader");
-          odcore::data::Container containerIsLeader(eventIsLeader, opendlv::knowledge::Insight::ID() + 300);
-          getConference().send(containerIsLeader);
-
           m_flagHead = 1;
         }
       }
-    }
-    if(lane == 1){
-      if((m_mioId == stationId || backwardId == 110) && flagHead){
-        std::cout << "Forward partner found: " << stationId << "." << std::endl;
-        m_forwardId = stationId;
-      }
-      if(forwardId == 110){
+      if (forwardId == 110 && m_flagHead == 1){
         std::cout << "Backward partner found: " << stationId << "." << std::endl;
         m_backwardId = stationId;
-      }
-      if(m_forwardId == stationId && flagHead == 1){
-        opendlv::knowledge::Insight eventCreateDistance(now,"createDistance");
-        odcore::data::Container containerCreateDistance(eventCreateDistance, opendlv::knowledge::Insight::ID() + 300);
-        getConference().send(containerCreateDistance);
-      }
-      if(stationId == m_forwardId && flag == 1){
-        std::cout << "Forward parther should be merging: " << stationId << "." << std::endl;
+        if(safeToMerge == 1){
+          std::cout << "Backward partner says safe to merge." << std::endl;
+          SendInsight("safeToMerge");
+        }
       }
     }
   }
@@ -512,15 +491,11 @@ void V2vIclcm::ReadVoice(opendlv::sensation::Voice &a_message){
     if(stationId < 100) {
       if(platoonId == 2){
         std::cout << "Got startPlatoon flag from " << stationId << std::endl;
-        opendlv::knowledge::Insight eventScenarioStart(now,"scenarioReady");
-        odcore::data::Container containerScenarioStart(eventScenarioStart, opendlv::knowledge::Insight::ID() + 300);
-        getConference().send(containerScenarioStart);
+        SendInsight("scenarioReady");
       }
       if(endOfScenario == 1){
         std::cout << "Got end of scenario message from " << stationId << std::endl;
-        opendlv::knowledge::Insight eventScenarioEnd(now,"scenarioEnd");
-        odcore::data::Container containerScenarioEnd(eventScenarioEnd, opendlv::knowledge::Insight::ID() + 300);
-        getConference().send(containerScenarioEnd);
+        SendInsight("scenarioEnd");
 
       }
     } 
@@ -590,6 +565,13 @@ void V2vIclcm::nextContainer(odcore::data::Container &a_c)
     }
     ReadVoice(message);
   }  
+}
+
+void V2vIclcm::SendInsight(std::string const &a_msg){
+  odcore::data::TimeStamp now;
+  opendlv::knowledge::Insight insight(now,a_msg);
+  odcore::data::Container c(insight);
+  getConference().send(c);
 }
 
 void V2vIclcm::setUp()
