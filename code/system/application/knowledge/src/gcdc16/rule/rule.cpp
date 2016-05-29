@@ -49,7 +49,6 @@ Rule::Rule(int32_t const &a_argc, char **a_argv)
   m_closestObject(),
   m_secondClosestObject(),
   m_mostInterestingObject(),
-  m_intersection_mostInterestingObject(0),
   m_desiredAzimuth(0.0f),
   m_cruiseSpeed(0.0),
   m_desiredAngularSize(30.0f),
@@ -512,7 +511,8 @@ void Rule::receivedContainerIntersectionScenario(odcore::data::Container &a_cont
     }
 
     float closestDistance = 99999;
-    opendlv::perception::Object* closestObject = 0;
+    bool foundObject = false;
+    opendlv::perception::Object closestObject;
 
     for (uint32_t i=0; i<objects.size(); i++) {
       opendlv::perception::Object object = objects.at(i);
@@ -532,7 +532,8 @@ void Rule::receivedContainerIntersectionScenario(odcore::data::Container &a_cont
 
             if (stationId < 100 && distanceToObject < closestDistance) {
               closestDistance = distanceToObject;
-              closestObject = &object; 
+              closestObject = object; 
+              foundObject = true;
             }
           }
           catch(...) {
@@ -543,9 +544,9 @@ void Rule::receivedContainerIntersectionScenario(odcore::data::Container &a_cont
       }
     }
 
-    if (closestObject != 0) {
+    if (foundObject) {
       // We have found a closest object with stationID smaller than 100
-      m_intersection_mostInterestingObject = closestObject;
+      m_mostInterestingObject = closestObject;
 
     }
   }
@@ -586,11 +587,11 @@ void Rule::bodyIntersectionScenario()
 
 
   odcore::data::TimeStamp timestamp;
-  if (m_intersection_mostInterestingObject != 0) {
+  if (m_mostInterestingObject.getSize_ListOfSources() > 0) {
 
-    std::vector<std::string> properties = m_intersection_mostInterestingObject->getListOfProperties();
+    std::vector<std::string> properties = m_mostInterestingObject.getListOfProperties();
     if (properties.empty()) {
-      std::cout << "getSize_ListOfSources(): " << m_intersection_mostInterestingObject->getSize_ListOfSources() << std::endl;
+      std::cout << "getSize_ListOfSources(): " << m_mostInterestingObject.getSize_ListOfSources() << std::endl;
       // for (auto qq:properties) {
       //   std::cout << "qq " << qq << std::endl;
       // }
@@ -610,9 +611,9 @@ void Rule::bodyIntersectionScenario()
       }
     }
 
-    float mioBearing = m_intersection_mostInterestingObject->getDirection().getAzimuth();
+    float mioBearing = m_mostInterestingObject.getDirection().getAzimuth();
     float mioRangeRate = 100000.0f;
-    float mioRange = m_intersection_mostInterestingObject->getDistance();
+    float mioRange = m_mostInterestingObject.getDistance();
     float mioTimeHeadway = mioRange / static_cast<float>(m_speed);
 
     opendlv::knowledge::Insight mioBearingInsight(timestamp, "mioBearing=" + std::to_string(mioBearing));
