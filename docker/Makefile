@@ -51,7 +51,7 @@ clean: docker-cleanup-exited-containers
 
 create-builder:
 	cd builder && docker build -f Dockerfile -t $(REPOSITORY)/$(PRODUCT):$(VERSION) . | tee $(BUILDLOG) || exit 1
-	docker images | grep $$(tail -1 builder/$(BUILDLOG) | cut -f3 -d" ") | grep "latest" && exit 0 || docker tag -f $(shell tail -1 builder/$(BUILDLOG) | cut -f3 -d" ") $(REPOSITORY)/$(PRODUCT):latest
+	docker images | grep $$(tail -1 builder/$(BUILDLOG) | cut -f3 -d" ") | grep "latest" && exit 0 || docker tag $$(tail -1 builder/$(BUILDLOG) | cut -f3 -d" ") $(REPOSITORY)/$(PRODUCT):latest
 
 build-fresh: create-builder
 	docker run --rm=true -ti -v $(OPENDLV_HOST_PATH):/opt/opendlv-sources $(REPOSITORY)/$(PRODUCT):$(VERSION) /build.sh FRESH
