@@ -300,13 +300,13 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
 
     float minThreshold = 20;
     float maxThreshold = 50;
-    float velocityCorrectionFactor =  100.0f;
+    float velocityCorrectionFactor =  100.0f;  //propotional constat forf PID controller  --- P controller
     float distanceCorrectionFactor = 3.0f;
     float releasePedalFactor = 3.0f;
 
     // this actually override the butto to activate the autonomous mode
     // use this only for test purposes
-    {
+/*    {
     bool m_started = true;
     m_desiredSpeed = 30/3.6;
     if (m_started)
@@ -315,7 +315,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
     odcore::data::Container c(cs);
     getConference().send(c);
     }
-    }
+    }*/
 
     float speedCorrection = 0;
 
@@ -338,16 +338,17 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
 
       // Correct according to vehicle in front
     }
-    m_accelerationValue = std::max(speedCorrection, 30.0f);
+    m_accelerationValue = std::min(speedCorrection, 30.0f);
     if (m_accelerationValue < 0.001f)
     {
         m_accelerationValue = 0.0;
     }
 
     std::cout << "\n\n distance to objects " << distanceToObject
-              << "\n desired speed" << m_desiredSpeed
-              << "\n speedCorrection " << speedCorrection
-              << "\n acceleration value " << m_accelerationValue << std::endl;
+              << "\n desired speed : " << m_desiredSpeed
+              << "\n current speed : " << m_currentSpeed
+              << "\n speedCorrection : " << speedCorrection
+              << "\n acceleration value : " << m_accelerationValue << std::endl;
 
 
     
