@@ -1,0 +1,11 @@
+# Please note that docker-compose does not prescribe a startup order
+
+diagnostics-health:
+  image: seresearch/fh16truck:latest
+  net: "host"
+  working_dir: "/opt/opendlv/bin"
+  restart: always
+  environment:
+  - LD_LIBRARY_PATH=/opt/opendlv/lib
+  command: "/opt/opendlv/bin/opendlv-system-core-diagnostics-health --cid=111 --freq=1"
+

@@ -60,17 +60,6 @@ build-incremental: create-builder
 	docker run --rm=true -ti -v $(OPENDLV_HOST_PATH):/opt/opendlv-sources $(REPOSITORY)/$(PRODUCT):$(VERSION) /build.sh INCREMENTAL
 
 
-# Example2:
-run-example2:
-	cd example2 && docker-compose up -d && cd ..
-
-watch-example2:
-	cd example2 && watch -n1 docker-compose ps && cd ..
-
-stop-example2:
-	cd example2 && docker-compose stop && docker-compose rm -f && cd ..
-
-
 # GCDC modules:
 run-gcdc-rule0:
 	cd gcdc-rule0 && docker-compose up -d && cd ..
@@ -81,6 +70,12 @@ watch-gcdc-rule0:
 stop-gcdc-rule0:
 	cd gcdc-rule0 && docker-compose stop && docker-compose rm -f && cd ..
 
+
+# Build base image for FH16 truck.
+create-fh16truck:
+	cd fh16 && rm -fr opendlv && cp -r ../../build.from.docker/install opendlv
+	cd fh16 && docker build -f Dockerfile -t seresearch/fh16truck:$(VERSION) . | tee $(BUILDLOG) || exit 1
+	cd fh16 && docker images | grep $$(tail -1 $(BUILDLOG) | cut -f3 -d" ") | grep "latest" && exit 0 || docker tag $$(tail -1 $(BUILDLOG) | cut -f3 -d" ") seresearch/fh16truck:latest
 
 
 docker-push: docker-tag-latest
