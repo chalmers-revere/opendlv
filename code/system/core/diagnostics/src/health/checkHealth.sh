@@ -29,7 +29,7 @@ DEV_PCAN=/dev/pcan${CAN_PORT}
 DEV_PCAN_SPEED=0x011c
 
 # Reachability tests:
-HAS_MULTICAST_ROUTE=$(route -n | grep "$MULTICAST_ROUTE" 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
+HAS_MULTICAST_ROUTE=$(ip route -n | grep "$MULTICAST_ROUTE" 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
 PING_LOCALHOST=$(ping -W1 -c1 $LOCALHOST 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
 PING_SCOTT1=$(ping -W1 -c1 $SCOTT1 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
 PING_SCOTT2=$(ping -W1 -c1 $SCOTT1 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
@@ -38,9 +38,9 @@ PING_COMBOX=$(ping -W1 -c1 $COMBOX 2>&1 >/dev/null && echo "PASSED" || echo "FAI
 
 # Devnode tests:
 HAS_DEV_PCAN=$(test -e $DEV_PCAN 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
-PCAN_NETDEV_DISABLED=$(cat /proc/pcan | grep -v "^*" | tr -s " " " " | cut -f4 -d" "| sed "${CAN_PORT}q;d")
+PCAN_NETDEV_DISABLED=$(cat /proc/pcan 2>&1 >/dev/null | grep -v "^*" | tr -s " " " " | cut -f4 -d" "| sed "${CAN_PORT}q;d")
 PCAN_NETDEV_DISABLED=$(test "$PCAN_NETDEV_DISABLED" == "-NA-" && echo "PASSED" || echo "FAILED")
-PCAN_CORRECT_SPEED=$(cat /proc/pcan | grep -v "^*" | tr -s " " " " | cut -f7 -d" "| sed "${CAN_PORT}q;d")
+PCAN_CORRECT_SPEED=$(cat /proc/pcan 2>&1 >/dev/null | grep -v "^*" | tr -s " " " " | cut -f7 -d" "| sed "${CAN_PORT}q;d")
 PCAN_CORRECT_SPEED=$(test "$PCAN_CORRECT_SPEED" == "$DEV_PCAN_SPEED" && echo "PASSED" || echo "FAILED")
 
 # System:
