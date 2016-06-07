@@ -25,6 +25,3 @@ RUN apk update && \
     apk upgrade && \
     apk add tcpdump
 
-#CMD /usr/sbin/tcpdump -C 1000 -W 100 -v -w '%Y-%m-%d_%H:%M:%S.pcap'
-
-#CMD /usr/sbin/tcpdump -G 900 -w '%Y-%m-%d_%H:%M:%S.pcap' -W 96
