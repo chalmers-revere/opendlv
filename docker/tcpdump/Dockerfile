@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-# Date: 2016-06-03
+# Date: 2016-06-07
 
 FROM alpine:latest
 
@@ -25,5 +25,6 @@ RUN apk update && \
     apk upgrade && \
     apk add tcpdump
 
-ENTRYPOINT [ "/usr/sbin/tcpdump", "-C", "1000", "-W", "100", "-v", "-w", "/dumps/pcap-dump" ]
+#CMD /usr/sbin/tcpdump -C 1000 -W 100 -v -w '%Y-%m-%d_%H:%M:%S.pcap'
 
+#CMD /usr/sbin/tcpdump -G 900 -w '%Y-%m-%d_%H:%M:%S.pcap' -W 96

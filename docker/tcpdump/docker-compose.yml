@@ -1,4 +1,4 @@
-# Makefile - Makefile to create a Docker image.
+# Dockerfile - Dockerfile to encapsulate tcpdump for bare logging.
 # Copyright (C) 2016 Christian Berger
 #
 # This program is free software; you can redistribute it and/or
@@ -15,19 +15,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-PRODUCT=opendlv-tcpdump
-VERSION="latest"
-REPOSITORY=chalmersrevere
-BUILDLOG=build.log
+# Date: 2016-06-07
 
-create-docker-tcpdump:
-	docker build -f Dockerfile -t $(REPOSITORY)/$(PRODUCT):$(VERSION) . | tee $(BUILDLOG) || exit 1
-
-
-run-docker-tcpdump:
-	docker run --rm=true --net=host -v $$(pwd)/dumps:/dumps $(REPOSITORY)/$(PRODUCT):$(VERSION)
-
-
-docker-push: docker-tag-latest
-	docker push $(REPOSITORY)/$(PRODUCT):latest
-
+opendlv-tcpdump:
+    build: .
+    net: "host"
+    volumes:
+    - /dumps:/dumps
+    working_dir: "/dumps"
+    command: /usr/sbin/tcpdump -G 900 -w '%Y-%m-%d_%H:%M:%S.pcap' -W 96
