@@ -22,6 +22,6 @@ FROM seresearch/odsimulation:latest
 # Set locale (fix the locale warnings)
 RUN localedef -v -c -i en_US -f UTF-8 en_US.UTF-8 || :
 
-RUN apt-get install -y libpopt-dev opendavinci-odcandatastructuregenerator opendavinci-oddatastructuregenerator opendavinci-odcantools
+RUN apt-get install -y bc libpopt-dev opendavinci-odcandatastructuregenerator opendavinci-oddatastructuregenerator opendavinci-odcantools
 
 ADD build.sh /build.sh
