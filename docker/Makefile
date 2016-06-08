@@ -51,8 +51,9 @@ docker-cleanup-exited-containers:
 	docker rm $$(docker ps -a -q)
 
 # This target cleans up the environment to start fresh.
-clean: docker-cleanup-exited-containers
+clean:
 	cd builder && rm -f $(BUILDLOG) && cd ..
+	sudo rm -fr ../build.from.docker ../code/generated/lib*
 
 ###############################################################################
 ###############################################################################
@@ -76,8 +77,11 @@ build-incremental: create-builder
 ###############################################################################
 ###############################################################################
 
+fh16-copy-opendlv:
+	cp -r ../build.from.docker/install fh16/opendlv
+
 # Build base image for FH16 truck.
-fh16: build-incremental
+fh16: build-incremental fh16-copy-opendlv
 	cd fh16 && docker-compose build
 
 
