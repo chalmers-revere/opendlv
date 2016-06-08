@@ -76,7 +76,7 @@ build-incremental: create-builder
 
 ###############################################################################
 ###############################################################################
-
+# Template for FH16 microservices.
 fh16-copy-opendlv:
 	cp -r ../build.from.docker/install fh16/opendlv
 
@@ -84,6 +84,15 @@ fh16-copy-opendlv:
 fh16: build-incremental fh16-copy-opendlv
 	cd fh16 && docker-compose build
 
+###############################################################################
+###############################################################################
+# FH16 ps3controller.
+fh16-ps3controller-copy-opendlv:
+	cp -r ../build.from.docker/install fh16-ps3controller/opendlv
+
+# Build base image for FH16 truck.
+fh16-ps3controller: build-incremental fh16-ps3controller-copy-opendlv
+	cd fh16-ps3controller && docker-compose build
 
 #docker-push: docker-tag-latest
 #	docker push $(REPOSITORY)/$(PRODUCT):latest

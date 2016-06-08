@@ -1,0 +1,34 @@
+# Please note that docker-compose does not prescribe a startup order
+
+# microservice for tcpdump
+opendlv-tcpdump:
+    build: tcpdump
+    net: "host"
+    restart: always
+    volumes:
+    - /dumps:/dumps
+    working_dir: "/dumps"
+    command: /usr/sbin/tcpdump -G 900 -w 'CID-11_%Y-%m-%d_%H:%M:%S.pcap' -W 96
+
+# microservice for diagnostics-health
+diagnostics-health:
+    build: .
+    net: "host"
+    working_dir: "/opt/opendlv/bin"
+    restart: always
+    environment:
+    - LD_LIBRARY_PATH=/opt/opendlv/lib
+    command: "/opt/opendlv/bin/opendlv-system-core-diagnostics-health --cid=11 --freq=1"
+
+# microservice for ps3controller
+can-ps3controller:
+    build: .
+    net: "host"
+    working_dir: "/opt/opendlv/bin"
+    restart: always
+    volumes:
+    - /dev/input/js0:/dev/input/js0
+    environment:
+    - LD_LIBRARY_PATH=/opt/opendlv/lib
+    command: "/opt/opendlv/bin/opendlv-tools-can-ps3controller --cid=11 --freq=100"
+
