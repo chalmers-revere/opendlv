@@ -4,6 +4,7 @@
 opendlv-tcpdump:
     build: tcpdump
     net: "host"
+    restart: always
     volumes:
     - /dumps:/dumps
     working_dir: "/dumps"

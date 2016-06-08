@@ -20,6 +20,7 @@
 opendlv-tcpdump:
     build: .
     net: "host"
+    restart: always
     volumes:
     - /dumps:/dumps
     working_dir: "/dumps"
