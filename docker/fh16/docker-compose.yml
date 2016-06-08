@@ -8,7 +8,7 @@ opendlv-tcpdump:
     volumes:
     - /dumps:/dumps
     working_dir: "/dumps"
-    command: /usr/sbin/tcpdump -G 900 -w '%Y-%m-%d_%H:%M:%S.pcap' -W 96
+    command: /usr/sbin/tcpdump -G 900 -w 'CID-10_%Y-%m-%d_%H:%M:%S.pcap' -W 96
 
 
 diagnostics-health:
@@ -18,5 +18,5 @@ diagnostics-health:
     restart: always
     environment:
     - LD_LIBRARY_PATH=/opt/opendlv/lib
-    command: "/opt/opendlv/bin/opendlv-system-core-diagnostics-health --cid=111 --freq=1"
+    command: "/opt/opendlv/bin/opendlv-system-core-diagnostics-health --cid=10 --freq=1"
 

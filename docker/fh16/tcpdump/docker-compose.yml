@@ -24,4 +24,4 @@ opendlv-tcpdump:
     volumes:
     - /dumps:/dumps
     working_dir: "/dumps"
-    command: /usr/sbin/tcpdump -G 900 -w '%Y-%m-%d_%H:%M:%S.pcap' -W 96
+    command: /usr/sbin/tcpdump -G 900 -w 'CID-10_%Y-%m-%d_%H:%M:%S.pcap' -W 96
