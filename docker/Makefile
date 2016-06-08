@@ -41,7 +41,7 @@ OPENDLV_HOST_PATH=$(shell dirname $(shell pwd))
 # This target will pull the latest OpenDaVINCI binary distribution.
 # It should be called every now and then or on request.
 docker-update-opendavinci:
-	docker pull $(shell awk '/^FROM/ { print $$2; exit }' Dockerfile)
+	docker pull $(shell awk '/^FROM/ { print $$2; exit }' builder/Dockerfile)
 
 ###############################################################################
 ###############################################################################

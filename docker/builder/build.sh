@@ -18,6 +18,7 @@ if [ "$1" == "FRESH" ]; then
     cd build.system
     cmake -DEIGEN3_INCLUDE_DIR=../../thirdparty/eigen3 -DKALMAN_INCLUDE_DIR=../../thirdparty/kalman/include -DTINYCNN_INCLUDE_DIR=../../thirdparty/tiny-cnn -DCMAKE_INSTALL_PREFIX=../../docker/fh16/opendlv ../../code/system
     make -j3
+    make install
     cd ..
 fi
 
@@ -26,6 +27,7 @@ if [ "$1" == "INCREMENTAL" ]; then
         cd build.from.docker
         cd build.system
         make -j3
+        make install
     else
         exit 1
     fi
