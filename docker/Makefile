@@ -38,46 +38,49 @@ OPENDLV_HOST_PATH=$(shell dirname $(shell pwd))
 #
 # Watch example2: make watch-example2
 
-build-and-run-gcdc-rule0: build-incremental run-gcdc-rule0 watch-gcdc-rule0
-
+# This target will pull the latest OpenDaVINCI binary distribution.
+# It should be called every now and then or on request.
 docker-update-opendavinci:
 	docker pull $(shell awk '/^FROM/ { print $$2; exit }' Dockerfile)
 
+###############################################################################
+###############################################################################
+
+# This target removes exited containers.
 docker-cleanup-exited-containers:
 	docker rm $$(docker ps -a -q)
 
+# This target cleans up the environment to start fresh.
 clean: docker-cleanup-exited-containers
 	cd builder && rm -f $(BUILDLOG) && cd ..
 
+###############################################################################
+###############################################################################
+
+# This target creates a Docker image to compile the OpenDLV source tree.
 create-builder:
 	cd builder && docker build -f Dockerfile -t $(REPOSITORY)/$(PRODUCT):$(VERSION) . | tee $(BUILDLOG) || exit 1
 	docker images | grep $$(tail -1 builder/$(BUILDLOG) | cut -f3 -d" ") | grep "latest" && exit 0 || docker tag $$(tail -1 builder/$(BUILDLOG) | cut -f3 -d" ") $(REPOSITORY)/$(PRODUCT):latest
 
+###############################################################################
+###############################################################################
+
+# This target compiles the OpenDLV source tree from scratch.
 build-fresh: create-builder
 	docker run --rm=true -ti -v $(OPENDLV_HOST_PATH):/opt/opendlv-sources $(REPOSITORY)/$(PRODUCT):$(VERSION) /build.sh FRESH
 
+# This tartget compiles the OpenDLV source tree in case of minor changes to code/system.
 build-incremental: create-builder
 	docker run --rm=true -ti -v $(OPENDLV_HOST_PATH):/opt/opendlv-sources $(REPOSITORY)/$(PRODUCT):$(VERSION) /build.sh INCREMENTAL
 
-
-# GCDC modules:
-run-gcdc-rule0:
-	cd gcdc-rule0 && docker-compose up -d && cd ..
-
-watch-gcdc-rule0:
-	cd gcdc-rule0 && watch -n1 docker-compose ps && cd ..
-
-stop-gcdc-rule0:
-	cd gcdc-rule0 && docker-compose stop && docker-compose rm -f && cd ..
-
+###############################################################################
+###############################################################################
 
 # Build base image for FH16 truck.
-create-fh16truck:
-	cd fh16 && rm -fr opendlv && cp -r ../../build.from.docker/install opendlv
-	cd fh16 && docker build -f Dockerfile -t seresearch/fh16truck:$(VERSION) . | tee $(BUILDLOG) || exit 1
-	cd fh16 && docker images | grep $$(tail -1 $(BUILDLOG) | cut -f3 -d" ") | grep "latest" && exit 0 || docker tag $$(tail -1 $(BUILDLOG) | cut -f3 -d" ") seresearch/fh16truck:latest
+fh16: build-incremental
+	cd fh16 && docker-compose build
 
 
-docker-push: docker-tag-latest
-	docker push $(REPOSITORY)/$(PRODUCT):latest
+#docker-push: docker-tag-latest
+#	docker push $(REPOSITORY)/$(PRODUCT):latest
 
