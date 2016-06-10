@@ -8,7 +8,7 @@ opendlv-tcpdump:
     volumes:
     - /dumps:/dumps
     working_dir: "/dumps"
-    command: /usr/sbin/tcpdump -G 900 -w 'CID-11_%Y-%m-%d_%H:%M:%S.pcap' -W 96
+    command: /usr/sbin/tcpdump -G 900 -w 'CID-71_%Y-%m-%d_%H:%M:%S.pcap' -W 96
 
 # microservice for diagnostics-health
 diagnostics-health:
@@ -18,7 +18,7 @@ diagnostics-health:
     restart: always
     environment:
     - LD_LIBRARY_PATH=/opt/opendlv/lib
-    command: "/opt/opendlv/bin/opendlv-system-core-diagnostics-health --cid=11 --freq=1"
+    command: "/opt/opendlv/bin/opendlv-system-core-diagnostics-health --cid=71 --freq=1"
 
 # microservice for ps3controller
 can-ps3controller:
@@ -28,7 +28,8 @@ can-ps3controller:
     restart: always
     volumes:
     - /dev/input/js0:/dev/input/js0
+    - /dev/pcan1:/dev/pcan1
     environment:
     - LD_LIBRARY_PATH=/opt/opendlv/lib
-    command: "/opt/opendlv/bin/opendlv-tools-can-ps3controller --cid=11 --freq=100"
+    command: "/opt/opendlv/bin/opendlv-tools-can-ps3controller --cid=71 --freq=100"
 
