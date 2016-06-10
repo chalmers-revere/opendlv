@@ -46,3 +46,16 @@ Depending on where you have installed OpenDaVINCI, you might need to adjust the 
 
 As soon as the microservices notice the availability of ```odsupercomponent``` for CID 71, the are activated and start to operate.
 
+Please note that the ```docker-compose.yml``` file has defined the services as "always restart", i.e. if the machine is rebooted the microservices are re-started as well awaiting an ```odsupercomponent``` to become available.
+
+If you want to stop and deactivate the service, simply execute:
+
+    $ cd fh16-ps3controller
+    $ docker-compose stop
+    $ docker-compose rm
+
+The last command will remove the exited Docker containers.
+
+The "always restart" feature with the CID session separation from OpenDaVINCI enables deployment and composition of microservices with different features that can be activated and deactivated by starting and stopping an ```odsupercomponent'''.
+
+
