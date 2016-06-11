@@ -9,7 +9,7 @@ First, make sure that you have a recent Docker environment installed.
 Next, change to the ```docker``` sub-folder and get the most recent OpenDaVINCI binary distribution:
 
     $ cd docker
-    $ make docker-update-opdavinci
+    $ make docker-update-opendavinci
 
 The OpenDaVINCI binary distribution bundles required libraries and dependencies to (a) run software based on OpenDaVINCI (such as OpenDLV) and (b) to build sources based on OpenDaVINCI in a reproducible way.
 
