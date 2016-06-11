@@ -79,6 +79,7 @@ build-incremental: create-builder
 # Template for FH16 microservices.
 fh16-copy-opendlv:
 	cp -r ../build.from.docker/install fh16/opendlv
+	cp fh16/checkHealth.sh fh16/opendlv/bin
 
 # Build base image for FH16 truck.
 fh16: build-incremental fh16-copy-opendlv
@@ -89,6 +90,7 @@ fh16: build-incremental fh16-copy-opendlv
 # FH16 ps3controller.
 fh16-ps3controller-copy-opendlv:
 	cp -r ../build.from.docker/install fh16-ps3controller/opendlv
+	cp fh16-ps3controller/checkHealth.sh fh16-ps3controller/opendlv/bin
 
 # Build base image for FH16 truck.
 fh16-ps3controller: build-incremental fh16-ps3controller-copy-opendlv
