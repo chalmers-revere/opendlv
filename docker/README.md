@@ -44,7 +44,7 @@ Depending on where you have installed OpenDaVINCI, you might need to adjust the 
 
     $ LD_LIBRARY_PATH=/opt/od3/lib /opt/od3/bin/odsupercomponent --cid=71
 
-As soon as the microservices notice the availability of ```odsupercomponent``` for CID 71, the are activated and start to operate.
+As soon as the microservices notice the availability of ```odsupercomponent``` for CID 71, they are activated and start to operate.
 
 Please note that the ```docker-compose.yml``` file has defined the services as "always restart", i.e. if the machine is rebooted the microservices are re-started as well awaiting an ```odsupercomponent``` to become available.
 
