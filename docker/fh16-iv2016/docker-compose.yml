@@ -1,0 +1,29 @@
+# Please note that docker-compose does not prescribe a startup order
+
+# microservice for tcpdump
+opendlv-tcpdump:
+    build: tcpdump
+    net: "host"
+    restart: always
+    volumes:
+    - /dumps:/dumps
+    working_dir: "/dumps"
+    command: /usr/sbin/tcpdump -G 900 -w 'CID-72_%Y-%m-%d_%H:%M:%S.pcap' -W 96
+
+# microservice for diagnostics-health
+# The host's /dev and /proc directories are mapped into the Docker container
+# to check for expected properties like device nodes. The privileged flag
+# allows the unrestricted access.
+diagnostics-health:
+    build: .
+    net: "host"
+    working_dir: "/opt/opendlv/bin"
+    restart: always
+    privileged: true
+    volumes:
+    - /dev:/from.host/dev
+    - /proc:/from.host/proc
+    environment:
+    - LD_LIBRARY_PATH=/opt/opendlv/lib
+    command: "/opt/opendlv/bin/opendlv-system-core-diagnostics-health --cid=72 --freq=1"
+
