@@ -80,11 +80,11 @@ build-incremental: create-builder
 
 # Tag Docker images using Git hashes for traceability.
 docker-tag-fh16:
-	for i in $$(cat fh16/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker tag fh16_$$i seresearch/$$i:$(VERSION); docker tag fh16_$$i seresearch/$$i:latest; done
+	for i in $$(cat fh16/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker tag fh16_$$i seresearch/fh16_$$i:$(VERSION); docker tag fh16_$$i seresearch/fh16_$$i:latest; done
 
 # Push Docker latest images for backup.
 docker-push-fh16: docker-tag-fh16
-	for i in $$(cat fh16/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/$$i:$(VERSION); docker push seresearch/$$i:latest; done
+	for i in $$(cat fh16/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/fh16_$$i:$(VERSION); docker push seresearch/fh16_$$i:latest; done
 
 fh16-copy-opendlv:
 	cp -r ../build.from.docker/install fh16/opendlv
@@ -101,11 +101,11 @@ fh16: build-incremental fh16-copy-opendlv
 
 # Tag Docker images using Git hashes for traceability.
 docker-tag-fh16-ps3controller:
-	for i in $$(cat fh16-ps3controller/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker tag fh16ps3controller_$$i seresearch/$$i:$(VERSION); docker tag fh16ps3controller_$$i seresearch/$$i:latest; done
+	for i in $$(cat fh16-ps3controller/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker tag fh16ps3controller_$$i seresearch/fh16ps3controller_$$i:$(VERSION); docker tag fh16ps3controller_$$i seresearch/fh16ps3controller_$$i:latest; done
 
 # Push Docker latest images for backup.
 docker-push-fh16-ps3controller: docker-tag-fh16-ps3controller
-	for i in $$(cat fh16-ps3controller/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/$$i:$(VERSION); docker push seresearch/$$i:latest; done
+	for i in $$(cat fh16-ps3controller/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/fh16ps3controller_$$i:$(VERSION); docker push seresearch/fh16ps3controller_$$i:latest; done
 
 fh16-ps3controller-copy-opendlv:
 	cp -r ../build.from.docker/install fh16-ps3controller/opendlv
@@ -122,11 +122,11 @@ fh16-ps3controller: build-incremental fh16-ps3controller-copy-opendlv
 
 # Tag Docker images using Git hashes for traceability.
 docker-tag-fh16-iv2016:
-	for i in $$(cat fh16-iv2016/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker tag fh16iv2016_$$i seresearch/$$i:$(VERSION); docker tag fh16iv2016_$$i seresearch/$$i:latest; done
+	for i in $$(cat fh16-iv2016/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker tag fh16iv2016_$$i seresearch/fh16iv2016_$$i:$(VERSION); docker tag fh16iv2016_$$i seresearch/fh16iv2016_$$i:latest; done
 
 # Push Docker latest images for backup.
 docker-push-fh16-iv2016: docker-tag-fh16-iv2016
-	for i in $$(cat fh16-iv2016/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/$$i:$(VERSION); docker push seresearch/$$i:latest; done
+	for i in $$(cat fh16-iv2016/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/fh16iv2016_$$i:$(VERSION); docker push seresearch/fh16iv2016_$$i:latest; done
 
 fh16-iv2016-copy-opendlv:
 	cp -r ../build.from.docker/install fh16-iv2016/opendlv
