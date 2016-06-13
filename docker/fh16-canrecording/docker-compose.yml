@@ -37,5 +37,5 @@ proxy-can:
     - "/dev/pcanpci1:/dev/pcan1"
     environment:
     - LD_LIBRARY_PATH=/opt/opendlv/lib
-    command: "/opt/opendlv/bin/opendlv-system-core-proxy-can --cid=71 --freq=100"
+    command: "/opt/opendlv/bin/opendlv-system-core-proxy-can --cid=61 --freq=100"
 
