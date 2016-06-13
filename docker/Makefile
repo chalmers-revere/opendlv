@@ -77,23 +77,62 @@ build-incremental: create-builder
 ###############################################################################
 ###############################################################################
 # Template for FH16 microservices.
+
+# Tag Docker images using Git hashes for traceability.
+docker-tag-fh16:
+	for i in $$(cat fh16/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker tag fh16_$$i seresearch/fh16_$$i:$(VERSION); docker tag fh16_$$i seresearch/fh16_$$i:latest; done
+
+# Push Docker latest images for backup.
+docker-push-fh16: docker-tag-fh16
+	for i in $$(cat fh16/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/fh16_$$i:$(VERSION); docker push seresearch/fh16_$$i:latest; done
+
 fh16-copy-opendlv:
 	cp -r ../build.from.docker/install fh16/opendlv
+	cp fh16/checkHealth.sh fh16/opendlv/bin
 
 # Build base image for FH16 truck.
 fh16: build-incremental fh16-copy-opendlv
 	cd fh16 && docker-compose build
 
+
 ###############################################################################
 ###############################################################################
 # FH16 ps3controller.
+
+# Tag Docker images using Git hashes for traceability.
+docker-tag-fh16-ps3controller:
+	for i in $$(cat fh16-ps3controller/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker tag fh16ps3controller_$$i seresearch/fh16ps3controller_$$i:$(VERSION); docker tag fh16ps3controller_$$i seresearch/fh16ps3controller_$$i:latest; done
+
+# Push Docker latest images for backup.
+docker-push-fh16-ps3controller: docker-tag-fh16-ps3controller
+	for i in $$(cat fh16-ps3controller/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/fh16ps3controller_$$i:$(VERSION); docker push seresearch/fh16ps3controller_$$i:latest; done
+
 fh16-ps3controller-copy-opendlv:
 	cp -r ../build.from.docker/install fh16-ps3controller/opendlv
+	cp fh16-ps3controller/checkHealth.sh fh16-ps3controller/opendlv/bin
 
-# Build base image for FH16 truck.
+# Build image for FH16 truck for PS3 controller.
 fh16-ps3controller: build-incremental fh16-ps3controller-copy-opendlv
 	cd fh16-ps3controller && docker-compose build
 
-#docker-push: docker-tag-latest
-#	docker push $(REPOSITORY)/$(PRODUCT):latest
+
+###############################################################################
+###############################################################################
+# FH16 IV2016.
+
+# Tag Docker images using Git hashes for traceability.
+docker-tag-fh16-iv2016:
+	for i in $$(cat fh16-iv2016/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker tag fh16iv2016_$$i seresearch/fh16iv2016_$$i:$(VERSION); docker tag fh16iv2016_$$i seresearch/fh16iv2016_$$i:latest; done
+
+# Push Docker latest images for backup.
+docker-push-fh16-iv2016: docker-tag-fh16-iv2016
+	for i in $$(cat fh16-iv2016/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/fh16iv2016_$$i:$(VERSION); docker push seresearch/fh16iv2016_$$i:latest; done
+
+fh16-iv2016-copy-opendlv:
+	cp -r ../build.from.docker/install fh16-iv2016/opendlv
+	cp fh16-iv2016/checkHealth.sh fh16-iv2016/opendlv/bin
+
+# Build image for FH16 truck for IV demo.
+fh16-iv2016: build-incremental fh16-iv2016-copy-opendlv
+	cd fh16-iv2016 && docker-compose build
 
