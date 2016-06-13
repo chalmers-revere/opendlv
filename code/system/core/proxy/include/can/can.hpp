@@ -20,10 +20,14 @@
 #ifndef CAN_CAN_HPP_
 #define CAN_CAN_HPP_
 
+#include <fstream>
+#include <map>
 #include <memory>
 
 #include <opendavinci/odcore/base/FIFOQueue.h>
+#include <opendavinci/odcore/base/Mutex.h>
 #include <opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h>
+#include <opendavinci/odcore/reflection/CSVFromVisitableVisitor.h>
 #include <odcantools/GenericCANMessageListener.h>
 #include <reverefh16mapping/GeneratedHeaders_reverefh16mapping.h>
 
@@ -77,6 +81,10 @@ class Can : public odcore::base::module::TimeTriggeredConferenceClientModule,
   std::unique_ptr<CanMessageDataStore> m_canMessageDataStore;
 
   canmapping::CanMapping m_revereFh16CanMessageMapping;
+
+  odcore::base::Mutex m_CSVWritingMutex;
+  std::map<uint32_t, std::shared_ptr<std::fstream> > m_mapOfCSVFiles;
+  std::map<uint32_t, std::shared_ptr<odcore::reflection::CSVFromVisitableVisitor> > m_mapOfCSVVisitors;
 };
 
 } // can
