@@ -31,6 +31,8 @@ diagnostics-health:
 proxy-can:
     build: .
     net: "host"
+    volumes:
+    - /dumps:/dumps
     working_dir: "/dumps"
     restart: always
     devices:
