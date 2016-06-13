@@ -31,7 +31,7 @@ diagnostics-health:
 proxy-can:
     build: .
     net: "host"
-    working_dir: "/opt/opendlv/bin"
+    working_dir: "/dumps"
     restart: always
     devices:
     - "/dev/pcanpci1:/dev/pcan1"
