@@ -52,7 +52,7 @@ Can::Can(int32_t const &a_argc, char **a_argv)
     , m_device()
     , m_canMessageDataStore()
     , m_revereFh16CanMessageMapping()
-    , m_CSVWritingMutex()
+    , m_ASCfile()
     , m_mapOfCSVFiles()
     , m_mapOfCSVVisitors()
 {
@@ -115,6 +115,13 @@ void Can::setUp()
       // Create a recorder instance.
       m_recorderGenericCanMessages = unique_ptr<Recorder>(new Recorder(recordingUrl.str(),
       MEMORY_SEGMENT_SIZE, NUMBER_OF_SEGMENTS, THREADING, DUMP_SHARED_DATA));
+
+      // Create a file to dump CAN data in ASC format.
+      stringstream fileName;
+      fileName << "CID-" << getCID() << "_"
+               << "can_data_" << TIMESTAMP << ".asc";
+      m_ASCfile = shared_ptr<fstream>(new fstream(fileName.str(), std::ios::out));
+      (*m_ASCfile) << "Time (s) Channel ID RX/TX d Length Byte 1 Byte 2 Byte 3 Byte 4 Byte 5 Byte 6 Byte 7 Byte 8" << endl;
     }
 
     const bool RECORD_MAPPED =
@@ -246,9 +253,11 @@ void Can::tearDown()
     it->second->close();
   }
 
-  // Fix linker error.
-  opendlv::proxy::reverefh16::Steering s;
-  (void)s;
+  // Flush output to ASC file.
+  if (m_ASCfile.get() != NULL) {
+    m_ASCfile->flush();
+    m_ASCfile->close();
+  }
 }
 
 void Can::nextGenericCANMessage(const automotive::GenericCANMessage &gcm)
@@ -259,6 +268,23 @@ void Can::nextGenericCANMessage(const automotive::GenericCANMessage &gcm)
   counter++;
   if (counter > CAN_MESSAGES_TO_IGNORE) {
     counter = 0;
+  }
+
+  if (m_ASCfile.get() != NULL) {
+//Time (s) Channel ID RX/TX d Length Byte 1 Byte 2 Byte 3 Byte 4 Byte 5 Byte 6 Byte 7 Byte 8
+//5.29517 1 123 Rx d 8 00 00 00 00 00 00 00 00
+    (*m_ASCfile) << (gcm.getDriverTimeStamp().getSeconds() + (static_cast<double>(gcm.getDriverTimeStamp().getFractionalMicroseconds())/(1000.0*1000.0)))
+              << " 1"
+              << " " << gcm.getIdentifier()
+              << " Rx"
+              << " d"
+              << " " << gcm.getLength();
+    uint64_t data = gcm.getData();
+    for(uint8_t i = 0; i < gcm.getLength(); i++) {
+        (*m_ASCfile) << " " << (data & 0xFF);
+        data = data>>8;
+    }
+    (*m_ASCfile) << endl;
   }
 
   // Map CAN message to high-level data structure.
