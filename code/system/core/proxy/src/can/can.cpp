@@ -26,6 +26,7 @@
 #include <opendavinci/odtools/recorder/Recorder.h>
 #include <opendavinci/odcore/reflection/Message.h>
 #include <opendavinci/odcore/reflection/MessageFromVisitableVisitor.h>
+#include <opendavinci/odcore/strings/StringToolbox.h>
 #include <odcantools/MessageToCANDataStore.h>
 #include <odcantools/CANDevice.h>
 #include <automotivedata/generated/automotive/GenericCANMessage.h>
@@ -83,6 +84,13 @@ void Can::setUp()
 
     // Automatically record all received raw CAN messages.
     TimeStamp ts;
+    std::vector<std::string> timeStampNoSpace = odcore::strings::StringToolbox::split(ts.getYYYYMMDD_HHMMSS(), ' ');
+    stringstream strTimeStampNoSpace;
+    strTimeStampNoSpace << timeStampNoSpace.at(0);
+    if (timeStampNoSpace.size() == 2) {
+        strTimeStampNoSpace << "_" << timeStampNoSpace.at(1);
+    }
+    const string TIMESTAMP = strTimeStampNoSpace.str();
 
     const bool RECORD_GCM =
     (getKeyValueConfiguration().getValue<int>("proxy-can.record_gcm") == 1);
@@ -91,7 +99,7 @@ void Can::setUp()
       stringstream recordingUrl;
       recordingUrl << "file://"
                    << "CID-" << getCID() << "_"
-                   << "can_gcm_" << ts.getYYYYMMDD_HHMMSS() << ".rec";
+                   << "can_gcm_" << TIMESTAMP << ".rec";
       // Size of memory segments (not needed for recording GenericCANMessages).
       const uint32_t MEMORY_SEGMENT_SIZE = 0;
       // Number of memory segments (not needed for recording
@@ -116,7 +124,7 @@ void Can::setUp()
       stringstream recordingUrl;
       recordingUrl << "file://"
                    << "CID-" << getCID() << "_"
-                   << "can_mapped_data_" << ts.getYYYYMMDD_HHMMSS() << ".rec";
+                   << "can_mapped_data_" << TIMESTAMP << ".rec";
       // Size of memory segments (not needed for recording GenericCANMessages).
       const uint32_t MEMORY_SEGMENT_SIZE = 0;
       // Number of memory segments (not needed for recording
@@ -137,7 +145,7 @@ void Can::setUp()
         {
             stringstream fileName;
             fileName << "CID-" << getCID() << "_"
-                     << "can_mapped_data_id-" << opendlv::proxy::reverefh16::ManualControl::ID() << "_" << ts.getYYYYMMDD_HHMMSS() << ".csv";
+                     << "can_mapped_data_id-" << opendlv::proxy::reverefh16::ManualControl::ID() << "_" << TIMESTAMP << ".csv";
 
             // Create map of CSV transformers.
             fstream *f = new std::fstream(fileName.str(), std::ios::out);
@@ -151,7 +159,7 @@ void Can::setUp()
         {
             stringstream fileName;
             fileName << "CID-" << getCID() << "_"
-                     << "can_mapped_data_id-" << opendlv::proxy::reverefh16::Steering::ID() << "_" << ts.getYYYYMMDD_HHMMSS() << ".csv";
+                     << "can_mapped_data_id-" << opendlv::proxy::reverefh16::Steering::ID() << "_" << TIMESTAMP << ".csv";
 
             // Create map of CSV transformers.
             fstream *f = new std::fstream(fileName.str(), std::ios::out);
@@ -166,7 +174,7 @@ void Can::setUp()
         {
             stringstream fileName;
             fileName << "CID-" << getCID() << "_"
-                     << "can_mapped_data_id-" << opendlv::proxy::reverefh16::Propulsion::ID() << "_" << ts.getYYYYMMDD_HHMMSS() << ".csv";
+                     << "can_mapped_data_id-" << opendlv::proxy::reverefh16::Propulsion::ID() << "_" << TIMESTAMP << ".csv";
 
             // Create map of CSV transformers.
             fstream *f = new std::fstream(fileName.str(), std::ios::out);
@@ -259,6 +267,7 @@ void Can::nextGenericCANMessage(const automotive::GenericCANMessage &gcm)
   for (auto c : result) {
     // Enqueue mapped container for direct recording.
     if (m_recorderMappedCanMessages.get()) {
+      c.setReceivedTimeStamp(gcm.getDriverTimeStamp());
       m_fifoMappedCanMessages.add(c);
     }
 
@@ -306,18 +315,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Can::body()
         // Transform container to CSV file.
         {
             // Add TimeStamps
-            uint64_t sentTS = c.getSentTimeStamp().toMicroseconds();
-            uint64_t receivedTS = c.getReceivedTimeStamp().toMicroseconds();
+            uint64_t receivedFromCAN = c.getReceivedTimeStamp().toMicroseconds();
             
-            std::shared_ptr<odcore::reflection::Field<uint64_t> > m_sentTS_ptr = std::shared_ptr<odcore::reflection::Field<uint64_t>>(new odcore::reflection::Field<uint64_t>(sentTS));
-            m_sentTS_ptr->setLongFieldIdentifier(0);
-            m_sentTS_ptr->setShortFieldIdentifier(0);
-            m_sentTS_ptr->setLongFieldName("Sent_TimeStamp");
-            m_sentTS_ptr->setShortFieldName("Sent_TimeStamp");
-            m_sentTS_ptr->setFieldDataType(odcore::data::reflection::AbstractField::UINT64_T);
-            m_sentTS_ptr->setSize(sizeof(uint64_t));
-            
-            std::shared_ptr<odcore::reflection::Field<uint64_t> > m_receivedTS_ptr = std::shared_ptr<odcore::reflection::Field<uint64_t>>(new odcore::reflection::Field<uint64_t>(receivedTS));
+            std::shared_ptr<odcore::reflection::Field<uint64_t> > m_receivedTS_ptr = std::shared_ptr<odcore::reflection::Field<uint64_t>>(new odcore::reflection::Field<uint64_t>(receivedFromCAN));
             m_receivedTS_ptr->setLongFieldIdentifier(0);
             m_receivedTS_ptr->setShortFieldIdentifier(0);
             m_receivedTS_ptr->setLongFieldName("Received_TimeStamp");
@@ -333,7 +333,6 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Can::body()
                 odcore::reflection::MessageFromVisitableVisitor mfvv;
                 temp.accept(mfvv);
                 odcore::reflection::Message m = mfvv.getMessage();
-                m.addField(m_sentTS_ptr);
                 m.addField(m_receivedTS_ptr);
                 m.accept(*m_mapOfCSVVisitors[c.getDataType()]);
               }
@@ -342,7 +341,6 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Can::body()
                 odcore::reflection::MessageFromVisitableVisitor mfvv;
                 temp.accept(mfvv);
                 odcore::reflection::Message m = mfvv.getMessage();
-                m.addField(m_sentTS_ptr);
                 m.addField(m_receivedTS_ptr);
                 m.accept(*m_mapOfCSVVisitors[c.getDataType()]);
               }
@@ -351,7 +349,6 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Can::body()
                 odcore::reflection::MessageFromVisitableVisitor mfvv;
                 temp.accept(mfvv);
                 odcore::reflection::Message m = mfvv.getMessage();
-                m.addField(m_sentTS_ptr);
                 m.addField(m_receivedTS_ptr);
                 m.accept(*m_mapOfCSVVisitors[c.getDataType()]);
               }
