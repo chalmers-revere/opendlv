@@ -118,6 +118,26 @@ fh16-ps3controller: build-incremental fh16-ps3controller-copy-opendlv
 
 ###############################################################################
 ###############################################################################
+# FH16 CAN recording.
+
+# Tag Docker images using Git hashes for traceability.
+docker-tag-fh16-canrecording:
+	for i in $$(cat fh16-canrecording/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker tag fh16canrecording_$$i seresearch/fh16canrecording_$$i:$(VERSION); docker tag fh16canrecording_$$i seresearch/fh16canrecording_$$i:latest; done
+
+# Push Docker latest images for backup.
+docker-push-fh16-canrecording: docker-tag-fh16-canrecording
+	for i in $$(cat fh16-canrecording/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/fh16canrecording_$$i:$(VERSION); docker push seresearch/fh16canrecording_$$i:latest; done
+
+fh16-canrecording-copy-opendlv:
+	cp -r ../build.from.docker/install fh16-canrecording/opendlv
+	cp fh16-canrecording/checkHealth.sh fh16-canrecording/opendlv/bin
+
+# Build image for FH16 truck for CAN data recording.
+fh16-canrecording: build-incremental fh16-canrecording-copy-opendlv
+	cd fh16-canrecording && docker-compose build
+
+###############################################################################
+###############################################################################
 # FH16 IV2016.
 
 # Tag Docker images using Git hashes for traceability.
