@@ -134,30 +134,50 @@ void Can::setUp()
       MEMORY_SEGMENT_SIZE, NUMBER_OF_SEGMENTS, THREADING, DUMP_SHARED_DATA));
 
       {
-        stringstream fileName;
-        fileName << "CID-" << getCID() << "_"
-                 << "can_mapped_data_id-" << opendlv::proxy::reverefh16::ManualControl::ID() << "-_" << ts.getYYYYMMDD_HHMMSS() << ".csv";
+        {
+            stringstream fileName;
+            fileName << "CID-" << getCID() << "_"
+                     << "can_mapped_data_id-" << opendlv::proxy::reverefh16::ManualControl::ID() << "_" << ts.getYYYYMMDD_HHMMSS() << ".csv";
 
-        // Create map of CSV transformers.
-        fstream *f;
+            // Create map of CSV transformers.
+            fstream *f = new std::fstream(fileName.str(), std::ios::out);
 
-        // Log ManualControl.
-        f = new std::fstream(fileName.str(), std::ios::out);
-        m_mapOfCSVFiles[opendlv::proxy::reverefh16::ManualControl::ID()] = std::shared_ptr<std::fstream>(f);
-        m_mapOfCSVVisitors[opendlv::proxy::reverefh16::ManualControl::ID()] =
-            std::shared_ptr<odcore::reflection::CSVFromVisitableVisitor>(new odcore::reflection::CSVFromVisitableVisitor(*f));
+            // Log ManualControl.
+            m_mapOfCSVFiles[opendlv::proxy::reverefh16::ManualControl::ID()] = std::shared_ptr<std::fstream>(f);
+            m_mapOfCSVVisitors[opendlv::proxy::reverefh16::ManualControl::ID()] =
+                std::shared_ptr<odcore::reflection::CSVFromVisitableVisitor>(new odcore::reflection::CSVFromVisitableVisitor(*f));
+        }
 
-        // Log Steering.
-        f = new std::fstream(fileName.str(), std::ios::out);
-        m_mapOfCSVFiles[opendlv::proxy::reverefh16::Steering::ID()] = std::shared_ptr<std::fstream>(f);
-        m_mapOfCSVVisitors[opendlv::proxy::reverefh16::Steering::ID()] =
-            std::shared_ptr<odcore::reflection::CSVFromVisitableVisitor>(new odcore::reflection::CSVFromVisitableVisitor(*f));
+        {
+            stringstream fileName;
+            fileName << "CID-" << getCID() << "_"
+                     << "can_mapped_data_id-" << opendlv::proxy::reverefh16::Steering::ID() << "_" << ts.getYYYYMMDD_HHMMSS() << ".csv";
 
-        // Log Propulsion.
-        f = new std::fstream(fileName.str(), std::ios::out);
-        m_mapOfCSVFiles[opendlv::proxy::reverefh16::Propulsion::ID()] = std::shared_ptr<std::fstream>(f);
-        m_mapOfCSVVisitors[opendlv::proxy::reverefh16::Propulsion::ID()] =
-            std::shared_ptr<odcore::reflection::CSVFromVisitableVisitor>(new odcore::reflection::CSVFromVisitableVisitor(*f));
+            // Create map of CSV transformers.
+            fstream *f = new std::fstream(fileName.str(), std::ios::out);
+
+            // Log Steering.
+            f = new std::fstream(fileName.str(), std::ios::out);
+            m_mapOfCSVFiles[opendlv::proxy::reverefh16::Steering::ID()] = std::shared_ptr<std::fstream>(f);
+            m_mapOfCSVVisitors[opendlv::proxy::reverefh16::Steering::ID()] =
+                std::shared_ptr<odcore::reflection::CSVFromVisitableVisitor>(new odcore::reflection::CSVFromVisitableVisitor(*f));
+        }
+
+        {
+            stringstream fileName;
+            fileName << "CID-" << getCID() << "_"
+                     << "can_mapped_data_id-" << opendlv::proxy::reverefh16::Propulsion::ID() << "_" << ts.getYYYYMMDD_HHMMSS() << ".csv";
+
+            // Create map of CSV transformers.
+            fstream *f = new std::fstream(fileName.str(), std::ios::out);
+
+            // Log Propulsion.
+            f = new std::fstream(fileName.str(), std::ios::out);
+            m_mapOfCSVFiles[opendlv::proxy::reverefh16::Propulsion::ID()] = std::shared_ptr<std::fstream>(f);
+            m_mapOfCSVVisitors[opendlv::proxy::reverefh16::Propulsion::ID()] =
+                std::shared_ptr<odcore::reflection::CSVFromVisitableVisitor>(new odcore::reflection::CSVFromVisitableVisitor(*f));
+        }
+
       }
     }
 
