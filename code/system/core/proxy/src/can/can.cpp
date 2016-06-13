@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include <vector>
 
@@ -281,7 +282,7 @@ void Can::nextGenericCANMessage(const automotive::GenericCANMessage &gcm)
               << " " << gcm.getLength();
     uint64_t data = gcm.getData();
     for(uint8_t i = 0; i < gcm.getLength(); i++) {
-        (*m_ASCfile) << " " << (data & 0xFF);
+        (*m_ASCfile) << " " << hex << (data & 0xFF);
         data = data>>8;
     }
     (*m_ASCfile) << endl;

@@ -87,6 +87,7 @@ docker-push-fh16: docker-tag-fh16
 	for i in $$(cat fh16/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/fh16_$$i:$(VERSION); docker push seresearch/fh16_$$i:latest; done
 
 fh16-copy-opendlv:
+	rm -fr fh16/opendlv
 	cp -r ../build.from.docker/install fh16/opendlv
 	cp fh16/checkHealth.sh fh16/opendlv/bin
 
@@ -108,6 +109,7 @@ docker-push-fh16-ps3controller: docker-tag-fh16-ps3controller
 	for i in $$(cat fh16-ps3controller/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/fh16ps3controller_$$i:$(VERSION); docker push seresearch/fh16ps3controller_$$i:latest; done
 
 fh16-ps3controller-copy-opendlv:
+	rm -fr fh16-ps3controller/opendlv
 	cp -r ../build.from.docker/install fh16-ps3controller/opendlv
 	cp fh16-ps3controller/checkHealth.sh fh16-ps3controller/opendlv/bin
 
@@ -129,6 +131,7 @@ docker-push-fh16-canrecording: docker-tag-fh16-canrecording
 	for i in $$(cat fh16-canrecording/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/fh16canrecording_$$i:$(VERSION); docker push seresearch/fh16canrecording_$$i:latest; done
 
 fh16-canrecording-copy-opendlv:
+	rm -fr fh16-canrecording/opendlv
 	cp -r ../build.from.docker/install fh16-canrecording/opendlv
 	cp fh16-canrecording/checkHealth.sh fh16-canrecording/opendlv/bin
 
@@ -149,6 +152,7 @@ docker-push-fh16-iv2016: docker-tag-fh16-iv2016
 	for i in $$(cat fh16-iv2016/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/fh16iv2016_$$i:$(VERSION); docker push seresearch/fh16iv2016_$$i:latest; done
 
 fh16-iv2016-copy-opendlv:
+	rm -fr fh16-iv2016/opendlv
 	cp -r ../build.from.docker/install fh16-iv2016/opendlv
 	cp fh16-iv2016/checkHealth.sh fh16-iv2016/opendlv/bin
 
