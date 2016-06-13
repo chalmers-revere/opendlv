@@ -66,7 +66,7 @@ Ledstrip::~Ledstrip()
 // This method will do the main data processing job.
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Ledstrip::body()
 {
-    const string SERIAL_PORT = "/dev/ttyUSB0";
+    const string SERIAL_PORT = "/dev/ttyACM1";
     //const string SERIAL_PORT = "/dev/ttyACM0"; // this is for the Arduino Uno with spare LED strip
     const uint32_t BAUD_RATE = 9600;
     const float pi=M_PI;
@@ -80,28 +80,28 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Ledstrip::body()
         //return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
     }
 
-//    const float increment=0.1;
-//    bool test=true, sign=false;
+    const float increment=0.1;
+    bool test=true, sign=false;
     
     while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
     
     CLOG2<<endl<<"Start while loop"<<endl;
     
-//    if(test) // this is for the Arduino Uno with spare LED strip
-//    {
-//        CLOG2<<"angle: "<<m_angle<<" rad"<<std::endl;
-//        if(sign) {m_angle+=counter;CLOG2<<"adding "<<increment<<endl;}
-//        else {m_angle-=increment;CLOG2<<"subtracting "<<increment<<endl;}
-//    }
+    if(test) // this is for the Arduino Uno with spare LED strip
+    {
+        CLOG2<<"angle: "<<m_angle<<" rad"<<std::endl;
+        if(sign) {m_angle+=increment;CLOG2<<"adding "<<increment<<endl;}
+        else {m_angle-=increment;CLOG2<<"subtracting "<<increment<<endl;}
+    }
     
     // the max angle is 45 deg = 0.785398 rad
     if(std::fabs(m_angle) >= 0.785398f){
         if(m_angle >= 0.0f){
             m_angle = 0.785398f;
-//            sign=false;
+            sign=false;
         } else {
             m_angle = -0.785398f;
-//            sign=true;
+            sign=true;
         }
     }
     
@@ -118,7 +118,11 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Ledstrip::body()
     */
     //uint8_t focus=round(m_angle/(45.0f/180.0f*pi)*46.0f)+46; // this is for the Arduino Uno with spare LED strip
     uint8_t focus=round(m_angle/(45.0f/180.0f*pi)*73.0f)+73;
-    uint8_t section_size=10; // the size of the LED section to be powered
+    uint8_t section_size=20; // the size of the LED section to be powered
+    uint8_t fade=5; // the number of LEDs to be dimmed at the edge of the lighted section
+    uint8_t checksum=0; // checksum resulting from the bitwise xor of the payload bytes
+    
+    checksum=focus^section_size^fade^m_R^m_G^m_B;
     
     // Message header: 0xFEDE
     // Message size: 7 bytes
@@ -126,16 +130,18 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Ledstrip::body()
     ledRequest.push_back(0xDE);
     ledRequest.push_back(focus);
     ledRequest.push_back(section_size);
+    ledRequest.push_back(fade);
     ledRequest.push_back(m_R);
     ledRequest.push_back(m_G);
     ledRequest.push_back(m_B);
+    ledRequest.push_back(checksum);
     
     std::string stringToSend(ledRequest.begin(),ledRequest.end());
     std::cout<<"Frame : ";
     for(uint8_t i=0;i<stringToSend.size();++i) std::cout<<(uint16_t)stringToSend.at(i)<<" ";
     std::cout << " : frame size = " << stringToSend.size()
-              << " {focus: "<< (uint16_t)focus << ", section size: " << (uint16_t)section_size 
-              << ", R: " << (uint16_t)m_R << ", G: " << (uint16_t)m_G << ", B: " << (uint16_t)m_B << "}" << std::endl;
+              << " {focus: "<< (uint16_t)focus << ", section size: " << (uint16_t)section_size //<< ", fading: " << (uint16_t)fading 
+              << ", R: " << (uint16_t)m_R << ", G: " << (uint16_t)m_G << ", B: " << (uint16_t)m_B << "}" << ", checksum: " << (uint16_t)checksum << std::endl;
     
     serial->send(stringToSend);
     std::cout<<"Frame sent."<<std::endl;  
