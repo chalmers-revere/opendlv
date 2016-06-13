@@ -53,6 +53,7 @@ Can::Can(int32_t const &a_argc, char **a_argv)
     , m_device()
     , m_canMessageDataStore()
     , m_revereFh16CanMessageMapping()
+    , m_startOfRecording()
     , m_ASCfile()
     , m_mapOfCSVFiles()
     , m_mapOfCSVVisitors()
@@ -122,6 +123,7 @@ void Can::setUp()
       fileName << "CID-" << getCID() << "_"
                << "can_data_" << TIMESTAMP << ".asc";
       m_ASCfile = shared_ptr<fstream>(new fstream(fileName.str(), std::ios::out));
+      m_startOfRecording = ts;
       (*m_ASCfile) << "Time (s) Channel ID RX/TX d Length Byte 1 Byte 2 Byte 3 Byte 4 Byte 5 Byte 6 Byte 7 Byte 8" << endl;
     }
 
@@ -272,14 +274,13 @@ void Can::nextGenericCANMessage(const automotive::GenericCANMessage &gcm)
   }
 
   if (m_ASCfile.get() != NULL) {
-//Time (s) Channel ID RX/TX d Length Byte 1 Byte 2 Byte 3 Byte 4 Byte 5 Byte 6 Byte 7 Byte 8
-//5.29517 1 123 Rx d 8 00 00 00 00 00 00 00 00
-    (*m_ASCfile) << (gcm.getDriverTimeStamp().getSeconds() + (static_cast<double>(gcm.getDriverTimeStamp().getFractionalMicroseconds())/(1000.0*1000.0)))
+    odcore::data::TimeStamp ts = (gcm.getDriverTimeStamp() - m_startOfRecording);
+    (*m_ASCfile) << (ts.getSeconds() + (static_cast<double>(ts.getFractionalMicroseconds())/(1000.0*1000.0)))
               << " 1"
               << " " << gcm.getIdentifier()
               << " Rx"
               << " d"
-              << " " << gcm.getLength();
+              << " " << static_cast<uint32_t>(gcm.getLength());
     uint64_t data = gcm.getData();
     for(uint8_t i = 0; i < gcm.getLength(); i++) {
         (*m_ASCfile) << " " << hex << (data & 0xFF);

@@ -82,6 +82,7 @@ class Can : public odcore::base::module::TimeTriggeredConferenceClientModule,
 
   canmapping::CanMapping m_revereFh16CanMessageMapping;
 
+  odcore::data::TimeStamp m_startOfRecording;
   std::shared_ptr<std::fstream> m_ASCfile;
   std::map<uint32_t, std::shared_ptr<std::fstream> > m_mapOfCSVFiles;
   std::map<uint32_t, std::shared_ptr<odcore::reflection::CSVFromVisitableVisitor> > m_mapOfCSVVisitors;
