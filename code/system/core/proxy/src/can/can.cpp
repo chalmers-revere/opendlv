@@ -274,7 +274,8 @@ void Can::nextGenericCANMessage(const automotive::GenericCANMessage &gcm)
   }
 
   if (m_ASCfile.get() != NULL) {
-    odcore::data::TimeStamp ts = (gcm.getDriverTimeStamp() - m_startOfRecording);
+    odcore::data::TimeStamp now;
+    odcore::data::TimeStamp ts = (now - m_startOfRecording);
     (*m_ASCfile) << (ts.getSeconds() + (static_cast<double>(ts.getFractionalMicroseconds())/(1000.0*1000.0)))
               << " 1"
               << " " << gcm.getIdentifier()
