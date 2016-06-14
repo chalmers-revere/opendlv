@@ -83,33 +83,32 @@ int counter = 0;
     getConference().send(c);
     */
 
+    if(m_lidarStringDecoder->IsRunning()) {
+      SendData();
+      //std::cout << "Echo sent" << std::endl;
+    }
+    else if(m_lidarStringDecoder->IsCentimeterMode()){
+      StartScan();
+      m_lidarStringDecoder->NotCentimeterMode();
+      std::cout << "Centimeter mode!" << std::endl;
+    }
+    else if(m_lidarStringDecoder->IsSettingsMode())
+    {
+      SetCentimeterMode();
+      m_lidarStringDecoder->NotSettingsMode();
+      std::cout << "Settings mode" << std::endl;
+    }
 
 
     counter++;
-    if (counter == 30) {
+    if (counter == 10) {
         cout << "Sending status request" << endl;
         Status();
     }
-    if (counter == 40) {
+    if (counter == 20) {
         cout << "Sending settings mode" << endl;
         SettingsMode();
     }
-    
-//    if(m_lidarStringDecoder->IsRunning()) {
-//      SendData();
-//      //std::cout << "Echo sent" << std::endl;
-//    }
-//    else if(m_lidarStringDecoder->IsCentimeterMode()){
-//      StartScan();
-//      m_lidarStringDecoder->NotCentimeterMode();
-//      std::cout << "Centimeter mode!" << std::endl;
-//    }
-//    else if(m_lidarStringDecoder->IsSettingsMode())
-//    {
-//      SetCentimeterMode();
-//      m_lidarStringDecoder->NotSettingsMode();
-//      std::cout << "Settings mode" << std::endl;
-//    }
     
   }
 
