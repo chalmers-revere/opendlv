@@ -298,16 +298,19 @@ void LidarStringDecoder::nextString(std::string const &a_string)
     string s = m_buf.str();
     while (s.size() >= 10) {
         uint32_t sizeBefore = s.size();
+cout << "LEN_BEFORE = " << s.size() << endl;
         if(tryDecode()) {
             break;
         }
         s = m_buf.str();
+cout << "LEN_AFTER = " << s.size() << endl;
         uint32_t sizeAfter = s.size();
         if (sizeAfter == sizeBefore) {
             // Remove first byte.
             m_buf.str(m_buf.str().substr(1));
         }
         s = m_buf.str();
+cout << "LEN_AFTER_2 = " << s.size() << endl;
     }
     m_buf.seekg(0, ios_base::end);
 }
