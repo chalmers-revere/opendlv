@@ -70,8 +70,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SetOpticalFlow::body()
     // TODO hardcoded parameter...
     float acceptableSpeedDeviation = 2.0f / 3.6f; // 2 km/h
     float speedCorrectionFactor = 5.0f;
- //   float speedDiffEstimateLimit = 0.5f;
-   // float estimateAmplitudeSpeedFactor = 25.0f;
+    // float speedDiffEstimateLimit = 0.5f;
+    // float estimateAmplitudeSpeedFactor = 25.0f;
     float accelerationPredictionTime = 0.5f;
 
 
@@ -201,8 +201,8 @@ void SetOpticalFlow::nextContainer(odcore::data::Container &a_container)
 
 void SetOpticalFlow::setUp()
 {
-  odcore::base::KeyValueConfiguration kv1 = getKeyValueConfiguration();
-  m_maxSpeed = kv1.getValue<float>("action-setopticalflow.max_speed");
+  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+  m_maxSpeed = kv.getValue<float>("action-setopticalflow.max_speed");
 }
 
 void SetOpticalFlow::tearDown()

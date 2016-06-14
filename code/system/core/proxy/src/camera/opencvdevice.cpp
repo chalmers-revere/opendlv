@@ -54,13 +54,10 @@ OpenCvDevice::OpenCvDevice(std::string const &a_name,
       + ":" + a_password + "@" + a_port + "/axis-cgi/mjpg/video.cgi?user=" 
       + a_username + "&password=" + a_password + "&channel=0&.mjpg";
 
-  //videoStreamAddress = std::string("http://") + a_username + ":" + a_password + "@" + a_port + "/mjpg/video.mjpg";
-
-  //videoStreamAddress = "/home/plankton/Videos/GCDC_videos/testrun_gbg.mkv";
-  //videoStreamAddress = "/home/plankton/Downloads/from_elvis_cam_24may/20060826_201443_20060826_205808.mkv";
+  std::string videoStreamAddressHack = "/home/bjornborg/Videos/highway.avi";
 
   std::cout << videoStreamAddress << std::endl;
-  m_capture.reset(new cv::VideoCapture(videoStreamAddress));
+  m_capture.reset(new cv::VideoCapture(videoStreamAddressHack));
 
   if (m_capture->isOpened()) {
     std::cout << "Open. width: " << a_width << " height: " << a_height << std::endl;
