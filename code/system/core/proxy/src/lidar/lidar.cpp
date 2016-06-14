@@ -126,6 +126,7 @@ void Lidar::setUp()
     shared_ptr<odcore::wrapper::SerialPort> serial(odcore::wrapper::SerialPortFactory::createSerialPort(SERIAL_PORT, 9600));
     serial->setStringListener(m_lidarStringDecoder.get());
     serial->start();
+    m_sick = serial;
     SetBaud38400();
     serial->stop();
     serial->setStringListener(NULL);
