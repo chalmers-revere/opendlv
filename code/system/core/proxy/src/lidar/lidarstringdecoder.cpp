@@ -251,20 +251,20 @@ bool LidarStringDecoder::tryDecode() {
         }
     }
 
-    // Find centimeter mode.
-    if ((!m_centimeterMode) && (m_buf.str().size() >= 44)) {
-        m_centimeterMode = true;
-        for (uint32_t i = 0; i < 44; i++) {
-            cout << "s = " << (int)(uint8_t)s.at(i) << ", resp = " << (int)(uint8_t)m_centimeterResponse[i] << endl;
-            m_centimeterMode &= ((int)(uint8_t)s.at(i) == (int)(uint8_t) m_centimeterResponse[i]);
-        }
-        if (m_centimeterMode) {
-          cout << "Received centimeterMode." << endl;
-            // Remove 10 bytes.
-            m_buf.str(m_buf.str().substr(44));
-            m_buf.seekg(0, ios_base::end);
-        }
-    }
+//    // Find centimeter mode.
+//    if ((!m_centimeterMode) && (m_buf.str().size() >= 44)) {
+//        m_centimeterMode = true;
+//        for (uint32_t i = 0; i < 44; i++) {
+//            cout << "s = " << (int)(uint8_t)s.at(i) << ", resp = " << (int)(uint8_t)m_centimeterResponse[i] << endl;
+//            m_centimeterMode &= ((int)(uint8_t)s.at(i) == (int)(uint8_t) m_centimeterResponse[i]);
+//        }
+//        if (m_centimeterMode) {
+//          cout << "Received centimeterMode." << endl;
+//            // Remove 10 bytes.
+//            m_buf.str(m_buf.str().substr(44));
+//            m_buf.seekg(0, ios_base::end);
+//        }
+//    }
 
 
     // Find start confirmation.
