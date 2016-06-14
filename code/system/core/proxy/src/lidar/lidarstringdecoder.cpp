@@ -240,8 +240,8 @@ void LidarStringDecoder::nextString(std::string const &a_string)
         const string s = m_buf.str();
         m_startConfirmed = true;
         for (uint32_t i = 0; i < 10; i++) {
-            cout << "s = " << s.at(i) << ", resp = " << m_startResponse[i] << endl;
-            m_startConfirmed &= (s.at(i) == m_startResponse[i]);
+            cout << "s = " << (int)(uint8_t)s.at(i) << ", resp = " << (int)(uint8_t)m_startResponse[i] << endl;
+            m_startConfirmed &= ((int)(uint8_t)s.at(i) == (int)(uint8_t)m_startResponse[i]);
         }
         if (m_startConfirmed) {
           cout << "Received start confirmation." << endl;
