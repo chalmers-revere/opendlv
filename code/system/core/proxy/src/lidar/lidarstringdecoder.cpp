@@ -227,7 +227,10 @@ void LidarStringDecoder::ConvertToDistances()
 
 void LidarStringDecoder::nextString(std::string const &a_string) 
 {
-cout << a_string << endl;
+    for (uint32_t i = 0; i < a_string.size(); i++) {
+        cout << hex << (int)a_string.at(i) << " ";
+    }
+    cout << endl;
 
 }
 
