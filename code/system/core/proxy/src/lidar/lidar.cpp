@@ -116,7 +116,7 @@ void Lidar::setUp()
   
 
   string SERIAL_PORT = kv.getValue<std::string>("proxy-lidar.port");
-  uint32_t BAUD_RATE = 9600; //TODO: Put in configuration file
+  uint32_t BAUD_RATE = kv.getValue<std::uint32_t>("proxy-lidar.baudrate");//9600; //TODO: Put in configuration file
 
 
   m_lidarStringDecoder = std::unique_ptr<LidarStringDecoder>(new LidarStringDecoder(getConference(), x, y, z));
@@ -126,7 +126,7 @@ void Lidar::setUp()
     shared_ptr<odcore::wrapper::SerialPort> serial(odcore::wrapper::SerialPortFactory::createSerialPort(SERIAL_PORT, 9600));
     serial->setStringListener(m_lidarStringDecoder.get());
     serial->start();
-    SetBaud38400();      
+    SetBaud38400();
     serial->stop();
     serial->setStringListener(NULL);
     }
@@ -139,7 +139,6 @@ void Lidar::setUp()
     m_sick = shared_ptr<odcore::wrapper::SerialPort>(odcore::wrapper::SerialPortFactory::createSerialPort(SERIAL_PORT, BAUD_RATE));
     m_sick->setStringListener(m_lidarStringDecoder.get());
     m_sick->start();
-    SetBaud9600();
   }
   catch(string &exception) {
     cerr << "[" << getName() << "] Could not connect to Sickan: " << exception << endl;
