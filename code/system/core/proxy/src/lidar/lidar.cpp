@@ -101,6 +101,10 @@ int counter = 0;
 
 
     counter++;
+    if (counter == 10) {
+        cout << "Sending status request" << endl;
+        StopScan();
+    }
     if (counter == 30) {
         cout << "Sending status request" << endl;
         Status();
