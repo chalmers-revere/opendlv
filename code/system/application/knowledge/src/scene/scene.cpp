@@ -49,6 +49,9 @@ Scene::Scene(int32_t const &a_argc, char **a_argv)
     , m_savedObjects()
     , m_objectCounter(0)
     , m_surfaceCounter(0)
+    , m_mutex()
+    , m_mergeDistance()
+    , m_initialised(false)
 {
 }
 
@@ -74,6 +77,9 @@ Scene::~Scene()
 
 void Scene::nextContainer(odcore::data::Container &a_container)
 {
+  if(!m_initialised){
+    return;
+  }
   if(a_container.getDataType() == opendlv::perception::Object::ID()) {
     opendlv::perception::Object unpackedObject =
     a_container.getData<opendlv::perception::Object>();
@@ -459,6 +465,9 @@ void Scene::TimeCheck()
 
 void Scene::setUp()
 {
+  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+  m_mergeDistance = kv.getValue<float>("knowledge-scene.mergeDistance");
+  m_initialised = true;
 }
 
 void Scene::tearDown()
