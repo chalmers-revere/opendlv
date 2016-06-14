@@ -139,6 +139,7 @@ void Lidar::setUp()
     m_sick = shared_ptr<odcore::wrapper::SerialPort>(odcore::wrapper::SerialPortFactory::createSerialPort(SERIAL_PORT, BAUD_RATE));
     m_sick->setStringListener(m_lidarStringDecoder.get());
     m_sick->start();
+    SetBaud9600();
   }
   catch(string &exception) {
     cerr << "[" << getName() << "] Could not connect to Sickan: " << exception << endl;
