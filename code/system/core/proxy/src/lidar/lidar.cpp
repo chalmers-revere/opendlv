@@ -101,11 +101,11 @@ int counter = 0;
 
 
     counter++;
+//    if (counter == 10) {
+//        cout << "Sending status request" << endl;
+//        Status();
+//    }
     if (counter == 10) {
-        cout << "Sending status request" << endl;
-        Status();
-    }
-    if (counter == 20) {
         cout << "Sending settings mode" << endl;
         SettingsMode();
     }
