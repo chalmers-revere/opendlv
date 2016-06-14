@@ -227,7 +227,8 @@ void LidarStringDecoder::ConvertToDistances()
 
 void LidarStringDecoder::nextString(std::string const &a_string) 
 {
-cout << a_string;
+cout << a_string << endl;
+
 }
 
 void LidarStringDecoder::nextStringOld(std::string const &a_string) 

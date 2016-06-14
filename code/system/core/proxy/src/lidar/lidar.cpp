@@ -60,6 +60,7 @@ Lidar::~Lidar()
 // This method will do the main data processing job.
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Lidar::body()
 {
+int counter = 0;
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() 
       == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
     /*
@@ -81,22 +82,30 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Lidar::body()
     odcore::data::Container c(reading);
     getConference().send(c);
     */
+
+
+
+    counter++;
+    if (counter == 30) {
+        cout << "Sending status request" << endl;
+        Status();
+    }
     
-    if(m_lidarStringDecoder->IsRunning()) {
-      SendData();
-      //std::cout << "Echo sent" << std::endl;
-    }
-    else if(m_lidarStringDecoder->IsCentimeterMode()){
-      StartScan();
-      m_lidarStringDecoder->NotCentimeterMode();
-      std::cout << "Centimeter mode!" << std::endl;
-    }
-    else if(m_lidarStringDecoder->IsSettingsMode())
-    {
-      SetCentimeterMode();
-      m_lidarStringDecoder->NotSettingsMode();
-      std::cout << "Settings mode" << std::endl;
-    }
+//    if(m_lidarStringDecoder->IsRunning()) {
+//      SendData();
+//      //std::cout << "Echo sent" << std::endl;
+//    }
+//    else if(m_lidarStringDecoder->IsCentimeterMode()){
+//      StartScan();
+//      m_lidarStringDecoder->NotCentimeterMode();
+//      std::cout << "Centimeter mode!" << std::endl;
+//    }
+//    else if(m_lidarStringDecoder->IsSettingsMode())
+//    {
+//      SetCentimeterMode();
+//      m_lidarStringDecoder->NotSettingsMode();
+//      std::cout << "Settings mode" << std::endl;
+//    }
     
   }
 
