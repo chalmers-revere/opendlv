@@ -151,11 +151,11 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Ledstrip::body()
     ledRequest.push_back(checksum);
     
     std::string stringToSend(ledRequest.begin(),ledRequest.end());
-    std::cout<<"Frame : ";
+    CLOG2 << "Frame : ";
     for(uint8_t i=0;i<stringToSend.size();++i) std::cout<<(uint16_t)stringToSend.at(i)<<" ";
-    std::cout << " : frame size = " << stringToSend.size()
-              << " {focus: "<< (uint16_t)focus << ", section size: " << (uint16_t)section_size << ", fade: " << (uint16_t)fade
-              << ", R: " << (uint16_t)m_R << ", G: " << (uint16_t)m_G << ", B: " << (uint16_t)m_B << "}" << ", checksum: " << (uint16_t)checksum << std::endl;
+    CLOG2 << " : frame size = " << stringToSend.size()
+          << " {focus: "<< (uint16_t)focus << ", section size: " << (uint16_t)section_size << ", fade: " << (uint16_t)fade
+          << ", R: " << (uint16_t)m_R << ", G: " << (uint16_t)m_G << ", B: " << (uint16_t)m_B << "}" << ", checksum: " << (uint16_t)checksum << std::endl;
     
     serial->send(stringToSend);
     std::cout<<"Frame sent."<<std::endl;  
