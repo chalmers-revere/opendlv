@@ -90,6 +90,10 @@ int counter = 0;
         cout << "Sending status request" << endl;
         Status();
     }
+    if (counter == 40) {
+        cout << "Sending settings mode" << endl;
+        SettingsMode();
+    }
     
 //    if(m_lidarStringDecoder->IsRunning()) {
 //      SendData();
