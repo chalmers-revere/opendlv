@@ -280,18 +280,7 @@ bool LidarStringDecoder::tryDecode() {
     }
 
     if (m_header && (m_buf.str().size() >= 7)) {
-        m_header = true;
-        for (uint32_t i = 0; i < 7; i++) {
-            cout << "s = " << (int)(uint8_t)s.at(i) << ", resp = " << (int)(uint8_t)m_measurementHeader[i] << endl;
-            m_header &= ((int)(uint8_t)s.at(i) == (int)(uint8_t) m_measurementHeader[i]);
-        }
-        if (m_header) {
-          cout << "Received header." << endl;
-            // Remove 7 bytes.
-            m_buf.str(m_buf.str().substr(7));
-            m_buf.seekg(0, ios_base::end);
-            return true;
-        }
+        // Store bytes in receive measurement buffer.
     }
 
     return retVal;

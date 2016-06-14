@@ -60,7 +60,7 @@ Lidar::~Lidar()
 // This method will do the main data processing job.
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Lidar::body()
 {
-int counter = -20;
+int counter = -10;
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() 
       == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
     /*
@@ -105,19 +105,19 @@ int counter = -20;
         cout << "Sending stop scan" << endl;
         StopScan();
     }
-    if (counter == 30) {
+    if (counter == 15) {
         cout << "Sending status request" << endl;
         Status();
     }
-    if (counter == 40) {
+    if (counter == 20) {
         cout << "Sending settings mode" << endl;
         SettingsMode();
     }
-    if (counter == 50) {
+    if (counter == 25) {
         cout << "Sending centimeter mode" << endl;
         SetCentimeterMode();
     }
-    if (counter == 60) {
+    if (counter == 30) {
         cout << "Start scanning" << endl;
         StartScan();
     }
