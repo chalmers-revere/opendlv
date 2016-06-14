@@ -19,7 +19,9 @@
 
 #ifndef LIDAR_LIDARSTRINGDECODER_HPP_
 #define LIDAR_LIDARSTRINGDECODER_HPP_
- 
+
+#include <sstream>
+
 #include <opendavinci/odcore/io/StringListener.h>
 #include <opendavinci/odcore/io/conference/ContainerConference.h>
 #include <opendavinci/odcore/base/Mutex.h>
@@ -72,6 +74,7 @@ class LidarStringDecoder : public odcore::io::StringListener {
   unsigned char m_measurementHeader[7];
   unsigned char m_buffer[44];
   unsigned char m_centimeterResponse[44];
+  std::stringstream m_buf;
 };
 
 } // gps

@@ -50,6 +50,7 @@ LidarStringDecoder::LidarStringDecoder(odcore::io::conference::ContainerConferen
     //, m_radii()
     , m_latestReadingMutex()
     , m_latestReading()
+    , m_buf()
 {
   m_position[0] = a_x;
   m_position[1] = a_y;
@@ -229,9 +230,23 @@ void LidarStringDecoder::nextString(std::string const &a_string)
 {
     for (uint32_t i = 0; i < a_string.size(); i++) {
         cout << hex << (int)(((uint8_t)a_string.at(i))&0xFF) << " ";
+        char c = a_string.at(i);
+        m_buf.write(&c, sizeof(char));
     }
     cout << endl;
 
+    if (m_buf.str().size() >= 10) {
+        // Try to find start message.
+        const string s = m_buf.str();
+        m_startConfirmed = true;
+        for (uint32_t i = 0; i < 10; i++) {
+            m_startConfirmed &= (s.at(0) == m_startResponse[i]);
+        }
+        cout << "Received start confirmation." << endl;
+        // Remove 10 bytes.
+        m_buf.str(m_buf.str().substr(10));
+        m_buf.seekg(0, ios_base::end);
+    }
 }
 
 void LidarStringDecoder::nextStringOld(std::string const &a_string) 
