@@ -230,8 +230,47 @@ void LidarStringDecoder::ConvertToDistances()
 bool LidarStringDecoder::tryDecode() {
     bool retVal = false;
     const string s = m_buf.str();
+
+
+    if (m_header && (m_buf.str().size() >= 7)) {
+        // Store bytes in receive measurement buffer.
+    }
+
+    // Find header.
+    if ((m_centimeterMode && !m_header) && (m_buf.str().size() >= 7)) {
+        m_header = true;
+        for (uint32_t i = 0; i < 7; i++) {
+            cout << "s = " << (int)(uint8_t)s.at(i) << ", resp = " << (int)(uint8_t)m_measurementHeader[i] << endl;
+            m_header &= ((int)(uint8_t)s.at(i) == (int)(uint8_t) m_measurementHeader[i]);
+        }
+        if (m_header) {
+          cout << "Received header." << endl;
+            // Remove 7 bytes.
+            m_buf.str(m_buf.str().substr(7));
+            m_buf.seekg(0, ios_base::end);
+            return true;
+        }
+    }
+
+    // Find centimeter mode.
+    if ((!m_centimeterMode) && (m_buf.str().size() >= 44)) {
+        m_centimeterMode = true;
+        for (uint32_t i = 0; i < 44; i++) {
+            cout << "s = " << (int)(uint8_t)s.at(i) << ", resp = " << (int)(uint8_t)m_centimeterResponse[i] << endl;
+            m_centimeterMode &= ((int)(uint8_t)s.at(i) == (int)(uint8_t) m_centimeterResponse[i]);
+        }
+        if (m_centimeterMode) {
+          cout << "Received centimeterMode." << endl;
+            // Remove 10 bytes.
+            m_buf.str(m_buf.str().substr(44));
+            m_buf.seekg(0, ios_base::end);
+            return true;
+        }
+    }
+
+
     // Find start confirmation.
-    if (!m_startConfirmed && (m_buf.str().size() >= 10)) {
+    if ((m_buf.str().size() >= 10)) {
         // Try to find start message.
         m_startConfirmed = true;
         for (uint32_t i = 0; i < 10; i++) {
@@ -247,41 +286,6 @@ bool LidarStringDecoder::tryDecode() {
         }
     }
 
-    // Find centimeter mode.
-    if ((m_startConfirmed && !m_centimeterMode) && (m_buf.str().size() >= 44)) {
-        m_centimeterMode = true;
-        for (uint32_t i = 0; i < 44; i++) {
-            cout << "s = " << (int)(uint8_t)s.at(i) << ", resp = " << (int)(uint8_t)m_centimeterResponse[i] << endl;
-            m_centimeterMode &= ((int)(uint8_t)s.at(i) == (int)(uint8_t) m_centimeterResponse[i]);
-        }
-        if (m_centimeterMode) {
-          cout << "Received centimeterMode." << endl;
-            // Remove 10 bytes.
-            m_buf.str(m_buf.str().substr(44));
-            m_buf.seekg(0, ios_base::end);
-            return true;
-        }
-    }
-
-    // Find header.
-    if ((m_startConfirmed && m_centimeterMode && !m_header) && (m_buf.str().size() >= 7)) {
-        m_header = true;
-        for (uint32_t i = 0; i < 7; i++) {
-            cout << "s = " << (int)(uint8_t)s.at(i) << ", resp = " << (int)(uint8_t)m_measurementHeader[i] << endl;
-            m_header &= ((int)(uint8_t)s.at(i) == (int)(uint8_t) m_measurementHeader[i]);
-        }
-        if (m_header) {
-          cout << "Received header." << endl;
-            // Remove 7 bytes.
-            m_buf.str(m_buf.str().substr(7));
-            m_buf.seekg(0, ios_base::end);
-            return true;
-        }
-    }
-
-    if (m_header && (m_buf.str().size() >= 7)) {
-        // Store bytes in receive measurement buffer.
-    }
 
     return retVal;
 }
@@ -298,19 +302,19 @@ void LidarStringDecoder::nextString(std::string const &a_string)
     string s = m_buf.str();
     while (s.size() >= 10) {
         uint32_t sizeBefore = s.size();
-cout << "LEN_BEFORE = " << s.size() << endl;
+cout << "LEN_BEFORE = " << dec << s.size() << endl;
         if(tryDecode()) {
             break;
         }
         s = m_buf.str();
-cout << "LEN_AFTER = " << s.size() << endl;
+cout << "LEN_AFTER = " << dec << s.size() << endl;
         uint32_t sizeAfter = s.size();
         if (sizeAfter == sizeBefore) {
             // Remove first byte.
             m_buf.str(m_buf.str().substr(1));
         }
         s = m_buf.str();
-cout << "LEN_AFTER_2 = " << s.size() << endl;
+cout << "LEN_AFTER_2 = " << dec << s.size() << endl;
     }
     m_buf.seekg(0, ios_base::end);
 }
