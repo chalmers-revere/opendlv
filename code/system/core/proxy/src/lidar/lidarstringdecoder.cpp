@@ -227,6 +227,11 @@ void LidarStringDecoder::ConvertToDistances()
 
 void LidarStringDecoder::nextString(std::string const &a_string) 
 {
+cout << a_string;
+}
+
+void LidarStringDecoder::nextStringOld(std::string const &a_string) 
+{
   //For debugging
   //std::string alpha = "0123456789ABCDEF";
 

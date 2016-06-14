@@ -119,6 +119,8 @@ void Lidar::setUp()
   uint32_t BAUD_RATE = kv.getValue<std::uint32_t>("proxy-lidar.baudrate");//9600; //TODO: Put in configuration file
 
 
+BAUD_RATE = 9600;
+
   m_lidarStringDecoder = std::unique_ptr<LidarStringDecoder>(new LidarStringDecoder(getConference(), x, y, z));
 
   if(BAUD_RATE != 9600) {
@@ -130,6 +132,7 @@ void Lidar::setUp()
     SetBaud38400();
     serial->stop();
     serial->setStringListener(NULL);
+    m_sick.reset();
     }
     catch(string &exception) {
       cerr << "[" << getName() << "] Could not connect to Sickan: " << exception << endl;
@@ -149,7 +152,7 @@ void Lidar::setUp()
 
   std::cout << "Connected to Sickan, please wait for configuration" << std::endl;
 
-  SettingsMode(); //Enter settings mode
+//  SettingsMode(); //Enter settings mode
   
 }
 
