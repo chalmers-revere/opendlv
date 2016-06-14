@@ -101,19 +101,19 @@ int counter = 0;
 
 
     counter++;
-//    if (counter == 10) {
-//        cout << "Sending status request" << endl;
-//        Status();
-//    }
-    if (counter == 10) {
+    if (counter == 30) {
+        cout << "Sending status request" << endl;
+        Status();
+    }
+    if (counter == 40) {
         cout << "Sending settings mode" << endl;
         SettingsMode();
     }
-    if (counter == 20) {
+    if (counter == 50) {
         cout << "Sending centimeter mode" << endl;
         SetCentimeterMode();
     }
-    if (counter == 30) {
+    if (counter == 60) {
         cout << "Start scanning" << endl;
         StartScan();
     }
