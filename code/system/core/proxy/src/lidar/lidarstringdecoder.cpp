@@ -229,11 +229,11 @@ void LidarStringDecoder::ConvertToDistances()
 void LidarStringDecoder::nextString(std::string const &a_string) 
 {
     for (uint32_t i = 0; i < a_string.size(); i++) {
-        cout << hex << (int)(((uint8_t)a_string.at(i))&0xFF) << " ";
+//        cout << hex << (int)(((uint8_t)a_string.at(i))&0xFF) << " ";
         char c = a_string.at(i);
         m_buf.write(&c, sizeof(char));
     }
-    cout << endl;
+//    cout << endl;
 
     const string s = m_buf.str();
     // Find start confirmation.
@@ -271,8 +271,10 @@ void LidarStringDecoder::nextString(std::string const &a_string)
 
     // We are ready.
     if ( (m_startConfirmed && m_centimeterMode) && (m_buf.str().size() >= (7 + 2*361 + 3)) ) {
-char d; cin >> d;
-
+        cout << m_buf.str() << endl;
+        m_buf.str(m_buf.str().substr(7 + 2*361 + 3));
+        m_buf.seekg(0, ios_base::end);
+        return;
     }
 }
 
