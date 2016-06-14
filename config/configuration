@@ -228,8 +228,7 @@ safety-manualoverride.torsionBarTorqueThreshold = 1.5
 
 ###############################################################################
 ###############################################################################
-# Sensation Optical flow
-
+# Optical flow
 sensation-vision-opticalflow.termCritMaxCount = 20
 sensation-vision-opticalflow.termCritEpsilon = 0.03
 sensation-vision-opticalflow.lkSearchWindowWidth = 30
@@ -249,8 +248,15 @@ knowledge-identity.rearAxleLocation = 5.0
 
 ###############################################################################
 ###############################################################################
+# Ivrule
+knowledge-ivrule.mioAngleRange = 30.0 #degrees
+knowledge-ivrule.mioDistanceRange = 30.0 #meters
+
+###############################################################################
+###############################################################################
 # Scene
 knowledge-scene.mergeDistance = 2.0
+knowledge-scene.validUntilDuration = 1;
 
 ###############################################################################
 ###############################################################################

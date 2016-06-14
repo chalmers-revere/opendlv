@@ -51,6 +51,7 @@ Scene::Scene(int32_t const &a_argc, char **a_argv)
     , m_surfaceCounter(0)
     , m_mutex()
     , m_mergeDistance()
+    , m_validUntilDuration()
     , m_initialised(false)
 {
 }
@@ -273,7 +274,8 @@ bool Scene::IsInRectangle(opendlv::model::Cartesian3 point, std::vector<opendlv:
 
 void Scene::SendStuff()
 {
-  odcore::data::TimeStamp validUntil;
+  odcore::data::TimeStamp now;
+  odcore::data::TimeStamp validUntil(now.getSeconds()+m_validUntilDuration,now.getFractionalMicroseconds());
   opendlv::perception::Environment environment(validUntil, m_savedObjects);
 
   odcore::data::Container objectContainerEnvironment(environment);
@@ -283,8 +285,8 @@ void Scene::SendStuff()
   std::cout << "Objects sent: " << std::endl;
 
   for(uint32_t i = 0; i < m_savedObjects.size(); i++) {
-    odcore::data::Container objectContainer(m_savedObjects[i], opendlv::perception::Object::ID() + 300);
-    getConference().send(objectContainer);
+    // odcore::data::Container objectContainer(m_savedObjects[i], opendlv::perception::Object::ID() + 300);
+    // getConference().send(objectContainer);
     std::cout << "ID: "<< m_savedObjects[i].getObjectId() << std::endl;
     std::cout << "Angle: "<< m_savedObjects[i].getDirection().getAzimuth() << std::endl;
     std::cout << "Distance: "<< m_savedObjects[i].getDistance() << std::endl;
@@ -467,6 +469,7 @@ void Scene::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
   m_mergeDistance = kv.getValue<float>("knowledge-scene.mergeDistance");
+  m_validUntilDuration = kv.getValue<uint8_t>("knowledge-scene.validUntilDuration");
   m_initialised = true;
 }
 

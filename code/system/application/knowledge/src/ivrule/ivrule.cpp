@@ -21,6 +21,11 @@
 
 #include "ivrule/ivrule.hpp"
 
+#include <cmath>
+
+#include "opendavinci/odcore/data/TimeStamp.h"
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
+
 namespace opendlv {
 namespace knowledge {
 namespace ivrule {
@@ -34,7 +39,10 @@ namespace ivrule {
 Ivrule::Ivrule(int32_t const &a_argc, char **a_argv)
     : TimeTriggeredConferenceClientModule(a_argc, a_argv, "knowledge-ivrule")
     , m_initialised(false)
-    , m_environmentValidUntil()
+    , m_mioAngleRange()
+    , m_mioDistanceRange()
+    , m_mioValidUntil()
+    , m_mio()
 {
 }
 
@@ -69,17 +77,56 @@ void Ivrule::nextContainer(odcore::data::Container &a_container)
 
 void Ivrule::ReadEnvironment(opendlv::perception::Environment &a_environment)
 {
-  m_environmentValidUntil = a_environment.getValidUntil();
+  odcore::data::TimeStamp now;
+  odcore::data::TimeStamp environmentValidUntil = a_environment.getValidUntil();
+  //1 second as valid data
+  if(now.toMicroseconds()-environmentValidUntil.toMicroseconds() < 0){
+    std::vector<opendlv::perception::Object> listOfObjects = a_environment.getListOfObjects();
+    if(listOfObjects.size() > 0){
+      m_mio = FindMio(listOfObjects);
+    }
+  }
 }
 
-opendlv::perception::Object Ivrule::GetMio()
+opendlv::perception::Object Ivrule::FindMio(std::vector<opendlv::perception::Object> &a_listOfObjects)
 {
   opendlv::perception::Object mio;
+  std::vector<float> scoreList;
+
+  for(auto object:a_listOfObjects){
+    opendlv::model::Direction direction = object.getDirection();
+    float azimuth = direction.getAzimuth();
+    float distance = object.getDistance();
+    std::vector<std::string> sources = object.getListOfSources();
+
+    float score = 0;
+
+    if(std::abs(azimuth) < m_mioAngleRange){
+      score += 100;
+    }
+    score += (100-distance)*2;
+    for(auto it:sources){
+      score += 80;
+    }
+
+    if(distance > 50){
+      score = 0;
+    }
+    scoreList.push_back(score);
+  }
+
+
+  
+  // return NULL;
+  odcore::data::TimeStamp now;
   return mio;
 }
 
 void Ivrule::setUp()
 {
+  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+  m_mioAngleRange = kv.getValue<float>("knowledge-ivrule.mioAngleRange");
+  m_mioDistanceRange = kv.getValue<float>("knowledge-ivrule.mioDistanceRange");
   m_initialised = true;
 }
 
