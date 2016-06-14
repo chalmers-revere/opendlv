@@ -113,6 +113,10 @@ int counter = 0;
         cout << "Sending centimeter mode" << endl;
         SetCentimeterMode();
     }
+    if (counter == 30) {
+        cout << "Start scanning" << endl;
+        StartScan();
+    }
     
   }
 

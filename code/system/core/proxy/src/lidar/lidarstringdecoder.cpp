@@ -254,7 +254,7 @@ void LidarStringDecoder::nextString(std::string const &a_string)
         if (m_startConfirmed && !m_centimeterMode) {
             if (m_buf.str().size() >= 44) {
                 m_centimeterMode = true;
-                for (uint32_t i = 0; i < 10; i++) {
+                for (uint32_t i = 0; i < 44; i++) {
                     cout << "s = " << (int)(uint8_t)s.at(i) << ", resp = " << (int)(uint8_t)m_centimeterResponse[i] << endl;
                     m_centimeterMode &= ((int)(uint8_t)s.at(i) == (int)(uint8_t) m_centimeterResponse[i]);
                 }
