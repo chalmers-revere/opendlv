@@ -248,7 +248,6 @@ bool LidarStringDecoder::tryDecode() {
             // Remove 7 bytes.
             m_buf.str(m_buf.str().substr(7));
             m_buf.seekg(0, ios_base::end);
-            return true;
         }
     }
 
@@ -264,7 +263,6 @@ bool LidarStringDecoder::tryDecode() {
             // Remove 10 bytes.
             m_buf.str(m_buf.str().substr(44));
             m_buf.seekg(0, ios_base::end);
-            return true;
         }
     }
 
@@ -282,7 +280,6 @@ bool LidarStringDecoder::tryDecode() {
             // Remove 10 bytes.
             m_buf.str(m_buf.str().substr(10));
             m_buf.seekg(0, ios_base::end);
-            return true;
         }
     }
 
@@ -303,9 +300,7 @@ void LidarStringDecoder::nextString(std::string const &a_string)
     while (s.size() >= 10) {
         uint32_t sizeBefore = s.size();
 cout << "LEN_BEFORE = " << dec << s.size() << endl;
-        if(tryDecode()) {
-            break;
-        }
+        tryDecode();
         s = m_buf.str();
 cout << "LEN_AFTER = " << dec << s.size() << endl;
         uint32_t sizeAfter = s.size();
