@@ -226,15 +226,7 @@ void LidarStringDecoder::ConvertToDistances()
   //std::cout << " in latestreading: " << m_latestReading.getListOfRadii()[0] << std::endl;
 }
 
-void LidarStringDecoder::nextString(std::string const &a_string) 
-{
-    for (uint32_t i = 0; i < a_string.size(); i++) {
-//        cout << hex << (int)(((uint8_t)a_string.at(i))&0xFF) << " ";
-        char c = a_string.at(i);
-        m_buf.write(&c, sizeof(char));
-    }
-//    cout << endl;
-
+void LidarStringDecoder::tryDecode() {
     const string s = m_buf.str();
     // Find start confirmation.
     if (!m_startConfirmed && (m_buf.str().size() >= 10)) {
@@ -276,6 +268,18 @@ void LidarStringDecoder::nextString(std::string const &a_string)
         m_buf.seekg(0, ios_base::end);
         return;
     }
+}
+
+void LidarStringDecoder::nextString(std::string const &a_string) 
+{
+    for (uint32_t i = 0; i < a_string.size(); i++) {
+        cout << hex << (int)(((uint8_t)a_string.at(i))&0xFF) << " ";
+        char c = a_string.at(i);
+        m_buf.write(&c, sizeof(char));
+    }
+    cout << endl;
+
+    tryDecode();
 }
 
 void LidarStringDecoder::nextStringOld(std::string const &a_string) 
