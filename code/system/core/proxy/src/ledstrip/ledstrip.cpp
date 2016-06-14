@@ -116,10 +116,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Ledstrip::body()
     * "focus" represents the centre of the LED section to be powered. 
     * It is obtained through the transformation of the direction 
     * of the movement angle (capped between [-45,45] deg) 
-    * into a ledstrip index (between [0,147])
+    * into a percentage value
     */
-    //uint8_t focus=round(m_angle/(45.0f/180.0f*pi)*46.0f)+46; // this is for the Arduino Uno with spare LED strip
-    focus=round(m_angle/(45.0f/180.0f*pi)*73.0f)+73;
+    focus=round(m_angle/(45.0f/180.0f*pi)*50.0f)+50.0f;
     
     uint8_t section_size=60; // the size of the LED section to be powered
     uint8_t fade=10; // the number of LEDs to be dimmed at the edge of the lighted section
