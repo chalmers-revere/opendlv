@@ -55,7 +55,7 @@ class LidarStringDecoder : public odcore::io::StringListener {
   bool CheckForSettingsResponse() ;
   bool CheckForStartResponse() ;
   void ConvertToDistances();
-  void tryDecode();
+  bool tryDecode();
 
   odcore::io::conference::ContainerConference &m_conference;
   bool m_firstHeader;

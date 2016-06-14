@@ -226,7 +226,8 @@ void LidarStringDecoder::ConvertToDistances()
   //std::cout << " in latestreading: " << m_latestReading.getListOfRadii()[0] << std::endl;
 }
 
-void LidarStringDecoder::tryDecode() {
+bool LidarStringDecoder::tryDecode() {
+    bool retVal = false;
     const string s = m_buf.str();
     // Find start confirmation.
     if (!m_startConfirmed && (m_buf.str().size() >= 10)) {
@@ -241,7 +242,7 @@ void LidarStringDecoder::tryDecode() {
             // Remove 10 bytes.
             m_buf.str(m_buf.str().substr(10));
             m_buf.seekg(0, ios_base::end);
-            return;
+            return true;
         }
     }
 
@@ -257,17 +258,18 @@ void LidarStringDecoder::tryDecode() {
             // Remove 10 bytes.
             m_buf.str(m_buf.str().substr(44));
             m_buf.seekg(0, ios_base::end);
-            return;
+            return true;
         }
     }
 
     // We are ready.
-    if ( (m_startConfirmed && m_centimeterMode) && (m_buf.str().size() >= (7 + 2*361 + 3)) ) {
-        cout << m_buf.str() << endl;
-        m_buf.str(m_buf.str().substr(7 + 2*361 + 3));
-        m_buf.seekg(0, ios_base::end);
-        return;
-    }
+//    if ( (m_startConfirmed && m_centimeterMode) && (m_buf.str().size() >= (7 + 2*361 + 3)) ) {
+//        cout << m_buf.str() << endl;
+//        m_buf.str(m_buf.str().substr(7 + 2*361 + 3));
+//        m_buf.seekg(0, ios_base::end);
+//        return;
+//    }
+    return retVal;
 }
 
 void LidarStringDecoder::nextString(std::string const &a_string) 
@@ -279,7 +281,19 @@ void LidarStringDecoder::nextString(std::string const &a_string)
     }
     cout << endl;
 
-    tryDecode();
+    string s = m_buf.str();
+    while (s.size() >= 10) {
+        uint32_t sizeBefore = s.size();
+        tryDecode();
+        s = m_buf.str();
+        uint32_t sizeAfter = s.size();
+        if (sizeAfter == sizeBefore) {
+            // Remove first byte.
+            m_buf.str(m_buf.str().substr(1));
+        }
+        s = m_buf.str();
+    }
+    m_buf.seekg(0, ios_base::end);
 }
 
 void LidarStringDecoder::nextStringOld(std::string const &a_string) 
