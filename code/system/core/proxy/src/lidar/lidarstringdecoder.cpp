@@ -19,17 +19,16 @@
 
 #include <stdint.h>
 
-#include <string>
-#include <iostream>
-#include <vector>
 #include <cmath>
 
+#include <iostream>
+#include <string>
+#include <vector>
+
 #include <opendavinci/odcore/data/Container.h>
- #include <opendavinci/odcore/base/Lock.h>
-
-#include "opendavinci/odcore/base/KeyValueConfiguration.h"
-
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
+#include <opendavinci/odcore/base/Lock.h>
+#include <opendavinci/odcore/base/KeyValueConfiguration.h>
+#include <opendlvdata/GeneratedHeaders_opendlvdata.h>
 
 #include "lidar/lidar.hpp"
 
@@ -49,7 +48,7 @@ LidarStringDecoder::LidarStringDecoder(odcore::io::conference::ContainerConferen
     , m_bufferSize(44)
     //, m_directions()
     //, m_radii()
-    , m_latestReadingMutex()
+//    , m_latestReadingMutex()
     , m_latestReading()
     , m_buf()
 {
@@ -67,6 +66,7 @@ LidarStringDecoder::LidarStringDecoder(odcore::io::conference::ContainerConferen
   m_startResponse[7] = 0x10; //11?
   m_startResponse[8] = 0x16; //17?
   m_startResponse[9] = 0x0A;
+
   m_measurementHeader[0] = 0x02;
   m_measurementHeader[1] = 0x80;
   m_measurementHeader[2] = 0xD6;
@@ -74,6 +74,7 @@ LidarStringDecoder::LidarStringDecoder(odcore::io::conference::ContainerConferen
   m_measurementHeader[4] = 0xB0;
   m_measurementHeader[5] = 0x69;
   m_measurementHeader[6] = 0x01; //01 for centimeters, 41 for millimeters
+
   m_centimeterResponse[0] = 0x06;
   m_centimeterResponse[1] = 0x02;
   m_centimeterResponse[2] = 0x80;
@@ -177,7 +178,7 @@ bool LidarStringDecoder::CheckForStartResponse()
 
 opendlv::proxy::EchoReading LidarStringDecoder::GetLatestReading()
 {
-  odcore::base::Lock l(m_latestReadingMutex);
+//  odcore::base::Lock l(m_latestReadingMutex);
   return m_latestReading;
 }
 
@@ -187,7 +188,6 @@ void LidarStringDecoder::ConvertToDistances()
   uint32_t byte2;
   uint32_t distance;
   double cartesian[2];
-  double PI = 3.14159265;
 
   std::vector<opendlv::model::Direction> directions; // m_directions.clear();
   std::vector<double> radii; // m_radii.clear();
@@ -204,12 +204,11 @@ void LidarStringDecoder::ConvertToDistances()
     }
 
     if(distance < 7500) { //We don't send max range responses
-      cartesian[0] = distance * sin(PI * i /360.0) / 100.0; //Local cartesian coordinates in meters (rotated coordinate system)
-      cartesian[1] = distance * (-cos(PI * i /360.0)) / 100.0;
+      cartesian[0] = distance * sin(M_PI * i /360.0) / 100.0; //Local cartesian coordinates in meters (rotated coordinate system)
+      cartesian[1] = distance * (-cos(M_PI * i /360.0)) / 100.0;
       cartesian[0] += m_position[0]; //Truck cartesian coordinates
       cartesian[1] += m_position[1];
 
-      
       double radius = std::sqrt(pow(cartesian[0],2) + std::pow(cartesian[1],2));
       float angle = static_cast<float>(std::atan2(cartesian[1],cartesian[0]));
       opendlv::model::Direction direction(angle,0);
@@ -220,11 +219,13 @@ void LidarStringDecoder::ConvertToDistances()
 
   //std::cout << "radius: " << radii[0];
 
-  odcore::base::Lock l(m_latestReadingMutex);
+//  odcore::base::Lock l(m_latestReadingMutex);
   m_latestReading.setListOfDirections(directions);
   m_latestReading.setListOfRadii(radii);
   m_latestReading.setNumberOfPoints(radii.size());
   //std::cout << " in latestreading: " << m_latestReading.getListOfRadii()[0] << std::endl;
+  odcore::data::Container c(m_latestReading);
+  m_conference.send(c);
 }
 
 bool LidarStringDecoder::tryDecode() {
@@ -246,6 +247,8 @@ bool LidarStringDecoder::tryDecode() {
 
     if (m_header && (byteCounter == 722)) {
 cout << "Completed payload." << endl;
+        // Do ray transformation.
+        ConvertToDistances();
         // Consumed all measurements; find next header; there should be three bytes trailing before the next sequence begins.
         m_header = false;
         return false;

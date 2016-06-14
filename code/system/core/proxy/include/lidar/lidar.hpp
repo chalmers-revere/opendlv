@@ -35,7 +35,7 @@ namespace proxy {
 namespace lidar {
 
 /**
- * This class provides...
+ * This class decodes data from SICK LMS 200.
  */
 class Lidar : public odcore::base::module::TimeTriggeredConferenceClientModule 
 {
@@ -46,17 +46,13 @@ class Lidar : public odcore::base::module::TimeTriggeredConferenceClientModule
   virtual ~Lidar();
 
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
-  virtual void nextContainer(odcore::data::Container &c);
 
  private:
-  void setUp();
-  void tearDown();
-  void SendData();
+  virtual void setUp();
+  virtual void tearDown();
   void Status();
   void StartScan();
   void StopScan();
-  void SetBaud9600();
-  void SetBaud38400();
   void SettingsMode();
   void SetCentimeterMode();
 

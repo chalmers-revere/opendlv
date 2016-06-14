@@ -57,185 +57,30 @@ Lidar::~Lidar()
 {
 }
 
-// This method will do the main data processing job.
-odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Lidar::body()
-{
-int counter = -10;
-  while (getModuleStateAndWaitForRemainingTimeInTimeslice() 
-      == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
-    /*
-    opendlv::model::Direction direction(0.0f,0.0f);
-    std::vector<opendlv::model::Direction> directions;
-    std::vector<double> distances;
-    float PI = 3.1415f;
-    for(int i = 0; i < 361; i++)
-    {
-      direction.setAzimuth(i * PI/ 360.0f);
-      directions.push_back(direction);
-      distances.push_back(1.0);
-    }
-    opendlv::proxy::EchoReading reading; 
-
-    reading.setListOfDirections(directions);
-    reading.setListOfRadii(distances);
-    reading.setNumberOfPoints(distances.size());
-    odcore::data::Container c(reading);
-    getConference().send(c);
-    */
-
-//    if(m_lidarStringDecoder->IsRunning()) {
-//      SendData();
-//      //std::cout << "Echo sent" << std::endl;
-//    }
-//    else if(m_lidarStringDecoder->IsCentimeterMode()){
-//      StartScan();
-//      m_lidarStringDecoder->NotCentimeterMode();
-//      std::cout << "Centimeter mode!" << std::endl;
-//    }
-//    else if(m_lidarStringDecoder->IsSettingsMode())
-//    {
-//      SetCentimeterMode();
-//      m_lidarStringDecoder->NotSettingsMode();
-//      std::cout << "Settings mode" << std::endl;
-//    }
-
-
-    counter++;
-    if (counter == 10) {
-        cout << "Sending stop scan" << endl;
-        StopScan();
-    }
-    if (counter == 15) {
-        cout << "Sending status request" << endl;
-        Status();
-    }
-    if (counter == 20) {
-        cout << "Sending settings mode" << endl;
-        SettingsMode();
-    }
-    if (counter == 25) {
-        cout << "Sending centimeter mode" << endl;
-        SetCentimeterMode();
-    }
-    if (counter == 30) {
-        cout << "Start scanning" << endl;
-        StartScan();
-    }
-    
-  }
-
-  return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
-}
-
 void Lidar::setUp()
 {
-  
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
-  std::string const type = kv.getValue<std::string>("proxy-lidar.type");
+//  std::string const type = kv.getValue<std::string>("proxy-lidar.type");
 
-  double x = kv.getValue<float>("proxy-lidar.mount.x");
-  double y = kv.getValue<float>("proxy-lidar.mount.y");
-  double z = kv.getValue<float>("proxy-lidar.mount.z");
-  
-
-  string SERIAL_PORT = kv.getValue<std::string>("proxy-lidar.port");
-  uint32_t BAUD_RATE = kv.getValue<std::uint32_t>("proxy-lidar.baudrate");//9600; //TODO: Put in configuration file
-
-
-BAUD_RATE = 9600;
-
+  const double x = kv.getValue<float>("proxy-lidar.mount.x");
+  const double y = kv.getValue<float>("proxy-lidar.mount.y");
+  const double z = kv.getValue<float>("proxy-lidar.mount.z");
   m_lidarStringDecoder = std::unique_ptr<LidarStringDecoder>(new LidarStringDecoder(getConference(), x, y, z));
 
-  if(BAUD_RATE != 9600) {
-    try {
-    shared_ptr<odcore::wrapper::SerialPort> serial(odcore::wrapper::SerialPortFactory::createSerialPort(SERIAL_PORT, 9600));
-    serial->setStringListener(m_lidarStringDecoder.get());
-    serial->start();
-    m_sick = serial;
-    SetBaud38400();
-    serial->stop();
-    serial->setStringListener(NULL);
-    m_sick.reset();
-    }
-    catch(string &exception) {
-      cerr << "[" << getName() << "] Could not connect to Sickan: " << exception << endl;
-    }
-  }
 
+  const string SERIAL_PORT = kv.getValue<std::string>("proxy-lidar.port");
+  const uint32_t BAUD_RATE = 9600; // Fixed baud rate.
   try {
     m_sick = shared_ptr<odcore::wrapper::SerialPort>(odcore::wrapper::SerialPortFactory::createSerialPort(SERIAL_PORT, BAUD_RATE));
     m_sick->setStringListener(m_lidarStringDecoder.get());
     m_sick->start();
+    cout << "Connected to SICK, waiting for configuration..." << std::endl;
   }
   catch(string &exception) {
-    cerr << "[" << getName() << "] Could not connect to Sickan: " << exception << endl;
+    cerr << "[" << getName() << "] Could not connect to SICK: " << exception << endl;
   }
-
-  //Status();
-
-  std::cout << "Connected to Sickan, please wait for configuration" << std::endl;
-
-//  SettingsMode(); //Enter settings mode
-  
 }
-
-void Lidar::SendData()
-{
-  odcore::data::Container c(m_lidarStringDecoder->GetLatestReading());
-  getConference().send(c);
-}
-
-void Lidar::Status()
-{
-  unsigned char statusCall[] = {0x02, 0x00, 0x01, 0x00, 0x31, 0x15, 0x12 };
-  std::string statusString( reinterpret_cast< char const* >(statusCall), 7) ;
-  m_sick->send(statusString);
-}
-
-void Lidar::StartScan()
-{
-  unsigned char streamStart[] = {0x02, 0x00, 0x02, 0x00, 0x20, 0x24, 0x34, 0x08};
-  std::string startString( reinterpret_cast< char const* >(streamStart), 8) ;
-  m_sick->send(startString);
-}
-
-void Lidar::StopScan()
-{
-  unsigned char streamStop[] = {0x02, 0x00, 0x02, 0x00, 0x20, 0x25, 0x35, 0x08};
-  std::string stopString( reinterpret_cast< char const* >(streamStop), 8) ;
-  m_sick->send(stopString);
-}
-
-void Lidar::SetBaud9600()
-{
-  unsigned char setBaud9600[] = {0x02, 0x00, 0x02, 0x00, 0x20, 0x42, 0x52, 0x08};
-  std::string baudString( reinterpret_cast< char const* >(setBaud9600), 8) ;
-  m_sick->send(baudString);
-}
-
-void Lidar::SetBaud38400()
-{
-  unsigned char setBaud38400[] = {0x02, 0x00, 0x02, 0x00, 0x20, 0x40, 0x50, 0x08};
-  std::string baudString( reinterpret_cast< char const* >(setBaud38400), 8) ;
-  m_sick->send(baudString);
-}
-
-
-void Lidar::SettingsMode()
-{
-  unsigned char settingsMode[] = {0x02, 0x00, 0x0A, 0x00, 0x20, 0x00, 0x53, 0x49, 0x43, 0x4B, 0x5F, 0x4C, 0x4D, 0x53, 0xBE, 0xC5};
-  std::string settingString( reinterpret_cast< char const* >(settingsMode), 16) ;
-  m_sick->send(settingString);
-}
-
-void Lidar::SetCentimeterMode()
-{
-  unsigned char centimeterMode[] = {0x02, 0x00, 0x21, 0x00, 0x77, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0D, 0x00, 0x00, 0x00, 0x02, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0xCB };
-  std::string centimeterString( reinterpret_cast< char const* >(centimeterMode), 39) ;
-  m_sick->send(centimeterString);
-}
-
 
 void Lidar::tearDown()
 {
@@ -244,8 +89,79 @@ void Lidar::tearDown()
   m_sick->setStringListener(NULL);
 }
 
-void Lidar::nextContainer(odcore::data::Container &c) {
-  (void)c;
+// This method will do the main data processing job.
+odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Lidar::body()
+{
+  // Initialization sequence.
+  uint32_t counter = 0;
+  while (getModuleStateAndWaitForRemainingTimeInTimeslice() 
+      == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+    counter++;
+    if (counter == 30) {
+      cout << "Sending stop scan" << endl;
+      StopScan();
+    }
+    if (counter == 35) {
+      cout << "Sending status request" << endl;
+      Status();
+    }
+    if (counter == 40) {
+      cout << "Sending settings mode" << endl;
+      SettingsMode();
+    }
+    if (counter == 45) {
+      cout << "Sending centimeter mode" << endl;
+      SetCentimeterMode();
+    }
+    if (counter == 50) {
+      cout << "Start scanning" << endl;
+      StartScan();
+      break;
+    }
+  }
+
+  // "Do nothing" sequence.
+  while (getModuleStateAndWaitForRemainingTimeInTimeslice() 
+      == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+    // Do nothing.
+  }
+
+  return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
+}
+
+void Lidar::Status()
+{
+  const unsigned char statusCall[] = {0x02, 0x00, 0x01, 0x00, 0x31, 0x15, 0x12 };
+  const std::string statusString( reinterpret_cast< char const* >(statusCall), 7) ;
+  m_sick->send(statusString);
+}
+
+void Lidar::StartScan()
+{
+  const unsigned char streamStart[] = {0x02, 0x00, 0x02, 0x00, 0x20, 0x24, 0x34, 0x08};
+  const std::string startString( reinterpret_cast< char const* >(streamStart), 8) ;
+  m_sick->send(startString);
+}
+
+void Lidar::StopScan()
+{
+  const unsigned char streamStop[] = {0x02, 0x00, 0x02, 0x00, 0x20, 0x25, 0x35, 0x08};
+  const std::string stopString( reinterpret_cast< char const* >(streamStop), 8) ;
+  m_sick->send(stopString);
+}
+
+void Lidar::SettingsMode()
+{
+  const unsigned char settingsMode[] = {0x02, 0x00, 0x0A, 0x00, 0x20, 0x00, 0x53, 0x49, 0x43, 0x4B, 0x5F, 0x4C, 0x4D, 0x53, 0xBE, 0xC5};
+  const std::string settingString( reinterpret_cast< char const* >(settingsMode), 16) ;
+  m_sick->send(settingString);
+}
+
+void Lidar::SetCentimeterMode()
+{
+  const unsigned char centimeterMode[] = {0x02, 0x00, 0x21, 0x00, 0x77, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0D, 0x00, 0x00, 0x00, 0x02, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0xCB };
+  const std::string centimeterString( reinterpret_cast< char const* >(centimeterMode), 39) ;
+  m_sick->send(centimeterString);
 }
 
 } // lidar
