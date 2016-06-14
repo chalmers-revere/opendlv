@@ -235,37 +235,44 @@ void LidarStringDecoder::nextString(std::string const &a_string)
     }
     cout << endl;
 
-    if (m_buf.str().size() >= 10) {
+    const string s = m_buf.str();
+    // Find start confirmation.
+    if (!m_startConfirmed && (m_buf.str().size() >= 10)) {
         // Try to find start message.
-        const string s = m_buf.str();
-        if (!m_startConfirmed) {
-            m_startConfirmed = true;
-            for (uint32_t i = 0; i < 10; i++) {
-                cout << "s = " << (int)(uint8_t)s.at(i) << ", resp = " << (int)(uint8_t)m_startResponse[i] << endl;
-                m_startConfirmed &= ((int)(uint8_t)s.at(i) == (int)(uint8_t) m_startResponse[i]);
-            }
-            if (m_startConfirmed) {
-              cout << "Received start confirmation." << endl;
-                // Remove 10 bytes.
-                m_buf.str(m_buf.str().substr(10));
-                m_buf.seekg(0, ios_base::end);
-            }
+        m_startConfirmed = true;
+        for (uint32_t i = 0; i < 10; i++) {
+            cout << "s = " << (int)(uint8_t)s.at(i) << ", resp = " << (int)(uint8_t)m_startResponse[i] << endl;
+            m_startConfirmed &= ((int)(uint8_t)s.at(i) == (int)(uint8_t) m_startResponse[i]);
         }
-        if (m_startConfirmed && !m_centimeterMode) {
-            if (m_buf.str().size() >= 44) {
-                m_centimeterMode = true;
-                for (uint32_t i = 0; i < 44; i++) {
-                    cout << "s = " << (int)(uint8_t)s.at(i) << ", resp = " << (int)(uint8_t)m_centimeterResponse[i] << endl;
-                    m_centimeterMode &= ((int)(uint8_t)s.at(i) == (int)(uint8_t) m_centimeterResponse[i]);
-                }
-                if (m_centimeterMode) {
-                  cout << "Received centimeterMode." << endl;
-                    // Remove 10 bytes.
-                    m_buf.str(m_buf.str().substr(44));
-                    m_buf.seekg(0, ios_base::end);
-                }
-            }
+        if (m_startConfirmed) {
+          cout << "Received start confirmation." << endl;
+            // Remove 10 bytes.
+            m_buf.str(m_buf.str().substr(10));
+            m_buf.seekg(0, ios_base::end);
+            return;
         }
+    }
+
+    // Find centimeter mode.
+    if ((m_startConfirmed && !m_centimeterMode) && (m_buf.str().size() >= 44)) {
+        m_centimeterMode = true;
+        for (uint32_t i = 0; i < 44; i++) {
+            cout << "s = " << (int)(uint8_t)s.at(i) << ", resp = " << (int)(uint8_t)m_centimeterResponse[i] << endl;
+            m_centimeterMode &= ((int)(uint8_t)s.at(i) == (int)(uint8_t) m_centimeterResponse[i]);
+        }
+        if (m_centimeterMode) {
+          cout << "Received centimeterMode." << endl;
+            // Remove 10 bytes.
+            m_buf.str(m_buf.str().substr(44));
+            m_buf.seekg(0, ios_base::end);
+            return;
+        }
+    }
+
+    // We are ready.
+    if ( (m_startConfirmed && m_centimeterMode) && (m_buf.str().size() >= (7 + 2*361 + 3)) ) {
+char d; cin >> d;
+
     }
 }
 
