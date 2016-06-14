@@ -120,7 +120,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Ledstrip::body()
     */
     focus=round(m_angle/(45.0f/180.0f*pi)*50.0f)+50.0f;
     
-    uint8_t section_size=60; // the size of the LED section to be powered
+    uint8_t section_size=50; // the size of the LED section to be powered
     uint8_t fade=10; // the number of LEDs to be dimmed at the edge of the lighted section
     uint8_t checksum=0; // checksum resulting from the bitwise xor of the payload bytes
     /*
@@ -139,18 +139,19 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Ledstrip::body()
     checksum=focus^section_size^fade^m_R^m_G^m_B;
     
     uint8_t R=m_R, G=m_G, B=m_B;
-
-    if(std::fabs(focus-50)<30)
+    
+    // set the color to green
+    if(std::fabs(focus-50)<=10)
     {
         R=0; G=255; B=0;
     }
-    else if(std::fabs(focus-50)<40)
+    //else if(std::fabs(focus-50)>10 && std::fabs(focus-50)<=40)
+    //{
+    //    R=180; G=65; B=10;
+    //}
+    else // set the color to orange
     {
-        R=237; G=120; B=6;
-    }
-    else
-    {
-        R=255; G=204; B=102;
+        R=200; G=50; B=5;
     }
 
     // Message header: 0xFEDE
