@@ -242,7 +242,9 @@ void LidarStringDecoder::nextString(std::string const &a_string)
         for (uint32_t i = 0; i < 10; i++) {
             m_startConfirmed &= (s.at(0) == m_startResponse[i]);
         }
-        cout << "Received start confirmation." << endl;
+        if (m_startConfirmed) {
+          cout << "Received start confirmation." << endl;
+        }
         // Remove 10 bytes.
         m_buf.str(m_buf.str().substr(10));
         m_buf.seekg(0, ios_base::end);
