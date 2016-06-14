@@ -138,6 +138,21 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Ledstrip::body()
 
     checksum=focus^section_size^fade^m_R^m_G^m_B;
     
+    uint8_t R=m_R, G=m_G, B=m_B;
+
+    if(std::fabs(focus-50)<30)
+    {
+        R=0; G=255; B=0;
+    }
+    else if(std::fabs(focus-50)<40)
+    {
+        R=237; G=120; B=6;
+    }
+    else
+    {
+        R=255; G=204; B=102;
+    }
+
     // Message header: 0xFEDE
     // Message size: 9 bytes
     ledRequest.push_back(0xFE);
@@ -145,9 +160,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Ledstrip::body()
     ledRequest.push_back(focus);
     ledRequest.push_back(section_size);
     ledRequest.push_back(fade);
-    ledRequest.push_back(m_R);
-    ledRequest.push_back(m_G);
-    ledRequest.push_back(m_B);
+    ledRequest.push_back(R);
+    ledRequest.push_back(G);
+    ledRequest.push_back(B);
     ledRequest.push_back(checksum);
     
     std::string stringToSend(ledRequest.begin(),ledRequest.end());
