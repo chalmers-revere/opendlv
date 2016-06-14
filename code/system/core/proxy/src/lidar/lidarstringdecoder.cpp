@@ -228,18 +228,33 @@ void LidarStringDecoder::ConvertToDistances()
 }
 
 bool LidarStringDecoder::tryDecode() {
-    bool retVal = false;
+    static uint32_t byteCounter = 0;
     const string s = m_buf.str();
 
-
-    if (m_header && (m_buf.str().size() >= 7)) {
+    if (m_header && (byteCounter < 722)) {
         // Store bytes in receive measurement buffer.
+        uint32_t processedBytes = 0;
+        while ( (byteCounter < 722) && (processedBytes < s.size()) ) {
+            m_measurements[byteCounter] = static_cast<char>(s.at(processedBytes));
+            processedBytes++; // Bytes processed in this cycle.
+            byteCounter++; // Bytes processed in total.
+        }
+        m_buf.str(m_buf.str().substr(processedBytes));
+
+        return true;
+    }
+
+    if (m_header && (byteCounter == 722)) {
+cout << "Completed payload." << endl;
+        // Consumed all measurements; find next header; there should be three bytes trailing before the next sequence begins.
+        m_header = false;
+        return false;
     }
 
     // Find header.
-    if ((m_centimeterMode && !m_header) && (m_buf.str().size() >= 7)) {
+    if (!m_header && (s.size() >= 7)) {
         m_header = true;
-        for (uint32_t i = 0; i < 7; i++) {
+        for (uint32_t i = 0; (i < 7) && m_header; i++) {
             cout << "s = " << (int)(uint8_t)s.at(i) << ", resp = " << (int)(uint8_t)m_measurementHeader[i] << endl;
             m_header &= ((int)(uint8_t)s.at(i) == (int)(uint8_t) m_measurementHeader[i]);
         }
@@ -248,9 +263,15 @@ bool LidarStringDecoder::tryDecode() {
             // Remove 7 bytes.
             m_buf.str(m_buf.str().substr(7));
             m_buf.seekg(0, ios_base::end);
+
+            // Reset byte counter for processing payload.
+            byteCounter = 0;
+            return true;
         }
+        // Not found, try next state.
     }
 
+//    // Not working reliably.
 //    // Find centimeter mode.
 //    if ((!m_centimeterMode) && (m_buf.str().size() >= 44)) {
 //        m_centimeterMode = true;
@@ -263,28 +284,34 @@ bool LidarStringDecoder::tryDecode() {
 //            // Remove 10 bytes.
 //            m_buf.str(m_buf.str().substr(44));
 //            m_buf.seekg(0, ios_base::end);
+//            return true;
 //        }
 //    }
 
 
     // Find start confirmation.
-    if ((m_buf.str().size() >= 10)) {
+    if (s.size() >= 10) {
         // Try to find start message.
         m_startConfirmed = true;
-        for (uint32_t i = 0; i < 10; i++) {
+        for (uint32_t i = 0; (i < 10) && m_startConfirmed; i++) {
             cout << "s = " << (int)(uint8_t)s.at(i) << ", resp = " << (int)(uint8_t)m_startResponse[i] << endl;
-            m_startConfirmed &= ((int)(uint8_t)s.at(i) == (int)(uint8_t) m_startResponse[i]);
+            // Byte 7 and 8 might be different.
+            if ( (i != 7) && (i != 8) ) {
+                m_startConfirmed &= ((int)(uint8_t)s.at(i) == (int)(uint8_t) m_startResponse[i]);
+            }
         }
         if (m_startConfirmed) {
           cout << "Received start confirmation." << endl;
             // Remove 10 bytes.
             m_buf.str(m_buf.str().substr(10));
             m_buf.seekg(0, ios_base::end);
+            return true;
         }
+        // Not found, shorten buffer.
     }
 
-
-    return retVal;
+    // Nothing processed.
+    return false;
 }
 
 void LidarStringDecoder::nextString(std::string const &a_string) 
@@ -297,20 +324,24 @@ void LidarStringDecoder::nextString(std::string const &a_string)
     cout << endl;
 
     string s = m_buf.str();
-    while (s.size() >= 10) {
-        uint32_t sizeBefore = s.size();
-cout << "LEN_BEFORE = " << dec << s.size() << endl;
-        tryDecode();
-        s = m_buf.str();
-cout << "LEN_AFTER = " << dec << s.size() << endl;
-        uint32_t sizeAfter = s.size();
-        if (sizeAfter == sizeBefore) {
-            // Remove first byte.
-            m_buf.str(m_buf.str().substr(1));
+    // We need at least 10 bytes before we can continue.
+    if (s.size() >= 10) {
+        while (s.size() > 0) {
+            cout << "length = " << dec << s.size() << endl;
+
+            if (!tryDecode()) {
+                // If decoding succeeds, don't modify buffer but try to consume more.
+            }
+            else {
+                // Remove first byte before continuing processing.
+                m_buf.str(m_buf.str().substr(1));
+            }
+            // Check remaining length.
+            s = m_buf.str();
         }
-        s = m_buf.str();
-cout << "LEN_AFTER_2 = " << dec << s.size() << endl;
     }
+
+    // Always add at the end for more bytes to buffer.
     m_buf.seekg(0, ios_base::end);
 }
 
