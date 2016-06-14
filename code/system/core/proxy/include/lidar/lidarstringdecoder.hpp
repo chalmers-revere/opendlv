@@ -59,6 +59,7 @@ class LidarStringDecoder : public odcore::io::StringListener {
 
   odcore::io::conference::ContainerConference &m_conference;
   bool m_firstHeader;
+  bool m_header;
   bool m_startConfirmed;
   bool m_settingsMode;
   bool m_centimeterMode;

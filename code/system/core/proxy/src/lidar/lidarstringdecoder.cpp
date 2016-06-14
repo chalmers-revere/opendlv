@@ -40,6 +40,7 @@ namespace lidar {
 LidarStringDecoder::LidarStringDecoder(odcore::io::conference::ContainerConference &a_conference, double a_x, double a_y, double a_z) 
     : m_conference(a_conference)
     , m_firstHeader(true)
+    , m_header(false)
     , m_startConfirmed(false)
     , m_settingsMode(false)
     , m_centimeterMode(false)
@@ -262,13 +263,37 @@ bool LidarStringDecoder::tryDecode() {
         }
     }
 
-    // We are ready.
-//    if ( (m_startConfirmed && m_centimeterMode) && (m_buf.str().size() >= (7 + 2*361 + 3)) ) {
-//        cout << m_buf.str() << endl;
-//        m_buf.str(m_buf.str().substr(7 + 2*361 + 3));
-//        m_buf.seekg(0, ios_base::end);
-//        return;
-//    }
+    // Find header.
+    if ((m_startConfirmed && m_centimeterMode && !m_header) && (m_buf.str().size() >= 7)) {
+        m_header = true;
+        for (uint32_t i = 0; i < 7; i++) {
+            cout << "s = " << (int)(uint8_t)s.at(i) << ", resp = " << (int)(uint8_t)m_measurementHeader[i] << endl;
+            m_header &= ((int)(uint8_t)s.at(i) == (int)(uint8_t) m_measurementHeader[i]);
+        }
+        if (m_header) {
+          cout << "Received header." << endl;
+            // Remove 7 bytes.
+            m_buf.str(m_buf.str().substr(7));
+            m_buf.seekg(0, ios_base::end);
+            return true;
+        }
+    }
+
+    if (m_header && (m_buf.str().size() >= 7)) {
+        m_header = true;
+        for (uint32_t i = 0; i < 7; i++) {
+            cout << "s = " << (int)(uint8_t)s.at(i) << ", resp = " << (int)(uint8_t)m_measurementHeader[i] << endl;
+            m_header &= ((int)(uint8_t)s.at(i) == (int)(uint8_t) m_measurementHeader[i]);
+        }
+        if (m_header) {
+          cout << "Received header." << endl;
+            // Remove 7 bytes.
+            m_buf.str(m_buf.str().substr(7));
+            m_buf.seekg(0, ios_base::end);
+            return true;
+        }
+    }
+
     return retVal;
 }
 
@@ -284,7 +309,9 @@ void LidarStringDecoder::nextString(std::string const &a_string)
     string s = m_buf.str();
     while (s.size() >= 10) {
         uint32_t sizeBefore = s.size();
-        tryDecode();
+        if(tryDecode()) {
+            break;
+        }
         s = m_buf.str();
         uint32_t sizeAfter = s.size();
         if (sizeAfter == sizeBefore) {
