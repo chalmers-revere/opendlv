@@ -252,9 +252,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Ledstrip::body()
 void Ledstrip::nextContainer(odcore::data::Container &a_container)
 { 
   odcore::data::TimeStamp now;
-  if (a_container.getDataType() == opendlv::sensation::DesiredDirectionOfMovement::ID()) {
-    opendlv::sensation::DesiredDirectionOfMovement directionObject = 
-    a_container.getData<opendlv::sensation::DesiredDirectionOfMovement>();
+  if (a_container.getDataType() == opendlv::knowledge::DesiredDirectionOfMovement::ID()) {
+    opendlv::knowledge::DesiredDirectionOfMovement directionObject = 
+    a_container.getData<opendlv::knowledge::DesiredDirectionOfMovement>();
 
     opendlv::model::Direction direction = directionObject.getDirection();
 
