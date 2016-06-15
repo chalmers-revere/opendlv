@@ -20,10 +20,10 @@
 #ifndef ECHOLOCATION_ECHOLOCATION_HPP_
 #define ECHOLOCATION_ECHOLOCATION_HPP_
 
-#include <memory>
+#include <vector>
 
-#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
-#include "opendavinci/odcore/data/Container.h"
+#include <opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h>
+#include <opendavinci/odcore/data/Container.h>
 
 namespace opendlv {
 namespace sensation {

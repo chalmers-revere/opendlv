@@ -210,20 +210,22 @@ message opendlv.perception.Surface [id = 184] {
   list<int16> traversableTo [id = 12];
 }
 
-message opendlv.knowledge.DesiredDirectionOfMovement [id = 180] {
-  opendlv.model.Direction direction [id = 1];
+message opendlv.perception.StimulusDirectionOfMovement [id = 180] {
+  opendlv.model.Direction desiredDirectionOfMovement [id = 1];
+  opendlv.model.Direction directionOfMovement [id = 2];
 }
 
-message opendlv.knowledge.DesiredOpticalFlow [id = 174] {
-  float desiredOpticalFlow [id =1];
+message opendlv.perception.StimulusOpticalFlow [id = 174] {
+  float desiredOpticalFlow [id = 1];
+  float opticalFlow [id = 2];
 }
 
-message opendlv.knowledge.DesiredDirectionAlignment [id = 182] {
+message opendlv.perception.StimulusDirectionAlignment [id = 182] {
   opendlv.model.Direction direction [id = 1];
   opendlv.model.Direction desiredDirection [id = 2];
 }
 
-message opendlv.knowledge.DesiredAngularSizeAlignment [id = 183] {
+message opendlv.perception.StimulusAngularSizeAlignment [id = 183] {
   opendlv.model.Direction direction [id = 1];
   float angularSize [id = 2];
   float desiredAngularSize [id = 3];

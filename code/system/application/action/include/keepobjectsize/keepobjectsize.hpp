@@ -46,7 +46,7 @@ class KeepObjectSize
   void setUp();
   void tearDown();
 
-  std::vector<std::unique_ptr<opendlv::knowledge::DesiredAngularSizeAlignment>> m_stimulii;
+  std::vector<std::unique_ptr<opendlv::perception::StimulusAngularSizeAlignment>> m_stimulii;
   std::vector<odcore::data::TimeStamp> m_correctionTimes;
 };
 
