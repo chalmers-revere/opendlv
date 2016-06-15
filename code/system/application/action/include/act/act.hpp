@@ -21,7 +21,6 @@
 #define ACT_ACT_HPP_
 
 #include <memory>
- #include <fstream>
 
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
@@ -47,8 +46,6 @@ class Act : public odcore::base::module::TimeTriggeredConferenceClientModule {
   void setUp();
   void tearDown();
 
-  float m_maxDuration;
-
   std::vector<odcore::data::TimeStamp> m_startTimesAccelerate;
   std::vector<odcore::data::TimeStamp> m_startTimesBrake;
   std::vector<odcore::data::TimeStamp> m_startTimesSteering;
@@ -58,21 +55,7 @@ class Act : public odcore::base::module::TimeTriggeredConferenceClientModule {
   float m_accelerationValue;
   float m_brakeValue;
   float m_steeringValue;
-
-  bool m_hasEstimateAcc;
-  odcore::data::TimeStamp m_timeOfEstimateAcc;
-  bool m_hasEstimateBrake;
-  odcore::data::TimeStamp m_timeOfEstimateBrake;
-  bool m_hasEstimateSteer;
-  odcore::data::TimeStamp m_timeOfEstimateSteer;
-
-  odcore::data::TimeStamp m_timeSinceLastObjectDetection;
-
-  float m_targetDistance;
-  int32_t m_targetObjectId;
-  opendlv::perception::Object m_targetObject;
-  float m_desiredSpeed;
-  float m_currentSpeed;
+  float m_correctionDuration;
 };
 
 } // act

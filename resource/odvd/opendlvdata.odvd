@@ -247,13 +247,6 @@ message opendlv.action.Correction [id = 186] {
   float priority [id = 5];
 }
 
-message opendlv.action.Estimate [id = 188] {
-  odcore::data::TimeStamp startTime [id = 1];
-  string type [id = 2];
-  float amplitude [id = 3];
-}
-
-
 message opendlv.proxy.reverefh16.ManualControl [id = 191] {
     double accelerationPedalPosition [id = 1];
     double brakePedalPosition [id = 2];

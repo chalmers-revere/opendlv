@@ -22,8 +22,9 @@
 
 #include <memory>
 
-#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 namespace opendlv {
 namespace action {
@@ -33,26 +34,22 @@ namespace setopticalflow {
  * This class provides...
  */
 class SetOpticalFlow
-: public odcore::base::module::TimeTriggeredConferenceClientModule {
+: public odcore::base::module::DataTriggeredConferenceClientModule {
  public:
   SetOpticalFlow(int32_t const &, char **);
   SetOpticalFlow(SetOpticalFlow const &) = delete;
   SetOpticalFlow &operator=(SetOpticalFlow const &) = delete;
   virtual ~SetOpticalFlow();
-  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
   virtual void nextContainer(odcore::data::Container &);
 
  private:
   void setUp();
   void tearDown();
 
-  float m_maxSpeed;
-  float m_currentSpeed;
-  float m_speedCorrection;
-  float m_desiredSpeed;
-  float m_currentEstimatedAcceleration;
-
-  std::vector<float> m_velocityMemory;
+  std::vector<std::unique_ptr<opendlv::knowledge::DesiredOpticalFlow>> m_stimulii;
+  std::vector<odcore::data::TimeStamp> m_correctionTimes;
+  odcore::data::TimeStamp m_opticFlowIdentified;
+  float m_opticFlow;
 };
 
 } // setopticalflow

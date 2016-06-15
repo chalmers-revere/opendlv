@@ -41,19 +41,12 @@
   */
   SetOpticalRotation::SetOpticalRotation(int32_t const &a_argc, char **a_argv)
   : DataTriggeredConferenceClientModule(
-    a_argc, a_argv, "action-setopticalrotation"),
-    m_desiredAzimuth(0.0f),
-    m_currentAzimuth(0.0f),
-    m_logRotation()
+    a_argc, a_argv, "action-setopticalrotation")
   {
-    odcore::data::TimeStamp now;
-    std::string filename("Rotation" + now.getYYYYMMDD_HHMMSS() + ".log");
-    m_logRotation.open(filename, std::ios::out|std::ios::app);
   }
 
   SetOpticalRotation::~SetOpticalRotation()
   {
-    m_logRotation.close();
   }
 
 /**
@@ -62,6 +55,8 @@
  */
  void SetOpticalRotation::nextContainer(odcore::data::Container &a_container)
  {
+   (void) a_container;
+   /*
   if (a_container.getDataType() == opendlv::sensation::DesiredDirectionOfMovement::ID()) {
     opendlv::sensation::DesiredDirectionOfMovement desiredMovement = a_container.getData<opendlv::sensation::DesiredDirectionOfMovement>();
     opendlv::model::Direction desiredDirection = desiredMovement.getDirection();
@@ -91,6 +86,7 @@
     odcore::data::Container container(correction);
     getConference().send(container);
   }
+  */
 }
 
 void SetOpticalRotation::setUp()

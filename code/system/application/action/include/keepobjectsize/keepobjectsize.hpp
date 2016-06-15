@@ -46,12 +46,8 @@ class KeepObjectSize
   void setUp();
   void tearDown();
 
-  std::unique_ptr<opendlv::perception::Object> m_object;
-  float m_desiredAzimuth;
-  float m_angularSize;
-  float m_targetSize;
-  int16_t m_targetObject;
-  bool m_crossingScenario;
+  std::vector<std::unique_ptr<opendlv::knowledge::DesiredAngularSizeAlignment>> m_stimulii;
+  std::vector<odcore::data::TimeStamp> m_correctionTimes;
 };
 
 } // keepobjectsize
