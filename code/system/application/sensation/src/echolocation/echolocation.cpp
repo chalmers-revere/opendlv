@@ -20,13 +20,13 @@
 #include <ctype.h>
 #include <cstring>
 #include <cmath>
+
 #include <iostream>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-#include "opendavinci/odcore/data/Container.h"
-#include "opendavinci/odcore/data/TimeStamp.h"
+#include <opendavinci/odcore/data/TimeStamp.h>
 
 #include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
@@ -55,31 +55,26 @@ Echolocation::~Echolocation()
 {
 }
 
-/**
- * Receives .
- * Sends .
- */
 void Echolocation::nextContainer(odcore::data::Container &a_c)
 {
-	if(a_c.getDataType() != opendlv::proxy::EchoReading::ID()){
-  	return;
+  if (a_c.getDataType() != opendlv::proxy::EchoReading::ID()){
+    return;
   }
-  //std::cout << "Echolocation container recieved" << std::endl;
 
   odcore::data::TimeStamp now;
+  if (m_times.size() > 0) {
+    odcore::data::TimeStamp diffStamp = now - m_times.back(); //Remove old data
+    double diffSeconds = diffStamp.toMicroseconds() / 1000000.0;
 
-  if(m_times.size() > 0) {
-	  odcore::data::TimeStamp diffStamp = now - m_times.back(); //Remove old data
-	  double diffSeconds = diffStamp.toMicroseconds() / 1000000.0;
-
-	  while(diffSeconds < 1.05) {
-	  	m_times.pop_back();
-	  	m_angles.pop_back();
-	  	m_distances.pop_back();
-	  	diffStamp = now - m_times.back();
-	  	diffSeconds = diffStamp.toMicroseconds() / 1000000.0;
-	  }
-	}
+    const double DIFF_SECONDS_THRESHOLD = 1.05;
+    while(diffSeconds < DIFF_SECONDS_THRESHOLD) {
+      m_times.pop_back();
+      m_angles.pop_back();
+      m_distances.pop_back();
+      diffStamp = now - m_times.back();
+      diffSeconds = diffStamp.toMicroseconds() / 1000000.0;
+    }
+  }
 
 
   opendlv::proxy::EchoReading reading = a_c.getData<opendlv::proxy::EchoReading>(); //Read new data
@@ -90,7 +85,7 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
   std::vector<float> angles;
 
   for(uint32_t i = 0; i < nNewPoints; i++) {
-  	angles.push_back(directions[i].getAzimuth());
+    angles.push_back(directions[i].getAzimuth());
   }
 
   m_angles.insert(m_angles.begin(), angles.begin(), angles.end());
@@ -109,131 +104,132 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
 
   std::cout << "Before algorithm, new points: " << nNewPoints << std::endl;
 
-	for(uint32_t k = 0; k < nPoints; k++) {
-		pointCloud.clear();
-		pointCloud.push_back(k);
-		if(!Contains(k, usedPoints)) {
-		  for(uint32_t i = 0; i < pointCloud.size(); i++) {
-				for(uint32_t j = 0; j < nPoints; j++) {
-					uint32_t x = pointCloud[i];
-					double dist = PointDistance(m_angles[x], m_distances[x], m_angles[j], m_distances[j]);
-					if(dist < 1 && !Contains(j,pointCloud)) {
-						//std::cout << "Close points" << std::endl;
-						pointCloud.push_back(j);
-						usedPoints.push_back(j);
-					}
-				}
-		  }
-		  if(pointCloud.size() > 5) { //TODO: evaluate parameter and move to config
-		  	//std::cout << "Nytt object!" << std::endl;
-		  	
-				double minDist = m_distances[pointCloud[0]];
-				//uint32_t minIndex = pointCloud[0];
-				float minAngle = m_angles[pointCloud[0]];
-				float maxAngle = m_angles[pointCloud[0]];
+  const double DIST_DELTA = 1.0;
+  const uint32_t POINT_CLOUD_SIZE = 5;
+  for(uint32_t k = 0; k < nPoints; k++) {
+    pointCloud.clear();
+    pointCloud.push_back(k);
+    if(!Contains(k, usedPoints)) {
+      for(uint32_t i = 0; i < pointCloud.size(); i++) {
+        for(uint32_t j = 0; j < nPoints; j++) {
+          uint32_t x = pointCloud[i];
+          double dist = PointDistance(m_angles[x], m_distances[x], m_angles[j], m_distances[j]);
+          if(dist < DIST_DELTA && !Contains(j,pointCloud)) {
+            //std::cout << "Close points" << std::endl;
+            pointCloud.push_back(j);
+            usedPoints.push_back(j);
+          }
+        }
+      }
+      if(pointCloud.size() > POINT_CLOUD_SIZE) { //TODO: evaluate parameter and move to config
+        
+        double minDist = m_distances[pointCloud[0]];
+        //uint32_t minIndex = pointCloud[0];
+        float minAngle = m_angles[pointCloud[0]];
+        float maxAngle = m_angles[pointCloud[0]];
 
-				for(uint32_t i = 1; i < pointCloud.size(); i++) {
-					if(m_distances[pointCloud[i]] < minDist) {
-						minDist = m_distances[pointCloud[i]];
-						//minIndex = pointCloud[i];
-					}
-					if(m_angles[pointCloud[i]] < minAngle) {
-						minAngle = m_angles[pointCloud[i]];
-					}
-					if(m_angles[pointCloud[i]] > maxAngle) {
-						maxAngle = m_angles[pointCloud[i]];
-					}
-				}
+        for(uint32_t i = 1; i < pointCloud.size(); i++) {
+          if(m_distances[pointCloud[i]] < minDist) {
+            minDist = m_distances[pointCloud[i]];
+            //minIndex = pointCloud[i];
+          }
+          if(m_angles[pointCloud[i]] < minAngle) {
+            minAngle = m_angles[pointCloud[i]];
+          }
+          if(m_angles[pointCloud[i]] > maxAngle) {
+            maxAngle = m_angles[pointCloud[i]];
+          }
+        }
 
-				//std::cout << "Setting object!" << std::endl;
-				//Set Object
-				//TODO: Dynamic confidence
-				float dynConfidence = std::sqrt(static_cast<float>(pointCloud.size()))/3.0f;
-				if(dynConfidence > 1) {
-					dynConfidence = 1;
-				}
-				identifiedObjects.push_back(opendlv::perception::Object());
-				identifiedObjects[objectCounter].setIdentified(now);
-				identifiedObjects[objectCounter].setTypeConfidence(-1.0f);
-				identifiedObjects[objectCounter].setDistance(minDist);
-				identifiedObjects[objectCounter].setDistanceConfidence(0.6f);
-				opendlv::model::Direction objectDirection = opendlv::model::Direction((maxAngle+minAngle)/2.0f, 0.0f);
-				identifiedObjects[objectCounter].setDirection(objectDirection);
-				identifiedObjects[objectCounter].setDirectionConfidence(0.5f);
-				identifiedObjects[objectCounter].setDirectionRateConfidence(-1.0f);
-				identifiedObjects[objectCounter].setAngularSize(maxAngle-minAngle);
-				identifiedObjects[objectCounter].setAngularSizeConfidence(0.5f);
-				identifiedObjects[objectCounter].setAngularSizeRateConfidence(-1.0f);
-				identifiedObjects[objectCounter].setConfidence(dynConfidence);
+        //std::cout << "Setting object!" << std::endl;
+        //Set Object
+        //TODO: Dynamic confidence
+        float dynConfidence = std::sqrt(static_cast<float>(pointCloud.size()))/3.0f;
+        if(dynConfidence > 1) {
+          dynConfidence = 1;
+        }
+        identifiedObjects.push_back(opendlv::perception::Object());
+        identifiedObjects[objectCounter].setIdentified(now);
+        identifiedObjects[objectCounter].setTypeConfidence(-1.0f);
+        identifiedObjects[objectCounter].setDistance(minDist);
+        identifiedObjects[objectCounter].setDistanceConfidence(0.6f);
+        opendlv::model::Direction objectDirection = opendlv::model::Direction((maxAngle+minAngle)/2.0f, 0.0f);
+        identifiedObjects[objectCounter].setDirection(objectDirection);
+        identifiedObjects[objectCounter].setDirectionConfidence(0.5f);
+        identifiedObjects[objectCounter].setDirectionRateConfidence(-1.0f);
+        identifiedObjects[objectCounter].setAngularSize(maxAngle-minAngle);
+        identifiedObjects[objectCounter].setAngularSizeConfidence(0.5f);
+        identifiedObjects[objectCounter].setAngularSizeRateConfidence(-1.0f);
+        identifiedObjects[objectCounter].setConfidence(dynConfidence);
         identifiedObjects[objectCounter].setObjectId(-1);
         std::string source = "echolocation";
         std::vector<std::string> sources;
         sources.push_back(source);
-				identifiedObjects[objectCounter].setListOfSources(sources);
+        identifiedObjects[objectCounter].setListOfSources(sources);
 
-				objectCounter++;
-		  }
-	  }
+        objectCounter++;
+      }
+    }
   }
 
   for(uint32_t i = 0; i < nNewPoints; i++) {
-  	std::cout << "Dist: " << distances[i] << " Angle: " << angles[i] << std::endl;
+    std::cout << "Dist: " << distances[i] << " Angle: " << angles[i] << std::endl;
   }
 
 
-	for(uint32_t i = 0; i < objectCounter; i++) {
-  	odcore::data::Container c(identifiedObjects[i]);
-  	getConference().send(c);
-  	std::cout << "Object sent with distance: " << identifiedObjects[i].getDistance() << " and angle:"  << 
-  			identifiedObjects[i].getDirection().getAzimuth() << "and angular size: " << 
-  			identifiedObjects[i].getAngularSize() << std::endl;
-	}
+  for(uint32_t i = 0; i < objectCounter; i++) {
+    odcore::data::Container c(identifiedObjects[i]);
+    getConference().send(c);
+    std::cout << "Object sent with distance: " << identifiedObjects[i].getDistance() << " and angle:"  << 
+        identifiedObjects[i].getDirection().getAzimuth() << "and angular size: " << 
+        identifiedObjects[i].getAngularSize() << std::endl;
+  }
 
 /*
-	{
-		int32_t height = 512;
-		int32_t width = 800;
-		cv::Mat lidarImage(height, width, CV_8UC3, cv::Scalar(0, 0, 0));
-		cv::Point origo(800/2, 512);
-		double scale = 512/90.0;
+  {
+    int32_t height = 512;
+    int32_t width = 800;
+    cv::Mat lidarImage(height, width, CV_8UC3, cv::Scalar(0, 0, 0));
+    cv::Point origo(800/2, 512);
+    double scale = 512/90.0;
 
-		for (uint32_t i=0; i<nNewPoints; i++) {
-			cv::Point endPoint(
-				origo.x - scale*distances[i]*std::sin(static_cast<double>(angles[i])),
-				origo.y - scale*distances[i]*std::cos(static_cast<double>(angles[i])));
-			cv::line(
-				lidarImage,
-				origo,
-				endPoint,
-				cv::Scalar(0, 0, 200),
-				2, 8, 0);
-		}
+    for (uint32_t i=0; i<nNewPoints; i++) {
+      cv::Point endPoint(
+        origo.x - scale*distances[i]*std::sin(static_cast<double>(angles[i])),
+        origo.y - scale*distances[i]*std::cos(static_cast<double>(angles[i])));
+      cv::line(
+        lidarImage,
+        origo,
+        endPoint,
+        cv::Scalar(0, 0, 200),
+        2, 8, 0);
+    }
 
-		cv::imshow("LIDAR debug", lidarImage);
-		cv::waitKey(10);
-	}
+    cv::imshow("LIDAR debug", lidarImage);
+    cv::waitKey(10);
+  }
 */
 }
 
 bool Echolocation::Contains(uint32_t a_point, std::vector<uint32_t> a_cloud)
 {
-	uint32_t length = a_cloud.size();
-	for(uint32_t i = 0; i < length; i++) {
-		if(a_point == a_cloud[i]) {
-			return true;
-		}
-	}
-	return false;
+  uint32_t length = a_cloud.size();
+  for(uint32_t i = 0; i < length; i++) {
+    if(a_point == a_cloud[i]) {
+      return true;
+    }
+  }
+  return false;
 }
 
 double Echolocation::PointDistance(float a_angle1, double a_dist1, float a_angle2, double a_dist2)
 {
-	double x1 = std::cos(static_cast<double>(a_angle1))*a_dist1;
-	double y1 = std::sin(static_cast<double>(a_angle1))*a_dist1;
-	double x2 = std::cos(static_cast<double>(a_angle2))*a_dist2;
-	double y2 = std::sin(static_cast<double>(a_angle2))*a_dist2;
-	double between = std::sqrt(std::pow(x1-x2,2) + std::pow(y1-y2,2));
-	return between;
+  double x1 = std::cos(static_cast<double>(a_angle1))*a_dist1;
+  double y1 = std::sin(static_cast<double>(a_angle1))*a_dist1;
+  double x2 = std::cos(static_cast<double>(a_angle2))*a_dist2;
+  double y2 = std::sin(static_cast<double>(a_angle2))*a_dist2;
+  double between = std::sqrt(std::pow(x1-x2,2) + std::pow(y1-y2,2));
+  return between;
 }
 
 void Echolocation::setUp()
