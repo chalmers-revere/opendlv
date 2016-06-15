@@ -68,7 +68,6 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Ledstrip::body()
 {
     const string SERIAL_PORT = "/dev/ttyUSB0";
     //const string SERIAL_PORT = "/dev/ttyACM0"; // this is for the Arduino Uno with spare LED strip
-    //const uint32_t BAUD_RATE = 9600;
     const uint32_t BAUD_RATE = 115200;
     const float pi=M_PI;
     
@@ -78,32 +77,40 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Ledstrip::body()
     }
     catch(string &exception) {
         cerr << "Serial port could not be created: " << exception << endl;
-        //return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
+        return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
     }
 
-    const float increment=0.05;
-    bool test=true, sign=false;
+    // variable for debugging purposes
+    //const float increment=0.05;
+    // boolean flags for debugging purposes
+    //bool test=false, sign=false;
+
     uint8_t focus=1;
 
     while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
     
     CLOG2<<endl<<"Start while loop"<<endl;
     
+    /*
+    // debug code
     if(test) // this is for the Arduino Uno with spare LED strip
     {
         CLOG2<<"angle: "<<m_angle<<" rad"<<std::endl;
         if(sign) {m_angle+=increment;CLOG2<<"adding "<<increment<<endl;}
         else {m_angle-=increment;CLOG2<<"subtracting "<<increment<<endl;}
     }
+    */
     
-    // the max angle is 45 deg = 0.785398 rad
+    // capping the max angle at 45 deg = 0.785398 rad
     if(std::fabs(m_angle) >= 0.785398f){
         if(m_angle >= 0.0f){
             m_angle = 0.785398f;
-            sign=false;
+            // for debugging purposes
+            //sign=false;
         } else {
             m_angle = -0.785398f;
-            sign=true;
+            // for debugging purposes
+            //sign=true;
         }
     }
     
@@ -145,13 +152,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Ledstrip::body()
     {
         R=0; G=255; B=0;
     }
-    //else if(std::fabs(focus-50)>10 && std::fabs(focus-50)<=40)
-    //{
-    //    R=180; G=65; B=10;
-    //}
     else // set the color to orange
     {
         R=200; G=50; B=5;
+        // light orange: (180,65,10)
     }
 
     // Message header: 0xFEDE
@@ -166,14 +170,14 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Ledstrip::body()
     ledRequest.push_back(B);
     ledRequest.push_back(checksum);
     
-    std::string stringToSend(ledRequest.begin(),ledRequest.end());
+    std::string command(ledRequest.begin(),ledRequest.end());
     CLOG2 << "Frame : ";
-    for(uint8_t i=0;i<stringToSend.size();++i) std::cout<<(uint16_t)stringToSend.at(i)<<" ";
-    CLOG2 << " : frame size = " << stringToSend.size()
+    for(uint8_t i=0;i<command.size();++i) std::cout<<(uint16_t)command.at(i)<<" ";
+    CLOG2 << " : frame size = " << command.size()
           << " {focus: "<< (uint16_t)focus << ", section size: " << (uint16_t)section_size << ", fade: " << (uint16_t)fade
           << ", R: " << (uint16_t)m_R << ", G: " << (uint16_t)m_G << ", B: " << (uint16_t)m_B << "}" << ", checksum: " << (uint16_t)checksum << std::endl;
-    
-    serial->send(stringToSend);
+
+    serial->send(command);
     std::cout<<"Frame sent."<<std::endl;  
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
@@ -181,7 +185,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Ledstrip::body()
 
 void Ledstrip::nextContainer(odcore::data::Container &a_container)
 { 
-  odcore::data::TimeStamp now;
+//  odcore::data::TimeStamp now;
+  
   if (a_container.getDataType() == opendlv::sensation::DesiredDirectionOfMovement::ID()) {
     opendlv::sensation::DesiredDirectionOfMovement directionObject = 
     a_container.getData<opendlv::sensation::DesiredDirectionOfMovement>();
@@ -190,9 +195,20 @@ void Ledstrip::nextContainer(odcore::data::Container &a_container)
 
     // -pi to pi. -pi right, pi left
     m_angle = direction.getAzimuth();
+    CLOG2 << "Direction azimuth: " << m_angle << std::endl;
   }
 
-
+/*
+  // code for testing purposes
+    if (a_container.getDataType() == opendlv::proxy::reverefh16::Steering::ID()) {
+opendlv::proxy::reverefh16::Steering steering = 
+        a_container.getData<opendlv::proxy::reverefh16::Steering>();
+ 
+        m_angle = steering.getRoadwheelangle();
+        //CLOG2<<"RoadWheelAngle: "<<m_angle<<std::endl;
+    }
+*/
+// code from competition
 //  if (a_container.getDataType() == (opendlv::perception::Object::ID() + 300)){
 //    opendlv::perception::Object inputObject = a_container.getData<opendlv::perception::Object>();
 //    
