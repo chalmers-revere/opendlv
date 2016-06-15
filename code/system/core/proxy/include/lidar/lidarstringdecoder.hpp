@@ -41,41 +41,22 @@ class LidarStringDecoder : public odcore::io::StringListener {
   virtual ~LidarStringDecoder();
 
   virtual void nextString(const std::string &);
-  void nextStringOld(const std::string &);
-  bool IsCentimeterMode() const;
-  bool IsRunning() const;
-  bool IsSettingsMode() const;
-  void NotSettingsMode();
-  void NotCentimeterMode();
 
  private:
-  bool CheckForCentimeterResponse() ;
-  bool CheckForMeasurementHeader() ;
-  bool CheckForSettingsResponse() ;
-  bool CheckForStartResponse() ;
   void ConvertToDistances();
   bool tryDecode();
 
   odcore::io::conference::ContainerConference &m_conference;
-  bool m_firstHeader;
   bool m_header;
   bool m_startConfirmed;
-  bool m_settingsMode;
-  bool m_centimeterMode;
-  bool m_settingsDone;
-  uint32_t m_counter;
-  uint32_t m_bufferSize;
-  //std::vector<opendlv::model::Direction> m_directions;
-  //std::vector<double> m_radii;
-//  odcore::base::Mutex m_latestReadingMutex;
+
   opendlv::proxy::EchoReading m_latestReading; 
   double m_position[3];
   unsigned char m_measurements[1000];
   unsigned char m_startResponse[10];
   unsigned char m_measurementHeader[7];
-  unsigned char m_buffer[44];
   unsigned char m_centimeterResponse[44];
-  std::stringstream m_buf;
+  std::stringstream m_buffer;
 };
 
 } // gps

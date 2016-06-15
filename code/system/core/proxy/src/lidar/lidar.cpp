@@ -101,19 +101,19 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Lidar::body()
       cout << "Sending stop scan" << endl;
       StopScan();
     }
-    if (counter == 35) {
+    if (counter == 32) {
       cout << "Sending status request" << endl;
       Status();
     }
-    if (counter == 40) {
+    if (counter == 34) {
       cout << "Sending settings mode" << endl;
       SettingsMode();
     }
-    if (counter == 45) {
+    if (counter == 38) {
       cout << "Sending centimeter mode" << endl;
       SetCentimeterMode();
     }
-    if (counter == 50) {
+    if (counter == 40) {
       cout << "Start scanning" << endl;
       StartScan();
       break;
