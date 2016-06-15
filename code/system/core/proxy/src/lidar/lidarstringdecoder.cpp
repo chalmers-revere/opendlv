@@ -252,7 +252,7 @@ cout << "Completed payload." << endl;
     if (!m_header && (s.size() >= 7)) {
         m_header = true;
         for (uint32_t i = 0; (i < 7) && m_header; i++) {
-            cout << "s = " << (int)(uint8_t)s.at(i) << ", resp = " << (int)(uint8_t)m_measurementHeader[i] << endl;
+//            cout << "s = " << (int)(uint8_t)s.at(i) << ", resp = " << (int)(uint8_t)m_measurementHeader[i] << endl;
             m_header &= ((int)(uint8_t)s.at(i) == (int)(uint8_t) m_measurementHeader[i]);
         }
         if (m_header) {
@@ -291,7 +291,7 @@ cout << "Completed payload." << endl;
         // Try to find start message.
         m_startConfirmed = true;
         for (uint32_t i = 0; (i < 10) && m_startConfirmed; i++) {
-            cout << "s = " << (int)(uint8_t)s.at(i) << ", resp = " << (int)(uint8_t)m_startResponse[i] << endl;
+//            cout << "s = " << (int)(uint8_t)s.at(i) << ", resp = " << (int)(uint8_t)m_startResponse[i] << endl;
             // Byte 7 and 8 might be different.
             if ( (i != 7) && (i != 8) ) {
                 m_startConfirmed &= ((int)(uint8_t)s.at(i) == (int)(uint8_t) m_startResponse[i]);
@@ -318,7 +318,7 @@ void LidarStringDecoder::nextString(std::string const &a_string)
         char c = a_string.at(i);
         m_buf.write(&c, sizeof(char));
     }
-    cout << endl;
+//    cout << endl;
 
     string s = m_buf.str();
     // We need at least 10 bytes before we can continue.
