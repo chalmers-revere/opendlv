@@ -48,6 +48,7 @@ Ivrule::Ivrule(int32_t const &a_argc, char **a_argv)
     , m_desiredOpticalFlow()
     , m_mioValidUntil(0,0)
     , m_mio()
+    , m_speed(0.0)
 {
 }
 
@@ -65,23 +66,22 @@ Ivrule::~Ivrule()
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
     odcore::data::TimeStamp now;
 
-    opendlv::sensation::DesiredOpticalFlow dof(m_desiredOpticalFlow);
-    odcore::data::Container containerDof(dof);
-    getConference().send(containerDof);
-
-
-
+    if(std::abs(m_speed) > 0.001f ){
+      opendlv::perception::StimulusOpticalFlow sof(m_desiredOpticalFlow, m_speed);
+      odcore::data::Container containerSof(sof);
+      getConference().send(containerSof);
+    }
     if(m_mioValidUntil.toMicroseconds() - now.toMicroseconds() > 0) {
       // Steer to mio
-      opendlv::sensation::DesiredDirectionOfMovement ddom(m_mio.getDirection());
-      odcore::data::Container containerDdom(ddom);
-      getConference().send(containerDdom);
+      opendlv::perception::StimulusDirectionOfMovement sdom(m_mio.getDirection(),opendlv::model::Direction(0,0));
+      odcore::data::Container containerSdom(sdom);
+      getConference().send(containerSdom);
 
       std::cout << "Sent ddom. Azimuth: " << m_mio.getDirection().getAzimuth() << std::endl;
 
-      // opendlv::perception::ObjectDesiredAngularSize das(m_mio.getDirection(),m_mio.getAngularSize(),m_desiredAngularSize);
-      // odcore::data::Container containerDas(das);
-      // getConference().send(containerDas);
+      opendlv::perception::StimulusAngularSizeAlignment sasa(m_mio.getDirection(),m_mio.getAngularSize(),m_desiredAngularSize);
+      odcore::data::Container containerSasa(sasa);
+      getConference().send(containerSasa);
 
       std::cout << "Sent daf. Desired angular size: " << m_desiredAngularSize << " Currently: " << m_mio.getAngularSize() << std::endl;
 
@@ -98,6 +98,10 @@ void Ivrule::nextContainer(odcore::data::Container &a_container)
   if(a_container.getDataType() == opendlv::perception::Environment::ID()) {
     opendlv::perception::Environment message = a_container.getData<opendlv::perception::Environment>();
     ReadEnvironment(message);
+  } else  if (a_container.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
+    auto propulsion = a_container.getData<opendlv::proxy::reverefh16::Propulsion>();
+    double speedKph = propulsion.getPropulsionShaftVehicleSpeed();
+    m_speed = static_cast<float>(speedKph / 3.6);
   }
 }
 
@@ -105,7 +109,6 @@ void Ivrule::ReadEnvironment(opendlv::perception::Environment &a_environment)
 {
   odcore::data::TimeStamp now;
   odcore::data::TimeStamp environmentValidUntil = a_environment.getValidUntil();
-  //1 second as valid data
   if(now.toMicroseconds()-environmentValidUntil.toMicroseconds() < 0){
     std::vector<opendlv::perception::Object> listOfObjects = a_environment.getListOfObjects();
     if(listOfObjects.size() > 0){

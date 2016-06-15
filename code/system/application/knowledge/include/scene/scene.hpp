@@ -69,7 +69,7 @@ class Scene : public odcore::base::module::TimeTriggeredConferenceClientModule {
   uint32_t m_surfaceCounter;
   odcore::base::Mutex m_mutex;
   float m_mergeDistance;
-  uint8_t m_validUntilDuration;
+  int32_t m_validUntilDuration;
   bool m_initialised;
 };
 

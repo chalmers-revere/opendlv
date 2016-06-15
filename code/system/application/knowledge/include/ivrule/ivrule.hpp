@@ -62,6 +62,7 @@ class Ivrule : public odcore::base::module::TimeTriggeredConferenceClientModule 
 
   odcore::data::TimeStamp m_mioValidUntil;
   opendlv::perception::Object m_mio;
+  float m_speed;
 };
 
 } // ivrule

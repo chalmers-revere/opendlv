@@ -258,7 +258,7 @@ knowledge-ivrule.desiredOpticalFlow = 5.6 #meters/s
 ###############################################################################
 # Scene
 knowledge-scene.mergeDistance = 2.0
-knowledge-scene.validUntilDuration = 1;
+knowledge-scene.validUntilDuration = 1
 
 ###############################################################################
 ###############################################################################
