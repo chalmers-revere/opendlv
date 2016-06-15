@@ -702,17 +702,17 @@ void Rule::bodyIntersectionScenario()
       if (mioBearing > 0.1f) { // ~ 5 degrees to left
 
         // spoofing the hell out of act
-        opendlv::perception::ObjectDesiredAngularSize angularsize(20, 5798); // secret id with act.cpp
-        odcore::data::Container objectContainer0(angularsize);
-        getConference().send(objectContainer0); 
+        // opendlv::perception::ObjectDesiredAngularSize angularsize(20, 5798); // secret id with act.cpp
+        // odcore::data::Container objectContainer0(angularsize);
+        // getConference().send(objectContainer0); 
       }
       else {
 
         // mio OCV vehicle is to the right, we should care about it
-        float euclideanDistance = 15;
-        opendlv::perception::ObjectDesiredAngularSize angularsize((euclideanDistance + 5), m_mostInterestingObject.getObjectId());
-        odcore::data::Container objectContainer0(angularsize);
-        getConference().send(objectContainer0); 
+        // float euclideanDistance = 15;
+        // opendlv::perception::ObjectDesiredAngularSize angularsize((euclideanDistance + 5), m_mostInterestingObject.getObjectId());
+        // odcore::data::Container objectContainer0(angularsize);
+        // getConference().send(objectContainer0); 
       }
       
     }
