@@ -46,7 +46,7 @@ class SetOpticalFlow
   void setUp();
   void tearDown();
 
-  std::vector<std::unique_ptr<opendlv::knowledge::DesiredOpticalFlow>> m_stimulii;
+  std::vector<std::unique_ptr<opendlv::perception::StimulusOpticalFlow>> m_stimulii;
   std::vector<odcore::data::TimeStamp> m_correctionTimes;
   odcore::data::TimeStamp m_opticFlowIdentified;
   float m_opticFlow;

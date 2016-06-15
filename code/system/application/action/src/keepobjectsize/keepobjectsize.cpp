@@ -58,8 +58,8 @@ KeepObjectSize::~KeepObjectSize()
  */
 void KeepObjectSize::nextContainer(odcore::data::Container &a_container)
 {
-  if(a_container.getDataType() == opendlv::knowledge::DesiredAngularSizeAlignment::ID()) {
-    auto desiredAngularSizeAlignment = a_container.getData<opendlv::knowledge::DesiredAngularSizeAlignment>();
+  if(a_container.getDataType() == opendlv::perception::StimulusAngularSizeAlignment::ID()) {
+    auto desiredAngularSizeAlignment = a_container.getData<opendlv::perception::StimulusAngularSizeAlignment>();
 
 
   }
