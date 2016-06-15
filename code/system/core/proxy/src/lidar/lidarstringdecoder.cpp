@@ -314,7 +314,7 @@ cout << "Completed payload." << endl;
 void LidarStringDecoder::nextString(std::string const &a_string) 
 {
     for (uint32_t i = 0; i < a_string.size(); i++) {
-        cout << hex << (int)(((uint8_t)a_string.at(i))&0xFF) << " ";
+//        cout << hex << (int)(((uint8_t)a_string.at(i))&0xFF) << " ";
         char c = a_string.at(i);
         m_buf.write(&c, sizeof(char));
     }
@@ -324,7 +324,7 @@ void LidarStringDecoder::nextString(std::string const &a_string)
     // We need at least 10 bytes before we can continue.
     if (s.size() >= 10) {
         while (s.size() > 0) {
-            cout << "length = " << dec << s.size() << endl;
+//            cout << "length = " << dec << s.size() << endl;
 
             if (tryDecode()) {
                 // If decoding succeeds, don't modify buffer but try to consume more.
