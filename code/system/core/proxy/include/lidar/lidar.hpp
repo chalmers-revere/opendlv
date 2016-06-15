@@ -37,8 +37,7 @@ namespace lidar {
 /**
  * This class decodes data from SICK LMS 200.
  */
-class Lidar : public odcore::base::module::TimeTriggeredConferenceClientModule 
-{
+class Lidar : public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
   Lidar(int32_t const &, char **);
   Lidar(Lidar const &) = delete;

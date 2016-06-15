@@ -50,7 +50,7 @@ class LidarStringDecoder : public odcore::io::StringListener {
   bool m_header;
   bool m_startConfirmed;
 
-  opendlv::proxy::EchoReading m_latestReading; 
+  opendlv::proxy::EchoReading m_latestReading;
   double m_position[3];
   unsigned char m_measurements[1000];
   unsigned char m_startResponse[10];

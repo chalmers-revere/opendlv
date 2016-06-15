@@ -36,7 +36,7 @@ namespace opendlv {
 namespace proxy {
 namespace lidar {
 
-LidarStringDecoder::LidarStringDecoder(odcore::io::conference::ContainerConference &a_conference, double a_x, double a_y, double a_z) 
+LidarStringDecoder::LidarStringDecoder(odcore::io::conference::ContainerConference &a_conference, double a_x, double a_y, double a_z)
     : m_conference(a_conference)
     , m_header(false)
     , m_startConfirmed(false)
@@ -124,28 +124,28 @@ void LidarStringDecoder::ConvertToDistances()
   double cartesian[2];
 
   std::vector<opendlv::model::Direction> directions; // m_directions.clear();
-  std::vector<double> radii; // m_radii.clear();
+  std::vector<double> radii;                         // m_radii.clear();
 
-  for(uint32_t i = 0; i < 361; i++) {
-    byte1 = (int)m_measurements[i*2];
-    byte2 = (int)m_measurements[i*2+1];
+  for (uint32_t i = 0; i < 361; i++) {
+    byte1 = (int)m_measurements[i * 2];
+    byte2 = (int)m_measurements[i * 2 + 1];
 
-    if(i < 361) {
-      distance = byte1 + (byte2%32)*256; //Integer centimeters in local polar coordinates
+    if (i < 361) {
+      distance = byte1 + (byte2 % 32) * 256; //Integer centimeters in local polar coordinates
     }
     else {
-      distance = byte2 + (byte1%32)*256; //Integer centimeters in local polar coordinates
+      distance = byte2 + (byte1 % 32) * 256; //Integer centimeters in local polar coordinates
     }
 
-    if(distance < 7500) { //We don't send max range responses
-      cartesian[0] = distance * sin(M_PI * i /360.0) / 100.0; //Local cartesian coordinates in meters (rotated coordinate system)
-      cartesian[1] = distance * (-cos(M_PI * i /360.0)) / 100.0;
+    if (distance < 7500) {                                     //We don't send max range responses
+      cartesian[0] = distance * sin(M_PI * i / 360.0) / 100.0; //Local cartesian coordinates in meters (rotated coordinate system)
+      cartesian[1] = distance * (-cos(M_PI * i / 360.0)) / 100.0;
       cartesian[0] += m_position[0]; //Truck cartesian coordinates
       cartesian[1] += m_position[1];
 
-      double radius = std::sqrt(pow(cartesian[0],2) + std::pow(cartesian[1],2));
-      float angle = static_cast<float>(std::atan2(cartesian[1],cartesian[0]));
-      opendlv::model::Direction direction(angle,0);
+      double radius = std::sqrt(pow(cartesian[0], 2) + std::pow(cartesian[1], 2));
+      float angle = static_cast<float>(std::atan2(cartesian[1], cartesian[0]));
+      opendlv::model::Direction direction(angle, 0);
       directions.push_back(direction);
       radii.push_back(radius);
     }
@@ -160,117 +160,118 @@ void LidarStringDecoder::ConvertToDistances()
   m_conference.send(c);
 }
 
-bool LidarStringDecoder::tryDecode() {
-    static uint32_t byteCounter = 0;
-    const string s = m_buffer.str();
+bool LidarStringDecoder::tryDecode()
+{
+  static uint32_t byteCounter = 0;
+  const string s = m_buffer.str();
 
-    if (m_header && (byteCounter < 722)) {
-        // Store bytes in receive measurement buffer.
-        uint32_t processedBytes = 0;
-        while ( (byteCounter < 722) && (processedBytes < s.size()) ) {
-            m_measurements[byteCounter] = static_cast<char>(s.at(processedBytes));
-            processedBytes++; // Bytes processed in this cycle.
-            byteCounter++; // Bytes processed in total.
-        }
-        m_buffer.str(m_buffer.str().substr(processedBytes));
-
-        return true;
+  if (m_header && (byteCounter < 722)) {
+    // Store bytes in receive measurement buffer.
+    uint32_t processedBytes = 0;
+    while ((byteCounter < 722) && (processedBytes < s.size())) {
+      m_measurements[byteCounter] = static_cast<char>(s.at(processedBytes));
+      processedBytes++; // Bytes processed in this cycle.
+      byteCounter++;    // Bytes processed in total.
     }
+    m_buffer.str(m_buffer.str().substr(processedBytes));
 
-    if (m_header && (byteCounter == 722)) {
-        cout << "Completed payload." << endl;
-        // Do ray transformation.
-        ConvertToDistances();
-        // Consumed all measurements; find next header; there should be three bytes trailing before the next sequence begins.
-        m_header = false;
-        return false;
-    }
+    return true;
+  }
 
-    // Find header.
-    if (!m_header && (s.size() >= 7)) {
-        m_header = true;
-        for (uint32_t i = 0; (i < 7) && m_header; i++) {
-            m_header &= ((int)(uint8_t)s.at(i) == (int)(uint8_t) m_measurementHeader[i]);
-        }
-        if (m_header) {
-          cout << "Received header." << endl;
-            // Remove 7 bytes.
-            m_buffer.str(m_buffer.str().substr(7));
-            m_buffer.seekg(0, ios_base::end);
-
-            // Reset byte counter for processing payload.
-            byteCounter = 0;
-            return true;
-        }
-        // Not found, try next state.
-    }
-
-//    // Not working reliably.
-//    // Find centimeter mode.
-//    if ((!m_centimeterMode) && (m_buffer.str().size() >= 44)) {
-//        m_centimeterMode = true;
-//        for (uint32_t i = 0; i < 44; i++) {
-//            cout << "s = " << (int)(uint8_t)s.at(i) << ", resp = " << (int)(uint8_t)m_centimeterResponse[i] << endl;
-//            m_centimeterMode &= ((int)(uint8_t)s.at(i) == (int)(uint8_t) m_centimeterResponse[i]);
-//        }
-//        if (m_centimeterMode) {
-//          cout << "Received centimeterMode." << endl;
-//            // Remove 10 bytes.
-//            m_buffer.str(m_buffer.str().substr(44));
-//            m_buffer.seekg(0, ios_base::end);
-//            return true;
-//        }
-//    }
-
-    // Find start confirmation.
-    if (s.size() >= 10) {
-        // Try to find start message.
-        m_startConfirmed = true;
-        for (uint32_t i = 0; (i < 10) && m_startConfirmed; i++) {
-          // Byte 7 and 8 might be different.
-          if ( (i != 7) && (i != 8) ) {
-            m_startConfirmed &= ((int)(uint8_t)s.at(i) == (int)(uint8_t) m_startResponse[i]);
-          }
-        }
-        if (m_startConfirmed) {
-          cout << "Received start confirmation." << endl;
-          // Remove 10 bytes.
-          m_buffer.str(m_buffer.str().substr(10));
-          m_buffer.seekg(0, ios_base::end);
-          return true;
-        }
-        // Not found, shorten buffer.
-    }
-
-    // Nothing processed.
+  if (m_header && (byteCounter == 722)) {
+    cout << "Completed payload." << endl;
+    // Do ray transformation.
+    ConvertToDistances();
+    // Consumed all measurements; find next header; there should be three bytes trailing before the next sequence begins.
+    m_header = false;
     return false;
+  }
+
+  // Find header.
+  if (!m_header && (s.size() >= 7)) {
+    m_header = true;
+    for (uint32_t i = 0; (i < 7) && m_header; i++) {
+      m_header &= ((int)(uint8_t)s.at(i) == (int)(uint8_t)m_measurementHeader[i]);
+    }
+    if (m_header) {
+      cout << "Received header." << endl;
+      // Remove 7 bytes.
+      m_buffer.str(m_buffer.str().substr(7));
+      m_buffer.seekg(0, ios_base::end);
+
+      // Reset byte counter for processing payload.
+      byteCounter = 0;
+      return true;
+    }
+    // Not found, try next state.
+  }
+
+  //    // Not working reliably.
+  //    // Find centimeter mode.
+  //    if ((!m_centimeterMode) && (m_buffer.str().size() >= 44)) {
+  //        m_centimeterMode = true;
+  //        for (uint32_t i = 0; i < 44; i++) {
+  //            cout << "s = " << (int)(uint8_t)s.at(i) << ", resp = " << (int)(uint8_t)m_centimeterResponse[i] << endl;
+  //            m_centimeterMode &= ((int)(uint8_t)s.at(i) == (int)(uint8_t) m_centimeterResponse[i]);
+  //        }
+  //        if (m_centimeterMode) {
+  //          cout << "Received centimeterMode." << endl;
+  //            // Remove 10 bytes.
+  //            m_buffer.str(m_buffer.str().substr(44));
+  //            m_buffer.seekg(0, ios_base::end);
+  //            return true;
+  //        }
+  //    }
+
+  // Find start confirmation.
+  if (s.size() >= 10) {
+    // Try to find start message.
+    m_startConfirmed = true;
+    for (uint32_t i = 0; (i < 10) && m_startConfirmed; i++) {
+      // Byte 7 and 8 might be different.
+      if ((i != 7) && (i != 8)) {
+        m_startConfirmed &= ((int)(uint8_t)s.at(i) == (int)(uint8_t)m_startResponse[i]);
+      }
+    }
+    if (m_startConfirmed) {
+      cout << "Received start confirmation." << endl;
+      // Remove 10 bytes.
+      m_buffer.str(m_buffer.str().substr(10));
+      m_buffer.seekg(0, ios_base::end);
+      return true;
+    }
+    // Not found, shorten buffer.
+  }
+
+  // Nothing processed.
+  return false;
 }
 
-void LidarStringDecoder::nextString(std::string const &a_string) 
+void LidarStringDecoder::nextString(std::string const &a_string)
 {
-    for (uint32_t i = 0; i < a_string.size(); i++) {
-        char c = a_string.at(i);
-        m_buffer.write(&c, sizeof(char));
-    }
+  for (uint32_t i = 0; i < a_string.size(); i++) {
+    char c = a_string.at(i);
+    m_buffer.write(&c, sizeof(char));
+  }
 
-    string s = m_buffer.str();
-    // We need at least 10 bytes before we can continue.
-    if (s.size() >= 10) {
-        while (s.size() > 0) {
-            if (tryDecode()) {
-                // If decoding succeeds, don't modify buffer but try to consume more.
-            }
-            else {
-                // Remove first byte before continuing processing.
-                m_buffer.str(m_buffer.str().substr(1));
-            }
-            // Check remaining length.
-            s = m_buffer.str();
-        }
+  string s = m_buffer.str();
+  // We need at least 10 bytes before we can continue.
+  if (s.size() >= 10) {
+    while (s.size() > 0) {
+      if (tryDecode()) {
+        // If decoding succeeds, don't modify buffer but try to consume more.
+      }
+      else {
+        // Remove first byte before continuing processing.
+        m_buffer.str(m_buffer.str().substr(1));
+      }
+      // Check remaining length.
+      s = m_buffer.str();
     }
+  }
 
-    // Always add at the end for more bytes to buffer.
-    m_buffer.seekg(0, ios_base::end);
+  // Always add at the end for more bytes to buffer.
+  m_buffer.seekg(0, ios_base::end);
 }
 
 } // gps

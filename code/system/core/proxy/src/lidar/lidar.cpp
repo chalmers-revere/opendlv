@@ -61,7 +61,7 @@ void Lidar::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
-//  std::string const type = kv.getValue<std::string>("proxy-lidar.type");
+  //  std::string const type = kv.getValue<std::string>("proxy-lidar.type");
 
   const double x = kv.getValue<float>("proxy-lidar.mount.x");
   const double y = kv.getValue<float>("proxy-lidar.mount.y");
@@ -77,7 +77,7 @@ void Lidar::setUp()
     m_sick->start();
     cout << "Connected to SICK, waiting for configuration..." << std::endl;
   }
-  catch(string &exception) {
+  catch (string &exception) {
     cerr << "[" << getName() << "] Could not connect to SICK: " << exception << endl;
   }
 }
@@ -94,8 +94,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Lidar::body()
 {
   // Initialization sequence.
   uint32_t counter = 0;
-  while (getModuleStateAndWaitForRemainingTimeInTimeslice() 
-      == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+  while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
     counter++;
     if (counter == 30) {
       cout << "Sending stop scan" << endl;
@@ -121,8 +120,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Lidar::body()
   }
 
   // "Do nothing" sequence.
-  while (getModuleStateAndWaitForRemainingTimeInTimeslice() 
-      == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+  while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
     // Do nothing.
   }
 
@@ -131,36 +129,36 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Lidar::body()
 
 void Lidar::Status()
 {
-  const unsigned char statusCall[] = {0x02, 0x00, 0x01, 0x00, 0x31, 0x15, 0x12 };
-  const std::string statusString( reinterpret_cast< char const* >(statusCall), 7) ;
+  const unsigned char statusCall[] = {0x02, 0x00, 0x01, 0x00, 0x31, 0x15, 0x12};
+  const std::string statusString(reinterpret_cast<char const *>(statusCall), 7);
   m_sick->send(statusString);
 }
 
 void Lidar::StartScan()
 {
   const unsigned char streamStart[] = {0x02, 0x00, 0x02, 0x00, 0x20, 0x24, 0x34, 0x08};
-  const std::string startString( reinterpret_cast< char const* >(streamStart), 8) ;
+  const std::string startString(reinterpret_cast<char const *>(streamStart), 8);
   m_sick->send(startString);
 }
 
 void Lidar::StopScan()
 {
   const unsigned char streamStop[] = {0x02, 0x00, 0x02, 0x00, 0x20, 0x25, 0x35, 0x08};
-  const std::string stopString( reinterpret_cast< char const* >(streamStop), 8) ;
+  const std::string stopString(reinterpret_cast<char const *>(streamStop), 8);
   m_sick->send(stopString);
 }
 
 void Lidar::SettingsMode()
 {
   const unsigned char settingsMode[] = {0x02, 0x00, 0x0A, 0x00, 0x20, 0x00, 0x53, 0x49, 0x43, 0x4B, 0x5F, 0x4C, 0x4D, 0x53, 0xBE, 0xC5};
-  const std::string settingString( reinterpret_cast< char const* >(settingsMode), 16) ;
+  const std::string settingString(reinterpret_cast<char const *>(settingsMode), 16);
   m_sick->send(settingString);
 }
 
 void Lidar::SetCentimeterMode()
 {
-  const unsigned char centimeterMode[] = {0x02, 0x00, 0x21, 0x00, 0x77, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0D, 0x00, 0x00, 0x00, 0x02, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0xCB };
-  const std::string centimeterString( reinterpret_cast< char const* >(centimeterMode), 39) ;
+  const unsigned char centimeterMode[] = {0x02, 0x00, 0x21, 0x00, 0x77, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0D, 0x00, 0x00, 0x00, 0x02, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0xCB};
+  const std::string centimeterString(reinterpret_cast<char const *>(centimeterMode), 39);
   m_sick->send(centimeterString);
 }
 
