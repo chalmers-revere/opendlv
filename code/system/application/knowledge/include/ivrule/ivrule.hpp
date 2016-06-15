@@ -51,11 +51,15 @@ class Ivrule : public odcore::base::module::TimeTriggeredConferenceClientModule 
   void setUp();
   void tearDown();
   void ReadEnvironment(opendlv::perception::Environment &);
-  opendlv::perception::Object FindMio(std::vector<opendlv::perception::Object> &);
+  void FindMio(std::vector<opendlv::perception::Object> &);
 
   bool m_initialised;
   float m_mioAngleRange;
   float m_mioDistanceRange;
+  uint8_t m_memoryDuration;
+  float m_desiredAngularSize;
+  float m_desiredOpticalFlow;
+
   odcore::data::TimeStamp m_mioValidUntil;
   opendlv::perception::Object m_mio;
 };
