@@ -17,22 +17,12 @@
  * USA.
  */
 
-#include <ctype.h>
-#include <cstring>
-#include <cmath>
 #include <iostream>
-#include <fstream>
-#include <thread>
-#include <chrono>
+#include <string>
 
 #include "opendavinci/odcore/base/KeyValueConfiguration.h"
-#include "opendavinci/odcore/data/Container.h"
-#include "opendavinci/odcore/data/TimeStamp.h"
-#include "opendavinci/odcore/base/Thread.h"
 #include "opendavinci/odcore/wrapper/SerialPort.h"
 #include "opendavinci/odcore/wrapper/SerialPortFactory.h"
-
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 #include "lidar/lidar.hpp"
 
@@ -61,24 +51,23 @@ void Lidar::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
-  //  std::string const type = kv.getValue<std::string>("proxy-lidar.type");
-
+  // Mounting configuration.
   const double x = kv.getValue<float>("proxy-lidar.mount.x");
   const double y = kv.getValue<float>("proxy-lidar.mount.y");
   const double z = kv.getValue<float>("proxy-lidar.mount.z");
   m_lidarStringDecoder = std::unique_ptr<LidarStringDecoder>(new LidarStringDecoder(getConference(), x, y, z));
 
-
+  // Connection configuration.
   const string SERIAL_PORT = kv.getValue<std::string>("proxy-lidar.port");
   const uint32_t BAUD_RATE = 9600; // Fixed baud rate.
   try {
-    m_sick = shared_ptr<odcore::wrapper::SerialPort>(odcore::wrapper::SerialPortFactory::createSerialPort(SERIAL_PORT, BAUD_RATE));
+    m_sick = std::shared_ptr<odcore::wrapper::SerialPort>(odcore::wrapper::SerialPortFactory::createSerialPort(SERIAL_PORT, BAUD_RATE));
     m_sick->setStringListener(m_lidarStringDecoder.get());
     m_sick->start();
-    cout << "Connected to SICK, waiting for configuration..." << std::endl;
+    std::cout << "Connected to SICK, waiting for configuration (takes approx. 30s)..." << std::endl;
   }
-  catch (string &exception) {
-    cerr << "[" << getName() << "] Could not connect to SICK: " << exception << endl;
+  catch (std::string &exception) {
+    std::cerr << "[" << getName() << "] Could not connect to SICK: " << exception << std::endl;
   }
 }
 
@@ -97,29 +86,29 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Lidar::body()
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
     counter++;
     if (counter == 30) {
-      cout << "Sending stop scan" << endl;
+      std::cout << "Sending stop scan" << std::endl;
       StopScan();
     }
     if (counter == 32) {
-      cout << "Sending status request" << endl;
+      std::cout << "Sending status request" << std::endl;
       Status();
     }
     if (counter == 34) {
-      cout << "Sending settings mode" << endl;
+      std::cout << "Sending settings mode" << std::endl;
       SettingsMode();
     }
     if (counter == 38) {
-      cout << "Sending centimeter mode" << endl;
+      std::cout << "Sending centimeter mode" << std::endl;
       SetCentimeterMode();
     }
     if (counter == 40) {
-      cout << "Start scanning" << endl;
+      std::cout << "Start scanning" << std::endl;
       StartScan();
       break;
     }
   }
 
-  // "Do nothing" sequence.
+  // "Do nothing" sequence in general.
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
     // Do nothing.
   }

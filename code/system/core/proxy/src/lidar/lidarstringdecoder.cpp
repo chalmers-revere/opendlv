@@ -26,9 +26,6 @@
 #include <vector>
 
 #include <opendavinci/odcore/data/Container.h>
-#include <opendavinci/odcore/base/Lock.h>
-#include <opendavinci/odcore/base/KeyValueConfiguration.h>
-#include <opendlvdata/GeneratedHeaders_opendlvdata.h>
 
 #include "lidar/lidar.hpp"
 

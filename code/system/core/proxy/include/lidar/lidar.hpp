@@ -21,12 +21,10 @@
 #define LIDAR_LIDAR_HPP_
 
 #include <memory>
-#include <list>
 
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/wrapper/SerialPort.h"
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 #include "lidar/lidarstringdecoder.hpp"
 
@@ -49,6 +47,7 @@ class Lidar : public odcore::base::module::TimeTriggeredConferenceClientModule {
  private:
   virtual void setUp();
   virtual void tearDown();
+
   void Status();
   void StartScan();
   void StopScan();

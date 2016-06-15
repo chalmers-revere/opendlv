@@ -24,7 +24,7 @@
 
 #include <opendavinci/odcore/io/StringListener.h>
 #include <opendavinci/odcore/io/conference/ContainerConference.h>
-#include <opendavinci/odcore/base/Mutex.h>
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 namespace opendlv {
 namespace proxy {
@@ -46,6 +46,7 @@ class LidarStringDecoder : public odcore::io::StringListener {
   void ConvertToDistances();
   bool tryDecode();
 
+ private:
   odcore::io::conference::ContainerConference &m_conference;
   bool m_header;
   bool m_startConfirmed;
