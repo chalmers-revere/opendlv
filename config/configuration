@@ -46,6 +46,12 @@ action-setopticalrotation.gain_heading = 1.5
 action-setopticalrotation.heading_tolerance = 0.05
 action-setopticalflow.max_speed = 30/3.6
 
+
+
+###############################################################################
+###############################################################################
+### GCDC SPECIFIC SETTINGS FOR RULE
+
 # Not last in the left lane
 knowledge-gcdc16-rule:0.initial_lane = 2
 knowledge-gcdc16-rule:0.is_tail = 0
@@ -219,7 +225,7 @@ proxy-v2v.listenPort = 5000
 
 ###############################################################################
 ###############################################################################
-
+### Safety
 safety-checkactuation.maxAllowedDeceleration = 3
 
 safety-manualoverride.accelerationPedalPositionThreshold = 0.1
@@ -228,7 +234,7 @@ safety-manualoverride.torsionBarTorqueThreshold = 1.5
 
 ###############################################################################
 ###############################################################################
-# Sensation Optical flow
+### Sensation Optical flow
 
 sensation-vision-opticalflow.termCritMaxCount = 20
 sensation-vision-opticalflow.termCritEpsilon = 0.03
@@ -239,7 +245,7 @@ sensation-vision-opticalflow.nAxisPoints = 15
 
 ###############################################################################
 ###############################################################################
-# Identity
+### Identity
 knowledge-identity.stationId = 110
 knowledge-identity.stationType = 8 #heavy truck
 knowledge-identity.vehicleLength = 7.3
@@ -250,7 +256,7 @@ knowledge-identity.rearAxleLocation = 5.0
 
 ###############################################################################
 ###############################################################################
-# Tools
+### Tools
 tools-can-joystick.devicenode = /dev/pcan1   # PEAK CAN device.
 tools-can-joystick.joystickdevicenode = /dev/input/js2   # Gamepad.
 
@@ -261,7 +267,9 @@ tools-can-simplecansender.devicenode = /dev/pcan1   # PEAK CAN device.
 tools-can-ps3controller.devicenode = /dev/pcan1   # PEAK CAN device.
 tools-can-ps3controller.ps3controllerdevicenode = /dev/input/js2   # Gamepad.
 
-# Perception
+###############################################################################
+###############################################################################
+### Perception
 perception-detectlane.inputSize = 640,480
 perception-detectlane.outputSize = 640,480
 perception-detectlane:0.source = front-left
