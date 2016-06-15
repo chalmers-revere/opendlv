@@ -326,7 +326,7 @@ void LidarStringDecoder::nextString(std::string const &a_string)
         while (s.size() > 0) {
             cout << "length = " << dec << s.size() << endl;
 
-            if (!tryDecode()) {
+            if (tryDecode()) {
                 // If decoding succeeds, don't modify buffer but try to consume more.
             }
             else {
