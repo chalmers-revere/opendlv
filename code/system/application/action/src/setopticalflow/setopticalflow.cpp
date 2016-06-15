@@ -64,10 +64,10 @@ void SetOpticalFlow::nextContainer(odcore::data::Container &a_container)
 
     m_opticFlow = currentSpeedKmh / 3.6f;
     m_opticFlowIdentified = odcore::data::TimeStamp();
-  } else if (a_container.getDataType() == opendlv::knowledge::DesiredOpticalFlow::ID()) {
+  } else if (a_container.getDataType() == opendlv::perception::StimulusOpticalFlow::ID()) {
 
 //    auto desiredOpticalFlow = 
-//        a_container.getData<opendlv::knowledge::DesiredOpticalFlow>();
+//        a_container.getData<opendlv::perception::StimulusOpticalFlow>();
 
    // float flow = desiredOpticalFlow.getDesiredOpticalFlow();
 

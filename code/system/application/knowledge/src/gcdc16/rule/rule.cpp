@@ -394,10 +394,10 @@ void Rule::bodyMergeScenario()
 
 
   if (m_scenarioIsReady) {
-    opendlv::knowledge::DesiredOpticalFlow desired(m_cruiseSpeed);
+ /*   opendlv::knowledge::DesiredOpticalFlow desired(m_cruiseSpeed);
     odcore::data::Container objectContainerDesiredOpticalFlow(desired);
     getConference().send(objectContainerDesiredOpticalFlow);
-
+*/
 
     if (m_isCreatingGap) {
 
@@ -461,10 +461,12 @@ void Rule::bodyMergeScenario()
       // getConference().send(objectContainerDistance);
     }
     
+    /*
     opendlv::model::Direction objectDirection(m_desiredAzimuth, 0.0f);
     opendlv::knowledge::DesiredDirectionOfMovement desiredDirection(objectDirection);
     odcore::data::Container objectContainerDirection(desiredDirection);
     getConference().send(objectContainerDirection);
+    */
   }
 
 
@@ -558,10 +560,11 @@ void Rule::receivedContainerIntersectionScenario(odcore::data::Container &a_cont
 
     if (whatInsight == "scenarioReady") {
       // set desired speed of 30 km/h
+      /*
       opendlv::knowledge::DesiredOpticalFlow desired(30/3.6f);
       odcore::data::Container objectContainerDesiredOpticalFlow(desired);
       getConference().send(objectContainerDesiredOpticalFlow);
-
+      */
     }
   }
 
