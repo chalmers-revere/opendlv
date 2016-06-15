@@ -159,13 +159,16 @@ void LidarStringDecoder::ConvertToDistances()
 
 bool LidarStringDecoder::tryDecode()
 {
+  const uint32_t HEADER_LENGTH = 7;
+  const uint32_t START_LENGTH = 10;
+  const uint32_t MAX_NUMBER_OF_BYTES_PER_PAYLOAD = 722;
   static uint32_t byteCounter = 0;
   const string s = m_buffer.str();
 
-  if (m_header && (byteCounter < 722)) {
+  if (m_header && (byteCounter < MAX_NUMBER_OF_BYTES_PER_PAYLOAD)) {
     // Store bytes in receive measurement buffer.
     uint32_t processedBytes = 0;
-    while ((byteCounter < 722) && (processedBytes < s.size())) {
+    while ((byteCounter < MAX_NUMBER_OF_BYTES_PER_PAYLOAD) && (processedBytes < s.size())) {
       m_measurements[byteCounter] = static_cast<char>(s.at(processedBytes));
       processedBytes++; // Bytes processed in this cycle.
       byteCounter++;    // Bytes processed in total.
@@ -175,7 +178,7 @@ bool LidarStringDecoder::tryDecode()
     return true;
   }
 
-  if (m_header && (byteCounter == 722)) {
+  if (m_header && (byteCounter == MAX_NUMBER_OF_BYTES_PER_PAYLOAD)) {
     cout << "Completed payload." << endl;
     // Do ray transformation.
     ConvertToDistances();
@@ -185,15 +188,15 @@ bool LidarStringDecoder::tryDecode()
   }
 
   // Find header.
-  if (!m_header && (s.size() >= 7)) {
+  if (!m_header && (s.size() >= HEADER_LENGTH)) {
     m_header = true;
-    for (uint32_t i = 0; (i < 7) && m_header; i++) {
+    for (uint32_t i = 0; (i < HEADER_LENGTH) && m_header; i++) {
       m_header &= ((int)(uint8_t)s.at(i) == (int)(uint8_t)m_measurementHeader[i]);
     }
     if (m_header) {
       cout << "Received header." << endl;
       // Remove 7 bytes.
-      m_buffer.str(m_buffer.str().substr(7));
+      m_buffer.str(m_buffer.str().substr(HEADER_LENGTH));
       m_buffer.seekg(0, ios_base::end);
 
       // Reset byte counter for processing payload.
@@ -203,28 +206,28 @@ bool LidarStringDecoder::tryDecode()
     // Not found, try next state.
   }
 
-  //    // Not working reliably.
-  //    // Find centimeter mode.
-  //    if ((!m_centimeterMode) && (m_buffer.str().size() >= 44)) {
-  //        m_centimeterMode = true;
-  //        for (uint32_t i = 0; i < 44; i++) {
-  //            cout << "s = " << (int)(uint8_t)s.at(i) << ", resp = " << (int)(uint8_t)m_centimeterResponse[i] << endl;
-  //            m_centimeterMode &= ((int)(uint8_t)s.at(i) == (int)(uint8_t) m_centimeterResponse[i]);
-  //        }
-  //        if (m_centimeterMode) {
-  //          cout << "Received centimeterMode." << endl;
-  //            // Remove 10 bytes.
-  //            m_buffer.str(m_buffer.str().substr(44));
-  //            m_buffer.seekg(0, ios_base::end);
-  //            return true;
-  //        }
-  //    }
+//    // Not working reliably.
+//    // Find centimeter mode.
+//    if ((!m_centimeterMode) && (m_buffer.str().size() >= 44)) {
+//        m_centimeterMode = true;
+//        for (uint32_t i = 0; i < 44; i++) {
+//            cout << "s = " << (int)(uint8_t)s.at(i) << ", resp = " << (int)(uint8_t)m_centimeterResponse[i] << endl;
+//            m_centimeterMode &= ((int)(uint8_t)s.at(i) == (int)(uint8_t) m_centimeterResponse[i]);
+//        }
+//        if (m_centimeterMode) {
+//          cout << "Received centimeterMode." << endl;
+//            // Remove 10 bytes.
+//            m_buffer.str(m_buffer.str().substr(44));
+//            m_buffer.seekg(0, ios_base::end);
+//            return true;
+//        }
+//    }
 
   // Find start confirmation.
-  if (s.size() >= 10) {
+  if (s.size() >= START_LENGTH) {
     // Try to find start message.
     m_startConfirmed = true;
-    for (uint32_t i = 0; (i < 10) && m_startConfirmed; i++) {
+    for (uint32_t i = 0; (i < START_LENGTH) && m_startConfirmed; i++) {
       // Byte 7 and 8 might be different.
       if ((i != 7) && (i != 8)) {
         m_startConfirmed &= ((int)(uint8_t)s.at(i) == (int)(uint8_t)m_startResponse[i]);
@@ -233,7 +236,7 @@ bool LidarStringDecoder::tryDecode()
     if (m_startConfirmed) {
       cout << "Received start confirmation." << endl;
       // Remove 10 bytes.
-      m_buffer.str(m_buffer.str().substr(10));
+      m_buffer.str(m_buffer.str().substr(START_LENGTH));
       m_buffer.seekg(0, ios_base::end);
       return true;
     }
