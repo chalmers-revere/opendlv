@@ -83,58 +83,56 @@ void Act::nextContainer(odcore::data::Container &a_container)
   odcore::data::TimeStamp now;
 
 
-  if(a_container.getDataType() == opendlv::perception::ObjectDesiredAngularSize::ID()) {
-    // This is really a desired distance
-    opendlv::perception::ObjectDesiredAngularSize desiredAngularSize =
-        a_container.getData<opendlv::perception::ObjectDesiredAngularSize>();
-    m_targetDistance = desiredAngularSize.getDesiredAngularSize();
-    if(desiredAngularSize.getObjectId() >= 0) {
-      m_targetObjectId = desiredAngularSize.getObjectId();
-    }
+  // if(a_container.getDataType() == opendlv::perception::ObjectDesiredAngularSize::ID()) {
+  //   // This is really a desired distance
+  //   opendlv::perception::ObjectDesiredAngularSize desiredAngularSize =
+  //       a_container.getData<opendlv::perception::ObjectDesiredAngularSize>();
+  //   m_targetDistance = desiredAngularSize.getDesiredAngularSize();
+  //   if(desiredAngularSize.getObjectId() >= 0) {
+  //     m_targetObjectId = desiredAngularSize.getObjectId();
+  //   }
+  // } 
 
+  // if(a_container.getDataType() == (opendlv::perception::Object::ID() + 300)) {
 
-  } 
+  //   std::cout << std::endl << "Act: Received Object" << std::endl;
+  //   opendlv::perception::Object object =
+  //       a_container.getData<opendlv::perception::Object>();
 
-  if(a_container.getDataType() == (opendlv::perception::Object::ID() + 300)) {
+  //   int16_t identity = object.getObjectId();
 
-    std::cout << std::endl << "Act: Received Object" << std::endl;
-    opendlv::perception::Object object =
-        a_container.getData<opendlv::perception::Object>();
+  //   if (identity == m_targetObjectId) {
+  //     std::cout << "Act: identity == m_targetObjectId" << std::endl;
+  //     m_targetObject = object;
+  //     m_timeSinceLastObjectDetection = now;
 
-    int16_t identity = object.getObjectId();
+  //     std::cout << "\n Front car distance : " << m_targetObject.getDistance() << std::endl;
+  //   }
+  // }
 
-    if (identity == m_targetObjectId) {
-      std::cout << "Act: identity == m_targetObjectId" << std::endl;
-      m_targetObject = object;
-      m_timeSinceLastObjectDetection = now;
+  // if (a_container.getDataType() == opendlv::sensation::DesiredOpticalFlow::ID()) {
 
-      std::cout << "\n Front car distance : " << m_targetObject.getDistance() << std::endl;
-    }
-  }
+  //   // This is really a desired velocity
 
-  if (a_container.getDataType() == opendlv::sensation::DesiredOpticalFlow::ID()) {
+  //   opendlv::sensation::DesiredOpticalFlow flow = 
+  //       a_container.getData<opendlv::sensation::DesiredOpticalFlow>();
 
-    // This is really a desired velocity
-
-    opendlv::sensation::DesiredOpticalFlow flow = 
-        a_container.getData<opendlv::sensation::DesiredOpticalFlow>();
-
-    m_desiredSpeed = flow.getDesiredOpticalFlow();
+  //   m_desiredSpeed = flow.getDesiredOpticalFlow();
 
     
 
-    std::cout << "\n Desired speed is now: " << m_desiredSpeed << std::endl;
-  }
+  //   std::cout << "\n Desired speed is now: " << m_desiredSpeed << std::endl;
+  // }
 
-  if (a_container.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
-    opendlv::proxy::reverefh16::Propulsion propulsion = 
-        a_container.getData<opendlv::proxy::reverefh16::Propulsion>();
+  // if (a_container.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
+  //   opendlv::proxy::reverefh16::Propulsion propulsion = 
+  //       a_container.getData<opendlv::proxy::reverefh16::Propulsion>();
     
-    float currentSpeedKmh = 
-        static_cast<float>(propulsion.getPropulsionShaftVehicleSpeed());
+  //   float currentSpeedKmh = 
+  //       static_cast<float>(propulsion.getPropulsionShaftVehicleSpeed());
 
-    m_currentSpeed = currentSpeedKmh / 3.6f;
-  }
+  //   m_currentSpeed = currentSpeedKmh / 3.6f;
+  // }
 
   
   /*
@@ -286,23 +284,23 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
 
     odcore::data::TimeStamp now;
 
-    float distanceToObject = m_targetObject.getDistance();
+    // float distanceToObject = m_targetObject.getDistance();
 
-    odcore::data::TimeStamp timeElapsed = now - m_timeSinceLastObjectDetection;
-     double timeMemoryLimit = 5.0; // sec
+    // odcore::data::TimeStamp timeElapsed = now - m_timeSinceLastObjectDetection;
+    //  double timeMemoryLimit = 5.0; // sec
 
-    if (timeElapsed.toMicroseconds()/1000000.0 > timeMemoryLimit
-      || m_targetObjectId == 5798) // Emergency spoof for interection scneario, secret handshake
-    {
-        distanceToObject = 1000.0;
-    }
+    // if (timeElapsed.toMicroseconds()/1000000.0 > timeMemoryLimit
+    //   || m_targetObjectId == 5798) // Emergency spoof for interection scneario, secret handshake
+    // {
+    //     distanceToObject = 1000.0;
+    // }
 
 
-    float minThreshold = 20;
-    float maxThreshold = 50;
-    float velocityCorrectionFactor =  100.0f;  //propotional constat forf PID controller  --- P controller
-    float distanceCorrectionFactor = 3.0f;
-    float releasePedalFactor = 3.0f;
+    // float minThreshold = 20;
+    // float maxThreshold = 50;
+    // float velocityCorrectionFactor =  100.0f;  //propotional constat forf PID controller  --- P controller
+    // float distanceCorrectionFactor = 3.0f;
+    // float releasePedalFactor = 3.0f;
 
     // this actually override the butto to activate the autonomous mode
     // use this only for test purposes
@@ -317,38 +315,38 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
     }
     }*/
 
-    float speedCorrection = 0;
+    // float speedCorrection = 0;
 
 
-    if (distanceToObject < minThreshold) {
-      // Want to brake
-      speedCorrection = - releasePedalFactor * minThreshold/distanceToObject;
-    }
-    else if ((m_desiredSpeed - m_currentSpeed) < 0.0f || distanceToObject > maxThreshold ){  
+    // if (distanceToObject < minThreshold) {
+    //   // Want to brake
+    //   speedCorrection = - releasePedalFactor * minThreshold/distanceToObject;
+    // }
+    // else if ((m_desiredSpeed - m_currentSpeed) < 0.0f || distanceToObject > maxThreshold ){  
       
-      float speedDiff = m_desiredSpeed - m_currentSpeed;
-      speedCorrection = speedDiff*velocityCorrectionFactor;
-    }
-    else {
-      // In the interval
-      float distanceRatio = m_targetDistance / distanceToObject ;
-      speedCorrection = 1.0f - distanceRatio;
+    //   float speedDiff = m_desiredSpeed - m_currentSpeed;
+    //   speedCorrection = speedDiff*velocityCorrectionFactor;
+    // }
+    // else {
+    //   // In the interval
+    //   float distanceRatio = m_targetDistance / distanceToObject ;
+    //   speedCorrection = 1.0f - distanceRatio;
 
-      speedCorrection *= distanceCorrectionFactor;
+    //   speedCorrection *= distanceCorrectionFactor;
 
-      // Correct according to vehicle in front
-    }
-    m_accelerationValue = std::min(speedCorrection, 30.0f);
-    if (m_accelerationValue < 0.001f)
-    {
-        m_accelerationValue = 0.0;
-    }
+    //   // Correct according to vehicle in front
+    // }
+    // m_accelerationValue = std::min(speedCorrection, 30.0f);
+    // if (m_accelerationValue < 0.001f)
+    // {
+    //     m_accelerationValue = 0.0;
+    // }
 
-    std::cout << "\n\n distance to objects " << distanceToObject
-              << "\n desired speed : " << m_desiredSpeed
-              << "\n current speed : " << m_currentSpeed
-              << "\n speedCorrection : " << speedCorrection
-              << "\n acceleration value : " << m_accelerationValue << std::endl;
+    // std::cout << "\n\n distance to objects " << distanceToObject
+    //           << "\n desired speed : " << m_desiredSpeed
+    //           << "\n current speed : " << m_currentSpeed
+    //           << "\n speedCorrection : " << speedCorrection
+    //           << "\n acceleration value : " << m_accelerationValue << std::endl;
 
 
     
@@ -439,56 +437,54 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
       getConference().send(actuationContainer);
     }
 */
-    {
-        opendlv::proxy::ActuationRequest actuationRequest;
-        if (m_brakeValue > 0.0f) {
-          std::cout << "braking: " << m_brakeValue << std::endl; 
-          actuationRequest = opendlv::proxy::ActuationRequest(m_brakeValue, m_steeringValue, false);
-        } else {
-          std::cout << "accelerating: " << m_accelerationValue << std::endl; 
-          actuationRequest = opendlv::proxy::ActuationRequest(m_accelerationValue, m_steeringValue, false);
-        }
-
-        // Former code from checkActuation.
-        float acceleration = actuationRequest.getAcceleration();
-        float steering = actuationRequest.getSteering();
-
-        float m_maxAllowedDeceleration = 3;
-        float steeringLimit = 0.2;
-        float accMaxLimit = 80;
-
-
-        // TODO if acceleration is negative it is m/s^2, if positive percent of acceleration pedal
-
-        // clamp steering
-        if (steering < -steeringLimit) {
-          steering = -steeringLimit;
-          std::cout << "steering request was capped to " << steering << std::endl;
-        }
-        else if (steering > steeringLimit) {
-          steering = steeringLimit;
-          std::cout << "steering request was capped to " << steering << std::endl;
-        }
-
-        // clamp acceleration
-        if (acceleration < -m_maxAllowedDeceleration) {
-          acceleration = -m_maxAllowedDeceleration;
-          std::cout << "acceleration request was capped to " << acceleration << std::endl;
-        }
-        else if (acceleration > accMaxLimit) {
-          acceleration = accMaxLimit;
-          std::cout << "acceleration request was capped to " << acceleration << std::endl;
-        }
-
-
-        actuationRequest.setAcceleration(acceleration);
-        actuationRequest.setSteering(steering);
-
-        actuationRequest.setIsValid(true);
-
-        odcore::data::Container actuationContainer(actuationRequest);
-        getConference().send(actuationContainer);
+    opendlv::proxy::ActuationRequest actuationRequest;
+    if (m_brakeValue > 0.0f) {
+      std::cout << "braking: " << m_brakeValue << std::endl; 
+      actuationRequest = opendlv::proxy::ActuationRequest(m_brakeValue, m_steeringValue, false);
+    } else {
+      std::cout << "accelerating: " << m_accelerationValue << std::endl; 
+      actuationRequest = opendlv::proxy::ActuationRequest(m_accelerationValue, m_steeringValue, false);
     }
+
+    // Former code from checkActuation.
+    float acceleration = actuationRequest.getAcceleration();
+    float steering = actuationRequest.getSteering();
+
+    float m_maxAllowedDeceleration = 3;
+    float steeringLimit = 0.2;
+    float accMaxLimit = 80;
+
+
+    // TODO if acceleration is negative it is m/s^2, if positive percent of acceleration pedal
+
+    // clamp steering
+    if (steering < -steeringLimit) {
+      steering = -steeringLimit;
+      std::cout << "steering request was capped to " << steering << std::endl;
+    }
+    else if (steering > steeringLimit) {
+      steering = steeringLimit;
+      std::cout << "steering request was capped to " << steering << std::endl;
+    }
+
+    // clamp acceleration
+    if (acceleration < -m_maxAllowedDeceleration) {
+      acceleration = -m_maxAllowedDeceleration;
+      std::cout << "acceleration request was capped to " << acceleration << std::endl;
+    }
+    else if (acceleration > accMaxLimit) {
+      acceleration = accMaxLimit;
+      std::cout << "acceleration request was capped to " << acceleration << std::endl;
+    }
+
+
+    actuationRequest.setAcceleration(acceleration);
+    actuationRequest.setSteering(steering);
+
+    actuationRequest.setIsValid(true);
+
+    odcore::data::Container actuationContainer(actuationRequest);
+    getConference().send(actuationContainer);
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
