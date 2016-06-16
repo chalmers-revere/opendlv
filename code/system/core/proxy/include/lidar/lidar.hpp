@@ -21,12 +21,10 @@
 #define LIDAR_LIDAR_HPP_
 
 #include <memory>
-#include <list>
 
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/wrapper/SerialPort.h"
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 #include "lidar/lidarstringdecoder.hpp"
 
@@ -35,10 +33,9 @@ namespace proxy {
 namespace lidar {
 
 /**
- * This class provides...
+ * This class decodes data from SICK LMS 200.
  */
-class Lidar : public odcore::base::module::TimeTriggeredConferenceClientModule 
-{
+class Lidar : public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
   Lidar(int32_t const &, char **);
   Lidar(Lidar const &) = delete;
@@ -46,17 +43,14 @@ class Lidar : public odcore::base::module::TimeTriggeredConferenceClientModule
   virtual ~Lidar();
 
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
-  virtual void nextContainer(odcore::data::Container &c);
 
  private:
-  void setUp();
-  void tearDown();
-  void SendData();
+  virtual void setUp();
+  virtual void tearDown();
+
   void Status();
   void StartScan();
   void StopScan();
-  void SetBaud9600();
-  void SetBaud38400();
   void SettingsMode();
   void SetCentimeterMode();
 

@@ -87,6 +87,7 @@ docker-push-fh16: docker-tag-fh16
 	for i in $$(cat fh16/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/fh16_$$i:$(VERSION); docker push seresearch/fh16_$$i:latest; done
 
 fh16-copy-opendlv:
+	rm -fr fh16/opendlv
 	cp -r ../build.from.docker/install fh16/opendlv
 	cp fh16/checkHealth.sh fh16/opendlv/bin
 
@@ -108,6 +109,7 @@ docker-push-fh16-ps3controller: docker-tag-fh16-ps3controller
 	for i in $$(cat fh16-ps3controller/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/fh16ps3controller_$$i:$(VERSION); docker push seresearch/fh16ps3controller_$$i:latest; done
 
 fh16-ps3controller-copy-opendlv:
+	rm -fr fh16-ps3controller/opendlv
 	cp -r ../build.from.docker/install fh16-ps3controller/opendlv
 	cp fh16-ps3controller/checkHealth.sh fh16-ps3controller/opendlv/bin
 
@@ -115,6 +117,48 @@ fh16-ps3controller-copy-opendlv:
 fh16-ps3controller: build-incremental fh16-ps3controller-copy-opendlv
 	cd fh16-ps3controller && docker-compose build
 
+
+###############################################################################
+###############################################################################
+# FH16 CAN recording.
+
+# Tag Docker images using Git hashes for traceability.
+docker-tag-fh16-canrecording:
+	for i in $$(cat fh16-canrecording/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker tag fh16canrecording_$$i seresearch/fh16canrecording_$$i:$(VERSION); docker tag fh16canrecording_$$i seresearch/fh16canrecording_$$i:latest; done
+
+# Push Docker latest images for backup.
+docker-push-fh16-canrecording: docker-tag-fh16-canrecording
+	for i in $$(cat fh16-canrecording/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/fh16canrecording_$$i:$(VERSION); docker push seresearch/fh16canrecording_$$i:latest; done
+
+fh16-canrecording-copy-opendlv:
+	rm -fr fh16-canrecording/opendlv
+	cp -r ../build.from.docker/install fh16-canrecording/opendlv
+	cp fh16-canrecording/checkHealth.sh fh16-canrecording/opendlv/bin
+
+# Build image for FH16 truck for CAN data recording.
+fh16-canrecording: build-incremental fh16-canrecording-copy-opendlv
+	cd fh16-canrecording && docker-compose build
+
+###############################################################################
+###############################################################################
+# FH16 lidar-echolocation-scene.
+
+# Tag Docker images using Git hashes for traceability.
+docker-tag-fh16-lidar-echolocation-scene:
+	for i in $$(cat fh16-lidar-echolocation-scene/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker tag fh16lidarecholocationscene_$$i seresearch/fh16lidarecholocationscene_$$i:$(VERSION); docker tag fh16lidarecholocationscene_$$i seresearch/fh16lidarecholocationscene_$$i:latest; done
+
+# Push Docker latest images for backup.
+docker-push-fh16-lidar-echolocation-scene: docker-tag-fh16-lidar-echolocation-scene
+	for i in $$(cat fh16-lidar-echolocation-scene/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/fh16lidarecholocationscene_$$i:$(VERSION); docker push seresearch/fh16lidarecholocationscene_$$i:latest; done
+
+fh16-lidar-echolocation-scene-copy-opendlv:
+	rm -fr fh16-lidar-echolocation-scene/opendlv
+	cp -r ../build.from.docker/install fh16-lidar-echolocation-scene/opendlv
+	cp fh16-lidar-echolocation-scene/checkHealth.sh fh16-lidar-echolocation-scene/opendlv/bin
+
+# Build image for FH16 truck for lidar-echolocation-scene.
+fh16-lidar-echolocation-scene: build-incremental fh16-lidar-echolocation-scene-copy-opendlv
+	cd fh16-lidar-echolocation-scene && docker-compose build
 
 ###############################################################################
 ###############################################################################
@@ -129,6 +173,7 @@ docker-push-fh16-iv2016: docker-tag-fh16-iv2016
 	for i in $$(cat fh16-iv2016/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/fh16iv2016_$$i:$(VERSION); docker push seresearch/fh16iv2016_$$i:latest; done
 
 fh16-iv2016-copy-opendlv:
+	rm -fr fh16-iv2016/opendlv
 	cp -r ../build.from.docker/install fh16-iv2016/opendlv
 	cp fh16-iv2016/checkHealth.sh fh16-iv2016/opendlv/bin
 

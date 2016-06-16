@@ -394,10 +394,10 @@ void Rule::bodyMergeScenario()
 
 
   if (m_scenarioIsReady) {
-    opendlv::sensation::DesiredOpticalFlow desired(m_cruiseSpeed);
+ /*   opendlv::knowledge::DesiredOpticalFlow desired(m_cruiseSpeed);
     odcore::data::Container objectContainerDesiredOpticalFlow(desired);
     getConference().send(objectContainerDesiredOpticalFlow);
-
+*/
 
     if (m_isCreatingGap) {
 
@@ -439,32 +439,34 @@ void Rule::bodyMergeScenario()
     }
 
     if (m_isLeader) {
-      m_desiredAzimuth = 0.0f; // could be dangerous, really want to follow road.
-      m_desiredAngularSize = 10 + timeHeadway*m_speed; // desired distance
-      int16_t objectId = m_closestObject.getObjectId();
-      opendlv::perception::ObjectDesiredAngularSize desiredAngularSize(m_desiredAngularSize, objectId);
-      odcore::data::Container objectContainerDistance(desiredAngularSize);
-      getConference().send(objectContainerDistance);
+      // m_desiredAzimuth = 0.0f; // could be dangerous, really want to follow road.
+      // m_desiredAngularSize = 10 + timeHeadway*m_speed; // desired distance
+      // int16_t objectId = m_closestObject.getObjectId();
+      // opendlv::perception::ObjectDesiredAngularSize desiredAngularSize(m_desiredAngularSize, objectId);
+      // odcore::data::Container objectContainerDistance(desiredAngularSize);
+      // getConference().send(objectContainerDistance);
     } else if (m_isCreatingGap) {
-      m_desiredAzimuth = m_secondClosestObject.getDirection().getAzimuth();
-      m_desiredAngularSize = 10 + timeHeadway*m_speed; // desired distance
-      int16_t objectId = m_closestObject.getObjectId();
-      opendlv::perception::ObjectDesiredAngularSize desiredAngularSize(m_desiredAngularSize, objectId);
-      odcore::data::Container objectContainerDistance(desiredAngularSize);
-      getConference().send(objectContainerDistance);
+      // m_desiredAzimuth = m_secondClosestObject.getDirection().getAzimuth();
+      // m_desiredAngularSize = 10 + timeHeadway*m_speed; // desired distance
+      // int16_t objectId = m_closestObject.getObjectId();
+      // opendlv::perception::ObjectDesiredAngularSize desiredAngularSize(m_desiredAngularSize, objectId);
+      // odcore::data::Container objectContainerDistance(desiredAngularSize);
+      // getConference().send(objectContainerDistance);
     } else {
-      m_desiredAzimuth = m_mostInterestingObject.getDirection().getAzimuth();
-      m_desiredAngularSize = 10 + timeHeadway*m_speed; // desired distance
-      int16_t objectId = m_mostInterestingObject.getObjectId();
-      opendlv::perception::ObjectDesiredAngularSize desiredAngularSize(m_desiredAngularSize, objectId);
-      odcore::data::Container objectContainerDistance(desiredAngularSize);
-      getConference().send(objectContainerDistance);
+      // m_desiredAzimuth = m_mostInterestingObject.getDirection().getAzimuth();
+      // m_desiredAngularSize = 10 + timeHeadway*m_speed; // desired distance
+      // int16_t objectId = m_mostInterestingObject.getObjectId();
+      // opendlv::perception::ObjectDesiredAngularSize desiredAngularSize(m_desiredAngularSize, objectId);
+      // odcore::data::Container objectContainerDistance(desiredAngularSize);
+      // getConference().send(objectContainerDistance);
     }
     
+    /*
     opendlv::model::Direction objectDirection(m_desiredAzimuth, 0.0f);
-    opendlv::sensation::DesiredDirectionOfMovement desiredDirection(objectDirection);
+    opendlv::knowledge::DesiredDirectionOfMovement desiredDirection(objectDirection);
     odcore::data::Container objectContainerDirection(desiredDirection);
     getConference().send(objectContainerDirection);
+    */
   }
 
 
@@ -558,10 +560,11 @@ void Rule::receivedContainerIntersectionScenario(odcore::data::Container &a_cont
 
     if (whatInsight == "scenarioReady") {
       // set desired speed of 30 km/h
-      opendlv::sensation::DesiredOpticalFlow desired(30/3.6f);
+      /*
+      opendlv::knowledge::DesiredOpticalFlow desired(30/3.6f);
       odcore::data::Container objectContainerDesiredOpticalFlow(desired);
       getConference().send(objectContainerDesiredOpticalFlow);
-
+      */
     }
   }
 
@@ -640,11 +643,11 @@ void Rule::bodyIntersectionScenario()
       getConference().send(mioTimeHeadwayContainer);
 
 
-      float euclideanDistance = 15;
+      // float euclideanDistance = 15;
 
-      opendlv::perception::ObjectDesiredAngularSize angularsize((euclideanDistance + 5), m_mostInterestingObject.getObjectId());
-      odcore::data::Container objectContainer0(angularsize);
-      getConference().send(objectContainer0); 
+      // opendlv::perception::ObjectDesiredAngularSize angularsize((euclideanDistance + 5), m_mostInterestingObject.getObjectId());
+      // odcore::data::Container objectContainer0(angularsize);
+      // getConference().send(objectContainer0); 
 
       
     }
@@ -702,17 +705,17 @@ void Rule::bodyIntersectionScenario()
       if (mioBearing > 0.1f) { // ~ 5 degrees to left
 
         // spoofing the hell out of act
-        opendlv::perception::ObjectDesiredAngularSize angularsize(20, 5798); // secret id with act.cpp
-        odcore::data::Container objectContainer0(angularsize);
-        getConference().send(objectContainer0); 
+        // opendlv::perception::ObjectDesiredAngularSize angularsize(20, 5798); // secret id with act.cpp
+        // odcore::data::Container objectContainer0(angularsize);
+        // getConference().send(objectContainer0); 
       }
       else {
 
         // mio OCV vehicle is to the right, we should care about it
-        float euclideanDistance = 15;
-        opendlv::perception::ObjectDesiredAngularSize angularsize((euclideanDistance + 5), m_mostInterestingObject.getObjectId());
-        odcore::data::Container objectContainer0(angularsize);
-        getConference().send(objectContainer0); 
+        // float euclideanDistance = 15;
+        // opendlv::perception::ObjectDesiredAngularSize angularsize((euclideanDistance + 5), m_mostInterestingObject.getObjectId());
+        // odcore::data::Container objectContainer0(angularsize);
+        // getConference().send(objectContainer0); 
       }
       
     }

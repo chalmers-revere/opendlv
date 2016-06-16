@@ -40,14 +40,12 @@ namespace setopticalflow {
   * @param a_argv Command line arguments.
   */
 SetOpticalFlow::SetOpticalFlow(int32_t const &a_argc, char **a_argv)
-    : TimeTriggeredConferenceClientModule(
+    : DataTriggeredConferenceClientModule(
       a_argc, a_argv, "action-setopticalflow"),
-    m_maxSpeed(0.0f),
-    m_currentSpeed(0.0f),
-    m_speedCorrection(0.0f),
-    m_desiredSpeed(0.0f),
-    m_currentEstimatedAcceleration(0.0f),
-    m_velocityMemory()
+    m_stimulii(),
+    m_correctionTimes(),
+    m_opticFlowIdentified(0, 0),
+    m_opticFlow(0.0f)
 {
 }
 
@@ -55,17 +53,28 @@ SetOpticalFlow::~SetOpticalFlow()
 {
 }
 
-/**
- * Receives current and desired flow.
- * Sends speed correction commands (throttle) and in rare cases a halt command
- * (brake) to Act.
- */
-
-odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SetOpticalFlow::body()
+void SetOpticalFlow::nextContainer(odcore::data::Container &a_container)
 {
-  while (getModuleStateAndWaitForRemainingTimeInTimeslice() 
-      == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+  // TODO: Action should never see proxy, should go through sensation
+  if (a_container.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
+    auto propulsion = a_container.getData<opendlv::proxy::reverefh16::Propulsion>();
+    
+    float currentSpeedKmh = 
+        static_cast<float>(propulsion.getPropulsionShaftVehicleSpeed());
 
+    m_opticFlow = currentSpeedKmh / 3.6f;
+    m_opticFlowIdentified = odcore::data::TimeStamp();
+  } else if (a_container.getDataType() == opendlv::perception::StimulusOpticalFlow::ID()) {
+
+//    auto desiredOpticalFlow = 
+//        a_container.getData<opendlv::perception::StimulusOpticalFlow>();
+
+   // float flow = desiredOpticalFlow.getDesiredOpticalFlow();
+
+  }
+}
+
+/*
 
     // TODO hardcoded parameter...
     float acceptableSpeedDeviation = 2.0f / 3.6f; // 2 km/h
@@ -162,47 +171,13 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SetOpticalFlow::body()
       getConference().send(container);
       std::cout << "Speed Correction: " << m_speedCorrection << std::endl;
     }
-  }
-  return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
-}
+*/
 
-
-
-void SetOpticalFlow::nextContainer(odcore::data::Container &a_container)
-{
-  
-  if (a_container.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
-    opendlv::proxy::reverefh16::Propulsion propulsion = 
-        a_container.getData<opendlv::proxy::reverefh16::Propulsion>();
-    
-    float currentSpeedKmh = 
-        static_cast<float>(propulsion.getPropulsionShaftVehicleSpeed());
-
-    m_currentSpeed = currentSpeedKmh / 3.6f;
-  }
-  else if (a_container.getDataType() == opendlv::sensation::DesiredOpticalFlow::ID()) {
-
-    opendlv::sensation::DesiredOpticalFlow flow = 
-        a_container.getData<opendlv::sensation::DesiredOpticalFlow>();
-
-    m_desiredSpeed = flow.getDesiredOpticalFlow();
-
-    if (m_desiredSpeed > m_maxSpeed) {
-      m_desiredSpeed = m_maxSpeed;
-      std::cout << "Desired speed " << m_desiredSpeed 
-          << " was larger than allowed max speed (" << m_maxSpeed 
-          << "). Corrected." << std::endl;
-    }
-
-    //std::cout << "Desired speed is now: " << m_desiredSpeed << std::endl;
-  }
-
-}
 
 void SetOpticalFlow::setUp()
 {
-  odcore::base::KeyValueConfiguration kv1 = getKeyValueConfiguration();
-  m_maxSpeed = kv1.getValue<float>("action-setopticalflow.max_speed");
+//  odcore::base::KeyValueConfiguration kv1 = getKeyValueConfiguration();
+//  m_maxSpeed = kv1.getValue<float>("action-setopticalflow.max_speed");
 }
 
 void SetOpticalFlow::tearDown()

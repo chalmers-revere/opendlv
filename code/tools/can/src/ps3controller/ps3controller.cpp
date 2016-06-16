@@ -71,8 +71,7 @@ void PS3Controller::setUp()
   using namespace automotive::odcantools;
 
   string const PS3CONTROLLER_DEVICE_NODE =
-  getKeyValueConfiguration().getValue<string>(
-  "tools-can-ps3controller.ps3controllerdevicenode");
+  getKeyValueConfiguration().getValue<string>("tools-can-ps3controller.ps3controllerdevicenode");
 
   string const DEVICE_NODE =
   getKeyValueConfiguration().getValue<string>("tools-can-ps3controller.devicenode");
@@ -205,8 +204,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode PS3Controller::body()
   
   automotive::GenericCANMessage gcm;
 
-  while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
-  odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+  while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
 
 #if !defined(WIN32) && !defined(__gnu_hurd__) && !defined(__APPLE__)
     struct js_event js;

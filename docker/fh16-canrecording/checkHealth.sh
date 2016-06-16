@@ -18,6 +18,7 @@
 # USA.
 
 # System configuration:
+LOCALHOST=127.0.0.1
 SCOTT1=10.42.42.1
 MULTICAST_ROUTE=225.0.0.0
 DOCKER_VOLUME_PREFIX=/from.host
@@ -28,6 +29,7 @@ DEV_PCAN_SPEED=0x011c
 
 # Reachability tests:
 HAS_MULTICAST_ROUTE=$(ip route | grep "$MULTICAST_ROUTE" 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
+PING_LOCALHOST=$(ping -W1 -c1 $LOCALHOST 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
 PING_SCOTT1=$(ping -W1 -c1 $SCOTT1 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
 
 # Devnode tests:
@@ -54,6 +56,7 @@ echo "$(hostname).has.${DEV_PCAN}=$HAS_DEV_PCAN"
 echo "$(hostname).has.dev.pcan.no_netdev=$PCAN_NETDEV_DISABLED"
 echo "$(hostname).has.dev.pcan.correct_speed=$PCAN_CORRECT_SPEED"
 echo "$(hostname).has.multicast_route=$HAS_MULTICAST_ROUTE"
+echo "$(hostname).ping.localhost=$PING_LOCALHOST"
 echo "$(hostname).ping.scott1=$PING_SCOTT1"
 echo "$(hostname).diskspace.used=$DISKSPACE_USED"
 echo "$(hostname).diskspace.available=$DISKSPACE_LEFT"

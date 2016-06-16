@@ -46,8 +46,8 @@ class KeepObjectAlignment
   void setUp();
   void tearDown();
 
-  float m_targetAzimuth;
-  int16_t m_targetId;
+  // float m_targetAzimuth;
+  // int16_t m_targetId;
 };
 
 } // keepobjectalignment

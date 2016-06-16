@@ -42,12 +42,8 @@ namespace keepobjectsize {
 KeepObjectSize::KeepObjectSize(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(
       a_argc, a_argv, "action-keepobjectsize"),
-      m_object(),
-      m_desiredAzimuth(0.0f),
-      m_angularSize(0.0f),
-      m_targetSize(0.1f),
-      m_targetObject(-2),
-      m_crossingScenario(false)
+    m_stimulii(),
+    m_correctionTimes()
 {
 }
 
@@ -62,24 +58,14 @@ KeepObjectSize::~KeepObjectSize()
  */
 void KeepObjectSize::nextContainer(odcore::data::Container &a_container)
 {
-  if(a_container.getDataType() == opendlv::perception::ObjectDesiredAngularSize::ID()) {
-    opendlv::perception::ObjectDesiredAngularSize desiredAngularSize =
-    a_container.getData<opendlv::perception::ObjectDesiredAngularSize>();
-    m_targetSize = desiredAngularSize.getDesiredAngularSize();
-    if(desiredAngularSize.getObjectId() >= 0) {
-      m_targetObject = desiredAngularSize.getObjectId();
-    }
-  } 
+  if(a_container.getDataType() == opendlv::perception::StimulusAngularSizeAlignment::ID()) {
+    auto desiredAngularSizeAlignment = a_container.getData<opendlv::perception::StimulusAngularSizeAlignment>();
 
-  if(a_container.getDataType() == (opendlv::perception::Object::ID() + 300)) {
-    opendlv::perception::Object unpackedObject =
-    a_container.getData<opendlv::perception::Object>();
 
-    int16_t identity = unpackedObject.getObjectId();
+  }
 
-    if (identity != -1) {
 
-      opendlv::model::Direction direction = unpackedObject.getDirection();
+/*      opendlv::model::Direction direction = unpackedObject.getDirection();
       float azimuth = direction.getAzimuth();
       float speedCorrection = 0.0f;
       float gainCorrection = 5.0f;
@@ -140,6 +126,8 @@ void KeepObjectSize::nextContainer(odcore::data::Container &a_container)
           speedCorrection = 0.0f;
         }
 
+*/
+
         /*
         m_angularSize = m_object->getAngularSize();
 
@@ -158,6 +146,8 @@ void KeepObjectSize::nextContainer(odcore::data::Container &a_container)
         }
         */
 
+/*
+
         speedCorrection *= gainCorrection;
         
         std::cout << "speedCorrection: " << speedCorrection << std::endl << std::endl;
@@ -165,9 +155,12 @@ void KeepObjectSize::nextContainer(odcore::data::Container &a_container)
         opendlv::action::Correction correction1(t0, "accelerate", false, speedCorrection);
         odcore::data::Container container(correction1);
         getConference().send(container);
+
+       
       }
     }
   }
+*/
 }
 
 

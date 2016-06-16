@@ -22,6 +22,7 @@ SCOTT1=10.42.42.1
 MULTICAST_ROUTE=225.0.0.0
 DOCKER_VOLUME_PREFIX=/from.host
 CAN_PORT=1
+PROC_PCAN=${DOCKER_VOLUME_PREFIX}/proc/pcan
 DEV_PCAN=${DOCKER_VOLUME_PREFIX}/dev/pcan${CAN_PORT}
 DEV_PCAN_SPEED=0x011c
 JS_PORT=0
@@ -33,9 +34,9 @@ PING_SCOTT1=$(ping -W1 -c1 $SCOTT1 2>&1 >/dev/null && echo "PASSED" || echo "FAI
 
 # Devnode tests:
 HAS_DEV_PCAN=$(test -e $DEV_PCAN 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
-PCAN_NETDEV_DISABLED=$(cat /proc/pcan 2>/dev/null | grep -v "^*" | tr -s " " " " | cut -f4 -d" "| sed "${CAN_PORT}q;d")
+PCAN_NETDEV_DISABLED=$(cat $PROC_PCAN 2>/dev/null | grep -v "^*" | tr -s " " " " | cut -f4 -d" "| sed "${CAN_PORT}q;d")
 PCAN_NETDEV_DISABLED=$(test "$PCAN_NETDEV_DISABLED" == "-NA-" && echo "PASSED" || echo "FAILED")
-PCAN_CORRECT_SPEED=$(cat /proc/pcan 2>/dev/null | grep -v "^*" | tr -s " " " " | cut -f7 -d" "| sed "${CAN_PORT}q;d")
+PCAN_CORRECT_SPEED=$(cat $PROC_PCAN 2>/dev/null | grep -v "^*" | tr -s " " " " | cut -f7 -d" "| sed "${CAN_PORT}q;d")
 PCAN_CORRECT_SPEED=$(test "$PCAN_CORRECT_SPEED" == "$DEV_PCAN_SPEED" && echo "PASSED" || echo "FAILED")
 HAS_DEV_JS=$(test -e $DEV_JS 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
 
