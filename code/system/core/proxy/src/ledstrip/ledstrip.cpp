@@ -187,17 +187,15 @@ void Ledstrip::nextContainer(odcore::data::Container &a_container)
 { 
 //  odcore::data::TimeStamp now;
   
-  if (a_container.getDataType() == opendlv::sensation::DesiredDirectionOfMovement::ID()) {
-    opendlv::sensation::DesiredDirectionOfMovement directionObject = 
-    a_container.getData<opendlv::sensation::DesiredDirectionOfMovement>();
+  if (a_container.getDataType() == opendlv::perception::StimulusDirectionOfMovement::ID()) {
+    opendlv::perception::StimulusDirectionOfMovement stimulusDirectionOfMovement = a_container.getData<opendlv::perception::StimulusDirectionOfMovement>();
 
-    opendlv::model::Direction direction = directionObject.getDirection();
+    opendlv::model::Direction direction = stimulusDirectionOfMovement.getDesiredDirectionOfMovement();
 
-    // -pi to pi. -pi right, pi left
     m_angle = direction.getAzimuth();
     CLOG2 << "Direction azimuth: " << m_angle << std::endl;
   }
-
+  
 /*
   // code for testing purposes
     if (a_container.getDataType() == opendlv::proxy::reverefh16::Steering::ID()) {

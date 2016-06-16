@@ -45,8 +45,7 @@ namespace can {
 namespace ps3controller {
 
 PS3Controller::PS3Controller(int32_t const &a_argc, char **a_argv)
-    : odcore::base::module::TimeTriggeredConferenceClientModule(
-      a_argc, a_argv, "tools-can-ps3controller")
+    : odcore::base::module::TimeTriggeredConferenceClientModule(a_argc, a_argv, "tools-can-ps3controller")
     , automotive::odcantools::GenericCANMessageListener()
     , m_fifo()
     , m_device()
@@ -166,8 +165,7 @@ void PS3Controller::tearDown()
   }
 }
 
-void PS3Controller::nextGenericCANMessage(
-const automotive::GenericCANMessage &gcm)
+void PS3Controller::nextGenericCANMessage(const automotive::GenericCANMessage &gcm)
 {
   // Map CAN message to high-level data structure.
   vector<odcore::data::Container> result = m_revereFh16CanMessageMapping.mapNext(gcm);
