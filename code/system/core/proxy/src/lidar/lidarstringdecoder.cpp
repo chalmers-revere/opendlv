@@ -26,6 +26,8 @@
 #include <vector>
 
 #include <opendavinci/odcore/data/Container.h>
+#include <opendavinci/odcore/data/TimeStamp.h>
+#include <opendavinci/odtools/recorder/Recorder.h>
 
 #include "lidar/lidar.hpp"
 
@@ -35,6 +37,7 @@ namespace lidar {
 
 LidarStringDecoder::LidarStringDecoder(odcore::io::conference::ContainerConference &a_conference, double a_x, double a_y, double a_z)
     : m_conference(a_conference)
+    , m_recorderLidar()
     , m_header(false)
     , m_startConfirmed(false)
     , m_latestReading()
@@ -113,6 +116,10 @@ LidarStringDecoder::~LidarStringDecoder()
 {
 }
 
+void LidarStringDecoder::setRecorder(std::shared_ptr<odtools::recorder::Recorder> r) {
+  m_recorderLidar = r;
+}
+
 void LidarStringDecoder::ConvertToDistances()
 {
   uint32_t byte1;
@@ -155,6 +162,12 @@ void LidarStringDecoder::ConvertToDistances()
   // Distribute data.
   odcore::data::Container c(m_latestReading);
   m_conference.send(c);
+
+  // Record the data directly.
+  if (m_recorderLidar.get() != NULL) {
+    c.setReceivedTimeStamp(odcore::data::TimeStamp());
+    m_recorderLidar->store(c);
+  }
 }
 
 bool LidarStringDecoder::tryDecode()

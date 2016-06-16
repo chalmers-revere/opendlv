@@ -19,10 +19,14 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
-#include "opendavinci/odcore/base/KeyValueConfiguration.h"
-#include "opendavinci/odcore/wrapper/SerialPort.h"
-#include "opendavinci/odcore/wrapper/SerialPortFactory.h"
+#include <opendavinci/odcore/base/KeyValueConfiguration.h>
+#include <opendavinci/odcore/data/TimeStamp.h>
+#include <opendavinci/odcore/wrapper/SerialPort.h>
+#include <opendavinci/odcore/wrapper/SerialPortFactory.h>
+#include <opendavinci/odcore/strings/StringToolbox.h>
+#include <opendavinci/odtools/recorder/Recorder.h>
 
 #include "lidar/lidar.hpp"
 
@@ -38,6 +42,7 @@ namespace lidar {
   */
 Lidar::Lidar(int32_t const &a_argc, char **a_argv)
     : TimeTriggeredConferenceClientModule(a_argc, a_argv, "proxy-lidar")
+    , m_recorderLidar()
     , m_sick()
     , m_lidarStringDecoder()
 {
@@ -57,10 +62,47 @@ void Lidar::setUp()
   const double z = kv.getValue<float>("proxy-lidar.mount.z");
   m_lidarStringDecoder = std::unique_ptr<LidarStringDecoder>(new LidarStringDecoder(getConference(), x, y, z));
 
+  const bool RECORD_LIDAR = (getKeyValueConfiguration().getValue<int>("proxy-lidar.record") == 1);
+  if (RECORD_LIDAR) {
+    // Automatically record all received raw CAN messages.
+    odcore::data::TimeStamp now;
+    std::vector<std::string> timeStampNoSpace = odcore::strings::StringToolbox::split(now.getYYYYMMDD_HHMMSS(), ' ');
+    std::stringstream strTimeStampNoSpace;
+    strTimeStampNoSpace << timeStampNoSpace.at(0);
+    if (timeStampNoSpace.size() == 2) {
+      strTimeStampNoSpace << "_" << timeStampNoSpace.at(1);
+    }
+    const string TIMESTAMP = strTimeStampNoSpace.str();
+
+    // URL for storing containers containing GenericCANMessages.
+    std::stringstream recordingUrl;
+    recordingUrl << "file://"
+                 << "CID-" << getCID() << "_"
+                 << "lidar_" << TIMESTAMP << ".rec";
+    // Size of memory segments (not needed for recording GenericCANMessages).
+    const uint32_t MEMORY_SEGMENT_SIZE = 0;
+    // Number of memory segments (not needed for recording
+    // GenericCANMessages).
+    const uint32_t NUMBER_OF_SEGMENTS = 0;
+    // Run recorder in asynchronous mode to allow real-time recording in
+    // background.
+    const bool THREADING = true;
+    // Dump shared images and shared data (not needed for recording
+    // GenericCANMessages)?
+    const bool DUMP_SHARED_DATA = false;
+
+    // Create a recorder instance.
+    m_recorderLidar = shared_ptr<odtools::recorder::Recorder>(new odtools::recorder::Recorder(recordingUrl.str(),
+    MEMORY_SEGMENT_SIZE, NUMBER_OF_SEGMENTS, THREADING, DUMP_SHARED_DATA));
+  }
+
+
   // Connection configuration.
   const string SERIAL_PORT = kv.getValue<std::string>("proxy-lidar.port");
   const uint32_t BAUD_RATE = 9600; // Fixed baud rate.
   try {
+    m_lidarStringDecoder->setRecorder(m_recorderLidar);
+
     m_sick = std::shared_ptr<odcore::wrapper::SerialPort>(odcore::wrapper::SerialPortFactory::createSerialPort(SERIAL_PORT, BAUD_RATE));
     m_sick->setStringListener(m_lidarStringDecoder.get());
     m_sick->start();

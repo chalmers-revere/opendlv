@@ -26,6 +26,7 @@
 #include <vector>
 
 #include <opendavinci/odcore/data/Container.h>
+#include <opendavinci/odcore/data/TimeStamp.h>
 #include <opendavinci/odtools/recorder/Recorder.h>
 
 #include "opendlvdata/GeneratedHeaders_opendlvdata.h"
@@ -212,6 +213,7 @@ void GpsStringDecoder::nextString(std::string const &s) {
     // Dump data.
     if ( (m_recorderGpsReadings.get() != NULL) &&
          (m_CSVFile.get() != NULL) ) {
+      c.setReceivedTimeStamp(odcore::data::TimeStamp());
       m_recorderGpsReadings->store(c);
 
       (*m_CSVFile) << timestamp << ","
