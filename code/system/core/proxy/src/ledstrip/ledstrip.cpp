@@ -125,7 +125,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Ledstrip::body()
     * of the movement angle (capped between [-45,45] deg) 
     * into a percentage value
     */
-    focus=round(m_angle/(45.0f/180.0f*pi)*50.0f)+50.0f;
+    focus=round(-m_angle/(45.0f/180.0f*pi)*50.0f)+50.0f;
     
     uint8_t section_size=50; // the size of the LED section to be powered
     uint8_t fade=10; // the number of LEDs to be dimmed at the edge of the lighted section
