@@ -20,8 +20,17 @@
 #ifndef GPS_GPSSTRINGDECODER_HPP_
 #define GPS_GPSSTRINGDECODER_HPP_
 
+#include <fstream>
+#include <memory>
+
 #include <opendavinci/odcore/io/StringListener.h>
 #include <opendavinci/odcore/io/conference/ContainerConference.h>
+
+namespace odtools {
+namespace recorder {
+class Recorder;
+}
+}
 
 namespace opendlv {
 namespace proxy {
@@ -39,8 +48,13 @@ class GpsStringDecoder : public odcore::io::StringListener {
 
   virtual void nextString(const std::string &s);
 
+ public:
+  void setDataSinks(std::shared_ptr<odtools::recorder::Recorder> recorder, std::shared_ptr<std::fstream> CSVFile);
+
  private:
   odcore::io::conference::ContainerConference &m_conference;
+  std::shared_ptr<odtools::recorder::Recorder> m_recorderGpsReadings;
+  std::shared_ptr<std::fstream> m_CSVFile;
 };
 
 } // gps
