@@ -23,6 +23,7 @@
 #include <fstream>
 #include <map>
 #include <memory>
+#include <string>
 
 #include <opendavinci/odcore/base/FIFOQueue.h>
 #include <opendavinci/odcore/base/Mutex.h>
@@ -56,7 +57,7 @@ class CanMessageDataStore;
  * them to high-level messages.
  */
 class Can : public odcore::base::module::TimeTriggeredConferenceClientModule,
-              public automotive::odcantools::GenericCANMessageListener {
+            public automotive::odcantools::GenericCANMessageListener {
  public:
   Can(int32_t const &, char **);
   Can(Can const &) = delete;
@@ -69,6 +70,17 @@ class Can : public odcore::base::module::TimeTriggeredConferenceClientModule,
   void setUp();
   void tearDown();
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+
+ private:
+  void setUpRecordingGenericCANMessage(const std::string &timeStampForFileName);
+  void setUpRecordingMappedGenericCANMessage(const std::string &timeStampForFileName);
+
+ private:
+  odcore::data::Container addCANTimeStamp(odcore::data::Container &c, const odcore::data::TimeStamp &ts);
+  void dumpASCData(const automotive::GenericCANMessage &gcm);
+  void dumpCSVData(odcore::data::Container &c);
+  void handleBeacons();
+  void disableCANRequests();
 
  private:
   odcore::base::FIFOQueue m_fifoGenericCanMessages;
@@ -84,8 +96,8 @@ class Can : public odcore::base::module::TimeTriggeredConferenceClientModule,
 
   odcore::data::TimeStamp m_startOfRecording;
   std::shared_ptr<std::fstream> m_ASCfile;
-  std::map<uint32_t, std::shared_ptr<std::fstream> > m_mapOfCSVFiles;
-  std::map<uint32_t, std::shared_ptr<odcore::reflection::CSVFromVisitableVisitor> > m_mapOfCSVVisitors;
+  std::map<uint32_t, std::shared_ptr<std::fstream>> m_mapOfCSVFiles;
+  std::map<uint32_t, std::shared_ptr<odcore::reflection::CSVFromVisitableVisitor>> m_mapOfCSVVisitors;
 };
 
 } // can

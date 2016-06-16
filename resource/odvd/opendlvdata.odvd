@@ -211,24 +211,28 @@ message opendlv.perception.Surface [id = 184] {
 }
 
 message opendlv.perception.StimulusDirectionOfMovement [id = 180] {
-  opendlv.model.Direction desiredDirectionOfMovement [id = 1];
-  opendlv.model.Direction directionOfMovement [id = 2];
+  odcore::data::TimeStamp identified [id = 1];
+  opendlv.model.Direction desiredDirectionOfMovement [id = 2];
+  opendlv.model.Direction directionOfMovement [id = 3];
 }
 
 message opendlv.perception.StimulusOpticalFlow [id = 174] {
-  float desiredOpticalFlow [id = 1];
-  float opticalFlow [id = 2];
+  odcore::data::TimeStamp identified [id = 1];
+  float desiredOpticalFlow [id = 2];
+  float opticalFlow [id = 3];
 }
 
 message opendlv.perception.StimulusDirectionAlignment [id = 182] {
-  opendlv.model.Direction direction [id = 1];
-  opendlv.model.Direction desiredDirection [id = 2];
+  odcore::data::TimeStamp identified [id = 1];
+  opendlv.model.Direction direction [id = 2];
+  opendlv.model.Direction desiredDirection [id = 3];
 }
 
 message opendlv.perception.StimulusAngularSizeAlignment [id = 183] {
-  opendlv.model.Direction direction [id = 1];
-  float angularSize [id = 2];
-  float desiredAngularSize [id = 3];
+  odcore::data::TimeStamp identified [id = 1];
+  opendlv.model.Direction direction [id = 2];
+  float angularSize [id = 3];
+  float desiredAngularSize [id = 4];
 }
 
 message opendlv.knowledge.Message [id = 185] {
@@ -253,6 +257,7 @@ message opendlv.proxy.reverefh16.ManualControl [id = 191] {
     double accelerationPedalPosition [id = 1];
     double brakePedalPosition [id = 2];
     double torsionBarTorque [id = 3];
+    odcore::data::TimeStamp fromSensor [id = 4];
 }
 
 message opendlv.proxy.reverefh16.AccelerationRequest [id = 192] {
@@ -275,16 +280,19 @@ message opendlv.proxy.reverefh16.Axles [id = 195] {
     double loadAxle11 [id = 1];
     double loadAxle12 [id = 2];
     double loadAxle13 [id = 3];
+    odcore::data::TimeStamp fromSensor [id = 4];
 }
 
 message opendlv.proxy.reverefh16.Propulsion [id = 196] {
     double propulsionShaftVehicleSpeed [id = 1];
+    odcore::data::TimeStamp fromSensor [id = 2];
 }
 
 message opendlv.proxy.reverefh16.VehicleState [id = 197] {
     double accelerationX [id = 1];
     double accelerationY [id = 2];
     double yawRate [id = 3];
+    odcore::data::TimeStamp fromSensor [id = 4];
 }
 
 message opendlv.proxy.reverefh16.Wheels [id = 198] {
@@ -294,11 +302,13 @@ message opendlv.proxy.reverefh16.Wheels [id = 198] {
     double speedWheel122 [id = 4];
     double speedWheel131 [id = 5];
     double speedWheel132 [id = 6];
+    odcore::data::TimeStamp fromSensor [id = 7];
 }
 
 message opendlv.proxy.reverefh16.Steering [id = 199] {
     double roadwheelangle [id = 1];
     double steeringwheelangle [id = 2];
+    odcore::data::TimeStamp fromSensor [id = 3];
 }
 
 // This message broadcasts the system's health as key/values.

@@ -31,6 +31,13 @@
 #include <odcantools/MessageToCANDataStore.h>
 #include <odcantools/CANDevice.h>
 #include <automotivedata/generated/automotive/GenericCANMessage.h>
+
+#include <opendlvdata/generated/opendlv/proxy/reverefh16/AccelerationRequest.h>
+#include <opendlvdata/generated/opendlv/proxy/reverefh16/BrakeRequest.h>
+#include <opendlvdata/generated/opendlv/proxy/reverefh16/SteeringRequest.h>
+#include <opendlvdata/generated/opendlv/proxy/reverefh16/VehicleState.h>
+#include <opendlvdata/generated/opendlv/proxy/reverefh16/Wheels.h>
+#include <opendlvdata/generated/opendlv/proxy/reverefh16/Axles.h>
 #include <opendlvdata/generated/opendlv/proxy/reverefh16/ManualControl.h>
 #include <opendlvdata/generated/opendlv/proxy/reverefh16/Propulsion.h>
 #include <opendlvdata/generated/opendlv/proxy/reverefh16/Steering.h>
@@ -42,10 +49,18 @@ namespace opendlv {
 namespace proxy {
 namespace can {
 
+using namespace std;
+using namespace odcore::base;
+using namespace odcore::data;
+using namespace odcore::reflection;
+using namespace odtools::recorder;
+using namespace automotive::odcantools;
+
+
 Can::Can(int32_t const &a_argc, char **a_argv)
     : odcore::base::module::TimeTriggeredConferenceClientModule(
       a_argc, a_argv, "proxy-can")
-    , automotive::odcantools::GenericCANMessageListener()
+    , GenericCANMessageListener()
     , m_fifoGenericCanMessages()
     , m_recorderGenericCanMessages()
     , m_fifoMappedCanMessages()
@@ -64,14 +79,9 @@ Can::~Can()
 {
 }
 
+
 void Can::setUp()
 {
-  using namespace std;
-  using namespace odcore::base;
-  using namespace odcore::data;
-  using namespace odtools::recorder;
-  using namespace automotive::odcantools;
-
   string const DEVICE_NODE =
   getKeyValueConfiguration().getValue<string>("proxy-can.devicenode");
 
@@ -85,118 +95,25 @@ void Can::setUp()
     cout << "Successfully opened CAN device '" << DEVICE_NODE << "'." << endl;
 
     // Automatically record all received raw CAN messages.
-    TimeStamp ts;
-    std::vector<std::string> timeStampNoSpace = odcore::strings::StringToolbox::split(ts.getYYYYMMDD_HHMMSS(), ' ');
+    m_startOfRecording = TimeStamp();
+    vector<string> timeStampNoSpace = odcore::strings::StringToolbox::split(m_startOfRecording.getYYYYMMDD_HHMMSS(), ' ');
     stringstream strTimeStampNoSpace;
     strTimeStampNoSpace << timeStampNoSpace.at(0);
     if (timeStampNoSpace.size() == 2) {
-        strTimeStampNoSpace << "_" << timeStampNoSpace.at(1);
+      strTimeStampNoSpace << "_" << timeStampNoSpace.at(1);
     }
     const string TIMESTAMP = strTimeStampNoSpace.str();
 
     const bool RECORD_GCM =
     (getKeyValueConfiguration().getValue<int>("proxy-can.record_gcm") == 1);
     if (RECORD_GCM) {
-      // URL for storing containers containing GenericCANMessages.
-      stringstream recordingUrl;
-      recordingUrl << "file://"
-                   << "CID-" << getCID() << "_"
-                   << "can_gcm_" << TIMESTAMP << ".rec";
-      // Size of memory segments (not needed for recording GenericCANMessages).
-      const uint32_t MEMORY_SEGMENT_SIZE = 0;
-      // Number of memory segments (not needed for recording
-      // GenericCANMessages).
-      const uint32_t NUMBER_OF_SEGMENTS = 0;
-      // Run recorder in asynchronous mode to allow real-time recording in
-      // background.
-      const bool THREADING = true;
-      // Dump shared images and shared data (not needed for recording
-      // GenericCANMessages)?
-      const bool DUMP_SHARED_DATA = false;
-
-      // Create a recorder instance.
-      m_recorderGenericCanMessages = unique_ptr<Recorder>(new Recorder(recordingUrl.str(),
-      MEMORY_SEGMENT_SIZE, NUMBER_OF_SEGMENTS, THREADING, DUMP_SHARED_DATA));
-
-      // Create a file to dump CAN data in ASC format.
-      stringstream fileName;
-      fileName << "CID-" << getCID() << "_"
-               << "can_data_" << TIMESTAMP << ".asc";
-      m_ASCfile = shared_ptr<fstream>(new fstream(fileName.str(), std::ios::out));
-      m_startOfRecording = ts;
-      (*m_ASCfile) << "Time (s) Channel ID RX/TX d Length Byte 1 Byte 2 Byte 3 Byte 4 Byte 5 Byte 6 Byte 7 Byte 8" << endl;
+      setUpRecordingGenericCANMessage(TIMESTAMP);
     }
 
     const bool RECORD_MAPPED =
     (getKeyValueConfiguration().getValue<int>("proxy-can.record_mapped_data") == 1);
     if (RECORD_MAPPED) {
-      // URL for storing containers containing GenericCANMessages.
-      stringstream recordingUrl;
-      recordingUrl << "file://"
-                   << "CID-" << getCID() << "_"
-                   << "can_mapped_data_" << TIMESTAMP << ".rec";
-      // Size of memory segments (not needed for recording GenericCANMessages).
-      const uint32_t MEMORY_SEGMENT_SIZE = 0;
-      // Number of memory segments (not needed for recording
-      // GenericCANMessages).
-      const uint32_t NUMBER_OF_SEGMENTS = 0;
-      // Run recorder in asynchronous mode to allow real-time recording in
-      // background.
-      const bool THREADING = true;
-      // Dump shared images and shared data (not needed for recording
-      // mapped containers)?
-      const bool DUMP_SHARED_DATA = false;
-
-      // Create a recorder instance.
-      m_recorderMappedCanMessages = unique_ptr<Recorder>(new Recorder(recordingUrl.str(),
-      MEMORY_SEGMENT_SIZE, NUMBER_OF_SEGMENTS, THREADING, DUMP_SHARED_DATA));
-
-      {
-        {
-            stringstream fileName;
-            fileName << "CID-" << getCID() << "_"
-                     << "can_mapped_data_id-" << opendlv::proxy::reverefh16::ManualControl::ID() << "_" << TIMESTAMP << ".csv";
-
-            // Create map of CSV transformers.
-            fstream *f = new std::fstream(fileName.str(), std::ios::out);
-
-            // Log ManualControl.
-            m_mapOfCSVFiles[opendlv::proxy::reverefh16::ManualControl::ID()] = std::shared_ptr<std::fstream>(f);
-            m_mapOfCSVVisitors[opendlv::proxy::reverefh16::ManualControl::ID()] =
-                std::shared_ptr<odcore::reflection::CSVFromVisitableVisitor>(new odcore::reflection::CSVFromVisitableVisitor(*f));
-        }
-
-        {
-            stringstream fileName;
-            fileName << "CID-" << getCID() << "_"
-                     << "can_mapped_data_id-" << opendlv::proxy::reverefh16::Steering::ID() << "_" << TIMESTAMP << ".csv";
-
-            // Create map of CSV transformers.
-            fstream *f = new std::fstream(fileName.str(), std::ios::out);
-
-            // Log Steering.
-            f = new std::fstream(fileName.str(), std::ios::out);
-            m_mapOfCSVFiles[opendlv::proxy::reverefh16::Steering::ID()] = std::shared_ptr<std::fstream>(f);
-            m_mapOfCSVVisitors[opendlv::proxy::reverefh16::Steering::ID()] =
-                std::shared_ptr<odcore::reflection::CSVFromVisitableVisitor>(new odcore::reflection::CSVFromVisitableVisitor(*f));
-        }
-
-        {
-            stringstream fileName;
-            fileName << "CID-" << getCID() << "_"
-                     << "can_mapped_data_id-" << opendlv::proxy::reverefh16::Propulsion::ID() << "_" << TIMESTAMP << ".csv";
-
-            // Create map of CSV transformers.
-            fstream *f = new std::fstream(fileName.str(), std::ios::out);
-
-            // Log Propulsion.
-            f = new std::fstream(fileName.str(), std::ios::out);
-            m_mapOfCSVFiles[opendlv::proxy::reverefh16::Propulsion::ID()] = std::shared_ptr<std::fstream>(f);
-            m_mapOfCSVVisitors[opendlv::proxy::reverefh16::Propulsion::ID()] =
-                std::shared_ptr<odcore::reflection::CSVFromVisitableVisitor>(new odcore::reflection::CSVFromVisitableVisitor(*f));
-        }
-
-      }
+      setUpRecordingMappedGenericCANMessage(TIMESTAMP);
     }
 
     // Create a data sink that automatically receives all Containers and
@@ -210,15 +127,118 @@ void Can::setUp()
   }
 }
 
-void Can::tearDown()
+
+void Can::setUpRecordingGenericCANMessage(const string &timeStampForFileName)
+{
+  // URL for storing containers containing GenericCANMessages.
+  stringstream recordingUrl;
+  recordingUrl << "file://"
+               << "CID-" << getCID() << "_"
+               << "can_gcm_" << timeStampForFileName << ".rec";
+  // Size of memory segments (not needed for recording GenericCANMessages).
+  const uint32_t MEMORY_SEGMENT_SIZE = 0;
+  // Number of memory segments (not needed for recording
+  // GenericCANMessages).
+  const uint32_t NUMBER_OF_SEGMENTS = 0;
+  // Run recorder in asynchronous mode to allow real-time recording in
+  // background.
+  const bool THREADING = true;
+  // Dump shared images and shared data (not needed for recording
+  // GenericCANMessages)?
+  const bool DUMP_SHARED_DATA = false;
+
+  // Create a recorder instance.
+  m_recorderGenericCanMessages = unique_ptr<Recorder>(new Recorder(recordingUrl.str(),
+  MEMORY_SEGMENT_SIZE, NUMBER_OF_SEGMENTS, THREADING, DUMP_SHARED_DATA));
+
+  // Create a file to dump CAN data in ASC format.
+  stringstream fileName;
+  fileName << "CID-" << getCID() << "_"
+           << "can_data_" << timeStampForFileName << ".asc";
+  m_ASCfile = shared_ptr<fstream>(new fstream(fileName.str(), ios::out));
+  (*m_ASCfile) << "Time (s) Channel ID RX/TX d Length Byte 1 Byte 2 Byte 3 Byte 4 Byte 5 Byte 6 Byte 7 Byte 8" << endl;
+}
+
+
+void Can::setUpRecordingMappedGenericCANMessage(const string &timeStampForFileName)
+{
+  // URL for storing containers containing GenericCANMessages.
+  stringstream recordingUrl;
+  recordingUrl << "file://"
+               << "CID-" << getCID() << "_"
+               << "can_mapped_data_" << timeStampForFileName << ".rec";
+  // Size of memory segments (not needed for recording GenericCANMessages).
+  const uint32_t MEMORY_SEGMENT_SIZE = 0;
+  // Number of memory segments (not needed for recording
+  // GenericCANMessages).
+  const uint32_t NUMBER_OF_SEGMENTS = 0;
+  // Run recorder in asynchronous mode to allow real-time recording in
+  // background.
+  const bool THREADING = true;
+  // Dump shared images and shared data (not needed for recording
+  // mapped containers)?
+  const bool DUMP_SHARED_DATA = false;
+
+  // Create a recorder instance.
+  m_recorderMappedCanMessages = unique_ptr<Recorder>(new Recorder(recordingUrl.str(),
+  MEMORY_SEGMENT_SIZE, NUMBER_OF_SEGMENTS, THREADING, DUMP_SHARED_DATA));
+
+  {
+    {
+      stringstream fileName;
+      fileName << "CID-" << getCID() << "_"
+               << "can_mapped_data_id-" << opendlv::proxy::reverefh16::ManualControl::ID() << "_" << timeStampForFileName << ".csv";
+
+      // Create map of CSV transformers.
+      fstream *f = new fstream(fileName.str(), ios::out);
+
+      // Log ManualControl.
+      m_mapOfCSVFiles[opendlv::proxy::reverefh16::ManualControl::ID()] = shared_ptr<fstream>(f);
+      m_mapOfCSVVisitors[opendlv::proxy::reverefh16::ManualControl::ID()] =
+      shared_ptr<CSVFromVisitableVisitor>(new CSVFromVisitableVisitor(*f));
+    }
+
+    {
+      stringstream fileName;
+      fileName << "CID-" << getCID() << "_"
+               << "can_mapped_data_id-" << opendlv::proxy::reverefh16::Steering::ID() << "_" << timeStampForFileName << ".csv";
+
+      // Create map of CSV transformers.
+      fstream *f = new fstream(fileName.str(), ios::out);
+
+      // Log Steering.
+      f = new fstream(fileName.str(), ios::out);
+      m_mapOfCSVFiles[opendlv::proxy::reverefh16::Steering::ID()] = shared_ptr<fstream>(f);
+      m_mapOfCSVVisitors[opendlv::proxy::reverefh16::Steering::ID()] =
+      shared_ptr<CSVFromVisitableVisitor>(new CSVFromVisitableVisitor(*f));
+    }
+
+    {
+      stringstream fileName;
+      fileName << "CID-" << getCID() << "_"
+               << "can_mapped_data_id-" << opendlv::proxy::reverefh16::Propulsion::ID() << "_" << timeStampForFileName << ".csv";
+
+      // Create map of CSV transformers.
+      fstream *f = new fstream(fileName.str(), ios::out);
+
+      // Log Propulsion.
+      f = new fstream(fileName.str(), ios::out);
+      m_mapOfCSVFiles[opendlv::proxy::reverefh16::Propulsion::ID()] = shared_ptr<fstream>(f);
+      m_mapOfCSVVisitors[opendlv::proxy::reverefh16::Propulsion::ID()] =
+      shared_ptr<CSVFromVisitableVisitor>(new CSVFromVisitableVisitor(*f));
+    }
+  }
+}
+
+
+void Can::disableCANRequests()
 {
   opendlv::proxy::reverefh16::BrakeRequest brakeRequest;
   brakeRequest.setEnableRequest(false);
   brakeRequest.setBrake(0.0);
-  odcore::data::Container brakeRequestContainer(brakeRequest);
+  Container brakeRequestContainer(brakeRequest);
 
-  canmapping::opendlv::proxy::reverefh16::BrakeRequest 
-      brakeRequestMapping;
+  canmapping::opendlv::proxy::reverefh16::BrakeRequest brakeRequestMapping;
   automotive::GenericCANMessage genericCanMessage = brakeRequestMapping.encode(brakeRequestContainer);
   m_device->write(genericCanMessage);
 
@@ -226,32 +246,34 @@ void Can::tearDown()
   opendlv::proxy::reverefh16::AccelerationRequest accelerationRequest;
   accelerationRequest.setEnableRequest(false);
   accelerationRequest.setAccelerationPedalPosition(0.0);
-  odcore::data::Container accelerationRequestContainer(accelerationRequest);
+  Container accelerationRequestContainer(accelerationRequest);
 
-  canmapping::opendlv::proxy::reverefh16::AccelerationRequest 
-      accelerationRequestMapping;
+  canmapping::opendlv::proxy::reverefh16::AccelerationRequest accelerationRequestMapping;
   genericCanMessage = accelerationRequestMapping.encode(accelerationRequestContainer);
   m_device->write(genericCanMessage);
+
 
   opendlv::proxy::reverefh16::SteeringRequest steeringRequest;
   steeringRequest.setEnableRequest(false);
   steeringRequest.setSteeringRoadWheelAngle(0.0);
   steeringRequest.setSteeringDeltaTorque(0.0);
-  odcore::data::Container steeringRequestContainer(steeringRequest);
+  Container steeringRequestContainer(steeringRequest);
 
-  canmapping::opendlv::proxy::reverefh16::SteeringRequest 
-      steeringRequestMapping;
+  canmapping::opendlv::proxy::reverefh16::SteeringRequest steeringRequestMapping;
   genericCanMessage = steeringRequestMapping.encode(steeringRequestContainer);
   m_device->write(genericCanMessage);
+}
 
 
+void Can::tearDown()
+{
+  // Stop the wrapper CAN device.
   if (m_device.get()) {
-    // Stop the wrapper CAN device.
     m_device->stop();
   }
 
   // Flush output to CSV files.
-  for(auto it = m_mapOfCSVFiles.begin(); it != m_mapOfCSVFiles.end(); it++) {
+  for (auto it = m_mapOfCSVFiles.begin(); it != m_mapOfCSVFiles.end(); it++) {
     it->second->flush();
     it->second->close();
   }
@@ -263,6 +285,67 @@ void Can::tearDown()
   }
 }
 
+
+Container Can::addCANTimeStamp(Container &c, const TimeStamp &ts)
+{
+  Container retVal = c;
+
+  if (c.getDataType() == opendlv::proxy::reverefh16::ManualControl::ID()) {
+    opendlv::proxy::reverefh16::ManualControl temp = c.getData<opendlv::proxy::reverefh16::ManualControl>();
+    temp.setFromSensor(ts);
+    retVal = Container(temp);
+  }
+  else if (c.getDataType() == opendlv::proxy::reverefh16::VehicleState::ID()) {
+    opendlv::proxy::reverefh16::VehicleState temp = c.getData<opendlv::proxy::reverefh16::VehicleState>();
+    temp.setFromSensor(ts);
+    retVal = Container(temp);
+  }
+  else if (c.getDataType() == opendlv::proxy::reverefh16::Wheels::ID()) {
+    opendlv::proxy::reverefh16::Wheels temp = c.getData<opendlv::proxy::reverefh16::Wheels>();
+    temp.setFromSensor(ts);
+    retVal = Container(temp);
+  }
+  else if (c.getDataType() == opendlv::proxy::reverefh16::Axles::ID()) {
+    opendlv::proxy::reverefh16::Axles temp = c.getData<opendlv::proxy::reverefh16::Axles>();
+    temp.setFromSensor(ts);
+    retVal = Container(temp);
+  }
+  else if (c.getDataType() == opendlv::proxy::reverefh16::Steering::ID()) {
+    opendlv::proxy::reverefh16::Steering temp = c.getData<opendlv::proxy::reverefh16::Steering>();
+    temp.setFromSensor(ts);
+    retVal = Container(temp);
+  }
+  else if (c.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
+    opendlv::proxy::reverefh16::Propulsion temp = c.getData<opendlv::proxy::reverefh16::Propulsion>();
+    temp.setFromSensor(ts);
+    retVal = Container(temp);
+  }
+
+  return retVal;
+}
+
+
+void Can::dumpASCData(const automotive::GenericCANMessage &gcm)
+{
+  if (m_ASCfile.get() != NULL) {
+    TimeStamp now;
+    TimeStamp ts = (now - m_startOfRecording);
+    (*m_ASCfile) << (ts.getSeconds() + (static_cast<double>(ts.getFractionalMicroseconds()) / (1000.0 * 1000.0)))
+                 << " 1"
+                 << " " << gcm.getIdentifier()
+                 << " Rx"
+                 << " d"
+                 << " " << static_cast<uint32_t>(gcm.getLength());
+    uint64_t data = gcm.getData();
+    for (uint8_t i = 0; i < gcm.getLength(); i++) {
+      (*m_ASCfile) << " " << hex << (data & 0xFF);
+      data = data >> 8;
+    }
+    (*m_ASCfile) << endl;
+  }
+}
+
+
 void Can::nextGenericCANMessage(const automotive::GenericCANMessage &gcm)
 {
   static int counter = 0;
@@ -273,37 +356,26 @@ void Can::nextGenericCANMessage(const automotive::GenericCANMessage &gcm)
     counter = 0;
   }
 
-  if (m_ASCfile.get() != NULL) {
-    odcore::data::TimeStamp now;
-    odcore::data::TimeStamp ts = (now - m_startOfRecording);
-    (*m_ASCfile) << (ts.getSeconds() + (static_cast<double>(ts.getFractionalMicroseconds())/(1000.0*1000.0)))
-              << " 1"
-              << " " << gcm.getIdentifier()
-              << " Rx"
-              << " d"
-              << " " << static_cast<uint32_t>(gcm.getLength());
-    uint64_t data = gcm.getData();
-    for(uint8_t i = 0; i < gcm.getLength(); i++) {
-        (*m_ASCfile) << " " << hex << (data & 0xFF);
-        data = data>>8;
-    }
-    (*m_ASCfile) << endl;
-  }
+  // Log raw CAN data in ASC format.
+  dumpASCData(gcm);
 
-  // Map CAN message to high-level data structure.
-  vector<odcore::data::Container> result = m_revereFh16CanMessageMapping.mapNext(gcm);
+  // Map CAN message to high-level data structures as defined in the ODVD file.
+  vector<Container> result = m_revereFh16CanMessageMapping.mapNext(gcm);
 
   for (auto c : result) {
+    // Add CAN device driver time stamp to message.
+    Container cTimeStamped = addCANTimeStamp(c, gcm.getDriverTimeStamp());
+
     // Enqueue mapped container for direct recording.
     if (m_recorderMappedCanMessages.get()) {
-      c.setReceivedTimeStamp(gcm.getDriverTimeStamp());
-      m_fifoMappedCanMessages.add(c);
+      cTimeStamped.setReceivedTimeStamp(gcm.getDriverTimeStamp());
+      m_fifoMappedCanMessages.add(cTimeStamped);
     }
 
     // Send container to conference only every tenth message.
     {
       if (counter == CAN_MESSAGE_COUNTER_WHEN_TO_SEND) {
-        getConference().send(c);
+        getConference().send(cTimeStamped);
       }
     }
   }
@@ -311,8 +383,92 @@ void Can::nextGenericCANMessage(const automotive::GenericCANMessage &gcm)
   // Enqueue CAN message wrapped as Container to be recorded if we have a valid
   // recorder.
   if (m_recorderGenericCanMessages.get()) {
-    odcore::data::Container c(gcm);
+    Container c(gcm);
     m_fifoGenericCanMessages.add(c);
+  }
+}
+
+
+void Can::handleBeacons()
+{
+  // Send messages to the beacon relays
+  if (m_canMessageDataStore->IsAutonomousEnabled() && !m_canMessageDataStore->IsOverridden()) {
+    // Activate green
+    string deviceIdGreen = "0";
+    uint32_t relayIndexGreen = 0;
+    bool relayValueGreen = false;
+    opendlv::proxy::RelayRequest relayRequestGreen(relayValueGreen, relayIndexGreen, deviceIdGreen);
+    Container objectContainerGreen(relayRequestGreen);
+    getConference().send(objectContainerGreen);
+
+
+    string deviceIdRed = "0";
+    uint32_t relayIndexRed = 1;
+    bool relayValueRed = true;
+    opendlv::proxy::RelayRequest relayRequestRed(relayValueRed, relayIndexRed, deviceIdRed);
+    Container objectContainerRed(relayRequestRed);
+    getConference().send(objectContainerRed);
+  }
+  else {
+    // Activate red
+    string deviceIdGreen = "0";
+    uint32_t relayIndexGreen = 0;
+    bool relayValueGreen = true;
+    opendlv::proxy::RelayRequest relayRequestGreen(relayValueGreen, relayIndexGreen, deviceIdGreen);
+    Container objectContainerGreen(relayRequestGreen);
+    getConference().send(objectContainerGreen);
+
+
+    string deviceIdRed = "0";
+    uint32_t relayIndexRed = 1;
+    bool relayValueRed = false;
+    opendlv::proxy::RelayRequest relayRequestRed(relayValueRed, relayIndexRed, deviceIdRed);
+    Container objectContainerRed(relayRequestRed);
+    getConference().send(objectContainerRed);
+  }
+}
+
+
+void Can::dumpCSVData(Container &c)
+{
+  // Add time stamps for CSV output.
+  const uint64_t receivedFromCAN = c.getReceivedTimeStamp().toMicroseconds();
+
+  shared_ptr<Field<uint64_t>> m_receivedTS_ptr = shared_ptr<Field<uint64_t>>(new Field<uint64_t>(receivedFromCAN));
+  m_receivedTS_ptr->setLongFieldIdentifier(0);
+  m_receivedTS_ptr->setShortFieldIdentifier(0);
+  m_receivedTS_ptr->setLongFieldName("Received_TimeStamp");
+  m_receivedTS_ptr->setShortFieldName("Received_TimeStamp");
+  m_receivedTS_ptr->setFieldDataType(reflection::AbstractField::UINT64_T);
+  m_receivedTS_ptr->setSize(sizeof(uint64_t));
+
+  if ((m_mapOfCSVFiles.count(c.getDataType()) == 1) &&
+  (m_mapOfCSVVisitors.count(c.getDataType()) == 1)) {
+    // We have a CSV file and a transformation available.
+    if (c.getDataType() == opendlv::proxy::reverefh16::ManualControl::ID()) {
+      opendlv::proxy::reverefh16::ManualControl temp = c.getData<opendlv::proxy::reverefh16::ManualControl>();
+      MessageFromVisitableVisitor mfvv;
+      temp.accept(mfvv);
+      Message m = mfvv.getMessage();
+      m.addField(m_receivedTS_ptr);
+      m.accept(*m_mapOfCSVVisitors[c.getDataType()]);
+    }
+    if (c.getDataType() == opendlv::proxy::reverefh16::Steering::ID()) {
+      opendlv::proxy::reverefh16::Steering temp = c.getData<opendlv::proxy::reverefh16::Steering>();
+      MessageFromVisitableVisitor mfvv;
+      temp.accept(mfvv);
+      Message m = mfvv.getMessage();
+      m.addField(m_receivedTS_ptr);
+      m.accept(*m_mapOfCSVVisitors[c.getDataType()]);
+    }
+    if (c.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
+      opendlv::proxy::reverefh16::Propulsion temp = c.getData<opendlv::proxy::reverefh16::Propulsion>();
+      MessageFromVisitableVisitor mfvv;
+      temp.accept(mfvv);
+      Message m = mfvv.getMessage();
+      m.addField(m_receivedTS_ptr);
+      m.accept(*m_mapOfCSVVisitors[c.getDataType()]);
+    }
   }
 }
 
@@ -320,12 +476,12 @@ void Can::nextGenericCANMessage(const automotive::GenericCANMessage &gcm)
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Can::body()
 {
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
-      odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+  odcore::data::dmcp::ModuleStateMessage::RUNNING) {
     // Record GenericCANMessages.
     if (m_recorderGenericCanMessages.get()) {
       const uint32_t ENTRIES = m_fifoGenericCanMessages.getSize();
       for (uint32_t i = 0; i < ENTRIES; i++) {
-        odcore::data::Container c = m_fifoGenericCanMessages.leave();
+        Container c = m_fifoGenericCanMessages.leave();
 
         // Store container to dump file.
         m_recorderGenericCanMessages->store(c);
@@ -336,95 +492,18 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Can::body()
     if (m_recorderMappedCanMessages.get()) {
       const uint32_t ENTRIES = m_fifoMappedCanMessages.getSize();
       for (uint32_t i = 0; i < ENTRIES; i++) {
-        odcore::data::Container c = m_fifoMappedCanMessages.leave();
+        Container c = m_fifoMappedCanMessages.leave();
 
         // Store container to dump file.
         m_recorderMappedCanMessages->store(c);
 
         // Transform container to CSV file.
-        {
-            // Add TimeStamps
-            uint64_t receivedFromCAN = c.getReceivedTimeStamp().toMicroseconds();
-            
-            std::shared_ptr<odcore::reflection::Field<uint64_t> > m_receivedTS_ptr = std::shared_ptr<odcore::reflection::Field<uint64_t>>(new odcore::reflection::Field<uint64_t>(receivedFromCAN));
-            m_receivedTS_ptr->setLongFieldIdentifier(0);
-            m_receivedTS_ptr->setShortFieldIdentifier(0);
-            m_receivedTS_ptr->setLongFieldName("Received_TimeStamp");
-            m_receivedTS_ptr->setShortFieldName("Received_TimeStamp");
-            m_receivedTS_ptr->setFieldDataType(odcore::data::reflection::AbstractField::UINT64_T);
-            m_receivedTS_ptr->setSize(sizeof(uint64_t));
-
-            if ( (m_mapOfCSVFiles.count(c.getDataType()) == 1) &&
-                 (m_mapOfCSVVisitors.count(c.getDataType()) == 1) ) {
-              // We have a CSV file and a transformation available.
-              if (c.getDataType() == opendlv::proxy::reverefh16::ManualControl::ID()) {
-                opendlv::proxy::reverefh16::ManualControl temp=c.getData<opendlv::proxy::reverefh16::ManualControl>();
-                odcore::reflection::MessageFromVisitableVisitor mfvv;
-                temp.accept(mfvv);
-                odcore::reflection::Message m = mfvv.getMessage();
-                m.addField(m_receivedTS_ptr);
-                m.accept(*m_mapOfCSVVisitors[c.getDataType()]);
-              }
-              if (c.getDataType() == opendlv::proxy::reverefh16::Steering::ID()) {
-                opendlv::proxy::reverefh16::Steering temp=c.getData<opendlv::proxy::reverefh16::Steering>();
-                odcore::reflection::MessageFromVisitableVisitor mfvv;
-                temp.accept(mfvv);
-                odcore::reflection::Message m = mfvv.getMessage();
-                m.addField(m_receivedTS_ptr);
-                m.accept(*m_mapOfCSVVisitors[c.getDataType()]);
-              }
-              if (c.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
-                opendlv::proxy::reverefh16::Propulsion temp=c.getData<opendlv::proxy::reverefh16::Propulsion>();
-                odcore::reflection::MessageFromVisitableVisitor mfvv;
-                temp.accept(mfvv);
-                odcore::reflection::Message m = mfvv.getMessage();
-                m.addField(m_receivedTS_ptr);
-                m.accept(*m_mapOfCSVVisitors[c.getDataType()]);
-              }
-
-            }
-        }
+        dumpCSVData(c);
       }
     }
 
-
-    // Send messages to the beacon relays
-    if (m_canMessageDataStore->IsAutonomousEnabled() && !m_canMessageDataStore->IsOverridden()) {
-      // Activate green
-      std::string deviceIdGreen = "0";
-      uint32_t relayIndexGreen = 0;
-      bool relayValueGreen = false;
-      opendlv::proxy::RelayRequest relayRequestGreen(relayValueGreen, relayIndexGreen, deviceIdGreen);
-      odcore::data::Container objectContainerGreen(relayRequestGreen);
-      getConference().send(objectContainerGreen);
-
-
-      std::string deviceIdRed = "0";
-      uint32_t relayIndexRed = 1;
-      bool relayValueRed = true;
-      opendlv::proxy::RelayRequest relayRequestRed(relayValueRed, relayIndexRed, deviceIdRed);
-      odcore::data::Container objectContainerRed(relayRequestRed);
-      getConference().send(objectContainerRed);
-
-    }
-    else {
-      // Activate red
-      std::string deviceIdGreen = "0";
-      uint32_t relayIndexGreen = 0;
-      bool relayValueGreen = true;
-      opendlv::proxy::RelayRequest relayRequestGreen(relayValueGreen, relayIndexGreen, deviceIdGreen);
-      odcore::data::Container objectContainerGreen(relayRequestGreen);
-      getConference().send(objectContainerGreen);
-
-
-      std::string deviceIdRed = "0";
-      uint32_t relayIndexRed = 1;
-      bool relayValueRed = false;
-      opendlv::proxy::RelayRequest relayRequestRed(relayValueRed, relayIndexRed, deviceIdRed);
-      odcore::data::Container objectContainerRed(relayRequestRed);
-      getConference().send(objectContainerRed);
-    }
-
+    // Indicate with lamps the truck's status.
+    handleBeacons();
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
