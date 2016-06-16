@@ -56,6 +56,20 @@ proxy-lidar.mount.yaw = 0.0
 
 ###############################################################################
 ###############################################################################
+# Scene
+knowledge-scene.mergeDistance = 2.0
+knowledge-scene.validUntilDuration = 1
+knowledge-scene.memoryCapacity = 5.0 # seconds
+
+
+###############################################################################
+###############################################################################
+# Echolocation
+sensation-echolocation.memoryThreshold = 0
+
+
+###############################################################################
+###############################################################################
 # Diagnostics
 diagnostics-health.script = ./checkHealth.sh
 diagnostics-health.sleep = 60 # Sleep between health checks in seconds
