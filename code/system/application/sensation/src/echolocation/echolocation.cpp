@@ -48,6 +48,7 @@ Echolocation::Echolocation(int32_t const &a_argc, char **a_argv)
     , m_angles()
     , m_distances()
     , m_times()
+    , m_memoryThreshold()
 {
 }
 
@@ -60,21 +61,24 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
   if (a_c.getDataType() != opendlv::proxy::EchoReading::ID()){
     return;
   }
-
   odcore::data::TimeStamp now;
+
   if (m_times.size() > 0) {
     odcore::data::TimeStamp diffStamp = now - m_times.back(); //Remove old data
-    double diffSeconds = diffStamp.toMicroseconds() / 1000000.0;
+    float diffSeconds = diffStamp.toMicroseconds() / 1000000.0;
 
-    const double DIFF_SECONDS_THRESHOLD = 1.05;
-    while(diffSeconds < DIFF_SECONDS_THRESHOLD) {
+    while(diffSeconds > m_memoryThreshold) {
       m_times.pop_back();
       m_angles.pop_back();
       m_distances.pop_back();
+      if(m_times.size() == 0){
+        break;;
+      }
       diffStamp = now - m_times.back();
       diffSeconds = diffStamp.toMicroseconds() / 1000000.0;
     }
   }
+  // std::cout << "Size of m_distances: " << m_distances.size() << std::endl;
 
 
   opendlv::proxy::EchoReading reading = a_c.getData<opendlv::proxy::EchoReading>(); //Read new data
@@ -102,7 +106,7 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
   uint32_t nPoints = m_angles.size();
   uint32_t objectCounter = 0;
 
-  std::cout << "Before algorithm, new points: " << nNewPoints << std::endl;
+  // std::cout << "Before algorithm, new points: " << nNewPoints << std::endl;
 
   const double DIST_DELTA = 1.0;
   const uint32_t POINT_CLOUD_SIZE = 5;
@@ -172,43 +176,20 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
     }
   }
 
-  for(uint32_t i = 0; i < nNewPoints; i++) {
-    std::cout << "Dist: " << distances[i] << " Angle: " << angles[i] << std::endl;
-  }
+  // for(uint32_t i = 0; i < nNewPoints; i++) {
+  //   std::cout << "Dist: " << distances[i] << " Angle: " << angles[i] << std::endl;
+  // }
 
-
+  std::cout << "===================================" << std::endl;
   for(uint32_t i = 0; i < objectCounter; i++) {
     odcore::data::Container c(identifiedObjects[i]);
     getConference().send(c);
-    std::cout << "Object sent with distance: " << identifiedObjects[i].getDistance() << " and angle:"  << 
-        identifiedObjects[i].getDirection().getAzimuth() << "and angular size: " << 
+    std::cout << "Object sent with distance: " << identifiedObjects[i].getDistance() << ", Angle: "  << 
+        identifiedObjects[i].getDirection().getAzimuth() << " , Angular size: " << 
         identifiedObjects[i].getAngularSize() << std::endl;
   }
+  std::cout << "===================================" << std::endl;
 
-/*
-  {
-    int32_t height = 512;
-    int32_t width = 800;
-    cv::Mat lidarImage(height, width, CV_8UC3, cv::Scalar(0, 0, 0));
-    cv::Point origo(800/2, 512);
-    double scale = 512/90.0;
-
-    for (uint32_t i=0; i<nNewPoints; i++) {
-      cv::Point endPoint(
-        origo.x - scale*distances[i]*std::sin(static_cast<double>(angles[i])),
-        origo.y - scale*distances[i]*std::cos(static_cast<double>(angles[i])));
-      cv::line(
-        lidarImage,
-        origo,
-        endPoint,
-        cv::Scalar(0, 0, 200),
-        2, 8, 0);
-    }
-
-    cv::imshow("LIDAR debug", lidarImage);
-    cv::waitKey(10);
-  }
-*/
 }
 
 bool Echolocation::Contains(uint32_t a_point, std::vector<uint32_t> a_cloud)
@@ -234,6 +215,8 @@ double Echolocation::PointDistance(float a_angle1, double a_dist1, float a_angle
 
 void Echolocation::setUp()
 {
+  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+  m_memoryThreshold = kv.getValue<float>("sensation-echolocation.memoryThreshold");
 }
 
 void Echolocation::tearDown()

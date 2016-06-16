@@ -28,6 +28,7 @@ file(GLOB_RECURSE thisproject-sources
   "${CMAKE_CURRENT_SOURCE_DIR}/src/gcdc16/rule/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/gcdc16/v2viclcm/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/identity/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/ivrule/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/linguistics/v2vcam/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/linguistics/v2vdenm/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/scene/*.cpp"
@@ -42,7 +43,10 @@ add_executable(${PROJECT_NAME}-gcdc16-v2viclcm "${CMAKE_CURRENT_SOURCE_DIR}/src/
 target_link_libraries(${PROJECT_NAME}-gcdc16-v2viclcm ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
 add_executable(${PROJECT_NAME}-identity "${CMAKE_CURRENT_SOURCE_DIR}/src/identity/main.cpp")
-target_link_libraries(${PROJECT_NAME}-identity ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+target_link_libraries(${PROJECT_NAME}-identity ${PROJECT_NAME}lib-static ${LIBRARIES})
+
+add_executable(${PROJECT_NAME}-ivrule "${CMAKE_CURRENT_SOURCE_DIR}/src/ivrule/main.cpp")
+target_link_libraries(${PROJECT_NAME}-ivrule ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
 add_executable(${PROJECT_NAME}-linguistics-v2vcam "${CMAKE_CURRENT_SOURCE_DIR}/src/linguistics/v2vcam/main.cpp")
 target_link_libraries(${PROJECT_NAME}-linguistics-v2vcam ${PROJECT_NAME}lib-static ${LIBRARIES}) 
@@ -60,6 +64,7 @@ include(RunTests)
 install(TARGETS ${PROJECT_NAME}-gcdc16-rule RUNTIME DESTINATION bin COMPONENT system-application)
 install(TARGETS ${PROJECT_NAME}-gcdc16-v2viclcm RUNTIME DESTINATION bin COMPONENT system-application)
 install(TARGETS ${PROJECT_NAME}-identity RUNTIME DESTINATION bin COMPONENT system-application)
+install(TARGETS ${PROJECT_NAME}-ivrule RUNTIME DESTINATION bin COMPONENT system-application)
 install(TARGETS ${PROJECT_NAME}-linguistics-v2vcam RUNTIME DESTINATION bin COMPONENT system-application)
 install(TARGETS ${PROJECT_NAME}-linguistics-v2vdenm RUNTIME DESTINATION bin COMPONENT system-application)
 install(TARGETS ${PROJECT_NAME}-scene RUNTIME DESTINATION bin COMPONENT system-application)

@@ -49,6 +49,11 @@ Scene::Scene(int32_t const &a_argc, char **a_argv)
     , m_savedObjects()
     , m_objectCounter(0)
     , m_surfaceCounter(0)
+    , m_mutex()
+    , m_mergeDistance()
+    , m_validUntilDuration()
+    , m_initialised(false)
+    , m_memoryCapacity()
 {
 }
 
@@ -57,8 +62,8 @@ Scene::~Scene()
 }
 
 /**
- * Receives .
- * Sends .
+ * Receives objects from low level sensors.
+ * Sends environment to high level applications.
  */
 
  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Scene::body()
@@ -66,6 +71,7 @@ Scene::~Scene()
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
       odcore::data::dmcp::ModuleStateMessage::RUNNING) {
 
+    TimeCheck();
     SendStuff();
 
   }
@@ -74,6 +80,9 @@ Scene::~Scene()
 
 void Scene::nextContainer(odcore::data::Container &a_container)
 {
+  if(!m_initialised){
+    return;
+  }
   if(a_container.getDataType() == opendlv::perception::Object::ID()) {
     opendlv::perception::Object unpackedObject =
     a_container.getData<opendlv::perception::Object>();
@@ -81,25 +90,25 @@ void Scene::nextContainer(odcore::data::Container &a_container)
     int16_t identity = unpackedObject.getObjectId();
 
     if (identity == -1) {
-    	   	
-  		//odcore::data::TimeStamp m_timeStamp = unpackedObject.getIdentified();
-  		std::string type = unpackedObject.getType();
-  		//float  typeConfidence = unpackedObject.getTypeConfidence();
-  		opendlv::model::Direction direction = unpackedObject.getDirection();
-  		float azimuth = direction.getAzimuth();
-  		//float directionConfidence = unpackedObject.getDirectionConfidence();
-  		//opendlv::model::Direction directionRate = unpackedObject.getDirectionRate();
-  		//float directionRateAzimuth = directionRate.getAzimuth();
-  		//float directionRateConfidence = unpackedObject.getDirectionRateConfidence();
-  		float distance = unpackedObject.getDistance();
-  		//float distanceConfidence = unpackedObject.getDistanceConfidence();
-  		//float m_angularSize = unpackedObject.getAngularSize();
-  		//float m_angularSizeConfidence = unpackedObject.getAngularSizeConfidence();
-  		//float m_angularSizeRate = unpackedObject.getAngularSizeRate();
-  		//float m_angularSizeRateConfidence = unpackedObject.getAngularSizeRateConfidence();
-  		//float m_confidence = unpackedObject.getConfidence();
-  		//std::vector<std::string> m_sources = unpackedObject.getListOfSources();
-  		std::vector<std::string> properties = unpackedObject.getListOfProperties();
+          
+      //odcore::data::TimeStamp m_timeStamp = unpackedObject.getIdentified();
+      std::string type = unpackedObject.getType();
+      //float  typeConfidence = unpackedObject.getTypeConfidence();
+      opendlv::model::Direction direction = unpackedObject.getDirection();
+      float azimuth = direction.getAzimuth();
+      //float directionConfidence = unpackedObject.getDirectionConfidence();
+      //opendlv::model::Direction directionRate = unpackedObject.getDirectionRate();
+      //float directionRateAzimuth = directionRate.getAzimuth();
+      //float directionRateConfidence = unpackedObject.getDirectionRateConfidence();
+      float distance = unpackedObject.getDistance();
+      //float distanceConfidence = unpackedObject.getDistanceConfidence();
+      //float m_angularSize = unpackedObject.getAngularSize();
+      //float m_angularSizeConfidence = unpackedObject.getAngularSizeConfidence();
+      //float m_angularSizeRate = unpackedObject.getAngularSizeRate();
+      //float m_angularSizeRateConfidence = unpackedObject.getAngularSizeRateConfidence();
+      //float m_confidence = unpackedObject.getConfidence();
+      //std::vector<std::string> m_sources = unpackedObject.getListOfSources();
+      std::vector<std::string> properties = unpackedObject.getListOfProperties();
 
       std::cout << "ID: " << identity << std::endl;
       std::cout << "Type: " << type << std::endl;
@@ -107,7 +116,6 @@ void Scene::nextContainer(odcore::data::Container &a_container)
       std::cout << "Angle: " << azimuth << std::endl << std::endl;
 
 
-      TimeCheck();
       bool objectExists = false;
       for (uint32_t i = 0; i < m_savedObjects.size(); i++) {
         //std::cout << "Debug0: " << std::endl;
@@ -267,7 +275,8 @@ bool Scene::IsInRectangle(opendlv::model::Cartesian3 point, std::vector<opendlv:
 
 void Scene::SendStuff()
 {
-  odcore::data::TimeStamp validUntil;
+  odcore::data::TimeStamp now;
+  odcore::data::TimeStamp validUntil = now + odcore::data::TimeStamp(m_validUntilDuration, 0);
   opendlv::perception::Environment environment(validUntil, m_savedObjects);
 
   odcore::data::Container objectContainerEnvironment(environment);
@@ -277,8 +286,8 @@ void Scene::SendStuff()
   std::cout << "Objects sent: " << std::endl;
 
   for(uint32_t i = 0; i < m_savedObjects.size(); i++) {
-    odcore::data::Container objectContainer(m_savedObjects[i], opendlv::perception::Object::ID() + 300);
-    getConference().send(objectContainer);
+    // odcore::data::Container objectContainer(m_savedObjects[i], opendlv::perception::Object::ID() + 300);
+    // getConference().send(objectContainer);
     std::cout << "ID: "<< m_savedObjects[i].getObjectId() << std::endl;
     std::cout << "Angle: "<< m_savedObjects[i].getDirection().getAzimuth() << std::endl;
     std::cout << "Distance: "<< m_savedObjects[i].getDistance() << std::endl;
@@ -438,10 +447,10 @@ void Scene::TimeCheck()
 {
   odcore::data::TimeStamp nowTimeStamp;
   for (uint32_t i = 0; i < m_savedObjects.size(); i++) {
-    double objectTimeStamp = (nowTimeStamp - m_savedObjects[i].getIdentified()).toMicroseconds() / 1000000.0;
+    float objectTimeStamp = (nowTimeStamp - m_savedObjects[i].getIdentified()).toMicroseconds() / 1000000.0;
     //std::cout << "Timestamp" << m_savedObjects[i].getIdentified().toMicroseconds() / 1000000.0 << std::endl;
     //std::cout << "Debug time: " << objectTimeStamp << std::endl;
-    if (objectTimeStamp > 1.0) { //TODO: Change to config parameter
+    if (objectTimeStamp > m_memoryCapacity) { 
      m_savedObjects.erase(m_savedObjects.begin() + i);
      std::cout << "Removed object" << std::endl;
      i--;
@@ -459,6 +468,11 @@ void Scene::TimeCheck()
 
 void Scene::setUp()
 {
+  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+  m_mergeDistance = kv.getValue<float>("knowledge-scene.mergeDistance");
+  m_validUntilDuration = kv.getValue<int32_t>("knowledge-scene.validUntilDuration");
+  m_memoryCapacity = kv.getValue<float>("knowledge-scene.memoryCapacity");
+  m_initialised = true;
 }
 
 void Scene::tearDown()

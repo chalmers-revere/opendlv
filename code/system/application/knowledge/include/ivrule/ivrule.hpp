@@ -17,19 +17,15 @@
  * USA.
  */
 
-#ifndef SCENE_SCENE_HPP_
-#define SCENE_SCENE_HPP_
+#ifndef IVRULE_IVRULE_HPP_
+#define IVRULE_IVRULE_HPP_
 
 #include <memory>
 #include <ctype.h>
 #include <cstring>
-#include <cmath>
-#include <iostream>
-#include <algorithm>
 
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
-#include "opendavinci/odcore/base/Mutex.h"
 #include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
@@ -37,44 +33,39 @@
 
 namespace opendlv {
 namespace knowledge {
-namespace scene {
+namespace ivrule {
 
 /**
- * This class provides...
+ * This class provides knowledge for specific vehicle following.
  */
-class Scene : public odcore::base::module::TimeTriggeredConferenceClientModule {
+class Ivrule : public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
-  Scene(int32_t const &, char **);
-  Scene(Scene const &) = delete;
-  Scene &operator=(Scene const &) = delete;
-  virtual ~Scene();
+  Ivrule(int32_t const &, char **);
+  Ivrule(Ivrule const &) = delete;
+  Ivrule &operator=(Ivrule const &) = delete;
+  virtual ~Ivrule();
   virtual void nextContainer(odcore::data::Container &);
 
  private:
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
   void setUp();
   void tearDown();
-  void MergeSurfaces(opendlv::perception::Surface, uint32_t);
-  std::vector<opendlv::model::Cartesian3> MergePoints(std::vector<opendlv::model::Cartesian3>, std::vector<opendlv::model::Cartesian3>, float);
-  opendlv::model::Cartesian3 CrossingPoint(std::vector<opendlv::model::Cartesian3>);
-  bool IsInRectangle(opendlv::model::Cartesian3, std::vector<opendlv::model::Cartesian3>);
-  void SendStuff();
-  double PointDistance(float a_angle1, double a_dist1, float a_angle2, double a_dist2);
-  void MergeObjects(opendlv::perception::Object a_object, uint32_t a_index);
-  void TimeCheck();
+  void ReadEnvironment(opendlv::perception::Environment &);
+  void FindMio(std::vector<opendlv::perception::Object> &);
 
-  std::vector<opendlv::perception::Surface> m_savedSurfaces;
-  std::vector<opendlv::perception::Object> m_savedObjects;
-  uint32_t m_objectCounter;
-  uint32_t m_surfaceCounter;
-  odcore::base::Mutex m_mutex;
-  float m_mergeDistance;
-  int32_t m_validUntilDuration;
   bool m_initialised;
-  float m_memoryCapacity;
+  float m_mioAngleRange;
+  float m_mioDistanceRange;
+  int32_t m_memoryDuration;
+  float m_desiredAngularSize;
+  float m_desiredOpticalFlow;
+
+  odcore::data::TimeStamp m_mioValidUntil;
+  opendlv::perception::Object m_mio;
+  float m_speed;
 };
 
-} // scene
+} // ivrule
 } // knowledge
 } // opendlv
 

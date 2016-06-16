@@ -46,37 +46,6 @@ action-setopticalrotation.gain_heading = 1.5
 action-setopticalrotation.heading_tolerance = 0.05
 action-setopticalflow.max_speed = 30/3.6
 
-# Not last in the left lane
-knowledge-gcdc16-rule:0.initial_lane = 2
-knowledge-gcdc16-rule:0.is_tail = 0
-knowledge-gcdc16-rule:0.platoon_id = 1
-knowledge-gcdc16-rule:0.scenario = mergeScenario
-
-# Last in the left lane
-knowledge-gcdc16-rule:1.initial_lane = 2
-knowledge-gcdc16-rule:1.is_tail = 1
-knowledge-gcdc16-rule:1.platoon_id = 1
-knowledge-gcdc16-rule:1.scenario = mergeScenario
-
-# Not last in the right lane
-knowledge-gcdc16-rule:2.initial_lane = 1
-knowledge-gcdc16-rule:2.is_tail = 0
-knowledge-gcdc16-rule:2.platoon_id = 2
-knowledge-gcdc16-rule:2.scenario = mergeScenario
-
-# Last in the right lane
-knowledge-gcdc16-rule:3.initial_lane = 1
-knowledge-gcdc16-rule:3.is_tail = 1
-knowledge-gcdc16-rule:3.platoon_id = 2
-knowledge-gcdc16-rule:3.scenario = mergeScenario
-
-
-# first three below never used...
-knowledge-gcdc16-rule:4.initial_lane = 1
-knowledge-gcdc16-rule:4.is_tail = 1
-knowledge-gcdc16-rule:4.platoon_id = 2
-knowledge-gcdc16-rule:4.scenario = intersectionScenario
-
 ###############################################################################
 ###############################################################################
 ### Proxy
@@ -228,8 +197,13 @@ safety-manualoverride.torsionBarTorqueThreshold = 1.5
 
 ###############################################################################
 ###############################################################################
-# Sensation Optical flow
+# Echolocation
 
+sensation-echolocation.memoryThreshold = 0
+
+###############################################################################
+###############################################################################
+# Optical flow
 sensation-vision-opticalflow.termCritMaxCount = 20
 sensation-vision-opticalflow.termCritEpsilon = 0.03
 sensation-vision-opticalflow.lkSearchWindowWidth = 30
@@ -247,6 +221,21 @@ knowledge-identity.vehicleWidth = 2.55
 knowledge-identity.vehicleRole = 0
 knowledge-identity.rearAxleLocation = 5.0
 
+###############################################################################
+###############################################################################
+# Ivrule
+knowledge-ivrule.mioAngleRange = 30.0 #degrees
+knowledge-ivrule.mioDistanceRange = 30.0 #meters
+knowledge-ivrule.memoryDuration = 1 #seconds
+knowledge-ivrule.desiredAngularSize = 6 #degrees
+knowledge-ivrule.desiredOpticalFlow = 5.6 #meters/s
+
+###############################################################################
+###############################################################################
+# Scene
+knowledge-scene.mergeDistance = 2.0
+knowledge-scene.validUntilDuration = 1
+knowledge-scene.memoryCapacity = 5.0 # seconds
 
 ###############################################################################
 ###############################################################################
@@ -271,9 +260,44 @@ perception-detectlane:1.source = front-right
 perception-detectvehicle:0.source = front-left
 perception-detectvehicle:1.source = front-right
 
+
 ###############################################################################
 ###############################################################################
 # Diagnostics
 diagnostics-health.script = ./checkHealth.sh
 diagnostics-health.sleep = 60 # Sleep between health checks in seconds
 
+###############################################################################
+###############################################################################
+# GCDC specific
+
+# Not last in the left lane
+knowledge-gcdc16-rule:0.initial_lane = 2
+knowledge-gcdc16-rule:0.is_tail = 0
+knowledge-gcdc16-rule:0.platoon_id = 1
+knowledge-gcdc16-rule:0.scenario = mergeScenario
+
+# Last in the left lane
+knowledge-gcdc16-rule:1.initial_lane = 2
+knowledge-gcdc16-rule:1.is_tail = 1
+knowledge-gcdc16-rule:1.platoon_id = 1
+knowledge-gcdc16-rule:1.scenario = mergeScenario
+
+# Not last in the right lane
+knowledge-gcdc16-rule:2.initial_lane = 1
+knowledge-gcdc16-rule:2.is_tail = 0
+knowledge-gcdc16-rule:2.platoon_id = 2
+knowledge-gcdc16-rule:2.scenario = mergeScenario
+
+# Last in the right lane
+knowledge-gcdc16-rule:3.initial_lane = 1
+knowledge-gcdc16-rule:3.is_tail = 1
+knowledge-gcdc16-rule:3.platoon_id = 2
+knowledge-gcdc16-rule:3.scenario = mergeScenario
+
+
+# first three below never used...
+knowledge-gcdc16-rule:4.initial_lane = 1
+knowledge-gcdc16-rule:4.is_tail = 1
+knowledge-gcdc16-rule:4.platoon_id = 2
+knowledge-gcdc16-rule:4.scenario = intersectionScenario
