@@ -71,6 +71,7 @@ class Scene : public odcore::base::module::TimeTriggeredConferenceClientModule {
   float m_mergeDistance;
   int32_t m_validUntilDuration;
   bool m_initialised;
+  float m_memoryCapacity;
 };
 
 } // scene

@@ -54,10 +54,8 @@ OpenCvDevice::OpenCvDevice(std::string const &a_name,
       + ":" + a_password + "@" + a_port + "/axis-cgi/mjpg/video.cgi?user=" 
       + a_username + "&password=" + a_password + "&channel=0&.mjpg";
 
-  std::string videoStreamAddressHack = "/home/bjornborg/Videos/highway.avi";
-
   std::cout << videoStreamAddress << std::endl;
-  m_capture.reset(new cv::VideoCapture(videoStreamAddressHack));
+  m_capture.reset(new cv::VideoCapture(videoStreamAddress));
 
   if (m_capture->isOpened()) {
     std::cout << "Open. width: " << a_width << " height: " << a_height << std::endl;
@@ -124,8 +122,8 @@ bool OpenCvDevice::CopyImageTo(char *a_destination, const uint32_t &a_size)
     // std::cout << "a_size: " << a_size << std::endl;
     ::memcpy(a_destination, m_image.data, a_size);
 
-    //cv::imshow("Camera feed", m_image);
-    //cv::waitKey(10);
+    // cv::imshow("Camera feed", m_image);
+    // cv::waitKey(10);
     retVal = true;
   }
 

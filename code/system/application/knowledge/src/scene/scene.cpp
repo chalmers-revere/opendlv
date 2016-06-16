@@ -53,6 +53,7 @@ Scene::Scene(int32_t const &a_argc, char **a_argv)
     , m_mergeDistance()
     , m_validUntilDuration()
     , m_initialised(false)
+    , m_memoryCapacity()
 {
 }
 
@@ -61,8 +62,8 @@ Scene::~Scene()
 }
 
 /**
- * Receives .
- * Sends .
+ * Receives objects from low level sensors.
+ * Sends environment to high level applications.
  */
 
  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Scene::body()
@@ -70,6 +71,7 @@ Scene::~Scene()
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
       odcore::data::dmcp::ModuleStateMessage::RUNNING) {
 
+    TimeCheck();
     SendStuff();
 
   }
@@ -88,25 +90,25 @@ void Scene::nextContainer(odcore::data::Container &a_container)
     int16_t identity = unpackedObject.getObjectId();
 
     if (identity == -1) {
-    	   	
-  		//odcore::data::TimeStamp m_timeStamp = unpackedObject.getIdentified();
-  		std::string type = unpackedObject.getType();
-  		//float  typeConfidence = unpackedObject.getTypeConfidence();
-  		opendlv::model::Direction direction = unpackedObject.getDirection();
-  		float azimuth = direction.getAzimuth();
-  		//float directionConfidence = unpackedObject.getDirectionConfidence();
-  		//opendlv::model::Direction directionRate = unpackedObject.getDirectionRate();
-  		//float directionRateAzimuth = directionRate.getAzimuth();
-  		//float directionRateConfidence = unpackedObject.getDirectionRateConfidence();
-  		float distance = unpackedObject.getDistance();
-  		//float distanceConfidence = unpackedObject.getDistanceConfidence();
-  		//float m_angularSize = unpackedObject.getAngularSize();
-  		//float m_angularSizeConfidence = unpackedObject.getAngularSizeConfidence();
-  		//float m_angularSizeRate = unpackedObject.getAngularSizeRate();
-  		//float m_angularSizeRateConfidence = unpackedObject.getAngularSizeRateConfidence();
-  		//float m_confidence = unpackedObject.getConfidence();
-  		//std::vector<std::string> m_sources = unpackedObject.getListOfSources();
-  		std::vector<std::string> properties = unpackedObject.getListOfProperties();
+          
+      //odcore::data::TimeStamp m_timeStamp = unpackedObject.getIdentified();
+      std::string type = unpackedObject.getType();
+      //float  typeConfidence = unpackedObject.getTypeConfidence();
+      opendlv::model::Direction direction = unpackedObject.getDirection();
+      float azimuth = direction.getAzimuth();
+      //float directionConfidence = unpackedObject.getDirectionConfidence();
+      //opendlv::model::Direction directionRate = unpackedObject.getDirectionRate();
+      //float directionRateAzimuth = directionRate.getAzimuth();
+      //float directionRateConfidence = unpackedObject.getDirectionRateConfidence();
+      float distance = unpackedObject.getDistance();
+      //float distanceConfidence = unpackedObject.getDistanceConfidence();
+      //float m_angularSize = unpackedObject.getAngularSize();
+      //float m_angularSizeConfidence = unpackedObject.getAngularSizeConfidence();
+      //float m_angularSizeRate = unpackedObject.getAngularSizeRate();
+      //float m_angularSizeRateConfidence = unpackedObject.getAngularSizeRateConfidence();
+      //float m_confidence = unpackedObject.getConfidence();
+      //std::vector<std::string> m_sources = unpackedObject.getListOfSources();
+      std::vector<std::string> properties = unpackedObject.getListOfProperties();
 
       std::cout << "ID: " << identity << std::endl;
       std::cout << "Type: " << type << std::endl;
@@ -114,7 +116,6 @@ void Scene::nextContainer(odcore::data::Container &a_container)
       std::cout << "Angle: " << azimuth << std::endl << std::endl;
 
 
-      TimeCheck();
       bool objectExists = false;
       for (uint32_t i = 0; i < m_savedObjects.size(); i++) {
         //std::cout << "Debug0: " << std::endl;
@@ -291,7 +292,7 @@ void Scene::SendStuff()
     std::cout << "Angle: "<< m_savedObjects[i].getDirection().getAzimuth() << std::endl;
     std::cout << "Distance: "<< m_savedObjects[i].getDistance() << std::endl;
   }
-  std::cout << "=====================================" << m_validUntilDuration << std::endl;
+  std::cout << "=====================================" << std::endl;
   
   //for(uint32_t i = 0; i < m_savedSurfaces.size(); i++) {
   //  odcore::data::Container surfaceContainer(m_savedSurfaces[i]);
@@ -446,10 +447,10 @@ void Scene::TimeCheck()
 {
   odcore::data::TimeStamp nowTimeStamp;
   for (uint32_t i = 0; i < m_savedObjects.size(); i++) {
-    double objectTimeStamp = (nowTimeStamp - m_savedObjects[i].getIdentified()).toMicroseconds() / 1000000.0;
+    float objectTimeStamp = (nowTimeStamp - m_savedObjects[i].getIdentified()).toMicroseconds() / 1000000.0;
     //std::cout << "Timestamp" << m_savedObjects[i].getIdentified().toMicroseconds() / 1000000.0 << std::endl;
     //std::cout << "Debug time: " << objectTimeStamp << std::endl;
-    if (objectTimeStamp > 1.0) { //TODO: Change to config parameter
+    if (objectTimeStamp > m_memoryCapacity) { 
      m_savedObjects.erase(m_savedObjects.begin() + i);
      std::cout << "Removed object" << std::endl;
      i--;
@@ -470,6 +471,7 @@ void Scene::setUp()
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
   m_mergeDistance = kv.getValue<float>("knowledge-scene.mergeDistance");
   m_validUntilDuration = kv.getValue<int32_t>("knowledge-scene.validUntilDuration");
+  m_memoryCapacity = kv.getValue<float>("knowledge-scene.memoryCapacity");
   m_initialised = true;
 }
 
