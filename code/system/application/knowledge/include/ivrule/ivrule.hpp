@@ -56,7 +56,7 @@ class Ivrule : public odcore::base::module::TimeTriggeredConferenceClientModule 
   bool m_initialised;
   float m_mioAngleRange;
   float m_mioDistanceRange;
-  uint8_t m_memoryDuration;
+  int32_t m_memoryDuration;
   float m_desiredAngularSize;
   float m_desiredOpticalFlow;
 

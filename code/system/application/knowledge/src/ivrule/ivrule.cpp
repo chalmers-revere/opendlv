@@ -71,19 +71,29 @@ Ivrule::~Ivrule()
       odcore::data::Container containerSof(sof);
       getConference().send(containerSof);
     }
-    if(m_mioValidUntil.toMicroseconds() - now.toMicroseconds() > 0) {
+    if((m_mioValidUntil-now).toMicroseconds() > 0) {
       // Steer to mio
       opendlv::perception::StimulusDirectionOfMovement sdom(m_mio.getDirection(),opendlv::model::Direction(0,0));
       odcore::data::Container containerSdom(sdom);
       getConference().send(containerSdom);
 
-      std::cout << "Sent ddom. Azimuth: " << m_mio.getDirection().getAzimuth() << std::endl;
+      // std::cout << "Sent sdom." << std::endl;
+
 
       opendlv::perception::StimulusAngularSizeAlignment sasa(m_mio.getDirection(),m_mio.getAngularSize(),m_desiredAngularSize);
       odcore::data::Container containerSasa(sasa);
       getConference().send(containerSasa);
 
-      std::cout << "Sent daf. Desired angular size: " << m_desiredAngularSize << " Currently: " << m_mio.getAngularSize() << std::endl;
+      // std::cout << "Sent sasa."  << std::endl;
+
+
+      // std::cout 
+      //     << " Id: " << m_mio.getObjectId() 
+      //     << " Azimuth: " << m_mio.getDirection().getAzimuth() 
+      //     << " Distance: " << m_mio.getDistance() 
+      //     << " Desired angular size: " << m_desiredAngularSize 
+      //     << " Currently: " << m_mio.getAngularSize() 
+      //     << std::endl;
 
     }
   }
@@ -139,13 +149,14 @@ void Ivrule::FindMio(std::vector<opendlv::perception::Object> &a_listOfObjects)
       score = 0;
     }
     scoreList.push_back(score);
+    std::cout << "Id: " << object.getObjectId() << " score: " << score << std::endl;
   }
   auto highestScore = std::max_element(scoreList.begin(),scoreList.end());
   if(*highestScore > 0){
-    auto winnerIndex = std::distance(scoreList.begin(), highestScore)-1;
+    auto winnerIndex = std::distance(scoreList.begin(), highestScore);
     m_mio = a_listOfObjects[winnerIndex];
 
-    std::cout << "Winner index: " << winnerIndex << " Score: " << *highestScore << std::endl;
+    std::cout << "Winner Id: " << a_listOfObjects[winnerIndex].getObjectId() << " Score: " << *highestScore << std::endl;
     odcore::data::TimeStamp now;
     m_mioValidUntil = odcore::data::TimeStamp(now.getSeconds()+m_memoryDuration,now.getFractionalMicroseconds());
 
@@ -157,7 +168,7 @@ void Ivrule::setUp()
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
   m_mioAngleRange = static_cast<float>(kv.getValue<double>("knowledge-ivrule.mioAngleRange")*opendlv::Constants::DEG2RAD);
   m_mioDistanceRange = kv.getValue<float>("knowledge-ivrule.mioDistanceRange");
-  m_memoryDuration = kv.getValue<uint8_t>("knowledge-ivrule.memoryDuration");
+  m_memoryDuration = kv.getValue<int32_t>("knowledge-ivrule.memoryDuration");
   m_desiredAngularSize = static_cast<float>(kv.getValue<double>("knowledge-ivrule.desiredAngularSize")*opendlv::Constants::DEG2RAD);
   m_desiredOpticalFlow = kv.getValue<float>("knowledge-ivrule.desiredOpticalFlow");
   m_initialised = true;
