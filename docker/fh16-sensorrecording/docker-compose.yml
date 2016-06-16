@@ -37,6 +37,8 @@ proxy-can:
     - /dumps:/dumps
     working_dir: "/dumps"
     restart: always
+    devices:
+    - "/dev/pcanpci1:/dev/pcan1"
     environment:
     - LD_LIBRARY_PATH=/opt/opendlv/lib
     command: "/opt/opendlv/bin/opendlv-system-core-proxy-can --cid=62 --freq=100"
