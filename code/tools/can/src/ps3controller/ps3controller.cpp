@@ -45,8 +45,7 @@ namespace can {
 namespace ps3controller {
 
 PS3Controller::PS3Controller(int32_t const &a_argc, char **a_argv)
-    : odcore::base::module::TimeTriggeredConferenceClientModule(
-      a_argc, a_argv, "tools-can-ps3controller")
+    : odcore::base::module::TimeTriggeredConferenceClientModule(a_argc, a_argv, "tools-can-ps3controller")
     , automotive::odcantools::GenericCANMessageListener()
     , m_fifo()
     , m_device()
@@ -72,8 +71,7 @@ void PS3Controller::setUp()
   using namespace automotive::odcantools;
 
   string const PS3CONTROLLER_DEVICE_NODE =
-  getKeyValueConfiguration().getValue<string>(
-  "tools-can-ps3controller.ps3controllerdevicenode");
+  getKeyValueConfiguration().getValue<string>("tools-can-ps3controller.ps3controllerdevicenode");
 
   string const DEVICE_NODE =
   getKeyValueConfiguration().getValue<string>("tools-can-ps3controller.devicenode");
@@ -166,8 +164,7 @@ void PS3Controller::tearDown()
   }
 }
 
-void PS3Controller::nextGenericCANMessage(
-const automotive::GenericCANMessage &gcm)
+void PS3Controller::nextGenericCANMessage(const automotive::GenericCANMessage &gcm)
 {
     // Map CAN message to high-level data structure.
     vector<odcore::data::Container> result = m_revereFh16CanMessageMapping.mapNext(gcm);
@@ -218,8 +215,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode PS3Controller::body()
   
   automotive::GenericCANMessage gcm;
 
-  while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
-  odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+  while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
 
 #if !defined(WIN32) && !defined(__gnu_hurd__) && !defined(__APPLE__)
     struct js_event js;
