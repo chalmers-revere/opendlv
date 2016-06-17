@@ -139,6 +139,29 @@ fh16-canrecording-copy-opendlv:
 fh16-canrecording: build-incremental fh16-canrecording-copy-opendlv
 	cd fh16-canrecording && docker-compose build
 
+
+###############################################################################
+###############################################################################
+# FH16 sensor recording.
+
+# Tag Docker images using Git hashes for traceability.
+docker-tag-fh16-sensorrecording:
+	for i in $$(cat fh16-sensorrecording/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker tag sensorrecording_$$i seresearch/fh16sensorrecording_$$i:$(VERSION); docker tag fh16sensorrecording_$$i seresearch/fh16sensorrecording_$$i:latest; done
+
+# Push Docker latest images for backup.
+docker-push-fh16-sensorrecording: docker-tag-fh16-sensorrecording
+	for i in $$(cat fh16-sensorrecording/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/sensorrecording_$$i:$(VERSION); docker push seresearch/sensorrecording_$$i:latest; done
+
+fh16-sensorrecording-copy-opendlv:
+	rm -fr fh16-sensorrecording/opendlv
+	cp -r ../build.from.docker/install fh16-sensorrecording/opendlv
+	cp fh16-sensorrecording/checkHealth.sh fh16-sensorrecording/opendlv/bin
+
+# Build image for FH16 truck for sensor data recording.
+fh16-sensorrecording: build-incremental fh16-sensorrecording-copy-opendlv
+	cd fh16-sensorrecording && docker-compose build
+
+
 ###############################################################################
 ###############################################################################
 # FH16 lidar-echolocation-scene.
@@ -160,6 +183,7 @@ fh16-lidar-echolocation-scene-copy-opendlv:
 fh16-lidar-echolocation-scene: build-incremental fh16-lidar-echolocation-scene-copy-opendlv
 	cd fh16-lidar-echolocation-scene && docker-compose build
 
+
 ###############################################################################
 ###############################################################################
 # FH16 IV2016.
@@ -180,4 +204,26 @@ fh16-iv2016-copy-opendlv:
 # Build image for FH16 truck for IV demo.
 fh16-iv2016: build-incremental fh16-iv2016-copy-opendlv
 	cd fh16-iv2016 && docker-compose build
+
+
+###############################################################################
+###############################################################################
+# FH16 lidar-echolocation-scene-ivrule.
+
+# Tag Docker images using Git hashes for traceability.
+docker-tag-fh16-lidar-echolocation-scen-ivrule:
+	for i in $$(cat fh16-lidar-echolocation-scene-ivrule/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker tag fh16lidarecholocationsceneivrule_$$i seresearch/fh16lidarecholocationsceneivrule_$$i:$(VERSION); docker tag fh16lidarecholocationsceneivrule_$$i seresearch/fh16lidarecholocationsceneivrule_$$i:latest; done
+
+# Push Docker latest images for backup.
+docker-push-fh16-lidar-echolocation-scene-ivrule: docker-tag-fh16-lidar-echolocation-scene-ivrule
+	for i in $$(cat fh16-lidar-echolocation-scene-ivrule/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/fh16lidarecholocationsceneivrule_$$i:$(VERSION); docker push seresearch/fh16lidarecholocationsceneivrule_$$i:latest; done
+
+fh16-lidar-echolocation-scene-copy-opendlv-ivrule:
+	rm -fr fh16-lidar-echolocation-scene-ivrule/opendlv
+	cp -r ../build.from.docker/install fh16-lidar-echolocation-scene-ivrule/opendlv
+	cp fh16-lidar-echolocation-scene-ivrule/checkHealth.sh fh16-lidar-echolocation-scene-ivrule/opendlv/bin
+
+# Build image for FH16 truck for lidar-echolocation-scene-ivrule.
+fh16-lidar-echolocation-scene-ivrule: build-incremental fh16-lidar-echolocation-scene-copy-opendlv-ivrule
+	cd fh16-lidar-echolocation-scene-ivrule && docker-compose build
 

@@ -28,6 +28,12 @@
 
 #include "lidar/lidarstringdecoder.hpp"
 
+namespace odtools {
+namespace recorder {
+class Recorder;
+}
+}
+
 namespace opendlv {
 namespace proxy {
 namespace lidar {
@@ -48,12 +54,15 @@ class Lidar : public odcore::base::module::TimeTriggeredConferenceClientModule {
   virtual void setUp();
   virtual void tearDown();
 
+ private:
   void Status();
   void StartScan();
   void StopScan();
   void SettingsMode();
   void SetCentimeterMode();
 
+ private:
+  std::shared_ptr<odtools::recorder::Recorder> m_recorderLidar;
   std::shared_ptr<odcore::wrapper::SerialPort> m_sick;
   std::unique_ptr<LidarStringDecoder> m_lidarStringDecoder;
 };

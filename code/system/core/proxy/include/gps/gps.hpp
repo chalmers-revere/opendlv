@@ -20,6 +20,7 @@
 #ifndef GPS_GPS_HPP_
 #define GPS_GPS_HPP_
 
+#include <fstream>
 #include <memory>
 
 #include <opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h>
@@ -27,6 +28,13 @@
 #include <opendavinci/odcore/io/tcp/TCPConnection.h>
 
 #include "gps/gpsstringdecoder.hpp"
+
+namespace odtools {
+namespace recorder {
+class Recorder;
+}
+}
+
 
 namespace opendlv {
 namespace proxy {
@@ -54,6 +62,10 @@ class Gps : public odcore::base::module::DataTriggeredConferenceClientModule {
   std::unique_ptr<Device> m_device;
   std::shared_ptr<odcore::io::tcp::TCPConnection> m_trimble;
   std::unique_ptr<GpsStringDecoder> m_gpsStringDecoder;
+
+ private:
+  std::shared_ptr<odtools::recorder::Recorder> m_recorderGpsReadings;
+  std::shared_ptr<std::fstream> m_CSVFile;
 };
 
 } // gps
