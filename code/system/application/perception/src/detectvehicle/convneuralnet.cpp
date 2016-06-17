@@ -104,7 +104,7 @@ void ConvNeuralNet::TearDown()
 }
 
 
-void ConvNeuralNet::Update(const cv::Mat* a_imageFrame)
+void ConvNeuralNet::Update(const cv::Mat* a_imageFrame, const bool *a_debugMode)
 {
   std::vector<tiny_cnn::vec_t> cnnImageData;
 
@@ -263,19 +263,21 @@ void ConvNeuralNet::Update(const cv::Mat* a_imageFrame)
           cv::Scalar( 255, 0, 0), 
           2, 8, 0);
     }
-    cv::imshow("calcHist Demo", histImage);
+    if(*a_debugMode){
+      cv::imshow("calcHist Demo", histImage);
+    }
+  }
+  if(*a_debugMode) {
+    cv::imshow("Final spatial map", spatialMap);
+    cv::imshow("Non-vehicle spatial map", nonVehicleMap);
+    cv::imshow("DIFF spatial map", mapDifference);
+    cv::imshow("Thresholded spatial map", thresholdedImg);
+    cv::imshow("CNN Output", workingImage);
+    cv::waitKey(10);
   }
 
 
-  cv::imshow("Final spatial map", spatialMap);
-  cv::imshow("Non-vehicle spatial map", nonVehicleMap);
-  cv::imshow("DIFF spatial map", mapDifference);
-  cv::imshow("Thresholded spatial map", thresholdedImg);
-  cv::imshow("CNN Output", workingImage);
   std::cout << "CNN output width: " << workingImage.cols << std::endl;
-
-  cv::waitKey(10);
-
 
   std::chrono::high_resolution_clock::time_point t3 = 
       std::chrono::high_resolution_clock::now();

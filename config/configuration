@@ -46,6 +46,7 @@ action-setopticalrotation.gain_heading = 1.5
 action-setopticalrotation.heading_tolerance = 0.05
 action-setopticalflow.max_speed = 30/3.6
 
+
 ###############################################################################
 ###############################################################################
 ### Proxy
@@ -190,7 +191,7 @@ proxy-v2v.listenPort = 5000
 
 ###############################################################################
 ###############################################################################
-
+### Safety
 safety-checkactuation.maxAllowedDeceleration = 3
 
 safety-manualoverride.accelerationPedalPositionThreshold = 0.1
@@ -215,7 +216,7 @@ sensation-vision-opticalflow.nAxisPoints = 15
 
 ###############################################################################
 ###############################################################################
-# Identity
+### Identity
 knowledge-identity.stationId = 110
 knowledge-identity.stationType = 8 #heavy truck
 knowledge-identity.vehicleLength = 7.3
@@ -241,7 +242,7 @@ knowledge-scene.memoryCapacity = 5.0 # seconds
 
 ###############################################################################
 ###############################################################################
-# Tools
+### Tools
 tools-can-joystick.devicenode = /dev/pcan1   # PEAK CAN device.
 tools-can-joystick.joystickdevicenode = /dev/input/js2   # Gamepad.
 
@@ -252,7 +253,9 @@ tools-can-simplecansender.devicenode = /dev/pcan1   # PEAK CAN device.
 tools-can-ps3controller.devicenode = /dev/pcan1   # PEAK CAN device.
 tools-can-ps3controller.ps3controllerdevicenode = /dev/input/js2   # Gamepad.
 
-# Perception
+###############################################################################
+###############################################################################
+### Perception
 perception-detectlane.inputSize = 640,480
 perception-detectlane.outputSize = 640,480
 perception-detectlane:0.source = front-left
