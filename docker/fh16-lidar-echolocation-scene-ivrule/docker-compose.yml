@@ -58,7 +58,7 @@ sensation-echolocation:
     restart: always
     environment:
     - LD_LIBRARY_PATH=/opt/opendlv/lib
-    command: "/opt/opendlv/bin/opendlv-system-application-sensation-echolocation --cid=73 --freq=11"
+    command: "/opt/opendlv/bin/opendlv-system-application-sensation-echolocation --cid=72 --freq=11"
 
 
 # microservice for proxy-lidar
