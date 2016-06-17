@@ -149,7 +149,12 @@ void Ivrule::FindMio(std::vector<opendlv::perception::Object> &a_listOfObjects)
       score = 0;
     }
     scoreList.push_back(score);
-    std::cout << "Id: " << object.getObjectId() << " score: " << score << std::endl;
+    std::cout << "Id: " << object.getObjectId() << " score: " << score << " scources: ";
+    for(auto it:sources){
+      std::cout << it << " ";
+    }
+
+    std::cout << std::endl;
   }
   auto highestScore = std::max_element(scoreList.begin(),scoreList.end());
   if(*highestScore > 0){
