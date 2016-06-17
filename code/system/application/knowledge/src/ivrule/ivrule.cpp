@@ -67,20 +67,20 @@ Ivrule::~Ivrule()
     odcore::data::TimeStamp now;
 
     if(std::abs(m_speed) > 0.001f ){
-      opendlv::perception::StimulusOpticalFlow sof(m_desiredOpticalFlow, m_speed);
+      opendlv::perception::StimulusOpticalFlow sof(now, m_desiredOpticalFlow, m_speed);
       odcore::data::Container containerSof(sof);
       getConference().send(containerSof);
     }
     if((m_mioValidUntil-now).toMicroseconds() > 0) {
       // Steer to mio
-      opendlv::perception::StimulusDirectionOfMovement sdom(m_mio.getDirection(),opendlv::model::Direction(0,0));
+      opendlv::perception::StimulusDirectionOfMovement sdom(now, m_mio.getDirection(),opendlv::model::Direction(0,0));
       odcore::data::Container containerSdom(sdom);
       getConference().send(containerSdom);
 
       // std::cout << "Sent sdom." << std::endl;
 
 
-      opendlv::perception::StimulusAngularSizeAlignment sasa(m_mio.getDirection(),m_mio.getAngularSize(),m_desiredAngularSize);
+      opendlv::perception::StimulusAngularSizeAlignment sasa(now, m_mio.getDirection(),m_mio.getAngularSize(),m_desiredAngularSize);
       odcore::data::Container containerSasa(sasa);
       getConference().send(containerSasa);
 
