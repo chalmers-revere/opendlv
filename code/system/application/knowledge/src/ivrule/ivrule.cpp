@@ -77,7 +77,7 @@ Ivrule::~Ivrule()
       odcore::data::Container containerSdom(sdom);
       getConference().send(containerSdom);
 
-      // std::cout << "Sent sdom." << std::endl;
+      std::cout << "Sent sdom." << std::endl;
 
 
       opendlv::perception::StimulusAngularSizeAlignment sasa(now, m_mio.getDirection(),m_mio.getAngularSize(),m_desiredAngularSize);

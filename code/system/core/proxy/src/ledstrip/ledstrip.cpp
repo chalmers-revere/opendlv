@@ -193,6 +193,7 @@ void Ledstrip::nextContainer(odcore::data::Container &a_container)
     opendlv::model::Direction direction = stimulusDirectionOfMovement.getDesiredDirectionOfMovement();
 
     m_angle = direction.getAzimuth();
+    std::cout << "Got an angle!" << std::endl;
     CLOG2 << "Direction azimuth: " << m_angle << std::endl;
   }
   
