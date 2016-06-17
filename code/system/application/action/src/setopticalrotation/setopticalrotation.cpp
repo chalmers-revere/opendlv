@@ -70,9 +70,8 @@ void SetOpticalRotation::nextContainer(odcore::data::Container &a_container)
   if (a_container.getDataType() == opendlv::perception::StimulusDirectionOfMovement::ID()) {
 
     // TODO: Should receive timestamp from sensors.
-    auto stimulusTime = a_container.getSentTimeStamp();
     auto stimulusDirectionOfMovement = a_container.getData<opendlv::perception::StimulusDirectionOfMovement>();
-
+    auto stimulusTime = stimulusDirectionOfMovement.getIdentified();
     AddStimulus(stimulusTime, stimulusDirectionOfMovement);
     Correct();
   }

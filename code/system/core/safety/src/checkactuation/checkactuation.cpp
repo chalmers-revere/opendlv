@@ -60,7 +60,7 @@ void CheckActuation::tearDown()
 
 void CheckActuation::nextContainer(odcore::data::Container &a_container)
 {
-  if (a_container.getDataType() == opendlv::proxy::ActuationRequest::ID()){
+  if (a_container.getDataType() == opendlv::proxy::ActuationRequest::ID()+300){
     opendlv::proxy::ActuationRequest actuationRequest 
         = a_container.getData<opendlv::proxy::ActuationRequest>();
     float acceleration = actuationRequest.getAcceleration();
