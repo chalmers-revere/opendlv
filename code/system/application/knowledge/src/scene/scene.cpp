@@ -110,10 +110,10 @@ void Scene::nextContainer(odcore::data::Container &a_container)
       //std::vector<std::string> m_sources = unpackedObject.getListOfSources();
       std::vector<std::string> properties = unpackedObject.getListOfProperties();
 
-      std::cout << "ID: " << identity << std::endl;
-      std::cout << "Type: " << type << std::endl;
-      std::cout << "Distance: " << distance << std::endl;
-      std::cout << "Angle: " << azimuth << std::endl << std::endl;
+      // std::cout << "ID: " << identity << std::endl;
+      // std::cout << "Type: " << type << std::endl;
+      // std::cout << "Distance: " << distance << std::endl;
+      // std::cout << "Angle: " << azimuth << std::endl << std::endl;
 
 
       bool objectExists = false;
@@ -147,7 +147,7 @@ void Scene::nextContainer(odcore::data::Container &a_container)
         m_savedObjects.push_back(unpackedObject);
       }
       //std::cout << "Debug4: " << std::endl;
-      std::cout << "Number of IDs: " << m_savedObjects.size() << std::endl << std::endl;
+      // std::cout << "Number of IDs: " << m_savedObjects.size() << std::endl << std::endl;
 	 }
   }
 
@@ -286,18 +286,16 @@ void Scene::SendStuff()
   std::cout << "Objects sent: " << std::endl;
 
   for(uint32_t i = 0; i < m_savedObjects.size(); i++) {
-    // odcore::data::Container objectContainer(m_savedObjects[i], opendlv::perception::Object::ID() + 300);
-    // getConference().send(objectContainer);
     std::cout << "ID: "<< m_savedObjects[i].getObjectId() << std::endl;
     std::cout << "Angle: "<< m_savedObjects[i].getDirection().getAzimuth() << std::endl;
     std::cout << "Distance: "<< m_savedObjects[i].getDistance() << std::endl;
   }
   std::cout << "=====================================" << std::endl;
   
-  //for(uint32_t i = 0; i < m_savedSurfaces.size(); i++) {
+  // for(uint32_t i = 0; i < m_savedSurfaces.size(); i++) {
   //  odcore::data::Container surfaceContainer(m_savedSurfaces[i]);
   //  getConference().send(surfaceContainer);
-  //}
+  // }
 }
 
 double Scene::PointDistance(float a_angle1, double a_dist1, float a_angle2, double a_dist2)
@@ -349,9 +347,8 @@ void Scene::MergeObjects(opendlv::perception::Object a_object, uint32_t a_index)
   m_savedObjects[a_index].setAngularSizeRateConfidence(a_object.getAngularSizeRateConfidence());
 
   if(m_savedObjects[a_index].getListOfSources().size() > 0) {
-    auto sourceSearch = std::find(std::begin(m_savedObjects[a_index].getListOfSources()), std::end(m_savedObjects[a_index].getListOfSources()), a_object.getListOfSources()[0]);
-    if (sourceSearch == std::end(m_savedObjects[a_index].getListOfSources())) {
-      m_savedObjects[a_index].getListOfSources().push_back(a_object.getListOfSources()[0]);
+    if (!m_savedObjects[a_index].contains_ListOfSources(a_object.getListOfSources()[0])) {
+      m_savedObjects[a_index].addTo_ListOfSources(a_object.getListOfSources()[0]);
       m_savedObjects[a_index].setConfidence(m_savedObjects[a_index].getConfidence() + (a_object.getConfidence() / 2));
     }
   }
