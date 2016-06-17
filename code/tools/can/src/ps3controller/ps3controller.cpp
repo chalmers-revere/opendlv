@@ -169,18 +169,28 @@ void PS3Controller::tearDown()
 void PS3Controller::nextGenericCANMessage(
 const automotive::GenericCANMessage &gcm)
 {
-  // Map CAN message to high-level data structure.
-  vector<odcore::data::Container> result = m_revereFh16CanMessageMapping.mapNext(gcm);
+    // Map CAN message to high-level data structure.
+    vector<odcore::data::Container> result = m_revereFh16CanMessageMapping.mapNext(gcm);
 
-  if (result.size() > 0) {
-    auto it = result.begin();
-    while (it != result.end()) {
-      odcore::data::Container c = (*it);
-      // Send container to conference.
-      getConference().send(c);
-      it++;
+    if (result.size() > 0) {
+        auto it = result.begin();
+        while (it != result.end()) {
+            odcore::data::Container c = (*it);
+            // Send container to conference.
+            getConference().send(c);
+
+            if(c.getDataType() == opendlv::proxy::reverefh16::Steering::ID())
+            {
+                opendlv::proxy::reverefh16::Steering steering=c.getData<opendlv::proxy::reverefh16::Steering>();
+                opendlv::model::Direction direction(steering.getSteeringwheelangle(), 0.0);
+                opendlv::perception::StimulusDirectionOfMovement stimulusDirectionOfMovement(direction,opendlv::model::Direction(0,0));
+                odcore::data::Container toBeSent(stimulusDirectionOfMovement);
+                getConference().send(toBeSent);
+            }
+
+            it++;
+        }
     }
-  }
 }
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode PS3Controller::body()
@@ -338,8 +348,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode PS3Controller::body()
 #endif
 
     cout << "Values: A: " << acceleration << ", B: " << deceleration << ", R: " << rotation << endl;
-    
+
     {
+        // send out the commands to the truck
+        
         opendlv::proxy::reverefh16::BrakeRequest brakeRequest;
         brakeRequest.setEnableRequest(true);
         brakeRequest.setBrake(deceleration);
