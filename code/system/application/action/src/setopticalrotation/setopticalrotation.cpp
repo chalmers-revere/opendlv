@@ -29,64 +29,142 @@
 
 #include "setopticalrotation/setopticalrotation.hpp"
 
- namespace opendlv {
-  namespace action {
-    namespace setopticalrotation {
+namespace opendlv {
+namespace action {
+namespace setopticalrotation {
 
 /**
-  * Constructor.
-  *
-  * @param a_argc Number of command line arguments.
-  * @param a_argv Command line arguments.
-  */
-  SetOpticalRotation::SetOpticalRotation(int32_t const &a_argc, char **a_argv)
-  : DataTriggeredConferenceClientModule(
-    a_argc, a_argv, "action-setopticalrotation")
-  {
-  }
+ * Constructor.
+ *
+ * @param a_argc Number of command line arguments.
+ * @param a_argv Command line arguments.
+ */
+SetOpticalRotation::SetOpticalRotation(int32_t const &a_argc, char **a_argv)
+    : DataTriggeredConferenceClientModule(a_argc, a_argv, 
+        "action-setopticalrotation"),
+    m_stimulusTime(),
+    m_stimulus(),
+    m_stimulusRate(),
+    m_correctionTime(0, 0),
+    m_correction(),
+    m_correctionGain(0.4f),
+    m_maxStimulusAge(0.5f),
+    m_patienceDuration(0.5f),
+    m_stimulusJerk(),
+    m_stimulusJerkThreshold(0.05f),
+    m_stimulusRateThreshold(0.05f),
+    m_stimulusThreshold(0.1f)
+{
+}
 
-  SetOpticalRotation::~SetOpticalRotation()
-  {
-  }
+SetOpticalRotation::~SetOpticalRotation()
+{
+}
 
 /**
  * Receives aim-point angle error.
  * Sends a optical rotation (steer) command to Act.
  */
- void SetOpticalRotation::nextContainer(odcore::data::Container &a_container)
- {
-   (void) a_container;
-   /*
-  if (a_container.getDataType() == opendlv::sensation::DesiredDirectionOfMovement::ID()) {
-    opendlv::sensation::DesiredDirectionOfMovement desiredMovement = a_container.getData<opendlv::sensation::DesiredDirectionOfMovement>();
-    opendlv::model::Direction desiredDirection = desiredMovement.getDirection();
-    m_desiredAzimuth = desiredDirection.getAzimuth();
+void SetOpticalRotation::nextContainer(odcore::data::Container &a_container)
+{
+  if (a_container.getDataType() == opendlv::perception::StimulusDirectionOfMovement::ID()) {
 
-  } else if (a_container.getDataType() == opendlv::sensation::DirectionOfMovement::ID()) {
-    opendlv::sensation::DirectionOfMovement directionMovement = a_container.getData<opendlv::sensation::DirectionOfMovement>();
-    opendlv::model::Direction direction = directionMovement.getDirection();
-    m_currentAzimuth = direction.getAzimuth();
+    // TODO: Should receive timestamp from sensors.
+    auto stimulusTime = a_container.getSentTimeStamp();
+    auto stimulusDirectionOfMovement = a_container.getData<opendlv::perception::StimulusDirectionOfMovement>();
+
+    AddStimulus(stimulusTime, stimulusDirectionOfMovement);
+    Correct();
+  }
+}
+
+void SetOpticalRotation::AddStimulus(odcore::data::TimeStamp const &a_stimulusTime, opendlv::perception::StimulusDirectionOfMovement const &a_stimulusDirectionOfMovement)
+{
+  odcore::data::TimeStamp now;
+
+  std::vector<odcore::data::TimeStamp> stimulusTimeToSave;
+  std::vector<float> stimulusToSave;
+  std::vector<float> stimulusRateToSave;
+  for (uint8_t i = 0; i < m_stimulusTime.size(); i++) {
+    auto t0 = m_stimulusTime[i];
+    auto stimulus = m_stimulus[i];
+    auto stimulusRate = m_stimulusRate[i];
+
+    float t1 = static_cast<float>(now.toMicroseconds() 
+        - t0.toMicroseconds()) / 1000000.0f;
+
+    if (t1 < m_maxStimulusAge) {
+      stimulusTimeToSave.push_back(t0);
+      stimulusToSave.push_back(stimulus);
+      stimulusRateToSave.push_back(stimulusRate);
+    }
+  }
+  
+  m_stimulusTime = stimulusTimeToSave;
+  m_stimulus = stimulusToSave;
+  m_stimulusRate = stimulusRateToSave;
+
+  float desiredDirectionOfMovementAzimuth = a_stimulusDirectionOfMovement.getDesiredDirectionOfMovement().getAzimuth();
+  float directionOfMovementAzimuth = a_stimulusDirectionOfMovement.getDirectionOfMovement().getAzimuth();
+  float stimulus = desiredDirectionOfMovementAzimuth - directionOfMovementAzimuth;
+
+  float stimulusRate = 0.0f;
+  if (m_stimulus.size() > 0) {
+    odcore::data::TimeStamp firstStimulusTime = m_stimulusTime[0];
+    float firstStimulus = m_stimulus[0];
+    float firstStimulusRate = m_stimulusRate[0];
+
+    float deltaTime = static_cast<float>(a_stimulusTime.toMicroseconds() 
+        - firstStimulusTime.toMicroseconds()) / 1000000.0f;
+
+    stimulusRate = (stimulus - firstStimulus) / deltaTime;
+    m_stimulusJerk = (stimulusRate - firstStimulusRate) / deltaTime;
+  } else {
+    m_stimulusJerk = 0.0f;
   }
 
-  //odcore::base::KeyValueConfiguration kv1 = getKeyValueConfiguration();
-  //float const gainAzimuth = kv1.getValue<float>("action-setopticalrotation.gain_heading");
-  float gainAzimuth = 1.5f;
-  odcore::base::KeyValueConfiguration kv2 = getKeyValueConfiguration();
-  //float const  azimuthTolerance = kv2.getValue<float>("action-setopticalrotation.heading_tolerance");
-  float azimuthTolerance = 0.05f;
-  float azimuthCorrection = m_desiredAzimuth - m_currentAzimuth; 
+  m_stimulusTime.push_back(a_stimulusTime);
+  m_stimulus.push_back(stimulus);
+  m_stimulusRate.push_back(stimulusRate);
+}
 
-
-  if ( std::abs(azimuthCorrection) > azimuthTolerance ) {
-    float steeringAmplitude = gainAzimuth * azimuthCorrection;
-    std::cout << "Stearing Amplitude: " << steeringAmplitude << std::endl;
-    m_logRotation << steeringAmplitude << std::endl;
-    odcore::data::TimeStamp t0;
-    opendlv::action::Correction correction(t0, "steering", false, steeringAmplitude);
-    odcore::data::Container container(correction);
-    getConference().send(container);
+void SetOpticalRotation::Correct()
+{
+  float priority = 0.2f;
+  
+  if (IsPatient()) {
+    return;
   }
-  */
+
+  float stimulus = m_stimulus.back();
+  float stimulusRate = m_stimulusRate.back();
+
+  if (std::abs(stimulus) > m_stimulusThreshold) {
+
+    bool isStimulusRateZero = (std::abs(stimulusRate) < m_stimulusRateThreshold);
+    bool isStimulusRateHelping = (static_cast<int>(std::copysign(1.0f, stimulus)) != static_cast<int>(std::copysign(1.0f, stimulusRate)));
+    if (isStimulusRateZero || (!isStimulusRateZero && !isStimulusRateHelping)) {
+
+      float amplitude = m_correctionGain * stimulus * stimulus;
+      odcore::data::TimeStamp t0;
+      opendlv::action::Correction correction(t0, "steering", false, amplitude, priority);
+      odcore::data::Container container(correction);
+      getConference().send(container);
+
+      m_correctionTime = t0;
+      m_correction = amplitude;
+    }
+  }
+}
+
+bool SetOpticalRotation::IsPatient() const
+{
+  odcore::data::TimeStamp now;
+
+  float timeSinceCorrection = static_cast<float>(now.toMicroseconds() 
+      - m_correctionTime.toMicroseconds()) / 1000000.0f;
+  
+  return (timeSinceCorrection < m_patienceDuration);
 }
 
 void SetOpticalRotation::setUp()

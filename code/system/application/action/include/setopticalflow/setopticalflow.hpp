@@ -43,13 +43,24 @@ class SetOpticalFlow
   virtual void nextContainer(odcore::data::Container &);
 
  private:
+  void AddStimulus(odcore::data::TimeStamp const &, opendlv::perception::StimulusOpticalFlow const &);
+  void Correct();
+  bool IsPatient() const;
   void setUp();
   void tearDown();
 
-  std::vector<std::unique_ptr<opendlv::perception::StimulusOpticalFlow>> m_stimulii;
-  std::vector<odcore::data::TimeStamp> m_correctionTimes;
-  odcore::data::TimeStamp m_opticFlowIdentified;
-  float m_opticFlow;
+  std::vector<odcore::data::TimeStamp> m_stimulusTime;
+  std::vector<float> m_stimulus;
+  std::vector<float> m_stimulusRate;
+  odcore::data::TimeStamp m_correctionTime;
+  float m_correction;
+  float m_correctionGain;
+  float m_maxStimulusAge;
+  float m_patienceDuration;
+  float m_stimulusJerk;
+  float m_stimulusJerkThreshold;
+  float m_stimulusRateThreshold;
+  float m_stimulusThreshold;
 };
 
 } // setopticalflow

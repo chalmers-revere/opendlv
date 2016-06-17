@@ -42,10 +42,18 @@ namespace setopticalflow {
 SetOpticalFlow::SetOpticalFlow(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(
       a_argc, a_argv, "action-setopticalflow"),
-    m_stimulii(),
-    m_correctionTimes(),
-    m_opticFlowIdentified(0, 0),
-    m_opticFlow(0.0f)
+    m_stimulusTime(),
+    m_stimulus(),
+    m_stimulusRate(),
+    m_correctionTime(0, 0),
+    m_correction(),
+    m_correctionGain(0.4f),
+    m_maxStimulusAge(0.5f),
+    m_patienceDuration(2.0f),
+    m_stimulusJerk(),
+    m_stimulusJerkThreshold(0.5f),
+    m_stimulusRateThreshold(0.5f),
+    m_stimulusThreshold(1.0f)
 {
 }
 
@@ -55,129 +63,108 @@ SetOpticalFlow::~SetOpticalFlow()
 
 void SetOpticalFlow::nextContainer(odcore::data::Container &a_container)
 {
-  // TODO: Action should never see proxy, should go through sensation
-  if (a_container.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
-    auto propulsion = a_container.getData<opendlv::proxy::reverefh16::Propulsion>();
-    
-    float currentSpeedKmh = 
-        static_cast<float>(propulsion.getPropulsionShaftVehicleSpeed());
+  if (a_container.getDataType() == opendlv::perception::StimulusOpticalFlow::ID()) {
 
-    m_opticFlow = currentSpeedKmh / 3.6f;
-    m_opticFlowIdentified = odcore::data::TimeStamp();
-  } else if (a_container.getDataType() == opendlv::perception::StimulusOpticalFlow::ID()) {
+    // TODO: Should receive timestamp from sensors.
+    auto stimulusTime = a_container.getSentTimeStamp();
+    auto stimulusOpticalFlow = a_container.getData<opendlv::perception::StimulusOpticalFlow>();
 
-//    auto desiredOpticalFlow = 
-//        a_container.getData<opendlv::perception::StimulusOpticalFlow>();
-
-   // float flow = desiredOpticalFlow.getDesiredOpticalFlow();
-
+    AddStimulus(stimulusTime, stimulusOpticalFlow);
+    Correct();
   }
 }
 
-/*
+void SetOpticalFlow::AddStimulus(odcore::data::TimeStamp const &a_stimulusTime, opendlv::perception::StimulusOpticalFlow const &a_stimulusOpticalFlow)
+{
+  odcore::data::TimeStamp now;
 
-    // TODO hardcoded parameter...
-    float acceptableSpeedDeviation = 2.0f / 3.6f; // 2 km/h
-    float speedCorrectionFactor = 5.0f;
- //   float speedDiffEstimateLimit = 0.5f;
-   // float estimateAmplitudeSpeedFactor = 25.0f;
-    float accelerationPredictionTime = 0.5f;
+  std::vector<odcore::data::TimeStamp> stimulusTimeToSave;
+  std::vector<float> stimulusToSave;
+  std::vector<float> stimulusRateToSave;
+  for (uint8_t i = 0; i < m_stimulusTime.size(); i++) {
+    auto t0 = m_stimulusTime[i];
+    auto stimulus = m_stimulus[i];
+    auto stimulusRate = m_stimulusRate[i];
 
+    float t1 = static_cast<float>(now.toMicroseconds() 
+        - t0.toMicroseconds()) / 1000000.0f;
 
-
-    float deltaTime = 1.0f/static_cast<float>(getFrequency());
-    uint32_t nrAccAvg = 50; 
-    m_velocityMemory.push_back(m_currentSpeed);
-    if (m_velocityMemory.size() > nrAccAvg+1) {
-      m_velocityMemory.erase(m_velocityMemory.begin());
-
-      float sumAcc = 0;
-      for (uint32_t i=0; i<m_velocityMemory.size()-1; i++) {
-        sumAcc += (m_velocityMemory.at(i+1) - m_velocityMemory.at(i))/deltaTime;
-      }
-      m_currentEstimatedAcceleration = sumAcc/nrAccAvg;
-      std::cout << "Current estimated acceleration: " 
-          << m_currentEstimatedAcceleration << std::endl;
+    if (t1 < m_maxStimulusAge) {
+      stimulusTimeToSave.push_back(t0);
+      stimulusToSave.push_back(stimulus);
+      stimulusRateToSave.push_back(stimulusRate);
     }
-    float predictedVelocity = m_currentSpeed + 
-        m_currentEstimatedAcceleration*accelerationPredictionTime;
+  }
+  
+  m_stimulusTime = stimulusTimeToSave;
+  m_stimulus = stimulusToSave;
+  m_stimulusRate = stimulusRateToSave;
 
-    std::cout << "Current speed: " << m_currentSpeed << std::endl;
-    std::cout << "Desired speed: " << m_desiredSpeed << std::endl;
-    std::cout << "Predicted speed " << accelerationPredictionTime 
-        << " seconds ahead: " << predictedVelocity << std::endl;
-    
+  float desiredOpticalFlow = a_stimulusOpticalFlow.getDesiredOpticalFlow();
+  float opticalFlow = a_stimulusOpticalFlow.getOpticalFlow();
+  float stimulus = desiredOpticalFlow - opticalFlow;
 
-    float speedDiff = 0;
-    if (m_currentSpeed < (m_desiredSpeed - acceptableSpeedDeviation)) {
-        
-      speedDiff = m_desiredSpeed - predictedVelocity;
+  float stimulusRate = 0.0f;
+  if (m_stimulus.size() > 0) {
+    odcore::data::TimeStamp firstStimulusTime = m_stimulusTime[0];
+    float firstStimulus = m_stimulus[0];
+    float firstStimulusRate = m_stimulusRate[0];
 
-      // TODO magical number
-      m_speedCorrection = speedDiff / speedCorrectionFactor;
+    float deltaTime = static_cast<float>(a_stimulusTime.toMicroseconds() 
+        - firstStimulusTime.toMicroseconds()) / 1000000.0f;
 
-    } else if (m_currentSpeed > (m_desiredSpeed + acceptableSpeedDeviation)) {
-      
-      speedDiff = m_desiredSpeed - predictedVelocity;
+    stimulusRate = (stimulus - firstStimulus) / deltaTime;
+    m_stimulusJerk = (stimulusRate - firstStimulusRate) / deltaTime;
+  } else {
+    m_stimulusJerk = 0.0f;
+  }
 
-      // TODO magical number
-      m_speedCorrection = speedDiff / speedCorrectionFactor;
-    
-    } else {
-      m_speedCorrection = 0.0f;
-    }
+  m_stimulusTime.push_back(a_stimulusTime);
+  m_stimulus.push_back(stimulus);
+  m_stimulusRate.push_back(stimulusRate);
+}
 
+void SetOpticalFlow::Correct()
+{
+  float priority = 0.2f;
+  
+  if (IsPatient()) {
+    return;
+  }
 
-    std::cout << speedDiff << std::endl;
+  float stimulus = m_stimulus.back();
+  float stimulusRate = m_stimulusRate.back();
 
+  if (std::abs(stimulus) > m_stimulusThreshold) {
 
+    bool isStimulusRateZero = (std::abs(stimulusRate) < m_stimulusRateThreshold);
+    bool isStimulusRateHelping = (static_cast<int>(std::copysign(1.0f, stimulus)) != static_cast<int>(std::copysign(1.0f, stimulusRate)));
+    if (isStimulusRateZero || (!isStimulusRateZero && !isStimulusRateHelping)) {
 
-    if (predictedVelocity < 0.4f * m_desiredSpeed) {
-      std::cout << "Mode 1" << std::endl;
+      float amplitude = m_correctionGain * stimulus * stimulus;
       odcore::data::TimeStamp t0;
-      float estimateAmplitude = 60.0f;
-      opendlv::action::Estimate estimate(t0, "accelerate", estimateAmplitude);
-      odcore::data::Container container(estimate);
+      opendlv::action::Correction correction(t0, "accelerate", false, amplitude, priority);
+      odcore::data::Container container(correction);
       getConference().send(container);
-      std::cout << "Speed Estimate: " << estimateAmplitude << std::endl;
-    }
-    else if (predictedVelocity > 0.4f * m_desiredSpeed && predictedVelocity < 0.8f * m_desiredSpeed) {
-      std::cout << "Mode 2" << std::endl;
-      odcore::data::TimeStamp t0;
-      float estimateAmplitude = 30.0f;
-      opendlv::action::Estimate estimate(t0, "accelerate", estimateAmplitude);
-      odcore::data::Container container(estimate);
-      getConference().send(container);
-      std::cout << "Speed Estimate: " << estimateAmplitude << std::endl;
-    }
-    else if (predictedVelocity > 0.8f * m_desiredSpeed && predictedVelocity < 0.9f * m_desiredSpeed) {
-      std::cout << "Mode 3" << std::endl;
-      odcore::data::TimeStamp t0;
-      float estimateAmplitude = 20.0f;
-      opendlv::action::Estimate estimate(t0, "accelerate", estimateAmplitude);
-      odcore::data::Container container(estimate);
-      getConference().send(container);
-      std::cout << "Speed Estimate: " << estimateAmplitude << std::endl;
-    }
-    else {
-      
-      std::cout << "CORRECTION MODE CORRECTION MODE CORRECTION MODE!!!!!" << std::endl;
 
-
-      odcore::data::TimeStamp t0;
-      opendlv::action::Correction correction1(
-          t0, "accelerate", false, m_speedCorrection);
-      odcore::data::Container container(correction1);
-      getConference().send(container);
-      std::cout << "Speed Correction: " << m_speedCorrection << std::endl;
+      m_correctionTime = t0;
+      m_correction = amplitude;
     }
-*/
+  }
+}
 
+bool SetOpticalFlow::IsPatient() const
+{
+  odcore::data::TimeStamp now;
+
+  float timeSinceCorrection = static_cast<float>(now.toMicroseconds() 
+      - m_correctionTime.toMicroseconds()) / 1000000.0f;
+  
+  return (timeSinceCorrection < m_patienceDuration);
+}
 
 void SetOpticalFlow::setUp()
 {
-//  odcore::base::KeyValueConfiguration kv1 = getKeyValueConfiguration();
-//  m_maxSpeed = kv1.getValue<float>("action-setopticalflow.max_speed");
 }
 
 void SetOpticalFlow::tearDown()

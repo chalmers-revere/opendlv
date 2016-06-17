@@ -25,7 +25,7 @@
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
 
-
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 #include "keepobjectsize/keepobjectsize.hpp"
 
@@ -42,8 +42,18 @@ namespace keepobjectsize {
 KeepObjectSize::KeepObjectSize(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(
       a_argc, a_argv, "action-keepobjectsize"),
-    m_stimulii(),
-    m_correctionTimes()
+    m_stimulusTime(),
+    m_stimulus(),
+    m_stimulusRate(),
+    m_correctionTime(0, 0),
+    m_correction(),
+    m_correctionGain(0.4f),
+    m_maxStimulusAge(0.5f),
+    m_patienceDuration(0.4f),
+    m_stimulusJerk(),
+    m_stimulusJerkThreshold(0.02f),
+    m_stimulusRateThreshold(0.02f),
+    m_stimulusThreshold(0.03f)
 {
 }
 
@@ -59,153 +69,104 @@ KeepObjectSize::~KeepObjectSize()
 void KeepObjectSize::nextContainer(odcore::data::Container &a_container)
 {
   if(a_container.getDataType() == opendlv::perception::StimulusAngularSizeAlignment::ID()) {
-    auto desiredAngularSizeAlignment = a_container.getData<opendlv::perception::StimulusAngularSizeAlignment>();
 
+    // TODO: Should receive timestamp from sensors.
+    auto stimulusTime = a_container.getSentTimeStamp();
+    auto stimulusAngularSizeAlignment = a_container.getData<opendlv::perception::StimulusAngularSizeAlignment>();
 
+    AddStimulus(stimulusTime, stimulusAngularSizeAlignment);
+    Correct();
   }
-
-
-/*      opendlv::model::Direction direction = unpackedObject.getDirection();
-      float azimuth = direction.getAzimuth();
-      float speedCorrection = 0.0f;
-      float gainCorrection = 5.0f;
-      float tolerance = 0.1f;
-
-      if (m_targetObject >= 0) { //Target objectID is known
-        if(unpackedObject.getObjectId() == m_targetObject)
-        {
-          m_object.reset(new opendlv::perception::Object(unpackedObject));
-
-          float distance = m_object->getDistance(); //Using distance instead of angularsize for GCDC
-
-          if (distance < m_targetSize*(1.0f-tolerance)) {
-            std::cout << "Too close: " << m_angularSize << std::endl;
-            float distanceRatio = distance / m_targetSize ;
-            speedCorrection = 1.0f - distanceRatio;
-          } else if (distance > m_targetSize*(1.0f+tolerance) && !m_crossingScenario) {
-            std::cout << "Too far" << std::endl;
-            float distanceRatio = m_targetSize / distance;
-            speedCorrection = distanceRatio - 1.0f; 
-          } else {
-            std::cout << "zero correction" << std::endl;
-            speedCorrection = 0.0f;
-          }
-
-          speedCorrection *= gainCorrection;
-        
-          std::cout << "speedCorrection: " << speedCorrection << std::endl << std::endl;
-          odcore::data::TimeStamp t0;
-          opendlv::action::Correction correction1(t0, "accelerate", false, speedCorrection);
-          odcore::data::Container container(correction1);
-          getConference().send(container);
-        }
-
-      }
-      else if (std::fabs(azimuth) < 0.22f) { //If target objectID isn't known
-        std::cout << "Correct Angle" << std::endl;
-        if (m_object == nullptr) {
-          m_object.reset(new opendlv::perception::Object(unpackedObject));
-        } else {
-          if (unpackedObject.getDistance() < m_object->getDistance())
-            m_object.reset(new opendlv::perception::Object(unpackedObject));
-            std::cout << "Closest object" << std::endl;
-        }    
-
-        float distance = m_object->getDistance();       //Using distance instead of angularsize for GCDC
-
-        if (distance < m_targetSize*(1.0f-tolerance)) {
-          std::cout << "Too close: " << m_angularSize << std::endl;
-          float distanceRatio = distance / m_targetSize ;
-          speedCorrection = 1.0f - distanceRatio;
-        } else if (distance > m_targetSize*(1.0f+tolerance) && !m_crossingScenario) {
-          std::cout << "Too far" << std::endl;
-          float distanceRatio = m_targetSize / distance;
-          speedCorrection = distanceRatio - 1.0f; 
-        } else {
-          std::cout << "zero correction" << std::endl;
-          speedCorrection = 0.0f;
-        }
-
-*/
-
-        /*
-        m_angularSize = m_object->getAngularSize();
-
-
-        if (std::fabs(m_angularSize) < m_targetSize*0.9f) {
-          std::cout << "Small enough: " << m_angularSize << std::endl;
-          float angularSizeRatio = m_angularSize / m_targetSize ;
-          speedCorrection = 1.0f - angularSizeRatio;
-        } else if (std::fabs(m_angularSize) > m_targetSize*1.1f) {
-          std::cout << "Object too big" << std::endl;
-          float angularSizeRatio = m_targetSize / m_angularSize;
-          speedCorrection = angularSizeRatio - 1.0f; 
-        } else {
-          std::cout << "zero correction" << std::endl;
-          speedCorrection = 0.0f;
-        }
-        */
-
-/*
-
-        speedCorrection *= gainCorrection;
-        
-        std::cout << "speedCorrection: " << speedCorrection << std::endl << std::endl;
-        odcore::data::TimeStamp t0;
-        opendlv::action::Correction correction1(t0, "accelerate", false, speedCorrection);
-        odcore::data::Container container(correction1);
-        getConference().send(container);
-
-       
-      }
-    }
-  }
-*/
 }
 
+void KeepObjectSize::AddStimulus(odcore::data::TimeStamp const &a_stimulusTime, opendlv::perception::StimulusAngularSizeAlignment const &a_stimulusAngularSizeAlignment)
+{
+  odcore::data::TimeStamp now;
 
+  std::vector<odcore::data::TimeStamp> stimulusTimeToSave;
+  std::vector<float> stimulusToSave;
+  std::vector<float> stimulusRateToSave;
+  for (uint8_t i = 0; i < m_stimulusTime.size(); i++) {
+    auto t0 = m_stimulusTime[i];
+    auto stimulus = m_stimulus[i];
+    auto stimulusRate = m_stimulusRate[i];
 
+    float t1 = static_cast<float>(now.toMicroseconds() 
+        - t0.toMicroseconds()) / 1000000.0f;
 
-
-
-
-
-
-
-
-
-
-
-
-  /*
-  if(c.getDataType() == opendlv::perception::LeadVehicleSize::ID()){
-    opendlv::perception::LeadVehicleSize leadVehicleSize = 
-        c.getData<opendlv::perception::LeadVehicleSize>();
-    float size = leadVehicleSize.getSize();
-  
-    // TODO: Quick way.
-    float desiredSize = 100.0f;
-    float error = (desiredSize - size) / desiredSize;
- 
-    if (error < -0.25f) {
-      // We are to to close, try to decrease acceleration.
-      float amplitude = 0.5f * error;
-      odcore::data::TimeStamp t0;
-      opendlv::action::Correction correction(t0, "accelerate", false, 
-          amplitude);
-      odcore::data::Container container(correction);
-      getConference().send(container);
-    } else if (error < -0.75f) {
-      // We are way to close, start braking!
-      float amplitude = 1.5f * error;
-      odcore::data::TimeStamp t0;
-      opendlv::action::Correction correction(t0, "brake", false, amplitude);
-      odcore::data::Container container(correction);
-      getConference().send(container);
+    if (t1 < m_maxStimulusAge) {
+      stimulusTimeToSave.push_back(t0);
+      stimulusToSave.push_back(stimulus);
+      stimulusRateToSave.push_back(stimulusRate);
     }
   }
-  */
+  
+  m_stimulusTime = stimulusTimeToSave;
+  m_stimulus = stimulusToSave;
+  m_stimulusRate = stimulusRateToSave;
 
+  float desiredAngularSize = a_stimulusAngularSizeAlignment.getDesiredAngularSize();
+  float angularSize = a_stimulusAngularSizeAlignment.getAngularSize();
+  float stimulus = desiredAngularSize - angularSize;
+
+  float stimulusRate = 0.0f;
+  if (m_stimulus.size() > 0) {
+    odcore::data::TimeStamp firstStimulusTime = m_stimulusTime[0];
+    float firstStimulus = m_stimulus[0];
+    float firstStimulusRate = m_stimulusRate[0];
+
+    float deltaTime = static_cast<float>(a_stimulusTime.toMicroseconds() 
+        - firstStimulusTime.toMicroseconds()) / 1000000.0f;
+
+    stimulusRate = (stimulus - firstStimulus) / deltaTime;
+    m_stimulusJerk = (stimulusRate - firstStimulusRate) / deltaTime;
+  } else {
+    m_stimulusJerk = 0.0f;
+  }
+
+  m_stimulusTime.push_back(a_stimulusTime);
+  m_stimulus.push_back(stimulus);
+  m_stimulusRate.push_back(stimulusRate);
+}
+
+void KeepObjectSize::Correct()
+{
+  float priority = 0.8f;
+ 
+  if (IsPatient()) {
+    return;
+  }
+
+  float stimulus = m_stimulus.back();
+  float stimulusRate = m_stimulusRate.back();
+
+  if (std::abs(stimulus) > m_stimulusThreshold) {
+
+    bool isStimulusRateZero = (std::abs(stimulusRate) < m_stimulusRateThreshold);
+    bool isStimulusRateHelping = (static_cast<int>(std::copysign(1.0f, stimulus)) != static_cast<int>(std::copysign(1.0f, stimulusRate)));
+    if (isStimulusRateZero || (!isStimulusRateZero && !isStimulusRateHelping)) {
+
+      float amplitude = m_correctionGain * stimulus * stimulus;
+      odcore::data::TimeStamp t0;
+      opendlv::action::Correction correction(t0, "accelerate", false, amplitude, priority);
+      odcore::data::Container container(correction);
+      getConference().send(container);
+
+      m_correctionTime = t0;
+      m_correction = amplitude;
+    }
+  }
+}
+
+bool KeepObjectSize::IsPatient() const
+{
+  odcore::data::TimeStamp now;
+
+  float timeSinceCorrection = static_cast<float>(now.toMicroseconds() 
+      - m_correctionTime.toMicroseconds()) / 1000000.0f;
+  
+  return (timeSinceCorrection < m_patienceDuration);
+}
 
 void KeepObjectSize::setUp()
 {

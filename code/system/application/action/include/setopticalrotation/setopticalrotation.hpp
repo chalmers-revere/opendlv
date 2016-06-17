@@ -25,6 +25,7 @@
 
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
+#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
 namespace opendlv {
 namespace action {
@@ -42,10 +43,25 @@ class SetOpticalRotation
   virtual ~SetOpticalRotation();
   virtual void nextContainer(odcore::data::Container &);
 
-
  private:
+  void AddStimulus(odcore::data::TimeStamp const &, opendlv::perception::StimulusDirectionOfMovement const &);
+  void Correct();
+  bool IsPatient() const;
   void setUp();
   void tearDown();
+  
+  std::vector<odcore::data::TimeStamp> m_stimulusTime;
+  std::vector<float> m_stimulus;
+  std::vector<float> m_stimulusRate;
+  odcore::data::TimeStamp m_correctionTime;
+  float m_correction;
+  float m_correctionGain;
+  float m_maxStimulusAge;
+  float m_patienceDuration;
+  float m_stimulusJerk;
+  float m_stimulusJerkThreshold;
+  float m_stimulusRateThreshold;
+  float m_stimulusThreshold;
 };
 
 } // setopticalrotation
