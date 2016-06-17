@@ -163,7 +163,7 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
 
 
   // odcore::data::TimeStamp start;
-  m_convNeuralNet->Update(&myImage,&m_debugMode);
+  m_convNeuralNet->Update(&myImage, m_debugMode);
   // odcore::data::TimeStamp end;
   // double duration = end.toMicroseconds() - start.toMicroseconds();
   // std::cout << "The update took " << duration << " microseconds (" << duration/1000000 << " seconds)." << std::endl;

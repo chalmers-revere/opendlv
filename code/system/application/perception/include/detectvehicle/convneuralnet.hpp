@@ -39,7 +39,7 @@ public:
 public:
   void SetUp();
   void TearDown();
-  void Update(const cv::Mat* a_imageFrame, const bool *);
+  void Update(const cv::Mat* a_imageFrame, const bool );
   bool IsInitialized();
 
   void GetDetectedVehicles(std::vector<cv::Rect>* container);

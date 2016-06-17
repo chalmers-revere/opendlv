@@ -104,7 +104,7 @@ void ConvNeuralNet::TearDown()
 }
 
 
-void ConvNeuralNet::Update(const cv::Mat* a_imageFrame, const bool *a_debugMode)
+void ConvNeuralNet::Update(const cv::Mat* a_imageFrame, const bool a_debugMode)
 {
   std::vector<tiny_cnn::vec_t> cnnImageData;
 
@@ -263,11 +263,11 @@ void ConvNeuralNet::Update(const cv::Mat* a_imageFrame, const bool *a_debugMode)
           cv::Scalar( 255, 0, 0), 
           2, 8, 0);
     }
-    if(*a_debugMode){
+    if(a_debugMode){
       cv::imshow("calcHist Demo", histImage);
     }
   }
-  if(*a_debugMode) {
+  if(a_debugMode) {
     cv::imshow("Final spatial map", spatialMap);
     cv::imshow("Non-vehicle spatial map", nonVehicleMap);
     cv::imshow("DIFF spatial map", mapDifference);
