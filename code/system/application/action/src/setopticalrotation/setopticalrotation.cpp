@@ -70,6 +70,7 @@ void SetOpticalRotation::nextContainer(odcore::data::Container &a_container)
   if (a_container.getDataType() == opendlv::perception::StimulusDirectionOfMovement::ID()) {
 
     // TODO: Should receive timestamp from sensors.
+    std::cout << "Got stimulus." << std::endl;
     auto stimulusDirectionOfMovement = a_container.getData<opendlv::perception::StimulusDirectionOfMovement>();
     auto stimulusTime = stimulusDirectionOfMovement.getIdentified();
     AddStimulus(stimulusTime, stimulusDirectionOfMovement);
@@ -149,7 +150,7 @@ void SetOpticalRotation::Correct()
       opendlv::action::Correction correction(t0, "steering", false, amplitude, priority);
       odcore::data::Container container(correction);
       getConference().send(container);
-
+      std::cout << "Sent steering amplitude: " << amplitude << std::endl;
       m_correctionTime = t0;
       m_correction = amplitude;
     }

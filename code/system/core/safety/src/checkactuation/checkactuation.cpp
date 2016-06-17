@@ -96,6 +96,7 @@ void CheckActuation::nextContainer(odcore::data::Container &a_container)
 
     actuationRequest.setAcceleration(acceleration);
     actuationRequest.setSteering(steering);
+    std::cout << "Actuation granted." << std::endl;
 
     actuationRequest.setIsValid(true);
     

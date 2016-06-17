@@ -89,6 +89,7 @@ void Act::nextContainer(odcore::data::Container &a_container)
       m_startTimesBrake.push_back(startTime);
       m_amplitudesBrake.push_back(amplitude);
     } else if (type == "steering") {
+      std::cout << "Got steering" << std::endl;
       if (isInhibitory) {
         m_startTimesSteering.clear();
         m_amplitudesSteering.clear();
@@ -182,11 +183,13 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
 
 
     if (m_brakeValue > 0.0f) {
+      std::cout << "Sent actuation request" << std::endl;
       opendlv::proxy::ActuationRequest actuationRequest(m_brakeValue, 
           m_steeringValue, false);
       odcore::data::Container actuationContainer(actuationRequest,opendlv::proxy::ActuationRequest::ID()+300);
       getConference().send(actuationContainer);
     } else {
+      std::cout << "Sent actuation request" << std::endl;
       opendlv::proxy::ActuationRequest actuationRequest(m_accelerationValue, 
           m_steeringValue, false);
       odcore::data::Container actuationContainer(actuationRequest,opendlv::proxy::ActuationRequest::ID()+300);
