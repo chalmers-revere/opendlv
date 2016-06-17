@@ -77,7 +77,7 @@ Ivrule::~Ivrule()
       odcore::data::Container containerSdom(sdom);
       getConference().send(containerSdom);
 
-      std::cout << "Sent sdom." << std::endl;
+      // std::cout << "Sent sdom." << std::endl;
 
 
       opendlv::perception::StimulusAngularSizeAlignment sasa(now, m_mio.getDirection(),m_mio.getAngularSize(),m_desiredAngularSize);
@@ -149,7 +149,12 @@ void Ivrule::FindMio(std::vector<opendlv::perception::Object> &a_listOfObjects)
       score = 0;
     }
     scoreList.push_back(score);
-    std::cout << "Id: " << object.getObjectId() << " score: " << score << std::endl;
+    std::cout << "Id: " << object.getObjectId() << " score: " << score << " scources: ";
+    for(auto it:sources){
+      std::cout << it << " ";
+    }
+
+    std::cout << std::endl;
   }
   auto highestScore = std::max_element(scoreList.begin(),scoreList.end());
   if(*highestScore > 0){
