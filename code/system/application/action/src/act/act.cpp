@@ -184,12 +184,12 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
     if (m_brakeValue > 0.0f) {
       opendlv::proxy::ActuationRequest actuationRequest(m_brakeValue, 
           m_steeringValue, false);
-      odcore::data::Container actuationContainer(actuationRequest);
+      odcore::data::Container actuationContainer(actuationRequest,opendlv::proxy::ActuationRequest::ID()+300);
       getConference().send(actuationContainer);
     } else {
       opendlv::proxy::ActuationRequest actuationRequest(m_accelerationValue, 
           m_steeringValue, false);
-      odcore::data::Container actuationContainer(actuationRequest);
+      odcore::data::Container actuationContainer(actuationRequest,opendlv::proxy::ActuationRequest::ID()+300);
       getConference().send(actuationContainer);
     }
   }
