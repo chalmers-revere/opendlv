@@ -27,6 +27,8 @@ CAN_PORT=1
 PROC_PCAN=${DOCKER_VOLUME_PREFIX}/proc/pcan
 DEV_PCAN=${DOCKER_VOLUME_PREFIX}/dev/pcan${CAN_PORT}
 DEV_PCAN_SPEED=0x011c
+LIDAR_PORT=0
+DEV_LIDAR=${DOCKER_VOLUME_PREFIX}/dev/ttyS${LIDAR_PORT}
 
 # Reachability tests:
 HAS_MULTICAST_ROUTE=$(ip route | grep "$MULTICAST_ROUTE" 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
@@ -40,6 +42,7 @@ PCAN_NETDEV_DISABLED=$(cat $PROC_PCAN 2>/dev/null | grep -v "^*" | tr -s " " " "
 PCAN_NETDEV_DISABLED=$(test "$PCAN_NETDEV_DISABLED" == "-NA-" && echo "PASSED" || echo "FAILED")
 PCAN_CORRECT_SPEED=$(cat $PROC_PCAN 2>/dev/null | grep -v "^*" | tr -s " " " " | cut -f7 -d" "| sed "${CAN_PORT}q;d")
 PCAN_CORRECT_SPEED=$(test "$PCAN_CORRECT_SPEED" == "$DEV_PCAN_SPEED" && echo "PASSED" || echo "FAILED")
+HAS_DEV_LIDAR=$(test -e $DEV_LIDAR 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
 
 # System:
 KERNEL=$(cat /proc/version | cut -f3 -d" ")
@@ -57,6 +60,7 @@ echo "$(hostname).system.uptime=${UPTIME}min"
 echo "$(hostname).has.${DEV_PCAN}=$HAS_DEV_PCAN"
 echo "$(hostname).has.dev.pcan.no_netdev=$PCAN_NETDEV_DISABLED"
 echo "$(hostname).has.dev.pcan.correct_speed=$PCAN_CORRECT_SPEED"
+echo "$(hostname).has.${DEV_LIDAR}=$HAS_DEV_LIDAR"
 echo "$(hostname).has.multicast_route=$HAS_MULTICAST_ROUTE"
 echo "$(hostname).ping.localhost=$PING_LOCALHOST"
 echo "$(hostname).ping.scott1=$PING_SCOTT1"

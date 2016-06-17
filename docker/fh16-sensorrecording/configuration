@@ -56,6 +56,18 @@ proxy-gps.trimble.ip = 10.42.42.112
 proxy-gps.trimble.port = 9999
 proxy-gps.record = 1  # Set to 1 to dump GPS data in .rec and .csv format.
 
+# proxy-lidar
+proxy-lidar.type = sick
+proxy-lidar.port = /dev/ttyS0
+proxy-lidar.baudrate = 9600
+proxy-lidar.mount.x = 1.25
+proxy-lidar.mount.y = 0.0
+proxy-lidar.mount.z = 1.0
+proxy-lidar.mount.roll = 0.0
+proxy-lidar.mount.pitch = 0.0
+proxy-lidar.mount.yaw = 0.0
+proxy-lidar.record = 1  # Set to 1 to dump Lidar data in .rec format.
+
 
 ###############################################################################
 ###############################################################################

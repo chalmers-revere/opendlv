@@ -10,6 +10,7 @@ opendlv-tcpdump:
     working_dir: "/dumps"
     command: /usr/sbin/tcpdump -G 900 -w 'CID-62_%Y-%m-%d_%H:%M:%S.pcap' -W 96
 
+
 # microservice for diagnostics-health
 # The host's /dev and /proc directories are mapped into the Docker container
 # to check for expected properties like device nodes. The privileged flag
@@ -27,6 +28,7 @@ diagnostics-health:
     - LD_LIBRARY_PATH=/opt/opendlv/lib
     command: "/opt/opendlv/bin/opendlv-system-core-diagnostics-health --cid=62 --freq=1"
 
+
 # microservice for proxy-can
 proxy-can:
     build: .
@@ -40,6 +42,22 @@ proxy-can:
     environment:
     - LD_LIBRARY_PATH=/opt/opendlv/lib
     command: "/opt/opendlv/bin/opendlv-system-core-proxy-can --cid=62 --freq=100"
+
+
+# microservice for proxy-lidar
+proxy-lidar:
+    build: .
+    net: "host"
+    volumes:
+    - /dumps:/dumps
+    working_dir: "/dumps"
+    restart: always
+    devices:
+    - "/dev/ttyS0:/dev/ttyS0"
+    environment:
+    - LD_LIBRARY_PATH=/opt/opendlv/lib
+    command: "/opt/opendlv/bin/opendlv-system-core-proxy-lidar --cid=62 --freq=1"
+
 
 # microservice for proxy-gps
 proxy-gps:

@@ -26,6 +26,12 @@
 #include <opendavinci/odcore/io/conference/ContainerConference.h>
 #include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
+namespace odtools {
+namespace recorder {
+class Recorder;
+}
+}
+
 namespace opendlv {
 namespace proxy {
 namespace lidar {
@@ -42,12 +48,16 @@ class LidarStringDecoder : public odcore::io::StringListener {
 
   virtual void nextString(const std::string &);
 
+  void setRecorder(std::shared_ptr<odtools::recorder::Recorder>);
+
  private:
   void ConvertToDistances();
   bool tryDecode();
 
  private:
   odcore::io::conference::ContainerConference &m_conference;
+  std::shared_ptr<odtools::recorder::Recorder> m_recorderLidar;
+
   bool m_header;
   bool m_startConfirmed;
 

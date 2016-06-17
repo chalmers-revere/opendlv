@@ -160,6 +160,7 @@ proxy-lidar.mount.z = 1.0
 proxy-lidar.mount.roll = 0.0
 proxy-lidar.mount.pitch = 0.0
 proxy-lidar.mount.yaw = 0.0
+proxy-lidar.record = 1  # Set to 1 to dump Lidar data in .rec format.
 
 proxy-sonararray:0.type = max
 proxy-sonararray:0.mount.x = 3.0,3.0,2.0,2.0
