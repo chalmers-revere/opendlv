@@ -11,7 +11,7 @@ global.buffer.memorySegmentSize = 4000000 # Size of a memory segment in bytes.
 global.buffer.numberOfMemorySegments = 50 # Number of memory segments.
 
 # List of modules expected to participate in a session.
-global.session.expectedModules = diagnostics,proxy-can
+global.session.expectedModules = diagnostics-health,proxy-can
 
 ###############################################################################
 ###############################################################################
