@@ -8,7 +8,7 @@ opendlv-tcpdump:
     volumes:
     - /dumps:/dumps
     working_dir: "/dumps"
-    command: /usr/sbin/tcpdump -G 900 -w 'CID-75_%Y-%m-%d_%H:%M:%S.pcap' -W 96
+    command: /usr/sbin/tcpdump -G 900 -w 'CID-74_%Y-%m-%d_%H:%M:%S.pcap' -W 96
 
 # microservice for diagnostics-health
 # The host's /dev and /proc directories are mapped into the Docker container
@@ -25,7 +25,7 @@ diagnostics-health:
     - /proc:/from.host/proc
     environment:
     - LD_LIBRARY_PATH=/opt/opendlv/lib
-    command: "/opt/opendlv/bin/opendlv-system-core-diagnostics-health --cid=75 --freq=1"
+    command: "/opt/opendlv/bin/opendlv-system-core-diagnostics-health --cid=74 --freq=1"
 
 
 # microservice for knowledge-scene to compose and distribute objects
@@ -36,7 +36,7 @@ knowledge-scene:
     restart: always
     environment:
     - LD_LIBRARY_PATH=/opt/opendlv/lib
-    command: "/opt/opendlv/bin/opendlv-system-application-knowledge-scene --cid=75 --freq=10"
+    command: "/opt/opendlv/bin/opendlv-system-application-knowledge-scene --cid=74 --freq=10"
 
 
 # microservice for knowledge-ivrule
@@ -47,7 +47,7 @@ knowledge-ivrule:
     restart: always
     environment:
     - LD_LIBRARY_PATH=/opt/opendlv/lib
-    command: "/opt/opendlv/bin/opendlv-system-application-knowledge-ivrule --cid=75 --freq=10"
+    command: "/opt/opendlv/bin/opendlv-system-application-knowledge-ivrule --cid=74 --freq=10"
 
 
 # microservice for perception-detectvehicle:0 to create objects from camera input
@@ -59,7 +59,7 @@ perception-detectvehicle0:
     restart: always
     environment:
     - LD_LIBRARY_PATH=/opt/opendlv/lib
-    command: "/opt/opendlv/bin/opendlv-system-application-perception-detectvehicle --cid=75 --id=0"
+    command: "/opt/opendlv/bin/opendlv-system-application-perception-detectvehicle --cid=74 --id=0"
 
 
 # microservice for sensation-echolocation to create objects from lidar input
@@ -70,7 +70,7 @@ sensation-echolocation:
     restart: always
     environment:
     - LD_LIBRARY_PATH=/opt/opendlv/lib
-    command: "/opt/opendlv/bin/opendlv-system-application-sensation-echolocation --cid=75"
+    command: "/opt/opendlv/bin/opendlv-system-application-sensation-echolocation --cid=74"
 
 
 # microservice for proxy-camera
@@ -82,7 +82,7 @@ proxy-camera0:
     restart: always
     environment:
     - LD_LIBRARY_PATH=/opt/opendlv/lib
-    command: "/opt/opendlv/bin/opendlv-system-core-proxy-camera --cid=75 --id=0 --freq=1"
+    command: "/opt/opendlv/bin/opendlv-system-core-proxy-camera --cid=74 --id=0 --freq=1"
 
 
 # microservice for proxy-lidar
@@ -97,5 +97,5 @@ proxy-lidar:
     - "/dev/ttyS0:/dev/ttyS0"
     environment:
     - LD_LIBRARY_PATH=/opt/opendlv/lib
-    command: "/opt/opendlv/bin/opendlv-system-core-proxy-lidar --cid=75 --freq=1"
+    command: "/opt/opendlv/bin/opendlv-system-core-proxy-lidar --cid=74 --freq=1"
 
