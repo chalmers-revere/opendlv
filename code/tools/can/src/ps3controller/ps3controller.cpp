@@ -181,9 +181,10 @@ const automotive::GenericCANMessage &gcm)
 
             if(c.getDataType() == opendlv::proxy::reverefh16::Steering::ID())
             {
+                odcore::data::TimeStamp now;
                 opendlv::proxy::reverefh16::Steering steering=c.getData<opendlv::proxy::reverefh16::Steering>();
                 opendlv::model::Direction direction(steering.getSteeringwheelangle(), 0.0);
-                opendlv::perception::StimulusDirectionOfMovement stimulusDirectionOfMovement(direction,opendlv::model::Direction(0,0));
+                opendlv::perception::StimulusDirectionOfMovement stimulusDirectionOfMovement(now, direction, opendlv::model::Direction(0,0));
                 odcore::data::Container toBeSent(stimulusDirectionOfMovement);
                 getConference().send(toBeSent);
             }
