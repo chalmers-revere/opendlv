@@ -165,6 +165,8 @@ bool SetOpticalFlow::IsPatient() const
 
 void SetOpticalFlow::setUp()
 {
+//  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+//  m_maxSpeed = kv.getValue<float>("action-setopticalflow.max_speed");
 }
 
 void SetOpticalFlow::tearDown()

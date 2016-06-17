@@ -20,12 +20,14 @@
 #include <stdint.h>
 
 #include <string>
-#include <iomanip>      // std::setprecision
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <vector>
 
 #include <opendavinci/odcore/data/Container.h>
+#include <opendavinci/odcore/data/TimeStamp.h>
+#include <opendavinci/odtools/recorder/Recorder.h>
 
 #include "opendlvdata/GeneratedHeaders_opendlvdata.h"
 
@@ -38,11 +40,32 @@ namespace gps {
 
 GpsStringDecoder::GpsStringDecoder(odcore::io::conference::ContainerConference &conference) :
     m_conference(conference)
+    , m_recorderGpsReadings()
+    , m_CSVFile()
 {
 }
 
 GpsStringDecoder::~GpsStringDecoder()
 {
+}
+
+void GpsStringDecoder::setDataSinks(std::shared_ptr<odtools::recorder::Recorder> recorder, std::shared_ptr<std::fstream> CSVFile) {
+  m_recorderGpsReadings = recorder;
+  m_CSVFile = CSVFile;
+
+  if (m_CSVFile.get() != NULL) {
+    (*m_CSVFile) << "timestamp" << ","
+                 << "latitude" << ","
+                 << "longitude" << ","
+                 << "altitude" << ","
+                 << "northHeading" << ","
+                 << "speed" << ","
+                 << "latitudeDirection" << ","
+                 << "longitudeDirection" << ","
+                 << "satelliteCount" << ","
+                 << "hasHeading" << ","
+                 << "hasRtk" << endl;
+  }
 }
 
 void GpsStringDecoder::nextString(std::string const &s) {
@@ -186,10 +209,28 @@ void GpsStringDecoder::nextString(std::string const &s) {
         satelliteCount, hasHeading, hasRtk);
     odcore::data::Container c(nextGps);
     m_conference.send(c);
-    (void)nextGps;
+
+    // Dump data.
+    if ( (m_recorderGpsReadings.get() != NULL) &&
+         (m_CSVFile.get() != NULL) ) {
+      c.setReceivedTimeStamp(odcore::data::TimeStamp());
+      m_recorderGpsReadings->store(c);
+
+      (*m_CSVFile) << timestamp << ","
+                   << std::setprecision(19) << latitude << ","
+                   << std::setprecision(19) << longitude << ","
+                   << std::setprecision(19) << altitude << ","
+                   << std::setprecision(5) << northHeading << ","
+                   << std::setprecision(5) << speed << ","
+                   << std::setprecision(5) << latitudeDirection << ","
+                   << std::setprecision(5) << longitudeDirection << ","
+                   << satelliteCount << ","
+                   << hasHeading << ","
+                   << hasRtk << endl;
+    }
   }
 
-  // Send opendlv::proxy::Wgs84Gps
+  // TODO: Send opendlv::proxy::Wgs84Gps
 }
 
 } // gps

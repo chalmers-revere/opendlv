@@ -45,8 +45,7 @@ namespace can {
 namespace ps3controller {
 
 PS3Controller::PS3Controller(int32_t const &a_argc, char **a_argv)
-    : odcore::base::module::TimeTriggeredConferenceClientModule(
-      a_argc, a_argv, "tools-can-ps3controller")
+    : odcore::base::module::TimeTriggeredConferenceClientModule(a_argc, a_argv, "tools-can-ps3controller")
     , automotive::odcantools::GenericCANMessageListener()
     , m_fifo()
     , m_device()
@@ -72,8 +71,7 @@ void PS3Controller::setUp()
   using namespace automotive::odcantools;
 
   string const PS3CONTROLLER_DEVICE_NODE =
-  getKeyValueConfiguration().getValue<string>(
-  "tools-can-ps3controller.ps3controllerdevicenode");
+  getKeyValueConfiguration().getValue<string>("tools-can-ps3controller.ps3controllerdevicenode");
 
   string const DEVICE_NODE =
   getKeyValueConfiguration().getValue<string>("tools-can-ps3controller.devicenode");
@@ -166,21 +164,31 @@ void PS3Controller::tearDown()
   }
 }
 
-void PS3Controller::nextGenericCANMessage(
-const automotive::GenericCANMessage &gcm)
+void PS3Controller::nextGenericCANMessage(const automotive::GenericCANMessage &gcm)
 {
-  // Map CAN message to high-level data structure.
-  vector<odcore::data::Container> result = m_revereFh16CanMessageMapping.mapNext(gcm);
+    // Map CAN message to high-level data structure.
+    vector<odcore::data::Container> result = m_revereFh16CanMessageMapping.mapNext(gcm);
 
-  if (result.size() > 0) {
-    auto it = result.begin();
-    while (it != result.end()) {
-      odcore::data::Container c = (*it);
-      // Send container to conference.
-      getConference().send(c);
-      it++;
+    if (result.size() > 0) {
+        auto it = result.begin();
+        while (it != result.end()) {
+            odcore::data::Container c = (*it);
+            // Send container to conference.
+            getConference().send(c);
+
+            if(c.getDataType() == opendlv::proxy::reverefh16::Steering::ID())
+            {
+                odcore::data::TimeStamp now;
+                opendlv::proxy::reverefh16::Steering steering=c.getData<opendlv::proxy::reverefh16::Steering>();
+                opendlv::model::Direction direction(steering.getSteeringwheelangle(), 0.0);
+                opendlv::perception::StimulusDirectionOfMovement stimulusDirectionOfMovement(now, direction, opendlv::model::Direction(0,0));
+                odcore::data::Container toBeSent(stimulusDirectionOfMovement);
+                getConference().send(toBeSent);
+            }
+
+            it++;
+        }
     }
-  }
 }
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode PS3Controller::body()
@@ -207,8 +215,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode PS3Controller::body()
   
   automotive::GenericCANMessage gcm;
 
-  while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
-  odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+  while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
 
 #if !defined(WIN32) && !defined(__gnu_hurd__) && !defined(__APPLE__)
     struct js_event js;
@@ -338,8 +345,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode PS3Controller::body()
 #endif
 
     cout << "Values: A: " << acceleration << ", B: " << deceleration << ", R: " << rotation << endl;
-    
+
     {
+        // send out the commands to the truck
+        
         opendlv::proxy::reverefh16::BrakeRequest brakeRequest;
         brakeRequest.setEnableRequest(true);
         brakeRequest.setBrake(deceleration);

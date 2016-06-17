@@ -18,30 +18,17 @@
 # USA.
 
 # System configuration:
-LOCALHOST=127.0.0.1
 SCOTT1=10.42.42.1
-SCOTT1=10.42.42.60
-COMBOX=10.42.42.61
-TRIMBLE=10.42.42.112
 MULTICAST_ROUTE=225.0.0.0
-CAN_PORT=2
-DEV_PCAN=/dev/pcan${CAN_PORT}
-DEV_PCAN_SPEED=0x011c
+DOCKER_VOLUME_PREFIX=/from.host
+DEV_SICK=${DOCKER_VOLUME_PREFIX}/dev/ttyS0
 
 # Reachability tests:
 HAS_MULTICAST_ROUTE=$(ip route | grep "$MULTICAST_ROUTE" 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
-PING_LOCALHOST=$(ping -W1 -c1 $LOCALHOST 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
 PING_SCOTT1=$(ping -W1 -c1 $SCOTT1 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
-PING_SCOTT2=$(ping -W1 -c1 $SCOTT1 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
-PING_TRIMBLE=$(ping -W1 -c1 $TRIMBLE 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
-PING_COMBOX=$(ping -W1 -c1 $COMBOX 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
 
 # Devnode tests:
-HAS_DEV_PCAN=$(test -e $DEV_PCAN 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
-PCAN_NETDEV_DISABLED=$(cat /proc/pcan 2>/dev/null | grep -v "^*" | tr -s " " " " | cut -f4 -d" "| grep -v "^$"| sed "${CAN_PORT}q;d")
-PCAN_NETDEV_DISABLED=$(test "$PCAN_NETDEV_DISABLED" == "-NA-" && echo "PASSED" || echo "FAILED")
-PCAN_CORRECT_SPEED=$(cat /proc/pcan 2>/dev/null | grep -v "^*" | tr -s " " " " | cut -f7 -d" "| grep -v "^$"| sed "${CAN_PORT}q;d")
-PCAN_CORRECT_SPEED=$(test "$PCAN_CORRECT_SPEED" == "$DEV_PCAN_SPEED" && echo "PASSED" || echo "FAILED")
+HAS_DEV_SICK=$(test -e $DEV_SICK 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
 
 # System:
 KERNEL=$(cat /proc/version | cut -f3 -d" ")
@@ -56,15 +43,9 @@ echo "health.host=$(hostname)"
 echo "$(hostname).system.kernel=$KERNEL"
 echo "$(hostname).system.loadaverage=$LOADAVERAGE"
 echo "$(hostname).system.uptime=${UPTIME}min"
-echo "$(hostname).has.${DEV_PCAN}=$HAS_DEV_PCAN"
-echo "$(hostname).has.dev.pcan.no_netdev=$PCAN_NETDEV_DISABLED"
-echo "$(hostname).has.dev.pcan.correct_speed=$PCAN_CORRECT_SPEED"
+echo "$(hostname).has.${DEV_SICK}=$HAS_DEV_SICK"
 echo "$(hostname).has.multicast_route=$HAS_MULTICAST_ROUTE"
-echo "$(hostname).ping.localhost=$PING_LOCALHOST"
 echo "$(hostname).ping.scott1=$PING_SCOTT1"
-echo "$(hostname).ping.scott2=$PING_SCOTT2"
-echo "$(hostname).ping.trimble=$PING_TRIMBLE"
-echo "$(hostname).ping.combox=$PING_COMBOX"
 echo "$(hostname).diskspace.used=$DISKSPACE_USED"
 echo "$(hostname).diskspace.available=$DISKSPACE_LEFT"
 

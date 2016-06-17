@@ -54,7 +54,7 @@ KeepObjectAlignment::~KeepObjectAlignment()
 /**
  * Receives object to keep stationary, including id, current angle,
  * current size, and desired angle.
- * Sends speed correction commands (throttle) to Act.
+ * Sends steering correction commands (steering) to Act.
  */
 void KeepObjectAlignment::nextContainer(odcore::data::Container &)
 {

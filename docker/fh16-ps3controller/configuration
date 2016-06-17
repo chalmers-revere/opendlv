@@ -11,7 +11,7 @@ global.buffer.memorySegmentSize = 4000000 # Size of a memory segment in bytes.
 global.buffer.numberOfMemorySegments = 50 # Number of memory segments.
 
 # List of modules expected to participate in a session.
-global.session.expectedModules = action-act,action-communicate,knowledge-gcdc16-rule,knowledge-gcdc16-v2viclcm,knowledge-identity,knowledge-linguistics-v2vcam,knowledge-linguistics-v2vdenm,knowledge-scene,perception-detectvehicle,sensation-audition,sensation-echolocation,sensation-geolocation,diagnostics,proxy-camera:0,proxy-camera:1,proxy-can,proxy-gps,proxy-ledstrip,proxy-lidar,proxy-beacons,proxy-v2v,safety-checkactuation,safety-manualoverride
+global.session.expectedModules = diagnostics-health,tools-can-ps3controller
 
 ###############################################################################
 ###############################################################################
