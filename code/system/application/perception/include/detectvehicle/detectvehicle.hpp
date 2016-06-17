@@ -69,6 +69,7 @@ class DetectVehicle
 
   Eigen::Vector3d m_scale;
   std::string m_sourceName;
+  bool m_debugMode;
 };
 
 } // detectvehicle

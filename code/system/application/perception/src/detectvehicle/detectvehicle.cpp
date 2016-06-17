@@ -55,6 +55,7 @@ DetectVehicle::DetectVehicle(int32_t const &a_argc, char **a_argv)
     , m_convNeuralNet()
     , m_scale(1, 1, 1)
     , m_sourceName()
+    , m_debugMode()
 {
   m_convNeuralNet = std::shared_ptr<ConvNeuralNet>(
       new ConvNeuralNet);
@@ -75,6 +76,8 @@ void DetectVehicle::setUp()
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
   m_sourceName = kv.getValue<std::string>("perception-detectvehicle.source");
   std::cout << "This DetectVehicle instance will receive images from " << m_sourceName << "." << std::endl;
+  m_debugMode = (kv.getValue<int32_t> ("perception-detectvehicle.debug") == 1);
+  std::cout << "Debug mode: " << m_debugMode << std::endl;
 }
 
 /**
@@ -169,7 +172,7 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   }
 
 
-  m_convNeuralNet->Update(&myImage);
+  m_convNeuralNet->Update(&myImage,&m_debugMode);
 
   std::vector<cv::Rect> detections;
   m_convNeuralNet->GetDetectedVehicles(&detections);

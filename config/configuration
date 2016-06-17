@@ -260,6 +260,7 @@ perception-detectlane:1.source = front-right
 
 
 perception-detectvehicle:0.source = front-left
+perception-detectvehicle:0.debug = 0 #bool
 perception-detectvehicle:1.source = front-right
 
 
