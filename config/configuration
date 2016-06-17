@@ -49,42 +49,6 @@ action-setopticalflow.max_speed = 30/3.6
 
 ###############################################################################
 ###############################################################################
-### GCDC SPECIFIC SETTINGS FOR RULE
-
-# Not last in the left lane
-knowledge-gcdc16-rule:0.initial_lane = 2
-knowledge-gcdc16-rule:0.is_tail = 0
-knowledge-gcdc16-rule:0.platoon_id = 1
-knowledge-gcdc16-rule:0.scenario = mergeScenario
-
-# Last in the left lane
-knowledge-gcdc16-rule:1.initial_lane = 2
-knowledge-gcdc16-rule:1.is_tail = 1
-knowledge-gcdc16-rule:1.platoon_id = 1
-knowledge-gcdc16-rule:1.scenario = mergeScenario
-
-# Not last in the right lane
-knowledge-gcdc16-rule:2.initial_lane = 1
-knowledge-gcdc16-rule:2.is_tail = 0
-knowledge-gcdc16-rule:2.platoon_id = 2
-knowledge-gcdc16-rule:2.scenario = mergeScenario
-
-# Last in the right lane
-knowledge-gcdc16-rule:3.initial_lane = 1
-knowledge-gcdc16-rule:3.is_tail = 1
-knowledge-gcdc16-rule:3.platoon_id = 2
-knowledge-gcdc16-rule:3.scenario = mergeScenario
-
-
-# first three below never used...
-knowledge-gcdc16-rule:4.initial_lane = 1
-knowledge-gcdc16-rule:4.is_tail = 1
-knowledge-gcdc16-rule:4.platoon_id = 2
-knowledge-gcdc16-rule:4.scenario = intersectionScenario
-
->>>>>>> 1f04980f8ed63d7fdd53d104baf82a53b11fd194
-###############################################################################
-###############################################################################
 ### Proxy
 proxy-can.devicenode = /dev/pcan1          # PEAK CAN device.
 proxy-can.record_gcm = 1                   # Set to 1 to dump received CAN data into a .rec file.

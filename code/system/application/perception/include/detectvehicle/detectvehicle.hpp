@@ -64,11 +64,8 @@ class DetectVehicle
   std::shared_ptr<ConvNeuralNet> m_convNeuralNet;
   Eigen::Vector3d m_scale;
   std::string m_sourceName;
-<<<<<<< HEAD
   bool m_debugMode;
-=======
   Eigen::Matrix3d m_pixel2World;
->>>>>>> 1f04980f8ed63d7fdd53d104baf82a53b11fd194
 };
 
 } // detectvehicle
