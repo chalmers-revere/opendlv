@@ -267,7 +267,6 @@ void ConvNeuralNet::Update(const cv::Mat* a_imageFrame, const bool *a_debugMode)
       cv::imshow("calcHist Demo", histImage);
     }
   }
-  std::cout << "What?  " << a_debugMode << std::endl;
   if(*a_debugMode) {
     cv::imshow("Final spatial map", spatialMap);
     cv::imshow("Non-vehicle spatial map", nonVehicleMap);
