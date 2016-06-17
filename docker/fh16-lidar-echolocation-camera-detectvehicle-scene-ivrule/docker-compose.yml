@@ -76,11 +76,11 @@ sensation-echolocation:
 proxy-camera0:
     build: .
     net: "host"
-    working_dir: "/dumps"
+    working_dir: "/opt/opendlv"
     restart: always
     environment:
     - LD_LIBRARY_PATH=/opt/opendlv/lib
-    command: "/opt/opendlv/bin/opendlv-system-core-proxy-lidar --cid=75 --id=0 --freq=1"
+    command: "/opt/opendlv/bin/opendlv-system-core-proxy-camera --cid=75 --id=0 --freq=1"
 
 
 # microservice for proxy-lidar
