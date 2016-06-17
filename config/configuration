@@ -259,7 +259,9 @@ perception-detectlane:0.source = front-left
 perception-detectlane:1.source = front-right
 
 
+perception-detectvehicle:0.debug = 1   # 0 do not show a window with debug information (does not work in Docker!)
 perception-detectvehicle:0.source = front-left
+perception-detectvehicle:1.debug = 1   # 0 do not show a window with debug information (does not work in Docker!)
 perception-detectvehicle:1.source = front-right
 
 

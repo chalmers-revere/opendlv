@@ -208,6 +208,28 @@ fh16-lidar-echolocation-scene-ivrule: build-incremental fh16-lidar-echolocation-
 
 ###############################################################################
 ###############################################################################
+# FH16 camera-detectvehicle-scene-ivrule.
+
+# Tag Docker images using Git hashes for traceability.
+docker-tag-fh16-camera-detectvehicle-scene-ivrule:
+	for i in $$(cat fh16-camera-detectvehicle-scene-ivrule/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker tag fh16cameradetectvehiclesceneivrule_$$i seresearch/fh16cameradetectvehiclesceneivrule_$$i:$(VERSION); docker tag fh16cameradetectvehiclesceneivrule_$$i seresearch/fh16cameradetectvehiclesceneivrule_$$i:latest; done
+
+# Push Docker latest images for backup.
+docker-push-fh16-camera-detectvehicle-scene-ivrule: docker-tag-fh16-camera-detectvehicle-scene-ivrule
+	for i in $$(cat fh16-detectvehicle-scene-ivrule/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/fh16cameradetectvehiclesceneivrule_$$i:$(VERSION); docker push seresearch/fh16cameradetectvehiclesceneivrule_$$i:latest; done
+
+fh16-camera-detectvehicle-scene-ivrule-copy-opendlv:
+	rm -fr fh16-camera-detectvehicle-scene-ivrule/opendlv
+	cp -r ../build.from.docker/install fh16-camera-detectvehicle-scene-ivrule/opendlv
+	cp fh16-camera-detectvehicle-scene-ivrule/checkHealth.sh fh16-camera-detectvehicle-scene-ivrule/opendlv/bin
+
+# Build image for FH16 truck for camera-detectvehicle-scene-ivrule.
+fh16-camera-detectvehicle-scene-ivrule: build-incremental fh16-camera-detectvehicle-scene-ivrule-copy-opendlv
+	cd fh16-camera-detectvehicle-scene-ivrule && docker-compose build
+
+
+###############################################################################
+###############################################################################
 # FH16 lidar-echolocation-camera-detectvehicle-scene-ivrule.
 
 # Tag Docker images using Git hashes for traceability.
