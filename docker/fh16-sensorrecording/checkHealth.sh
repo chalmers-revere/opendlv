@@ -38,9 +38,9 @@ PING_TRIMBLE=$(ping -W1 -c1 $TRIMBLE 2>&1 >/dev/null && echo "PASSED" || echo "F
 
 # Devnode tests:
 HAS_DEV_PCAN=$(test -e $DEV_PCAN 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
-PCAN_NETDEV_DISABLED=$(cat $PROC_PCAN 2>/dev/null | grep -v "^*" | tr -s " " " " | cut -f4 -d" "| sed "${CAN_PORT}q;d")
+PCAN_NETDEV_DISABLED=$(cat $PROC_PCAN 2>/dev/null | grep -v "^*" | tr -s " " " " | cut -f4 -d" "| grep -v "^$"| sed "${CAN_PORT}q;d")
 PCAN_NETDEV_DISABLED=$(test "$PCAN_NETDEV_DISABLED" == "-NA-" && echo "PASSED" || echo "FAILED")
-PCAN_CORRECT_SPEED=$(cat $PROC_PCAN 2>/dev/null | grep -v "^*" | tr -s " " " " | cut -f7 -d" "| sed "${CAN_PORT}q;d")
+PCAN_CORRECT_SPEED=$(cat $PROC_PCAN 2>/dev/null | grep -v "^*" | tr -s " " " " | cut -f7 -d" "| grep -v "^$"| sed "${CAN_PORT}q;d")
 PCAN_CORRECT_SPEED=$(test "$PCAN_CORRECT_SPEED" == "$DEV_PCAN_SPEED" && echo "PASSED" || echo "FAILED")
 HAS_DEV_LIDAR=$(test -e $DEV_LIDAR 2>&1 >/dev/null && echo "PASSED" || echo "FAILED")
 
