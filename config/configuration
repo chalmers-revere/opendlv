@@ -122,6 +122,7 @@ proxy-gps.mount.y = -0.7
 proxy-gps.mount.z = 3.5
 proxy-gps.trimble.ip = 10.42.42.112
 proxy-gps.trimble.port = 9999
+proxy-gps.record = 1  # Set to 1 to dump GPS data in .rec and .csv format.
 
 proxy-imu:0.type = pololu.altimu10
 proxy-imu:0.pololu.altimu10.device_node = /dev/i2c-2

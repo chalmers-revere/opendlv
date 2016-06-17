@@ -1,0 +1,65 @@
+###############################################################################
+###############################################################################
+#
+# GLOBAL CONFIGURATION
+#
+# The following attributes define the buffer sizes for recording and
+# replaying. You need to adjust these parameters depending on the
+# camera resolution for example (640x480x3 --> 1,000,000 for memorySegment,
+# 1280x720x3 --> 2,800,000), 1280x1024x3 --> 3,932,160
+global.buffer.memorySegmentSize = 4000000 # Size of a memory segment in bytes.
+global.buffer.numberOfMemorySegments = 50 # Number of memory segments.
+
+# List of modules expected to participate in a session.
+global.session.expectedModules = action-act,action-communicate,knowledge-gcdc16-rule,knowledge-gcdc16-v2viclcm,knowledge-identity,knowledge-linguistics-v2vcam,knowledge-linguistics-v2vdenm,knowledge-scene,perception-detectvehicle,sensation-audition,sensation-echolocation,sensation-geolocation,diagnostics,proxy-camera:0,proxy-camera:1,proxy-can,proxy-gps,proxy-ledstrip,proxy-lidar,proxy-beacons,proxy-v2v,safety-checkactuation,safety-manualoverride
+
+###############################################################################
+###############################################################################
+#
+# CONFIGURATION FOR ODSUPERCOMPONENT
+#
+# If the managed level is pulse_shift, all connected modules will be informed
+# about the supercomponent's real time by this increment per module. Thus, the
+# execution times per modules are better aligned with supercomponent and the
+# data exchange is somewhat more predictable.
+odsupercomponent.pulseshift.shift = 10000 # (in microseconds)
+
+# If the managed level is pulse_time_ack, this is the timeout for waiting for
+# an ACK message from a connected client.
+odsupercomponent.pulsetimeack.timeout = 5000 # (in milliseconds)
+
+# If the managed level is pulse_time_ack, the modules are triggered sequentially
+# by sending pulses and waiting for acknowledgment messages. To allow the modules
+# to deliver their respective containers, this yielding time is used to sleep
+# before supercomponent sends the pulse messages the next module in this execution
+# cycle. This value needs to be adjusted for networked simulations to ensure
+# deterministic execution. 
+odsupercomponent.pulsetimeack.yield = 5000 # (in microseconds)
+
+# List of modules (without blanks) that will not get a pulse message from odsupercomponent.
+odsupercomponent.pulsetimeack.exclude = odcockpit
+
+###############################################################################
+###############################################################################
+# proxy
+proxy-can.devicenode = /dev/pcan1          # PEAK CAN device.
+proxy-can.record_gcm = 1                   # Set to 1 to dump received CAN data into a .rec file.
+proxy-can.record_mapped_data = 1           # Set to 1 to dump mapped data from a CAN message into a .rec file.
+
+
+# proxy-gps
+proxy-gps.type = trimble
+proxy-gps.mount.x = 4.0
+proxy-gps.mount.y = -0.7
+proxy-gps.mount.z = 3.5
+proxy-gps.trimble.ip = 10.42.42.112
+proxy-gps.trimble.port = 9999
+proxy-gps.record = 1  # Set to 1 to dump GPS data in .rec and .csv format.
+
+
+###############################################################################
+###############################################################################
+# Diagnostics
+diagnostics-health.script = ./checkHealth.sh
+diagnostics-health.sleep = 60 # Sleep between health checks in seconds
+
