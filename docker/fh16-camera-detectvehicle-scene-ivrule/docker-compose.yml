@@ -62,17 +62,6 @@ perception-detectvehicle0:
     command: "/opt/opendlv/bin/opendlv-system-application-perception-detectvehicle --cid=74 --id=0"
 
 
-# microservice for sensation-echolocation to create objects from lidar input
-sensation-echolocation:
-    build: .
-    net: "host"
-    working_dir: "/opt/opendlv/bin"
-    restart: always
-    environment:
-    - LD_LIBRARY_PATH=/opt/opendlv/lib
-    command: "/opt/opendlv/bin/opendlv-system-application-sensation-echolocation --cid=74"
-
-
 # microservice for proxy-camera
 proxy-camera0:
     build: .
@@ -83,19 +72,4 @@ proxy-camera0:
     environment:
     - LD_LIBRARY_PATH=/opt/opendlv/lib
     command: "/opt/opendlv/bin/opendlv-system-core-proxy-camera --cid=74 --id=0 --freq=1"
-
-
-# microservice for proxy-lidar
-proxy-lidar:
-    build: .
-    net: "host"
-    volumes:
-    - /dumps:/dumps
-    working_dir: "/dumps"
-    restart: always
-    devices:
-    - "/dev/ttyS0:/dev/ttyS0"
-    environment:
-    - LD_LIBRARY_PATH=/opt/opendlv/lib
-    command: "/opt/opendlv/bin/opendlv-system-core-proxy-lidar --cid=74 --freq=1"
 
