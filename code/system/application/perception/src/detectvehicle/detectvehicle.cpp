@@ -40,9 +40,6 @@ namespace perception {
 namespace detectvehicle {
 
 
-// TODO add documentation
-
-
 /**
   * Constructor.
   *
@@ -52,9 +49,12 @@ namespace detectvehicle {
 DetectVehicle::DetectVehicle(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(
       a_argc, a_argv, "perception-detectvehicle")
+    , m_initialised(false)
     , m_convNeuralNet()
     , m_scale(1, 1, 1)
     , m_sourceName()
+    , m_debugMode()
+    , m_pixel2World()
 {
   m_convNeuralNet = std::shared_ptr<ConvNeuralNet>(
       new ConvNeuralNet);
@@ -74,7 +74,23 @@ void DetectVehicle::setUp()
   m_scale = Eigen::Vector3d(scale, scale, 1);
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
   m_sourceName = kv.getValue<std::string>("perception-detectvehicle.source");
+
+  std::string path = "/opt/opendlv/share/opendlv/tools/vision/projection/";
+
+  if (m_sourceName == "front-left") {
+    m_pixel2World = ReadMatrix(path+"leftCameraTransformationMatrix.csv",3,3);
+  }
+  else if (m_sourceName == "front-right") {
+    m_pixel2World = ReadMatrix(path+"rightCameraTransformationMatrix.csv",3,3);
+  }
+  else {
+    std::cout << "Cannot load transformation matrix for " << m_sourceName << ". Undefined camera source." << std::endl;
+  }
   std::cout << "This DetectVehicle instance will receive images from " << m_sourceName << "." << std::endl;
+  m_debugMode = (kv.getValue<int32_t> ("perception-detectvehicle.debug") == 1);
+  std::cout << "Debug mode: " << m_debugMode << std::endl;
+  std::cout << "Setup complete." << std::endl;
+  m_initialised = true;
 }
 
 /**
@@ -83,35 +99,31 @@ void DetectVehicle::setUp()
  */
 void DetectVehicle::nextContainer(odcore::data::Container &c)
 {
-  if (c.getDataType() != odcore::data::image::SharedImage::ID()) {
-    // received container that we don't care about
-    return;
-  }
-  std::cout << std::endl;
-
   if (!m_convNeuralNet->IsInitialized()) {
     std::cout << "Convolutional Neural Net not yet initialized" << std::endl;
     return;
   }
+  // Return if we receive container that we don't care about or module hasn't been properly initialised
+  if (c.getDataType() != odcore::data::image::SharedImage::ID() || !m_initialised) {
+    return;
+  }
+
 
   odcore::data::image::SharedImage mySharedImg = 
       c.getData<odcore::data::image::SharedImage>();
 
 
   std::string cameraName = mySharedImg.getName();
-  //std::cout << "Received image from camera " << cameraName  << "!" << std::endl;
+  // std::cout << "Received image from camera " << cameraName  << "!" << std::endl;
 
+  // Receive image from a source that this instance should not care about
   if (m_sourceName.compare(cameraName) != 0) {
-    // Received image from a source that this instance should not care about
     //std::cout << "Received image came from wrong source. Expected " << m_sourceName << std::endl;
     return;
   }
 
-  // extract time stamp from container
-  //odcore::data::TimeStamp timeStampOfImage = c.getSentTimeStamp();
   odcore::data::TimeStamp timeStampOfImage = c.getReceivedTimeStamp();
-
-  odcore::data::TimeStamp nowTimeStamp;
+  // odcore::data::TimeStamp start;
 
   //double tmpSeconds = (nowTimeStamp - timeStampOfImage).toMicroseconds() / 1000000.0;
   //std::cout << "tmpSeconds: " << tmpSeconds << std::endl;
@@ -149,34 +161,18 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   //double timeStamp = ((double)c.getSentTimeStamp().toMicroseconds())/1000000;
   //std::cout << "timeStamp: " << timeStamp << std::endl;
 
-  Eigen::Matrix3d transformationMatrix;
 
-  if (cameraName == "front-left") {
-    transformationMatrix = ReadMatrix(
-        "/opt/opendlv/share/opendlv/tools/vision/projection/leftCameraTransformationMatrix.csv",3,3);
-  }
-  else if (cameraName == "front-right") {
-    transformationMatrix = ReadMatrix(
-        "/opt/opendlv/share/opendlv/tools/vision/projection/rightCameraTransformationMatrix.csv",3,3);
-  }
-  else {
-    std::cout << "Cannot load transformation matrix for " << cameraName 
-        << ", aborting image analysis..." << std::endl;
-
-    // Release memory, no memory leaks for the people!
-    cvReleaseImage(&myIplImage);
-    return;
-  }
-
-
+  m_convNeuralNet->Update(&myImage,&m_debugMode);
+  odcore::data::TimeStamp start;
   m_convNeuralNet->Update(&myImage);
+  odcore::data::TimeStamp end;
+  double duration = end.toMicroseconds() - start.toMicroseconds();
+  // std::cout << "The update took " << duration << " microseconds (" << duration/1000000 << " seconds)." << std::endl;
 
   std::vector<cv::Rect> detections;
   m_convNeuralNet->GetDetectedVehicles(&detections);
 
-  sendObjectInformation(&detections, timeStampOfImage, transformationMatrix, cameraName);
-
-
+  sendObjectInformation(&detections, timeStampOfImage);
 
   cvReleaseImage(&myIplImage);
 }
@@ -191,7 +187,6 @@ Eigen::MatrixXd DetectVehicle::ReadMatrix(std::string fileName, int nRows,
     int nCols)
 {
   std::ifstream file(fileName);
-
   Eigen::MatrixXd matrix(nRows,nCols);
 
   if (file.is_open()) {
@@ -204,12 +199,10 @@ Eigen::MatrixXd DetectVehicle::ReadMatrix(std::string fileName, int nRows,
     }
   }  
   file.close();
-
   return matrix;
 }
 
-void DetectVehicle::TransformPointToGlobalFrame(Eigen::Vector3d &point, 
-    Eigen::Matrix3d transformationMatrix)
+void DetectVehicle::TransformPointToGlobalFrame(Eigen::Vector3d &point)
 {
   // std::cout<<"point before \n";
   // std::cout<<point<<std::endl;
@@ -217,7 +210,7 @@ void DetectVehicle::TransformPointToGlobalFrame(Eigen::Vector3d &point,
   point = point.cwiseProduct(m_scale);
   // std::cout<<"point after 1\n";
   // std::cout<<point<<std::endl;
-  point = transformationMatrix * point;
+  point = m_pixel2World * point;
 
   // std::cout<<"point final before \n";
   // std::cout<<point<<std::endl;
@@ -228,9 +221,7 @@ void DetectVehicle::TransformPointToGlobalFrame(Eigen::Vector3d &point,
 }
 
 void DetectVehicle::sendObjectInformation(std::vector<cv::Rect>* detections, 
-    odcore::data::TimeStamp timeStampOfImage, 
-    Eigen::Matrix3d transformationMatrix,
-    std::string cameraName)
+    odcore::data::TimeStamp timeStampOfImage)
 {
   for (uint32_t i=0; i<detections->size(); i++) {
     
@@ -239,64 +230,68 @@ void DetectVehicle::sendObjectInformation(std::vector<cv::Rect>* detections,
     odcore::data::TimeStamp lastSeen = timeStampOfImage;
     
     std::string type = "vehicle";
+
+    //Hardcoded confidence
     float typeConfidence = 0.5f;
 
     Eigen::Vector3d pointBottomLeft(
         currentBoundingBox.x, 
         currentBoundingBox.y + currentBoundingBox.height, 
         1);
-    TransformPointToGlobalFrame(pointBottomLeft, transformationMatrix);
-    
     Eigen::Vector3d pointBottomRight(
         currentBoundingBox.x + currentBoundingBox.width, 
         currentBoundingBox.y + currentBoundingBox.height, 
         1);
-    TransformPointToGlobalFrame(pointBottomRight, transformationMatrix);
-
     Eigen::Vector3d pointBottomMid(
         currentBoundingBox.x + currentBoundingBox.width / 2.0f, 
         currentBoundingBox.y + currentBoundingBox.height, 
         1);
-    TransformPointToGlobalFrame(pointBottomMid, transformationMatrix);
+    TransformPointToGlobalFrame(pointBottomLeft);
+    TransformPointToGlobalFrame(pointBottomRight);
+    TransformPointToGlobalFrame(pointBottomMid);
 
     float headingOfBottomLeft = std::atan2(pointBottomLeft(1), pointBottomLeft(0));
     float headingOfBottomRight = std::atan2(pointBottomRight(1), pointBottomRight(0));
     float angularSize = headingOfBottomLeft - headingOfBottomRight;
+    //Hardcoded confidence
     float angularSizeConfidence = -1.0f;
 
 
     float azimuth = headingOfBottomRight + angularSize / 2.0f; //midpoint of box
-    float zenith = -1.0f;
+    float zenith = 0;
     opendlv::model::Direction direction(azimuth, zenith);
+    //Hardcoded confidence
     float directionConfidence = 0.1f;
 
-    float azimuthRate = -1.0f;
-    float zenithRate = -1.0f;
+    float azimuthRate = 0;
+    float zenithRate = 0;
     opendlv::model::Direction directionRate(azimuthRate, zenithRate);
     float directionRateConfidence = -1.0f;
 
 
-    float distance = (float) sqrt(pow(pointBottomMid(0),2) + pow(pointBottomMid(1),2));
+    float distance = static_cast<float>(sqrt(pow(pointBottomMid(0),2) + pow(pointBottomMid(1),2)));
+    //Hardcoded confidence
     float distanceConfidence = 0.5f;
 
 
-    float angularSizeRate = -1.0f;
+    float angularSizeRate = 0;
     float angularSizeRateConfidence = -1.0f;
 
 
     float confidence = 0.2f;
     std::vector<std::string> sources;
-    sources.push_back(cameraName);
+    sources.push_back(m_sourceName);
 
     std::vector<std::string> properties;
 
     uint16_t objectId = -1;
 
-    float detectionWidth = (float) 
+    float detectionWidth = static_cast<float>(
         sqrt(pow(pointBottomRight(0) - pointBottomLeft(0),2) + 
-        pow(pointBottomRight(1) - pointBottomLeft(1),2));
+        pow(pointBottomRight(1) - pointBottomLeft(1),2)));
 
     //std::cout << "Object width: " << detectionWidth << " m" << std::endl;
+    //Should detection sort be in the this module?
     if (angularSize < 0 
         || distance > 150 
         || detectionWidth < 0.5f 
@@ -316,9 +311,9 @@ void DetectVehicle::sendObjectInformation(std::vector<cv::Rect>* detections,
     std::cout << "Sending DetectedObject:" << std::endl;
     std::cout << "    type:          " << type << std::endl;
     std::cout << "    azimuth:       " << azimuth << std::endl;
-    std::cout << "    azimuth (deg): " << (azimuth*(float)opendlv::Constants::RAD2DEG) << std::endl;
+    std::cout << "    azimuth (deg): " << (azimuth*static_cast<float>(opendlv::Constants::RAD2DEG)) << std::endl;
     std::cout << "    angularSize:   " << angularSize << std::endl;
-    std::cout << "    angSize (deg): " << (angularSize*(float)opendlv::Constants::RAD2DEG) << std::endl;
+    std::cout << "    angSize (deg): " << (angularSize*static_cast<float>(opendlv::Constants::RAD2DEG)) << std::endl;
     std::cout << "    distance (m):  " << distance << std::endl;
     std::cout << "    width (m):     " << detectionWidth << std::endl;
     /*
