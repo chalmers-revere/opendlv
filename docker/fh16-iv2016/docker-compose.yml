@@ -8,7 +8,7 @@ opendlv-tcpdump:
     volumes:
     - /dumps:/dumps
     working_dir: "/dumps"
-    command: /usr/sbin/tcpdump -G 900 -w 'CID-72_%Y-%m-%d_%H:%M:%S.pcap' -W 96
+    command: /usr/sbin/tcpdump -G 900 -w 'CID-77_%Y-%m-%d_%H:%M:%S.pcap' -W 96
 
 # microservice for diagnostics-health
 # The host's /dev and /proc directories are mapped into the Docker container
@@ -25,5 +25,90 @@ diagnostics-health:
     - /proc:/from.host/proc
     environment:
     - LD_LIBRARY_PATH=/opt/opendlv/lib
-    command: "/opt/opendlv/bin/opendlv-system-core-diagnostics-health --cid=72 --freq=1"
+    command: "/opt/opendlv/bin/opendlv-system-core-diagnostics-health --cid=77 --freq=1"
+
+
+# microservice for knowledge-scene to compose and distribute objects
+knowledge-scene:
+    build: .
+    net: "host"
+    working_dir: "/opt/opendlv/bin"
+    restart: always
+    environment:
+    - LD_LIBRARY_PATH=/opt/opendlv/lib
+    command: "/opt/opendlv/bin/opendlv-system-application-knowledge-scene --cid=77 --freq=10"
+
+
+# microservice for knowledge-ivrule
+knowledge-ivrule:
+    build: .
+    net: "host"
+    working_dir: "/opt/opendlv/bin"
+    restart: always
+    environment:
+    - LD_LIBRARY_PATH=/opt/opendlv/lib
+    command: "/opt/opendlv/bin/opendlv-system-application-knowledge-ivrule --cid=77 --freq=10"
+
+
+# microservice for sensation-echolocation to create objects from lidar input
+sensation-echolocation:
+    build: .
+    net: "host"
+    working_dir: "/opt/opendlv/bin"
+    restart: always
+    environment:
+    - LD_LIBRARY_PATH=/opt/opendlv/lib
+    command: "/opt/opendlv/bin/opendlv-system-application-sensation-echolocation --cid=77 --freq=11"
+
+
+# microservice for proxy-lidar
+proxy-lidar:
+    build: .
+    net: "host"
+    volumes:
+    - /dumps:/dumps
+    working_dir: "/dumps"
+    restart: always
+    devices:
+    - "/dev/ttyS0:/dev/ttyS0"
+    environment:
+    - LD_LIBRARY_PATH=/opt/opendlv/lib
+    command: "/opt/opendlv/bin/opendlv-system-core-proxy-lidar --cid=77 --freq=1"
+
+
+# microservice for proxy-can
+proxy-can:
+    build: .
+    net: "host"
+    volumes:
+    - /dumps:/dumps
+    working_dir: "/dumps"
+    restart: always
+    devices:
+    - "/dev/pcanpci1:/dev/pcan1"
+    environment:
+    - LD_LIBRARY_PATH=/opt/opendlv/lib
+    command: "/opt/opendlv/bin/opendlv-system-core-proxy-can --cid=77 --freq=100"
+
+
+# microservice for safety-checkactuation
+safety-checkactuation:
+    build: .
+    net: "host"
+    working_dir: "/opt/opendlv/bin"
+    restart: always
+    environment:
+    - LD_LIBRARY_PATH=/opt/opendlv/lib
+    command: "/opt/opendlv/bin/opendlv-system-core-safety-checkactuation --cid=77"
+
+
+# microservice for action-act
+action-act:
+    build: .
+    net: "host"
+    working_dir: "/opt/opendlv/bin"
+    restart: always
+    environment:
+    - LD_LIBRARY_PATH=/opt/opendlv/lib
+    command: "/opt/opendlv/bin/opendlv-system-application-action-act --cid=77 --freq=100"
 

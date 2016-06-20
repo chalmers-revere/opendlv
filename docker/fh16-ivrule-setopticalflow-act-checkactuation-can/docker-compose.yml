@@ -8,7 +8,7 @@ opendlv-tcpdump:
     volumes:
     - /dumps:/dumps
     working_dir: "/dumps"
-    command: /usr/sbin/tcpdump -G 900 -w 'CID-74_%Y-%m-%d_%H:%M:%S.pcap' -W 96
+    command: /usr/sbin/tcpdump -G 900 -w 'CID-80_%Y-%m-%d_%H:%M:%S.pcap' -W 96
 
 # microservice for diagnostics-health
 # The host's /dev and /proc directories are mapped into the Docker container
@@ -25,18 +25,7 @@ diagnostics-health:
     - /proc:/from.host/proc
     environment:
     - LD_LIBRARY_PATH=/opt/opendlv/lib
-    command: "/opt/opendlv/bin/opendlv-system-core-diagnostics-health --cid=74 --freq=1"
-
-
-# microservice for knowledge-scene to compose and distribute objects
-knowledge-scene:
-    build: .
-    net: "host"
-    working_dir: "/opt/opendlv/bin"
-    restart: always
-    environment:
-    - LD_LIBRARY_PATH=/opt/opendlv/lib
-    command: "/opt/opendlv/bin/opendlv-system-application-knowledge-scene --cid=74 --freq=10"
+    command: "/opt/opendlv/bin/opendlv-system-core-diagnostics-health --cid=80 --freq=1"
 
 
 # microservice for knowledge-ivrule
@@ -47,29 +36,53 @@ knowledge-ivrule:
     restart: always
     environment:
     - LD_LIBRARY_PATH=/opt/opendlv/lib
-    command: "/opt/opendlv/bin/opendlv-system-application-knowledge-ivrule --cid=74 --freq=10"
+    command: "/opt/opendlv/bin/opendlv-system-application-knowledge-ivrule --cid=80 --freq=10"
 
 
-# microservice for perception-detectvehicle:0 to create objects from camera input
-perception-detectvehicle0:
+# microservice for action-act
+action-setopticalflow:
     build: .
     net: "host"
-    ipc: "host"
-    working_dir: "/opt/opendlv"
+    working_dir: "/opt/opendlv/bin"
     restart: always
     environment:
     - LD_LIBRARY_PATH=/opt/opendlv/lib
-    command: "/opt/opendlv/bin/opendlv-system-application-perception-detectvehicle --cid=74 --id=0"
+    command: "/opt/opendlv/bin/opendlv-system-application-action-setopticalflow --cid=80"
 
 
-# microservice for proxy-camera
-proxy-camera0:
+# microservice for action-act
+action-act:
     build: .
     net: "host"
-    ipc: "host"
-    working_dir: "/opt/opendlv"
+    working_dir: "/opt/opendlv/bin"
     restart: always
     environment:
     - LD_LIBRARY_PATH=/opt/opendlv/lib
-    command: "/opt/opendlv/bin/opendlv-system-core-proxy-camera --cid=74 --id=0 --freq=1"
+    command: "/opt/opendlv/bin/opendlv-system-application-action-act --cid=80 --freq=100"
+
+
+# microservice for safety-checkactuation
+safety-checkactuation:
+    build: .
+    net: "host"
+    working_dir: "/opt/opendlv/bin"
+    restart: always
+    environment:
+    - LD_LIBRARY_PATH=/opt/opendlv/lib
+    command: "/opt/opendlv/bin/opendlv-system-core-safety-checkactuation --cid=80"
+
+
+# microservice for proxy-can
+proxy-can:
+    build: .
+    net: "host"
+    volumes:
+    - /dumps:/dumps
+    working_dir: "/dumps"
+    restart: always
+    devices:
+    - "/dev/pcanpci1:/dev/pcan1"
+    environment:
+    - LD_LIBRARY_PATH=/opt/opendlv/lib
+    command: "/opt/opendlv/bin/opendlv-system-core-proxy-can --cid=80 --freq=100"
 
