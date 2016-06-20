@@ -52,7 +52,7 @@ public:
 private:
   void GetConvNet(
       int32_t a_width, int32_t a_height,
-      tiny_cnn::network<tiny_cnn::mse, tiny_cnn::gradient_descent>* a_cnn,
+      tiny_cnn::network<tiny_cnn::sequential>* a_cnn,
       bool a_isTrainingNetwork);
 
   void ConvertImageRGB(
@@ -86,7 +86,7 @@ private:
 
 /* Private fields */
 private:
-  tiny_cnn::network<tiny_cnn::mse, tiny_cnn::gradient_descent> m_cnn;
+  tiny_cnn::network<tiny_cnn::sequential> m_cnn;
 
   int32_t m_inputWidth;
   int32_t m_inputHeight;
