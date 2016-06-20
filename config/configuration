@@ -202,7 +202,10 @@ safety-manualoverride.torsionBarTorqueThreshold = 1.5
 ###############################################################################
 # Echolocation
 
-sensation-echolocation.memoryThreshold = 0
+sensation-echolocation.memoryThreshold = 0 #discrete seconds
+sensation-echolocation.pointCloudRadius = 1.0 #meters
+sensation-echolocation.pointCloudSizeMinimum = 5 #number of points
+
 
 ###############################################################################
 ###############################################################################

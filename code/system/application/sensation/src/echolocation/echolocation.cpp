@@ -49,6 +49,9 @@ Echolocation::Echolocation(int32_t const &a_argc, char **a_argv)
     , m_distances()
     , m_times()
     , m_memoryThreshold()
+    , m_pointCloudRadius()
+    , m_pointCloudSizeMinimum()
+    , m_initialised(false)
 {
 }
 
@@ -58,7 +61,7 @@ Echolocation::~Echolocation()
 
 void Echolocation::nextContainer(odcore::data::Container &a_c)
 {
-  if (a_c.getDataType() != opendlv::proxy::EchoReading::ID()){
+  if (!m_initialised || a_c.getDataType() != opendlv::proxy::EchoReading::ID()){
     return;
   }
   odcore::data::TimeStamp now;
@@ -108,8 +111,8 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
 
   // std::cout << "Before algorithm, new points: " << nNewPoints << std::endl;
 
-  const double DIST_DELTA = 1.0;
-  const uint32_t POINT_CLOUD_SIZE = 5;
+  // const double m_pointCloudRadius = 1.0;
+  // const uint32_t m_pointCloudSizeMinimum = 5;
   for(uint32_t k = 0; k < nPoints; k++) {
     pointCloud.clear();
     pointCloud.push_back(k);
@@ -118,14 +121,14 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
         for(uint32_t j = 0; j < nPoints; j++) {
           uint32_t x = pointCloud[i];
           double dist = PointDistance(m_angles[x], m_distances[x], m_angles[j], m_distances[j]);
-          if(dist < DIST_DELTA && !Contains(j,pointCloud)) {
+          if(dist < m_pointCloudRadius && !Contains(j,pointCloud)) {
             //std::cout << "Close points" << std::endl;
             pointCloud.push_back(j);
             usedPoints.push_back(j);
           }
         }
       }
-      if(pointCloud.size() > POINT_CLOUD_SIZE) { //TODO: evaluate parameter and move to config
+      if(pointCloud.size() > m_pointCloudSizeMinimum) { //TODO: evaluate parameter and move to config
         
         double minDist = m_distances[pointCloud[0]];
         //uint32_t minIndex = pointCloud[0];
@@ -217,6 +220,9 @@ void Echolocation::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
   m_memoryThreshold = kv.getValue<float>("sensation-echolocation.memoryThreshold");
+  m_pointCloudRadius = kv.getValue<double>("sensation-echolocation.pointCloudRadius");
+  m_pointCloudSizeMinimum = kv.getValue<int32_t>("sensation-echolocation.pointCloudSizeMinimum");
+  m_initialised = true;
 }
 
 void Echolocation::tearDown()
