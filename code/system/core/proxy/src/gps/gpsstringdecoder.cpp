@@ -224,7 +224,7 @@ void GpsStringDecoder::nextString(std::string const &s) {
                    << std::setprecision(5) << speed << ","
                    << std::setprecision(5) << latitudeDirection << ","
                    << std::setprecision(5) << longitudeDirection << ","
-                   << satelliteCount << ","
+                   << (uint32_t)satelliteCount << ","
                    << hasHeading << ","
                    << hasRtk << endl;
     }
