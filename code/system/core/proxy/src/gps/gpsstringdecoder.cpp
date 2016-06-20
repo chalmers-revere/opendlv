@@ -216,7 +216,7 @@ void GpsStringDecoder::nextString(std::string const &s) {
       c.setReceivedTimeStamp(odcore::data::TimeStamp());
       m_recorderGpsReadings->store(c);
 
-      (*m_CSVFile) << timestamp << ","
+      (*m_CSVFile) << std::setprecision(19) << timestamp << ","
                    << std::setprecision(19) << latitude << ","
                    << std::setprecision(19) << longitude << ","
                    << std::setprecision(19) << altitude << ","
