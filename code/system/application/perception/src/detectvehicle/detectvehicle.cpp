@@ -70,8 +70,8 @@ void DetectVehicle::setUp()
 {
   std::cout << "DetectVehicle::setUp()" << std::endl;
   m_convNeuralNet->SetUp();
-  float scale = 1280.0f/800.0f;
-  m_scale = Eigen::Vector3d(scale, scale, 1);
+  // float scale = 1280.0f/800.0f;
+  // m_scale = Eigen::Vector3d(scale, scale, 1);
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
   m_sourceName = kv.getValue<std::string>("perception-detectvehicle.source");
 
