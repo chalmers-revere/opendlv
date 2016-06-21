@@ -86,9 +86,9 @@ void DetectVehicle::setUp()
   else {
     std::cout << "Cannot load transformation matrix for " << m_sourceName << ". Undefined camera source." << std::endl;
   }
-  std::cout << "This DetectVehicle instance will receive images from " << m_sourceName << "." << std::endl;
   m_debugMode = (kv.getValue<int32_t> ("perception-detectvehicle.debug") == 1);
   std::cout << "Debug mode: " << m_debugMode << std::endl;
+  std::cout << "This DetectVehicle instance will receive images from " << m_sourceName << "." << std::endl;
   std::cout << "Setup complete." << std::endl;
   m_initialised = true;
 }
