@@ -140,7 +140,7 @@ void Ivrule::FindMio(std::vector<opendlv::perception::Object> &a_listOfObjects)
     std::vector<std::string> sources = object.getListOfSources();
 
     float score = 0;
-    score += (50-std::abs(azimuth*static_cast<float>(opendlv::Constants::RAD2DEG)));
+    score += (std::pow(8.0f,2.0f)-std::pow(azimuth*static_cast<float>(opendlv::Constants::RAD2DEG)/45.0f*8.0f,2.0f));
     score += (100-distance)*2;
     for(auto it:sources){
       score += 80;
