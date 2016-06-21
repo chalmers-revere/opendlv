@@ -47,9 +47,9 @@ SetOpticalRotation::SetOpticalRotation(int32_t const &a_argc, char **a_argv)
     m_stimulusRate(),
     m_correctionTime(0, 0),
     m_correction(),
-    m_correctionGain(0.4f),
+    m_correctionGain(0.2f),
     m_maxStimulusAge(0.5f),
-    m_patienceDuration(0.5f),
+    m_patienceDuration(0.3f),
     m_stimulusJerk(),
     m_stimulusJerkThreshold(0.05f),
     m_stimulusRateThreshold(0.05f),
@@ -154,7 +154,7 @@ void SetOpticalRotation::Correct()
     bool isStimulusRateHelping = (static_cast<int>(std::copysign(1.0f, stimulus)) != static_cast<int>(std::copysign(1.0f, stimulusRate)));
     if (isStimulusRateZero || (!isStimulusRateZero && !isStimulusRateHelping)) {
 
-      float amplitude = m_correctionGain * stimulus * stimulus;
+      float amplitude = m_correctionGain * stimulus;
       odcore::data::TimeStamp t0;
       opendlv::action::Correction correction(t0, "steering", false, amplitude, priority);
       odcore::data::Container container(correction);

@@ -59,7 +59,6 @@ void Vehicle::SetSpeed(double a_speed)
 
 void Vehicle::Update(double a_theta, double a_dt)
 {
-  a_theta = -a_theta;
   double const a = m_cmToFront;
   double const b = m_cmToRear;
   double const cF = m_corneringStiffnessFront;
