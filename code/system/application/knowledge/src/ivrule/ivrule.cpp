@@ -66,11 +66,9 @@ Ivrule::~Ivrule()
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
     odcore::data::TimeStamp now;
 
-    if(std::abs(m_speed) > 0.001f ){
-      opendlv::perception::StimulusOpticalFlow sof(now, m_desiredOpticalFlow, m_speed);
-      odcore::data::Container containerSof(sof);
-      getConference().send(containerSof);
-    }
+    opendlv::perception::StimulusOpticalFlow sof(now, m_desiredOpticalFlow, m_speed);
+    odcore::data::Container containerSof(sof);
+    getConference().send(containerSof);
     if((m_mioValidUntil-now).toMicroseconds() > 0) {
       // Steer to mio
       opendlv::perception::StimulusDirectionOfMovement sdom(now, m_mio.getDirection(),opendlv::model::Direction(0,0));
