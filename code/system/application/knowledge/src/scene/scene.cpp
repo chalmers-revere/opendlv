@@ -282,15 +282,15 @@ void Scene::SendStuff()
   odcore::data::Container objectContainerEnvironment(environment);
   getConference().send(objectContainerEnvironment);
 
-  std::cout << "=====================================" << std::endl;
-  std::cout << "Objects sent: " << std::endl;
+  // std::cout << "=====================================" << std::endl;
+  // std::cout << "Objects sent: " << std::endl;
 
-  for(uint32_t i = 0; i < m_savedObjects.size(); i++) {
-    std::cout << "ID: "<< m_savedObjects[i].getObjectId() << std::endl;
-    std::cout << "Angle: "<< m_savedObjects[i].getDirection().getAzimuth() << std::endl;
-    std::cout << "Distance: "<< m_savedObjects[i].getDistance() << std::endl;
-  }
-  std::cout << "=====================================" << std::endl;
+  // for(uint32_t i = 0; i < m_savedObjects.size(); i++) {
+  //   std::cout << "ID: "<< m_savedObjects[i].getObjectId() << std::endl;
+  //   std::cout << "Angle: "<< m_savedObjects[i].getDirection().getAzimuth() << std::endl;
+  //   std::cout << "Distance: "<< m_savedObjects[i].getDistance() << std::endl;
+  // }
+  // std::cout << "=====================================" << std::endl;
   
   // for(uint32_t i = 0; i < m_savedSurfaces.size(); i++) {
   //  odcore::data::Container surfaceContainer(m_savedSurfaces[i]);
