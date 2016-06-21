@@ -47,9 +47,9 @@ SetOpticalFlow::SetOpticalFlow(int32_t const &a_argc, char **a_argv)
     m_stimulusRate(),
     m_correctionTime(0, 0),
     m_correction(),
-    m_correctionGain(0.8f),
-    m_maxStimulusAge(4.0f),
-    m_patienceDuration(2.0f),
+    m_correctionGain(10.0f),
+    m_maxStimulusAge(4.1f),
+    m_patienceDuration(4.0f),
     m_stimulusJerk(),
     m_stimulusJerkThreshold(0.5f),
     m_stimulusRateThreshold(0.5f),
@@ -105,13 +105,9 @@ void SetOpticalFlow::AddStimulus(odcore::data::TimeStamp const &a_stimulusTime, 
   float stimulus = desiredOpticalFlow - opticalFlow;
 
   if (std::abs(stimulus) < 1.0f) {
-    m_patienceDuration = 0.5f;
-    m_maxStimulusAge = 1.0f;
-    m_correctionGain = 0.5f;
-  } else {
     m_patienceDuration = 2.0f;
-    m_maxStimulusAge = 4.0f;
-    m_correctionGain = 1.0f;
+  } else {
+    m_patienceDuration = 10.0f;
   }
 
   float stimulusRate = 0.0f;
