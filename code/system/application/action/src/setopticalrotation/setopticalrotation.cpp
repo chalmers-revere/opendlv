@@ -47,13 +47,13 @@ SetOpticalRotation::SetOpticalRotation(int32_t const &a_argc, char **a_argv)
     m_stimulusRate(),
     m_correctionTime(0, 0),
     m_correction(),
-    m_correctionGain(0.4f),
+    m_correctionGain(0.2f),
     m_maxStimulusAge(0.5f),
-    m_patienceDuration(0.5f),
+    m_patienceDuration(0.3f),
     m_stimulusJerk(),
     m_stimulusJerkThreshold(0.05f),
     m_stimulusRateThreshold(0.05f),
-    m_stimulusThreshold(0.1f)
+    m_stimulusThreshold(0.05f)
 {
 }
 
@@ -125,6 +125,11 @@ void SetOpticalRotation::AddStimulus(odcore::data::TimeStamp const &a_stimulusTi
   m_stimulusTime.push_back(a_stimulusTime);
   m_stimulus.push_back(stimulus);
   m_stimulusRate.push_back(stimulusRate);
+
+//  std::cout << "==============" << std::endl;
+//  std::cout << "Stimulus (" << m_stimulus.size() << "): " << stimulus << std::endl;
+//  std::cout << "Stimulus rate (" << m_stimulusRate.size() << "): " << stimulusRate << std::endl;
+//  std::cout << "Stimulus jerk: " << m_stimulusJerk << std::endl;
 }
 
 void SetOpticalRotation::Correct()
@@ -135,8 +140,13 @@ void SetOpticalRotation::Correct()
     return;
   }
 
+  std::cout << "<<< Start to correct!" << std::endl;
+
   float stimulus = m_stimulus.back();
   float stimulusRate = m_stimulusRate.back();
+  
+  std::cout << "Stimulus: " << stimulus << std::endl;
+  std::cout << "Stimulus rate: " << stimulusRate << std::endl;
 
   if (std::abs(stimulus) > m_stimulusThreshold) {
 
@@ -144,16 +154,20 @@ void SetOpticalRotation::Correct()
     bool isStimulusRateHelping = (static_cast<int>(std::copysign(1.0f, stimulus)) != static_cast<int>(std::copysign(1.0f, stimulusRate)));
     if (isStimulusRateZero || (!isStimulusRateZero && !isStimulusRateHelping)) {
 
-      float amplitude = m_correctionGain * stimulus * stimulus;
+      float amplitude = m_correctionGain * stimulus;
       odcore::data::TimeStamp t0;
       opendlv::action::Correction correction(t0, "steering", false, amplitude, priority);
       odcore::data::Container container(correction);
       getConference().send(container);
 
+      std::cout << "Correction: " << amplitude << std::endl;
+
       m_correctionTime = t0;
       m_correction = amplitude;
     }
   }
+  
+  std::cout << ">>> End correction!" << std::endl;
 }
 
 bool SetOpticalRotation::IsPatient() const
