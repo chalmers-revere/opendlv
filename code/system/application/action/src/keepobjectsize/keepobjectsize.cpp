@@ -47,14 +47,14 @@ KeepObjectSize::KeepObjectSize(int32_t const &a_argc, char **a_argv)
     m_stimulusRate(),
     m_correctionTime(0, 0),
     m_correction(),
-    m_correctionGain(0.4f),
+    m_correctionGain(200.0f),
     m_maxStimulusAge(0.5f),
     m_patienceDuration(0.4f),
     m_stimulusJerk(),
     m_stimulusJerkThreshold(0.02f),
     m_stimulusRateThreshold(0.02f),
     m_stimulusThreshold(0.02f),
-    m_equilibrium(20.0f)
+    m_equilibrium(10.0f)
 {
 }
 

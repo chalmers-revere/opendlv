@@ -47,13 +47,13 @@ SetOpticalRotation::SetOpticalRotation(int32_t const &a_argc, char **a_argv)
     m_stimulusRate(),
     m_correctionTime(0, 0),
     m_correction(),
-    m_correctionGain(0.2f),
+    m_correctionGain(0.17f),
     m_maxStimulusAge(1.0f),
-    m_patienceDuration(0.2f),
+    m_patienceDuration(0.1f),
     m_stimulusJerk(),
     m_stimulusJerkThreshold(0.02f),
-    m_stimulusRateThreshold(0.02f),
-    m_stimulusThreshold(0.02f)
+    m_stimulusRateThreshold(0.017f),
+    m_stimulusThreshold(0.01f)
 {
 }
 
