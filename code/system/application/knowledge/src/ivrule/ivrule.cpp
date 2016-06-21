@@ -69,6 +69,7 @@ Ivrule::~Ivrule()
     opendlv::perception::StimulusOpticalFlow sof(now, m_desiredOpticalFlow, m_speed);
     odcore::data::Container containerSof(sof);
     getConference().send(containerSof);
+    std::cout << "Send sof. Desired OF: " << m_desiredOpticalFlow  << " Current OF: " << m_speed << std::endl;
 
 
     if((m_mioValidUntil-now).toMicroseconds() > 0) {
