@@ -188,12 +188,17 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
           m_steeringValue, false);
       odcore::data::Container actuationContainer(actuationRequest,opendlv::proxy::ActuationRequest::ID()+300);
       getConference().send(actuationContainer);
+
+      std::cout << "Send steering " << m_steeringValue << " brake " << m_brakeValue << std::endl;
+
     } else {
       std::cout << "Sent actuation request" << std::endl;
       opendlv::proxy::ActuationRequest actuationRequest(m_accelerationValue, 
           m_steeringValue, false);
       odcore::data::Container actuationContainer(actuationRequest,opendlv::proxy::ActuationRequest::ID()+300);
       getConference().send(actuationContainer);
+      
+      std::cout << "Send steering " << m_steeringValue << " acceleration " << m_accelerationValue << std::endl;
     }
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
