@@ -314,7 +314,7 @@ void ConvNeuralNet::GetDetectedVehicles(std::vector<cv::Rect>* container)
 
 void ConvNeuralNet::GetConvNet(
     int32_t a_width, int32_t a_height,
-    tiny_cnn::network<tiny_cnn::mse, tiny_cnn::gradient_descent>* a_cnn,
+    tiny_cnn::network<tiny_cnn::sequential>* a_cnn,
     bool a_isTrainingNetwork)
 {
   // works ~ 93 %
