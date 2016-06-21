@@ -48,12 +48,12 @@ SetOpticalRotation::SetOpticalRotation(int32_t const &a_argc, char **a_argv)
     m_correctionTime(0, 0),
     m_correction(),
     m_correctionGain(0.2f),
-    m_maxStimulusAge(0.5f),
-    m_patienceDuration(0.3f),
+    m_maxStimulusAge(1.0f),
+    m_patienceDuration(0.2f),
     m_stimulusJerk(),
-    m_stimulusJerkThreshold(0.05f),
-    m_stimulusRateThreshold(0.05f),
-    m_stimulusThreshold(0.05f)
+    m_stimulusJerkThreshold(0.02f),
+    m_stimulusRateThreshold(0.02f),
+    m_stimulusThreshold(0.02f)
 {
 }
 
@@ -152,6 +152,16 @@ void SetOpticalRotation::Correct()
 
     bool isStimulusRateZero = (std::abs(stimulusRate) < m_stimulusRateThreshold);
     bool isStimulusRateHelping = (static_cast<int>(std::copysign(1.0f, stimulus)) != static_cast<int>(std::copysign(1.0f, stimulusRate)));
+
+    if (isStimulusRateZero) {
+      std::cout << "Rate is zero!" << std::endl;
+    }
+
+    if (isStimulusRateHelping) {
+      std::cout << "Rate is helping!" << std::endl;
+    }
+
+
     if (isStimulusRateZero || (!isStimulusRateZero && !isStimulusRateHelping)) {
 
       float amplitude = m_correctionGain * stimulus;

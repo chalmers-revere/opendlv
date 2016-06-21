@@ -67,20 +67,24 @@ void Act::nextContainer(odcore::data::Container &a_container)
     opendlv::action::Correction correction = 
         a_container.getData<opendlv::action::Correction>();
 
-    auto startTime = correction.getStartTime();
+  //  auto startTime = correction.getStartTime();
     std::string type = correction.getType();
-    bool isInhibitory = correction.getIsInhibitory();
+  //  bool isInhibitory = correction.getIsInhibitory();
     float amplitude = correction.getAmplitude();
     
     if (type == "accelerate") {
-      if (isInhibitory) {
+  /*    if (isInhibitory) {
         m_startTimesAccelerate.clear();
         m_amplitudesAccelerate.clear();
       }
         
       m_startTimesAccelerate.push_back(startTime);
       m_amplitudesAccelerate.push_back(amplitude);
+      */
+      m_accelerationValue = amplitude;
+
     } else if (type == "brake") {
+      /*
       if (isInhibitory) {
         m_startTimesBrake.clear();
         m_amplitudesBrake.clear();
@@ -88,7 +92,12 @@ void Act::nextContainer(odcore::data::Container &a_container)
         
       m_startTimesBrake.push_back(startTime);
       m_amplitudesBrake.push_back(amplitude);
+      */
+      m_brakeValue = amplitude;
+
+
     } else if (type == "steering") {
+      /*
       if (isInhibitory) {
         m_startTimesSteering.clear();
         m_amplitudesSteering.clear();
@@ -96,6 +105,9 @@ void Act::nextContainer(odcore::data::Container &a_container)
         
       m_startTimesSteering.push_back(startTime);
       m_amplitudesSteering.push_back(amplitude);
+      */
+
+      m_steeringValue = amplitude;
     }
   }
 }
@@ -108,10 +120,13 @@ void Act::nextContainer(odcore::data::Container &a_container)
 */
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
 {
-  float freq = static_cast<float>(getFrequency());
-
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
     odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+
+    /*
+    m_accelerationValue = 0.0f;
+    m_brakeValue = 0;
+    m_steeringValue = 0;
 
     odcore::data::TimeStamp now;
 
@@ -125,8 +140,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
           - t0.toMicroseconds()) / 1000000.0f;
 
       if (t1 < m_correctionDuration) {
-        float deltaValue = amplitude / freq;
-        m_accelerationValue += deltaValue;
+      //  float ratio = t1 / m_correctionDuration;
+      //  float deltaValue = amplitude * ratio;
+        m_accelerationValue = 25.0f; // += deltaValue;
 
         startTimesAccelerateToSave.push_back(t0);
         amplitudesAccelerateToSave.push_back(amplitude);
@@ -147,7 +163,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
           - t0.toMicroseconds()) / 1000000.0f;
 
       if (t1 < m_correctionDuration) {
-        float deltaValue = amplitude / freq;
+        float ratio = t1 / m_correctionDuration;
+        float deltaValue = amplitude * ratio;
         m_brakeValue += deltaValue;
 
         startTimesBrakeToSave.push_back(t0);
@@ -169,7 +186,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
           - t0.toMicroseconds()) / 1000000.0f;
 
       if (t1 < m_correctionDuration) {
-        float deltaValue = amplitude / freq;
+        float ratio = t1 / m_correctionDuration;
+        float deltaValue = amplitude * ratio;
         m_steeringValue += deltaValue;
 
         startTimesSteeringToSave.push_back(t0);
@@ -179,6 +197,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
 
     m_startTimesSteering = startTimesSteeringToSave;
     m_amplitudesSteering = amplitudesSteeringToSave;
+    */
 
 
     if (m_brakeValue > 0.0f) {
