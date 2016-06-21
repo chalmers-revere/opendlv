@@ -47,13 +47,14 @@ SetOpticalFlow::SetOpticalFlow(int32_t const &a_argc, char **a_argv)
     m_stimulusRate(),
     m_correctionTime(0, 0),
     m_correction(),
-    m_correctionGain(0.8f),
-    m_maxStimulusAge(4.0f),
-    m_patienceDuration(2.0f),
+    m_correctionGain(5.0f),
+    m_maxStimulusAge(4.1f),
+    m_patienceDuration(4.0f),
     m_stimulusJerk(),
     m_stimulusJerkThreshold(0.5f),
     m_stimulusRateThreshold(0.5f),
-    m_stimulusThreshold(1.0f)
+    m_stimulusThreshold(1.0f),
+    m_equilibrium(20.0f)
 {
 }
 
@@ -104,15 +105,11 @@ void SetOpticalFlow::AddStimulus(odcore::data::TimeStamp const &a_stimulusTime, 
   float opticalFlow = a_stimulusOpticalFlow.getOpticalFlow();
   float stimulus = desiredOpticalFlow - opticalFlow;
 
-  if (std::abs(stimulus) < 1.0f) {
-    m_patienceDuration = 0.5f;
-    m_maxStimulusAge = 1.0f;
-    m_correctionGain = 0.5f;
-  } else {
-    m_patienceDuration = 2.0f;
-    m_maxStimulusAge = 4.0f;
-    m_correctionGain = 1.0f;
-  }
+ // if (std::abs(stimulus) < 1.0f) {
+ //   m_patienceDuration = 2.0f;
+ // } else {
+ //   m_patienceDuration = 10.0f;
+ // }
 
   float stimulusRate = 0.0f;
   if (m_stimulus.size() > 0) {
@@ -155,24 +152,25 @@ void SetOpticalFlow::Correct()
   std::cout << "Stimulus: " << stimulus << std::endl;
   std::cout << "Stimulus rate: " << stimulusRate << std::endl;
 
+  float amplitude = m_equilibrium;
   if (std::abs(stimulus) > m_stimulusThreshold) {
 
     bool isStimulusRateZero = (std::abs(stimulusRate) < m_stimulusRateThreshold);
     bool isStimulusRateHelping = (static_cast<int>(std::copysign(1.0f, stimulus)) != static_cast<int>(std::copysign(1.0f, stimulusRate)));
     if (isStimulusRateZero || (!isStimulusRateZero && !isStimulusRateHelping)) {
-
-      float amplitude = m_correctionGain * stimulus;
-      odcore::data::TimeStamp t0;
-      opendlv::action::Correction correction(t0, "accelerate", false, amplitude, priority);
-      odcore::data::Container container(correction);
-      getConference().send(container);
-      
-      std::cout << "Correction: " << amplitude << std::endl;
-
-      m_correctionTime = t0;
-      m_correction = amplitude;
+      amplitude += m_correctionGain * stimulus;
     }
   }
+      
+  odcore::data::TimeStamp t0;
+  opendlv::action::Correction correction(t0, "accelerate", false, amplitude, priority);
+  odcore::data::Container container(correction);
+  getConference().send(container);
+      
+  std::cout << "Correction: " << amplitude << std::endl;
+
+  m_correctionTime = t0;
+  m_correction = amplitude;
   
   std::cout << ">>> End correction!" << std::endl;
 }

@@ -61,6 +61,7 @@ class SetOpticalFlow
   float m_stimulusJerkThreshold;
   float m_stimulusRateThreshold;
   float m_stimulusThreshold;
+  float m_equilibrium;
 };
 
 } // setopticalflow

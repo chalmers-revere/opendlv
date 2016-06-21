@@ -53,7 +53,8 @@ KeepObjectSize::KeepObjectSize(int32_t const &a_argc, char **a_argv)
     m_stimulusJerk(),
     m_stimulusJerkThreshold(0.02f),
     m_stimulusRateThreshold(0.02f),
-    m_stimulusThreshold(0.03f)
+    m_stimulusThreshold(0.02f),
+    m_equilibrium(20.0f)
 {
 }
 
@@ -136,26 +137,36 @@ void KeepObjectSize::Correct()
   if (IsPatient()) {
     return;
   }
+  
+  std::cout << "<<< Start to correct!" << std::endl;
 
   float stimulus = m_stimulus.back();
   float stimulusRate = m_stimulusRate.back();
 
+  std::cout << "Stimulus: " << stimulus << std::endl;
+  std::cout << "Stimulus rate: " << stimulusRate << std::endl;
+
+  float amplitude = m_equilibrium;
   if (std::abs(stimulus) > m_stimulusThreshold) {
 
     bool isStimulusRateZero = (std::abs(stimulusRate) < m_stimulusRateThreshold);
     bool isStimulusRateHelping = (static_cast<int>(std::copysign(1.0f, stimulus)) != static_cast<int>(std::copysign(1.0f, stimulusRate)));
     if (isStimulusRateZero || (!isStimulusRateZero && !isStimulusRateHelping)) {
-
-      float amplitude = m_correctionGain * stimulus * stimulus;
-      odcore::data::TimeStamp t0;
-      opendlv::action::Correction correction(t0, "accelerate", false, amplitude, priority);
-      odcore::data::Container container(correction);
-      getConference().send(container);
-
-      m_correctionTime = t0;
-      m_correction = amplitude;
+      amplitude += m_correctionGain * stimulus;
     }
   }
+
+  odcore::data::TimeStamp t0;
+  opendlv::action::Correction correction(t0, "accelerate", false, amplitude, priority);
+  odcore::data::Container container(correction);
+  getConference().send(container);
+  
+  std::cout << "Correction: " << amplitude << std::endl;
+
+  m_correctionTime = t0;
+  m_correction = amplitude;
+  
+  std::cout << ">>> End correction!" << std::endl;
 }
 
 bool KeepObjectSize::IsPatient() const
