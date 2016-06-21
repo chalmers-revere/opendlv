@@ -204,7 +204,7 @@ safety-manualoverride.torsionBarTorqueThreshold = 1.5
 
 sensation-echolocation.memoryThreshold = 0 #discrete seconds
 sensation-echolocation.pointCloudRadius = 1.0 #meters
-sensation-echolocation.pointCloudSizeMinimum = 5 #number of points
+sensation-echolocation.pointCloudSizeMinimum = 3 #number of points
 
 
 ###############################################################################
@@ -230,16 +230,16 @@ knowledge-identity.rearAxleLocation = 5.0
 ###############################################################################
 ###############################################################################
 # Ivrule
-knowledge-ivrule.mioAngleRange = 30.0 #degrees
-knowledge-ivrule.mioDistanceRange = 30.0 #meters
+knowledge-ivrule.mioAngleRange = 45.0 #degrees
+knowledge-ivrule.mioDistanceRange = 50.0 #meters
 knowledge-ivrule.memoryDuration = 1 #seconds
-knowledge-ivrule.desiredAngularSize = 6 #degrees
+knowledge-ivrule.desiredAngularSize = 4 #degrees
 knowledge-ivrule.desiredOpticalFlow = 5.6 #meters/s
 
 ###############################################################################
 ###############################################################################
 # Scene
-knowledge-scene.mergeDistance = 2.0
+knowledge-scene.mergeDistance = 3.5
 knowledge-scene.validUntilDuration = 1
 knowledge-scene.memoryCapacity = 5.0 # seconds
 
