@@ -122,6 +122,11 @@ void SetOpticalFlow::AddStimulus(odcore::data::TimeStamp const &a_stimulusTime, 
   m_stimulusTime.push_back(a_stimulusTime);
   m_stimulus.push_back(stimulus);
   m_stimulusRate.push_back(stimulusRate);
+
+//  std::cout << "==============" << std::endl;
+//  std::cout << "Stimulus (" << m_stimulus.size() << "): " << stimulus << std::endl;
+//  std::cout << "Stimulus rate (" << m_stimulusRate.size() << "): " << stimulusRate << std::endl;
+//  std::cout << "Stimulus jerk: " << m_stimulusJerk << std::endl;
 }
 
 void SetOpticalFlow::Correct()
@@ -131,9 +136,14 @@ void SetOpticalFlow::Correct()
   if (IsPatient()) {
     return;
   }
+  
+  std::cout << "<<< Start to correct!" << std::endl;
 
   float stimulus = m_stimulus.back();
   float stimulusRate = m_stimulusRate.back();
+  
+  std::cout << "Stimulus: " << stimulus << std::endl;
+  std::cout << "Stimulus rate: " << stimulusRate << std::endl;
 
   if (std::abs(stimulus) > m_stimulusThreshold) {
 
@@ -141,16 +151,20 @@ void SetOpticalFlow::Correct()
     bool isStimulusRateHelping = (static_cast<int>(std::copysign(1.0f, stimulus)) != static_cast<int>(std::copysign(1.0f, stimulusRate)));
     if (isStimulusRateZero || (!isStimulusRateZero && !isStimulusRateHelping)) {
 
-      float amplitude = m_correctionGain * stimulus * stimulus;
+      float amplitude = m_correctionGain * stimulus;
       odcore::data::TimeStamp t0;
       opendlv::action::Correction correction(t0, "accelerate", false, amplitude, priority);
       odcore::data::Container container(correction);
       getConference().send(container);
+      
+      std::cout << "Correction: " << amplitude << std::endl;
 
       m_correctionTime = t0;
       m_correction = amplitude;
     }
   }
+  
+  std::cout << ">>> End correction!" << std::endl;
 }
 
 bool SetOpticalFlow::IsPatient() const
