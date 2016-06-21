@@ -274,6 +274,28 @@ fh16-ivrule-setopticalflow-act-checkactuation-can: build-incremental fh16-ivrule
 
 ###############################################################################
 ###############################################################################
+# FH16 lidar-echolocation-scene-ivrule-act-checkactuation-can.
+
+# Tag Docker images using Git hashes for traceability.
+docker-tag-fh16-lidar-echolocation-scene-ivrule-act-checkactuation-can:
+	for i in $$(cat fh16-lidar-echolocation-scene-ivrule-act-checkactuation-can/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker tag fh16lidarecholocationsceneivruleactcheckactuationcan_$$i seresearch/fh16lidarecholocationsceneivruleactcheckactuationcan_$$i:$(VERSION); docker tag fh16lidarecholocationsceneivruleactcheckactuationcan_$$i seresearch/fh16lidarecholocationsceneivruleactcheckactuationcan_$$i:latest; done
+
+# Push Docker latest images for backup.
+docker-push-fh16-lidar-echolocation-scene-ivrule-act-checkactuation-can: docker-tag-fh16-lidar-echolocation-scene-ivrule-act-checkactuation-can
+	for i in $$(cat fh16-lidar-echolocation-scene-ivrule-act-checkactuation-can/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/fh16lidarecholocationsceneivruleactcheckactuationcan_$$i:$(VERSION); docker push seresearch/fh16lidarecholocationsceneivruleactcheckactuationcan_$$i:latest; done
+
+fh16-lidar-echolocation-scene-ivrule-act-checkactuation-can-copy-opendlv:
+	rm -fr fh16-lidar-echolocation-scene-ivrule-act-checkactuation-can/opendlv
+	cp -r ../build.from.docker/install fh16-lidar-echolocation-scene-ivrule-act-checkactuation-can/opendlv
+	cp fh16-lidar-echolocation-scene-ivrule-act-checkactuation-can/checkHealth.sh fh16-lidar-echolocation-scene-ivrule-act-checkactuation-can/opendlv/bin
+
+# Build image for FH16 truck for lidar-echolocation-scene-ivrule-act-checkactuation-can.
+fh16-lidar-echolocation-scene-ivrule-act-checkactuation-can: build-incremental fh16-lidar-echolocation-scene-ivrule-act-checkactuation-can-copy-opendlv
+	cd fh16-lidar-echolocation-scene-ivrule-act-checkactuation-can && docker-compose build
+
+
+###############################################################################
+###############################################################################
 # FH16 IV2016.
 
 # Tag Docker images using Git hashes for traceability.

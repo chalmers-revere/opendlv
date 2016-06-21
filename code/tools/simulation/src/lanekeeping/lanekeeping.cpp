@@ -35,7 +35,7 @@ LaneKeeping::LaneKeeping(int32_t const &a_argc, char **a_argv)
     : odcore::base::module::TimeTriggeredConferenceClientModule(
       a_argc, a_argv, "tools-simulation-lanekeeping"),
     m_vehicle(new Vehicle),
-    m_steering(0.0f)
+    m_steering(0.01f)
 {
 }
 
@@ -46,7 +46,7 @@ LaneKeeping::~LaneKeeping()
 void LaneKeeping::setUp()
 {
   m_vehicle->SetSpeed(9.0f);
-  m_vehicle->SetHeading(0.2f);
+  m_vehicle->SetHeading(0.1f);
 
   std::cout << "Set up" << std::endl;
 }
@@ -60,7 +60,10 @@ void LaneKeeping::nextContainer(odcore::data::Container &a_c)
 {
   if(a_c.getDataType() == opendlv::proxy::ActuationRequest::ID()){
     auto actuationRequest = a_c.getData<opendlv::proxy::ActuationRequest>();
-    m_steering = actuationRequest.getSteering();
+    if(actuationRequest.getIsValid()) {
+      m_steering = actuationRequest.getSteering();
+      std::cout << "Got steering: " << m_steering << std::endl;
+    }
   }
 }
 
@@ -75,23 +78,26 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode LaneKeeping::body()
     odcore::data::TimeStamp duration = thisTimestep - previousTimestep;
     previousTimestep = thisTimestep;
 
-
+    std::cout << "==================" << std::endl;
     std::cout << "m_steering: " << m_steering << std::endl;
     double deltaTime = duration.toMicroseconds() / 1000000.0;
-    //std::cout << "deltaTime: " << deltaTime << std::endl; 
+    std::cout << "deltaTime: " << deltaTime << std::endl; 
     m_vehicle->Update(m_steering, deltaTime);
 
-    double lateralPosition = m_vehicle->GetLateralPosition();
+    // double lateralPosition = m_vehicle->GetLateralPosition();
     double heading = m_vehicle->GetHeading();
 
     std::cout << "Heading: " << heading << std::endl;
     std::cout << "Heading (degrees): " << (heading * 57.295779513) << std::endl;
-    std::cout << "Lateral position: " << lateralPosition << std::endl;
+    // std::cout << "Lateral position: " << lateralPosition << std::endl;
 
-// TODO: Use Surface instead.
-//    opendlv::perception::LanePosition lanePosition(lateralPosition, heading);
-//    odcore::data::Container msg(lanePosition);  
-//    getConference().send(msg);
+    odcore::data::TimeStamp identified;
+    opendlv::model::Direction desiredDirectionOfMovement(-heading, 0.0f);
+    opendlv::model::Direction directionOfMovement(0.0f, 0.0f);
+
+    opendlv::perception::StimulusDirectionOfMovement stimulusDirectionOfMovement(identified, desiredDirectionOfMovement, directionOfMovement);
+    odcore::data::Container msg(stimulusDirectionOfMovement);  
+    getConference().send(msg);
   }
 
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
