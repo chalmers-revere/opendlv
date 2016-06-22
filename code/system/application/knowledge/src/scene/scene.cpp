@@ -332,12 +332,12 @@ void Scene::MergeObjects(opendlv::perception::Object a_object, uint32_t a_index)
 
   m_savedObjects[a_index].setIdentified(a_object.getIdentified()); //Sets the saved objects timestamp to the new timestamp
 
-  opendlv::model::Direction newDirection((m_savedObjects[a_index].getDirection().getAzimuth() + a_object.getDirection().getAzimuth())/2,(m_savedObjects[a_index].getDirection().getZenith() + a_object.getDirection().getZenith())/2);
-  m_savedObjects[a_index].setDirection(newDirection);
+  // opendlv::model::Direction newDirection((m_savedObjects[a_index].getDirection().getAzimuth() + a_object.getDirection().getAzimuth())/2,(m_savedObjects[a_index].getDirection().getZenith() + a_object.getDirection().getZenith())/2);
+  m_savedObjects[a_index].setDirection(a_object.getDirection());
   m_savedObjects[a_index].setDirectionConfidence(a_object.getDirectionConfidence());
-  m_savedObjects[a_index].setAngularSize((m_savedObjects[a_index].getAngularSize() + a_object.getAngularSize())/2);
+  m_savedObjects[a_index].setAngularSize(a_object.getAngularSize());
   m_savedObjects[a_index].setAngularSizeConfidence(a_object.getAngularSizeConfidence());
-  m_savedObjects[a_index].setDistance((m_savedObjects[a_index].getDistance() + a_object.getDistance())/2);
+  m_savedObjects[a_index].setDistance( a_object.getDistance());
   m_savedObjects[a_index].setDistanceConfidence((m_savedObjects[a_index].getDistanceConfidence() + a_object.getDistanceConfidence())/2);
   m_savedObjects[a_index].setType(a_object.getType());
   m_savedObjects[a_index].setTypeConfidence(a_object.getTypeConfidence());
