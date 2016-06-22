@@ -112,3 +112,32 @@ action-act:
     - LD_LIBRARY_PATH=/opt/opendlv/lib
     command: "/opt/opendlv/bin/opendlv-system-application-action-act --cid=77 --freq=100"
 
+# microservice for action-setopticalrotation
+action-setopticalrotation:
+    build: .
+    net: "host"
+    working_dir: "/opt/opendlv/bin"
+    restart: always
+    environment:
+    - LD_LIBRARY_PATH=/opt/opendlv/lib
+    command: "/opt/opendlv/bin/opendlv-system-application-action-setopticalrotation --cid=77"
+
+# microservice for action-setopticalflow
+action-setopticalflow:
+    build: .
+    net: "host"
+    working_dir: "/opt/opendlv/bin"
+    restart: always
+    environment:
+    - LD_LIBRARY_PATH=/opt/opendlv/lib
+    command: "/opt/opendlv/bin/opendlv-system-application-action-setopticalflow --cid=77"
+    
+# microservice for action-keepobjectsize
+action-keepobjectsize:
+    build: .
+    net: "host"
+    working_dir: "/opt/opendlv/bin"
+    restart: always
+    environment:
+    - LD_LIBRARY_PATH=/opt/opendlv/lib
+    command: "/opt/opendlv/bin/opendlv-system-application-action-keepobjectsize --cid=77"
