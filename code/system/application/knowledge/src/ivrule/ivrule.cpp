@@ -66,10 +66,6 @@ Ivrule::~Ivrule()
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
     odcore::data::TimeStamp now;
 
-    opendlv::perception::StimulusOpticalFlow sof(now, m_desiredOpticalFlow, m_speed);
-    odcore::data::Container containerSof(sof);
-    getConference().send(containerSof);
-    // std::cout << "Send sof. Desired OF: " << m_desiredOpticalFlow  << " Current OF: " << m_speed << std::endl;
 
 
     if((m_mioValidUntil-now).toMicroseconds() > 0) {
@@ -95,7 +91,11 @@ Ivrule::~Ivrule()
       //     << " Desired angular size: " << m_desiredAngularSize 
       //     << " Currently: " << m_mio.getAngularSize() 
       //     << std::endl;
-
+    } else {
+      opendlv::perception::StimulusOpticalFlow sof(now, m_desiredOpticalFlow, m_speed);
+      odcore::data::Container containerSof(sof);
+      getConference().send(containerSof);
+      // std::cout << "Send sof. Desired OF: " << m_desiredOpticalFlow  << " Current OF: " << m_speed << std::endl;
     }
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
@@ -142,7 +142,7 @@ void Ivrule::FindMio(std::vector<opendlv::perception::Object> &a_listOfObjects)
     float score = 0;
     score += (std::pow(8.0f,2.0f
       )-std::pow(azimuth*static_cast<float>(opendlv::Constants::RAD2DEG)/45.0f*8.0f,2.0f));
-    score += (100-distance)*2;
+    score += (100-distance)*3;
     for(auto it:sources){
       score += 80;
     }
