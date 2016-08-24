@@ -48,7 +48,7 @@ class CanMessageDataStore
  public:
   CanMessageDataStore(
   std::shared_ptr<automotive::odcantools::CANDevice> canDevice);
-  virtual void add(const odcore::data::Container &container);
+  virtual void add(odcore::data::Container &container);
 };
 
 } // can

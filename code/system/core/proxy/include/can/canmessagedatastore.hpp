@@ -49,7 +49,7 @@ class CanMessageDataStore
  public:
   CanMessageDataStore(
   std::shared_ptr<automotive::odcantools::CANDevice> canDevice);
-  virtual void add(odcore::data::Container const &container);
+  virtual void add(odcore::data::Container &container);
 
   bool IsAutonomousEnabled();
   bool IsOverridden();
