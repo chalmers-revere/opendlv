@@ -1,4 +1,4 @@
-tiny-cnn: A header only, dependency-free deep learning framework in C++11
+tiny-cnn: A header-only, dependency-free deep learning framework for C++11
 ========
 
 | **Linux/Mac OS** | **Windows** |
@@ -17,16 +17,25 @@ tiny-cnn is a C++11 implementation of deep learning. It is suitable for deep lea
 * [License](#license)
 * [Mailing list](#mailing-list)
 
-see [Wiki Pages](https://github.com/nyanp/tiny-cnn/wiki) for more info.
+Check out the [documentation](doc/readme.md) for more info.
+
+## What's New
+- [tiny-cnn v0.1.0 released!](https://github.com/nyanp/tiny-cnn/releases/tag/v0.1.0)
 
 ## Features
-- fast, without GPU
+- reasonably fast, without GPU
     - with TBB threading and SSE/AVX vectorization
     - 98.8% accuracy on MNIST in 13 minutes training (@Core i7-3520M)
-- header only
-    - Just include tiny_cnn.h and write your model in c++. There is nothing to install.
-- small dependency & simple implementation
-- [can import caffe's model](https://github.com/nyanp/tiny-cnn/tree/master/examples/caffe_converter)
+- portable & header-only
+    - Run anywhere as long as you have a compiler which supports C++11
+    - Just include tiny_cnn.h and write your model in C++. There is nothing to install.
+- easy to integrate with real applications
+    - no output to stdout/stderr
+    - a constant throughput (simple parallelization model, no garbage collection)
+    - work without throwing an exception
+    - [can import caffe's model](https://github.com/nyanp/tiny-cnn/tree/master/examples/caffe_converter)
+- simply implemented
+    - be a good library for learning neural networks
 
 ## Comparison with other libraries
 
@@ -50,6 +59,10 @@ see [Wiki Pages](https://github.com/nyanp/tiny-cnn/wiki) for more info.
 * contrast normalization layer
 * dropout layer
 * linear operation layer
+* deconvolution layer
+* unpooling layer
+* elementwise-add layer
+* concat layer
 
 ### activation functions
 * tanh
@@ -64,7 +77,7 @@ see [Wiki Pages](https://github.com/nyanp/tiny-cnn/wiki) for more info.
 * cross-entropy
 * mean-squared-error
 
-### optimization algorithm
+### optimization algorithms
 * stochastic gradient descent (with/without L2 normalization and momentum)
 * stochastic gradient levenberg marquardt
 * adagrad
@@ -73,7 +86,7 @@ see [Wiki Pages](https://github.com/nyanp/tiny-cnn/wiki) for more info.
 
 ## Dependencies
 ##### Minimum requirements
-Nothing.All you need is a C++11 compiler.
+Nothing. All you need is a C++11 compiler.
 
 ##### Requirements to build sample/test programs
 [OpenCV](http://opencv.org/)
@@ -95,8 +108,10 @@ Some cmake options are available:
 |USE_OMP|Use OpenMP for parallelization|OFF*|[OpenMP Compiler](http://openmp.org/wp/openmp-compilers/)|
 |USE_SSE|Use Intel SSE instruction set|ON|Intel CPU which supports SSE|
 |USE_AVX|Use Intel AVX instruction set|ON|Intel CPU which supports AVX|
+|USE_OPENCV|Use OpenCV for sample/test programs|ON|[Open Source Computer Vision Library](http://opencv.org/)|
 |BUILD_TESTS|Build unist tests|OFF|-**|
 |BUILD_EXAMPLES|Build example projects|ON|-|
+|BUILD_DOCS|Build documentation|OFF|[Doxygen](http://www.doxygen.org/)|
 
 *tiny-cnn use c++11 standard library for parallelization by default
 **to build tests, type `git submodule update --init` before build
@@ -116,37 +131,39 @@ construct convolutional neural networks
 #include "tiny_cnn/tiny_cnn.h"
 using namespace tiny_cnn;
 using namespace tiny_cnn::activation;
+using namespace tiny_cnn::layers;
 
 void construct_cnn() {
     using namespace tiny_cnn;
 
-    // specify loss-function and optimization-algorithm
-    network<mse, adagrad> net;
-    //network<cross_entropy, RMSprop> net;
+    network<sequential> net;
 
     // add layers
-    net << convolutional_layer<tan_h>(32, 32, 5, 1, 6) // 32x32in, conv5x5, 1-6 f-maps
-        << average_pooling_layer<tan_h>(28, 28, 6, 2) // 28x28in, 6 f-maps, pool2x2
-        << fully_connected_layer<tan_h>(14 * 14 * 6, 120)
-        << fully_connected_layer<identity>(120, 10);
+    net << conv<tan_h>(32, 32, 5, 1, 6)  // in:32x32x1, 5x5conv, 6fmaps
+        << ave_pool<tan_h>(28, 28, 6, 2) // in:28x28x6, 2x2pooling
+        << fc<tan_h>(14 * 14 * 6, 120)   // in:14x14x6, out:120
+        << fc<identity>(120, 10);        // in:120,     out:10
 
-    assert(net.in_dim() == 32 * 32);
-    assert(net.out_dim() == 10);
-    
+    assert(net.in_data_size() == 32 * 32);
+    assert(net.out_data_size() == 10);
+
     // load MNIST dataset
     std::vector<label_t> train_labels;
     std::vector<vec_t> train_images;
-    
+
     parse_mnist_labels("train-labels.idx1-ubyte", &train_labels);
-    parse_mnist_images("train-images.idx3-ubyte", &train_images);
-    
+    parse_mnist_images("train-images.idx3-ubyte", &train_images, -1.0, 1.0, 2, 2);
+
+    // declare optimization algorithm
+    adagrad optimizer;
+
     // train (50-epoch, 30-minibatch)
-    net.train(train_images, train_labels, 30, 50);
-    
+    net.train<mse>(optimizer, train_images, train_labels, 30, 50);
+
     // save
     std::ofstream ofs("weights");
     ofs << net;
-    
+
     // load
     // std::ifstream ifs("weights");
     // ifs >> net;
@@ -158,15 +175,16 @@ construct multi-layer perceptron(mlp)
 #include "tiny_cnn/tiny_cnn.h"
 using namespace tiny_cnn;
 using namespace tiny_cnn::activation;
+using namespace tiny_cnn::layers;
 
 void construct_mlp() {
-    network<mse, gradient_descent> net;
+    network<sequential> net;
 
-    net << fully_connected_layer<sigmoid>(32 * 32, 300)
-        << fully_connected_layer<identity>(300, 10);
+    net << fc<sigmoid>(32 * 32, 300)
+        << fc<identity>(300, 10);
 
-    assert(net.in_dim() == 32 * 32);
-    assert(net.out_dim() == 10);
+    assert(net.in_data_size() == 32 * 32);
+    assert(net.out_data_size() == 10);
 }
 ```
 
@@ -178,14 +196,14 @@ using namespace tiny_cnn;
 using namespace tiny_cnn::activation;
 
 void construct_mlp() {
-    auto mynet = make_mlp<mse, gradient_descent, tan_h>({ 32 * 32, 300, 10 });
+    auto mynet = make_mlp<tan_h>({ 32 * 32, 300, 10 });
 
-    assert(mynet.in_dim() == 32 * 32);
-    assert(mynet.out_dim() == 10);
+    assert(mynet.in_data_size() == 32 * 32);
+    assert(mynet.out_data_size() == 10);
 }
 ```
 
-more sample, read examples/main.cpp or [MNIST example](https://github.com/nyanp/tiny-cnn/tree/master/examples/caffe_converter) page.
+more sample, read examples/main.cpp or [MNIST example](https://github.com/nyanp/tiny-cnn/tree/master/examples/mnist) page.
 
 ## References
 [1] Y. Bengio, [Practical Recommendations for Gradient-Based Training of Deep Architectures.](http://arxiv.org/pdf/1206.5533v2.pdf) 
