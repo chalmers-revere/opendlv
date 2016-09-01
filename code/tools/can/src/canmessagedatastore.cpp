@@ -34,7 +34,7 @@ std::shared_ptr<automotive::odcantools::CANDevice> canDevice)
 {
 }
 
-void CanMessageDataStore::add(const odcore::data::Container &container)
+void CanMessageDataStore::add(odcore::data::Container &container)
 {
   using namespace automotive;
   if (container.getDataType() == GenericCANMessage::ID()) {

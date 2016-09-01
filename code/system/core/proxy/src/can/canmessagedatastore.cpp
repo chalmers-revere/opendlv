@@ -42,14 +42,9 @@ std::shared_ptr<automotive::odcantools::CANDevice> canDevice)
 {
 }
 
-void CanMessageDataStore::add(odcore::data::Container const &a_container)
+void CanMessageDataStore::add(odcore::data::Container &container)
 {
   odcore::base::Lock l(m_dataStoreMutex);
-
-  // TODO: Kids, do not try this at home. Issue: #19.
-  odcore::data::Container &container = const_cast<odcore::data::Container &>(
-  a_container);
-
 
   if (container.getDataType() == opendlv::proxy::ControlState::ID()) {
     opendlv::proxy::ControlState controlState = container.getData<opendlv::proxy::ControlState>();

@@ -435,8 +435,7 @@ void Can::dumpCSVData(Container &c)
   const uint64_t receivedFromCAN = c.getReceivedTimeStamp().toMicroseconds();
 
   shared_ptr<Field<uint64_t>> m_receivedTS_ptr = shared_ptr<Field<uint64_t>>(new Field<uint64_t>(receivedFromCAN));
-  m_receivedTS_ptr->setLongFieldIdentifier(0);
-  m_receivedTS_ptr->setShortFieldIdentifier(0);
+  m_receivedTS_ptr->setFieldIdentifier(0);
   m_receivedTS_ptr->setLongFieldName("Received_TimeStamp");
   m_receivedTS_ptr->setShortFieldName("Received_TimeStamp");
   m_receivedTS_ptr->setFieldDataType(reflection::AbstractField::UINT64_T);
