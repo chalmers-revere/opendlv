@@ -113,7 +113,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Signalinjector::body()
       m_throttle.pop_back();
     }
     if (breakValue > 0.0f) {
-      opendlv::proxy::ActuationRequest actuationRequest(breakValue, 
+      opendlv::proxy::ActuationRequest actuationRequest(-breakValue, 
           steerValue, true);
       odcore::data::Container actuationContainer(actuationRequest,opendlv::proxy::ActuationRequest::ID());
       getConference().send(actuationContainer);
