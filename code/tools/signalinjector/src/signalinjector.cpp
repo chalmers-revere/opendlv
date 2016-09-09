@@ -100,22 +100,22 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Signalinjector::body()
     odcore::data::TimeStamp now;
     float time = static_cast<float>((now.toMicroseconds() - startTime.toMicroseconds()))/1000000;
     // std::cout << std::get<0>(m_brake[0]) << std::endl;
-    while(std::get<0>(m_brake.back()) < time && !m_brake.empty()){
+    while(!m_brake.empty() && std::get<0>(m_brake.back()) < time){
       breakValue = std::get<1>(m_brake.back());
       m_brake.pop_back();
     }
-    while(std::get<0>(m_steering.back()) < time && !m_steering.empty()){
+    while(!m_steering.empty() && std::get<0>(m_steering.back()) < time ){
       steerValue = std::get<1>(m_steering.back());
       m_steering.pop_back();
     }
-    while(std::get<0>(m_throttle.back()) < time && !m_throttle.empty()){
+    while(!m_throttle.empty() && std::get<0>(m_throttle.back()) < time ){
       throttleValue = std::get<1>(m_throttle.back());
       m_throttle.pop_back();
     }
     if (breakValue > 0.0f) {
       opendlv::proxy::ActuationRequest actuationRequest(breakValue, 
           steerValue, true);
-      odcore::data::Container actuationContainer(actuationRequest,opendlv::proxy::ActuationRequest::ID()+300);
+      odcore::data::Container actuationContainer(actuationRequest,opendlv::proxy::ActuationRequest::ID());
       getConference().send(actuationContainer);
 
       std::cout << "Send steering " << steerValue << " brake " << breakValue << std::endl;
@@ -123,7 +123,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Signalinjector::body()
     } else {
       opendlv::proxy::ActuationRequest actuationRequest(throttleValue,
           steerValue, true);
-      odcore::data::Container actuationContainer(actuationRequest,opendlv::proxy::ActuationRequest::ID()+300);
+      odcore::data::Container actuationContainer(actuationRequest,opendlv::proxy::ActuationRequest::ID());
       getConference().send(actuationContainer); 
       
       std::cout << "Send steering " << steerValue << " acceleration " << throttleValue << std::endl;
