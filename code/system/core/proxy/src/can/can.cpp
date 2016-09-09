@@ -376,6 +376,7 @@ void Can::nextGenericCANMessage(const automotive::GenericCANMessage &gcm)
     {
       if (counter == CAN_MESSAGE_COUNTER_WHEN_TO_SEND) {
         getConference().send(cTimeStamped);
+        std::cout << "Received can data" << std::endl;
       }
     }
   }
