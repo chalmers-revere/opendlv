@@ -51,10 +51,11 @@ class Signalinjector
   void ImportData(std::vector<std::pair<double,double>> &, std::string);
 
   bool m_initialized;
-
-  std::vector<std::pair<double,double>> m_throttle;
+  std::vector<std::string> m_fileNames;
+  int32_t m_testNumber;
   std::vector<std::pair<double,double>> m_brake;
   std::vector<std::pair<double,double>> m_steering;
+  std::vector<std::pair<double,double>> m_throttle;
 };
 
 } // signalinjector

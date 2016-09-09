@@ -253,6 +253,9 @@ tools-can-simplecansender.devicenode = /dev/pcan1   # PEAK CAN device.
 tools-can-ps3controller.devicenode = /dev/pcan1   # PEAK CAN device.
 tools-can-ps3controller.ps3controllerdevicenode = /dev/input/js2   # Gamepad.
 
+tools-signalinjector.filenames = test_bpfh.csv,test_stfh.csv,test_tpfh.csv #brake, steering, throttle
+tools-signalinjector.testnumber = 0
+
 ###############################################################################
 ###############################################################################
 ### Perception
