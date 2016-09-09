@@ -48,14 +48,14 @@ class Signalinjector
 
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
-  void ImportData(std::vector<std::pair<double,double>> &, std::string);
+  void ImportData(std::vector<std::pair<float,float>> &, std::string);
 
   bool m_initialized;
   std::vector<std::string> m_fileNames;
   int32_t m_testNumber;
-  std::vector<std::pair<double,double>> m_brake;
-  std::vector<std::pair<double,double>> m_steering;
-  std::vector<std::pair<double,double>> m_throttle;
+  std::vector<std::pair<float,float>> m_brake;
+  std::vector<std::pair<float,float>> m_steering;
+  std::vector<std::pair<float,float>> m_throttle;
 };
 
 } // signalinjector

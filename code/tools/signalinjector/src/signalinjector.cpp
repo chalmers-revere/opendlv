@@ -92,26 +92,48 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Signalinjector::body()
   std::cin >> execute;
   
   odcore::data::TimeStamp startTime;
+  float breakValue;
+  float steerValue;
+  float throttleValue;
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
   odcore::data::dmcp::ModuleStateMessage::RUNNING && execute == 'y'){
     odcore::data::TimeStamp now;
-    double time = static_cast<double>((now.toMicroseconds() - startTime.toMicroseconds()))/1000000;
+    float time = static_cast<float>((now.toMicroseconds() - startTime.toMicroseconds()))/1000000;
     // std::cout << std::get<0>(m_brake[0]) << std::endl;
-    while(std::get<0>(m_brake.back()) < time){
-      //todo send the message to can
+    while(std::get<0>(m_brake.back()) < time && !m_brake.empty()){
+      breakValue = std::get<1>(m_brake.back());
       m_brake.pop_back();
     }
-    while(std::get<0>(m_steering.back()) < time){
-      //todo send the message to can
+    while(std::get<0>(m_steering.back()) < time && !m_steering.empty()){
+      steerValue = std::get<1>(m_steering.back());
       m_steering.pop_back();
     }
-    while(std::get<0>(m_throttle.back()) < time){
-      //todo send the message to can
+    while(std::get<0>(m_throttle.back()) < time && !m_throttle.empty()){
+      throttleValue = std::get<1>(m_throttle.back());
       m_throttle.pop_back();
     }
+    if (breakValue > 0.0f) {
+      opendlv::proxy::ActuationRequest actuationRequest(breakValue, 
+          steerValue, true);
+      odcore::data::Container actuationContainer(actuationRequest,opendlv::proxy::ActuationRequest::ID()+300);
+      getConference().send(actuationContainer);
 
+      std::cout << "Send steering " << steerValue << " brake " << breakValue << std::endl;
+
+    } else {
+      opendlv::proxy::ActuationRequest actuationRequest(throttleValue,
+          steerValue, true);
+      odcore::data::Container actuationContainer(actuationRequest,opendlv::proxy::ActuationRequest::ID()+300);
+      getConference().send(actuationContainer); 
+      
+      std::cout << "Send steering " << steerValue << " acceleration " << throttleValue << std::endl;
+    }
     std::cout << "Brake: " << m_brake.size() <<  " Steering: " << m_steering.size() << " Throttle: " << m_throttle.size() << std::endl;
-    //todo jump out when finished the vectors
+    
+    if(m_brake.empty() || m_steering.empty() || m_throttle.empty()) {
+      execute = 'n';
+      std::cout << "stop" << std::endl;
+    }
   }
 
 
@@ -119,7 +141,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Signalinjector::body()
 }
 
 
-void Signalinjector::ImportData(std::vector<std::pair<double,double>> &a_vec, std::string a_fileName)
+void Signalinjector::ImportData(std::vector<std::pair<float,float>> &a_vec, std::string a_fileName)
 {
   std::cout << a_fileName << std::endl;
   std::ifstream file(a_fileName);
@@ -128,7 +150,7 @@ void Signalinjector::ImportData(std::vector<std::pair<double,double>> &a_vec, st
     std::getline(file, val);
     if(val != ""){
       std::vector<std::string> vstr = odcore::strings::StringToolbox::split(val,',');
-      a_vec.push_back(std::make_pair(std::stod(vstr[0]),std::stod(vstr[1])));
+      a_vec.push_back(std::make_pair(std::stof(vstr[0]),std::stof(vstr[1])));
     }
   }
   file.close();
