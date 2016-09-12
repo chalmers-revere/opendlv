@@ -146,6 +146,7 @@ void Signalinjector::ImportData(std::vector<std::pair<float,float>> &a_vec, std:
   std::cout << a_fileName << std::endl;
   std::ifstream file(a_fileName);
   std::string val;
+  std::getline(file, val);
   while(file.good()){
     std::getline(file, val);
     if(val != ""){
