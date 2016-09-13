@@ -121,7 +121,7 @@ proxy-gps.type = trimble
 proxy-gps.mount.x = 4.0
 proxy-gps.mount.y = -0.7
 proxy-gps.mount.z = 3.5
-proxy-gps.trimble.ip = 10.42.42.112
+proxy-gps.trimble.ip = 10.42.42.17
 proxy-gps.trimble.port = 9999
 proxy-gps.record = 1  # Set to 1 to dump GPS data in .rec and .csv format.
 
