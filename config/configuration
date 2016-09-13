@@ -210,6 +210,13 @@ action-keepobjectsize.stimulusRateThreshold = 0.02
 action-keepobjectsize.stimulusThreshold = 0.02
 action-keepobjectsize.equilibrium = 10.0
 
+action-setopticalrotation.correctionGain = 0.17
+action-setopticalrotation.maxStimulusAge = 1.0
+action-setopticalrotation.patienceDuration = 0.1
+action-setopticalrotation.stimulusJerkThreshold = 0.02
+action-setopticalrotation.stimulusRateThreshold = 0.017
+action-setopticalrotation.stimulusThreshold = 0.01
+
 ###############################################################################
 ###############################################################################
 # Echolocation
