@@ -70,6 +70,9 @@ KeepObjectSize::~KeepObjectSize()
  */
 void KeepObjectSize::nextContainer(odcore::data::Container &a_container)
 {
+  if(!m_initialised){
+    return;
+  }
   if(a_container.getDataType() == opendlv::perception::StimulusAngularSizeAlignment::ID()) {
 
     // TODO: Should receive timestamp from sensors.
@@ -184,11 +187,12 @@ void KeepObjectSize::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
   m_correctionGain = kv.getValue<float>("action-keepobjectsize.correctionGain");
-  m_patienceDuration = kv.getValue<float>("action-keepobjectsize.maxStimulusAge");
-  m_stimulusJerkThreshold = kv.getValue<float>("action-keepobjectsize.patienceDuration");
-  m_stimulusRateThreshold = kv.getValue<float>("action-keepobjectsize.stimulusJerkThreshold");
-  m_stimulusThreshold = kv.getValue<float>("action-keepobjectsize.");
-  m_equilibrium = kv.getValue<float>("action-keepobjectsize.");
+  m_maxStimulusAge = kv.getValue<float>("action-keepobjectsize.maxStimulusAge");
+  m_patienceDuration = kv.getValue<float>("action-keepobjectsize.patienceDuration");
+  m_stimulusJerkThreshold = kv.getValue<float>("action-keepobjectsize.stimulusJerkThreshold");
+  m_stimulusRateThreshold = kv.getValue<float>("action-keepobjectsize.stimulusRateThreshold");
+  m_stimulusThreshold = kv.getValue<float>("action-keepobjectsize.stimulusThreshold");
+  m_equilibrium = kv.getValue<float>("action-keepobjectsize.equilibrium");
   m_initialised = true;
 }
 
