@@ -42,6 +42,7 @@ namespace keepobjectsize {
 KeepObjectSize::KeepObjectSize(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(
       a_argc, a_argv, "action-keepobjectsize"),
+    m_initialised(false),
     m_stimulusTime(),
     m_stimulus(),
     m_stimulusRate(),
@@ -181,6 +182,14 @@ bool KeepObjectSize::IsPatient() const
 
 void KeepObjectSize::setUp()
 {
+  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+  m_correctionGain = kv.getValue<float>("action-keepobjectsize.correctionGain");
+  m_patienceDuration = kv.getValue<float>("action-keepobjectsize.maxStimulusAge");
+  m_stimulusJerkThreshold = kv.getValue<float>("action-keepobjectsize.patienceDuration");
+  m_stimulusRateThreshold = kv.getValue<float>("action-keepobjectsize.stimulusJerkThreshold");
+  m_stimulusThreshold = kv.getValue<float>("action-keepobjectsize.");
+  m_equilibrium = kv.getValue<float>("action-keepobjectsize.");
+  m_initialised = true;
 }
 
 void KeepObjectSize::tearDown()

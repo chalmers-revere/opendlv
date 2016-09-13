@@ -200,6 +200,18 @@ safety-manualoverride.torsionBarTorqueThreshold = 1.5
 
 ###############################################################################
 ###############################################################################
+### Action
+
+action-keepobjectsize.correctionGain = 200.0
+action-keepobjectsize.maxStimulusAge = 0.5
+action-keepobjectsize.patienceDuration = 0.4
+action-keepobjectsize.stimulusJerkThreshold = 0.02
+action-keepobjectsize.stimulusRateThreshold = 0.02
+action-keepobjectsize.stimulusThreshold = 0.02
+action-keepobjectsize.equilibrium = 10.0
+
+###############################################################################
+###############################################################################
 # Echolocation
 
 sensation-echolocation.memoryThreshold = 0 #discrete seconds
