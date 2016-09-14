@@ -192,6 +192,8 @@ proxy-v2v.listenPort = 5000
 ###############################################################################
 ###############################################################################
 ### Safety
+safety-checkactuation.steeringLimit = 0.2
+safety-checkactuation.accMaxLimit = 80
 safety-checkactuation.maxAllowedDeceleration = 3
 
 safety-manualoverride.accelerationPedalPositionThreshold = 0.1
@@ -209,6 +211,14 @@ action-keepobjectsize.stimulusJerkThreshold = 0.02
 action-keepobjectsize.stimulusRateThreshold = 0.02
 action-keepobjectsize.stimulusThreshold = 0.02
 action-keepobjectsize.equilibrium = 10.0
+
+action-setopticalflow.correctionGain = 5.0
+action-setopticalflow.maxStimulusAge = 4.1
+action-setopticalflow.patienceDuration = 4.0
+action-setopticalflow.stimulusJerkThreshold = 0.5
+action-setopticalflow.stimulusRateThreshold = 0.5
+action-setopticalflow.stimulusThreshold = 1.0
+action-setopticalflow.equilibrium = 20.0
 
 action-setopticalrotation.correctionGain = 0.17
 action-setopticalrotation.maxStimulusAge = 1.0

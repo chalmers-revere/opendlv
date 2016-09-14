@@ -18,18 +18,6 @@
  * USA.
  */
 
-/*
-#include <ctype.h>
-#include <cstring>
-#include <cmath>
-#include <iostream>
-#include <algorithm>
-
-#include "opendavinci/odcore/data/Container.h"
-#include "opendavinci/odcore/data/TimeStamp.h"
-
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
-*/
 
 #include "scene/scene.hpp"
 
@@ -45,6 +33,7 @@ namespace scene {
   */
 Scene::Scene(int32_t const &a_argc, char **a_argv)
     : TimeTriggeredConferenceClientModule(a_argc, a_argv, "knowledge-scene")
+    , m_initialised(false)
     , m_savedSurfaces()
     , m_savedObjects()
     , m_objectCounter(0)
@@ -52,7 +41,6 @@ Scene::Scene(int32_t const &a_argc, char **a_argv)
     , m_mutex()
     , m_mergeDistance()
     , m_validUntilDuration()
-    , m_initialised(false)
     , m_memoryCapacity()
 {
 }
@@ -70,7 +58,6 @@ Scene::~Scene()
 {
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
       odcore::data::dmcp::ModuleStateMessage::RUNNING) {
-
     TimeCheck();
     SendStuff();
 
@@ -91,41 +78,17 @@ void Scene::nextContainer(odcore::data::Container &a_container)
 
     if (identity == -1) {
           
-      //odcore::data::TimeStamp m_timeStamp = unpackedObject.getIdentified();
       std::string type = unpackedObject.getType();
-      //float  typeConfidence = unpackedObject.getTypeConfidence();
       opendlv::model::Direction direction = unpackedObject.getDirection();
       float azimuth = direction.getAzimuth();
-      //float directionConfidence = unpackedObject.getDirectionConfidence();
-      //opendlv::model::Direction directionRate = unpackedObject.getDirectionRate();
-      //float directionRateAzimuth = directionRate.getAzimuth();
-      //float directionRateConfidence = unpackedObject.getDirectionRateConfidence();
       float distance = unpackedObject.getDistance();
-      //float distanceConfidence = unpackedObject.getDistanceConfidence();
-      //float m_angularSize = unpackedObject.getAngularSize();
-      //float m_angularSizeConfidence = unpackedObject.getAngularSizeConfidence();
-      //float m_angularSizeRate = unpackedObject.getAngularSizeRate();
-      //float m_angularSizeRateConfidence = unpackedObject.getAngularSizeRateConfidence();
-      //float m_confidence = unpackedObject.getConfidence();
-      //std::vector<std::string> m_sources = unpackedObject.getListOfSources();
       std::vector<std::string> properties = unpackedObject.getListOfProperties();
-
-      // std::cout << "ID: " << identity << std::endl;
-      // std::cout << "Type: " << type << std::endl;
-      // std::cout << "Distance: " << distance << std::endl;
-      // std::cout << "Angle: " << azimuth << std::endl << std::endl;
-
-
       bool objectExists = false;
       for (uint32_t i = 0; i < m_savedObjects.size(); i++) {
-        //std::cout << "Debug0: " << std::endl;
-
         if (properties.size() > 0 && m_savedObjects[i].getListOfProperties().size() > 0) {
-        
           std::string stationId = m_savedObjects[i].getListOfProperties()[0];
           if (properties[0] == stationId){
             MergeObjects(unpackedObject, i);
-           //std::cout << "Debug1: " << std::endl;
             objectExists = true;
             break;
           }
@@ -134,20 +97,16 @@ void Scene::nextContainer(odcore::data::Container &a_container)
         double betweenObjects = PointDistance(azimuth, distance, m_savedObjects[i].getDirection().getAzimuth(), m_savedObjects[i].getDistance());
         if (betweenObjects < 2.0) {
           MergeObjects(unpackedObject, i);
-          //std::cout << "Debug2: " << std::endl;
           objectExists = true;
           break;
         }
       }
 
       if (!objectExists) {
-        //std::cout << "Debug3: " << std::endl;
         unpackedObject.setObjectId(m_objectCounter);//TODO: Modulus to Object ID
         m_objectCounter++;
         m_savedObjects.push_back(unpackedObject);
       }
-      //std::cout << "Debug4: " << std::endl;
-      // std::cout << "Number of IDs: " << m_savedObjects.size() << std::endl << std::endl;
 	 }
   }
 
@@ -156,8 +115,6 @@ void Scene::nextContainer(odcore::data::Container &a_container)
     opendlv::perception::Surface unpackedSurface =
         a_container.getData<opendlv::perception::Surface>();
     std::vector<opendlv::model::Cartesian3> corners = unpackedSurface.getListOfEdges();
-
-    TimeCheck();
 
     bool exists = false;
     opendlv::model::Cartesian3 cross = CrossingPoint(corners);
@@ -195,22 +152,12 @@ void Scene::MergeSurfaces(opendlv::perception::Surface a_newSurface, uint32_t a_
   if(a_newSurface.getConfidence() > m_savedSurfaces[a_index].getConfidence()) {
     m_savedSurfaces[a_index].setConfidence(a_newSurface.getConfidence());
   }
-/*
-  auto sourceSearch = std::find(std::begin(m_savedSurfaces[a_index].getListOfSources()), std::end(m_savedSurfaces[a_index].getListOfSources()), a_newSurface.getListOfSources()[0]);
-  if (sourceSearch == std::end(m_savedSurfaces[a_index].getListOfSources())) {
-    m_savedSurfaces[a_index].getListOfSources().push_back(a_newSurface.getListOfSources()[0]);
-    m_savedSurfaces[a_index].setConfidence(m_savedSurfaces[a_index].getConfidence() + (a_newSurface.getConfidence() / 2)); 
-  }
-  */
   for (uint32_t i = 0; i < a_newSurface.getListOfProperties().size(); i++) {
     auto propertySearch = std::find(std::begin(m_savedSurfaces[a_index].getListOfProperties()), std::end(m_savedSurfaces[a_index].getListOfProperties()), a_newSurface.getListOfProperties()[i]);
     if (propertySearch == std::end(m_savedSurfaces[a_index].getListOfProperties())) {
       m_savedSurfaces[a_index].getListOfProperties().push_back(a_newSurface.getListOfProperties()[i]);
     }
   }
-
-  //list<int16> connectedWith [id = 11];
-  //list<int16> traversableTo [id = 12];
 }
 
 std::vector<opendlv::model::Cartesian3> Scene::MergePoints(std::vector<opendlv::model::Cartesian3> points1, std::vector<opendlv::model::Cartesian3> points2, float scale)
@@ -361,85 +308,6 @@ void Scene::MergeObjects(opendlv::perception::Object a_object, uint32_t a_index)
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-/*
-
-  
-  if (m_savedObjects[a_index].getTypeConfidence() < a_object.getTypeConfidence()) {
-    m_savedObjects[a_index].setType(a_object.getType());
-    m_savedObjects[a_index].setTypeConfidence(a_object.getTypeConfidence());
-  }
-
-  float confidenceModifierDirection = 1.0f;
-
-  if (std::fabs(m_savedObjects[a_index].getDirection().getAzimuth() - a_object.getDirection().getAzimuth()) < 0.07f) {
-    confidenceModifierDirection = 1.25f;
-  }
-  m_savedObjects[a_index].setDirection(a_object.getDirection());
-
-
-  confidenceDirection = confidenceDirection > 1 ? 1 : confidenceDirection;
-  m_savedObjects[a_index].setDirectionConfidence(confidenceDirection); 
-
-
-
-
-
-  if (m_savedObjects[a_index].getDirectionConfidence() <= a_object.getDirectionConfidence()) { //Borde inte confidence höjas oavsett? /MS
-    float confidenceDirection = confidenceModifierDirection * a_object.getDirectionConfidence();
-    
-    
-  }
-
-  if (m_savedObjects[a_index].getDirectionRateConfidence() < a_object.getDirectionRateConfidence()) { //Skulle vi inte alltid ta nya? /MS
-    m_savedObjects[a_index].setDirectionRate(a_object.getDirectionRate());
-    m_savedObjects[a_index].setDirectionRateConfidence(a_object.getDirectionRateConfidence());
-  }
-
-
-  float confidenceModifierDistance = 1.0f;
-  if (std::fabs(m_savedObjects[a_index].getDistance() - a_object.getDistance()) < 0.5f) {
-    confidenceModifierDistance = 1.25f;
-  }
-
-
-  m_savedObjects[a_index].setDistance(a_object.getDistance()); //Samma här, borde den inte öka oavsett? /MS
-  if (m_savedObjects[a_index].getDistanceConfidence() < a_object.getDistanceConfidence()) {
-    float confidenceDistance = confidenceModifierDistance * a_object.getDistanceConfidence();
-    confidenceDistance = confidenceDistance > 1 ? 1 : confidenceDistance;
-    m_savedObjects[a_index].setDistanceConfidence(confidenceDistance);
-  }
-  if (m_savedObjects[a_index].getAngularSizeConfidence() < a_object.getAngularSizeConfidence()) { //Inte nya alltså? /MS
-    m_savedObjects[a_index].setAngularSize(a_object.getAngularSize());
-    m_savedObjects[a_index].setAngularSizeConfidence(a_object.getAngularSizeConfidence());
-  }
-  if (m_savedObjects[a_index].getAngularSizeRateConfidence() < a_object.getAngularSizeRateConfidence()) { //Inte nya? /MS
-    m_savedObjects[a_index].setAngularSizeRate(a_object.getAngularSizeRate());
-    m_savedObjects[a_index].setAngularSizeRateConfidence(a_object.getAngularSizeRateConfidence());
-  }
-  auto sourceSearch = std::find(std::begin(m_savedObjects[a_index].getListOfSources()), std::end(m_savedObjects[a_index].getListOfSources()), a_object.getListOfSources()[0]);
-  if (sourceSearch == std::end(m_savedObjects[a_index].getListOfSources())) { //Är det inte tvärtom? /MS
-    m_savedObjects[a_index].getListOfSources().push_back(a_object.getListOfSources()[0]);
-    m_savedObjects[a_index].setConfidence(m_savedObjects[a_index].getConfidence() + (a_object.getConfidence() / 2)); //Kan bli för högt? /MS
-  }
-  for (uint32_t i = 0; i < a_object.getListOfProperties().size(); i++) {
-    auto propertySearch = std::find(std::begin(m_savedObjects[a_index].getListOfProperties()), std::end(m_savedObjects[a_index].getListOfProperties()), a_object.getListOfProperties()[i]);
-    if (propertySearch == std::end(m_savedObjects[a_index].getListOfProperties())) {
-      m_savedObjects[a_index].getListOfProperties().push_back(a_object.getListOfProperties()[i]);
-    }
-  }
-}
-*/
-
 void Scene::TimeCheck()
 {
   odcore::data::TimeStamp nowTimeStamp;
@@ -455,9 +323,10 @@ void Scene::TimeCheck()
   }
 
   for (uint32_t i = 0; i < m_savedSurfaces.size(); i++) {
-    double surfaceTimeStamp = (nowTimeStamp - m_savedSurfaces[i].getIdentified()).toMicroseconds() / 1000000.0;
-    if (surfaceTimeStamp > 1) { //TODO: Change to config parameter
+    float surfaceTimeStamp = (nowTimeStamp - m_savedSurfaces[i].getIdentified()).toMicroseconds() / 1000000.0;
+    if (surfaceTimeStamp > m_memoryCapacity) { 
      m_savedSurfaces.erase(m_savedSurfaces.begin() + i);
+     std::cout << "Removed surface" << std::endl;
      i--;
     }
   }

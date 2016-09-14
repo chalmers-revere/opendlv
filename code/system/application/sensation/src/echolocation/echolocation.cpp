@@ -109,10 +109,6 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
   uint32_t nPoints = m_angles.size();
   uint32_t objectCounter = 0;
 
-  // std::cout << "Before algorithm, new points: " << nNewPoints << std::endl;
-
-  // const double m_pointCloudRadius = 1.0;
-  // const uint32_t m_pointCloudSizeMinimum = 5;
   for(uint32_t k = 0; k < nPoints; k++) {
     pointCloud.clear();
     pointCloud.push_back(k);
@@ -122,23 +118,19 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
           uint32_t x = pointCloud[i];
           double dist = PointDistance(m_angles[x], m_distances[x], m_angles[j], m_distances[j]);
           if(dist < m_pointCloudRadius && !Contains(j,pointCloud)) {
-            //std::cout << "Close points" << std::endl;
             pointCloud.push_back(j);
             usedPoints.push_back(j);
           }
         }
       }
-      if(pointCloud.size() > m_pointCloudSizeMinimum) { //TODO: evaluate parameter and move to config
-        
+      if(pointCloud.size() > m_pointCloudSizeMinimum) { 
         double minDist = m_distances[pointCloud[0]];
-        //uint32_t minIndex = pointCloud[0];
         float minAngle = m_angles[pointCloud[0]];
         float maxAngle = m_angles[pointCloud[0]];
 
         for(uint32_t i = 1; i < pointCloud.size(); i++) {
           if(m_distances[pointCloud[i]] < minDist) {
             minDist = m_distances[pointCloud[i]];
-            //minIndex = pointCloud[i];
           }
           if(m_angles[pointCloud[i]] < minAngle) {
             minAngle = m_angles[pointCloud[i]];

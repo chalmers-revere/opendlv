@@ -42,6 +42,9 @@ class CheckActuation
   virtual void setUp();
   virtual void tearDown();
 
+  bool m_initialised;
+  float m_steeringLimit;
+  float m_accMaxLimit;
   float m_maxAllowedDeceleration;
 };
 

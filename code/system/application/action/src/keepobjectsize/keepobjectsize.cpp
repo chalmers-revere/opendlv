@@ -136,8 +136,6 @@ void KeepObjectSize::AddStimulus(odcore::data::TimeStamp const &a_stimulusTime, 
 
 void KeepObjectSize::Correct()
 {
-  float priority = 0.8f;
- 
   if (IsPatient()) {
     return;
   }
@@ -161,7 +159,7 @@ void KeepObjectSize::Correct()
   }
 
   odcore::data::TimeStamp t0;
-  opendlv::action::Correction correction(t0, "accelerate", false, amplitude, priority);
+  opendlv::action::Correction correction(t0, "accelerate", false, amplitude);
   odcore::data::Container container(correction);
   getConference().send(container);
   

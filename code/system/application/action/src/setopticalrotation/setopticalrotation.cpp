@@ -139,7 +139,6 @@ void SetOpticalRotation::AddStimulus(odcore::data::TimeStamp const &a_stimulusTi
 
 void SetOpticalRotation::Correct()
 {
-  float priority = 0.2f;
   
   if (IsPatient()) {
     return;
@@ -171,7 +170,7 @@ void SetOpticalRotation::Correct()
 
       float amplitude = m_correctionGain * stimulus;
       odcore::data::TimeStamp t0;
-      opendlv::action::Correction correction(t0, "steering", false, amplitude, priority);
+      opendlv::action::Correction correction(t0, "steering", false, amplitude);
       odcore::data::Container container(correction);
       getConference().send(container);
 
