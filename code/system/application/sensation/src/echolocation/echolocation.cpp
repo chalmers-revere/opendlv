@@ -49,6 +49,9 @@ Echolocation::Echolocation(int32_t const &a_argc, char **a_argv)
     , m_distances()
     , m_times()
     , m_memoryThreshold()
+    , m_pointCloudRadius()
+    , m_pointCloudSizeMinimum()
+    , m_initialised(false)
 {
 }
 
@@ -58,7 +61,7 @@ Echolocation::~Echolocation()
 
 void Echolocation::nextContainer(odcore::data::Container &a_c)
 {
-  if (a_c.getDataType() != opendlv::proxy::EchoReading::ID()){
+  if (!m_initialised || a_c.getDataType() != opendlv::proxy::EchoReading::ID()){
     return;
   }
   odcore::data::TimeStamp now;
@@ -106,10 +109,6 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
   uint32_t nPoints = m_angles.size();
   uint32_t objectCounter = 0;
 
-  // std::cout << "Before algorithm, new points: " << nNewPoints << std::endl;
-
-  const double DIST_DELTA = 1.0;
-  const uint32_t POINT_CLOUD_SIZE = 5;
   for(uint32_t k = 0; k < nPoints; k++) {
     pointCloud.clear();
     pointCloud.push_back(k);
@@ -118,24 +117,20 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
         for(uint32_t j = 0; j < nPoints; j++) {
           uint32_t x = pointCloud[i];
           double dist = PointDistance(m_angles[x], m_distances[x], m_angles[j], m_distances[j]);
-          if(dist < DIST_DELTA && !Contains(j,pointCloud)) {
-            //std::cout << "Close points" << std::endl;
+          if(dist < m_pointCloudRadius && !Contains(j,pointCloud)) {
             pointCloud.push_back(j);
             usedPoints.push_back(j);
           }
         }
       }
-      if(pointCloud.size() > POINT_CLOUD_SIZE) { //TODO: evaluate parameter and move to config
-        
+      if(pointCloud.size() > m_pointCloudSizeMinimum) { 
         double minDist = m_distances[pointCloud[0]];
-        //uint32_t minIndex = pointCloud[0];
         float minAngle = m_angles[pointCloud[0]];
         float maxAngle = m_angles[pointCloud[0]];
 
         for(uint32_t i = 1; i < pointCloud.size(); i++) {
           if(m_distances[pointCloud[i]] < minDist) {
             minDist = m_distances[pointCloud[i]];
-            //minIndex = pointCloud[i];
           }
           if(m_angles[pointCloud[i]] < minAngle) {
             minAngle = m_angles[pointCloud[i]];
@@ -180,15 +175,15 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
   //   std::cout << "Dist: " << distances[i] << " Angle: " << angles[i] << std::endl;
   // }
 
-  std::cout << "===================================" << std::endl;
+  // std::cout << "===================================" << std::endl;
   for(uint32_t i = 0; i < objectCounter; i++) {
     odcore::data::Container c(identifiedObjects[i]);
     getConference().send(c);
-    std::cout << "Object sent with distance: " << identifiedObjects[i].getDistance() << ", Angle: "  << 
-        identifiedObjects[i].getDirection().getAzimuth() << " , Angular size: " << 
-        identifiedObjects[i].getAngularSize() << std::endl;
+    // std::cout << "Object sent with distance: " << identifiedObjects[i].getDistance() << ", Angle: "  << 
+    //     identifiedObjects[i].getDirection().getAzimuth() << " , Angular size: " << 
+    //     identifiedObjects[i].getAngularSize() << std::endl;
   }
-  std::cout << "===================================" << std::endl;
+  // std::cout << "===================================" << std::endl;
 
 }
 
@@ -217,6 +212,9 @@ void Echolocation::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
   m_memoryThreshold = kv.getValue<float>("sensation-echolocation.memoryThreshold");
+  m_pointCloudRadius = kv.getValue<double>("sensation-echolocation.pointCloudRadius");
+  m_pointCloudSizeMinimum = kv.getValue<int32_t>("sensation-echolocation.pointCloudSizeMinimum");
+  m_initialised = true;
 }
 
 void Echolocation::tearDown()

@@ -77,14 +77,14 @@ proxy-lidar:
 
 
 # microservice for action-act
-action-act:
-    build: .
-    net: "host"
-    working_dir: "/opt/opendlv/bin"
-    restart: always
-    environment:
-    - LD_LIBRARY_PATH=/opt/opendlv/lib
-    command: "/opt/opendlv/bin/opendlv-system-application-action-act --cid=81 --freq=100"
+#action-act:
+#    build: .
+#    net: "host"
+#    working_dir: "/opt/opendlv/bin"
+#    restart: always
+#    environment:
+#    - LD_LIBRARY_PATH=/opt/opendlv/lib
+#    command: "/opt/opendlv/bin/opendlv-system-application-action-act --cid=81 --freq=100"
 
 
 # microservice for safety-checkactuation

@@ -70,8 +70,8 @@ void DetectVehicle::setUp()
 {
   std::cout << "DetectVehicle::setUp()" << std::endl;
   m_convNeuralNet->SetUp();
-  float scale = 1280.0f/800.0f;
-  m_scale = Eigen::Vector3d(scale, scale, 1);
+  // float scale = 1280.0f/800.0f;
+  // m_scale = Eigen::Vector3d(scale, scale, 1);
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
   m_sourceName = kv.getValue<std::string>("perception-detectvehicle.source");
 
@@ -86,9 +86,9 @@ void DetectVehicle::setUp()
   else {
     std::cout << "Cannot load transformation matrix for " << m_sourceName << ". Undefined camera source." << std::endl;
   }
-  std::cout << "This DetectVehicle instance will receive images from " << m_sourceName << "." << std::endl;
   m_debugMode = (kv.getValue<int32_t> ("perception-detectvehicle.debug") == 1);
   std::cout << "Debug mode: " << m_debugMode << std::endl;
+  std::cout << "This DetectVehicle instance will receive images from " << m_sourceName << "." << std::endl;
   std::cout << "Setup complete." << std::endl;
   m_initialised = true;
 }
@@ -163,7 +163,7 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
 
 
   // odcore::data::TimeStamp start;
-  m_convNeuralNet->Update(&myImage,&m_debugMode);
+  m_convNeuralNet->Update(&myImage, m_debugMode);
   // odcore::data::TimeStamp end;
   // double duration = end.toMicroseconds() - start.toMicroseconds();
   // std::cout << "The update took " << duration << " microseconds (" << duration/1000000 << " seconds)." << std::endl;

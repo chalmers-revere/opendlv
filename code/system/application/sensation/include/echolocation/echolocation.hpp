@@ -51,6 +51,9 @@ class Echolocation
   std::vector<double> m_distances;
   std::vector<odcore::data::TimeStamp> m_times;
   float m_memoryThreshold;
+  double m_pointCloudRadius;
+  uint32_t m_pointCloudSizeMinimum;
+  bool m_initialised;
 };
 
 } // echolocation

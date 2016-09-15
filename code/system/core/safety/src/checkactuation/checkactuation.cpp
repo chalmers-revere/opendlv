@@ -38,7 +38,10 @@ namespace checkactuation {
 CheckActuation::CheckActuation(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(a_argc, a_argv, 
           "safety-checkactuation"),
-    m_maxAllowedDeceleration(0.0)
+    m_initialised(false),
+    m_steeringLimit(),
+    m_accMaxLimit(),
+    m_maxAllowedDeceleration()
 {
 }
 
@@ -49,9 +52,13 @@ CheckActuation::~CheckActuation()
 void CheckActuation::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
-
-  m_maxAllowedDeceleration = kv.getValue<double>(
+  m_steeringLimit = kv.getValue<float>(
+      "safety-checkactuation.steeringLimit");
+  m_accMaxLimit = kv.getValue<float>(
+      "safety-checkactuation.accMaxLimit");
+  m_maxAllowedDeceleration = kv.getValue<float>(
       "safety-checkactuation.maxAllowedDeceleration");
+  m_initialised = true;
 }
 
 void CheckActuation::tearDown()
@@ -67,19 +74,15 @@ void CheckActuation::nextContainer(odcore::data::Container &a_container)
     float steering = actuationRequest.getSteering();
 
 
-    float steeringLimit = 0.2;
-    float accMaxLimit = 80;
 
-
-    // TODO if acceleration is negative it is m/s^2, if positive percent of acceleration pedal
 
     // clamp steering
-    if (steering < -steeringLimit) {
-      steering = -steeringLimit;
+    if (steering < -m_steeringLimit) {
+      steering = -m_steeringLimit;
       std::cout << "steering request was capped to " << steering << std::endl;
     }
-    else if (steering > steeringLimit) {
-      steering = steeringLimit;
+    else if (steering > m_steeringLimit) {
+      steering = m_steeringLimit;
       std::cout << "steering request was capped to " << steering << std::endl;
     }
 
@@ -88,8 +91,8 @@ void CheckActuation::nextContainer(odcore::data::Container &a_container)
       acceleration = -m_maxAllowedDeceleration;
       std::cout << "acceleration request was capped to " << acceleration << std::endl;
     }
-    else if (acceleration > accMaxLimit) {
-      acceleration = accMaxLimit;
+    else if (acceleration > m_accMaxLimit) {
+      acceleration = m_accMaxLimit;
       std::cout << "acceleration request was capped to " << acceleration << std::endl;
     }
 

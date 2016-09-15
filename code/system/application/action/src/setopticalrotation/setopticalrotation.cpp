@@ -42,18 +42,19 @@ namespace setopticalrotation {
 SetOpticalRotation::SetOpticalRotation(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(a_argc, a_argv, 
         "action-setopticalrotation"),
+    m_initialised(false),
     m_stimulusTime(),
     m_stimulus(),
     m_stimulusRate(),
     m_correctionTime(0, 0),
     m_correction(),
-    m_correctionGain(0.2f),
-    m_maxStimulusAge(1.0f),
-    m_patienceDuration(0.2f),
+    m_correctionGain(),
+    m_maxStimulusAge(),
+    m_patienceDuration(),
     m_stimulusJerk(),
-    m_stimulusJerkThreshold(0.02f),
-    m_stimulusRateThreshold(0.02f),
-    m_stimulusThreshold(0.02f)
+    m_stimulusJerkThreshold(),
+    m_stimulusRateThreshold(),
+    m_stimulusThreshold()
 {
 }
 
@@ -67,9 +68,13 @@ SetOpticalRotation::~SetOpticalRotation()
  */
 void SetOpticalRotation::nextContainer(odcore::data::Container &a_container)
 {
+  if(!m_initialised){
+    return;
+  }
   if (a_container.getDataType() == opendlv::perception::StimulusDirectionOfMovement::ID()) {
 
     // TODO: Should receive timestamp from sensors.
+    std::cout << "Got stimulus." << std::endl;
     auto stimulusDirectionOfMovement = a_container.getData<opendlv::perception::StimulusDirectionOfMovement>();
     auto stimulusTime = stimulusDirectionOfMovement.getIdentified();
     AddStimulus(stimulusTime, stimulusDirectionOfMovement);
@@ -134,7 +139,6 @@ void SetOpticalRotation::AddStimulus(odcore::data::TimeStamp const &a_stimulusTi
 
 void SetOpticalRotation::Correct()
 {
-  float priority = 0.2f;
   
   if (IsPatient()) {
     return;
@@ -166,10 +170,11 @@ void SetOpticalRotation::Correct()
 
       float amplitude = m_correctionGain * stimulus;
       odcore::data::TimeStamp t0;
-      opendlv::action::Correction correction(t0, "steering", false, amplitude, priority);
+      opendlv::action::Correction correction(t0, "steering", false, amplitude);
       odcore::data::Container container(correction);
       getConference().send(container);
 
+      std::cout << "Sent steering amplitude: " << amplitude << std::endl;
       std::cout << "Correction: " << amplitude << std::endl;
 
       m_correctionTime = t0;
@@ -192,6 +197,14 @@ bool SetOpticalRotation::IsPatient() const
 
 void SetOpticalRotation::setUp()
 {
+  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+  m_correctionGain = kv.getValue<float>("action-setopticalrotation.correctionGain");
+  m_maxStimulusAge = kv.getValue<float>("action-setopticalrotation.maxStimulusAge");
+  m_patienceDuration = kv.getValue<float>("action-setopticalrotation.patienceDuration");
+  m_stimulusJerkThreshold = kv.getValue<float>("action-setopticalrotation.stimulusJerkThreshold");
+  m_stimulusRateThreshold = kv.getValue<float>("action-setopticalrotation.stimulusRateThreshold");
+  m_stimulusThreshold = kv.getValue<float>("action-setopticalrotation.stimulusThreshold");
+  m_initialised = true;
 }
 
 void SetOpticalRotation::tearDown()

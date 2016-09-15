@@ -49,6 +49,7 @@ class SetOpticalFlow
   void setUp();
   void tearDown();
 
+  bool m_initialised;
   std::vector<odcore::data::TimeStamp> m_stimulusTime;
   std::vector<float> m_stimulus;
   std::vector<float> m_stimulusRate;
