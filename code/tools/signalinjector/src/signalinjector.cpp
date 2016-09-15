@@ -69,7 +69,7 @@ void Signalinjector::setUp()
   m_testNumber = kv.getValue<int32_t>("tools-signalinjector.testnumber"); 
   // std::cout << m_testNumber << std::endl;
 
-  std::string path = "/opt/opendlv/var/tools/signalinjector/" + std::to_string(m_testNumber) + "/";
+  std::string path = std::to_string(m_testNumber) + "/";
 
   ImportData(m_brake, path + m_fileNames[0]);
   ImportData(m_steering, path + m_fileNames[1]);
