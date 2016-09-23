@@ -24,6 +24,7 @@
 #include <opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h>
 #include <opendavinci/odcore/data/Container.h>
 
+#include <fstream>
 #include <vector>
 #include <utility>
 
@@ -40,8 +41,6 @@ class Signalinjector
   Signalinjector &operator=(Signalinjector const &) = delete;
   virtual ~Signalinjector();
 
-  virtual void nextContainer(odcore::data::Container &);
-
  private:
   void setUp();
   void tearDown();
@@ -51,6 +50,8 @@ class Signalinjector
   void ImportData(std::vector<std::pair<float,float>> &, std::string);
 
   bool m_initialized;
+  bool m_record;
+  std::ofstream m_log;
   std::vector<std::string> m_fileNames;
   int32_t m_testNumber;
   std::vector<std::pair<float,float>> m_brake;

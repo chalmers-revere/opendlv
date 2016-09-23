@@ -21,6 +21,7 @@
 #include <ctype.h>
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -48,6 +49,8 @@ Signalinjector::Signalinjector(int32_t const &a_argc, char **a_argv)
     : odcore::base::module::TimeTriggeredConferenceClientModule(
       a_argc, a_argv, "tools-signalinjector"),
       m_initialized(false),
+      m_record(),
+      m_log(),
       m_fileNames(),
       m_testNumber(),
       m_brake(),
@@ -63,13 +66,33 @@ Signalinjector::~Signalinjector()
 void Signalinjector::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+  m_record = (kv.getValue<int32_t>("tools-signalinjector.record") == 1);
+  if(m_record) {
+    odcore::data::TimeStamp now;
+    std::vector<std::string> timeStampNoSpace = odcore::strings::StringToolbox::split(now.getYYYYMMDD_HHMMSS(), ' ');
+    std::stringstream strTimeStampNoSpace;
+    strTimeStampNoSpace << timeStampNoSpace.at(0);
+    if (timeStampNoSpace.size() == 2) {
+      strTimeStampNoSpace << "_" << timeStampNoSpace.at(1);
+    }
+    const std::string TIMESTAMP = strTimeStampNoSpace.str();
+
+    std::string csvfilename = "CID-" + std::to_string(getCID()) + "_signalinjector_" + TIMESTAMP + ".csv";
+    m_log.open(csvfilename, std::ios::out | std::ios::app);
+    std::string header = "#timestamp, \
+      break pos [m/s2], \
+      steering [radians], \
+      throttle pos [percent]";
+
+    m_log << header << std::endl;
+
+  }
   std::string const filenames = kv.getValue<std::string>("tools-signalinjector.filenames");
   m_fileNames = odcore::strings::StringToolbox::split(filenames,',');
   // std::cout << m_fileNames[0] << std::endl;
   m_testNumber = kv.getValue<int32_t>("tools-signalinjector.testnumber"); 
   // std::cout << m_testNumber << std::endl;
-
-  std::string path = std::to_string(m_testNumber) + "/";
+  std::string path = "/opt/opendlv/var/tools/signalinjector/" + std::to_string(m_testNumber) + "/";
 
   ImportData(m_brake, path + m_fileNames[0]);
   ImportData(m_steering, path + m_fileNames[1]);
@@ -79,12 +102,10 @@ void Signalinjector::setUp()
 
 void Signalinjector::tearDown()
 {
+  m_log.close();
 }
 
 
-void Signalinjector::nextContainer(odcore::data::Container &)
-{
-}
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Signalinjector::body(){
   std::cout << "Execute? [yn]:";
@@ -129,7 +150,15 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Signalinjector::body()
       std::cout << "Send steering " << steerValue << " acceleration " << throttleValue << std::endl;
     }
     std::cout << "Brake: " << m_brake.size() <<  " Steering: " << m_steering.size() << " Throttle: " << m_throttle.size() << std::endl;
-    
+    if(m_record) {
+      m_log << std::setprecision(15) 
+        << std::to_string(now.toMicroseconds()) +
+        + "," + std::to_string(breakValue) +
+        + "," + std::to_string(steerValue) +
+        + "," + std::to_string(throttleValue) << std::endl;
+    }
+
+
     if(m_brake.empty() || m_steering.empty() || m_throttle.empty()) {
       execute = 'n';
       std::cout << "stop" << std::endl;

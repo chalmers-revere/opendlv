@@ -50,7 +50,7 @@ action-setopticalflow.max_speed = 30/3.6
 ###############################################################################
 ###############################################################################
 ### Proxy
-proxy-can.devicenode = /dev/pcan1          # PEAK CAN device.
+proxy-can.devicenode = /dev/pcan2          # PEAK CAN device.
 proxy-can.record_gcm = 1                   # Set to 1 to dump received CAN data into a .rec file.
 proxy-can.record_mapped_data = 1           # Set to 1 to dump mapped data from a CAN message into a .rec file.
 
@@ -243,18 +243,19 @@ knowledge-scene.memoryCapacity = 5.0 # seconds
 ###############################################################################
 ###############################################################################
 ### Tools
-tools-can-joystick.devicenode = /dev/pcan1   # PEAK CAN device.
+tools-can-joystick.devicenode = /dev/pcan2   # PEAK CAN device.
 tools-can-joystick.joystickdevicenode = /dev/input/js2   # Gamepad.
 
-tools-can-keyboard.devicenode = /dev/pcan1   # PEAK CAN device.
+tools-can-keyboard.devicenode = /dev/pcan2   # PEAK CAN device.
 
-tools-can-simplecansender.devicenode = /dev/pcan1   # PEAK CAN device.
+tools-can-simplecansender.devicenode = /dev/pcan2   # PEAK CAN device.
 
-tools-can-ps3controller.devicenode = /dev/pcan1   # PEAK CAN device.
+tools-can-ps3controller.devicenode = /dev/pcan2   # PEAK CAN device.
 tools-can-ps3controller.ps3controllerdevicenode = /dev/input/js2   # Gamepad.
 
+tools-signalinjector.record = 1
 tools-signalinjector.filenames = test_bpfh.csv,test_stfh.csv,test_tpfh.csv #brake, steering, throttle
-tools-signalinjector.testnumber = 0
+tools-signalinjector.testnumber = 19
 
 ###############################################################################
 ###############################################################################
