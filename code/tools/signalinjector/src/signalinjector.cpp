@@ -67,6 +67,12 @@ void Signalinjector::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
   m_record = (kv.getValue<int32_t>("tools-signalinjector.record") == 1);
+  std::string const filenames = kv.getValue<std::string>("tools-signalinjector.filenames");
+  // std::cout << m_fileNames[0] << std::endl;
+  m_testNumber = kv.getValue<int32_t>("tools-signalinjector.testnumber"); 
+  // std::cout << m_testNumber << std::endl;
+  
+
   if(m_record) {
     odcore::data::TimeStamp now;
     std::vector<std::string> timeStampNoSpace = odcore::strings::StringToolbox::split(now.getYYYYMMDD_HHMMSS(), ' ');
@@ -77,8 +83,15 @@ void Signalinjector::setUp()
     }
     const std::string TIMESTAMP = strTimeStampNoSpace.str();
 
+    struct stat st;
+    if (::stat(("data/" + std::to_string(m_testNumber)).c_str(), &st) == -1) {
+      ::system(("mkdir -p data/" + std::to_string(m_testNumber)).c_str());
+      std::cout<<"Created dir"<<std::endl;
+    }
+
+
     std::string csvfilename = "CID-" + std::to_string(getCID()) + "_signalinjector_" + TIMESTAMP + ".csv";
-    m_log.open(csvfilename, std::ios::out | std::ios::app);
+    m_log.open("data/" + std::to_string(m_testNumber) + "/" + csvfilename, std::ios::out | std::ios::app);
     std::string header = "#timestamp, \
       break pos [m/s2], \
       steering [radians], \
@@ -87,11 +100,8 @@ void Signalinjector::setUp()
     m_log << header << std::endl;
 
   }
-  std::string const filenames = kv.getValue<std::string>("tools-signalinjector.filenames");
+
   m_fileNames = odcore::strings::StringToolbox::split(filenames,',');
-  // std::cout << m_fileNames[0] << std::endl;
-  m_testNumber = kv.getValue<int32_t>("tools-signalinjector.testnumber"); 
-  // std::cout << m_testNumber << std::endl;
   std::string path = "/opt/opendlv/var/tools/signalinjector/" + std::to_string(m_testNumber) + "/";
 
   ImportData(m_brake, path + m_fileNames[0]);
