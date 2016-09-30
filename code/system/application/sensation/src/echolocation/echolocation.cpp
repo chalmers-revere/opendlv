@@ -62,6 +62,12 @@ Echolocation::~Echolocation()
 {
 }
 
+
+/**
+ * Receives Point cloud data from lidar sick. 
+ * Sends Processed and interpreted objects that are detected
+ */
+
 void Echolocation::nextContainer(odcore::data::Container &a_c)
 {
   if (!m_initialised || a_c.getDataType() != opendlv::proxy::EchoReading::ID()){
