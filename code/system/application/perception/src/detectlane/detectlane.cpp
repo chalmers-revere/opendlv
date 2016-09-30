@@ -105,23 +105,55 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
 
   cv::Mat cannyImg;
   cv::Mat intenImg;
+  cv::Mat color_dst;
 
   cv::Canny(m_image, cannyImg, m_cannyThreshold, m_cannyThreshold*3, 3);
   //medianBlur(src,src,3);
   cv::inRange(m_image, cv::Scalar(m_intensityThreshold, m_intensityThreshold, m_intensityThreshold), cv::Scalar(255, 255, 255), intenImg);
 
+  // Make output image into a 3 channel BGR image
+  // cv::cvtColor(m_image, color_dst, CV_GRAY2BGR);
 
-  // const int32_t windowWidth = 640;
-  // const int32_t windowHeight = 480;
-  // cv::Mat display;
-  // cv::Mat displa2;
-  // cv::resize(cannyImg, display, cv::Size(windowWidth, windowHeight), 0, 0,
-  //   cv::INTER_CUBIC);
-  // cv::imshow("FOE", display);
-  // cv::resize(intenImg, displa2, cv::Size(windowWidth, windowHeight), 0, 0,
-  //   cv::INTER_CUBIC);
-  // cv::imshow("FOE2", displa2);
-  // cv::waitKey(1);
+  // Vector holder for each line (rho,theta)
+  cv::vector<cv::Vec2f> detectedLines;
+
+  // OpenCV function that uses the Hough transform and finds the "strongest" lines in the transformation    
+  cv::HoughLines(cannyImg, detectedLines, 1, 3.14f/180, m_houghThreshold );
+  // std::cout << "Unfiltered: "<< detectedLines.size() << std::endl;
+  std::vector<cv::Vec2f> test;
+  float angleTresh = 60 * 3.14f/180;
+  for(uint16_t i = 0; i != detectedLines.size(); i++){
+    if(angleTresh > detectedLines[i][1] || 3.14f-angleTresh < detectedLines[i][1]){
+      test.push_back(detectedLines[i]);
+    }
+  }
+  detectedLines = test;
+  // std::cout << "Filtered: "<< detectedLines.size() << std::endl;
+
+
+  for( size_t i = 0; i < detectedLines.size(); i++ ) {
+    float rho = detectedLines[i][0];
+    float theta = detectedLines[i][1];
+    float a = cos(theta), b = sin(theta);
+    float x0 = a*rho, y0 = b*rho;
+    cv::Point pt1(cvRound(x0 + 2000*(-b)),
+               cvRound(y0 + 2000*(a)));
+    cv::Point pt2(cvRound(x0 - 2000*(-b)),
+               cvRound(y0 - 2000*(a)));
+
+    line(m_image, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
+  }
+  const int32_t windowWidth = 640;
+  const int32_t windowHeight = 480;
+  cv::Mat display;
+  cv::Mat displa2;
+  cv::resize(cannyImg, display, cv::Size(windowWidth, windowHeight), 0, 0,
+    cv::INTER_CUBIC);
+  cv::imshow("FOE", display);
+  cv::resize(m_image, displa2, cv::Size(windowWidth, windowHeight), 0, 0,
+    cv::INTER_CUBIC);
+  cv::imshow("FOE2", displa2);
+  cv::waitKey(1);
 
 }
 
