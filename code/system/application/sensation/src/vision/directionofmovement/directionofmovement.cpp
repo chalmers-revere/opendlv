@@ -62,8 +62,7 @@ DirectionOfMovement::~DirectionOfMovement()
 }
 
 /**
- * Receives .
- * Sends .
+ * Receives images as well the optical flow to calculate the focus of expansion
  */
 void DirectionOfMovement::nextContainer(odcore::data::Container &a_c)
 {
@@ -158,25 +157,6 @@ void DirectionOfMovement::SendContainer()
 
 void DirectionOfMovement::setUp()
 {
- // std::ifstream file("fileName");
-
- // Eigen::Matrix3d transformationMatrix;
-
-
- // if (file.is_open())
- // {
- //   for(int i = 0; i < 3; i++){
- //     for(int j = 0; j < 3; j++){
- //      double item = 0.0;
- //      file >> item;
- //       transformationMatrix(i,j) = item;
- //     }
- //   }
- // }
- 
- // file.close();
-
-
 }
 
 void DirectionOfMovement::tearDown()

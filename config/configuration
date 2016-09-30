@@ -66,7 +66,7 @@ proxy-camera:0.name = front-left
 proxy-camera:0.port = 10.42.42.90
 proxy-camera:0.username = root
 proxy-camera:0.password = gcdc
-proxy-camera:0.resolution = 1280x720
+proxy-camera:0.resolution = 1080x720
 proxy-camera:0.bpp = 3
 proxy-camera:0.mount.x = 3.1
 proxy-camera:0.mount.y = 0.5
@@ -134,8 +134,8 @@ proxy-imu:0.mount.roll = 0.0
 proxy-imu:0.mount.pitch = 0.0
 proxy-imu:0.mount.yaw = 0.0
 
-proxy-imu:0.type = pololu.altimu10
-proxy-imu:0.pololu.altimu10.device_node = /dev/i2c-2
+proxy-imu:1.type = pololu.altimu10
+proxy-imu:1.pololu.altimu10.device_node = /dev/i2c-2
 proxy-imu:1.mount.x = -2.55
 proxy-imu:1.mount.y = 0.0
 proxy-imu:1.mount.z = 0.79
@@ -143,8 +143,8 @@ proxy-imu:1.mount.roll = 0.0
 proxy-imu:1.mount.pitch = 0.0
 proxy-imu:1.mount.yaw = 0.0
 
-proxy-imu:0.type = pololu.altimu10
-proxy-imu:0.pololu.altimu10.device_node = /dev/i2c-2
+proxy-imu:2.type = pololu.altimu10
+proxy-imu:2.pololu.altimu10.device_node = /dev/i2c-2
 proxy-imu:2.mount.x = -5.37
 proxy-imu:2.mount.y = 0.0
 proxy-imu:2.mount.z = 0.68
@@ -229,16 +229,13 @@ action-setopticalrotation.stimulusThreshold = 0.01
 
 ###############################################################################
 ###############################################################################
-# Echolocation
+# Sensation
 
 sensation-echolocation.memoryThreshold = 0 #discrete seconds
 sensation-echolocation.pointCloudRadius = 1.0 #meters
 sensation-echolocation.pointCloudSizeMinimum = 3 #number of points
 
 
-###############################################################################
-###############################################################################
-# Optical flow
 sensation-vision-opticalflow.termCritMaxCount = 20
 sensation-vision-opticalflow.termCritEpsilon = 0.03
 sensation-vision-opticalflow.lkSearchWindowWidth = 30
@@ -246,9 +243,10 @@ sensation-vision-opticalflow.maxLevel = 3
 sensation-vision-opticalflow.minEigThreshold = 0.001
 sensation-vision-opticalflow.nAxisPoints = 15
 
+
 ###############################################################################
 ###############################################################################
-### Identity
+# Knowledge
 knowledge-identity.stationId = 110
 knowledge-identity.stationType = 8 #heavy truck
 knowledge-identity.vehicleLength = 7.3
@@ -256,21 +254,16 @@ knowledge-identity.vehicleWidth = 2.55
 knowledge-identity.vehicleRole = 0
 knowledge-identity.rearAxleLocation = 5.0
 
-###############################################################################
-###############################################################################
-# Ivrule
+
+knowledge-scene.mergeDistance = 3.5
+knowledge-scene.validUntilDuration = 1
+knowledge-scene.memoryCapacity = 5.0 # seconds
+
 knowledge-ivrule.mioAngleRange = 45.0 #degrees
 knowledge-ivrule.mioDistanceRange = 50.0 #meters
 knowledge-ivrule.memoryDuration = 1 #seconds
 knowledge-ivrule.desiredAngularSize = 4 #degrees
 knowledge-ivrule.desiredOpticalFlow = 5.6 #meters/s
-
-###############################################################################
-###############################################################################
-# Scene
-knowledge-scene.mergeDistance = 3.5
-knowledge-scene.validUntilDuration = 1
-knowledge-scene.memoryCapacity = 5.0 # seconds
 
 ###############################################################################
 ###############################################################################
@@ -292,7 +285,9 @@ perception-detectlane.inputSize = 640,480
 perception-detectlane.outputSize = 640,480
 perception-detectlane:0.source = front-left
 perception-detectlane:1.source = front-right
-
+perception-detectlane.intensityThreshold = 200
+perception-detectlane.cannyThreshold = 150
+perception-detectlane.houghThreshold = 80
 
 perception-detectvehicle:0.debug = 1   # 0 do not show a window with debug information (does not work in Docker!)
 perception-detectvehicle:0.source = front-left
