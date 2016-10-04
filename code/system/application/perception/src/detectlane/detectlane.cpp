@@ -22,12 +22,6 @@
 #include <cmath>
 #include <iostream>
 
-// #include "detectlane/Drawing.h"
-// #include "detectlane/DecisionMaking.h"
-// #include "detectlane/ExtractingRegions.h"
-// #include "detectlane/ProcessImage.h"
-
-#include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/GeneratedHeaders_OpenDaVINCI.h"
 #include "opendavinci/odcore/wrapper/SharedMemoryFactory.h"
 #include "opendavinci/odcore/wrapper/SharedMemory.h"
@@ -53,6 +47,7 @@ DetectLane::DetectLane(int32_t const &a_argc, char **a_argv)
       a_argc, a_argv, "perception-detectlane"),
     m_initialized(false),
     m_image(),
+    m_visualMemory(),
     m_intensityThreshold(),
     m_cannyThreshold(),
     m_houghThreshold()
@@ -65,14 +60,15 @@ DetectLane::~DetectLane()
 }
 
 /**
- * Receives .
- * Sends .
+ * Receives images from vision source and detect lanes.
+ * Sends drivalble lanes objects.
  */
 void DetectLane::nextContainer(odcore::data::Container &a_c)
 {
-	if (!m_initialized || a_c.getDataType() != odcore::data::image::SharedImage::ID()) {
+  if (!m_initialized || a_c.getDataType() != odcore::data::image::SharedImage::ID()) {
     return;
   }
+  odcore::data::TimeStamp now;
 
   odcore::data::image::SharedImage mySharedImg =
         a_c.getData<odcore::data::image::SharedImage>();
@@ -101,21 +97,64 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   sharedMem->unlock();
   m_image.release();
   m_image = tmpImage.clone();
+
+
   cvReleaseImage(&myIplImage);
 
-  cv::Rect myROI(0, 450, 1000, 270);
+  cv::Rect myROI(0, 450, 1080, 270);
+  // cv::Rect myROI(0, 450, 1, 1);
   m_image = m_image(myROI);
 
+  const int32_t windowWidth = 640;
+  const int32_t windowHeight = 240;
+  cv::Mat display[3];
 
+  cv::Mat visualImpression = m_image.clone();
+  m_visualMemory.push_back(std::make_pair(now,visualImpression));
+  
+  double memThreshold = 1.0;
+  while(m_visualMemory.size() > 0 && (now-m_visualMemory[0].first).toMicroseconds()/1000000.0 > memThreshold){
+    m_visualMemory.pop_front();
+  }
+  cv::Mat exposedImage = m_visualMemory[0].second.clone();
+  if(m_visualMemory.size() > 1) {
+    cv::Mat tmp;
+    // cv::Mat exposedImage;// =  m_visualMemory[0].second.clone();
+    double alpha;
+    double beta;
+    for(uint16_t i = 1; i < m_visualMemory.size(); i++){
+      // exposedImage +=  m_visualMemory[i].second;
+      // cv::AddWeighted
+      alpha = i/(i+1.0);
+      // std::cout << alpha << std::endl;
+      beta = 1-alpha;
+      cv::addWeighted(exposedImage, alpha, m_visualMemory[i].second, beta, 0, tmp, -1);
+      exposedImage = tmp;
+    }
+    // exposedImage = exposedImage/m_visualMemory.size();
+    // std::cout <<"o" << m_visualMemory[0].second << std::endl;
+    
 
+    // std::cout << m_visualMemory[0].second << std::endl;
+    // std::cout << m_visualMemory[1].second << std::endl;
+    // std::cout << exposedImage << std::endl;
+    cv::resize(exposedImage, display[2], cv::Size(windowWidth, windowHeight), 0, 0,
+      cv::INTER_CUBIC);
+    cv::imshow("FOE3", display[2]);
+  }
   cv::Mat cannyImg;
+  cv::Canny(exposedImage, cannyImg, m_cannyThreshold, m_cannyThreshold*3, 3);
+
+  // std::cout<< "Memory length: " << m_visualMemory.size() << " Type: " << m_image.type()<< "," << m_image.depth() << "," << m_image.channels() << std::endl;
+
+
+
   cv::Mat intenImg;
   cv::Mat color_dst;
 
 
-  cv::Canny(m_image, cannyImg, m_cannyThreshold, m_cannyThreshold*3, 3);
   //medianBlur(src,src,3);
-  cv::inRange(m_image, cv::Scalar(m_intensityThreshold, m_intensityThreshold, m_intensityThreshold), cv::Scalar(255, 255, 255), intenImg);
+  // cv::inRange(m_image, cv::Scalar(m_intensityThreshold, m_intensityThreshold, m_intensityThreshold), cv::Scalar(255, 255, 255), intenImg);
 
   // Make output image into a 3 channel BGR image
   // cv::cvtColor(m_image, color_dst, CV_GRAY2BGR);
@@ -126,14 +165,14 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   // OpenCV function that uses the Hough transform and finds the "strongest" lines in the transformation    
   cv::HoughLines(cannyImg, detectedLines, 1, 3.14f/180, m_houghThreshold );
   // std::cout << "Unfiltered: "<< detectedLines.size() << std::endl;
-  std::vector<cv::Vec2f> test;
-  float angleTresh = 60 * 3.14f/180;
+  std::vector<cv::Vec2f> tmpVec;
+  float angleTresh = 85 * 3.14f/180;
   for(uint16_t i = 0; i != detectedLines.size(); i++){
     if(angleTresh > detectedLines[i][1] || 3.14f-angleTresh < detectedLines[i][1]){
-      test.push_back(detectedLines[i]);
+      tmpVec.push_back(detectedLines[i]);
     }
   }
-  detectedLines = test;
+  detectedLines = tmpVec;
   // std::cout << "Filtered: "<< detectedLines.size() << std::endl;
 
 
@@ -147,33 +186,33 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     cv::Point pt2(cvRound(x0 - 2000*(-b)),
                cvRound(y0 - 2000*(a)));
 
-    cv::line(cannyImg, pt1, pt2, cv::Scalar(255,255,255), 1, 1 );
+    cv::line(m_image, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
   }
+  //  FOR INTENSITY THRESHOLD
+  // cv::HoughLines(intenImg, detectedLines, 1, 3.14f/180, m_houghThreshold );
+  // // std::cout << "Unfiltered: "<< detectedLines.size() << std::endl;
+  // test.clear();
+  // for(uint16_t i = 0; i != detectedLines.size(); i++){
+  //   if(angleTresh > detectedLines[i][1] || 3.14f-angleTresh < detectedLines[i][1]){
+  //     test.push_back(detectedLines[i]);
+  //   }
+  // }
+  // detectedLines = test;
+  // // std::cout << "Filtered: "<< detectedLines.size() << std::endl;
 
-  cv::HoughLines(intenImg, detectedLines, 1, 3.14f/180, m_houghThreshold );
-  // std::cout << "Unfiltered: "<< detectedLines.size() << std::endl;
-  test.clear();
-  for(uint16_t i = 0; i != detectedLines.size(); i++){
-    if(angleTresh > detectedLines[i][1] || 3.14f-angleTresh < detectedLines[i][1]){
-      test.push_back(detectedLines[i]);
-    }
-  }
-  detectedLines = test;
-  // std::cout << "Filtered: "<< detectedLines.size() << std::endl;
 
+  // for( size_t i = 0; i < detectedLines.size(); i++ ) {
+  //   float rho = detectedLines[i][0];
+  //   float theta = detectedLines[i][1];
+  //   float a = cos(theta), b = sin(theta);
+  //   float x0 = a*rho, y0 = b*rho;
+  //   cv::Point pt1(cvRound(x0 + 2000*(-b)),
+  //              cvRound(y0 + 2000*(a)));
+  //   cv::Point pt2(cvRound(x0 - 2000*(-b)),
+  //              cvRound(y0 - 2000*(a)));
 
-  for( size_t i = 0; i < detectedLines.size(); i++ ) {
-    float rho = detectedLines[i][0];
-    float theta = detectedLines[i][1];
-    float a = cos(theta), b = sin(theta);
-    float x0 = a*rho, y0 = b*rho;
-    cv::Point pt1(cvRound(x0 + 2000*(-b)),
-               cvRound(y0 + 2000*(a)));
-    cv::Point pt2(cvRound(x0 - 2000*(-b)),
-               cvRound(y0 - 2000*(a)));
-
-    cv::line(intenImg, pt1, pt2, cv::Scalar(255,255,255), 1, 1 );
-  }
+  //   cv::line(intenImg, pt1, pt2, cv::Scalar(255,255,255), 1, 1 );
+  // }
 
 
   // // Input Quadilateral or Image plane coordinates
@@ -197,20 +236,12 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
 
   // cv::polylines(m_image, countours, constCont, 4, 1, cv::Scalar(0,255,0), 4, 8, 0);
 
-  // const int32_t windowWidth = 640;
-  // const int32_t windowHeight = 480;
-  // cv::Mat display;
-  // cv::Mat displa2;
-  // cv::Mat displa3;
-  // cv::resize(cannyImg, display, cv::Size(windowWidth, windowHeight), 0, 0,
-    // cv::INTER_CUBIC);
-  cv::imshow("FOE", cannyImg);
-  // cv::resize(m_image, displa2, cv::Size(windowWidth, windowHeight), 0, 0,
-    // cv::INTER_CUBIC);
-  cv::imshow("FOE2", m_image);
-  // cv::resize(warpedImg, displa3, cv::Size(windowWidth, windowHeight), 0, 0,
-  //   cv::INTER_CUBIC);
-  cv::imshow("FOE3", intenImg);
+  cv::resize(cannyImg, display[0], cv::Size(windowWidth, windowHeight), 0, 0,
+    cv::INTER_CUBIC);
+  cv::imshow("FOE", display[0]);
+  cv::resize(m_image, display[1], cv::Size(windowWidth, windowHeight), 0, 0,
+    cv::INTER_CUBIC);
+  cv::imshow("FOE2", display[1]);
 
   cv::waitKey(1);
   // warpedImg.release();
@@ -224,7 +255,9 @@ void DetectLane::setUp()
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
   m_intensityThreshold = kv.getValue<uint16_t>("perception-detectlane.intensityThreshold");
   m_cannyThreshold = kv.getValue<uint16_t>("perception-detectlane.cannyThreshold");
+  m_cannyThreshold = 25;
   m_houghThreshold = kv.getValue<uint16_t>("perception-detectlane.houghThreshold");
+  m_houghThreshold = 130;
   m_initialized = true;
 
 }

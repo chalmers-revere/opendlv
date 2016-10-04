@@ -24,6 +24,8 @@
 #include <iostream>
 #include <fstream>
 #include <Eigen/Dense>
+#include <utility>
+#include <deque>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -31,6 +33,7 @@
 
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
+#include "opendavinci/odcore/data/TimeStamp.h"
 
 namespace opendlv {
 namespace perception {
@@ -54,6 +57,8 @@ class DetectLane
 
   bool m_initialized;
   cv::Mat m_image;
+  std::deque<std::pair<odcore::data::TimeStamp, cv::Mat>> m_visualMemory;
+
   uint16_t m_intensityThreshold;
   uint16_t m_cannyThreshold;
   uint16_t m_houghThreshold;
