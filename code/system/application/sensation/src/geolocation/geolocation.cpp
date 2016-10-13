@@ -113,9 +113,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       if (!hasGpsReference) {
         gpsReference = opendlv::data::environment::WGS84Coordinate(
             gpsReading.getLatitude(),
-            opendlv::data::environment::WGS84Coordinate::NORTH,
-            gpsReading.getLongitude(),
-            opendlv::data::environment::WGS84Coordinate::EAST);
+            gpsReading.getLongitude());
         hasGpsReference = true;
 
         // TODO: now this variable is set only once using the first data, it is
@@ -174,9 +172,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 
       opendlv::data::environment::WGS84Coordinate currentLocation(
           gpsReading.getLatitude(),
-          opendlv::data::environment::WGS84Coordinate::NORTH,
-          gpsReading.getLongitude(),
-          opendlv::data::environment::WGS84Coordinate::EAST);
+          gpsReading.getLongitude());
 
       odcore::data::TimeStamp timeBeforeConversionGps2Point;
       opendlv::data::environment::Point3 currentCartesianLocation =
