@@ -26,15 +26,12 @@ useradd $BUILD_AS -g $BUILD_AS
 
 cat <<EOF > /opt/opendlv.build/build.sh
 #!/bin/bash
-export PATH=/usr/lib/ccache:$PATH
-export CCACHE_DIR=/opt/ccache
-
 cd /opt/opendlv.build
 
 echo "[opendlv Docker builder] Incremental build."
 
 mkdir -p build.system && cd build.system
-CCACHE_DIR=/opt/ccache PATH=/usr/lib/ccache:/opt/od4/bin:$PATH cmake -D CXXTEST_INCLUDE_DIR=/opt/opendlv.sources/thirdparty/cxxtest -D OPENDAVINCI_DIR=/opt/od4 -D CMAKE_INSTALL_PREFIX=/opt/opendlv /opt/opendlv.sources/code/system
+CCACHE_DIR=/opt/ccache PATH=/usr/lib/ccache:/opt/od4/bin:$PATH cmake -D CXXTEST_INCLUDE_DIR=/opt/opendlv.sources/thirdparty/cxxtest -D OPENDAVINCI_DIR=/opt/od4 -D ODVDVEHICLE_DIR=/opt/opendlv.core -D KALMAN_INCLUDE_DIR=/opt/opendlv.sources/thirdparty/kalman/include -D TINYCNN_INCLUDE_DIR=/opt/opendlv.sources/thirdparty/tiny-cnn -D CMAKE_INSTALL_PREFIX=/opt/opendlv /opt/opendlv.sources/code/system
 
 CCACHE_DIR=/opt/ccache PATH=/usr/lib/ccache:/opt/od4/bin:$PATH make -j4 && make test && make install
 EOF

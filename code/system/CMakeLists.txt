@@ -38,6 +38,11 @@ include(CheckCxxTestEnvironment)
 find_package(OpenDaVINCI REQUIRED)
 
 ###########################################################################
+# Find AutomotiveData.
+SET(AUTOMOTIVEDATA_DIR "${OPENDAVINCI_DIR}")
+FIND_PACKAGE (AutomotiveData REQUIRED)
+
+###########################################################################
 # Find OpenDLV.
 set(OPENDLV_DIR "${OPENDAVINCI_DIR}")
 find_package(OpenDLV REQUIRED)
@@ -48,9 +53,16 @@ set(OPENDLVDATA_DIR "${CMAKE_INSTALL_PREFIX}")
 find_package(ODVDOpenDLVData REQUIRED)
 
 ###########################################################################
+# Find ODVDVehicle.
+SET (CMAKE_MODULE_PATH "${ODVDVEHICLE_DIR}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules" ${CMAKE_MODULE_PATH})
+FIND_PACKAGE (ODVDVehicle REQUIRED)
+
+###########################################################################
 # Set common include directories.
+INCLUDE_DIRECTORIES(SYSTEM ${AUTOMOTIVEDATA_INCLUDE_DIRS})
 include_directories(SYSTEM ${OPENDAVINCI_INCLUDE_DIRS})
 include_directories(SYSTEM ${OPENDLV_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(SYSTEM ${ODVDVEHICLE_INCLUDE_DIRS})
 include_directories(SYSTEM ${ODVDOPENDLVDATA_INCLUDE_DIRS})
 include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 include_directories(SYSTEM ${KALMAN_INCLUDE_DIR})
@@ -60,6 +72,8 @@ include_directories(SYSTEM ${TINYCNN_INCLUDE_DIR})
 # Set libraries to link against.
 set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
               ${OPENDLV_LIBRARIES}
+              ${AUTOMOTIVEDATA_LIBRARIES}
+              ${ODVDVEHICLE_LIBRARIES}
               ${ODVDOPENDLVDATA_LIBRARIES})
 
 ###########################################################################
@@ -68,14 +82,14 @@ set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
 add_subdirectory(application)
 
 #install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../config/configuration DESTINATION . COMPONENT system)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/system/application/perception/detectvehicle/trained_cnn DESTINATION ./share/opendlv/system/application/perception/detectvehicle/ COMPONENT system)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/system/application/perception/detectvehicle/normalization_constants DESTINATION ./share/opendlv/system/application/perception/detectvehicle/ COMPONENT system)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/tools/vision/projection/leftCameraTransformationMatrix.csv DESTINATION ./share/opendlv/tools/vision/projection/ COMPONENT system)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/tools/vision/projection/rightCameraTransformationMatrix.csv DESTINATION ./share/opendlv/tools/vision/projection/ COMPONENT system)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/tools/vision/projection/leftCameraWarpPoints.csv DESTINATION ./share/opendlv/tools/vision/projection/ COMPONENT system)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/tools/vision/projection/rightCameraWarpPoints.csv DESTINATION ./share/opendlv/tools/vision/projection/ COMPONENT system)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/tools/vision/projection/leftCameraTransformationMatrixWarped.csv DESTINATION ./share/opendlv/tools/vision/projection/ COMPONENT system)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/tools/vision/projection/rightCameraTransformationMatrixWarped.csv DESTINATION ./share/opendlv/tools/vision/projection/ COMPONENT system)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/system/application/perception/detectlane/leftCameraRegions.csv DESTINATION ./share/opendlv/system/application/perception/detectlane/ COMPONENT system)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resource/system/application/perception/detectlane/rightCameraRegions.csv DESTINATION ./share/opendlv/system/application/perception/detectlane/ COMPONENT system)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resources/system/application/perception/detectvehicle/trained_cnn DESTINATION ./share/opendlv/system/application/perception/detectvehicle/ COMPONENT system)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resources/system/application/perception/detectvehicle/normalization_constants DESTINATION ./share/opendlv/system/application/perception/detectvehicle/ COMPONENT system)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resources/tools/vision/projection/leftCameraTransformationMatrix.csv DESTINATION ./share/opendlv/tools/vision/projection/ COMPONENT system)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resources/tools/vision/projection/rightCameraTransformationMatrix.csv DESTINATION ./share/opendlv/tools/vision/projection/ COMPONENT system)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resources/tools/vision/projection/leftCameraWarpPoints.csv DESTINATION ./share/opendlv/tools/vision/projection/ COMPONENT system)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resources/tools/vision/projection/rightCameraWarpPoints.csv DESTINATION ./share/opendlv/tools/vision/projection/ COMPONENT system)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resources/tools/vision/projection/leftCameraTransformationMatrixWarped.csv DESTINATION ./share/opendlv/tools/vision/projection/ COMPONENT system)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resources/tools/vision/projection/rightCameraTransformationMatrixWarped.csv DESTINATION ./share/opendlv/tools/vision/projection/ COMPONENT system)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resources/system/application/perception/detectlane/leftCameraRegions.csv DESTINATION ./share/opendlv/system/application/perception/detectlane/ COMPONENT system)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resources/system/application/perception/detectlane/rightCameraRegions.csv DESTINATION ./share/opendlv/system/application/perception/detectlane/ COMPONENT system)
 

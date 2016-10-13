@@ -21,6 +21,8 @@ cmake_minimum_required(VERSION 2.8)
 #
 # PATH=/opt/od4/bin:$PATH cmake -D CMAKE_INSTALL_PREFIX=<Where shall Chalmers.Revere.OpenDLV be installed?> 
 #                               -D OPENDAVINCI_DIR=<Where is OpenDaVINCI installed?> 
+#                               -D KALMAN_INCLUDE_DIR=<Where is Kalman installed?> 
+#                               -D TINYCNN_INCLUDE_DIR=<Where is TinyCNN installed?> 
 #                               -D CXXTEST_INCLUDE_DIR=<Where is CxxTest installed?> ..
 #
 # The adjusted PATH variable is required to find odDataStructureGenerator-latest.jar.
@@ -110,7 +112,7 @@ ExternalProject_Add (libodvdopendlvdata
 
 ###############################################################################
 # This "external project" builds and installs the system software stack.
-ExternalProject_Add(code
+ExternalProject_Add(system
     DEPENDS libodvdopendlvdata
     DOWNLOAD_COMMAND ""
     UPDATE_COMMAND ""
@@ -119,6 +121,9 @@ ExternalProject_Add(code
     CMAKE_ARGS "-DOPENDAVINCI_DIR=${OPENDAVINCI_DIR}"
     CMAKE_ARGS "-DODVDVEHICLE_DIR=${ODVDVEHICLE_DIR}"
     CMAKE_ARGS "-DCXXTEST_INCLUDE_DIR=${CXXTEST_INCLUDE_DIR}"
+    CMAKE_ARGS "-DEIGEN3_INCLUDE_DIR=${OPENDAVINCI_DIR}/include/opendavinci"
+    CMAKE_ARGS "-DKALMAN_INCLUDE_DIR=${KALMAN_INCLUDE_DIR}"
+    CMAKE_ARGS "-DTINYCNN_INCLUDE_DIR=${TINYCNN_INCLUDE_DIR}"
     TEST_BEFORE_INSTALL 1
     INSTALL_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/system-prefix/src/system-build --target install COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/system-prefix/src/system-build --target ${MAKE_PACKAGE})
 
