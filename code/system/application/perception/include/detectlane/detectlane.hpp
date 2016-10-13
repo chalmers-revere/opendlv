@@ -20,12 +20,13 @@
 #ifndef DETECTLANE_DETECTLANE_HPP_
 #define DETECTLANE_DETECTLANE_HPP_
 
-#include <memory>
-#include <iostream>
-#include <fstream>
-#include <Eigen/Dense>
-#include <utility>
 #include <deque>
+#include <Eigen/Dense>
+#include <fstream>
+#include <iostream>
+#include <memory>
+#include <utility>
+#include <vector>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -62,6 +63,9 @@ class DetectLane
   uint16_t m_intensityThreshold;
   uint16_t m_cannyThreshold;
   uint16_t m_houghThreshold;
+  double m_memThreshold;
+
+  void GetGrouping(std::vector<cv::Vec2f> &, std::vector<cv::Vec2f> &, double);
 
 };
 

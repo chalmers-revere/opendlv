@@ -44,19 +44,19 @@ namespace detectlane {
   */
 DetectLane::DetectLane(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(
-      a_argc, a_argv, "perception-detectlane"),
-    m_initialized(false),
-    m_image(),
-    m_visualMemory(),
-    m_intensityThreshold(),
-    m_cannyThreshold(),
-    m_houghThreshold()
+      a_argc, a_argv, "perception-detectlane")
+    , m_initialized(false)
+    , m_image()
+    , m_visualMemory()
+    , m_intensityThreshold()
+    , m_cannyThreshold()
+    , m_houghThreshold()
+    , m_memThreshold()
 {
 }
 
 DetectLane::~DetectLane()
 {
-  m_image.release();
 }
 
 /**
@@ -112,8 +112,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   cv::Mat visualImpression = m_image.clone();
   m_visualMemory.push_back(std::make_pair(now,visualImpression));
   
-  double memThreshold = 1.0;
-  while(m_visualMemory.size() > 0 && (now-m_visualMemory[0].first).toMicroseconds()/1000000.0 > memThreshold){
+  while(m_visualMemory.size() > 0 && (now-m_visualMemory[0].first).toMicroseconds()/1000000.0 > m_memThreshold){
     m_visualMemory.pop_front();
   }
   cv::Mat exposedImage = m_visualMemory[0].second.clone();
@@ -163,7 +162,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   cv::vector<cv::Vec2f> detectedLines;
 
   // OpenCV function that uses the Hough transform and finds the "strongest" lines in the transformation    
-  cv::HoughLines(cannyImg, detectedLines, 1, 3.14f/180, m_houghThreshold );
+  cv::HoughLines(cannyImg, detectedLines, 1, 3.14f/180, m_houghThreshold);
   // std::cout << "Unfiltered: "<< detectedLines.size() << std::endl;
   std::vector<cv::Vec2f> tmpVec;
   float angleTresh = 85 * 3.14f/180;
@@ -173,6 +172,11 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     }
   }
   detectedLines = tmpVec;
+
+  //Grouping the vectors
+  std::vector<cv::Vec2f> groups;
+  GetGrouping(groups, detectedLines,100);
+  detectedLines = groups; 
   // std::cout << "Filtered: "<< detectedLines.size() << std::endl;
 
 
@@ -188,6 +192,8 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
 
     cv::line(m_image, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
   }
+
+
   //  FOR INTENSITY THRESHOLD
   // cv::HoughLines(intenImg, detectedLines, 1, 3.14f/180, m_houghThreshold );
   // // std::cout << "Unfiltered: "<< detectedLines.size() << std::endl;
@@ -223,8 +229,6 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   // cv::Mat lambda = cv::getPerspectiveTransform(inputQuad, outputQuad);
   // cv::Mat warpedImg = m_image.clone();
   // cv::warpPerspective(m_image, warpedImg, lambda, warpedImg.size());
-
-
   // cv::Point polypoint[4];
   // for(int i=0;i<4;i++){
   //     polypoint[i]= inputQuad[i];
@@ -232,9 +236,30 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   // const cv::Point* countours[1]={polypoint};
   // int v = 4;
   // const int* constCont = &v; 
-  
-
   // cv::polylines(m_image, countours, constCont, 4, 1, cv::Scalar(0,255,0), 4, 8, 0);
+
+
+  // Holder for the mean (rho,theta) for each group
+
+  // Get parametric line representation
+  // std::vector<cv::Vec2f> p, m;
+
+  // GetParametricRepresentation(p,m,groups);
+
+  // // Get points on lines
+  // std::vector<cv::Vec2f> xPoints,yPoints;
+  // std::vector<cv::Vec2f> X, Y;
+  // float row1 = 100, row2 = 480;
+  // GetPointsOnLine(xPoints,yPoints,X,Y,p,m,row1,row2);
+
+  // // Pair up lines to form a surface
+  // std::vector<cv::Vec2i> groupIds;
+  // GetLinePairs(xPoints,yPoints,groupIds);
+
+
+  // uint8_t leftLane =  groupIds[0][0];
+  // uint8_t rightLane = groupIds[0][1];
+
 
   cv::resize(cannyImg, display[0], cv::Size(windowWidth, windowHeight), 0, 0,
     cv::INTER_CUBIC);
@@ -255,15 +280,54 @@ void DetectLane::setUp()
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
   m_intensityThreshold = kv.getValue<uint16_t>("perception-detectlane.intensityThreshold");
   m_cannyThreshold = kv.getValue<uint16_t>("perception-detectlane.cannyThreshold");
-  m_cannyThreshold = 25;
   m_houghThreshold = kv.getValue<uint16_t>("perception-detectlane.houghThreshold");
-  m_houghThreshold = 130;
+  m_memThreshold = kv.getValue<double>("perception-detectlane.memThreshold");
   m_initialized = true;
 
 }
 
 void DetectLane::tearDown()
 {
+  m_image.release();
+}
+
+void DetectLane::GetGrouping(std::vector<cv::Vec2f> &a_groups, std::vector<cv::Vec2f> &a_lines, double a_groupingRadius)
+{
+  if(a_lines.size() < 1) {
+    return;
+  }
+  std::vector< std::vector<cv::Vec2f> > group;
+  std::vector<cv::Vec2f> groupMean, groupSum;
+  std::vector<cv::Vec2f> tmp;
+  group.push_back(tmp);
+  group.at(0).push_back(a_lines.at(0));
+  groupMean.push_back(group.at(0).at(0));
+  groupSum.push_back(group.at(0).at(0));
+  
+  for(uint16_t i = 1; i < a_lines.size(); i++) {
+    bool groupAssigned = false;
+    for(uint16_t j = 0; j < group.size(); j++) {
+      double xDiff = a_lines[i][0] - groupMean[j][0];
+      double yDiff = a_lines[i][1] - groupMean[j][1];
+      double absDiff = sqrt(pow(xDiff,2) + pow(yDiff,2));
+
+      if( absDiff <= a_groupingRadius) {
+        group.at(j).push_back(a_lines.at(i));
+        groupSum.at(j) += a_lines.at(i);
+        groupMean.at(j)[0] = groupSum.at(j)[0] / group.at(j).size();
+        groupMean.at(j)[1] = groupSum.at(j)[1] / group.at(j).size();
+        groupAssigned = true;
+        break;
+      }
+    }
+    if(!groupAssigned) {
+      group.push_back(tmp);
+      group.at(group.size()-1).push_back(a_lines.at(i));
+      groupMean.push_back(a_lines.at(i));
+      groupSum.push_back(a_lines.at(i));
+    }
+  }
+  a_groups = groupMean;
 }
 
 
