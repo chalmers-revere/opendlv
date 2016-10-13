@@ -60,22 +60,19 @@ void VBOReplay::setUp()
   if (!(LAT < 0) && !(LON < 0)) {
     // NORTH/WEST
     ref =
-    WGS84Coordinate(LAT, WGS84Coordinate::NORTH, LON, WGS84Coordinate::WEST);
+    WGS84Coordinate(LAT, LON);
   }
   else if (!(LAT < 0) && (LON < 0)) {
     // NORTH/EAST
-    ref = WGS84Coordinate(
-    LAT, WGS84Coordinate::NORTH, LON * -1.0, WGS84Coordinate::EAST);
+    ref = WGS84Coordinate(LAT, LON * -1.0);
   }
   else if ((LAT < 0) && !(LON < 0)) {
     // SOUTH/WEST
-    ref = WGS84Coordinate(
-    LAT * -1.0, WGS84Coordinate::SOUTH, LON, WGS84Coordinate::WEST);
+    ref = WGS84Coordinate(LAT * -1.0, LON);
   }
   else if ((LAT < 0) && (LON < 0)) {
     // SOUTH/EAST
-    ref = WGS84Coordinate(
-    LAT * -1.0, WGS84Coordinate::SOUTH, LON * -1.0, WGS84Coordinate::EAST);
+    ref = WGS84Coordinate(LAT * -1.0, LON * -1.0);
   }
   else {
     cerr << "[vboreplay] Invalid specification of "
@@ -86,8 +83,7 @@ void VBOReplay::setUp()
             "= 57.687745843 and global.reference.WGS84.longitude = "
             "-11.98219965283333."
          << endl;
-    ref = WGS84Coordinate(
-    57.70485804, WGS84Coordinate::NORTH, 11.93831921, WGS84Coordinate::EAST);
+    ref = WGS84Coordinate(57.70485804, 11.93831921);
   }
   m_reference = ref;
   CLOG1 << "[vboreplay] Reference frame located at " << m_reference.toString()
@@ -166,23 +162,19 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VBOReplay::body()
       WGS84Coordinate coordinate;
       if (!(latInDEG < 0) && !(lonInDEG < 0)) {
         // NORTH/WEST
-        coordinate = WGS84Coordinate(
-        latInDEG, WGS84Coordinate::NORTH, lonInDEG, WGS84Coordinate::WEST);
+        coordinate = WGS84Coordinate(latInDEG, lonInDEG);
       }
       else if (!(latInDEG < 0) && (lonInDEG < 0)) {
         // NORTH/EAST
-        coordinate = WGS84Coordinate(latInDEG, WGS84Coordinate::NORTH,
-        lonInDEG * -1.0, WGS84Coordinate::EAST);
+        coordinate = WGS84Coordinate(latInDEG, lonInDEG * -1.0);
       }
       else if ((latInDEG < 0) && !(lonInDEG < 0)) {
         // SOUTH/WEST
-        coordinate = WGS84Coordinate(latInDEG * -1.0, WGS84Coordinate::SOUTH,
-        lonInDEG, WGS84Coordinate::WEST);
+        coordinate = WGS84Coordinate(latInDEG * -1.0, lonInDEG);
       }
       else if ((latInDEG < 0) && (lonInDEG < 0)) {
         // SOUTH/EAST
-        coordinate = WGS84Coordinate(latInDEG * -1.0, WGS84Coordinate::SOUTH,
-        lonInDEG * -1.0, WGS84Coordinate::EAST);
+        coordinate = WGS84Coordinate(latInDEG * -1.0, lonInDEG * -1.0);
       }
 
       // Distribute data.
