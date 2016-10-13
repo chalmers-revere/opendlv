@@ -34,7 +34,7 @@ cd /opt/opendlv.build
 echo "[opendlv Docker builder] Complete build."
 cmake -E remove_directory .
 CCACHE_DIR=/opt/ccache PATH=/usr/lib/ccache:/opt/od4/bin:$PATH cmake -D CXXTEST_INCLUDE_DIR=/opt/opendlv.sources/thirdparty/cxxtest -D OPENDAVINCI_DIR=/opt/od4 -D ODVDVEHICLE_DIR=/opt/opendlv.core -D KALMAN_INCLUDE_DIR=/opt/opendlv.sources/thirdparty/kalman/include -D TINYCNN_INCLUDE_DIR=/opt/opendlv.sources/thirdparty/tiny-cnn -D CMAKE_INSTALL_PREFIX=/opt/opendlv /opt/opendlv.sources
-CCACHE_DIR=/opt/ccache PATH=/usr/lib/ccache:/opt/od4/bin:$PATH make -j2
+CCACHE_DIR=/opt/ccache PATH=/usr/lib/ccache:/opt/od4/bin:$PATH make -j4
 EOF
 
 chmod 755 /opt/opendlv.build/build.sh
