@@ -39,6 +39,7 @@ BUILD_PATH=$(BUILD_PATH_BASE)/$(DOCKER_IMAGE_NAME_PREFIX)$(shell echo $(BASE_IMA
 # Directories.
 SOURCE_TREE_PATH=$(shell dirname $(shell pwd))
 BUILD_PATH_BASE=$(SOURCE_TREE_PATH)/docker/builds
+CCACHE_PATH=$(HOME)/.ccache
 MAPPED_VOLUME_SOURCES=opendlv.sources
 MAPPED_VOLUME_BUILD=opendlv.build
 MAPPED_VOLUME_INSTALL=/opt/opendlv

@@ -82,10 +82,10 @@ set(PROJECT_ROOT ${CMAKE_SOURCE_DIR})
 ###########################################################################
 ###########################################################################
 ###########################################################################
-# This "external project" simply deletes the existing libodvdopendlvdatamodel.
-ExternalProject_Add (libodvdopendlvdatamodel-cleanup
+# This "external project" simply deletes the existing libodvdopendlvdata.
+ExternalProject_Add (libodvdopendlvdata-cleanup
     DOWNLOAD_COMMAND ""
-    UPDATE_COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_BINARY_DIR}/libodvdopendlvdatamodel
+    UPDATE_COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_BINARY_DIR}/libodvdopendlvdata
     PATCH_COMMAND ""
     SOURCE_DIR ""
     CONFIGURE_COMMAND ""
@@ -93,25 +93,25 @@ ExternalProject_Add (libodvdopendlvdatamodel-cleanup
     TEST_COMMAND ""
     INSTALL_COMMAND "")
 
-# This "external project" builds libodvdopendlvdatamodel.
-ExternalProject_Add (libodvdopendlvdatamodel
-    DEPENDS libodvdopendlvdatamodel-cleanup
+# This "external project" builds libodvdopendlvdata.
+ExternalProject_Add (libodvdopendlvdata
+    DEPENDS libodvdopendlvdata-cleanup
     DOWNLOAD_COMMAND ""
-    UPDATE_COMMAND cd ${CMAKE_CURRENT_BINARY_DIR} && ${Java_JAVA_EXECUTABLE} -jar ${ODDATASTRUCTUREGENERATOR_EXECUTABLE} --withCMake ${CMAKE_CURRENT_SOURCE_DIR}/resources/odvd/ODVDOpenDLVDataModel.odvd
+    UPDATE_COMMAND cd ${CMAKE_CURRENT_BINARY_DIR} && ${Java_JAVA_EXECUTABLE} -jar ${ODDATASTRUCTUREGENERATOR_EXECUTABLE} --withCMake ${CMAKE_CURRENT_SOURCE_DIR}/resources/odvd/ODVDOpenDLVData.odvd
     PATCH_COMMAND ""
-    SOURCE_DIR "${CMAKE_CURRENT_BINARY_DIR}/libodvdopendlvdatamodel"
+    SOURCE_DIR "${CMAKE_CURRENT_BINARY_DIR}/libodvdopendlvdata"
     CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
     CMAKE_ARGS "-DOPENDAVINCI_DIR=${OPENDAVINCI_DIR}"
     CMAKE_ARGS "-DCMAKE_TOOLCHAIN_FILE=${TOOLCHAIN_FILE}"
     CMAKE_ARGS "-DCXXTEST_INCLUDE_DIR=${CXXTEST_INCLUDE_DIR}"
     TEST_BEFORE_INSTALL 1
     TEST_COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_PARAMETERS}
-    INSTALL_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/libodvdopendlvdatamodel-prefix/src/libodvdopendlvdatamodel-build --target install COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/libodvdopendlvdatamodel-prefix/src/libodvdopendlvdatamodel-build --target ${MAKE_PACKAGE})
+    INSTALL_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/libodvdopendlvdata-prefix/src/libodvdopendlvdata-build --target install COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/libodvdopendlvdata-prefix/src/libodvdopendlvdata-build --target ${MAKE_PACKAGE})
 
 ###############################################################################
 # This "external project" builds and installs the system software stack.
 ExternalProject_Add(code
-    DEPENDS libodvdopendlvdatamodel
+    DEPENDS libodvdopendlvdata
     DOWNLOAD_COMMAND ""
     UPDATE_COMMAND ""
     SOURCE_DIR "${CMAKE_SOURCE_DIR}/code/system"
