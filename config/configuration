@@ -135,7 +135,7 @@ proxy-imu:0.mount.pitch = 0.0
 proxy-imu:0.mount.yaw = 0.0
 
 proxy-imu:0.type = pololu.altimu10
-proxy-imu:0.pololu.altimu10.device_node = /dev/i2c-2
+proxy-imu:0.pololu.altimu10.device_node = /
 proxy-imu:1.mount.x = -2.55
 proxy-imu:1.mount.y = 0.0
 proxy-imu:1.mount.z = 0.79
@@ -143,8 +143,8 @@ proxy-imu:1.mount.roll = 0.0
 proxy-imu:1.mount.pitch = 0.0
 proxy-imu:1.mount.yaw = 0.0
 
-proxy-imu:0.type = pololu.altimu10
-proxy-imu:0.pololu.altimu10.device_node = /dev/i2c-2
+proxy-imu:2.type = pololu.altimu10
+proxy-imu:2.pololu.altimu10.device_node = /
 proxy-imu:2.mount.x = -5.37
 proxy-imu:2.mount.y = 0.0
 proxy-imu:2.mount.z = 0.68
@@ -229,16 +229,12 @@ action-setopticalrotation.stimulusThreshold = 0.01
 
 ###############################################################################
 ###############################################################################
-# Echolocation
+### Sensation
 
 sensation-echolocation.memoryThreshold = 0 #discrete seconds
 sensation-echolocation.pointCloudRadius = 1.0 #meters
 sensation-echolocation.pointCloudSizeMinimum = 3 #number of points
 
-
-###############################################################################
-###############################################################################
-# Optical flow
 sensation-vision-opticalflow.termCritMaxCount = 20
 sensation-vision-opticalflow.termCritEpsilon = 0.03
 sensation-vision-opticalflow.lkSearchWindowWidth = 30
@@ -248,7 +244,7 @@ sensation-vision-opticalflow.nAxisPoints = 15
 
 ###############################################################################
 ###############################################################################
-### Identity
+### Knowledge
 knowledge-identity.stationId = 110
 knowledge-identity.stationType = 8 #heavy truck
 knowledge-identity.vehicleLength = 7.3
@@ -256,18 +252,16 @@ knowledge-identity.vehicleWidth = 2.55
 knowledge-identity.vehicleRole = 0
 knowledge-identity.rearAxleLocation = 5.0
 
-###############################################################################
-###############################################################################
-# Ivrule
 knowledge-ivrule.mioAngleRange = 45.0 #degrees
 knowledge-ivrule.mioDistanceRange = 50.0 #meters
 knowledge-ivrule.memoryDuration = 1 #seconds
 knowledge-ivrule.desiredAngularSize = 4 #degrees
 knowledge-ivrule.desiredOpticalFlow = 5.6 #meters/s
 
-###############################################################################
-###############################################################################
-# Scene
+knowledge-linguistics-v2vcam.printOutbound = 1
+knowledge-linguistics-v2vcam.printInbound = 1
+knowledge-linguistics-v2vcam.record = 0
+
 knowledge-scene.mergeDistance = 3.5
 knowledge-scene.validUntilDuration = 1
 knowledge-scene.memoryCapacity = 5.0 # seconds
@@ -302,13 +296,13 @@ perception-detectvehicle:1.source = front-right
 
 ###############################################################################
 ###############################################################################
-# Diagnostics
+### Diagnostics
 diagnostics-health.script = ./checkHealth.sh
 diagnostics-health.sleep = 60 # Sleep between health checks in seconds
 
 ###############################################################################
 ###############################################################################
-# GCDC specific
+### GCDC specific
 
 # Not last in the left lane
 knowledge-gcdc16-rule:0.initial_lane = 2

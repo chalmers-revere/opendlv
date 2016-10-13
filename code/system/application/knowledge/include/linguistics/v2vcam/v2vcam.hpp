@@ -82,9 +82,14 @@ class V2vCam
   int32_t GetYawRateConfidence() const;
   int32_t GetVehicleRole() const;
 
+  bool m_initialised;
   std::ofstream m_sendLog;
   std::ofstream m_receiveLog;
   std::time_t m_timeType2004;
+  bool m_printInbound;
+  bool m_printOutbound;
+  bool m_record;
+
 
   unsigned char const m_messageId = 2;
   int32_t m_stationId = 0;
