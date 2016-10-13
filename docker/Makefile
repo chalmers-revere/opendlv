@@ -18,7 +18,7 @@
 ###############################################################################
 # Parameters for this Makefile.
 BASE_IMAGE=seresearch/opendlv-core-on-opendavinci-ubuntu-16.04-complete
-BASE_IMAGE_VERSION=v0.2.1
+BASE_IMAGE_VERSION=v0.2.2
 
 ###############################################################################
 # Tools.
