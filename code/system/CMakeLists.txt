@@ -45,13 +45,13 @@ find_package(OpenDLV REQUIRED)
 ###########################################################################
 # Find OpenDLV data structures.
 set(OPENDLVDATA_DIR "${CMAKE_INSTALL_PREFIX}")
-find_package(opendlvdata REQUIRED)
+find_package(ODVDOpenDLVData REQUIRED)
 
 ###########################################################################
 # Set common include directories.
 include_directories(SYSTEM ${OPENDAVINCI_INCLUDE_DIRS})
 include_directories(SYSTEM ${OPENDLV_INCLUDE_DIRS})
-include_directories(SYSTEM ${OPENDLVDATA_INCLUDE_DIRS})
+include_directories(SYSTEM ${ODVDOPENDLVDATA_INCLUDE_DIRS})
 include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 include_directories(SYSTEM ${KALMAN_INCLUDE_DIR})
 include_directories(SYSTEM ${TINYCNN_INCLUDE_DIR})
@@ -60,7 +60,7 @@ include_directories(SYSTEM ${TINYCNN_INCLUDE_DIR})
 # Set libraries to link against.
 set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
               ${OPENDLV_LIBRARIES}
-              ${OPENDLVDATA_LIBRARIES})
+              ${ODVDOPENDLVDATA_LIBRARIES})
 
 ###########################################################################
 # Add subfolders with sources.
