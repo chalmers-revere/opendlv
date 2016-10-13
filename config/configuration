@@ -286,8 +286,8 @@ perception-detectlane.outputSize = 640,480
 perception-detectlane:0.source = front-left
 perception-detectlane:1.source = front-right
 perception-detectlane.intensityThreshold = 200
-perception-detectlane.cannyThreshold = 150
-perception-detectlane.houghThreshold = 80
+perception-detectlane.cannyThreshold = 25
+perception-detectlane.houghThreshold = 130
 
 perception-detectvehicle:0.debug = 1   # 0 do not show a window with debug information (does not work in Docker!)
 perception-detectvehicle:0.source = front-left

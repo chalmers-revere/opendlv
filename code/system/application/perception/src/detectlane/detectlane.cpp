@@ -145,7 +145,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   cv::Mat cannyImg;
   cv::Canny(exposedImage, cannyImg, m_cannyThreshold, m_cannyThreshold*3, 3);
 
-  // std::cout<< "Memory length: " << m_visualMemory.size() << " Type: " << m_image.type()<< "," << m_image.depth() << "," << m_image.channels() << std::endl;
+  // std::cout<< "Memory length: " << m_visualMmeory.size() << " Type: " << m_image.type()<< "," << m_image.depth() << "," << m_image.channels() << std::endl;
 
 
 
