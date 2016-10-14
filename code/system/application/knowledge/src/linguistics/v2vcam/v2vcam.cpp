@@ -411,13 +411,11 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
 
       gpsReference = opendlv::data::environment::WGS84Coordinate(
           m_latitude,
-          opendlv::data::environment::WGS84Coordinate::NORTH,
-          m_longitude,
-          opendlv::data::environment::WGS84Coordinate::EAST);
+          m_longitude);
 
       opendlv::data::environment::WGS84Coordinate currentLocation(
-          latitude / std::pow(10,7), opendlv::data::environment::WGS84Coordinate::NORTH,
-          longitude / std::pow(10,7), opendlv::data::environment::WGS84Coordinate::EAST);
+          latitude / std::pow(10,7),
+          longitude / std::pow(10,7));
 
       opendlv::data::environment::Point3 currentObjectCartesianLocation =
           gpsReference.transform(currentLocation);
@@ -495,8 +493,7 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
           m_distance, m_distanceConfidence, m_angularSize, m_angularSizeConfidence, m_angularSizeRate, m_angularSizeRateConfidence, m_confidence, m_sources, m_properties, m_objectId);
       odcore::data::Container objectContainer(detectedObject);
       getConference().send(objectContainer);
-   }
-
+    }
   } else {
     // std::cout << "Message type not CAM." << std::endl;
   }
@@ -504,9 +501,7 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
 
 void V2vCam::SendWGS84Coordinate()
 {
-  opendlv::data::environment::WGS84Coordinate coordPacket(m_latitude, 
-      opendlv::data::environment::WGS84Coordinate::NORTH, m_longitude, 
-      opendlv::data::environment::WGS84Coordinate::EAST);
+  opendlv::data::environment::WGS84Coordinate coordPacket(m_latitude, m_longitude);
   // std::cout << std::setprecision(11) << coordPacket.getLatitude() 
   //     << " " << coordPacket.getLongitude() << std::endl;
   odcore::data::Container nextC(coordPacket);

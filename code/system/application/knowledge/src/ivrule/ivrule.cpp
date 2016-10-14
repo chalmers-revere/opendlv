@@ -26,7 +26,7 @@
 #include <iostream>
 
 #include "opendavinci/odcore/data/TimeStamp.h"
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
+#include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
 
 namespace opendlv {
 namespace knowledge {
