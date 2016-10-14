@@ -32,7 +32,8 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/base/Mutex.h"
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
 
@@ -44,7 +45,7 @@ namespace detectlane {
  * This class provides the ability to detect lanes given an image source.
  */
 class DetectLane
-: public odcore::base::module::DataTriggeredConferenceClientModule {
+: public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
   DetectLane(int32_t const &, char **);
   DetectLane(DetectLane const &) = delete;
@@ -55,6 +56,7 @@ class DetectLane
  private:
   void setUp();
   void tearDown();
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
   bool m_initialized;
   cv::Mat m_image;
@@ -64,8 +66,23 @@ class DetectLane
   uint16_t m_cannyThreshold;
   uint16_t m_houghThreshold;
   double m_memThreshold;
+  double m_upperLaneLimit;
+  double m_lowerLaneLimit;
+  int16_t m_roi[4];
+  odcore::base::Mutex m_mtx;
 
   void GetGrouping(std::vector<cv::Vec2f> &, std::vector<cv::Vec2f> &, double);
+  void GetParametricRepresentation(std::vector<cv::Vec2f> &,std::vector<cv::Vec2f> &,std::vector<cv::Vec2f> &);
+  void GetPointsOnLine(std::vector<cv::Vec2f> &a_xPoints
+    , std::vector<cv::Vec2f> &a_yPoints
+    , std::vector<cv::Vec2f> &a_X
+    , std::vector<cv::Vec2f> &a_Y
+    , std::vector<cv::Vec2f> &a_p
+    , std::vector<cv::Vec2f> &a_m);
+  void GetLinePairs(std::vector<cv::Vec2f> &
+    , std::vector<cv::Vec2i> &);
+
+
 
 };
 

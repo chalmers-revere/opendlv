@@ -29,6 +29,7 @@
 
 
 #include "opendlvdata/GeneratedHeaders_opendlvdata.h"
+#include <opendavinci/odcore/base/Lock.h>
 
 #include "detectlane/detectlane.hpp"
 
@@ -43,7 +44,7 @@ namespace detectlane {
   * @param a_argv Command line arguments.
   */
 DetectLane::DetectLane(int32_t const &a_argc, char **a_argv)
-    : DataTriggeredConferenceClientModule(
+    : TimeTriggeredConferenceClientModule(
       a_argc, a_argv, "perception-detectlane")
     , m_initialized(false)
     , m_image()
@@ -52,12 +53,80 @@ DetectLane::DetectLane(int32_t const &a_argc, char **a_argv)
     , m_cannyThreshold()
     , m_houghThreshold()
     , m_memThreshold()
+    , m_upperLaneLimit(50)
+    , m_lowerLaneLimit(200)
+    , m_roi{0, 120, 1280, 600}
+    , m_mtx()
+
 {
 }
 
 DetectLane::~DetectLane()
 {
 }
+void DetectLane::setUp()
+{
+
+  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+  m_intensityThreshold = kv.getValue<uint16_t>("perception-detectlane.intensityThreshold");
+  m_cannyThreshold = kv.getValue<uint16_t>("perception-detectlane.cannyThreshold");
+  m_cannyThreshold = 40;
+  m_houghThreshold = kv.getValue<uint16_t>("perception-detectlane.houghThreshold");
+  m_houghThreshold = 200;
+  m_memThreshold = kv.getValue<double>("perception-detectlane.memThreshold");
+  m_memThreshold = 1;
+  m_initialized = true;
+
+}
+
+void DetectLane::tearDown()
+{
+  m_image.release();
+}
+
+
+odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode DetectLane::body()
+{
+  // int8_t sgn = 1;
+  while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
+  odcore::data::dmcp::ModuleStateMessage::RUNNING)
+  {
+    // char key = (char) cv::waitKey(1);
+    // switch(key) {
+    //   case 'u':
+    //     sgn = -sgn;
+    //     break;
+    //   case 'j':    
+    //   {
+    //     odcore::base::Lock l(m_mtx);
+    //     m_roi[0] = m_roi[0] + sgn*5;
+    //     break;
+    //   }
+    //   case 'i':
+    //   {
+    //     odcore::base::Lock l(m_mtx);
+    //     m_roi[1] = m_roi[1] + sgn*5;
+    //   }
+    //     break;
+    //   case 'k':
+    //   {
+    //     odcore::base::Lock l(m_mtx);
+    //     m_roi[3] = m_roi[3] - sgn*5;
+    //   }
+    //     break;
+    //   case 'l':
+    //   {
+    //     odcore::base::Lock l(m_mtx);
+    //     m_roi[2] = m_roi[2] - sgn*5;
+    //   }
+    //     break;
+    //   default:
+    //     break;
+    // }
+  }
+  return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
+}
+
 
 /**
  * Receives images from vision source and detect lanes.
@@ -101,9 +170,10 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
 
   cvReleaseImage(&myIplImage);
 
-  cv::Rect myROI(0, 450, 1080, 270);
-  // cv::Rect myROI(0, 450, 1, 1);
-  m_image = m_image(myROI);
+  cv::Rect rectROI(m_roi[0], m_roi[1], m_roi[2], m_roi[3]);
+  // std::cout << m_roi[0]<<" x " << m_roi[1]<<" x " << m_roi[2] <<" x " << m_roi[3] << std::endl;
+  // cv::Rect rectROI(0, 450, 1280, 270);
+  m_image = m_image(rectROI);
 
   const int32_t windowWidth = 640;
   const int32_t windowHeight = 240;
@@ -162,10 +232,10 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   cv::vector<cv::Vec2f> detectedLines;
 
   // OpenCV function that uses the Hough transform and finds the "strongest" lines in the transformation    
-  cv::HoughLines(cannyImg, detectedLines, 1, 3.14f/180, m_houghThreshold);
+  cv::HoughLines(cannyImg, detectedLines, 1, opendlv::Constants::PI/180, m_houghThreshold);
   // std::cout << "Unfiltered: "<< detectedLines.size() << std::endl;
   std::vector<cv::Vec2f> tmpVec;
-  float angleTresh = 85 * 3.14f/180;
+  float angleTresh = 85 * opendlv::Constants::PI/180;
   for(uint16_t i = 0; i != detectedLines.size(); i++){
     if(angleTresh > detectedLines[i][1] || 3.14f-angleTresh < detectedLines[i][1]){
       tmpVec.push_back(detectedLines[i]);
@@ -244,17 +314,26 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   // Get parametric line representation
   // std::vector<cv::Vec2f> p, m;
 
-  // GetParametricRepresentation(p,m,groups);
+  // GetParametricRepresentation(p, m, detectedLines);
 
-  // // Get points on lines
-  // std::vector<cv::Vec2f> xPoints,yPoints;
-  // std::vector<cv::Vec2f> X, Y;
-  // float row1 = 100, row2 = 480;
-  // GetPointsOnLine(xPoints,yPoints,X,Y,p,m,row1,row2);
+  // Get points on lines
+  // std::vector<cv::Vec2f> xScreenP,yScreenP;
+  // std::vector<cv::Vec2f> xWorldP, yWorldP;
+  // GetPointsOnLine(xScreenP, yScreenP, xWorldP, yWorldP, p, m);
 
-  // // Pair up lines to form a surface
+  // Pair up lines to form a surface
   // std::vector<cv::Vec2i> groupIds;
-  // GetLinePairs(xPoints,yPoints,groupIds);
+  // GetLinePairs(xScreenP, groupIds);
+
+  // std::cout << groupIds.size() << std::endl;
+  // for(uint8_t i = 0; i < groupIds.size(); i++) {
+  //   for(uint8_t j = 0; j < 2; j++) {
+  //     for(uint8_t k = 0; k < 4; k++) {
+
+  //       cv::circle(m_image, cv::Point(xScreenP[groupIds[i][j]][k],yScreenP[groupIds[i][j]][k]), 2, cv::Scalar(0,255,0), 1, 8);
+  //     }
+  //   }
+  // }
 
 
   // uint8_t leftLane =  groupIds[0][0];
@@ -274,22 +353,6 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
 }
 
 
-void DetectLane::setUp()
-{
-
-  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
-  m_intensityThreshold = kv.getValue<uint16_t>("perception-detectlane.intensityThreshold");
-  m_cannyThreshold = kv.getValue<uint16_t>("perception-detectlane.cannyThreshold");
-  m_houghThreshold = kv.getValue<uint16_t>("perception-detectlane.houghThreshold");
-  m_memThreshold = kv.getValue<double>("perception-detectlane.memThreshold");
-  m_initialized = true;
-
-}
-
-void DetectLane::tearDown()
-{
-  m_image.release();
-}
 
 void DetectLane::GetGrouping(std::vector<cv::Vec2f> &a_groups, std::vector<cv::Vec2f> &a_lines, double a_groupingRadius)
 {
@@ -330,6 +393,79 @@ void DetectLane::GetGrouping(std::vector<cv::Vec2f> &a_groups, std::vector<cv::V
   a_groups = groupMean;
 }
 
+void DetectLane::GetParametricRepresentation(std::vector<cv::Vec2f> &a_p
+    , std::vector<cv::Vec2f> &a_m
+    , std::vector<cv::Vec2f> &a_groups)
+{
+  for(uint i = 0; i < a_groups.size(); i++){
+    float rho = a_groups[i][0];
+    float theta = a_groups[i][1];
+    
+    float heading = -(static_cast<float>(opendlv::Constants::PI) / 2.0f - theta);
+    float a = cos(theta), b = sin(theta);
+    float x0 = a*rho, y0 = b*rho;
+    
+    a_p.push_back(cv::Vec2f(cos(heading),sin(heading)));
+    a_m.push_back(cv::Vec2f(x0,y0));
+  }
+}
+void DetectLane::GetPointsOnLine(std::vector<cv::Vec2f> &a_xPoints
+    , std::vector<cv::Vec2f> &a_yPoints
+    , std::vector<cv::Vec2f> &a_X
+    , std::vector<cv::Vec2f> &a_Y
+    , std::vector<cv::Vec2f> &a_p
+    , std::vector<cv::Vec2f> &a_m)
+{
+  for (uint16_t i = 0; i < a_p.size(); i++) {
+    float t1,t2;
+    // To handle special case of dividing 0  
+    if(fabs(a_p[i][1]) > 0.000001f){
+      t1 = ( static_cast<float>(m_upperLaneLimit) - a_m[i][1]) / sin(a_p[i][1]);
+      t2 = ( static_cast<float>(m_lowerLaneLimit) - a_m[i][1]) / sin(a_p[i][1]);
+    }
+    else {
+      t1 = 0;
+      t2 = 0;
+    }
+    Eigen::Vector3d point1, point2;
+    
+    float x1 = (t1 * a_p[i][0] + a_m[i][0]); 
+    point1 << x1, m_upperLaneLimit, 1;
+    // TransformPointToGlobalFrame(point1);
+
+    float x2 = (t2 * a_p[i][0] + a_m[i][0]); 
+    point2 << x2, m_lowerLaneLimit, 1;
+    // TransformPointToGlobalFrame(point2);
+
+    a_X.push_back(cv::Vec2f(point1(0),point2(0)));
+    a_Y.push_back(cv::Vec2f(point1(1),point2(1)));
+
+    a_xPoints.push_back(cv::Vec2f(x1,x2));
+    a_yPoints.push_back(cv::Vec2f(m_upperLaneLimit,m_lowerLaneLimit));
+    
+  }
+}
+void DetectLane::GetLinePairs(std::vector<cv::Vec2f> &a_xPoints
+  , std::vector<cv::Vec2i> &a_groupIds)
+{
+  float leftId, rightId;
+  for(uint16_t i = 0; i < a_xPoints.size()-1; i++) {
+    for(uint16_t j= i+1; j < a_xPoints.size(); j++) {
+      if(a_xPoints[i][0] < a_xPoints[j][1]) {
+        leftId = i, rightId = j;
+      } else {
+        leftId = j, rightId = i;
+      }
+      a_groupIds.push_back(cv::Vec2f(leftId,rightId));
+      
+      // float xDiff1 = xPoints[rightId][0] - xPoints[leftId][0];
+      // float xDiff2 = xPoints[rightId][1] - xPoints[leftId][1];
+      // Lane width has to be  2 < w < 5 to be valid
+      //if( xDiff1 > 0 && xDiff1 < 10 && xDiff2 > 0 && xDiff2 < 10){
+      //}
+    }
+  }
+}
 
 } // detectlane
 } // perception
