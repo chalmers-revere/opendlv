@@ -38,7 +38,7 @@
 #include "opendavinci/odcore/base/KeyValueConfiguration.h"
 
 
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
+#include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
 
 #include "detectlane/detectlane.hpp"
 

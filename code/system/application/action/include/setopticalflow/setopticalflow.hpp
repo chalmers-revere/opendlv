@@ -24,7 +24,7 @@
 
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
+#include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
 
 namespace opendlv {
 namespace action {
@@ -49,6 +49,7 @@ class SetOpticalFlow
   void setUp();
   void tearDown();
 
+  bool m_initialised;
   std::vector<odcore::data::TimeStamp> m_stimulusTime;
   std::vector<float> m_stimulus;
   std::vector<float> m_stimulusRate;

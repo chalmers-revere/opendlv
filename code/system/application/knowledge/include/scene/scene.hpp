@@ -30,7 +30,7 @@
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
 #include "opendavinci/odcore/base/Mutex.h"
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
+#include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
 
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
@@ -63,6 +63,7 @@ class Scene : public odcore::base::module::TimeTriggeredConferenceClientModule {
   void MergeObjects(opendlv::perception::Object a_object, uint32_t a_index);
   void TimeCheck();
 
+  bool m_initialised;
   std::vector<opendlv::perception::Surface> m_savedSurfaces;
   std::vector<opendlv::perception::Object> m_savedObjects;
   uint32_t m_objectCounter;
@@ -70,7 +71,6 @@ class Scene : public odcore::base::module::TimeTriggeredConferenceClientModule {
   odcore::base::Mutex m_mutex;
   float m_mergeDistance;
   int32_t m_validUntilDuration;
-  bool m_initialised;
   float m_memoryCapacity;
 };
 

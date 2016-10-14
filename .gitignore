@@ -1,7 +1,7 @@
 build
-build.from.docker
-install
 *.swp
 *.swo
 *~
 *.pyc
+*.idx3-ubyte
+*.idx1-ubyte

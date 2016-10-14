@@ -1,4 +1,4 @@
-# Makefile - Makefile to create a Docker image.
+# Makefile - Makefile to build OpenDLV using Docker-encapsulated builders.
 # Copyright (C) 2016 Christian Berger
 #
 # This program is free software; you can redistribute it and/or
@@ -15,303 +15,115 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-PRODUCT=opendlv
-GITVERSION=$(shell git describe --abbrev=0 --tags | head -n1)
-GITHASH=$(shell git rev-parse --short HEAD)
-GITUNCOMMITTEDCHANGES=$(shell if [ "`git ls-files -m ..`" != "" ]; then echo "-modified"; else echo ""; fi)
-VERSION="$(GITVERSION)-$(GITHASH)$(GITUNCOMMITTEDCHANGES)"
-REPOSITORY=chalmersrevere
-BUILDLOG=build.log
-OPENDLV_HOST_PATH=$(shell dirname $(shell pwd))
-
-# Workflow:
-#
-# Once or after change to OpenDaVINCI: make docker-update-opendavinci
-#
-# Initial build: make build-fresh
-#
-# Incremental building: make build-incremental
-#
-# Run example2: make run-example2
-#
-# Stop example2: make stop-example2
-#
-# Watch example2: make watch-example2
-
-# This target will pull the latest OpenDaVINCI binary distribution.
-# It should be called every now and then or on request.
-docker-update-opendavinci:
-	docker pull $(shell awk '/^FROM/ { print $$2; exit }' builder/Dockerfile)
+###############################################################################
+# Parameters for this Makefile.
+BASE_IMAGE=seresearch/opendlv-core-on-opendavinci-ubuntu-16.04-complete
+BASE_IMAGE_VERSION=v0.2.2
 
 ###############################################################################
+# Tools.
+DOCKER=$(shell which docker)
+CMAKE=$(shell which cmake)
+
+###############################################################################
+# Determine Git-related setting.
+VERSION=v$(shell head -1 ../VERSION | cut -f1 -d" ")
+GIT_CURRENT_BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
+GIT_HASH=$(shell git rev-parse --short HEAD)
+GIT_COMMITS_IN_CURRENT_BRANCH=$(shell git rev-list --count `git rev-parse --abbrev-ref HEAD`)
+GIT_HAS_UNCOMMITTED_CHANGES=$(shell if [ "`git ls-files -m ..`" != "" ]; then echo "-modified"; else echo ""; fi)
+DOCKER_IMAGE_NAME_PREFIX=opendlv-on-
+BUILD_PATH=$(BUILD_PATH_BASE)/$(DOCKER_IMAGE_NAME_PREFIX)$(shell echo $(BASE_IMAGE) | cut -f2 -d"/")-$(GIT_CURRENT_BRANCH)
+
+###############################################################################
+# Directories.
+SOURCE_TREE_PATH=$(shell dirname $(shell pwd))
+BUILD_PATH_BASE=$(SOURCE_TREE_PATH)/docker/builds
+CCACHE_PATH=$(HOME)/.ccache
+MAPPED_VOLUME_SOURCES=opendlv.sources
+MAPPED_VOLUME_BUILD=opendlv.build
+MAPPED_VOLUME_INSTALL=/opt/opendlv
+RUN_BUILD_AS=odv # OpenDaVINCI is built as odv.
+RUN_BUILD_UID_AS=$(shell getent passwd `whoami` | cut -f3 -d":")
+PACKAGES_DIR=$(BUILD_PATH)
+
+###############################################################################
+# Docker settings.
+DOCKERFILE_BASEIMAGE=s%BASEIMAGE%$(BASE_IMAGE)%
+DOCKER_REPOSITORY_NAME=seresearch
+DOCKER_IMAGE_NAME=$(DOCKER_IMAGE_NAME_PREFIX)$(shell echo $(BASE_IMAGE) | cut -f2 -d"/")
+DOCKER_IMAGE_NAME_WITH_GIT_HASH=$(DOCKER_IMAGE_NAME)-$(GIT_HASH)
+DOCKER_NETWORK_NAME=nw_$(DOCKER_IMAGE_NAME_WITH_GIT_HASH)
+DOCKER_IMAGE_NAME_WITH_GIT_COMMITS_IN_CURRENT_BRANCH=$(DOCKER_IMAGE_NAME_PREFIX)$(shell echo $(BASE_IMAGE) | cut -f2 -d"/")-$(GIT_HASH):$(GIT_COMMITS_IN_CURRENT_BRANCH)
+DOCKER_IMAGE_NAME_SHORT_NAME=$(DOCKER_REPOSITORY_NAME)/$(DOCKER_IMAGE_NAME)
+
 ###############################################################################
 
-# This target removes exited containers.
-docker-cleanup-exited-containers:
-	docker rm $$(docker ps -a -q)
+.PHONY: all buildComplete buildIncremental createDockerImage pushDockerImage clean cleanAll cleanDocker removeExitedContainers removeNoneDockerImages removeExistingDockerImages updateDockerBaseImage
 
-# This target cleans up the environment to start fresh.
+###############################################################################
+
+all: updateBuildComplete createDockerImage
+
+###############################################################################
+
 clean:
-	cd builder && rm -f $(BUILDLOG) && cd ..
-	sudo rm -fr ../build.from.docker ../code/generated/lib*
+	$(CMAKE) -E remove_directory $(BUILD_PATH)
+
+cleanAll: clean cleanDocker
+
+cleanDocker: removeExitedContainers removeNoneDockerImages removeExistingDockerImages
+
+removeExitedContainers:
+	$(DOCKER) rm $$($(DOCKER) ps -a -q) || exit 0
+
+removeNoneDockerImages:
+	for i in $$($(DOCKER) images | grep none | tr -s " " ";" | cut -f3 -d";"); do $(DOCKER) rmi $$i; done
+
+removeExistingDockerImages:
+	$(DOCKER) rmi -f `$(DOCKER) images | grep $(DOCKER_IMAGE_NAME)- | tr -s " " ";" | cut -f3 -d";"` || exit 0
+
+updateDockerBaseImage:
+	$(DOCKER) pull $(BASE_IMAGE):$(BASE_IMAGE_VERSION)
 
 ###############################################################################
-###############################################################################
-
-# This target creates a Docker image to compile the OpenDLV source tree.
-create-builder:
-	cd builder && docker build -f Dockerfile -t $(REPOSITORY)/$(PRODUCT):$(VERSION) . | tee $(BUILDLOG) || exit 1
-	docker images | grep $$(tail -1 builder/$(BUILDLOG) | cut -f3 -d" ") | grep "latest" && exit 0 || docker tag $$(tail -1 builder/$(BUILDLOG) | cut -f3 -d" ") $(REPOSITORY)/$(PRODUCT):latest
-
-###############################################################################
-###############################################################################
-
-# This target compiles the OpenDLV source tree from scratch.
-build-fresh: create-builder
-	docker run --rm=true -ti -v $(OPENDLV_HOST_PATH):/opt/opendlv-sources $(REPOSITORY)/$(PRODUCT):$(VERSION) /build.sh FRESH
-
-# This tartget compiles the OpenDLV source tree in case of minor changes to code/system.
-build-incremental: create-builder
-	docker run --rm=true -ti -v $(OPENDLV_HOST_PATH):/opt/opendlv-sources $(REPOSITORY)/$(PRODUCT):$(VERSION) /build.sh INCREMENTAL
+define compile
+	$(CMAKE) -E make_directory $(BUILD_PATH)
+	$(CMAKE) -E make_directory $(BUILD_PATH)$(MAPPED_VOLUME_INSTALL)
+	$(CMAKE) -E make_directory $(BUILD_PATH)/$(MAPPED_VOLUME_BUILD)
+	$(CMAKE) -E make_directory $(BUILD_PATH)/opendlv.deb
+	$(DOCKER) network inspect $(DOCKER_NETWORK_NAME) || $(DOCKER) network create $(DOCKER_NETWORK_NAME)
+	$(DOCKER) network ls
+	$(DOCKER) run -ti --rm -v $(SOURCE_TREE_PATH):/opt/$(MAPPED_VOLUME_SOURCES) -v $(BUILD_PATH)/$(MAPPED_VOLUME_BUILD):/opt/$(MAPPED_VOLUME_BUILD) -v $(BUILD_PATH)$(MAPPED_VOLUME_INSTALL):$(MAPPED_VOLUME_INSTALL) -v $(CCACHE_PATH):/opt/ccache -v $(SOURCE_TREE_PATH)/docker/completeBuild.sh:/opt/completeBuild.sh -w /opt $(BASE_IMAGE):$(BASE_IMAGE_VERSION) /opt/completeBuild.sh $(RUN_BUILD_AS) $(RUN_BUILD_UID_AS)
+	$(DOCKER) network rm $(DOCKER_NETWORK_NAME)
+	mkdir -p $(PACKAGES_DIR)/$(DOCKER_IMAGE_NAME) && for i in $$(find $(BUILD_PATH)/$(MAPPED_VOLUME_BUILD) -type f -name "*deb" | grep -v CPack); do cp $$i $(PACKAGES_DIR)/$(DOCKER_IMAGE_NAME); done
+	touch $(BUILD_PATH)/$(MAPPED_VOLUME_BUILD)/build.incremental
+endef
 
 ###############################################################################
-###############################################################################
-# Template for FH16 microservices.
+# Build targets using the selected Docker image.
+buildComplete:
+	$(call compile)
 
-# Tag Docker images using Git hashes for traceability.
-docker-tag-fh16:
-	for i in $$(cat fh16/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker tag fh16_$$i seresearch/fh16_$$i:$(VERSION); docker tag fh16_$$i seresearch/fh16_$$i:latest; done
+updateBuildComplete: updateDockerBaseImage
+	$(call compile)
 
-# Push Docker latest images for backup.
-docker-push-fh16: docker-tag-fh16
-	for i in $$(cat fh16/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/fh16_$$i:$(VERSION); docker push seresearch/fh16_$$i:latest; done
-
-fh16-copy-opendlv:
-	rm -fr fh16/opendlv
-	cp -r ../build.from.docker/install fh16/opendlv
-	cp fh16/checkHealth.sh fh16/opendlv/bin
-
-# Build base image for FH16 truck.
-fh16: build-incremental fh16-copy-opendlv
-	cd fh16 && docker-compose build
-
+buildIncremental:
+	$(DOCKER) run -ti --rm -v $(SOURCE_TREE_PATH):/opt/$(MAPPED_VOLUME_SOURCES) -v $(BUILD_PATH)/$(MAPPED_VOLUME_BUILD):/opt/$(MAPPED_VOLUME_BUILD) -v $(BUILD_PATH)$(MAPPED_VOLUME_INSTALL):$(MAPPED_VOLUME_INSTALL) -v $(CCACHE_PATH):/opt/ccache -v $(SOURCE_TREE_PATH)/docker/incrementalBuild.sh:/opt/incrementalBuild.sh -w /opt $(BASE_IMAGE):$(BASE_IMAGE_VERSION) /opt/incrementalBuild.sh $(RUN_BUILD_AS) $(RUN_BUILD_UID_AS)
+	mkdir -p $(PACKAGES_DIR)/$(DOCKER_IMAGE_NAME) && for i in $$(find $(BUILD_PATH)/$(MAPPED_VOLUME_BUILD) -type f -name "*deb" | grep -v CPack); do cp $$i $(PACKAGES_DIR)/$(DOCKER_IMAGE_NAME); done
 
 ###############################################################################
-###############################################################################
-# FH16 ps3controller.
-
-# Tag Docker images using Git hashes for traceability.
-docker-tag-fh16-ps3controller:
-	for i in $$(cat fh16-ps3controller/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker tag fh16ps3controller_$$i seresearch/fh16ps3controller_$$i:$(VERSION); docker tag fh16ps3controller_$$i seresearch/fh16ps3controller_$$i:latest; done
-
-# Push Docker latest images for backup.
-docker-push-fh16-ps3controller: docker-tag-fh16-ps3controller
-	for i in $$(cat fh16-ps3controller/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/fh16ps3controller_$$i:$(VERSION); docker push seresearch/fh16ps3controller_$$i:latest; done
-
-fh16-ps3controller-copy-opendlv:
-	rm -fr fh16-ps3controller/opendlv
-	cp -r ../build.from.docker/install fh16-ps3controller/opendlv
-	cp fh16-ps3controller/checkHealth.sh fh16-ps3controller/opendlv/bin
-
-# Build image for FH16 truck for PS3 controller.
-fh16-ps3controller: build-incremental fh16-ps3controller-copy-opendlv
-	cd fh16-ps3controller && docker-compose build
-
+# This target creates a new Docker image based on the selected Docker image using the freshly built binaries.
+createDockerImage:
+	cat $(SOURCE_TREE_PATH)/docker/Dockerfile.template | sed -e $(DOCKERFILE_BASEIMAGE) > $(BUILD_PATH)/Dockerfile
+	echo $(MAPPED_VOLUME_BUILD) > $(BUILD_PATH)/.dockerignore
+	cd $(BUILD_PATH) && $(DOCKER) build -t $(DOCKER_REPOSITORY_NAME)/$(DOCKER_IMAGE_NAME_WITH_GIT_COMMITS_IN_CURRENT_BRANCH) . | tee $(BUILD_PATH)/$(MAPPED_VOLUME_BUILD)/build.log || exit 1
+	$(DOCKER) images | grep $$(tail -1 $(BUILD_PATH)/$(MAPPED_VOLUME_BUILD)/build.log | cut -f3 -d" ") | grep "latest" && exit 0 || $(DOCKER) tag $$(tail -1 $(BUILD_PATH)/$(MAPPED_VOLUME_BUILD)/build.log | cut -f3 -d" ") $(DOCKER_IMAGE_NAME_SHORT_NAME):latest
+	$(DOCKER) tag $(DOCKER_IMAGE_NAME_SHORT_NAME):latest $(DOCKER_IMAGE_NAME_SHORT_NAME):$(VERSION)
 
 ###############################################################################
-###############################################################################
-# FH16 CAN recording.
 
-# Tag Docker images using Git hashes for traceability.
-docker-tag-fh16-canrecording:
-	for i in $$(cat fh16-canrecording/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker tag fh16canrecording_$$i seresearch/fh16canrecording_$$i:$(VERSION); docker tag fh16canrecording_$$i seresearch/fh16canrecording_$$i:latest; done
-
-# Push Docker latest images for backup.
-docker-push-fh16-canrecording: docker-tag-fh16-canrecording
-	for i in $$(cat fh16-canrecording/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/fh16canrecording_$$i:$(VERSION); docker push seresearch/fh16canrecording_$$i:latest; done
-
-fh16-canrecording-copy-opendlv:
-	rm -fr fh16-canrecording/opendlv
-	cp -r ../build.from.docker/install fh16-canrecording/opendlv
-	cp fh16-canrecording/checkHealth.sh fh16-canrecording/opendlv/bin
-
-# Build image for FH16 truck for CAN data recording.
-fh16-canrecording: build-incremental fh16-canrecording-copy-opendlv
-	cd fh16-canrecording && docker-compose build
-
-
-###############################################################################
-###############################################################################
-# FH16 sensor recording.
-
-# Tag Docker images using Git hashes for traceability.
-docker-tag-fh16-sensorrecording:
-	for i in $$(cat fh16-sensorrecording/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker tag sensorrecording_$$i seresearch/fh16sensorrecording_$$i:$(VERSION); docker tag fh16sensorrecording_$$i seresearch/fh16sensorrecording_$$i:latest; done
-
-# Push Docker latest images for backup.
-docker-push-fh16-sensorrecording: docker-tag-fh16-sensorrecording
-	for i in $$(cat fh16-sensorrecording/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/sensorrecording_$$i:$(VERSION); docker push seresearch/sensorrecording_$$i:latest; done
-
-fh16-sensorrecording-copy-opendlv:
-	rm -fr fh16-sensorrecording/opendlv
-	cp -r ../build.from.docker/install fh16-sensorrecording/opendlv
-	cp fh16-sensorrecording/checkHealth.sh fh16-sensorrecording/opendlv/bin
-
-# Build image for FH16 truck for sensor data recording.
-fh16-sensorrecording: build-incremental fh16-sensorrecording-copy-opendlv
-	cd fh16-sensorrecording && docker-compose build
-
-
-###############################################################################
-###############################################################################
-# FH16 lidar-echolocation-scene.
-
-# Tag Docker images using Git hashes for traceability.
-docker-tag-fh16-lidar-echolocation-scene:
-	for i in $$(cat fh16-lidar-echolocation-scene/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker tag fh16lidarecholocationscene_$$i seresearch/fh16lidarecholocationscene_$$i:$(VERSION); docker tag fh16lidarecholocationscene_$$i seresearch/fh16lidarecholocationscene_$$i:latest; done
-
-# Push Docker latest images for backup.
-docker-push-fh16-lidar-echolocation-scene: docker-tag-fh16-lidar-echolocation-scene
-	for i in $$(cat fh16-lidar-echolocation-scene/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/fh16lidarecholocationscene_$$i:$(VERSION); docker push seresearch/fh16lidarecholocationscene_$$i:latest; done
-
-fh16-lidar-echolocation-scene-copy-opendlv:
-	rm -fr fh16-lidar-echolocation-scene/opendlv
-	cp -r ../build.from.docker/install fh16-lidar-echolocation-scene/opendlv
-	cp fh16-lidar-echolocation-scene/checkHealth.sh fh16-lidar-echolocation-scene/opendlv/bin
-
-# Build image for FH16 truck for lidar-echolocation-scene.
-fh16-lidar-echolocation-scene: build-incremental fh16-lidar-echolocation-scene-copy-opendlv
-	cd fh16-lidar-echolocation-scene && docker-compose build
-
-
-###############################################################################
-###############################################################################
-# FH16 lidar-echolocation-scene-ivrule.
-
-# Tag Docker images using Git hashes for traceability.
-docker-tag-fh16-lidar-echolocation-scene-ivrule:
-	for i in $$(cat fh16-lidar-echolocation-scene-ivrule/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker tag fh16lidarecholocationsceneivrule_$$i seresearch/fh16lidarecholocationsceneivrule_$$i:$(VERSION); docker tag fh16lidarecholocationsceneivrule_$$i seresearch/fh16lidarecholocationsceneivrule_$$i:latest; done
-
-# Push Docker latest images for backup.
-docker-push-fh16-lidar-echolocation-scene-ivrule: docker-tag-fh16-lidar-echolocation-scene-ivrule
-	for i in $$(cat fh16-lidar-echolocation-scene-ivrule/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/fh16lidarecholocationsceneivrule_$$i:$(VERSION); docker push seresearch/fh16lidarecholocationsceneivrule_$$i:latest; done
-
-fh16-lidar-echolocation-scene-ivrule-copy-opendlv:
-	rm -fr fh16-lidar-echolocation-scene-ivrule/opendlv
-	cp -r ../build.from.docker/install fh16-lidar-echolocation-scene-ivrule/opendlv
-	cp fh16-lidar-echolocation-scene-ivrule/checkHealth.sh fh16-lidar-echolocation-scene-ivrule/opendlv/bin
-
-# Build image for FH16 truck for lidar-echolocation-scene-ivrule.
-fh16-lidar-echolocation-scene-ivrule: build-incremental fh16-lidar-echolocation-scene-ivrule-copy-opendlv
-	cd fh16-lidar-echolocation-scene-ivrule && docker-compose build
-
-
-###############################################################################
-###############################################################################
-# FH16 camera-detectvehicle-scene-ivrule.
-
-# Tag Docker images using Git hashes for traceability.
-docker-tag-fh16-camera-detectvehicle-scene-ivrule:
-	for i in $$(cat fh16-camera-detectvehicle-scene-ivrule/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker tag fh16cameradetectvehiclesceneivrule_$$i seresearch/fh16cameradetectvehiclesceneivrule_$$i:$(VERSION); docker tag fh16cameradetectvehiclesceneivrule_$$i seresearch/fh16cameradetectvehiclesceneivrule_$$i:latest; done
-
-# Push Docker latest images for backup.
-docker-push-fh16-camera-detectvehicle-scene-ivrule: docker-tag-fh16-camera-detectvehicle-scene-ivrule
-	for i in $$(cat fh16-detectvehicle-scene-ivrule/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/fh16cameradetectvehiclesceneivrule_$$i:$(VERSION); docker push seresearch/fh16cameradetectvehiclesceneivrule_$$i:latest; done
-
-fh16-camera-detectvehicle-scene-ivrule-copy-opendlv:
-	rm -fr fh16-camera-detectvehicle-scene-ivrule/opendlv
-	cp -r ../build.from.docker/install fh16-camera-detectvehicle-scene-ivrule/opendlv
-	cp fh16-camera-detectvehicle-scene-ivrule/checkHealth.sh fh16-camera-detectvehicle-scene-ivrule/opendlv/bin
-
-# Build image for FH16 truck for camera-detectvehicle-scene-ivrule.
-fh16-camera-detectvehicle-scene-ivrule: build-incremental fh16-camera-detectvehicle-scene-ivrule-copy-opendlv
-	cd fh16-camera-detectvehicle-scene-ivrule && docker-compose build
-
-
-###############################################################################
-###############################################################################
-# FH16 lidar-echolocation-camera-detectvehicle-scene-ivrule.
-
-# Tag Docker images using Git hashes for traceability.
-docker-tag-fh16-lidar-echolocation-camera-detectvehicle-scene-ivrule:
-	for i in $$(cat fh16-lidar-echolocation-camera-detectvehicle-scene-ivrule/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker tag fh16lidarecholocationcameradetectvehiclesceneivrule_$$i seresearch/fh16lidarecholocationcameradetectvehiclesceneivrule_$$i:$(VERSION); docker tag fh16lidarecholocationcameradetectvehiclesceneivrule_$$i seresearch/fh16lidarecholocationcameradetectvehiclesceneivrule_$$i:latest; done
-
-# Push Docker latest images for backup.
-docker-push-fh16-lidar-echolocation-camera-detectvehicle-scene-ivrule: docker-tag-fh16-lidar-echolocation-camera-detectvehicle-scene-ivrule
-	for i in $$(cat fh16-lidar-echolocation-camera-detectvehicle-scene-ivrule/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/fh16lidarecholocationcameradetectvehiclesceneivrule_$$i:$(VERSION); docker push seresearch/fh16lidarecholocationcameradetectvehiclesceneivrule_$$i:latest; done
-
-fh16-lidar-echolocation-camera-detectvehicle-scene-ivrule-copy-opendlv:
-	rm -fr fh16-lidar-echolocation-camera-detectvehicle-scene-ivrule/opendlv
-	cp -r ../build.from.docker/install fh16-lidar-echolocation-camera-detectvehicle-scene-ivrule/opendlv
-	cp fh16-lidar-echolocation-camera-detectvehicle-scene-ivrule/checkHealth.sh fh16-lidar-echolocation-camera-detectvehicle-scene-ivrule/opendlv/bin
-
-# Build image for FH16 truck for lidar-echolocation-camera-detectvehicle-scene-ivrule.
-fh16-lidar-echolocation-camera-detectvehicle-scene-ivrule: build-incremental fh16-lidar-echolocation-camera-detectvehicle-scene-ivrule-copy-opendlv
-	cd fh16-lidar-echolocation-camera-detectvehicle-scene-ivrule && docker-compose build
-
-
-###############################################################################
-###############################################################################
-# FH16 ivrule-setopticalflow-act-checkactuation-can.
-
-# Tag Docker images using Git hashes for traceability.
-docker-tag-fh16-ivrule-setopticalflow-act-checkactuation-can:
-	for i in $$(cat fh16-ivrule-setopticalflow-act-checkactuation-can/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker tag fh16ivrulesetopticalflowactcheckactuationcan_$$i seresearch/fh16ivrulesetopticalflowactcheckactuationcan_$$i:$(VERSION); docker tag fh16ivrulesetopticalflowactcheckactuationcan_$$i seresearch/fh16ivrulesetopticalflowactcheckactuationcan_$$i:latest; done
-
-# Push Docker latest images for backup.
-docker-push-fh16-ivrule-setopticalflow-act-checkactuation-can: docker-tag-fh16-ivrule-setopticalflow-act-checkactuation-can
-	for i in $$(cat fh16-ivrule-setopticalflow-act-checkactuation-can/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/fh16ivrulesetopticalflowactcheckactuationcan_$$i:$(VERSION); docker push seresearch/fh16ivrulesetopticalflowactcheckactuationcan_$$i:latest; done
-
-fh16-ivrule-setopticalflow-act-checkactuation-can-copy-opendlv:
-	rm -fr fh16-ivrule-setopticalflow-act-checkactuation-can/opendlv
-	cp -r ../build.from.docker/install fh16-ivrule-setopticalflow-act-checkactuation-can/opendlv
-	cp fh16-ivrule-setopticalflow-act-checkactuation-can/checkHealth.sh fh16-ivrule-setopticalflow-act-checkactuation-can/opendlv/bin
-
-# Build image for FH16 truck for lidar-echolocation-camera-detectvehicle-scene-ivrule.
-fh16-ivrule-setopticalflow-act-checkactuation-can: build-incremental fh16-ivrule-setopticalflow-act-checkactuation-can-copy-opendlv
-	cd fh16-ivrule-setopticalflow-act-checkactuation-can && docker-compose build
-
-
-###############################################################################
-###############################################################################
-# FH16 lidar-echolocation-scene-ivrule-act-checkactuation-can.
-
-# Tag Docker images using Git hashes for traceability.
-docker-tag-fh16-lidar-echolocation-scene-ivrule-act-checkactuation-can:
-	for i in $$(cat fh16-lidar-echolocation-scene-ivrule-act-checkactuation-can/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker tag fh16lidarecholocationsceneivruleactcheckactuationcan_$$i seresearch/fh16lidarecholocationsceneivruleactcheckactuationcan_$$i:$(VERSION); docker tag fh16lidarecholocationsceneivruleactcheckactuationcan_$$i seresearch/fh16lidarecholocationsceneivruleactcheckactuationcan_$$i:latest; done
-
-# Push Docker latest images for backup.
-docker-push-fh16-lidar-echolocation-scene-ivrule-act-checkactuation-can: docker-tag-fh16-lidar-echolocation-scene-ivrule-act-checkactuation-can
-	for i in $$(cat fh16-lidar-echolocation-scene-ivrule-act-checkactuation-can/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/fh16lidarecholocationsceneivruleactcheckactuationcan_$$i:$(VERSION); docker push seresearch/fh16lidarecholocationsceneivruleactcheckactuationcan_$$i:latest; done
-
-fh16-lidar-echolocation-scene-ivrule-act-checkactuation-can-copy-opendlv:
-	rm -fr fh16-lidar-echolocation-scene-ivrule-act-checkactuation-can/opendlv
-	cp -r ../build.from.docker/install fh16-lidar-echolocation-scene-ivrule-act-checkactuation-can/opendlv
-	cp fh16-lidar-echolocation-scene-ivrule-act-checkactuation-can/checkHealth.sh fh16-lidar-echolocation-scene-ivrule-act-checkactuation-can/opendlv/bin
-
-# Build image for FH16 truck for lidar-echolocation-scene-ivrule-act-checkactuation-can.
-fh16-lidar-echolocation-scene-ivrule-act-checkactuation-can: build-incremental fh16-lidar-echolocation-scene-ivrule-act-checkactuation-can-copy-opendlv
-	cd fh16-lidar-echolocation-scene-ivrule-act-checkactuation-can && docker-compose build
-
-
-###############################################################################
-###############################################################################
-# FH16 IV2016.
-
-# Tag Docker images using Git hashes for traceability.
-docker-tag-fh16-iv2016:
-	for i in $$(cat fh16-iv2016/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker tag fh16iv2016_$$i seresearch/fh16iv2016_$$i:$(VERSION); docker tag fh16iv2016_$$i seresearch/fh16iv2016_$$i:latest; done
-
-# Push Docker latest images for backup.
-docker-push-fh16-iv2016: docker-tag-fh16-iv2016
-	for i in $$(cat fh16-iv2016/docker-compose.yml | grep -v "^ "| grep -v "#" | grep -v "^$$" | cut -f1 -d":"); do docker push seresearch/fh16iv2016_$$i:$(VERSION); docker push seresearch/fh16iv2016_$$i:latest; done
-
-fh16-iv2016-copy-opendlv:
-	rm -fr fh16-iv2016/opendlv
-	cp -r ../build.from.docker/install fh16-iv2016/opendlv
-	cp fh16-iv2016/checkHealth.sh fh16-iv2016/opendlv/bin
-
-# Build image for FH16 truck for IV demo.
-fh16-iv2016: build-incremental fh16-iv2016-copy-opendlv
-	cd fh16-iv2016 && docker-compose build
+pushDockerImage: createDockerImage
+	$(DOCKER) push $(DOCKER_IMAGE_NAME_SHORT_NAME):latest
+	$(DOCKER) push $(DOCKER_IMAGE_NAME_SHORT_NAME):$(VERSION)
 

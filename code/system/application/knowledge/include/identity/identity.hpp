@@ -26,7 +26,7 @@
 #include "opendavinci/odcore/data/Container.h"
 
  
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
+#include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
 
 namespace opendlv {
 namespace knowledge {

@@ -25,7 +25,7 @@
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
 
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
+#include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
 
 #include "keepobjectsize/keepobjectsize.hpp"
 
@@ -42,19 +42,20 @@ namespace keepobjectsize {
 KeepObjectSize::KeepObjectSize(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(
       a_argc, a_argv, "action-keepobjectsize"),
+    m_initialised(false),
     m_stimulusTime(),
     m_stimulus(),
     m_stimulusRate(),
     m_correctionTime(0, 0),
     m_correction(),
-    m_correctionGain(0.4f),
-    m_maxStimulusAge(0.5f),
-    m_patienceDuration(0.4f),
+    m_correctionGain(),
+    m_maxStimulusAge(),
+    m_patienceDuration(),
     m_stimulusJerk(),
-    m_stimulusJerkThreshold(0.02f),
-    m_stimulusRateThreshold(0.02f),
-    m_stimulusThreshold(0.02f),
-    m_equilibrium(20.0f)
+    m_stimulusJerkThreshold(),
+    m_stimulusRateThreshold(),
+    m_stimulusThreshold(),
+    m_equilibrium()
 {
 }
 
@@ -69,6 +70,9 @@ KeepObjectSize::~KeepObjectSize()
  */
 void KeepObjectSize::nextContainer(odcore::data::Container &a_container)
 {
+  if(!m_initialised){
+    return;
+  }
   if(a_container.getDataType() == opendlv::perception::StimulusAngularSizeAlignment::ID()) {
 
     // TODO: Should receive timestamp from sensors.
@@ -132,8 +136,6 @@ void KeepObjectSize::AddStimulus(odcore::data::TimeStamp const &a_stimulusTime, 
 
 void KeepObjectSize::Correct()
 {
-  float priority = 0.8f;
- 
   if (IsPatient()) {
     return;
   }
@@ -157,7 +159,7 @@ void KeepObjectSize::Correct()
   }
 
   odcore::data::TimeStamp t0;
-  opendlv::action::Correction correction(t0, "accelerate", false, amplitude, priority);
+  opendlv::action::Correction correction(t0, "accelerate", false, amplitude);
   odcore::data::Container container(correction);
   getConference().send(container);
   
@@ -181,6 +183,15 @@ bool KeepObjectSize::IsPatient() const
 
 void KeepObjectSize::setUp()
 {
+  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+  m_correctionGain = kv.getValue<float>("action-keepobjectsize.correctionGain");
+  m_maxStimulusAge = kv.getValue<float>("action-keepobjectsize.maxStimulusAge");
+  m_patienceDuration = kv.getValue<float>("action-keepobjectsize.patienceDuration");
+  m_stimulusJerkThreshold = kv.getValue<float>("action-keepobjectsize.stimulusJerkThreshold");
+  m_stimulusRateThreshold = kv.getValue<float>("action-keepobjectsize.stimulusRateThreshold");
+  m_stimulusThreshold = kv.getValue<float>("action-keepobjectsize.stimulusThreshold");
+  m_equilibrium = kv.getValue<float>("action-keepobjectsize.equilibrium");
+  m_initialised = true;
 }
 
 void KeepObjectSize::tearDown()

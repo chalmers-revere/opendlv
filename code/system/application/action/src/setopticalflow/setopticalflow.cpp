@@ -25,7 +25,7 @@
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
 
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
+#include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
 
 #include "setopticalflow/setopticalflow.hpp"
 
@@ -42,6 +42,7 @@ namespace setopticalflow {
 SetOpticalFlow::SetOpticalFlow(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(
       a_argc, a_argv, "action-setopticalflow"),
+    m_initialised(false),
     m_stimulusTime(),
     m_stimulus(),
     m_stimulusRate(),
@@ -64,6 +65,9 @@ SetOpticalFlow::~SetOpticalFlow()
 
 void SetOpticalFlow::nextContainer(odcore::data::Container &a_container)
 {
+  if(!m_initialised) {
+    return;
+  }
   if (a_container.getDataType() == opendlv::perception::StimulusOpticalFlow::ID()) {
 
     // TODO: Should receive timestamp from sensors.
@@ -138,8 +142,6 @@ void SetOpticalFlow::AddStimulus(odcore::data::TimeStamp const &a_stimulusTime, 
 
 void SetOpticalFlow::Correct()
 {
-  float priority = 0.2f;
-  
   if (IsPatient()) {
     return;
   }
@@ -163,7 +165,7 @@ void SetOpticalFlow::Correct()
   }
       
   odcore::data::TimeStamp t0;
-  opendlv::action::Correction correction(t0, "accelerate", false, amplitude, priority);
+  opendlv::action::Correction correction(t0, "accelerate", false, amplitude);
   odcore::data::Container container(correction);
   getConference().send(container);
       
@@ -187,8 +189,15 @@ bool SetOpticalFlow::IsPatient() const
 
 void SetOpticalFlow::setUp()
 {
-//  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
-//  m_maxSpeed = kv.getValue<float>("action-setopticalflow.max_speed");
+  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+  m_correctionGain = kv.getValue<float>("action-setopticalflow.correctionGain");
+  m_maxStimulusAge = kv.getValue<float>("action-setopticalflow.maxStimulusAge");
+  m_patienceDuration = kv.getValue<float>("action-setopticalflow.patienceDuration");
+  m_stimulusJerkThreshold = kv.getValue<float>("action-setopticalflow.stimulusJerkThreshold");
+  m_stimulusRateThreshold = kv.getValue<float>("action-setopticalflow.stimulusRateThreshold");
+  m_stimulusThreshold = kv.getValue<float>("action-setopticalflow.stimulusThreshold");
+  m_equilibrium = kv.getValue<float>("action-setopticalflow.equilibrium");
+  m_initialised = true;
 }
 
 void SetOpticalFlow::tearDown()

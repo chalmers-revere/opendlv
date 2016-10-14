@@ -104,7 +104,7 @@ void ConvNeuralNet::TearDown()
 }
 
 
-void ConvNeuralNet::Update(const cv::Mat* a_imageFrame, const bool *a_debugMode)
+void ConvNeuralNet::Update(const cv::Mat* a_imageFrame, const bool a_debugMode)
 {
   std::vector<tiny_cnn::vec_t> cnnImageData;
 
@@ -234,40 +234,38 @@ void ConvNeuralNet::Update(const cv::Mat* a_imageFrame, const bool *a_debugMode)
   }
 
 
-  { //Testing stuff with histograms
-    int32_t histSize = 64; //from 0 to 255
-    float range[] = { 1, 256 } ; //the upper boundary is exclusive
-    const float* histRange = { range };
-    bool uniform = true;
-    bool accumulate = false;
-    cv::Mat hist;
-    cv::calcHist(&mapDifference, 1, 0, cv::Mat(), hist, 1, &histSize, 
-        &histRange, uniform, accumulate);
-    int32_t hist_w = 512; 
-    int32_t hist_h = 400;
-    int32_t bin_w = cvRound((double) hist_w/histSize);
-    cv::Mat histImage( hist_h, hist_w, CV_8UC3, cv::Scalar( 0,0,0));
-    normalize(hist, hist, 0, histImage.rows, cv::NORM_MINMAX, -1, cv::Mat());
+  if(a_debugMode) {
+    { //Testing stuff with histograms
+      int32_t histSize = 64; //from 0 to 255
+      float range[] = { 1, 256 } ; //the upper boundary is exclusive
+      const float* histRange = { range };
+      bool uniform = true;
+      bool accumulate = false;
+      cv::Mat hist;
+      cv::calcHist(&mapDifference, 1, 0, cv::Mat(), hist, 1, &histSize, 
+          &histRange, uniform, accumulate);
+      int32_t hist_w = 512; 
+      int32_t hist_h = 400;
+      int32_t bin_w = cvRound((double) hist_w/histSize);
+      cv::Mat histImage( hist_h, hist_w, CV_8UC3, cv::Scalar( 0,0,0));
+      normalize(hist, hist, 0, histImage.rows, cv::NORM_MINMAX, -1, cv::Mat());
 
-    cv::line(
-        histImage, 
-        cv::Point(hist_w * (thresh/255), hist_h),
-        cv::Point(hist_w * (thresh/255), 0),
-        cv::Scalar( 0, 0, 200), 
-        2, 8, 0);
-    for( int32_t i = 1; i < histSize; i++ ) {
       cv::line(
           histImage, 
-          cv::Point(bin_w*(i-1), hist_h - cvRound(hist.at<float>(i-1))),
-          cv::Point(bin_w*(i), hist_h - cvRound(hist.at<float>(i))),
-          cv::Scalar( 255, 0, 0), 
+          cv::Point(hist_w * (thresh/255), hist_h),
+          cv::Point(hist_w * (thresh/255), 0),
+          cv::Scalar( 0, 0, 200), 
           2, 8, 0);
-    }
-    if(*a_debugMode){
+      for( int32_t i = 1; i < histSize; i++ ) {
+        cv::line(
+            histImage, 
+            cv::Point(bin_w*(i-1), hist_h - cvRound(hist.at<float>(i-1))),
+            cv::Point(bin_w*(i), hist_h - cvRound(hist.at<float>(i))),
+            cv::Scalar( 255, 0, 0), 
+            2, 8, 0);
+      }
       cv::imshow("calcHist Demo", histImage);
     }
-  }
-  if(*a_debugMode) {
     cv::imshow("Final spatial map", spatialMap);
     cv::imshow("Non-vehicle spatial map", nonVehicleMap);
     cv::imshow("DIFF spatial map", mapDifference);
@@ -316,7 +314,7 @@ void ConvNeuralNet::GetDetectedVehicles(std::vector<cv::Rect>* container)
 
 void ConvNeuralNet::GetConvNet(
     int32_t a_width, int32_t a_height,
-    tiny_cnn::network<tiny_cnn::mse, tiny_cnn::gradient_descent>* a_cnn,
+    tiny_cnn::network<tiny_cnn::sequential>* a_cnn,
     bool a_isTrainingNetwork)
 {
   // works ~ 93 %
