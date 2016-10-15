@@ -17,10 +17,10 @@
  * USA.
  */
 
-#include "gcdc16/rule/rule.hpp"
+#include "gcdc16/rule/intersectionhost/intersectionhost.hpp"
 
 int32_t main(int32_t a_argc, char **a_argv)
 {
-  opendlv::knowledge::gcdc16::rule::Rule main(a_argc, a_argv);
+  opendlv::knowledge::gcdc16::rule::intersectionhost::IntersectionHost main(a_argc, a_argv);
   return main.runModule();
 }

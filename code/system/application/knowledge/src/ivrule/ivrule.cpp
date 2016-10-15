@@ -92,7 +92,7 @@ Ivrule::~Ivrule()
       //     << " Currently: " << m_mio.getAngularSize() 
       //     << std::endl;
     } else {
-      opendlv::perception::StimulusOpticalFlow sof(now, m_desiredOpticalFlow, m_speed);
+      opendlv::perception::StimulusGroundSpeed sof(now, m_desiredOpticalFlow, m_speed);
       odcore::data::Container containerSof(sof);
       getConference().send(containerSof);
       // std::cout << "Send sof. Desired OF: " << m_desiredOpticalFlow  << " Current OF: " << m_speed << std::endl;

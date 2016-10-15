@@ -29,12 +29,13 @@
 
 #include "opendavinci/odcore/strings/StringToolbox.h"
 
-#include "gcdc16/rule/rule.hpp"
+#include "gcdc16/rule/platoon/platoon.hpp"
 
 namespace opendlv {
 namespace knowledge {
 namespace gcdc16 {
 namespace rule {
+namespace platoon {
 
 /**
 * Constructor.
@@ -42,9 +43,9 @@ namespace rule {
 * @param a_argc Number of command line arguments.
 * @param a_argv Command line arguments.
 */
-Rule::Rule(int32_t const &a_argc, char **a_argv)
+Platoon::Platoon(int32_t const &a_argc, char **a_argv)
 : TimeTriggeredConferenceClientModule(
-  a_argc, a_argv, "knowledge-gcdc16-rule"),
+  a_argc, a_argv, "knowledge-gcdc16-platoon"),
   m_object(),
   m_closestObject(),
   m_secondClosestObject(),
@@ -70,12 +71,12 @@ Rule::Rule(int32_t const &a_argc, char **a_argv)
 {
 }
 
-Rule::~Rule()
+Platoon::~Platoon()
 {
 }
 
 
-odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Rule::body()
+odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Platoon::body()
 {
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
@@ -113,7 +114,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Rule::body()
 * Sends .
 */
 /*
-double Rule::getDistances(double hostVelocity)
+double Platoon::getDistances(double hostVelocity)
 {
   double desiredDistance = standstillDistance + headway * hostVelocity;
   //double safeDistance = scalingFactor * desiredDistance;
@@ -122,7 +123,7 @@ double Rule::getDistances(double hostVelocity)
   return desiredDistance;
 }
 
-bool Rule::euclideanDistance(double measuredDistance)
+bool Platoon::euclideanDistance(double measuredDistance)
 {
   double distanceError = measuredDistance - minimumEuclideanDistance;
   if (distanceError >= 0) {
@@ -133,7 +134,7 @@ bool Rule::euclideanDistance(double measuredDistance)
 }
 */
 
-void Rule::nextContainer(odcore::data::Container &a_container)
+void Platoon::nextContainer(odcore::data::Container &a_container)
 {
   if (!m_hasSetupBeenRun) {
     return;
@@ -153,7 +154,7 @@ void Rule::nextContainer(odcore::data::Container &a_container)
 }
 
 
-void Rule::receivedContainerMergeScenario(odcore::data::Container &a_container)
+void Platoon::receivedContainerMergeScenario(odcore::data::Container &a_container)
 {
 
 
@@ -165,7 +166,7 @@ void Rule::receivedContainerMergeScenario(odcore::data::Container &a_container)
     std::vector<opendlv::perception::Object> objects = receivedEnvironment.getListOfObjects();
 
     if (objects.size() < 2) {
-      std::cout << "ERROR: rule.cpp only received info about " << objects.size() << " objects..." << std::endl;
+      std::cout << "ERROR: platoon.cpp only received info about " << objects.size() << " objects..." << std::endl;
       return;
     }
 
@@ -333,7 +334,7 @@ void Rule::receivedContainerMergeScenario(odcore::data::Container &a_container)
   }
 }
 
-void Rule::bodyMergeScenario()
+void Platoon::bodyMergeScenario()
 {
   odcore::data::TimeStamp timestamp;
 
@@ -495,7 +496,7 @@ void Rule::bodyMergeScenario()
 
 }
 
-void Rule::receivedContainerIntersectionScenario(odcore::data::Container &a_container)
+void Platoon::receivedContainerIntersectionScenario(odcore::data::Container &a_container)
 {
 
   odcore::data::TimeStamp timestamp;
@@ -508,7 +509,7 @@ void Rule::receivedContainerIntersectionScenario(odcore::data::Container &a_cont
     std::vector<opendlv::perception::Object> objects = receivedEnvironment.getListOfObjects();
 
     if (objects.size() < 1) {
-      std::cout << "ERROR: rule.cpp only received info about " << objects.size() << " objects..." << std::endl;
+      std::cout << "ERROR: platoon.cpp only received info about " << objects.size() << " objects..." << std::endl;
       return;
     }
 
@@ -571,7 +572,7 @@ void Rule::receivedContainerIntersectionScenario(odcore::data::Container &a_cont
 }
 
 
-void Rule::bodyIntersectionScenario()
+void Platoon::bodyIntersectionScenario()
 {
   /*
   bool debuggingSpeed = false;
@@ -747,20 +748,21 @@ void Rule::bodyIntersectionScenario()
 
 
 
-void Rule::setUp()
+void Platoon::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
-  m_currentLane = kv.getValue<std::string>("knowledge-gcdc16-rule.initial_lane");
-  m_isTail = kv.getValue<std::string>("knowledge-gcdc16-rule.is_tail");
-  m_platoonId = kv.getValue<std::string>("knowledge-gcdc16-rule.platoon_id");
-  m_scenarioType = kv.getValue<std::string>("knowledge-gcdc16-rule.scenario");
+  m_currentLane = kv.getValue<std::string>("knowledge-gcdc16-platoon.initial_lane");
+  m_isTail = kv.getValue<std::string>("knowledge-gcdc16-platoon.is_tail");
+  m_platoonId = kv.getValue<std::string>("knowledge-gcdc16-platoon.platoon_id");
+  m_scenarioType = kv.getValue<std::string>("knowledge-gcdc16-platoon.scenario");
   m_hasSetupBeenRun = true;
 }
 
-void Rule::tearDown()
+void Platoon::tearDown()
 {
 }
 
+} // platoon
 } // rule
 } // gcdc16
 } // knowledge
