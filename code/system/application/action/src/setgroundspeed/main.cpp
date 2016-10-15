@@ -17,10 +17,10 @@
  * USA.
  */
 
-#include "setopticalflow/setopticalflow.hpp"
+#include "setgroundspeed/setgroundspeed.hpp"
 
 int32_t main(int32_t a_argc, char **a_argv)
 {
-  opendlv::action::setopticalflow::SetOpticalFlow main(a_argc, a_argv);
+  opendlv::action::setgroundspeed::SetGroundSpeed main(a_argc, a_argv);
   return main.runModule();
 }

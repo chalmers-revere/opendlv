@@ -27,11 +27,11 @@
 
 #include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
 
-#include "setopticalflow/setopticalflow.hpp"
+#include "setgroundspeed/setgroundspeed.hpp"
 
 namespace opendlv {
 namespace action {
-namespace setopticalflow {
+namespace setgroundspeed {
 
 /**
   * Constructor.
@@ -39,9 +39,9 @@ namespace setopticalflow {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-SetOpticalFlow::SetOpticalFlow(int32_t const &a_argc, char **a_argv)
+SetGroundSpeed::SetGroundSpeed(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(
-      a_argc, a_argv, "action-setopticalflow"),
+      a_argc, a_argv, "action-setgroundspeed"),
     m_initialised(false),
     m_stimulusTime(),
     m_stimulus(),
@@ -59,27 +59,27 @@ SetOpticalFlow::SetOpticalFlow(int32_t const &a_argc, char **a_argv)
 {
 }
 
-SetOpticalFlow::~SetOpticalFlow()
+SetGroundSpeed::~SetGroundSpeed()
 {
 }
 
-void SetOpticalFlow::nextContainer(odcore::data::Container &a_container)
+void SetGroundSpeed::nextContainer(odcore::data::Container &a_container)
 {
   if(!m_initialised) {
     return;
   }
-  if (a_container.getDataType() == opendlv::perception::StimulusOpticalFlow::ID()) {
+  if (a_container.getDataType() == opendlv::perception::StimulusGroundSpeed::ID()) {
 
     // TODO: Should receive timestamp from sensors.
     auto stimulusTime = a_container.getSentTimeStamp();
-    auto stimulusOpticalFlow = a_container.getData<opendlv::perception::StimulusOpticalFlow>();
+    auto stimulusGroundSpeed = a_container.getData<opendlv::perception::StimulusGroundSpeed>();
 
-    AddStimulus(stimulusTime, stimulusOpticalFlow);
+    AddStimulus(stimulusTime, stimulusGroundSpeed);
     Correct();
   }
 }
 
-void SetOpticalFlow::AddStimulus(odcore::data::TimeStamp const &a_stimulusTime, opendlv::perception::StimulusOpticalFlow const &a_stimulusOpticalFlow)
+void SetGroundSpeed::AddStimulus(odcore::data::TimeStamp const &a_stimulusTime, opendlv::perception::StimulusGroundSpeed const &a_stimulusGroundSpeed)
 {
   odcore::data::TimeStamp now;
 
@@ -105,9 +105,9 @@ void SetOpticalFlow::AddStimulus(odcore::data::TimeStamp const &a_stimulusTime, 
   m_stimulus = stimulusToSave;
   m_stimulusRate = stimulusRateToSave;
 
-  float desiredOpticalFlow = a_stimulusOpticalFlow.getDesiredOpticalFlow();
-  float opticalFlow = a_stimulusOpticalFlow.getOpticalFlow();
-  float stimulus = desiredOpticalFlow - opticalFlow;
+  float desiredGroundSpeed = a_stimulusGroundSpeed.getDesiredGroundSpeed();
+  float groundSpeed = a_stimulusGroundSpeed.getGroundSpeed();
+  float stimulus = desiredGroundSpeed - groundSpeed;
 
  // if (std::abs(stimulus) < 1.0f) {
  //   m_patienceDuration = 2.0f;
@@ -140,7 +140,7 @@ void SetOpticalFlow::AddStimulus(odcore::data::TimeStamp const &a_stimulusTime, 
 //  std::cout << "Stimulus jerk: " << m_stimulusJerk << std::endl;
 }
 
-void SetOpticalFlow::Correct()
+void SetGroundSpeed::Correct()
 {
   if (IsPatient()) {
     return;
@@ -177,7 +177,7 @@ void SetOpticalFlow::Correct()
   std::cout << ">>> End correction!" << std::endl;
 }
 
-bool SetOpticalFlow::IsPatient() const
+bool SetGroundSpeed::IsPatient() const
 {
   odcore::data::TimeStamp now;
 
@@ -187,23 +187,23 @@ bool SetOpticalFlow::IsPatient() const
   return (timeSinceCorrection < m_patienceDuration);
 }
 
-void SetOpticalFlow::setUp()
+void SetGroundSpeed::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
-  m_correctionGain = kv.getValue<float>("action-setopticalflow.correctionGain");
-  m_maxStimulusAge = kv.getValue<float>("action-setopticalflow.maxStimulusAge");
-  m_patienceDuration = kv.getValue<float>("action-setopticalflow.patienceDuration");
-  m_stimulusJerkThreshold = kv.getValue<float>("action-setopticalflow.stimulusJerkThreshold");
-  m_stimulusRateThreshold = kv.getValue<float>("action-setopticalflow.stimulusRateThreshold");
-  m_stimulusThreshold = kv.getValue<float>("action-setopticalflow.stimulusThreshold");
-  m_equilibrium = kv.getValue<float>("action-setopticalflow.equilibrium");
+  m_correctionGain = kv.getValue<float>("action-setgroundspeed.correctionGain");
+  m_maxStimulusAge = kv.getValue<float>("action-setgroundspeed.maxStimulusAge");
+  m_patienceDuration = kv.getValue<float>("action-setgroundspeed.patienceDuration");
+  m_stimulusJerkThreshold = kv.getValue<float>("action-setgroundspeed.stimulusJerkThreshold");
+  m_stimulusRateThreshold = kv.getValue<float>("action-setgroundspeed.stimulusRateThreshold");
+  m_stimulusThreshold = kv.getValue<float>("action-setgroundspeed.stimulusThreshold");
+  m_equilibrium = kv.getValue<float>("action-setgroundspeed.equilibrium");
   m_initialised = true;
 }
 
-void SetOpticalFlow::tearDown()
+void SetGroundSpeed::tearDown()
 {
 }
 
-} // setopticalflow
+} // setgroundspeed
 } // action
 } // opendlv

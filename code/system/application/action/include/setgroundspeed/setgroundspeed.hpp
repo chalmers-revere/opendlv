@@ -28,22 +28,22 @@
 
 namespace opendlv {
 namespace action {
-namespace setopticalflow {
+namespace setgroundspeed {
 
 /**
  * This class provides...
  */
-class SetOpticalFlow
+class SetGroundSpeed
 : public odcore::base::module::DataTriggeredConferenceClientModule {
  public:
-  SetOpticalFlow(int32_t const &, char **);
-  SetOpticalFlow(SetOpticalFlow const &) = delete;
-  SetOpticalFlow &operator=(SetOpticalFlow const &) = delete;
-  virtual ~SetOpticalFlow();
+  SetGroundSpeed(int32_t const &, char **);
+  SetGroundSpeed(SetGroundSpeed const &) = delete;
+  SetGroundSpeed &operator=(SetGroundSpeed const &) = delete;
+  virtual ~SetGroundSpeed();
   virtual void nextContainer(odcore::data::Container &);
 
  private:
-  void AddStimulus(odcore::data::TimeStamp const &, opendlv::perception::StimulusOpticalFlow const &);
+  void AddStimulus(odcore::data::TimeStamp const &, opendlv::perception::StimulusGroundSpeed const &);
   void Correct();
   bool IsPatient() const;
   void setUp();
@@ -65,7 +65,7 @@ class SetOpticalFlow
   float m_equilibrium;
 };
 
-} // setopticalflow
+} // setgroundspeed
 } // action
 } // opendlv
 

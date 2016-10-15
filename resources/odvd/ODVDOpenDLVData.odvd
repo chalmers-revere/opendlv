@@ -216,10 +216,10 @@ message opendlv.perception.StimulusDirectionOfMovement [id = 180] {
   opendlv.model.Direction directionOfMovement [id = 3];
 }
 
-message opendlv.perception.StimulusOpticalFlow [id = 174] {
+message opendlv.perception.StimulusGroundSpeed [id = 174] {
   odcore::data::TimeStamp identified [id = 1];
-  float desiredOpticalFlow [id = 2];
-  float opticalFlow [id = 3];
+  float desiredGroundSpeed [id = 2];
+  float groundSpeed [id = 3];
 }
 
 message opendlv.perception.StimulusDirectionAlignment [id = 182] {

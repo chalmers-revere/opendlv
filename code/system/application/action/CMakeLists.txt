@@ -32,7 +32,7 @@ file(GLOB_RECURSE thisproject-sources
   "${CMAKE_CURRENT_SOURCE_DIR}/src/keepobjectsize/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/removeloomingfront/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/removeloomingrear/*.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/setopticalflow/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/setgroundspeed/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/setopticalrotation/*.cpp"
   )
 
@@ -59,8 +59,8 @@ target_link_libraries(${PROJECT_NAME}-removeloomingfront ${PROJECT_NAME}lib-stat
 add_executable(${PROJECT_NAME}-removeloomingrear "${CMAKE_CURRENT_SOURCE_DIR}/src/removeloomingrear/main.cpp")
 target_link_libraries(${PROJECT_NAME}-removeloomingrear ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
-add_executable(${PROJECT_NAME}-setopticalflow "${CMAKE_CURRENT_SOURCE_DIR}/src/setopticalflow/main.cpp")
-target_link_libraries(${PROJECT_NAME}-setopticalflow ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+add_executable(${PROJECT_NAME}-setgroundspeed "${CMAKE_CURRENT_SOURCE_DIR}/src/setgroundspeed/main.cpp")
+target_link_libraries(${PROJECT_NAME}-setgroundspeed ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
 add_executable(${PROJECT_NAME}-setopticalrotation "${CMAKE_CURRENT_SOURCE_DIR}/src/setopticalrotation/main.cpp")
 target_link_libraries(${PROJECT_NAME}-setopticalrotation ${PROJECT_NAME}lib-static ${LIBRARIES}) 
@@ -76,5 +76,5 @@ install(TARGETS ${PROJECT_NAME}-keepobjectalignment RUNTIME DESTINATION bin COMP
 install(TARGETS ${PROJECT_NAME}-keepobjectsize RUNTIME DESTINATION bin COMPONENT system-application)
 install(TARGETS ${PROJECT_NAME}-removeloomingfront RUNTIME DESTINATION bin COMPONENT system-application)
 install(TARGETS ${PROJECT_NAME}-removeloomingrear RUNTIME DESTINATION bin COMPONENT system-application)
-install(TARGETS ${PROJECT_NAME}-setopticalflow RUNTIME DESTINATION bin COMPONENT system-application)
+install(TARGETS ${PROJECT_NAME}-setgroundspeed RUNTIME DESTINATION bin COMPONENT system-application)
 install(TARGETS ${PROJECT_NAME}-setopticalrotation RUNTIME DESTINATION bin COMPONENT system-application)
