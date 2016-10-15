@@ -17,10 +17,10 @@
  * USA.
  */
 
-#include "removeloomingfront/removeloomingfront.hpp"
+#include "removeloomingconflict/removeloomingconflict.hpp"
 
 int32_t main(int32_t a_argc, char **a_argv)
 {
-  opendlv::action::removeloomingfront::RemoveLoomingFront main(a_argc, a_argv);
+  opendlv::action::removeloomingconflict::RemoveLoomingConflict main(a_argc, a_argv);
   return main.runModule();
 }

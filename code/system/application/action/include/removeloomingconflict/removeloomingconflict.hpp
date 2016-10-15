@@ -17,8 +17,8 @@
  * USA.
  */
 
-#ifndef REMOVELOOMINGFRONT_REMOVELOOMINGFRONT_HPP_
-#define REMOVELOOMINGFRONT_REMOVELOOMINGFRONT_HPP_
+#ifndef REMOVELOOMINGCONFLICT_REMOVELOOMINGCONFLICT_HPP_
+#define REMOVELOOMINGCONFLICT_REMOVELOOMINGCONFLICT_HPP_
 
 #include <memory>
 
@@ -27,18 +27,18 @@
 
 namespace opendlv {
 namespace action {
-namespace removeloomingfront {
+namespace removeloomingconflict {
 
 /**
  * This class provides...
  */
-class RemoveLoomingFront
+class RemoveLoomingConflict
 : public odcore::base::module::DataTriggeredConferenceClientModule {
  public:
-  RemoveLoomingFront(int32_t const &, char **);
-  RemoveLoomingFront(RemoveLoomingFront const &) = delete;
-  RemoveLoomingFront &operator=(RemoveLoomingFront const &) = delete;
-  virtual ~RemoveLoomingFront();
+  RemoveLoomingConflict(int32_t const &, char **);
+  RemoveLoomingConflict(RemoveLoomingConflict const &) = delete;
+  RemoveLoomingConflict &operator=(RemoveLoomingConflict const &) = delete;
+  virtual ~RemoveLoomingConflict();
   virtual void nextContainer(odcore::data::Container &);
 
  private:
@@ -46,7 +46,7 @@ class RemoveLoomingFront
   void tearDown();
 };
 
-} // removeloomingfront
+} // removeloomingconflict
 } // action
 } // opendlv
 

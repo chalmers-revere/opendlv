@@ -30,7 +30,7 @@ file(GLOB_RECURSE thisproject-sources
   "${CMAKE_CURRENT_SOURCE_DIR}/src/increaseobjectmargin/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/keepobjectalignment/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/keepobjectsize/*.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/removeloomingfront/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/removeloomingconflict/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/setgroundspeed/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/setopticalrotation/*.cpp"
   )
@@ -52,8 +52,8 @@ target_link_libraries(${PROJECT_NAME}-keepobjectalignment ${PROJECT_NAME}lib-sta
 add_executable(${PROJECT_NAME}-keepobjectsize "${CMAKE_CURRENT_SOURCE_DIR}/src/keepobjectsize/main.cpp")
 target_link_libraries(${PROJECT_NAME}-keepobjectsize ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
-add_executable(${PROJECT_NAME}-removeloomingfront "${CMAKE_CURRENT_SOURCE_DIR}/src/removeloomingfront/main.cpp")
-target_link_libraries(${PROJECT_NAME}-removeloomingfront ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+add_executable(${PROJECT_NAME}-removeloomingconflict "${CMAKE_CURRENT_SOURCE_DIR}/src/removeloomingconflict/main.cpp")
+target_link_libraries(${PROJECT_NAME}-removeloomingconflict ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
 add_executable(${PROJECT_NAME}-setgroundspeed "${CMAKE_CURRENT_SOURCE_DIR}/src/setgroundspeed/main.cpp")
 target_link_libraries(${PROJECT_NAME}-setgroundspeed ${PROJECT_NAME}lib-static ${LIBRARIES}) 
@@ -70,6 +70,6 @@ install(TARGETS ${PROJECT_NAME}-communicate RUNTIME DESTINATION bin COMPONENT sy
 install(TARGETS ${PROJECT_NAME}-increaseobjectmargin RUNTIME DESTINATION bin COMPONENT system-application)
 install(TARGETS ${PROJECT_NAME}-keepobjectalignment RUNTIME DESTINATION bin COMPONENT system-application)
 install(TARGETS ${PROJECT_NAME}-keepobjectsize RUNTIME DESTINATION bin COMPONENT system-application)
-install(TARGETS ${PROJECT_NAME}-removeloomingfront RUNTIME DESTINATION bin COMPONENT system-application)
+install(TARGETS ${PROJECT_NAME}-removeloomingconflict RUNTIME DESTINATION bin COMPONENT system-application)
 install(TARGETS ${PROJECT_NAME}-setgroundspeed RUNTIME DESTINATION bin COMPONENT system-application)
 install(TARGETS ${PROJECT_NAME}-setopticalrotation RUNTIME DESTINATION bin COMPONENT system-application)
