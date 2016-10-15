@@ -197,3 +197,13 @@ services:
        depends_on:
            - odsupercomponent
        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-sick --cid=${CID} --freq=2"
+    
+    # microservice for proxy-v2v
+    proxy-v2v:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv/bin"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv/bin/opendlv-core-system-proxy-v2v --cid=${CID}"
