@@ -42,14 +42,14 @@ add_library(${PROJECT_NAME}lib-static STATIC ${thisproject-sources})
 add_executable(${PROJECT_NAME}-gcdc16-rule-platoon "${CMAKE_CURRENT_SOURCE_DIR}/src/gcdc16/rule/platoon/main.cpp")
 target_link_libraries(${PROJECT_NAME}-gcdc16-rule-platoon ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
-add_executable(${PROJECT_NAME}-gcdc16-rule-intersection-host "${CMAKE_CURRENT_SOURCE_DIR}/src/gcdc16/rule/intersectionhost/main.cpp")
-target_link_libraries(${PROJECT_NAME}-gcdc16-rule-intersection-host ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+add_executable(${PROJECT_NAME}-gcdc16-rule-intersectionhost "${CMAKE_CURRENT_SOURCE_DIR}/src/gcdc16/rule/intersectionhost/main.cpp")
+target_link_libraries(${PROJECT_NAME}-gcdc16-rule-intersectionhost ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
-add_executable(${PROJECT_NAME}-gcdc16-rule-intersection-left "${CMAKE_CURRENT_SOURCE_DIR}/src/gcdc16/rule/intersectionleft/main.cpp")
-target_link_libraries(${PROJECT_NAME}-gcdc16-rule-intersection-left ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+add_executable(${PROJECT_NAME}-gcdc16-rule-intersectionleft "${CMAKE_CURRENT_SOURCE_DIR}/src/gcdc16/rule/intersectionleft/main.cpp")
+target_link_libraries(${PROJECT_NAME}-gcdc16-rule-intersectionleft ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
-add_executable(${PROJECT_NAME}-gcdc16-rule-intersection-right "${CMAKE_CURRENT_SOURCE_DIR}/src/gcdc16/rule/intersectionright/main.cpp")
-target_link_libraries(${PROJECT_NAME}-gcdc16-rule-intersection-right ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+add_executable(${PROJECT_NAME}-gcdc16-rule-intersectionright "${CMAKE_CURRENT_SOURCE_DIR}/src/gcdc16/rule/intersectionright/main.cpp")
+target_link_libraries(${PROJECT_NAME}-gcdc16-rule-intersectionright ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
 add_executable(${PROJECT_NAME}-gcdc16-v2viclcm "${CMAKE_CURRENT_SOURCE_DIR}/src/gcdc16/v2viclcm/main.cpp")
 target_link_libraries(${PROJECT_NAME}-gcdc16-v2viclcm ${PROJECT_NAME}lib-static ${LIBRARIES}) 
@@ -74,9 +74,9 @@ include(RunTests)
 
 # Install
 install(TARGETS ${PROJECT_NAME}-gcdc16-rule-platoon RUNTIME DESTINATION bin COMPONENT system-application)
-install(TARGETS ${PROJECT_NAME}-gcdc16-rule-intersection-host RUNTIME DESTINATION bin COMPONENT system-application)
-install(TARGETS ${PROJECT_NAME}-gcdc16-rule-intersection-left RUNTIME DESTINATION bin COMPONENT system-application)
-install(TARGETS ${PROJECT_NAME}-gcdc16-rule-intersection-right RUNTIME DESTINATION bin COMPONENT system-application)
+install(TARGETS ${PROJECT_NAME}-gcdc16-rule-intersectionhost RUNTIME DESTINATION bin COMPONENT system-application)
+install(TARGETS ${PROJECT_NAME}-gcdc16-rule-intersectionleft RUNTIME DESTINATION bin COMPONENT system-application)
+install(TARGETS ${PROJECT_NAME}-gcdc16-rule-intersectionright RUNTIME DESTINATION bin COMPONENT system-application)
 install(TARGETS ${PROJECT_NAME}-gcdc16-v2viclcm RUNTIME DESTINATION bin COMPONENT system-application)
 install(TARGETS ${PROJECT_NAME}-identity RUNTIME DESTINATION bin COMPONENT system-application)
 install(TARGETS ${PROJECT_NAME}-ivrule RUNTIME DESTINATION bin COMPONENT system-application)

@@ -161,11 +161,11 @@ services:
     proxy-trimble:
         build: .
         network_mode: "host"
-        working_dir: "/opt/opendlv/bin"
+        working_dir: "/opt/opendlv.core/bin"
         restart: always
         depends_on:
             - odsupercomponent
-        command: "/opt/opendlv/bin/opendlv-core-system-proxy-trimble --cid=${CID} --freq=20"
+        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-trimble --cid=${CID} --freq=20"
 
     # microservice for proxy-camera-axis
     proxy-camera-axis:
@@ -187,8 +187,8 @@ services:
            - odsupercomponent
        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-fh16 --cid=${CID} --freq=100"
 
-   # microservice for proxy-lidar
-   proxy-lidar:
+   # microservice for proxy-sick
+   proxy-sick:
        build: .
        network_mode: "host"
        user: root  # This parameter will be replaced as soon as group_add parameter is available in docker-compose, cf. https://github.com/docker/compose/pull/3709.
