@@ -61,15 +61,16 @@ class DetectLane
   bool m_initialized;
   cv::Mat m_image;
   std::deque<std::pair<odcore::data::TimeStamp, cv::Mat>> m_visualMemory;
-
   uint16_t m_intensityThreshold;
   uint16_t m_cannyThreshold;
   uint16_t m_houghThreshold;
   double m_memThreshold;
   double m_upperLaneLimit;
   double m_lowerLaneLimit;
+  int16_t m_screenSize[2];
   int16_t m_roi[4];
   odcore::base::Mutex m_mtx;
+  bool m_debug;
 
   void GetGrouping(std::vector<cv::Vec2f> &, std::vector<cv::Vec2f> &, double);
   void GetParametricRepresentation(std::vector<cv::Vec2f> &,std::vector<cv::Vec2f> &,std::vector<cv::Vec2f> &);
@@ -80,7 +81,7 @@ class DetectLane
     , std::vector<cv::Vec2f> &a_p
     , std::vector<cv::Vec2f> &a_m);
   void GetLinePairs(std::vector<cv::Vec2f> &
-    , std::vector<cv::Vec2i> &);
+    , std::vector<int8_t> &);
 
 
 

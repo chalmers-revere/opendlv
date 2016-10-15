@@ -281,14 +281,21 @@ tools-can-ps3controller.ps3controllerdevicenode = /dev/input/js2   # Gamepad.
 ###############################################################################
 ###############################################################################
 ### Perception
-perception-detectlane.inputSize = 640,480
-perception-detectlane.outputSize = 640,480
 perception-detectlane:0.source = front-left
 perception-detectlane:1.source = front-right
 perception-detectlane.intensityThreshold = 200
-perception-detectlane.cannyThreshold = 25
-perception-detectlane.houghThreshold = 130
+perception-detectlane.cannyThreshold = 35
+perception-detectlane.houghThreshold = 200
 perception-detectlane.memThreshold = 1.0 #seconds
+perception-detectlane.upperLaneLimit = 440
+perception-detectlane.lowerLaneLimit = 700
+perception-detectlane.screenWidth = 1280
+perception-detectlane.screenHeight = 720
+perception-detectlane.roiX = 0
+perception-detectlane.roiY = 420
+perception-detectlane.roiWidth = 1280
+perception-detectlane.roiHeight = 300
+perception-detectlane.debug = 0;
 
 perception-detectvehicle:0.debug = 1   # 0 do not show a window with debug information (does not work in Docker!)
 perception-detectvehicle:0.source = front-left

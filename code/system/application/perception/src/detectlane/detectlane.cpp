@@ -53,76 +53,160 @@ DetectLane::DetectLane(int32_t const &a_argc, char **a_argv)
     , m_cannyThreshold()
     , m_houghThreshold()
     , m_memThreshold()
-    , m_upperLaneLimit(50)
-    , m_lowerLaneLimit(200)
-    , m_roi{0, 120, 1280, 600}
+    , m_upperLaneLimit()
+    , m_lowerLaneLimit()
+    , m_screenSize()
+    , m_roi()
     , m_mtx()
+    , m_debug()
 
 {
 }
 
 DetectLane::~DetectLane()
 {
+  m_image.release();
 }
 void DetectLane::setUp()
 {
-
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
   m_intensityThreshold = kv.getValue<uint16_t>("perception-detectlane.intensityThreshold");
   m_cannyThreshold = kv.getValue<uint16_t>("perception-detectlane.cannyThreshold");
-  m_cannyThreshold = 40;
   m_houghThreshold = kv.getValue<uint16_t>("perception-detectlane.houghThreshold");
-  m_houghThreshold = 200;
   m_memThreshold = kv.getValue<double>("perception-detectlane.memThreshold");
-  m_memThreshold = 1;
+  m_upperLaneLimit = kv.getValue<uint16_t>("perception-detectlane.upperLaneLimit");
+  m_lowerLaneLimit = kv.getValue<uint16_t>("perception-detectlane.lowerLaneLimit");
+  m_screenSize[0] = kv.getValue<uint16_t>("perception-detectlane.screenWidth");
+  m_screenSize[1] = kv.getValue<uint16_t>("perception-detectlane.screenHeight");
+  m_roi[0] = kv.getValue<uint16_t>("perception-detectlane.roiX");
+  m_roi[1] = kv.getValue<uint16_t>("perception-detectlane.roiY");
+  m_roi[2] = kv.getValue<uint16_t>("perception-detectlane.roiWidth");
+  m_roi[3] = kv.getValue<uint16_t>("perception-detectlane.roiHeight");
+  m_debug = (kv.getValue<int32_t>("perception-detectlane.debug") == 1);
   m_initialized = true;
-
 }
 
 void DetectLane::tearDown()
 {
-  m_image.release();
 }
 
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode DetectLane::body()
 {
-  // int8_t sgn = 1;
+  int8_t sgn = 1;
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
   odcore::data::dmcp::ModuleStateMessage::RUNNING)
   {
-    // char key = (char) cv::waitKey(1);
-    // switch(key) {
-    //   case 'u':
-    //     sgn = -sgn;
-    //     break;
-    //   case 'j':    
-    //   {
-    //     odcore::base::Lock l(m_mtx);
-    //     m_roi[0] = m_roi[0] + sgn*5;
-    //     break;
-    //   }
-    //   case 'i':
-    //   {
-    //     odcore::base::Lock l(m_mtx);
-    //     m_roi[1] = m_roi[1] + sgn*5;
-    //   }
-    //     break;
-    //   case 'k':
-    //   {
-    //     odcore::base::Lock l(m_mtx);
-    //     m_roi[3] = m_roi[3] - sgn*5;
-    //   }
-    //     break;
-    //   case 'l':
-    //   {
-    //     odcore::base::Lock l(m_mtx);
-    //     m_roi[2] = m_roi[2] - sgn*5;
-    //   }
-    //     break;
-    //   default:
-    //     break;
-    // }
+    if(m_debug){
+      char key = (char) cv::waitKey(1);
+      switch(key) {
+        case 'u':
+          sgn = -sgn;
+          break;
+        case 'j':    
+          {
+            odcore::base::Lock l(m_mtx);
+            m_roi[0] = m_roi[0] + sgn*5;
+            if(m_roi[0] < 0) {
+              m_roi[0] = 0;
+            } else if(m_roi[0] + m_roi[2] > m_screenSize[0]) {
+              m_roi[0] = m_screenSize[0] - m_roi[2];
+            }
+          }
+          m_visualMemory.clear();
+          std::cout << m_roi[0]<<" x " << m_roi[1]<<" x " << m_roi[2] <<" x " << m_roi[3] << std::endl;
+          break;
+        case 'i':
+          {
+            odcore::base::Lock l(m_mtx);
+            m_roi[1] = m_roi[1] + sgn*5;
+            if(m_roi[1] < 0) {
+              m_roi[1] = 0;
+            } else if(m_roi[1] + m_roi[3] > m_screenSize[1]) {
+              m_roi[1] = m_screenSize[1] - m_roi[3];
+            }
+          }
+          m_visualMemory.clear();
+          std::cout << m_roi[0]<<" x " << m_roi[1]<<" x " << m_roi[2] <<" x " << m_roi[3] << std::endl;
+          break;
+        case 'l':
+          {
+            odcore::base::Lock l(m_mtx);
+            m_roi[2] = m_roi[2] - sgn*5;
+            if(m_roi[2] > m_screenSize[0]) {
+              m_roi[2] = m_screenSize[0];
+            } else if(m_roi[0] + m_roi[2] > m_screenSize[0]) {
+              m_roi[2] = m_screenSize[0] - m_roi[0];
+            }
+          }
+          m_visualMemory.clear();
+          std::cout << m_roi[0]<<" x " << m_roi[1]<<" x " << m_roi[2] <<" x " << m_roi[3] << std::endl;
+          break;
+        case 'k':
+          {
+            odcore::base::Lock l(m_mtx);
+            m_roi[3] = m_roi[3] - sgn*5;
+            if(m_roi[3] > m_screenSize[1]) {
+              m_roi[3] = m_screenSize[1];
+            } else if(m_roi[1] + m_roi[3] > m_screenSize[1]) {
+              m_roi[3] = m_screenSize[1] - m_roi[1];
+            }
+          }
+          m_visualMemory.clear();
+          std::cout << m_roi[0]<<" x " << m_roi[1]<<" x " << m_roi[2] <<" x " << m_roi[3] << std::endl;
+          break;
+        case'y':
+          m_memThreshold += 0.1;
+          std::cout << "Mem: " << m_memThreshold << std::endl;
+          break;
+        case'h':
+          m_memThreshold -= 0.1;
+          if (m_memThreshold < 0.1) {
+            m_memThreshold = 0.1;
+          }
+          std::cout << "Mem: " << m_memThreshold << std::endl;
+          break;
+        case't':
+          m_cannyThreshold += 5;
+          std::cout << "Canny: " << m_cannyThreshold << std::endl;
+          break;
+        case'g':
+          m_cannyThreshold -= 5;
+          if (m_cannyThreshold > 255) {
+            m_cannyThreshold = 0;
+          }
+          std::cout << "Canny: " << m_cannyThreshold << std::endl;
+          break;
+        case'r':
+          m_houghThreshold += 5;
+          std::cout << "Hough: " << m_houghThreshold << std::endl;
+          break;
+        case'f':
+          m_houghThreshold -= 5;
+          if (m_houghThreshold < 10) {
+            m_houghThreshold = 15;
+          }
+          std::cout << "Hough: " << m_houghThreshold << std::endl;
+          break;
+        case'w':
+          m_upperLaneLimit -= 5;
+          std::cout << "UpperLaneLimit: " << m_upperLaneLimit << std::endl;
+          break;
+        case's':
+          m_upperLaneLimit += 5;
+          std::cout << "UpperLaneLimit: " << m_upperLaneLimit << std::endl;
+          break;
+        case'q':
+          m_lowerLaneLimit -= 5;
+          std::cout << "LowerLaneLimit: " << m_lowerLaneLimit << std::endl;
+          break;
+        case'a':
+          m_lowerLaneLimit += 5;
+          std::cout << "LowerLaneLimit: " << m_lowerLaneLimit << std::endl;
+        default:
+          break;
+      }
+    }
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
@@ -167,19 +251,26 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   m_image.release();
   m_image = tmpImage.clone();
 
-
   cvReleaseImage(&myIplImage);
 
-  cv::Rect rectROI(m_roi[0], m_roi[1], m_roi[2], m_roi[3]);
-  // std::cout << m_roi[0]<<" x " << m_roi[1]<<" x " << m_roi[2] <<" x " << m_roi[3] << std::endl;
-  // cv::Rect rectROI(0, 450, 1280, 270);
-  m_image = m_image(rectROI);
 
-  const int32_t windowWidth = 640;
-  const int32_t windowHeight = 240;
+  cv::Rect rectROI(m_roi[0], m_roi[1], m_roi[2], m_roi[3]);
+  // cv::Rect rectROI(0, 450, 1280, 270);
+  cv::Mat croppedImg;
+  try {
+    odcore::base::Lock l(m_mtx);
+    croppedImg = m_image(rectROI);
+  } catch (cv::Exception& e) {
+    std::cerr << "Error cropping the image due to dimension size." << std::endl;
+    return;
+  }
+
+
+  const int32_t windowWidth = 640/2;
+  const int32_t windowHeight = 400/2;
   cv::Mat display[3];
 
-  cv::Mat visualImpression = m_image.clone();
+  cv::Mat visualImpression = croppedImg.clone();
   m_visualMemory.push_back(std::make_pair(now,visualImpression));
   
   while(m_visualMemory.size() > 0 && (now-m_visualMemory[0].first).toMicroseconds()/1000000.0 > m_memThreshold){
@@ -188,39 +279,38 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   cv::Mat exposedImage = m_visualMemory[0].second.clone();
   if(m_visualMemory.size() > 1) {
     cv::Mat tmp;
-    // cv::Mat exposedImage;// =  m_visualMemory[0].second.clone();
     double alpha;
     double beta;
     for(uint16_t i = 1; i < m_visualMemory.size(); i++){
-      // exposedImage +=  m_visualMemory[i].second;
-      // cv::AddWeighted
       alpha = i/(i+1.0);
-      // std::cout << alpha << std::endl;
       beta = 1-alpha;
       cv::addWeighted(exposedImage, alpha, m_visualMemory[i].second, beta, 0, tmp, -1);
       exposedImage = tmp;
     }
-    // exposedImage = exposedImage/m_visualMemory.size();
-    // std::cout <<"o" << m_visualMemory[0].second << std::endl;
-    
-
-    // std::cout << m_visualMemory[0].second << std::endl;
-    // std::cout << m_visualMemory[1].second << std::endl;
-    // std::cout << exposedImage << std::endl;
+    if(m_debug) {
     cv::resize(exposedImage, display[2], cv::Size(windowWidth, windowHeight), 0, 0,
       cv::INTER_CUBIC);
-    cv::imshow("FOE3", display[2]);
+    cv::imshow("FOE3", display[2]); 
+    }
   }
   cv::Mat cannyImg;
   cv::Canny(exposedImage, cannyImg, m_cannyThreshold, m_cannyThreshold*3, 3);
 
+
+
+  if(m_debug) {
+  cv::line(m_image, cv::Point(0,m_upperLaneLimit), cv::Point(m_screenSize[0],m_upperLaneLimit), cv::Scalar(255,0,0), 3, 1 );
+  cv::line(m_image, cv::Point(0,m_lowerLaneLimit), cv::Point(m_screenSize[0],m_lowerLaneLimit), cv::Scalar(255,0,0), 3, 1 );
+  
+  cv::line(m_image, cv::Point(m_roi[0],0), cv::Point(m_roi[0],m_screenSize[1]), cv::Scalar(255,255,0), 3, 1 );
+  cv::line(m_image, cv::Point(m_roi[0]+m_roi[2],0), cv::Point(m_roi[0]+m_roi[2],m_screenSize[1]), cv::Scalar(255,255,0), 3, 1 );
+  cv::line(m_image, cv::Point(0,m_roi[1]), cv::Point(m_screenSize[0],m_roi[1]), cv::Scalar(255,255,0), 3, 1 );
+  cv::line(m_image, cv::Point(0,m_roi[1]+m_roi[3]), cv::Point(m_screenSize[0],m_roi[1]+m_roi[3]), cv::Scalar(255,255,0), 3, 1 ); 
+  }
   // std::cout<< "Memory length: " << m_visualMmeory.size() << " Type: " << m_image.type()<< "," << m_image.depth() << "," << m_image.channels() << std::endl;
 
-
-
-  cv::Mat intenImg;
-  cv::Mat color_dst;
-
+  // cv::Mat intenImg;
+  // cv::Mat color_dst;
 
   //medianBlur(src,src,3);
   // cv::inRange(m_image, cv::Scalar(m_intensityThreshold, m_intensityThreshold, m_intensityThreshold), cv::Scalar(255, 255, 255), intenImg);
@@ -233,6 +323,20 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
 
   // OpenCV function that uses the Hough transform and finds the "strongest" lines in the transformation    
   cv::HoughLines(cannyImg, detectedLines, 1, opendlv::Constants::PI/180, m_houghThreshold);
+  if(detectedLines.size() < 3){
+    if(m_debug) {
+    cv::resize(cannyImg, display[0], cv::Size(windowWidth, windowHeight), 0, 0,
+      cv::INTER_CUBIC);
+    cv::imshow("FOE", display[0]);
+    cv::resize(m_image, display[1], cv::Size(windowWidth*2, windowHeight*2), 0, 0,
+      cv::INTER_CUBIC);
+    cv::imshow("FOE2", display[1]);
+    cv::waitKey(1);
+    }
+    return;
+  }
+
+  // Filtering stuff out
   // std::cout << "Unfiltered: "<< detectedLines.size() << std::endl;
   std::vector<cv::Vec2f> tmpVec;
   float angleTresh = 85 * opendlv::Constants::PI/180;
@@ -250,19 +354,18 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   // std::cout << "Filtered: "<< detectedLines.size() << std::endl;
 
 
-  for( size_t i = 0; i < detectedLines.size(); i++ ) {
-    float rho = detectedLines[i][0];
-    float theta = detectedLines[i][1];
-    float a = cos(theta), b = sin(theta);
-    float x0 = a*rho, y0 = b*rho;
-    cv::Point pt1(cvRound(x0 + 2000*(-b)),
-               cvRound(y0 + 2000*(a)));
-    cv::Point pt2(cvRound(x0 - 2000*(-b)),
-               cvRound(y0 - 2000*(a)));
+  if(m_debug) {
+    for( size_t i = 0; i < detectedLines.size(); i++ ) {
+      float rho = detectedLines[i][0];
+      float theta = detectedLines[i][1];
+      float a = cos(theta), b = sin(theta);
+      float x0 = a*rho, y0 = b*rho;
+      cv::Point pt1(m_roi[0] + x0 + 2000*(-b), m_roi[1] + y0 + 2000*(a));
+      cv::Point pt2(m_roi[0] + x0 - 2000*(-b), m_roi[1] + y0 - 2000*(a));
 
-    cv::line(m_image, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
+      cv::line(m_image, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
+    }
   }
-
 
   //  FOR INTENSITY THRESHOLD
   // cv::HoughLines(intenImg, detectedLines, 1, 3.14f/180, m_houghThreshold );
@@ -309,46 +412,39 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   // cv::polylines(m_image, countours, constCont, 4, 1, cv::Scalar(0,255,0), 4, 8, 0);
 
 
-  // Holder for the mean (rho,theta) for each group
-
   // Get parametric line representation
-  // std::vector<cv::Vec2f> p, m;
+  std::vector<cv::Vec2f> p, m;
 
-  // GetParametricRepresentation(p, m, detectedLines);
+  GetParametricRepresentation(p, m, detectedLines);
 
   // Get points on lines
-  // std::vector<cv::Vec2f> xScreenP,yScreenP;
-  // std::vector<cv::Vec2f> xWorldP, yWorldP;
-  // GetPointsOnLine(xScreenP, yScreenP, xWorldP, yWorldP, p, m);
+  std::vector<cv::Vec2f> xScreenP,yScreenP;
+  std::vector<cv::Vec2f> xWorldP, yWorldP;
+  GetPointsOnLine(xScreenP, yScreenP, xWorldP, yWorldP, p, m);
 
   // Pair up lines to form a surface
-  // std::vector<cv::Vec2i> groupIds;
-  // GetLinePairs(xScreenP, groupIds);
+  std::vector<int8_t> groupIds;
+  GetLinePairs(xScreenP, groupIds);
 
   // std::cout << groupIds.size() << std::endl;
-  // for(uint8_t i = 0; i < groupIds.size(); i++) {
-  //   for(uint8_t j = 0; j < 2; j++) {
-  //     for(uint8_t k = 0; k < 4; k++) {
 
-  //       cv::circle(m_image, cv::Point(xScreenP[groupIds[i][j]][k],yScreenP[groupIds[i][j]][k]), 2, cv::Scalar(0,255,0), 1, 8);
-  //     }
-  //   }
-  // }
+  if(m_debug) {
+    for(uint8_t i = 0; i < groupIds.size(); i++) {
+      for(uint8_t k = 0; k < 4; k++) {
+        cv::circle(m_image, cv::Point(xScreenP[groupIds[i]][k],yScreenP[groupIds[i]][k]), 10, cv::Scalar(0,255,0), 3, 8);
+      }
+    }
+    cv::resize(cannyImg, display[0], cv::Size(windowWidth, windowHeight), 0, 0,
+      cv::INTER_CUBIC);
+    cv::imshow("FOE", display[0]);
+    cv::resize(m_image, display[1], cv::Size(windowWidth*2, windowHeight*2), 0, 0,
+      cv::INTER_CUBIC);
+    cv::imshow("FOE2", display[1]);
+    cv::waitKey(1);
+  }
 
-
-  // uint8_t leftLane =  groupIds[0][0];
-  // uint8_t rightLane = groupIds[0][1];
-
-
-  cv::resize(cannyImg, display[0], cv::Size(windowWidth, windowHeight), 0, 0,
-    cv::INTER_CUBIC);
-  cv::imshow("FOE", display[0]);
-  cv::resize(m_image, display[1], cv::Size(windowWidth, windowHeight), 0, 0,
-    cv::INTER_CUBIC);
-  cv::imshow("FOE2", display[1]);
-
-  cv::waitKey(1);
-  // warpedImg.release();
+  // // uint8_t leftLane =  groupIds[0][0];
+  // // uint8_t rightLane = groupIds[0][1];
 
 }
 
@@ -409,10 +505,10 @@ void DetectLane::GetParametricRepresentation(std::vector<cv::Vec2f> &a_p
     a_m.push_back(cv::Vec2f(x0,y0));
   }
 }
-void DetectLane::GetPointsOnLine(std::vector<cv::Vec2f> &a_xPoints
-    , std::vector<cv::Vec2f> &a_yPoints
-    , std::vector<cv::Vec2f> &a_X
-    , std::vector<cv::Vec2f> &a_Y
+void DetectLane::GetPointsOnLine(std::vector<cv::Vec2f> &a_xScreenP
+    , std::vector<cv::Vec2f> &a_yScreenP
+    , std::vector<cv::Vec2f> &a_xWorldP
+    , std::vector<cv::Vec2f> &a_yWorldP
     , std::vector<cv::Vec2f> &a_p
     , std::vector<cv::Vec2f> &a_m)
 {
@@ -420,8 +516,8 @@ void DetectLane::GetPointsOnLine(std::vector<cv::Vec2f> &a_xPoints
     float t1,t2;
     // To handle special case of dividing 0  
     if(fabs(a_p[i][1]) > 0.000001f){
-      t1 = ( static_cast<float>(m_upperLaneLimit) - a_m[i][1]) / sin(a_p[i][1]);
-      t2 = ( static_cast<float>(m_lowerLaneLimit) - a_m[i][1]) / sin(a_p[i][1]);
+      t1 =  (static_cast<float>(m_upperLaneLimit - m_roi[1]) - a_m[i][1]) / sin(a_p[i][1]);
+      t2 =  (static_cast<float>(m_lowerLaneLimit - m_roi[1]) - a_m[i][1]) / sin(a_p[i][1]);
     }
     else {
       t1 = 0;
@@ -433,37 +529,54 @@ void DetectLane::GetPointsOnLine(std::vector<cv::Vec2f> &a_xPoints
     point1 << x1, m_upperLaneLimit, 1;
     // TransformPointToGlobalFrame(point1);
 
-    float x2 = (t2 * a_p[i][0] + a_m[i][0]); 
+    float x2 =  (t2 * a_p[i][0] + a_m[i][0]); 
     point2 << x2, m_lowerLaneLimit, 1;
     // TransformPointToGlobalFrame(point2);
 
-    a_X.push_back(cv::Vec2f(point1(0),point2(0)));
-    a_Y.push_back(cv::Vec2f(point1(1),point2(1)));
+    a_xWorldP.push_back(cv::Vec2f(point1(0),point2(0)));
+    a_yWorldP.push_back(cv::Vec2f(point1(1),point2(1)));
 
-    a_xPoints.push_back(cv::Vec2f(x1,x2));
-    a_yPoints.push_back(cv::Vec2f(m_upperLaneLimit,m_lowerLaneLimit));
+    a_xScreenP.push_back(cv::Vec2f(x1,x2));
+    a_yScreenP.push_back(cv::Vec2f(m_upperLaneLimit,m_lowerLaneLimit));
     
   }
 }
 void DetectLane::GetLinePairs(std::vector<cv::Vec2f> &a_xPoints
-  , std::vector<cv::Vec2i> &a_groupIds)
+  , std::vector<int8_t> &a_groupIds)
 {
-  float leftId, rightId;
-  for(uint16_t i = 0; i < a_xPoints.size()-1; i++) {
-    for(uint16_t j= i+1; j < a_xPoints.size(); j++) {
-      if(a_xPoints[i][0] < a_xPoints[j][1]) {
-        leftId = i, rightId = j;
-      } else {
-        leftId = j, rightId = i;
-      }
-      a_groupIds.push_back(cv::Vec2f(leftId,rightId));
+  // float leftId, rightId;
+  // for(uint16_t i = 0; i < a_xPoints.size()-1; i++) {
+  //   for(uint16_t j= i+1; j < a_xPoints.size(); j++) {
+  //     if(a_xPoints[i][0] < a_xPoints[j][1]) {
+  //       leftId = i, rightId = j;
+  //     } else {
+  //       leftId = j, rightId = i;
+  //     }
+  //     a_groupIds.push_back(cv::Vec2f(leftId,rightId));
       
-      // float xDiff1 = xPoints[rightId][0] - xPoints[leftId][0];
-      // float xDiff2 = xPoints[rightId][1] - xPoints[leftId][1];
-      // Lane width has to be  2 < w < 5 to be valid
-      //if( xDiff1 > 0 && xDiff1 < 10 && xDiff2 > 0 && xDiff2 < 10){
-      //}
+  //     // float xDiff1 = xPoints[rightId][0] - xPoints[leftId][0];
+  //     // float xDiff2 = xPoints[rightId][1] - xPoints[leftId][1];
+  //     // Lane width has to be  2 < w < 5 to be valid
+  //     //if( xDiff1 > 0 && xDiff1 < 10 && xDiff2 > 0 && xDiff2 < 10){
+  //     //}
+  //   }
+  // }
+  int8_t leftLineId = -1;
+  int8_t rightLineId = -1;
+  for(uint8_t i = 0; i < a_xPoints.size(); i++){
+    if(a_xPoints[i][1] < m_screenSize[0]/2) {
+      if(leftLineId == -1 || a_xPoints[i][1] > a_xPoints[leftLineId][1]){
+        leftLineId = i;
+      }
+    } else {
+      if(rightLineId == -1 ||a_xPoints[i][1] < a_xPoints[rightLineId][1]){
+        rightLineId = i;
+      }
     }
+  }
+  if(leftLineId != rightLineId) {
+    a_groupIds.push_back(leftLineId);
+    a_groupIds.push_back(rightLineId);
   }
 }
 
