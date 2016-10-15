@@ -27,7 +27,7 @@ global.buffer.memorySegmentSize = 2800000 # Size of a memory segment in bytes.
 global.buffer.numberOfMemorySegments = 4  # Number of memory segments.
 
 # The following key describes the list of modules expected to participate in this --cid session.
-global.session.expectedModules = action-act,action-communicate,action-removeloomingconflict,action-setgroundspeed,action-setopticalrotation,knowledge-gcdc16-rule-intersection-left,knowledge-gcdc16-v2viclcm,knowledge-identity,knowledge-linguistics-v2vcam,knowledge-scene,perception-detectlane,sensation-audition,sensation-echolocation,proxy-trimble,proxy-camera-axis,proxy-fh16,proxy-lidar
+global.session.expectedModules = action-communicate,knowledge-gcdc16-rule-intersection-host,knowledge-gcdc16-v2viclcm,knowledge-identity,knowledge-linguistics-v2vcam,sensation-audition,proxy-applanix
 
 
 ###############################################################################
@@ -68,81 +68,22 @@ odsupercomponent.pulsetimeack.exclude = odcockpit
 # NEXT, THE CONFIGURATION FOR OPENDLV SOFTWARE FOLLOWS. 
 #
 
-# action-act
-
 # action-communicate
 
-# action-removeloomingconflict
-action-removeloomingconflict.correctionGain = 0.4
-action-removeloomingconflict.maxStimulusAge = 0.5
-action-removeloomingconflict.patienceDuration = 0.4
-action-removeloomingconflict.stimulusJerkThreshold = 0.02
-action-removeloomingconflict.stimulusRateThreshold = 0.02
-action-removeloomingconflict.stimulusThreshold = 0.02
-action-removeloomingconflict.equilibrium = 20.0
-
-# action-setgroundspeed
-action-setgroundspeed.correctionGain = 5.0
-action-setgroundspeed.maxStimulusAge = 4.1
-action-setgroundspeed.patienceDuration = 4.0
-action-setgroundspeed.stimulusJerkThreshold = 0.5
-action-setgroundspeed.stimulusRateThreshold = 0.5
-action-setgroundspeed.stimulusThreshold = 1.0
-action-setgroundspeed.equilibrium = 20.0  # kph
-
-# action-setopticalrotation
-action-setopticalrotation.correctionGain = 0.2
-action-setopticalrotation.maxStimulusAge =  1.0
-action-setopticalrotation.patienceDuration = 0.2
-action-setopticalrotation.stimulusJerkThreshold =  0.02
-action-setopticalrotation.stimulusRateThreshold = 0.02
-action-setopticalrotation.stimulusThreshold = 0.02
-
-# knowledge-gcdc16-rule-intersection-left
+# knowledge-gcdc16-rule-intersection-host
 
 # knowledge-gcdc16-v2viclcm
 
 # knowledge-identity
-knowledge-identity.stationId = 110
-knowledge-identity.stationType = 8 #heavy truck
-knowledge-identity.vehicleLength = 7.3
-knowledge-identity.vehicleWidth = 2.55 
-knowledge-identity.vehicleRole = 0
-knowledge-identity.rearAxleLocation = 5.0
+knowledge-identity.stationId = 
+knowledge-identity.stationType = 
+knowledge-identity.vehicleLength = 
+knowledge-identity.vehicleWidth = 
+knowledge-identity.vehicleRole = 
+knowledge-identity.rearAxleLocation = 
 
 # knowledge-linguistics-v2vcam
 
-# knowledge-scene
-knowledge-scene.mergeDistance = 4.0
-knowledge-scene.validUntilDuration = 1
-knowledge-scene.memoryCapacity = 1.0 # seconds
-
-# perception-detectlane
-
 # sensation-audition
 
-# sensation-echolocation
-sensation-echolocation.memoryThreshold = 0
-sensation-echolocation.pointCloudSizeMinimum = 3 #number of points
-sensation-echolocation.pointCloudRadius = 2 # meters
-
-# proxy-trimble
-
-# proxy-camera-axis
-
-# proxy-fh16
-proxy-fh16.devicenode = /dev/pcan2 # PEAK CAN device.
-proxy-fh16.record_gcm = 0           # 1 = dump generic CAN messages.
-proxy-fh16.record_mapped_data = 0   # 1 = record mapped containers.
-
-# proxy-lidar
-proxy-lidar.type = sick
-proxy-lidar.port = /dev/ttyS1
-proxy-lidar.baudrate = 9600
-proxy-lidar.mount.x = 1.25
-proxy-lidar.mount.y = 0.0
-proxy-lidar.mount.z = 1.0
-proxy-lidar.mount.roll = 0.0
-proxy-lidar.mount.pitch = 0.0
-proxy-lidar.mount.yaw = 0.0
-proxy-lidar.record = 1  # Set to 1 to dump Lidar data in .rec format.
+# proxy-applanix
