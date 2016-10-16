@@ -42,6 +42,7 @@ Scene::Scene(int32_t const &a_argc, char **a_argv)
     , m_mergeDistance()
     , m_validUntilDuration()
     , m_memoryCapacity()
+    , m_debug()
 {
 }
 
@@ -55,6 +56,7 @@ void Scene::setUp()
   m_mergeDistance = kv.getValue<float>("knowledge-scene.mergeDistance");
   m_validUntilDuration = kv.getValue<int32_t>("knowledge-scene.validUntilDuration");
   m_memoryCapacity = kv.getValue<float>("knowledge-scene.memoryCapacity");
+  m_debug = (kv.getValue<int32_t>("knowledge-scene.debug") == 1);
   m_initialised = true;
 }
 
@@ -234,28 +236,31 @@ void Scene::SendStuff()
   odcore::data::Container objectContainerEnvironment(environment);
   getConference().send(objectContainerEnvironment);
 
-  std::cout << "=====================================" << std::endl;
-  std::cout << "Objects sent: " << std::endl;
 
-  for(uint32_t i = 0; i < m_savedObjects.size(); i++) {
-    std::cout << "ID: "<< m_savedObjects[i].getObjectId() << std::endl;
-    std::cout << "Angle: "<< m_savedObjects[i].getDirection().getAzimuth() << std::endl;
-    std::cout << "Distance: "<< m_savedObjects[i].getDistance() << std::endl;
-  }
-  std::cout << "Surfaces sent: " << std::endl;
+  if(m_debug){
+    std::cout << "=====================================" << std::endl;
+    std::cout << "Objects sent: " << std::endl;
 
-  for(uint32_t i = 0; i < m_savedSurfaces.size(); i++) {
-    std::cout << "ID: "<< m_savedSurfaces[i].getSurfaceId() << std::endl;
-    opendlv::model::Cartesian3 cross = CrossingPoint(m_savedSurfaces[i].getListOfEdges());
-    std::cout << "CrossingPoint: "<< cross.toString() << std::endl;
-    std::cout << "Sources: ";
-    std::vector<std::string> listSources =  m_savedSurfaces[i].getListOfSources();
-    for(uint8_t j = 0; j < listSources.size(); j++) {
-      std::cout << listSources[j] << ", ";
+    for(uint32_t i = 0; i < m_savedObjects.size(); i++) {
+      std::cout << "ID: "<< m_savedObjects[i].getObjectId() << std::endl;
+      std::cout << "Angle: "<< m_savedObjects[i].getDirection().getAzimuth() << std::endl;
+      std::cout << "Distance: "<< m_savedObjects[i].getDistance() << std::endl;
     }
-    std::cout << std::endl;
+    std::cout << "Surfaces sent: " << std::endl;
+
+    for(uint32_t i = 0; i < m_savedSurfaces.size(); i++) {
+      std::cout << "ID: "<< m_savedSurfaces[i].getSurfaceId() << std::endl;
+      opendlv::model::Cartesian3 cross = CrossingPoint(m_savedSurfaces[i].getListOfEdges());
+      std::cout << "CrossingPoint: "<< cross.toString() << std::endl;
+      std::cout << "Sources: ";
+      std::vector<std::string> listSources =  m_savedSurfaces[i].getListOfSources();
+      for(uint8_t j = 0; j < listSources.size(); j++) {
+        std::cout << listSources[j] << ", ";
+      }
+      std::cout << std::endl;
+    }
+    std::cout << "=====================================" << std::endl;
   }
-  std::cout << "=====================================" << std::endl;
 }
 
 double Scene::PointDistance(float a_angle1, double a_dist1, float a_angle2, double a_dist2)
