@@ -288,7 +288,7 @@ void V2vCam::nextContainer(odcore::data::Container &a_c)
        m_longitude = temp.getLongitude();
   }
   else if(a_c.getDataType() == opendlv::proxy::GpsReading::ID()) {
-       opendlv::data::environment::WGS84Coordinate temp = a_c.getData<opendlv::data::environment::WGS84Coordinate>();
+       opendlv::proxy::GpsReading temp = a_c.getData<opendlv::proxy::GpsReading>();
        m_latitude = temp.getLatitude();
        m_longitude = temp.getLongitude();
   }
