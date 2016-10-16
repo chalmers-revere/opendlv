@@ -58,10 +58,16 @@ SET (CMAKE_MODULE_PATH "${ODVDVEHICLE_DIR}/share/cmake-${CMAKE_MAJOR_VERSION}.${
 FIND_PACKAGE (ODVDVehicle REQUIRED)
 
 ###########################################################################
+# Find ODVDV2V.
+SET (CMAKE_MODULE_PATH "${ODVDVEHICLE_DIR}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules" ${CMAKE_MODULE_PATH})
+FIND_PACKAGE (ODVDV2V REQUIRED)
+
+###########################################################################
 # Set common include directories.
 INCLUDE_DIRECTORIES(SYSTEM ${AUTOMOTIVEDATA_INCLUDE_DIRS})
 include_directories(SYSTEM ${OPENDAVINCI_INCLUDE_DIRS})
 include_directories(SYSTEM ${OPENDLV_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(SYSTEM ${ODVDV2V_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(SYSTEM ${ODVDVEHICLE_INCLUDE_DIRS})
 include_directories(SYSTEM ${ODVDOPENDLVDATA_INCLUDE_DIRS})
 include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
@@ -74,6 +80,7 @@ set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
               ${OPENDLV_LIBRARIES}
               ${AUTOMOTIVEDATA_LIBRARIES}
               ${ODVDVEHICLE_LIBRARIES}
+              ${ODVDV2V_LIBRARIES}
               ${ODVDOPENDLVDATA_LIBRARIES})
 
 ###########################################################################

@@ -116,17 +116,17 @@ message opendlv.proxy.RelayRequest [id = 170] {
   string deviceId [id = 3];
 }
 
-// This message is already migrated to OpenDLV.core. DO NOT CHANGE CONTENT OR IDENTIFIERS HERE!
-message opendlv.proxy.V2vReading [id = 171] {
-  uint32 size [id = 1];
-  string data [id = 2];
-}
+// This message is already migrated to OpenDLV.core. DO NOT CHANGE CONTENT OR IDENTIFIERS HERE!*/
+// message opendlv.proxy.V2vReading [id = 171] {
+//   uint32 size [id = 1];
+//   string data [id = 2];
+// }
 
-// This message is already migrated to OpenDLV.core. DO NOT CHANGE CONTENT OR IDENTIFIERS HERE!
-message opendlv.proxy.V2vRequest [id = 172] {
-  uint32 size [id = 1];
-  string data [id = 2];
-}
+// This message is already migrated to OpenDLV.core. DO NOT CHANGE CONTENT OR IDENTIFIERS HERE!*/
+// message opendlv.proxy.V2vRequest [id = 172] {
+//   uint32 size [id = 1];
+//   string data [id = 2];
+// }
 
 message opendlv.sensation.Voice [id = 175] {
   string type [id = 1];
