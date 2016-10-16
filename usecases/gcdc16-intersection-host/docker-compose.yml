@@ -90,7 +90,8 @@ services:
     # micro service for proxy-roadscape.
     proxy-roadscape:
         build: .
-        image: seresearch/copplar-core-on-opendlv-core-on-opendavinci-ubuntu-16.04:latest
+        image: chalmersrevere/copplar-core-on-opendlv-core-on-opendavinci-ubuntu-16.04-complete:latest
+#       image: seresearch/copplar-core-on-opendlv-core-on-opendavinci-ubuntu-16.04:latest
         network_mode: "host"
         devices:
         - "/dev/pcan32:/dev/pcanusb0"
@@ -102,8 +103,8 @@ services:
     proxy-v2v:
         build: .
         network_mode: "host"
-        working_dir: "/opt/opendlv/bin"
+        working_dir: "/opt/opendlv.core/bin"
         restart: always
         depends_on:
             - odsupercomponent
-        command: "/opt/opendlv/bin/opendlv-core-system-proxy-v2v --cid=${CID}"
+        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-v2v --cid=${CID}"
