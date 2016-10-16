@@ -92,7 +92,8 @@ knowledge-linguistics-v2vcam.record = 0
 
 # sensation-audition
 
-# proxy-applanix
+# proxy-roadscape
+proxy-roadscape.devicenode = /dev/pcanusb0
 
 # proxy-v2v
 proxy-v2v.comboxIp = 10.42.42.61

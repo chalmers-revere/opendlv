@@ -181,6 +181,7 @@ services:
     proxy-fh16:
         build: .
         network_mode: "host"
+        restart: always
         devices:
         - "/dev/pcanpci2:/dev/pcan2"
         depends_on:
@@ -191,6 +192,7 @@ services:
     proxy-sick:
         build: .
         network_mode: "host"
+        restart: always
         user: root  # This parameter will be replaced as soon as group_add parameter is available in docker-compose, cf. https://github.com/docker/compose/pull/3709.
         devices:
             - "/dev/ttyS1:/dev/ttyS1"
