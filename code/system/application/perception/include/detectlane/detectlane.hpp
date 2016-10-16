@@ -71,6 +71,7 @@ class DetectLane
   int16_t m_roi[4];
   odcore::base::Mutex m_mtx;
   bool m_debug;
+  Eigen::Matrix3d m_transformationMatrix;
 
   void GetGrouping(std::vector<cv::Vec2f> &, std::vector<cv::Vec2f> &, double);
   void GetParametricRepresentation(std::vector<cv::Vec2f> &,std::vector<cv::Vec2f> &,std::vector<cv::Vec2f> &);
@@ -80,8 +81,10 @@ class DetectLane
     , std::vector<cv::Vec2f> &a_Y
     , std::vector<cv::Vec2f> &a_p
     , std::vector<cv::Vec2f> &a_m);
-  void GetLinePairs(std::vector<cv::Vec2f> &
-    , std::vector<int8_t> &);
+  void GetLinePairs(std::vector<cv::Vec2f> &, std::vector<int8_t> &);
+  Eigen::MatrixXd ReadMatrix(std::string fileName, uint8_t nRows, uint8_t nCols);
+  void TransformPointToGlobalFrame(Eigen::Vector3d &point);
+
 
 
 

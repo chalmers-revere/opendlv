@@ -54,9 +54,25 @@ services:
     # microservice for proxy-camera-axis
     proxy-camera-axis:
         build: .
+        environment:
+            - DISPLAY=$DISPLAY
         network_mode: "host"
         working_dir: "/opt/opendlv.core/bin"
         restart: always
+        volumes:
+            - ~/Videos:/opt/Videos
         depends_on:
             - odsupercomponent
         command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-camera-axis --cid=${CID} --freq=20"
+
+    perception-detectlane:
+        build: .
+        environment:
+            - DISPLAY=$DISPLAY
+        network_mode: "host"
+        working_dir: "/opt/opendlv/bin"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv/bin/opendlv-system-application-perception-detectlane --cid=${CID} --freq=20"
+

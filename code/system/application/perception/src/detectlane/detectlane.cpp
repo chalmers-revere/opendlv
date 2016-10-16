@@ -59,6 +59,7 @@ DetectLane::DetectLane(int32_t const &a_argc, char **a_argv)
     , m_roi()
     , m_mtx()
     , m_debug()
+    , m_transformationMatrix()
 
 {
 }
@@ -83,6 +84,8 @@ void DetectLane::setUp()
   m_roi[2] = kv.getValue<uint16_t>("perception-detectlane.roiWidth");
   m_roi[3] = kv.getValue<uint16_t>("perception-detectlane.roiHeight");
   m_debug = (kv.getValue<int32_t>("perception-detectlane.debug") == 1);
+  m_transformationMatrix = ReadMatrix(
+          "/opt/opendlv/share/opendlv/tools/vision/projection/leftCameraTransformationMatrix.csv",3,3);
   m_initialized = true;
 }
 
@@ -299,13 +302,13 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
 
 
   if(m_debug) {
-  cv::line(m_image, cv::Point(0,m_upperLaneLimit), cv::Point(m_screenSize[0],m_upperLaneLimit), cv::Scalar(255,0,0), 3, 1 );
-  cv::line(m_image, cv::Point(0,m_lowerLaneLimit), cv::Point(m_screenSize[0],m_lowerLaneLimit), cv::Scalar(255,0,0), 3, 1 );
-  
-  cv::line(m_image, cv::Point(m_roi[0],0), cv::Point(m_roi[0],m_screenSize[1]), cv::Scalar(255,255,0), 3, 1 );
-  cv::line(m_image, cv::Point(m_roi[0]+m_roi[2],0), cv::Point(m_roi[0]+m_roi[2],m_screenSize[1]), cv::Scalar(255,255,0), 3, 1 );
-  cv::line(m_image, cv::Point(0,m_roi[1]), cv::Point(m_screenSize[0],m_roi[1]), cv::Scalar(255,255,0), 3, 1 );
-  cv::line(m_image, cv::Point(0,m_roi[1]+m_roi[3]), cv::Point(m_screenSize[0],m_roi[1]+m_roi[3]), cv::Scalar(255,255,0), 3, 1 ); 
+    cv::line(m_image, cv::Point(0,m_upperLaneLimit), cv::Point(m_screenSize[0],m_upperLaneLimit), cv::Scalar(255,0,0), 3, 1 );
+    cv::line(m_image, cv::Point(0,m_lowerLaneLimit), cv::Point(m_screenSize[0],m_lowerLaneLimit), cv::Scalar(255,0,0), 3, 1 );
+    
+    cv::line(m_image, cv::Point(m_roi[0],0), cv::Point(m_roi[0],m_screenSize[1]), cv::Scalar(255,255,0), 3, 1 );
+    cv::line(m_image, cv::Point(m_roi[0]+m_roi[2],0), cv::Point(m_roi[0]+m_roi[2],m_screenSize[1]), cv::Scalar(255,255,0), 3, 1 );
+    cv::line(m_image, cv::Point(0,m_roi[1]), cv::Point(m_screenSize[0],m_roi[1]), cv::Scalar(255,255,0), 3, 1 );
+    cv::line(m_image, cv::Point(0,m_roi[1]+m_roi[3]), cv::Point(m_screenSize[0],m_roi[1]+m_roi[3]), cv::Scalar(255,255,0), 3, 1 ); 
   }
   // std::cout<< "Memory length: " << m_visualMmeory.size() << " Type: " << m_image.type()<< "," << m_image.depth() << "," << m_image.channels() << std::endl;
 
@@ -425,14 +428,20 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   // Pair up lines to form a surface
   std::vector<int8_t> groupIds;
   GetLinePairs(xScreenP, groupIds);
+  if(groupIds.size() == 0){
+    return;
+  }
 
   // std::cout << groupIds.size() << std::endl;
 
+
   if(m_debug) {
     for(uint8_t i = 0; i < groupIds.size(); i++) {
-      for(uint8_t k = 0; k < 4; k++) {
+      for(uint8_t k = 0; k < 2; k++) {
         cv::circle(m_image, cv::Point(xScreenP[groupIds[i]][k],yScreenP[groupIds[i]][k]), 10, cv::Scalar(0,255,0), 3, 8);
+        // std::cout << xWorldP[groupIds[i]][k] << "x" << yWorldP[groupIds[i]][k] << ",";
       }
+      // std::cout << std::endl;
     }
     cv::resize(cannyImg, display[0], cv::Size(windowWidth, windowHeight), 0, 0,
       cv::INTER_CUBIC);
@@ -443,8 +452,58 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     cv::waitKey(1);
   }
 
-  // // uint8_t leftLane =  groupIds[0][0];
-  // // uint8_t rightLane = groupIds[0][1];
+
+  odcore::data::TimeStamp imageTimeStamp = a_c.getSentTimeStamp();
+  std::string type = "surface";
+  float typeConfidence = 1;
+
+  std::vector<opendlv::model::Cartesian3> edges;
+
+  //topleft
+  edges.push_back(opendlv::model::Cartesian3(xWorldP[groupIds[0]][0],yWorldP[groupIds[0]][0],0));
+  //bottomleft
+  edges.push_back(opendlv::model::Cartesian3(xWorldP[groupIds[0]][1],yWorldP[groupIds[0]][1],0));
+  //bottomright
+  edges.push_back(opendlv::model::Cartesian3(xWorldP[groupIds[1]][1],yWorldP[groupIds[1]][1],0));
+  //topright
+  edges.push_back(opendlv::model::Cartesian3(xWorldP[groupIds[1]][0],yWorldP[groupIds[1]][0],0));
+  // std::cout << "+++++++++++++++++++++++++++" << std::endl;
+  // for(uint8_t i = 0; i < edges.size(); i++) { 
+  //   std::cout << edges[i].toString() << std::endl;
+  // }
+  // std::cout << "+++++++++++++++++++++++++++" << std::endl;
+
+  float edgesConfidence = 1;
+
+  bool traversable = true;
+  float confidence = 1;
+  std::vector<std::string> sources;
+  sources.push_back(mySharedImg.getName());
+
+  std::vector<std::string> properties;
+
+  int16_t surfaceId = 0;
+
+  std::vector<int16_t> connectedWidth;
+  std::vector<int16_t> traversableTo;
+
+  opendlv::perception::Surface detectedSurface(imageTimeStamp,
+      type,
+      typeConfidence,
+      edges,
+      edgesConfidence,
+      traversable,
+      confidence,
+      sources,
+      properties,
+      surfaceId,
+      connectedWidth,
+      traversableTo);
+
+
+  odcore::data::Container objectContainer(detectedSurface);
+  getConference().send(objectContainer);
+
 
 }
 
@@ -527,11 +586,11 @@ void DetectLane::GetPointsOnLine(std::vector<cv::Vec2f> &a_xScreenP
     
     float x1 = (t1 * a_p[i][0] + a_m[i][0]); 
     point1 << x1, m_upperLaneLimit, 1;
-    // TransformPointToGlobalFrame(point1);
+    TransformPointToGlobalFrame(point1);
 
     float x2 =  (t2 * a_p[i][0] + a_m[i][0]); 
     point2 << x2, m_lowerLaneLimit, 1;
-    // TransformPointToGlobalFrame(point2);
+    TransformPointToGlobalFrame(point2);
 
     a_xWorldP.push_back(cv::Vec2f(point1(0),point2(0)));
     a_yWorldP.push_back(cv::Vec2f(point1(1),point2(1)));
@@ -574,10 +633,48 @@ void DetectLane::GetLinePairs(std::vector<cv::Vec2f> &a_xPoints
       }
     }
   }
-  if(leftLineId != rightLineId) {
+  if(leftLineId != rightLineId && leftLineId != -1 && rightLineId != -1) {
     a_groupIds.push_back(leftLineId);
     a_groupIds.push_back(rightLineId);
   }
+}
+
+Eigen::MatrixXd DetectLane::ReadMatrix(std::string fileName, uint8_t nRows,
+    uint8_t nCols)
+{
+  std::ifstream file(fileName);
+  Eigen::MatrixXd matrix(nRows,nCols);
+  if (file.is_open()) {
+    for(int i = 0; i < nRows; i++){
+      for(int j = 0; j < nCols; j++){
+        double item = 0.0;
+        file >> item;
+        matrix(i,j) = item;
+      }
+    }
+    // std::cout << matrix << std::endl;
+  } else {
+    std::cout << "Couldn't read the projection matrix." << std::endl;
+  }
+  file.close();
+  return matrix;
+}
+void DetectLane::TransformPointToGlobalFrame(Eigen::Vector3d &point)
+{
+  // std::cout<<"point before \n";
+  // std::cout<<point<<std::endl;
+  // point = point.cwiseProduct(m_scale);
+  // std::cout<<"point after 1\n";
+  // std::cout<<point<<std::endl;
+  point = m_transformationMatrix * point;
+
+  // std::cout<<"point final before \n";
+  // std::cout<<point<<std::endl;
+
+  point = point / point(2);
+  // std::cout<<"point final \n";
+  // std::cout<<point<<std::endl;
+
 }
 
 } // detectlane
