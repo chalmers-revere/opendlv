@@ -78,12 +78,12 @@ knowledge-gcdc16-v2viclcm.printInbound = 1
 knowledge-gcdc16-v2viclcm.record = 0
 
 # knowledge-identity
-knowledge-identity.stationId = 
-knowledge-identity.stationType = 
-knowledge-identity.vehicleLength = 
-knowledge-identity.vehicleWidth = 
-knowledge-identity.vehicleRole = 
-knowledge-identity.rearAxleLocation = 
+knowledge-identity.stationId = 1
+knowledge-identity.stationType = 2
+knowledge-identity.vehicleLength = 4.2
+knowledge-identity.vehicleWidth = 2.4
+knowledge-identity.vehicleRole = 3
+knowledge-identity.rearAxleLocation = 1.1
 
 # knowledge-linguistics-v2vcam
 knowledge-linguistics-v2vcam.printOutbound = 1
