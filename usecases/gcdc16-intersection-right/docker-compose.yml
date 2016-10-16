@@ -171,11 +171,11 @@ services:
     proxy-camera-axis:
         build: .
         network_mode: "host"
-        working_dir: "/opt/opendl.core/bin"
+        working_dir: "/opt/opendlv.core/bin"
         restart: always
         depends_on:
             - odsupercomponent
-        command: "/opt/opendl.core/bin/opendlv-core-system-proxy-camera-axis --cid=${CID} --freq=10"
+        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-camera-axis --cid=${CID} --freq=10"
 
     # micro service for proxy-fh16
     proxy-fh16:
