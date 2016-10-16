@@ -30,7 +30,7 @@
 #include "geolocation/kinematicmodel.hpp"
 #include "geolocation/kinematicobservationmodel.hpp"
 
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
+#include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
 
 namespace opendlv {
 namespace sensation {

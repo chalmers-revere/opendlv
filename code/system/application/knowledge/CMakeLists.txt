@@ -25,7 +25,10 @@ set(LIBRARIES ${LIBRARIES})
 
 # Build
 file(GLOB_RECURSE thisproject-sources 
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/gcdc16/rule/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/gcdc16/rule/platoon/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/gcdc16/rule/intersectionhost/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/gcdc16/rule/intersectionleft/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/gcdc16/rule/intersectionright/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/gcdc16/v2viclcm/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/identity/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/ivrule/*.cpp"
@@ -36,8 +39,17 @@ file(GLOB_RECURSE thisproject-sources
 
 add_library(${PROJECT_NAME}lib-static STATIC ${thisproject-sources})
 
-add_executable(${PROJECT_NAME}-gcdc16-rule "${CMAKE_CURRENT_SOURCE_DIR}/src/gcdc16/rule/main.cpp")
-target_link_libraries(${PROJECT_NAME}-gcdc16-rule ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+add_executable(${PROJECT_NAME}-gcdc16-rule-platoon "${CMAKE_CURRENT_SOURCE_DIR}/src/gcdc16/rule/platoon/main.cpp")
+target_link_libraries(${PROJECT_NAME}-gcdc16-rule-platoon ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+
+add_executable(${PROJECT_NAME}-gcdc16-rule-intersectionhost "${CMAKE_CURRENT_SOURCE_DIR}/src/gcdc16/rule/intersectionhost/main.cpp")
+target_link_libraries(${PROJECT_NAME}-gcdc16-rule-intersectionhost ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+
+add_executable(${PROJECT_NAME}-gcdc16-rule-intersectionleft "${CMAKE_CURRENT_SOURCE_DIR}/src/gcdc16/rule/intersectionleft/main.cpp")
+target_link_libraries(${PROJECT_NAME}-gcdc16-rule-intersectionleft ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+
+add_executable(${PROJECT_NAME}-gcdc16-rule-intersectionright "${CMAKE_CURRENT_SOURCE_DIR}/src/gcdc16/rule/intersectionright/main.cpp")
+target_link_libraries(${PROJECT_NAME}-gcdc16-rule-intersectionright ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
 add_executable(${PROJECT_NAME}-gcdc16-v2viclcm "${CMAKE_CURRENT_SOURCE_DIR}/src/gcdc16/v2viclcm/main.cpp")
 target_link_libraries(${PROJECT_NAME}-gcdc16-v2viclcm ${PROJECT_NAME}lib-static ${LIBRARIES}) 
@@ -61,7 +73,10 @@ target_link_libraries(${PROJECT_NAME}-scene ${PROJECT_NAME}lib-static ${LIBRARIE
 include(RunTests)
 
 # Install
-install(TARGETS ${PROJECT_NAME}-gcdc16-rule RUNTIME DESTINATION bin COMPONENT system-application)
+install(TARGETS ${PROJECT_NAME}-gcdc16-rule-platoon RUNTIME DESTINATION bin COMPONENT system-application)
+install(TARGETS ${PROJECT_NAME}-gcdc16-rule-intersectionhost RUNTIME DESTINATION bin COMPONENT system-application)
+install(TARGETS ${PROJECT_NAME}-gcdc16-rule-intersectionleft RUNTIME DESTINATION bin COMPONENT system-application)
+install(TARGETS ${PROJECT_NAME}-gcdc16-rule-intersectionright RUNTIME DESTINATION bin COMPONENT system-application)
 install(TARGETS ${PROJECT_NAME}-gcdc16-v2viclcm RUNTIME DESTINATION bin COMPONENT system-application)
 install(TARGETS ${PROJECT_NAME}-identity RUNTIME DESTINATION bin COMPONENT system-application)
 install(TARGETS ${PROJECT_NAME}-ivrule RUNTIME DESTINATION bin COMPONENT system-application)

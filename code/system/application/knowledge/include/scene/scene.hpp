@@ -30,7 +30,7 @@
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
 #include "opendavinci/odcore/base/Mutex.h"
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
+#include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
 
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
