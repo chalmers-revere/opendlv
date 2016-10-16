@@ -85,7 +85,7 @@ services:
         restart: always
         depends_on:
             - odsupercomponent
-        command: "/opt/opendlv/bin/opendlv-system-application-knowledge-gcdc16-rule-intersection-right --cid=${CID} --freq=10"
+        command: "/opt/opendlv/bin/opendlv-system-application-knowledge-gcdc16-rule-intersectionright --cid=${CID} --freq=10"
 
     # microservice for knowledge-gcdc16-v2viclcm
     knowledge-gcdc16-v2viclcm:
