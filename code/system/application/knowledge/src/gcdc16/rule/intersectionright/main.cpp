@@ -17,10 +17,10 @@
  * USA.
  */
 
-#include "removeloomingrear/removeloomingrear.hpp"
+#include "gcdc16/rule/intersectionright/intersectionright.hpp"
 
 int32_t main(int32_t a_argc, char **a_argv)
 {
-  opendlv::action::removeloomingrear::RemoveLoomingRear main(a_argc, a_argv);
+  opendlv::knowledge::gcdc16::rule::intersectionright::IntersectionRight main(a_argc, a_argv);
   return main.runModule();
 }

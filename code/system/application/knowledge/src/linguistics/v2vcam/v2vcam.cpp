@@ -260,6 +260,11 @@ void V2vCam::nextContainer(odcore::data::Container &a_c)
         counter = 0;
       }
   }
+  else if(a_c.getDataType() == opendlv::data::environment::WGS84Coordinate::ID()) {
+       opendlv::data::environment::WGS84Coordinate temp = a_c.getData<opendlv::data::environment::WGS84Coordinate>();
+       m_latitude = temp.getLatitude();
+       m_longitude = temp.getLongitude();
+  }
 }
 
 void V2vCam::ReadInsight(opendlv::knowledge::Insight const &a_insight)

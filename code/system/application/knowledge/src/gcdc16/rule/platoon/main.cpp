@@ -17,10 +17,10 @@
  * USA.
  */
 
-#include "removeloomingfront/removeloomingfront.hpp"
+#include "gcdc16/rule/platoon/platoon.hpp"
 
 int32_t main(int32_t a_argc, char **a_argv)
 {
-  opendlv::action::removeloomingfront::RemoveLoomingFront main(a_argc, a_argv);
+  opendlv::knowledge::gcdc16::rule::platoon::Platoon main(a_argc, a_argv);
   return main.runModule();
 }

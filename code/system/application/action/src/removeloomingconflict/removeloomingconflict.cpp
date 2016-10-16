@@ -27,11 +27,11 @@
 
 #include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
 
-#include "removeloomingfront/removeloomingfront.hpp"
+#include "removeloomingconflict/removeloomingconflict.hpp"
 
  namespace opendlv {
   namespace action {
-    namespace removeloomingfront {
+    namespace removeloomingconflict {
 
 /**
   * Constructor.
@@ -39,13 +39,13 @@
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-  RemoveLoomingFront::RemoveLoomingFront(int32_t const &a_argc, char **a_argv)
+  RemoveLoomingConflict::RemoveLoomingConflict(int32_t const &a_argc, char **a_argv)
   : DataTriggeredConferenceClientModule(
-    a_argc, a_argv, "action-removeloomingfront")
+    a_argc, a_argv, "action-removeloomingconflict")
   {
   }
 
-  RemoveLoomingFront::~RemoveLoomingFront()
+  RemoveLoomingConflict::~RemoveLoomingConflict()
   {
   }
 
@@ -55,7 +55,7 @@
  * Sends halt command (brake) or in rare cases a world rotation (steer) command
  * to Act.
  */
- void RemoveLoomingFront::nextContainer(odcore::data::Container &)
+ void RemoveLoomingConflict::nextContainer(odcore::data::Container &)
  {
    /*
    if(c.getDataType() == opendlv::perception::Object::ID()){
@@ -83,14 +83,14 @@
   */
 }
 
-void RemoveLoomingFront::setUp()
+void RemoveLoomingConflict::setUp()
 {
 }
 
-void RemoveLoomingFront::tearDown()
+void RemoveLoomingConflict::tearDown()
 {
 }
 
-} // removeloomingfront
+} // removeloomingconflict
 } // action
 } // opendlv
