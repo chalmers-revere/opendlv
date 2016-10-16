@@ -86,6 +86,7 @@ message opendlv.proxy.EchoReading [id = 166] {
   uint32 numberOfPoints [id = 3];
 }
 
+// This message is already migrated to OpenDLV.core. DO NOT CHANGE CONTENT OR IDENTIFIERS HERE!
 message opendlv.proxy.GpsReading [id = 167] {
   double timestamp [id = 1];
   double latitude [id = 2];
@@ -115,11 +116,13 @@ message opendlv.proxy.RelayRequest [id = 170] {
   string deviceId [id = 3];
 }
 
+// This message is already migrated to OpenDLV.core. DO NOT CHANGE CONTENT OR IDENTIFIERS HERE!
 message opendlv.proxy.V2vReading [id = 171] {
   uint32 size [id = 1];
   string data [id = 2];
 }
 
+// This message is already migrated to OpenDLV.core. DO NOT CHANGE CONTENT OR IDENTIFIERS HERE!
 message opendlv.proxy.V2vRequest [id = 172] {
   uint32 size [id = 1];
   string data [id = 2];
@@ -216,10 +219,10 @@ message opendlv.perception.StimulusDirectionOfMovement [id = 180] {
   opendlv.model.Direction directionOfMovement [id = 3];
 }
 
-message opendlv.perception.StimulusOpticalFlow [id = 174] {
+message opendlv.perception.StimulusGroundSpeed [id = 174] {
   odcore::data::TimeStamp identified [id = 1];
-  float desiredOpticalFlow [id = 2];
-  float opticalFlow [id = 3];
+  float desiredGroundSpeed [id = 2];
+  float groundSpeed [id = 3];
 }
 
 message opendlv.perception.StimulusDirectionAlignment [id = 182] {

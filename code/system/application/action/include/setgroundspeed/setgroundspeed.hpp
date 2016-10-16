@@ -17,36 +17,55 @@
  * USA.
  */
 
-#ifndef REMOVELOOMINGFRONT_REMOVELOOMINGFRONT_HPP_
-#define REMOVELOOMINGFRONT_REMOVELOOMINGFRONT_HPP_
+#ifndef SETGROUNDSPEED_SETGROUNDSPEED_HPP_
+#define SETGROUNDSPEED_SETGROUNDSPEED_HPP_
 
 #include <memory>
 
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
+#include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
 
 namespace opendlv {
 namespace action {
-namespace removeloomingfront {
+namespace setgroundspeed {
 
 /**
  * This class provides...
  */
-class RemoveLoomingFront
+class SetGroundSpeed
 : public odcore::base::module::DataTriggeredConferenceClientModule {
  public:
-  RemoveLoomingFront(int32_t const &, char **);
-  RemoveLoomingFront(RemoveLoomingFront const &) = delete;
-  RemoveLoomingFront &operator=(RemoveLoomingFront const &) = delete;
-  virtual ~RemoveLoomingFront();
+  SetGroundSpeed(int32_t const &, char **);
+  SetGroundSpeed(SetGroundSpeed const &) = delete;
+  SetGroundSpeed &operator=(SetGroundSpeed const &) = delete;
+  virtual ~SetGroundSpeed();
   virtual void nextContainer(odcore::data::Container &);
 
  private:
+  void AddStimulus(odcore::data::TimeStamp const &, opendlv::perception::StimulusGroundSpeed const &);
+  void Correct();
+  bool IsPatient() const;
   void setUp();
   void tearDown();
+
+  bool m_initialised;
+  std::vector<odcore::data::TimeStamp> m_stimulusTime;
+  std::vector<float> m_stimulus;
+  std::vector<float> m_stimulusRate;
+  odcore::data::TimeStamp m_correctionTime;
+  float m_correction;
+  float m_correctionGain;
+  float m_maxStimulusAge;
+  float m_patienceDuration;
+  float m_stimulusJerk;
+  float m_stimulusJerkThreshold;
+  float m_stimulusRateThreshold;
+  float m_stimulusThreshold;
+  float m_equilibrium;
 };
 
-} // removeloomingfront
+} // setgroundspeed
 } // action
 } // opendlv
 
