@@ -89,7 +89,7 @@ services:
 
     # micro service for proxy-roadscape.
     proxy-roadscape:
-        build: .
+        image: chalmersrevere/copplar-core-on-opendlv-on-opendlv-core-on-opendavinci-ubuntu-16.04-complete:latest
         network_mode: "host"
         devices:
         - "/dev/pcan32:/dev/pcanusb0"
