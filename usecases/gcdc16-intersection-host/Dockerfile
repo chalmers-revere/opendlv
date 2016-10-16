@@ -17,5 +17,4 @@
 
 # Date: 2016-09-09
 
-#FROM seresearch/opendlv-on-opendlv-core-on-opendavinci-ubuntu-16.04-complete:latest
-FROM chalmersrevere/copplar-core-on-opendlv-core-on-opendavinci-ubuntu-16.04-complete:latest
+FROM chalmersrevere/copplar-core-on-opendlv-on-opendlv-core-on-opendavinci-ubuntu-16.04-complete:latest
