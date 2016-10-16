@@ -114,7 +114,7 @@ knowledge-identity.vehicleRole = 0
 knowledge-identity.rearAxleLocation = 5.0
 
 # knowledge-linguistics-v2vcam
-knowledge-linguistics-v2vcam.printOutbound = 1
+knowledge-linguistics-v2vcam.printOutbound = 0
 knowledge-linguistics-v2vcam.printInbound = 1
 knowledge-linguistics-v2vcam.record = 0
 
