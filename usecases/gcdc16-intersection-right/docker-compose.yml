@@ -161,11 +161,11 @@ services:
     proxy-trimble:
         build: .
         network_mode: "host"
-        working_dir: "/opt/opendlv/bin"
+        working_dir: "/opt/opendlv.core/bin"
         restart: always
         depends_on:
             - odsupercomponent
-        command: "/opt/opendlv/bin/opendlv-core-system-proxy-trimble --cid=${CID} --freq=20"
+        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-trimble --cid=${CID} --freq=20"
 
     # microservice for proxy-camera-axis
     proxy-camera-axis:
