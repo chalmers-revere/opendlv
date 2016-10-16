@@ -17,55 +17,36 @@
  * USA.
  */
 
-#ifndef SETOPTICALFLOW_SETOPTICALFLOW_HPP_
-#define SETOPTICALFLOW_SETOPTICALFLOW_HPP_
+#ifndef REMOVELOOMINGCONFLICT_REMOVELOOMINGCONFLICT_HPP_
+#define REMOVELOOMINGCONFLICT_REMOVELOOMINGCONFLICT_HPP_
 
 #include <memory>
 
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
-#include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
 
 namespace opendlv {
 namespace action {
-namespace setopticalflow {
+namespace removeloomingconflict {
 
 /**
  * This class provides...
  */
-class SetOpticalFlow
+class RemoveLoomingConflict
 : public odcore::base::module::DataTriggeredConferenceClientModule {
  public:
-  SetOpticalFlow(int32_t const &, char **);
-  SetOpticalFlow(SetOpticalFlow const &) = delete;
-  SetOpticalFlow &operator=(SetOpticalFlow const &) = delete;
-  virtual ~SetOpticalFlow();
+  RemoveLoomingConflict(int32_t const &, char **);
+  RemoveLoomingConflict(RemoveLoomingConflict const &) = delete;
+  RemoveLoomingConflict &operator=(RemoveLoomingConflict const &) = delete;
+  virtual ~RemoveLoomingConflict();
   virtual void nextContainer(odcore::data::Container &);
 
  private:
-  void AddStimulus(odcore::data::TimeStamp const &, opendlv::perception::StimulusOpticalFlow const &);
-  void Correct();
-  bool IsPatient() const;
   void setUp();
   void tearDown();
-
-  bool m_initialised;
-  std::vector<odcore::data::TimeStamp> m_stimulusTime;
-  std::vector<float> m_stimulus;
-  std::vector<float> m_stimulusRate;
-  odcore::data::TimeStamp m_correctionTime;
-  float m_correction;
-  float m_correctionGain;
-  float m_maxStimulusAge;
-  float m_patienceDuration;
-  float m_stimulusJerk;
-  float m_stimulusJerkThreshold;
-  float m_stimulusRateThreshold;
-  float m_stimulusThreshold;
-  float m_equilibrium;
 };
 
-} // setopticalflow
+} // removeloomingconflict
 } // action
 } // opendlv
 

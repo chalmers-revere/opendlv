@@ -17,8 +17,8 @@
  * USA.
  */
 
-#ifndef GCDC16_RULE_RULE_HPP_
-#define GCDC16_RULE_RULE_HPP_
+#ifndef GCDC16_RULE_INTERSECTIONHOST_INTERSECTIONHOST_HPP_
+#define GCDC16_RULE_INTERSECTIONHOST_INTERSECTIONHOST_HPP_
 
 #include <memory>
 
@@ -31,16 +31,17 @@ namespace opendlv {
 namespace knowledge {
 namespace gcdc16 {
 namespace rule {
+namespace intersectionhost {
 
 /**
  * This class provides...
  */
-class Rule : public odcore::base::module::TimeTriggeredConferenceClientModule {
+class IntersectionHost : public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
-  Rule(int32_t const &, char **);
-  Rule(Rule const &) = delete;
-  Rule &operator=(Rule const &) = delete;
-  virtual ~Rule();
+  IntersectionHost(int32_t const &, char **);
+  IntersectionHost(IntersectionHost const &) = delete;
+  IntersectionHost &operator=(IntersectionHost const &) = delete;
+  virtual ~IntersectionHost();
   virtual void nextContainer(odcore::data::Container &);
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
@@ -81,6 +82,7 @@ class Rule : public odcore::base::module::TimeTriggeredConferenceClientModule {
   //double minimumEuclideanDistance;
 };
 
+} // intersectionhost
 } // rule
 } // gcdc16
 } // knowledge
