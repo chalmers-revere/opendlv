@@ -216,7 +216,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
       odcore::data::Container actuationContainer(actuationRequest,opendlv::proxy::ActuationRequest::ID()+300);
       getConference().send(actuationContainer);
       
-      std::cout << "Send steering " << m_steeringValue << " acceleration " << m_accelerationValue << std::endl;
+     // std::cout << "Send steering " << m_steeringValue << " acceleration " << m_accelerationValue << std::endl;
     }
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
