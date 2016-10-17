@@ -48,7 +48,8 @@ IntersectionRight::IntersectionRight(int32_t const &a_argc, char **a_argv)
   a_argc, a_argv, "knowledge-gcdc16-rule-intersectionright"),
   m_enableLaneFollowing(),
   m_runScenario(false),
-  m_desiredGroundSpeed()
+  m_desiredGroundSpeed(),
+  m_previousAzimuthFollowed()
 {
 }
 
@@ -68,21 +69,108 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode IntersectionRight::bod
    
 }
 
+void IntersectionRight::ActOnEnvironment(opendlv::perception::Environment &a_environment)
+{
+  odcore::data::TimeStamp now;
+  odcore::data::TimeStamp environmentValidUntil = a_environment.getValidUntil();
+  if (now.toMicroseconds() - environmentValidUntil.toMicroseconds() > 0) {
+    return;
+  }
+
+  auto listOfObjects = a_environment.getListOfObjects();
+  if (listOfObjects.size() > 0) {
+    ActOnMio(listOfObjects);
+  }
+  
+  auto listOfSurfaces = a_environment.getListOfSurfaces();
+  if (listOfSurfaces.size() > 0) {
+    ActOnLane(listOfSurfaces);
+  }
+}
+
+void IntersectionRight::ActOnMio(std::vector<opendlv::perception::Object> &a_listOfObjects)
+{
+  for (auto object : a_listOfObjects) {
+    for (auto property : object.getListOfProperties()) {
+      if (property == "Station Id: 1") {
+        auto direction = object.getDirection();
+        float azimuth = direction.getAzimuth();
+        float distance = object.getDistance();
+        
+        std::cout << "The MIO was found in azimuth " << azimuth << " at a distance of " << distance << " m." << std::endl;
+
+
+      }
+    }
+  }
+}
+
+void IntersectionRight::ActOnLane(std::vector<opendlv::perception::Surface> &a_listOfSurfaces)
+{
+  float azimuth_pre = m_previousAzimuthFollowed;
+  float azimuth_new = 0.0f;
+
+  for (auto surface : a_listOfSurfaces) {
+    auto listOfEdges = surface.getListOfEdges();
+
+    if (listOfEdges.size() < 4) {
+      opendlv::model::Cartesian3 topLeftCorner = listOfEdges[0];
+      opendlv::model::Cartesian3 topRightCorner = listOfEdges[3];
+
+      float x_m = 0.5f * (topLeftCorner.getX() - topRightCorner.getX());
+      float y_m = 0.5f * (topLeftCorner.getY() - topRightCorner.getY());
+
+      float azimuth = atan2(y_m, x_m); 
+
+      if (std::abs(azimuth_pre - azimuth) < std::abs(azimuth_pre - azimuth_new)) {
+        azimuth_new = azimuth;
+      }
+    }
+  }
+
+  m_previousAzimuthFollowed = azimuth_new;
+  ControlDirectionOfMovement(azimuth_new);
+}
+
+
 void IntersectionRight::nextContainer(odcore::data::Container &a_container)
 {
-  if (a_container.getDataType() == (opendlv::knowledge::Insight::ID() + 300)) {
+  if (a_container.getDataType() == (opendlv::knowledge::Insight::ID())) {
     opendlv::knowledge::Insight insight = a_container.getData<opendlv::knowledge::Insight>();
-    std::string whatInsight = insight.getInsight();
-
-
-    if (whatInsight == "scenarioReady") {
-      // set desired speed of 30 km/h
-      /*
-      opendlv::knowledge::DesiredOpticalFlow desired(30/3.6f);
-      odcore::data::Container objectContainerDesiredOpticalFlow(desired);
-      getConference().send(objectContainerDesiredOpticalFlow);
-      */
+    if (insight.getInsight() == "scenarioReady") {
+      m_runScenario = true;
     }
+  } else if (a_container.getDataType() == opendlv::perception::Environment::ID()) {
+    opendlv::perception::Environment message = a_container.getData<opendlv::perception::Environment>();
+    ActOnEnvironment(message);
+  } else if (a_container.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
+    auto propulsion = a_container.getData<opendlv::proxy::reverefh16::Propulsion>();
+    double speedKph = propulsion.getPropulsionShaftVehicleSpeed();
+    float speed = static_cast<float>(speedKph / 3.6);
+    ControlGroundSpeed(speed);
+  }
+}
+
+void IntersectionRight::ControlGroundSpeed(float a_speed)
+{
+  std::cout << "Speed control - wants " << m_desiredGroundSpeed << " has " << a_speed << std::endl;
+  odcore::data::TimeStamp now;
+  if (m_runScenario) {
+    opendlv::perception::StimulusGroundSpeed sgs(now, m_desiredGroundSpeed, a_speed);
+    odcore::data::Container container(sgs);
+    getConference().send(container);
+  }
+}
+
+void IntersectionRight::ControlDirectionOfMovement(float a_azimuth)
+{
+  std::cout << "Direction control - wants " << a_azimuth << std::endl;
+  odcore::data::TimeStamp now;
+  if (m_runScenario) {
+    opendlv::model::Direction direction(a_azimuth, 0.0f);
+    opendlv::perception::StimulusDirectionOfMovement sdom(now, direction, opendlv::model::Direction(0.0f, 0.0f));
+    odcore::data::Container container(sdom);
+    getConference().send(container);
   }
 }
 

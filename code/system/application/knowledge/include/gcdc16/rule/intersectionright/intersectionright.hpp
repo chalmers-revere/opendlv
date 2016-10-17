@@ -46,12 +46,18 @@ class IntersectionRight : public odcore::base::module::TimeTriggeredConferenceCl
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
  private:
+  void ActOnEnvironment(opendlv::perception::Environment &);
+  void ActOnMio(std::vector<opendlv::perception::Object> &);
+  void ActOnLane(std::vector<opendlv::perception::Surface> &);
+  void ControlDirectionOfMovement(float);
+  void ControlGroundSpeed(float);
   void setUp();
   void tearDown();
   
   bool m_enableLaneFollowing;
   bool m_runScenario;
   float m_desiredGroundSpeed;
+  float m_previousAzimuthFollowed;
 };
 
 } // intersectionright

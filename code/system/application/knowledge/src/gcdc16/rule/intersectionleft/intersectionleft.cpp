@@ -179,9 +179,9 @@ void IntersectionLeft::setUp()
   bool forceScenarioStart = kv.getValue<bool>("knowledge-gcdc16-rule-intersectionleft.forceScenarioStart");
 
   std::cout << "Force scenario start: " << forceScenarioStart << " Enable lane following: " << m_enableLaneFollowing << std::endl;
-  if (forceScenarioStart) {
+  //if (forceScenarioStart) {
     m_runScenario = true;
-  }
+  //}
 }
 
 void IntersectionLeft::tearDown()
