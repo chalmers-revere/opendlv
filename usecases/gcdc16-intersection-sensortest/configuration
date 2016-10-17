@@ -122,6 +122,7 @@ sensation-echolocation.pointCloudRadius = 2 # meters
 # proxy-trimble
 proxy-trimble.ip = 10.42.42.112
 proxy-trimble.port = 9999
+proxy-trimble.debug = 0
 
 # proxy-camera-axis
 proxy-camera-axis.type = opencv-ip-axis
