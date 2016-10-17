@@ -120,6 +120,7 @@ knowledge-identity.rearAxleLocation = 5.0
 knowledge-linguistics-v2vcam.printOutbound = 1
 knowledge-linguistics-v2vcam.printInbound = 1
 knowledge-linguistics-v2vcam.record = 0
+knowledge-linguistics-v2vcam.debug = 0
 
 # knowledge-scene
 knowledge-scene.mergeDistance = 4.0
@@ -139,6 +140,7 @@ sensation-echolocation.pointCloudRadius = 2 # meters
 # proxy-trimble
 proxy-trimble.ip = 10.42.42.112
 proxy-trimble.port = 9999
+proxy-trimble.debug = 0
 
 # proxy-camera-axis
 proxy-camera-axis.type = opencv-ip-axis
