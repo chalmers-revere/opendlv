@@ -203,8 +203,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
     if (m_brakeValue > 0.0f) {
       // std::cout << "Sent actuation request" << std::endl;
       opendlv::proxy::ActuationRequest actuationRequest(m_brakeValue, 
-          m_steeringValue, false);
-      odcore::data::Container actuationContainer(actuationRequest,opendlv::proxy::ActuationRequest::ID()+300);
+          m_steeringValue, true);
+      odcore::data::Container actuationContainer(actuationRequest,opendlv::proxy::ActuationRequest::ID());
       getConference().send(actuationContainer);
 
      // std::cout << "Send steering " << m_steeringValue << " brake " << m_brakeValue << std::endl;
@@ -212,8 +212,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
     } else {
       // std::cout << "Sent actuation request" << std::endl;
       opendlv::proxy::ActuationRequest actuationRequest(m_accelerationValue, 
-          m_steeringValue, false);
-      odcore::data::Container actuationContainer(actuationRequest,opendlv::proxy::ActuationRequest::ID()+300);
+          m_steeringValue, true);
+      odcore::data::Container actuationContainer(actuationRequest,opendlv::proxy::ActuationRequest::ID());
       getConference().send(actuationContainer);
       
      // std::cout << "Send steering " << m_steeringValue << " acceleration " << m_accelerationValue << std::endl;
