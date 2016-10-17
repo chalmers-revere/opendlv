@@ -178,7 +178,7 @@ void IntersectionLeft::nextContainer(odcore::data::Container &a_container)
 
 void IntersectionLeft::ControlGroundSpeed(float a_speed)
 {
-  a_speed = 10.0f; // REMOVE ME: test
+  a_speed = 3.0f; // REMOVE ME: test
 
   std::cout << "Speed control - wants " << m_desiredGroundSpeed << " has " << a_speed << std::endl;
   odcore::data::TimeStamp now;
