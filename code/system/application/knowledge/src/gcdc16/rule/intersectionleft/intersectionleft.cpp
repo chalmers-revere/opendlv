@@ -88,47 +88,19 @@ void IntersectionLeft::ActOnEnvironment(opendlv::perception::Environment &a_envi
 
 void IntersectionLeft::ActOnMio(std::vector<opendlv::perception::Object> &a_listOfObjects)
 {
-  (void) a_listOfObjects;
-  /*
-  opendlv::perception::Object mio;
-  std::vector<float> scoreList;
+  for (auto object : a_listOfObjects) {
+    for (auto property : object.getListOfProperties()) {
+      if (property == "Station Id: 1") {
+        auto direction = object.getDirection();
+        float azimuth = direction.getAzimuth();
+        float distance = object.getDistance();
+        
+        std::cout << "The MIO was found in azimuth " << azimuth << " at a distance of " << distance << " m." << std::endl;
 
-  for(auto object:a_listOfObjects){
-    opendlv::model::Direction direction = object.getDirection();
-    float azimuth = direction.getAzimuth();
-    float distance = object.getDistance();
-    std::vector<std::string> sources = object.getListOfSources();
 
-    float score = 0;
-    score += (std::pow(8.0f,2.0f
-      )-std::pow(azimuth*static_cast<float>(opendlv::Constants::RAD2DEG)/45.0f*8.0f,2.0f));
-    score += (100-distance)*3;
-    for(auto it:sources){
-      score += 80;
+      }
     }
-
-    if(distance > m_mioDistanceRange || std::abs(azimuth) > m_mioAngleRange){
-      score = 0;
-    }
-    scoreList.push_back(score);
-    std::cout << "Id: " << object.getObjectId() << " score: " << score << " scources: ";
-    for(auto it:sources){
-      std::cout << it << " ";
-    }
-
-    std::cout << std::endl;
   }
-  auto highestScore = std::max_element(scoreList.begin(),scoreList.end());
-  if(*highestScore > 0){
-    auto winnerIndex = std::distance(scoreList.begin(), highestScore);
-    m_mio = a_listOfObjects[winnerIndex];
-
-    std::cout << "Winner Id: " << a_listOfObjects[winnerIndex].getObjectId() << " Score: " << *highestScore << std::endl;
-    odcore::data::TimeStamp now;
-    m_mioValidUntil = odcore::data::TimeStamp(now.getSeconds()+m_memoryDuration,now.getFractionalMicroseconds());
-
-  }
-  */
 }
 
 void IntersectionLeft::ActOnLane(std::vector<opendlv::perception::Surface> &a_listOfSurfaces)
@@ -207,9 +179,9 @@ void IntersectionLeft::setUp()
   bool forceScenarioStart = kv.getValue<bool>("knowledge-gcdc16-rule-intersectionleft.forceScenarioStart");
 
   std::cout << "Force scenario start: " << forceScenarioStart << " Enable lane following: " << m_enableLaneFollowing << std::endl;
-//  if (forceScenarioStart) {
+  if (forceScenarioStart) {
     m_runScenario = true;
-//  }
+  }
 }
 
 void IntersectionLeft::tearDown()
