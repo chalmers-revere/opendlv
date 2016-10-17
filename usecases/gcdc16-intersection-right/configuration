@@ -100,8 +100,8 @@ action-setopticalrotation.stimulusThreshold = 0.02
 
 # knowledge-gcdc16-rule-intersectionright
 knowledge-gcdc16-rule-intersectionright.desiredGroundSpeed = 8.3
-knowledge-gcdc16-rule-intersectionright.enableLaneFollowing = true
-knowledge-gcdc16-rule-intersectionright.forceScenarioStart = true
+knowledge-gcdc16-rule-intersectionright.enableLaneFollowing = 1
+knowledge-gcdc16-rule-intersectionright.forceScenarioStart = 1
 
 # knowledge-linguistics-v2vcam
 knowledge-linguistics-v2vcam.printOutbound = 0
@@ -109,6 +109,7 @@ knowledge-linguistics-v2vcam.printInbound = 0
 knowledge-linguistics-v2vcam.record = 0
 
 # knowledge-gcdc16-v2viclcm
+knowledge-gcdc16-v2viclcm.participantsReady = 0
 knowledge-gcdc16-v2viclcm.printOutbound = 0
 knowledge-gcdc16-v2viclcm.printInbound = 0
 knowledge-gcdc16-v2viclcm.record = 0
@@ -140,7 +141,7 @@ perception-detectlane.roiX = 310
 perception-detectlane.roiY = 195
 perception-detectlane.roiWidth = 805
 perception-detectlane.roiHeight = 525
-perception-detectlane.debug = 0
+perception-detectlane.debug = 1
 
 # sensation-audition
 

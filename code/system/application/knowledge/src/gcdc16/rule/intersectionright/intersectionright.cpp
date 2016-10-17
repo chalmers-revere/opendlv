@@ -45,7 +45,7 @@ namespace intersectionright {
 */
 IntersectionRight::IntersectionRight(int32_t const &a_argc, char **a_argv)
 : TimeTriggeredConferenceClientModule(
-  a_argc, a_argv, "knowledge-gcdc16-intersectionright"),
+  a_argc, a_argv, "knowledge-gcdc16-rule-intersectionright"),
   m_enableLaneFollowing(),
   m_runScenario(false),
   m_desiredGroundSpeed()

@@ -45,7 +45,7 @@ namespace intersectionleft {
 */
 IntersectionLeft::IntersectionLeft(int32_t const &a_argc, char **a_argv)
 : TimeTriggeredConferenceClientModule(
-  a_argc, a_argv, "knowledge-gcdc16-intersectionleft"),
+  a_argc, a_argv, "knowledge-gcdc16-rule-intersectionleft"),
   m_enableLaneFollowing(),
   m_runScenario(false),
   m_desiredGroundSpeed(),
@@ -206,9 +206,10 @@ void IntersectionLeft::setUp()
   m_enableLaneFollowing = kv.getValue<bool>("knowledge-gcdc16-rule-intersectionleft.enableLaneFollowing");
   bool forceScenarioStart = kv.getValue<bool>("knowledge-gcdc16-rule-intersectionleft.forceScenarioStart");
 
-  if (forceScenarioStart) {
+  std::cout << "Force scenario start: " << forceScenarioStart << " Enable lane following: " << m_enableLaneFollowing << std::endl;
+//  if (forceScenarioStart) {
     m_runScenario = true;
-  }
+//  }
 }
 
 void IntersectionLeft::tearDown()

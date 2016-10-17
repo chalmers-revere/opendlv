@@ -45,7 +45,7 @@ namespace intersectionhost {
 */
 IntersectionHost::IntersectionHost(int32_t const &a_argc, char **a_argv)
 : TimeTriggeredConferenceClientModule(
-  a_argc, a_argv, "knowledge-gcdc16-intersectionhost")
+  a_argc, a_argv, "knowledge-gcdc16-rule-intersectionhost")
 {
 }
 
