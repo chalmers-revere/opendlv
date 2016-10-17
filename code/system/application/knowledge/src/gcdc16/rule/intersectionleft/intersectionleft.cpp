@@ -48,7 +48,8 @@ IntersectionLeft::IntersectionLeft(int32_t const &a_argc, char **a_argv)
   a_argc, a_argv, "knowledge-gcdc16-intersectionleft"),
   m_enableLaneFollowing(),
   m_runScenario(false),
-  m_desiredGroundSpeed()
+  m_desiredGroundSpeed(),
+  m_previousAzimuthFollowed()
 {
 }
 
@@ -132,7 +133,29 @@ void IntersectionLeft::ActOnMio(std::vector<opendlv::perception::Object> &a_list
 
 void IntersectionLeft::ActOnLane(std::vector<opendlv::perception::Surface> &a_listOfSurfaces)
 {
-  (void) a_listOfSurfaces;
+  float azimuth_pre = m_previousAzimuthFollowed;
+  float azimuth_new = 0.0f;
+
+  for (auto surface : a_listOfSurfaces) {
+    auto listOfEdges = surface.getListOfEdges();
+
+    if (listOfEdges.size() < 4) {
+      opendlv::model::Cartesian3 topLeftCorner = listOfEdges[0];
+      opendlv::model::Cartesian3 topRightCorner = listOfEdges[3];
+
+      float x_m = 0.5f * (topLeftCorner.getX() - topRightCorner.getX());
+      float y_m = 0.5f * (topLeftCorner.getY() - topRightCorner.getY());
+
+      float azimuth = atan2(y_m, x_m); 
+
+      if (std::abs(azimuth_pre - azimuth) < std::abs(azimuth_pre - azimuth_new)) {
+        azimuth_new = azimuth;
+      }
+    }
+  }
+
+  m_previousAzimuthFollowed = azimuth_new;
+  ControlDirectionOfMovement(azimuth_new);
 }
 
 void IntersectionLeft::nextContainer(odcore::data::Container &a_container)
@@ -155,6 +178,7 @@ void IntersectionLeft::nextContainer(odcore::data::Container &a_container)
 
 void IntersectionLeft::ControlGroundSpeed(float a_speed)
 {
+  std::cout << "Speed control - wants " << m_desiredGroundSpeed << " has " << a_speed << std::endl;
   odcore::data::TimeStamp now;
   if (m_runScenario) {
     opendlv::perception::StimulusGroundSpeed sgs(now, m_desiredGroundSpeed, a_speed);
@@ -163,15 +187,16 @@ void IntersectionLeft::ControlGroundSpeed(float a_speed)
   }
 }
 
-void IntersectionLeft::ControlDirectionOfMovement()
+void IntersectionLeft::ControlDirectionOfMovement(float a_azimuth)
 {
- /* odcore::data::TimeStamp now;
+  std::cout << "Direction control - wants " << a_azimuth << std::endl;
+  odcore::data::TimeStamp now;
   if (m_runScenario) {
-    opendlv::perception::StimulusDirectionOfMovement sdom(now, m_mio.getDirection(),opendlv::model::Direction(0,0));
-    odcore::data::Container containerSdom(sdom);
-    getConference().send(containerSdom);
+    opendlv::model::Direction direction(a_azimuth, 0.0f);
+    opendlv::perception::StimulusDirectionOfMovement sdom(now, direction, opendlv::model::Direction(0.0f, 0.0f));
+    odcore::data::Container container(sdom);
+    getConference().send(container);
   }
-  */
 }
 
 void IntersectionLeft::setUp()
