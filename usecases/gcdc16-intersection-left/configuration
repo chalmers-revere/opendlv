@@ -27,7 +27,7 @@ global.buffer.memorySegmentSize = 2800000 # Size of a memory segment in bytes.
 global.buffer.numberOfMemorySegments = 4  # Number of memory segments.
 
 # The following key describes the list of modules expected to participate in this --cid session.
-global.session.expectedModules = action-act,action-communicate,action-removeloomingconflict,action-setgroundspeed,action-setopticalrotation,knowledge-gcdc16-rule-intersection-left,knowledge-gcdc16-v2viclcm,knowledge-identity,knowledge-linguistics-v2vcam,knowledge-scene,perception-detectlane,sensation-audition,sensation-echolocation,proxy-trimble,proxy-camera-axis,proxy-fh16,proxy-sick,proxy-v2v
+global.session.expectedModules = action-act,action-communicate,action-removeloomingconflict,action-setgroundspeed,action-setopticalrotation,knowledge-gcdc16-rule-intersectionleft,knowledge-gcdc16-v2viclcm,knowledge-identity,knowledge-linguistics-v2vcam,knowledge-scene,perception-detectlane,sensation-audition,sensation-echolocation,proxy-trimble,proxy-camera-axis,proxy-fh16,proxy-sick,proxy-v2v
 
 
 ###############################################################################
@@ -98,10 +98,10 @@ action-setopticalrotation.stimulusJerkThreshold =  0.02
 action-setopticalrotation.stimulusRateThreshold = 0.02
 action-setopticalrotation.stimulusThreshold = 0.02
 
-# knowledge-gcdc16-rule-intersection-left
-knowledge-gcdc16-rule-intersection-left.desiredGroundSpeed = 8.3
-knowledge-gcdc16-rule-intersection-left.enableLaneFollowing = true
-knowledge-gcdc16-rule-intersection-left.forceScenarioStart = true
+# knowledge-gcdc16-rule-intersectionleft
+knowledge-gcdc16-rule-intersectionleft.desiredGroundSpeed = 8.3
+knowledge-gcdc16-rule-intersectionleft.enableLaneFollowing = true
+knowledge-gcdc16-rule-intersectionleft.forceScenarioStart = true
 
 # knowledge-linguistics-v2vcam
 knowledge-linguistics-v2vcam.printOutbound = 0
@@ -120,7 +120,6 @@ knowledge-identity.vehicleLength = 7.3
 knowledge-identity.vehicleWidth = 2.55 
 knowledge-identity.vehicleRole = 0
 knowledge-identity.rearAxleLocation = 5.0
-
 
 # knowledge-scene
 knowledge-scene.mergeDistance = 4.0

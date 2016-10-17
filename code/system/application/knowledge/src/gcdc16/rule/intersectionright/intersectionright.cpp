@@ -89,9 +89,9 @@ void IntersectionRight::nextContainer(odcore::data::Container &a_container)
 void IntersectionRight::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
-  m_desiredGroundSpeed = static_cast<float>(kv.getValue<double>("knowledge-gcdc16-rule-intersection-right.desiredAngularSize"));
-  m_enableLaneFollowing = kv.getValue<bool>("knowledge-gcdc16-rule-intersection-right.enableLaneFollowing");
-  bool forceScenarioStart = kv.getValue<bool>("knowledge-gcdc16-rule-intersection-right.forceScenarioStart");
+  m_desiredGroundSpeed = static_cast<float>(kv.getValue<double>("knowledge-gcdc16-rule-intersectionright.desiredGroundSpeed"));
+  m_enableLaneFollowing = kv.getValue<bool>("knowledge-gcdc16-rule-intersectionright.enableLaneFollowing");
+  bool forceScenarioStart = kv.getValue<bool>("knowledge-gcdc16-rule-intersectionright.forceScenarioStart");
   
   if (forceScenarioStart) {
     m_runScenario = true;

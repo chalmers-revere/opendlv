@@ -27,7 +27,7 @@ global.buffer.memorySegmentSize = 2800000 # Size of a memory segment in bytes.
 global.buffer.numberOfMemorySegments = 4  # Number of memory segments.
 
 # The following key describes the list of modules expected to participate in this --cid session.
-global.session.expectedModules = action-communicate,knowledge-gcdc16-rule-intersection-host,knowledge-gcdc16-v2viclcm,knowledge-identity,knowledge-linguistics-v2vcam,sensation-audition,proxy-applanix,proxy-v2v
+global.session.expectedModules = action-communicate,knowledge-gcdc16-rule-intersectionhost,knowledge-gcdc16-v2viclcm,knowledge-identity,knowledge-linguistics-v2vcam,sensation-audition,proxy-applanix,proxy-v2v
 
 
 ###############################################################################
@@ -70,7 +70,7 @@ odsupercomponent.pulsetimeack.exclude = odcockpit
 
 # action-communicate
 
-# knowledge-gcdc16-rule-intersection-host
+# knowledge-gcdc16-rule-intersectionhost
 
 # knowledge-gcdc16-v2viclcm
 knowledge-gcdc16-v2viclcm.printOutbound = 1
