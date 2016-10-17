@@ -20,23 +20,32 @@
 #ifndef DETECTLANE_DETECTLANE_HPP_
 #define DETECTLANE_DETECTLANE_HPP_
 
-#include <memory>
-#include <iostream>
-#include <fstream>
+#include <deque>
 #include <Eigen/Dense>
-#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
+#include <fstream>
+#include <iostream>
+#include <memory>
+#include <utility>
+#include <vector>
+
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
+#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/base/Mutex.h"
 #include "opendavinci/odcore/data/Container.h"
-#include "detectlane/InversePerspectiveMapping.hpp"
+#include "opendavinci/odcore/data/TimeStamp.h"
 
 namespace opendlv {
 namespace perception {
 namespace detectlane {
 
 /**
- * This class provides...
+ * This class provides the ability to detect lanes given an image source.
  */
 class DetectLane
-: public odcore::base::module::DataTriggeredConferenceClientModule {
+: public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
   DetectLane(int32_t const &, char **);
   DetectLane(DetectLane const &) = delete;
@@ -47,86 +56,36 @@ class DetectLane
  private:
   void setUp();
   void tearDown();
-  Eigen::MatrixXd ReadMatrix(std::string fileName,int nRows,
-      int nCols);
-  void TransformPointToGlobalFrame(Eigen::Vector3d &point);
-  double GetLaneOffset(double kLeft,double mLeft, double kRight,
-      double mRight,double col, int p1, int p2);
-  double GetHeadingAngle(double kLeft,double mLeft, double kRight,
-      double mRight, double row1, double row2, int p1, int p2);
-  void ReadWarpPointsMatrix(std::vector<cv::Point2f> & a_points,
-      std::string a_fileName);
-  void ReadInputWindowSize(std::string a_stringStream);
-  void ReadOutputWindowSize(std::string a_stringStream);
-  void GetGrouping(std::vector<cv::Vec2f> &groups,
-      std::vector<cv::Vec2f> &lines);
-  void GetParametricRepresentation(std::vector<cv::Vec2f> &p,std::vector<cv::Vec2f> &m,std::vector<cv::Vec2f> &groups);
-  void GetPointsOnLine(std::vector<cv::Vec2f> &xPoints,std::vector<cv::Vec2f> &yPoints,
-    std::vector<cv::Vec2f> &X, std::vector<cv::Vec2f> &Y,
-    std::vector<cv::Vec2f> &p,std::vector<cv::Vec2f> &m,float row1, float row2);
-  void GetLinePairs(std::vector<cv::Vec2f> &xPoints,std::vector<cv::Vec2f> &yPoints,std::vector<cv::Vec2i> &groupIds);
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
-
-
-  bool m_setup;
-  int m_width;
-  int m_height;
-  int m_outputWidth;
-  int m_outputHeight;
-  int m_maxRow;
-  int m_minRow;
-  int m_midRegion;
-  int m_threshold;
-  int m_houghThreshold;
-  int m_cannyThresholdTrue;
-  
-  double m_standardLaneWidth;  
   bool m_initialized;
-
-
-  // Matrix holding region lines
-  Eigen::MatrixXd m_regions;
-  Eigen::MatrixXd m_leftCameraRegions;
-  Eigen::MatrixXd m_rightCameraRegions;
-  
-  // Matrix holding the lines col = row * k + m for the region lines
-  Eigen::MatrixXd m_lines;
-  Eigen::MatrixXd m_leftLines;
-  Eigen::MatrixXd m_rightLines;
-  
-  // Number of scan lines / points
-  int m_nPoints;
-  // Number of search regions
-  long m_nRegions;
-
-  // Matrix holding the mean column for each region on each row
-  Eigen::MatrixXd m_recoveredPoints;
-
-  // Holds the K and M parameters for each region
-  Eigen::MatrixXd m_k, m_m;
-
-  Eigen::MatrixXd m_K, m_M;
-  // Counts the number of points per each region
-  Eigen::VectorXd m_pointsPerRegion;
-  
-  // Holds the index that decides the left and right road track
-  Eigen::MatrixXd m_regionIndex;
-  
-  // Holds the location of found lanes
-  Eigen::VectorXd m_laneLocation2;
-
-  // Inverse perspective mapping class
-  std::unique_ptr<InversePerspectiveMapping> m_leftIpm;
-  std::unique_ptr<InversePerspectiveMapping> m_rightIpm;
-
+  cv::Mat m_image;
+  std::deque<std::pair<odcore::data::TimeStamp, cv::Mat>> m_visualMemory;
+  uint16_t m_intensityThreshold;
+  uint16_t m_cannyThreshold;
+  uint16_t m_houghThreshold;
+  double m_memThreshold;
+  double m_upperLaneLimit;
+  double m_lowerLaneLimit;
+  int16_t m_screenSize[2];
+  int16_t m_roi[4];
+  odcore::base::Mutex m_mtx;
+  bool m_debug;
   Eigen::Matrix3d m_transformationMatrix;
-  Eigen::Matrix3d m_leftTransformationMatrix;
-  Eigen::Matrix3d m_rightTransformationMatrix;
+
+  void GetGrouping(std::vector<cv::Vec2f> &, std::vector<cv::Vec2f> &, double);
+  void GetParametricRepresentation(std::vector<cv::Vec2f> &,std::vector<cv::Vec2f> &,std::vector<cv::Vec2f> &);
+  void GetPointsOnLine(std::vector<cv::Vec2f> &a_xPoints
+    , std::vector<cv::Vec2f> &a_yPoints
+    , std::vector<cv::Vec2f> &a_X
+    , std::vector<cv::Vec2f> &a_Y
+    , std::vector<cv::Vec2f> &a_p
+    , std::vector<cv::Vec2f> &a_m);
+  void GetLinePairs(std::vector<cv::Vec2f> &, std::vector<int8_t> &);
+  Eigen::MatrixXd ReadMatrix(std::string fileName, uint8_t nRows, uint8_t nCols);
+  void TransformPointToGlobalFrame(Eigen::Vector3d &point);
 
 
-  Eigen::Vector3d m_scale;
-  
-  std::string m_sourceName;
 
 
 };

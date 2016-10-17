@@ -134,8 +134,8 @@ proxy-imu:0.mount.roll = 0.0
 proxy-imu:0.mount.pitch = 0.0
 proxy-imu:0.mount.yaw = 0.0
 
-proxy-imu:0.type = pololu.altimu10
-proxy-imu:0.pololu.altimu10.device_node = /
+proxy-imu:1.type = pololu.altimu10
+proxy-imu:1.pololu.altimu10.device_node = /dev/i2c-2
 proxy-imu:1.mount.x = -2.55
 proxy-imu:1.mount.y = 0.0
 proxy-imu:1.mount.z = 0.79
@@ -144,7 +144,7 @@ proxy-imu:1.mount.pitch = 0.0
 proxy-imu:1.mount.yaw = 0.0
 
 proxy-imu:2.type = pololu.altimu10
-proxy-imu:2.pololu.altimu10.device_node = /
+proxy-imu:2.pololu.altimu10.device_node = /dev/i2c-2
 proxy-imu:2.mount.x = -5.37
 proxy-imu:2.mount.y = 0.0
 proxy-imu:2.mount.z = 0.68
@@ -229,7 +229,7 @@ action-setopticalrotation.stimulusThreshold = 0.01
 
 ###############################################################################
 ###############################################################################
-### Sensation
+# Sensation
 
 sensation-echolocation.memoryThreshold = 0 #discrete seconds
 sensation-echolocation.pointCloudRadius = 1.0 #meters
@@ -242,9 +242,10 @@ sensation-vision-opticalflow.maxLevel = 3
 sensation-vision-opticalflow.minEigThreshold = 0.001
 sensation-vision-opticalflow.nAxisPoints = 15
 
+
 ###############################################################################
 ###############################################################################
-### Knowledge
+# Knowledge
 knowledge-identity.stationId = 110
 knowledge-identity.stationType = 8 #heavy truck
 knowledge-identity.vehicleLength = 7.3
@@ -252,19 +253,15 @@ knowledge-identity.vehicleWidth = 2.55
 knowledge-identity.vehicleRole = 0
 knowledge-identity.rearAxleLocation = 5.0
 
+knowledge-scene.mergeDistance = 3.5
+knowledge-scene.validUntilDuration = 1
+knowledge-scene.memoryCapacity = 5.0 # seconds
+
 knowledge-ivrule.mioAngleRange = 45.0 #degrees
 knowledge-ivrule.mioDistanceRange = 50.0 #meters
 knowledge-ivrule.memoryDuration = 1 #seconds
 knowledge-ivrule.desiredAngularSize = 4 #degrees
 knowledge-ivrule.desiredOpticalFlow = 5.6 #meters/s
-
-knowledge-linguistics-v2vcam.printOutbound = 1
-knowledge-linguistics-v2vcam.printInbound = 1
-knowledge-linguistics-v2vcam.record = 0
-
-knowledge-scene.mergeDistance = 3.5
-knowledge-scene.validUntilDuration = 1
-knowledge-scene.memoryCapacity = 5.0 # seconds
 
 ###############################################################################
 ###############################################################################
@@ -282,11 +279,21 @@ tools-can-ps3controller.ps3controllerdevicenode = /dev/input/js2   # Gamepad.
 ###############################################################################
 ###############################################################################
 ### Perception
-perception-detectlane.inputSize = 640,480
-perception-detectlane.outputSize = 640,480
 perception-detectlane:0.source = front-left
 perception-detectlane:1.source = front-right
-
+perception-detectlane.intensityThreshold = 200
+perception-detectlane.cannyThreshold = 35
+perception-detectlane.houghThreshold = 200
+perception-detectlane.memThreshold = 1.0 #seconds
+perception-detectlane.upperLaneLimit = 440
+perception-detectlane.lowerLaneLimit = 700
+perception-detectlane.screenWidth = 1280
+perception-detectlane.screenHeight = 720
+perception-detectlane.roiX = 0
+perception-detectlane.roiY = 420
+perception-detectlane.roiWidth = 1280
+perception-detectlane.roiHeight = 300
+perception-detectlane.debug = 0;
 
 perception-detectvehicle:0.debug = 1   # 0 do not show a window with debug information (does not work in Docker!)
 perception-detectvehicle:0.source = front-left

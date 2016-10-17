@@ -27,7 +27,7 @@ global.buffer.memorySegmentSize = 2800000 # Size of a memory segment in bytes.
 global.buffer.numberOfMemorySegments = 4  # Number of memory segments.
 
 # The following key describes the list of modules expected to participate in this --cid session.
-global.session.expectedModules = action-act,action-communicate,action-removeloomingconflict,action-setgroundspeed,action-setopticalrotation,knowledge-gcdc16-rule-intersection-right,knowledge-gcdc16-v2viclcm,knowledge-identity,knowledge-linguistics-v2vcam,knowledge-scene,perception-detectlane,sensation-audition,sensation-echolocation,proxy-trimble,proxy-camera-axis,proxy-fh16,proxy-lidar,proxy-v2v
+global.session.expectedModules = action-communicateknowledge-gcdc16-rule-intersection-right,knowledge-gcdc16-v2viclcm,knowledge-identity,knowledge-linguistics-v2vcam,knowledge-scene,perception-detectlane,sensation-audition,sensation-echolocation,proxy-trimble,proxy-camera-axis,proxy-fh16,proxy-lidar,proxy-v2v
 
 
 ###############################################################################
@@ -68,38 +68,9 @@ odsupercomponent.pulsetimeack.exclude = odcockpit
 # NEXT, THE CONFIGURATION FOR OPENDLV SOFTWARE FOLLOWS. 
 #
 
-# action-act
-
 # action-communicate
 
-# action-removeloomingconflict
-action-removeloomingconflict.correctionGain = 0.4
-action-removeloomingconflict.maxStimulusAge = 0.5
-action-removeloomingconflict.patienceDuration = 0.4
-action-removeloomingconflict.stimulusJerkThreshold = 0.02
-action-removeloomingconflict.stimulusRateThreshold = 0.02
-action-removeloomingconflict.stimulusThreshold = 0.02
-action-removeloomingconflict.equilibrium = 20.0
-
-# action-setgroundspeed
-action-setgroundspeed.correctionGain = 5.0
-action-setgroundspeed.maxStimulusAge = 4.1
-action-setgroundspeed.patienceDuration = 4.0
-action-setgroundspeed.stimulusJerkThreshold = 0.5
-action-setgroundspeed.stimulusRateThreshold = 0.5
-action-setgroundspeed.stimulusThreshold = 1.0
-action-setgroundspeed.equilibrium = 20.0  # kph
-
-# action-setopticalrotation
-action-setopticalrotation.correctionGain = 0.2
-action-setopticalrotation.maxStimulusAge =  1.0
-action-setopticalrotation.patienceDuration = 0.2
-action-setopticalrotation.stimulusJerkThreshold =  0.02
-action-setopticalrotation.stimulusRateThreshold = 0.02
-action-setopticalrotation.stimulusThreshold = 0.02
-
 # knowledge-gcdc16-rule-intersection-right
-knowledge-gcdc16-rule-intersection-right.desiredGroundSpeed = 8.3
 
 # knowledge-gcdc16-v2viclcm
 knowledge-gcdc16-v2viclcm.printOutbound = 1
@@ -115,7 +86,7 @@ knowledge-identity.vehicleRole = 0
 knowledge-identity.rearAxleLocation = 5.0
 
 # knowledge-linguistics-v2vcam
-knowledge-linguistics-v2vcam.printOutbound = 1
+knowledge-linguistics-v2vcam.printOutbound = 0
 knowledge-linguistics-v2vcam.printInbound = 1
 knowledge-linguistics-v2vcam.record = 0
 
@@ -155,6 +126,6 @@ proxy-lidar.mount.yaw = 0.0
 proxy-lidar.record = 1  # Set to 1 to dump Lidar data in .rec format.
 
 # proxy-v2v
-proxy-v2v.comboxIp = 10.42.42.15
+proxy-v2v.comboxIp = 10.42.42.61
 proxy-v2v.comboxPort = 5003
 proxy-v2v.listenPort = 5000

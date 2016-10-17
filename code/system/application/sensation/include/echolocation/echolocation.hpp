@@ -20,6 +20,7 @@
 #ifndef ECHOLOCATION_ECHOLOCATION_HPP_
 #define ECHOLOCATION_ECHOLOCATION_HPP_
 
+#include <deque>
 #include <vector>
 
 #include <opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h>
@@ -45,11 +46,11 @@ class Echolocation
   void setUp();
   void tearDown();
   double PointDistance(float, double, float, double);
-  bool Contains(uint32_t, std::vector<uint32_t>);
 
-  std::vector<float> m_angles;
-  std::vector<double> m_distances;
-  std::vector<odcore::data::TimeStamp> m_times;
+  std::deque<float> m_listAzimuth;
+  std::deque<float> m_listZenith;
+  std::deque<double> m_listDistance;
+  std::deque<odcore::data::TimeStamp> m_listTime;
   float m_memoryThreshold;
   double m_pointCloudRadius;
   uint32_t m_pointCloudSizeMinimum;

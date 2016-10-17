@@ -99,6 +99,7 @@ action-setopticalrotation.stimulusRateThreshold = 0.02
 action-setopticalrotation.stimulusThreshold = 0.02
 
 # knowledge-gcdc16-rule-intersection-left
+knowledge-gcdc16-rule-intersection-right.desiredGroundSpeed = 8.3
 
 # knowledge-gcdc16-v2viclcm
 knowledge-gcdc16-v2viclcm.printOutbound = 1

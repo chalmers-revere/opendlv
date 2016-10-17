@@ -48,38 +48,8 @@ class IntersectionRight : public odcore::base::module::TimeTriggeredConferenceCl
  private:
   void setUp();
   void tearDown();
-  //double getDistances(double);
-  //bool euclideanDistance(double);
-
-  void receivedContainerMergeScenario(odcore::data::Container &a_container);
-  void receivedContainerIntersectionScenario(odcore::data::Container &a_container);
-  void bodyMergeScenario();
-  void bodyIntersectionScenario();
-
- private:
-
-  std::unique_ptr<opendlv::perception::Object> m_object;
-  opendlv::perception::Object m_closestObject;
-  opendlv::perception::Object m_secondClosestObject;
-  opendlv::perception::Object m_mostInterestingObject;
-  float m_desiredAzimuth;
-  float m_cruiseSpeed;
-  float m_desiredAngularSize;
-  float m_speed;
-  bool m_isAutonomous;
-  std::string m_platoonId;
-  std::string m_currentLane;
-  std::string m_isTail;
-  bool m_hasMerged;
-  bool m_isInitialized;
-  bool m_scenarioIsReady;
-  bool m_isLeader;
-  std::string m_scenarioType;
-  bool m_hasSetupBeenRun;
-  bool m_isCreatingGap;
-  //double standstillDistance;
-  //double headway;
-  //double minimumEuclideanDistance;
+  
+  float m_desiredGroundSpeed;
 };
 
 } // intersectionright

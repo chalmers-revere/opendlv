@@ -53,7 +53,6 @@ OpenCvDevice::OpenCvDevice(std::string const &a_name,
   std::string videoStreamAddress = std::string("http://") + a_username 
       + ":" + a_password + "@" + a_port + "/axis-cgi/mjpg/video.cgi?user=" 
       + a_username + "&password=" + a_password + "&channel=0&.mjpg";
-
   std::cout << videoStreamAddress << std::endl;
   m_capture.reset(new cv::VideoCapture(videoStreamAddress));
 

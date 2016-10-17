@@ -190,6 +190,7 @@ message opendlv.perception.Object [id = 181] {
 message opendlv.perception.Environment [id = 189] {
   odcore::data::TimeStamp validUntil [id = 1];
   list<opendlv.perception.Object> objects [id = 2];
+  list<opendlv.perception.Surface> surfaces[id = 3];
 }
 
 message opendlv.perception.Surface [id = 184] {

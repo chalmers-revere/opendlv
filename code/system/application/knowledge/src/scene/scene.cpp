@@ -42,6 +42,7 @@ Scene::Scene(int32_t const &a_argc, char **a_argv)
     , m_mergeDistance()
     , m_validUntilDuration()
     , m_memoryCapacity()
+    , m_debug()
 {
 }
 
@@ -49,6 +50,19 @@ Scene::~Scene()
 {
 }
 
+void Scene::setUp()
+{
+  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+  m_mergeDistance = kv.getValue<float>("knowledge-scene.mergeDistance");
+  m_validUntilDuration = kv.getValue<int32_t>("knowledge-scene.validUntilDuration");
+  m_memoryCapacity = kv.getValue<float>("knowledge-scene.memoryCapacity");
+  m_debug = (kv.getValue<int32_t>("knowledge-scene.debug") == 1);
+  m_initialised = true;
+}
+
+void Scene::tearDown()
+{
+}
 /**
  * Receives objects from low level sensors.
  * Sends environment to high level applications.
@@ -107,11 +121,8 @@ void Scene::nextContainer(odcore::data::Container &a_container)
         m_objectCounter++;
         m_savedObjects.push_back(unpackedObject);
       }
-	 }
-  }
-
-  
-  else if(a_container.getDataType() == opendlv::perception::Surface::ID()) {
+   }
+  } else if(a_container.getDataType() == opendlv::perception::Surface::ID()) {
     opendlv::perception::Surface unpackedSurface =
         a_container.getData<opendlv::perception::Surface>();
     std::vector<opendlv::model::Cartesian3> corners = unpackedSurface.getListOfEdges();
@@ -122,13 +133,14 @@ void Scene::nextContainer(odcore::data::Container &a_container)
     for(uint32_t i = 0; i < m_savedSurfaces.size() && !exists; i++) {
       if(IsInRectangle(cross, m_savedSurfaces[i].getListOfEdges())) {
         MergeSurfaces(unpackedSurface,i);
-
         exists = true;
+        // std::cout << i << std::endl;
       }
 
     }
     if(!exists) {
       //Create new
+      // std::cout << "Created new surface." << std::endl;
       unpackedSurface.setSurfaceId(m_surfaceCounter);
       m_surfaceCounter++;
       m_savedSurfaces.push_back(unpackedSurface);
@@ -137,36 +149,16 @@ void Scene::nextContainer(odcore::data::Container &a_container)
   }
 }
 
-void Scene::MergeSurfaces(opendlv::perception::Surface a_newSurface, uint32_t a_index)
-{
-  m_savedSurfaces[a_index].setIdentified(a_newSurface.getIdentified());
-
-  float scale = a_newSurface.getEdgesConfidence()/(a_newSurface.getEdgesConfidence()+m_savedSurfaces[a_index].getEdgesConfidence());
-  std::vector<opendlv::model::Cartesian3> mergedPoints = MergePoints(a_newSurface.getListOfEdges(), m_savedSurfaces[a_index].getListOfEdges(), scale);
-  m_savedSurfaces[a_index].setEdgesConfidence((m_savedSurfaces[a_index].getEdgesConfidence() + a_newSurface.getEdgesConfidence())/2.0f);
-  
-  if(!m_savedSurfaces[a_index].getTraversable() || !a_newSurface.getTraversable()) {
-    m_savedSurfaces[a_index].setTraversable(false);
-  }
-
-  if(a_newSurface.getConfidence() > m_savedSurfaces[a_index].getConfidence()) {
-    m_savedSurfaces[a_index].setConfidence(a_newSurface.getConfidence());
-  }
-  for (uint32_t i = 0; i < a_newSurface.getListOfProperties().size(); i++) {
-    auto propertySearch = std::find(std::begin(m_savedSurfaces[a_index].getListOfProperties()), std::end(m_savedSurfaces[a_index].getListOfProperties()), a_newSurface.getListOfProperties()[i]);
-    if (propertySearch == std::end(m_savedSurfaces[a_index].getListOfProperties())) {
-      m_savedSurfaces[a_index].getListOfProperties().push_back(a_newSurface.getListOfProperties()[i]);
-    }
-  }
-}
 
 std::vector<opendlv::model::Cartesian3> Scene::MergePoints(std::vector<opendlv::model::Cartesian3> points1, std::vector<opendlv::model::Cartesian3> points2, float scale)
 {
   std::vector<opendlv::model::Cartesian3> newPoints;
   for(uint32_t i = 0; i < 4; i++) {
     opendlv::model::Cartesian3 point;
-    point.setX(points1[i].getX() * scale + points2[i].getX() * (scale - 1) );
-    point.setY(points1[i].getY() * scale + points2[i].getY() * (scale - 1) );
+    point.setX(points1[i].getX() * scale + points2[i].getX() * (1-scale) );
+    point.setY(points1[i].getY() * scale + points2[i].getY() * (1-scale) );
+    point.setZ(points1[i].getZ() * scale + points2[i].getZ() * (1-scale) );
+    // std::cout << point.toString() << std::endl;
     newPoints.push_back(point);
   }
   return newPoints;
@@ -175,16 +167,24 @@ std::vector<opendlv::model::Cartesian3> Scene::MergePoints(std::vector<opendlv::
 opendlv::model::Cartesian3 Scene::CrossingPoint(std::vector<opendlv::model::Cartesian3> linePoints)
 {
   if(linePoints.size() == 4) {
-    float k1 = (linePoints[0].getY() - linePoints[2].getY())/(linePoints[0].getX() - linePoints[2].getX());
-    float k2 = (linePoints[1].getY() - linePoints[3].getY())/(linePoints[1].getX() - linePoints[3].getX());
-    float m1 = linePoints[0].getY() - k1 * linePoints[0].getX();
-    float m2 = linePoints[1].getY() - k2 * linePoints[1].getX();
-
-    if(std::abs(k1-k2) < 0.01f) {
-      float x = (m2-m1)/(k1-k2);
-      float y = k1 * x + m1;
-      return opendlv::model::Cartesian3(x,y,0.0f);
+    float sum[] = {0,0,0};
+    for(uint8_t i = 0; i < 4; i++) {
+      sum[0] +=linePoints[i].getX();
+      sum[1] +=linePoints[i].getY();
+      sum[2] +=linePoints[i].getZ();
     }
+
+    // float k1 = (linePoints[0].getY() - linePoints[2].getY())/(linePoints[0].getX() - linePoints[2].getX());
+    // float k2 = (linePoints[1].getY() - linePoints[3].getY())/(linePoints[1].getX() - linePoints[3].getX());
+    // float m1 = linePoints[0].getY() - k1 * linePoints[0].getX();
+    // float m2 = linePoints[1].getY() - k2 * linePoints[1].getX();
+
+    // if(std::abs(k1-k2) < 0.01f) {
+      // float x = (m2-m1)/(k1-k2);
+      // float y = k1 * x + m1;
+      // return opendlv::model::Cartesian3(x,y,0.0f);
+    // }
+    return opendlv::model::Cartesian3(sum[0]/4,sum[1]/4,sum[2]/4);
   }
   return opendlv::model::Cartesian3(-1.0f,-1.0f,-1.0f);
 }
@@ -193,56 +193,74 @@ bool Scene::IsInRectangle(opendlv::model::Cartesian3 point, std::vector<opendlv:
 {
   float x = point.getX();
   float y = point.getY();
-  float xMin = x;
-  float xMax = x;
-  float yMin = y;
-  float yMax = y;
 
-  for(uint32_t i = 0; i < 4; i++) {
-    float xTemp = corners[i].getX();
-    float yTemp = corners[i].getY();
-    if(xTemp < xMin) {
-      xMin = xTemp;
-    }
-    if(xTemp > xMax) {
-      xMax = xTemp;
-    }
-    if(yTemp < yMin) {
-      yMin = yTemp;
-    }
-    if(yTemp > yMax) {
-      yMax = yTemp;
-    }
-  }
-  if(fabs(x - xMax) < 0.001f || fabs(x - xMin) < 0.001f || fabs(y - yMin) < 0.001f || fabs(y - yMax) < 0.001f) {
+  float xMin = corners[1].getX();
+  float xMax = corners[0].getX();
+  float yMin = corners[2].getY();
+  float yMax = corners[1].getY();
+  // std::cout << "x: " << x << " y: " << y << std::endl;
+  // std::cout << "xMin: " << xMin << " xMax: " << xMax << " yMin: " << yMin << " yMax: " << yMax << std::endl;  
+  if(x > xMin && x < xMax && y > yMin && y < yMax) {
+    return true;
+  } else {
     return false;
   }
-  return true;
+  // for(uint32_t i = 0; i < 4; i++) {
+  //   float xTemp = corners[i].getX();
+  //   float yTemp = corners[i].getY();
+  //   if(xTemp < xMin) {
+  //     xMin = xTemp;
+  //   }
+  //   if(xTemp > xMax) {
+  //     xMax = xTemp;
+  //   }
+  //   if(yTemp < yMin) {
+  //     yMin = yTemp;
+  //   }
+  //   if(yTemp > yMax) {
+  //     yMax = yTemp;
+  //   }
+  // }
+  // if(fabs(x - xMax) < 0.001f || fabs(x - xMin) < 0.001f || fabs(y - yMin) < 0.001f || fabs(y - yMax) < 0.001f) {
+  //   return false;
+  // }
+  // return true;
 }
 
 void Scene::SendStuff()
 {
   odcore::data::TimeStamp now;
   odcore::data::TimeStamp validUntil = now + odcore::data::TimeStamp(m_validUntilDuration, 0);
-  opendlv::perception::Environment environment(validUntil, m_savedObjects);
+  opendlv::perception::Environment environment(validUntil, m_savedObjects, m_savedSurfaces);
 
   odcore::data::Container objectContainerEnvironment(environment);
   getConference().send(objectContainerEnvironment);
 
-  // std::cout << "=====================================" << std::endl;
-  // std::cout << "Objects sent: " << std::endl;
 
-  // for(uint32_t i = 0; i < m_savedObjects.size(); i++) {
-  //   std::cout << "ID: "<< m_savedObjects[i].getObjectId() << std::endl;
-  //   std::cout << "Angle: "<< m_savedObjects[i].getDirection().getAzimuth() << std::endl;
-  //   std::cout << "Distance: "<< m_savedObjects[i].getDistance() << std::endl;
-  // }
-  // std::cout << "=====================================" << std::endl;
-  
-  // for(uint32_t i = 0; i < m_savedSurfaces.size(); i++) {
-  //  odcore::data::Container surfaceContainer(m_savedSurfaces[i]);
-  //  getConference().send(surfaceContainer);
-  // }
+  if(m_debug){
+    std::cout << "=====================================" << std::endl;
+    std::cout << "Objects sent: " << std::endl;
+
+    for(uint32_t i = 0; i < m_savedObjects.size(); i++) {
+      std::cout << "ID: "<< m_savedObjects[i].getObjectId() << std::endl;
+      std::cout << "Angle: "<< m_savedObjects[i].getDirection().getAzimuth() << std::endl;
+      std::cout << "Distance: "<< m_savedObjects[i].getDistance() << std::endl;
+    }
+    std::cout << "Surfaces sent: " << std::endl;
+
+    for(uint32_t i = 0; i < m_savedSurfaces.size(); i++) {
+      std::cout << "ID: "<< m_savedSurfaces[i].getSurfaceId() << std::endl;
+      opendlv::model::Cartesian3 cross = CrossingPoint(m_savedSurfaces[i].getListOfEdges());
+      std::cout << "CrossingPoint: "<< cross.toString() << std::endl;
+      std::cout << "Sources: ";
+      std::vector<std::string> listSources =  m_savedSurfaces[i].getListOfSources();
+      for(uint8_t j = 0; j < listSources.size(); j++) {
+        std::cout << listSources[j] << ", ";
+      }
+      std::cout << std::endl;
+    }
+    std::cout << "=====================================" << std::endl;
+  }
 }
 
 double Scene::PointDistance(float a_angle1, double a_dist1, float a_angle2, double a_dist2)
@@ -307,6 +325,31 @@ void Scene::MergeObjects(opendlv::perception::Object a_object, uint32_t a_index)
     }
   }
 }
+void Scene::MergeSurfaces(opendlv::perception::Surface a_newSurface, uint32_t a_index)
+{
+  // std::cout << "merging!!!" << a_index << std::endl;
+  m_savedSurfaces[a_index].setIdentified(a_newSurface.getIdentified());
+
+  // float scale = a_newSurface.getEdgesConfidence()/(a_newSurface.getEdgesConfidence()+m_savedSurfaces[a_index].getEdgesConfidence());
+  const float scale = 0.1;
+  std::vector<opendlv::model::Cartesian3> mergedPoints = MergePoints(a_newSurface.getListOfEdges(), m_savedSurfaces[a_index].getListOfEdges(), scale);
+  m_savedSurfaces[a_index].setListOfEdges(mergedPoints);
+  m_savedSurfaces[a_index].setEdgesConfidence((m_savedSurfaces[a_index].getEdgesConfidence() + a_newSurface.getEdgesConfidence())/2.0f);
+  
+  if(!m_savedSurfaces[a_index].getTraversable() || !a_newSurface.getTraversable()) {
+    m_savedSurfaces[a_index].setTraversable(false);
+  }
+
+  if(a_newSurface.getConfidence() > m_savedSurfaces[a_index].getConfidence()) {
+    m_savedSurfaces[a_index].setConfidence(a_newSurface.getConfidence());
+  }
+  for (uint32_t i = 0; i < a_newSurface.getListOfProperties().size(); i++) {
+    auto propertySearch = std::find(std::begin(m_savedSurfaces[a_index].getListOfProperties()), std::end(m_savedSurfaces[a_index].getListOfProperties()), a_newSurface.getListOfProperties()[i]);
+    if (propertySearch == std::end(m_savedSurfaces[a_index].getListOfProperties())) {
+      m_savedSurfaces[a_index].getListOfProperties().push_back(a_newSurface.getListOfProperties()[i]);
+    }
+  }
+}
 
 void Scene::TimeCheck()
 {
@@ -332,18 +375,6 @@ void Scene::TimeCheck()
   }
 }
 
-void Scene::setUp()
-{
-  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
-  m_mergeDistance = kv.getValue<float>("knowledge-scene.mergeDistance");
-  m_validUntilDuration = kv.getValue<int32_t>("knowledge-scene.validUntilDuration");
-  m_memoryCapacity = kv.getValue<float>("knowledge-scene.memoryCapacity");
-  m_initialised = true;
-}
-
-void Scene::tearDown()
-{
-}
 
 } // scene
 } // knowledge
