@@ -99,6 +99,9 @@ action-setopticalrotation.stimulusRateThreshold = 0.02
 action-setopticalrotation.stimulusThreshold = 0.02
 
 # knowledge-gcdc16-rule-intersection-right
+knowledge-gcdc16-rule-intersection-right.desiredGroundSpeed = 8.3
+knowledge-gcdc16-rule-intersection-right.enableLaneFollowing = true
+knowledge-gcdc16-rule-intersection-right.forceScenarioStart = true
 
 # knowledge-gcdc16-v2viclcm
 knowledge-gcdc16-v2viclcm.printOutbound = 1
