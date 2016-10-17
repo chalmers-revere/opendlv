@@ -20,59 +20,26 @@
 version: '2'
 
 services:
-    odsupercomponent:
+    # microservice for knowledge-scene
+    knowledge-scene:
         build: .
         network_mode: "host"
-        volumes:
-        - .:/opt/opendlv.data
-        command: "/opt/od4/bin/odsupercomponent --cid=${CID} --verbose=1 --configuration=/opt/opendlv.data/configuration"
+        working_dir: "/opt/opendlv/bin"
+        restart: always
+        command: "/opt/opendlv/bin/opendlv-system-application-knowledge-scene --cid=${CID} --freq=10"
 
-
-#    # micro service for proxy-fh16.
-#    proxy-fh16:
-#        build: .
-#        network_mode: "host"
-#        devices:
-#        - "/dev/pcanpci2:/dev/pcan2"
-#        depends_on:
-#            - odsupercomponent
-#        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-fh16 --cid=${CID} --freq=100"
-
-
-#    # microservice for proxy-sick
-#    proxy-lidar:
-#        build: .
-#        network_mode: "host"
-#        user: root  # This parameter will be replaced as soon as group_add parameter is available in docker-compose, cf. https://github.com/docker/compose/pull/3709.
-#        devices:
-#            - "/dev/ttyS1:/dev/ttyS1"
-#        depends_on:
-#            - odsupercomponent
-#        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-sick --cid=${CID} --freq=2"
-
+    # microservice for perception-detectlane
+    perception-detectlane:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv/bin"
+        restart: always
+        command: "/opt/opendlv/bin/opendlv-system-application-perception-detectlane --cid=${CID}"
 
     # microservice for proxy-camera-axis
     proxy-camera-axis:
         build: .
-        environment:
-            - DISPLAY=$DISPLAY
         network_mode: "host"
         working_dir: "/opt/opendlv.core/bin"
         restart: always
-        volumes:
-            - ~/Videos:/opt/Videos
-        depends_on:
-            - odsupercomponent
-        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-camera-axis --cid=${CID} --freq=20"
-
-    perception-detectlane:
-        build: .
-        environment:
-            - DISPLAY=$DISPLAY
-        network_mode: "host"
-        working_dir: "/opt/opendlv/bin"
-        restart: always
-        depends_on:
-            - odsupercomponent
-        command: "/opt/opendlv/bin/opendlv-system-application-perception-detectlane --cid=${CID} --freq=20"
-
+        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-camera-axis --cid=${CID} --freq=10"
