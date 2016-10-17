@@ -202,9 +202,9 @@ void IntersectionLeft::ControlDirectionOfMovement(float a_azimuth)
 void IntersectionLeft::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
-  m_desiredGroundSpeed = static_cast<float>(kv.getValue<double>("knowledge-gcdc16-rule-intersection-left.desiredGroundSpeed"));
-  m_enableLaneFollowing = kv.getValue<bool>("knowledge-gcdc16-rule-intersection-left.enableLaneFollowing");
-  bool forceScenarioStart = kv.getValue<bool>("knowledge-gcdc16-rule-intersection-left.forceScenarioStart");
+  m_desiredGroundSpeed = static_cast<float>(kv.getValue<double>("knowledge-gcdc16-rule-intersectionleft.desiredGroundSpeed"));
+  m_enableLaneFollowing = kv.getValue<bool>("knowledge-gcdc16-rule-intersectionleft.enableLaneFollowing");
+  bool forceScenarioStart = kv.getValue<bool>("knowledge-gcdc16-rule-intersectionleft.forceScenarioStart");
 
   if (forceScenarioStart) {
     m_runScenario = true;
