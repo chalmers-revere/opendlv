@@ -103,9 +103,14 @@ knowledge-gcdc16-rule-intersection-left.desiredGroundSpeed = 8.3
 knowledge-gcdc16-rule-intersection-left.enableLaneFollowing = true
 knowledge-gcdc16-rule-intersection-left.forceScenarioStart = true
 
+# knowledge-linguistics-v2vcam
+knowledge-linguistics-v2vcam.printOutbound = 0
+knowledge-linguistics-v2vcam.printInbound = 0
+knowledge-linguistics-v2vcam.record = 0
+
 # knowledge-gcdc16-v2viclcm
-knowledge-gcdc16-v2viclcm.printOutbound = 1
-knowledge-gcdc16-v2viclcm.printInbound = 1
+knowledge-gcdc16-v2viclcm.printOutbound = 0
+knowledge-gcdc16-v2viclcm.printInbound = 0
 knowledge-gcdc16-v2viclcm.record = 0
 
 # knowledge-identity
@@ -116,10 +121,6 @@ knowledge-identity.vehicleWidth = 2.55
 knowledge-identity.vehicleRole = 0
 knowledge-identity.rearAxleLocation = 5.0
 
-# knowledge-linguistics-v2vcam
-knowledge-linguistics-v2vcam.printOutbound = 1
-knowledge-linguistics-v2vcam.printInbound = 1
-knowledge-linguistics-v2vcam.record = 0
 
 # knowledge-scene
 knowledge-scene.mergeDistance = 4.0
@@ -128,6 +129,19 @@ knowledge-scene.memoryCapacity = 1.0 # seconds
 knowledge-scene.debug = 0
 
 # perception-detectlane
+perception-detectlane.intensityThreshold = 200
+perception-detectlane.cannyThreshold = 60
+perception-detectlane.houghThreshold = 155
+perception-detectlane.memThreshold = 1.0 #seconds
+perception-detectlane.upperLaneLimit = 270
+perception-detectlane.lowerLaneLimit = 620
+perception-detectlane.screenWidth = 1280
+perception-detectlane.screenHeight = 720
+perception-detectlane.roiX = 310
+perception-detectlane.roiY = 195
+perception-detectlane.roiWidth = 805
+perception-detectlane.roiHeight = 525
+perception-detectlane.debug = 0
 
 # sensation-audition
 
@@ -139,6 +153,7 @@ sensation-echolocation.pointCloudRadius = 2 # meters
 # proxy-trimble
 proxy-trimble.ip = 10.42.42.112
 proxy-trimble.port = 9999
+proxy-trimble.debug = 0
 
 # proxy-camera-axis
 proxy-camera-axis.type = opencv-ip-axis
@@ -172,9 +187,10 @@ proxy-sick.mount.z = 1.0
 proxy-sick.mount.roll = 0.0
 proxy-sick.mount.pitch = 0.0
 proxy-sick.mount.yaw = 0.0
-proxy-sick.record = 1  # Set to 1 to dump Lidar data in .rec format.
+proxy-sick.record = 0  # Set to 1 to dump Lidar data in .rec format.
 
 # proxy-v2v
 proxy-v2v.comboxIp = 10.42.42.61
 proxy-v2v.comboxPort = 5003
 proxy-v2v.listenPort = 5000
+proxy-v2v.debug = 0
