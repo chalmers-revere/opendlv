@@ -58,7 +58,7 @@ class V2vIclcm
 
 
   uint64_t GenerateGenerationTime() const;
-
+  bool m_initialised;
   std::ofstream m_sendLog;
   std::ofstream m_receiveLog;
   std::time_t m_timeType2004;
@@ -67,6 +67,9 @@ class V2vIclcm
   bool m_mioBeenLeader;
   bool m_hasMerged;
   uint32_t m_counterMerge = 0;
+  bool m_printOutbound;
+  bool m_printInbound;
+  bool m_record;
 
   unsigned char m_messageId = 10;
   unsigned char m_containerMask = 0;
