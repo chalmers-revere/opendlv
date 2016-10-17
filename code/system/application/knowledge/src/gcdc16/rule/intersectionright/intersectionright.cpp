@@ -46,6 +46,8 @@ namespace intersectionright {
 IntersectionRight::IntersectionRight(int32_t const &a_argc, char **a_argv)
 : TimeTriggeredConferenceClientModule(
   a_argc, a_argv, "knowledge-gcdc16-intersectionright"),
+  m_enableLaneFollowing(),
+  m_runScenario(false),
   m_desiredGroundSpeed()
 {
 }
@@ -86,7 +88,14 @@ void IntersectionRight::nextContainer(odcore::data::Container &a_container)
 
 void IntersectionRight::setUp()
 {
-    m_desiredGroundSpeed = static_cast<float>(kv.getValue<double>("knowledge-gcdc16-rule-intersection-right.desiredAngularSize"));
+  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+  m_desiredGroundSpeed = static_cast<float>(kv.getValue<double>("knowledge-gcdc16-rule-intersection-right.desiredAngularSize"));
+  m_enableLaneFollowing = kv.getValue<bool>("knowledge-gcdc16-rule-intersection-right.enableLaneFollowing");
+  bool forceScenarioStart = kv.getValue<bool>("knowledge-gcdc16-rule-intersection-right.forceScenarioStart");
+  
+  if (forceScenarioStart) {
+    m_runScenario = true;
+  }
 }
 
 void IntersectionRight::tearDown()

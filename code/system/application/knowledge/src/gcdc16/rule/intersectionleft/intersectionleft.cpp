@@ -46,9 +46,9 @@ namespace intersectionleft {
 IntersectionLeft::IntersectionLeft(int32_t const &a_argc, char **a_argv)
 : TimeTriggeredConferenceClientModule(
   a_argc, a_argv, "knowledge-gcdc16-intersectionleft"),
-  m_desiredGroundSpeed(),
-  m_speed(),
-  m_runScenario(false)
+  m_enableLaneFollowing(),
+  m_runScenario(false),
+  m_desiredGroundSpeed()
 {
 }
 
@@ -59,13 +59,11 @@ IntersectionLeft::~IntersectionLeft()
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode IntersectionLeft::body()
 {
-
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
       odcore::data::dmcp::ModuleStateMessage::RUNNING) {
 
   } 
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
-   
 }
 
 void IntersectionLeft::ActOnEnvironment(opendlv::perception::Environment &a_environment)
@@ -83,12 +81,13 @@ void IntersectionLeft::ActOnEnvironment(opendlv::perception::Environment &a_envi
   
   auto listOfSurfaces = a_environment.getListOfSurfaces();
   if (listOfSurfaces.size() > 0) {
-    FindLane(listOfSurfaces);
+    ActOnLane(listOfSurfaces);
   }
 }
 
 void IntersectionLeft::ActOnMio(std::vector<opendlv::perception::Object> &a_listOfObjects)
 {
+  (void) a_listOfObjects;
   /*
   opendlv::perception::Object mio;
   std::vector<float> scoreList;
@@ -133,12 +132,11 @@ void IntersectionLeft::ActOnMio(std::vector<opendlv::perception::Object> &a_list
 
 void IntersectionLeft::ActOnLane(std::vector<opendlv::perception::Surface> &a_listOfSurfaces)
 {
+  (void) a_listOfSurfaces;
 }
 
 void IntersectionLeft::nextContainer(odcore::data::Container &a_container)
 {
-  odcore::data::TimeStamp now;
-
   if (a_container.getDataType() == (opendlv::knowledge::Insight::ID())) {
     opendlv::knowledge::Insight insight = a_container.getData<opendlv::knowledge::Insight>();
     if (insight.getInsight() == "scenarioReady") {
@@ -157,6 +155,7 @@ void IntersectionLeft::nextContainer(odcore::data::Container &a_container)
 
 void IntersectionLeft::ControlGroundSpeed(float a_speed)
 {
+  odcore::data::TimeStamp now;
   if (m_runScenario) {
     opendlv::perception::StimulusGroundSpeed sgs(now, m_desiredGroundSpeed, a_speed);
     odcore::data::Container container(sgs);
@@ -164,9 +163,27 @@ void IntersectionLeft::ControlGroundSpeed(float a_speed)
   }
 }
 
+void IntersectionLeft::ControlDirectionOfMovement()
+{
+ /* odcore::data::TimeStamp now;
+  if (m_runScenario) {
+    opendlv::perception::StimulusDirectionOfMovement sdom(now, m_mio.getDirection(),opendlv::model::Direction(0,0));
+    odcore::data::Container containerSdom(sdom);
+    getConference().send(containerSdom);
+  }
+  */
+}
+
 void IntersectionLeft::setUp()
 {
-    m_desiredGroundSpeed = static_cast<float>(kv.getValue<double>("knowledge-gcdc16-rule-intersection-left.desiredAngularSize"));
+  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+  m_desiredGroundSpeed = static_cast<float>(kv.getValue<double>("knowledge-gcdc16-rule-intersection-left.desiredAngularSize"));
+  m_enableLaneFollowing = kv.getValue<bool>("knowledge-gcdc16-rule-intersection-left.enableLaneFollowing");
+  bool forceScenarioStart = kv.getValue<bool>("knowledge-gcdc16-rule-intersection-left.forceScenarioStart");
+
+  if (forceScenarioStart) {
+    m_runScenario = true;
+  }
 }
 
 void IntersectionLeft::tearDown()

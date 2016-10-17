@@ -49,14 +49,14 @@ class IntersectionLeft : public odcore::base::module::TimeTriggeredConferenceCli
   void ActOnEnvironment(opendlv::perception::Environment &);
   void ActOnMio(std::vector<opendlv::perception::Object> &);
   void ActOnLane(std::vector<opendlv::perception::Surface> &);
+  void ControlDirectionOfMovement();
   void ControlGroundSpeed(float);
   void setUp();
   void tearDown();
 
-  float m_desiredGroundSpeed;
-  float m_speed;
+  bool m_enableLaneFollowing;
   bool m_runScenario;
-
+  float m_desiredGroundSpeed;
 };
 
 } // intersectionleft

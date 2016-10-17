@@ -49,6 +49,8 @@ class IntersectionRight : public odcore::base::module::TimeTriggeredConferenceCl
   void setUp();
   void tearDown();
   
+  bool m_enableLaneFollowing;
+  bool m_runScenario;
   float m_desiredGroundSpeed;
 };
 
