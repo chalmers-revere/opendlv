@@ -72,10 +72,16 @@ odsupercomponent.pulsetimeack.exclude = odcockpit
 
 # knowledge-gcdc16-rule-intersection-right
 
+# knowledge-linguistics-v2vcam
+knowledge-linguistics-v2vcam.printOutbound = 0
+knowledge-linguistics-v2vcam.printInbound = 0
+knowledge-linguistics-v2vcam.record = 0
+
 # knowledge-gcdc16-v2viclcm
-knowledge-gcdc16-v2viclcm.printOutbound = 1
-knowledge-gcdc16-v2viclcm.printInbound = 1
+knowledge-gcdc16-v2viclcm.printOutbound = 0
+knowledge-gcdc16-v2viclcm.printInbound = 0
 knowledge-gcdc16-v2viclcm.record = 0
+knowledge-gcdc16-v2viclcm.startPlatoon = 0
 
 # knowledge-identity
 knowledge-identity.stationId = 110
@@ -85,16 +91,11 @@ knowledge-identity.vehicleWidth = 2.55
 knowledge-identity.vehicleRole = 0
 knowledge-identity.rearAxleLocation = 5.0
 
-# knowledge-linguistics-v2vcam
-knowledge-linguistics-v2vcam.printOutbound = 0
-knowledge-linguistics-v2vcam.printInbound = 1
-knowledge-linguistics-v2vcam.record = 0
-
 # knowledge-scene
 knowledge-scene.mergeDistance = 4.0
 knowledge-scene.validUntilDuration = 1
 knowledge-scene.memoryCapacity = 1.0 # seconds
-knowledge-scene.debug = 1
+knowledge-scene.debug = 0
 
 # perception-detectlane
 perception-detectlane.intensityThreshold = 200
@@ -154,7 +155,7 @@ proxy-sick.mount.z = 1.0
 proxy-sick.mount.roll = 0.0
 proxy-sick.mount.pitch = 0.0
 proxy-sick.mount.yaw = 0.0
-proxy-sick.record = 1  # Set to 1 to dump Lidar data in .rec format.
+proxy-sick.record = 0  # Set to 1 to dump Lidar data in .rec format.
 
 # proxy-v2v
 proxy-v2v.comboxIp = 10.42.42.61

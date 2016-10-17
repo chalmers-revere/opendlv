@@ -75,9 +75,11 @@ void V2vIclcm::setUp()
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
 
-  m_printOutbound =(kv.getValue<int32_t>("knowledge-linguistics-v2viclcm.printOutbound") == 1);
-  m_printInbound =(kv.getValue<int32_t>("knowledge-linguistics-v2viclcm.printInbound") == 1);
-  m_record = (kv.getValue<int32_t>("knowledge-linguistics-v2viclcm.record") == 1);
+  m_printOutbound =(kv.getValue<int32_t>("knowledge-gcdc16-v2viclcm.printOutbound") == 1);
+  m_printInbound =(kv.getValue<int32_t>("knowledge-gcdc16-v2viclcm.printInbound") == 1);
+  m_record = (kv.getValue<int32_t>("knowledge-gcdc16-v2viclcm.record") == 1);
+  m_participantsReady = (kv.getValue<int32_t>("knowledge-gcdc16-v2viclcm.participantsReady") == 1);
+  
 
   if (m_record) {
 
@@ -451,77 +453,81 @@ void V2vIclcm::ReadVoice(opendlv::sensation::Voice &a_message){
   // if((stationId < 100)){
   //   std::cout << output << std::endl;
   // }
-  if(stationId < 100){
-    SendInsight("cruiseSpeed="+std::to_string(cruiseSpeed/100.0));
-    if (participantsReady == 1){
-      std::cout<< "Got participantsReady flag from "<< stationId << std::endl;
-    }
+  // if(stationId < 100){
+  //   SendInsight("cruiseSpeed="+std::to_string(cruiseSpeed/100.0));
+  //   if (participantsReady == 1){
+  //     std::cout<< "Got participantsReady flag from "<< stationId << std::endl;
+  //   }
   
 
-    if (mergeRequest == 1) {
-      SendInsight("mergeRequest");
-      std::cout<< "Got mergeRequest flag from "<< stationId << std::endl;
-    }
+  //   if (mergeRequest == 1) {
+  //     SendInsight("mergeRequest");
+  //     std::cout<< "Got mergeRequest flag from "<< stationId << std::endl;
+  //   }
 
-    if (endOfScenario == 1) {
-      SendInsight("scenarioEnd");
-      std::cout << "Got end of scenario message from " << stationId << std::endl;
-    }
-  }
-  if(m_scenario == "mergeScenario" && m_hasMerged == false){
-    if ((stationId < 100) &&( (startPlatoon == 0 && m_platoonId == 1) || (startPlatoon == 1 && m_platoonId == 2))) {
+  //   if (endOfScenario == 1) {
+  //     SendInsight("scenarioEnd");
+  //     std::cout << "Got end of scenario message from " << stationId << std::endl;
+  //   }
+  // }
+  // if(m_scenario == "mergeScenario" && m_hasMerged == false){
+  //   if ((stationId < 100) &&( (startPlatoon == 0 && m_platoonId == 1) || (startPlatoon == 1 && m_platoonId == 2))) {
+  //     SendInsight("scenarioReady");
+  //     std::cout << "Got startPlatoon flag from " << stationId << std::endl;
+  //   }
+  //   if(lane == 1){
+  //     if(forwardId == 110){
+  //       std::cout << "Backward partner found: " << stationId << "." << std::endl;
+  //       m_backwardId = stationId;
+  //     }
+  //     if(m_forwardId == stationId && flagHead == 1){
+  //       std::cout << "Creating distance for station: " << stationId << std::endl;
+  //       SendInsight("createDistance");
+  //     }
+  //     if(stationId == m_forwardId && flag == 1){
+  //       std::cout << "Forward parther should be merging: " << stationId << "." << std::endl;
+  //     }
+  //   }
+  //   if(m_lane == 2){
+
+  //     if(stationId == m_mioId){
+  //       if(flagHead == 1){
+  //         std::cout << "Mio became leader." << std::endl;
+  //         m_mioBeenLeader = true;
+
+  //       }
+  //       if(m_mioBeenLeader && (flagHead == 0 || lane == 1 || platoonId == 2)){
+  //         std::cout << "Mio has merged." << std::endl;
+  //         m_flagHead = 1;
+  //       }
+  //     }
+  //     if (forwardId == 110 && m_flagHead == 1){
+  //       std::cout << "Backward partner found: " << stationId << "." << std::endl;
+  //       m_backwardId = stationId;
+  //       if(safeToMerge == 1){
+  //         std::cout << "Backward partner says safe to merge." << std::endl;
+  //         SendInsight("safeToMerge");
+  //       }
+  //     }
+  //   }
+  // }
+  // if(m_scenario == "intersectionScenario"){
+  if(stationId < 100) {
+    if(participantsReady == 1){
+      std::cout << "Got participantsReady flag from " << stationId << std::endl;
       SendInsight("scenarioReady");
+    }
+    if(platoonId == 1){
       std::cout << "Got startPlatoon flag from " << stationId << std::endl;
+      SendInsight("scenarioReady");
     }
-    if(lane == 1){
-      if(forwardId == 110){
-        std::cout << "Backward partner found: " << stationId << "." << std::endl;
-        m_backwardId = stationId;
-      }
-      if(m_forwardId == stationId && flagHead == 1){
-        std::cout << "Creating distance for station: " << stationId << std::endl;
-        SendInsight("createDistance");
-      }
-      if(stationId == m_forwardId && flag == 1){
-        std::cout << "Forward parther should be merging: " << stationId << "." << std::endl;
-      }
+    if(endOfScenario == 1){
+      std::cout << "Got end of scenario message from " << stationId << std::endl;
+      SendInsight("scenarioEnd");
+
     }
-    if(m_lane == 2){
-
-      if(stationId == m_mioId){
-        if(flagHead == 1){
-          std::cout << "Mio became leader." << std::endl;
-          m_mioBeenLeader = true;
-
-        }
-        if(m_mioBeenLeader && (flagHead == 0 || lane == 1 || platoonId == 2)){
-          std::cout << "Mio has merged." << std::endl;
-          m_flagHead = 1;
-        }
-      }
-      if (forwardId == 110 && m_flagHead == 1){
-        std::cout << "Backward partner found: " << stationId << "." << std::endl;
-        m_backwardId = stationId;
-        if(safeToMerge == 1){
-          std::cout << "Backward partner says safe to merge." << std::endl;
-          SendInsight("safeToMerge");
-        }
-      }
-    }
-  }
-  if(m_scenario == "intersectionScenario"){
-    if(stationId < 100) {
-      if(platoonId == 2){
-        std::cout << "Got startPlatoon flag from " << stationId << std::endl;
-        SendInsight("scenarioReady");
-      }
-      if(endOfScenario == 1){
-        std::cout << "Got end of scenario message from " << stationId << std::endl;
-        SendInsight("scenarioEnd");
-
-      }
-    } 
   } 
+  // } 
 
   if(m_record){
     m_receiveLog <<  std::setprecision(15) << std::to_string(GenerateGenerationTime())+
