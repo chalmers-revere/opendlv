@@ -96,6 +96,19 @@ knowledge-scene.validUntilDuration = 1
 knowledge-scene.memoryCapacity = 1.0 # seconds
 
 # perception-detectlane
+perception-detectlane.intensityThreshold = 200
+perception-detectlane.cannyThreshold = 60
+perception-detectlane.houghThreshold = 155
+perception-detectlane.memThreshold = 1.0 #seconds
+perception-detectlane.upperLaneLimit = 270
+perception-detectlane.lowerLaneLimit = 620
+perception-detectlane.screenWidth = 1280
+perception-detectlane.screenHeight = 720
+perception-detectlane.roiX = 310
+perception-detectlane.roiY = 195
+perception-detectlane.roiWidth = 805
+perception-detectlane.roiHeight = 525
+perception-detectlane.debug = 0
 
 # sensation-audition
 
@@ -107,6 +120,21 @@ sensation-echolocation.pointCloudRadius = 2 # meters
 # proxy-trimble
 
 # proxy-camera-axis
+proxy-camera-axis.type = opencv-ip-axis
+proxy-camera-axis.name = front-left
+proxy-camera-axis.address = 10.42.42.90
+proxy-camera-axis.username = root
+proxy-camera-axis.password = gcdc
+proxy-camera-axis.width = 1280
+proxy-camera-axis.height = 720
+proxy-camera-axis.bpp = 3
+proxy-camera-axis.mount.x = 3.1
+proxy-camera-axis.mount.y = 0.5
+proxy-camera-axis.mount.z = 1.0
+proxy-camera-axis.mount.roll = 0.0
+proxy-camera-axis.mount.pitch = -0.1
+proxy-camera-axis.mount.yaw = 0.2
+proxy-camera-axis.debug = 0
 
 # proxy-fh16
 proxy-fh16.devicenode = /dev/pcan2 # PEAK CAN device.

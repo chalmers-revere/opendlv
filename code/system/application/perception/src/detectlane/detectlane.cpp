@@ -584,11 +584,11 @@ void DetectLane::GetPointsOnLine(std::vector<cv::Vec2f> &a_xScreenP
     }
     Eigen::Vector3d point1, point2;
     
-    float x1 = (t1 * a_p[i][0] + a_m[i][0]); 
+    float x1 = (t1 * a_p[i][0] + a_m[i][0]) + m_roi[0]; 
     point1 << x1, m_upperLaneLimit, 1;
     TransformPointToGlobalFrame(point1);
 
-    float x2 =  (t2 * a_p[i][0] + a_m[i][0]); 
+    float x2 =  (t2 * a_p[i][0] + a_m[i][0] + m_roi[0]); 
     point2 << x2, m_lowerLaneLimit, 1;
     TransformPointToGlobalFrame(point2);
 

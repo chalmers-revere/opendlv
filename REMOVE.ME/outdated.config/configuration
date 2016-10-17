@@ -235,6 +235,7 @@ sensation-echolocation.memoryThreshold = 0 #discrete seconds
 sensation-echolocation.pointCloudRadius = 1.0 #meters
 sensation-echolocation.pointCloudSizeMinimum = 3 #number of points
 
+
 sensation-vision-opticalflow.termCritMaxCount = 20
 sensation-vision-opticalflow.termCritEpsilon = 0.03
 sensation-vision-opticalflow.lkSearchWindowWidth = 30
@@ -252,6 +253,7 @@ knowledge-identity.vehicleLength = 7.3
 knowledge-identity.vehicleWidth = 2.55 
 knowledge-identity.vehicleRole = 0
 knowledge-identity.rearAxleLocation = 5.0
+
 
 knowledge-scene.mergeDistance = 3.5
 knowledge-scene.validUntilDuration = 1
@@ -303,13 +305,13 @@ perception-detectvehicle:1.source = front-right
 
 ###############################################################################
 ###############################################################################
-### Diagnostics
+# Diagnostics
 diagnostics-health.script = ./checkHealth.sh
 diagnostics-health.sleep = 60 # Sleep between health checks in seconds
 
 ###############################################################################
 ###############################################################################
-### GCDC specific
+# GCDC specific
 
 # Not last in the left lane
 knowledge-gcdc16-rule:0.initial_lane = 2
