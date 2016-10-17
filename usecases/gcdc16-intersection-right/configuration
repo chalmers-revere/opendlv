@@ -27,7 +27,7 @@ global.buffer.memorySegmentSize = 2800000 # Size of a memory segment in bytes.
 global.buffer.numberOfMemorySegments = 4  # Number of memory segments.
 
 # The following key describes the list of modules expected to participate in this --cid session.
-global.session.expectedModules = action-act,action-communicate,action-removeloomingconflict,action-setgroundspeed,action-setopticalrotation,knowledge-gcdc16-rule-intersection-right,knowledge-gcdc16-v2viclcm,knowledge-identity,knowledge-linguistics-v2vcam,knowledge-scene,perception-detectlane,sensation-audition,sensation-echolocation,proxy-trimble,proxy-camera-axis,proxy-fh16,proxy-sick,proxy-v2v
+global.session.expectedModules = action-act,action-communicate,action-removeloomingconflict,action-setgroundspeed,action-setopticalrotation,knowledge-gcdc16-rule-intersectionright,knowledge-gcdc16-v2viclcm,knowledge-identity,knowledge-linguistics-v2vcam,knowledge-scene,perception-detectlane,sensation-audition,sensation-echolocation,proxy-trimble,proxy-camera-axis,proxy-fh16,proxy-sick,proxy-v2v
 
 
 ###############################################################################
@@ -98,10 +98,10 @@ action-setopticalrotation.stimulusJerkThreshold =  0.02
 action-setopticalrotation.stimulusRateThreshold = 0.02
 action-setopticalrotation.stimulusThreshold = 0.02
 
-# knowledge-gcdc16-rule-intersection-right
-knowledge-gcdc16-rule-intersection-right.desiredGroundSpeed = 8.3
-knowledge-gcdc16-rule-intersection-right.enableLaneFollowing = true
-knowledge-gcdc16-rule-intersection-right.forceScenarioStart = true
+# knowledge-gcdc16-rule-intersectionright
+knowledge-gcdc16-rule-intersectionright.desiredGroundSpeed = 8.3
+knowledge-gcdc16-rule-intersectionright.enableLaneFollowing = true
+knowledge-gcdc16-rule-intersectionright.forceScenarioStart = true
 
 # knowledge-gcdc16-v2viclcm
 knowledge-gcdc16-v2viclcm.printOutbound = 1
