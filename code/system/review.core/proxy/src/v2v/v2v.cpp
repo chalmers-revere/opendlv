@@ -122,10 +122,10 @@ void V2v::setUp()
     //      m_device = std::unique_ptr<Device>(new GeonetworkingDualDevice());
   }
 
-  if (m_device.get() == nullptr) {
-    std::cerr << "[proxy-v2v] No valid device driver defined."
-              << std::endl;
-  }
+  // if (m_device.get() == nullptr) {
+  //   std::cerr << "[proxy-v2v] No valid device driver defined."
+  //             << std::endl;
+  // }
 
 
   const std::string RECEIVER = "0.0.0.0";
