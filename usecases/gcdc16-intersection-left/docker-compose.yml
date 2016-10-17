@@ -133,9 +133,14 @@ services:
         network_mode: "host"
         working_dir: "/opt/opendlv/bin"
         restart: always
+        ipc: host
+        environment:
+            - DISPLAY=$DISPLAY
+        volumes:
+            - /tmp/.X11-unix:/tmp/.X11-unix
         depends_on:
             - odsupercomponent
-        command: "/opt/opendlv/bin/opendlv-system-application-perception-detectlane --cid=${CID}"
+        command: "/opt/opendlv/bin/opendlv-system-application-perception-detectlane --cid=${CID} --freq=20"
 
     # microservice for sensation-audition
     sensation-audition:
@@ -175,7 +180,8 @@ services:
         restart: always
         depends_on:
             - odsupercomponent
-        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-camera-axis --cid=${CID} --freq=10"
+        ipc: host
+        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-camera-axis --cid=${CID} --freq=20"
 
     # micro service for proxy-fh16
     proxy-fh16:
@@ -188,7 +194,7 @@ services:
             - odsupercomponent
         command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-fh16 --cid=${CID} --freq=100"
 
-    # microservice for proxy-sick
+    #microservice for proxy-sick
     proxy-sick:
         build: .
         network_mode: "host"
