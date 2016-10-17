@@ -100,8 +100,8 @@ action-setopticalrotation.stimulusThreshold = 0.02
 
 # knowledge-gcdc16-rule-intersectionleft
 knowledge-gcdc16-rule-intersectionleft.desiredGroundSpeed = 8.3
-knowledge-gcdc16-rule-intersectionleft.enableLaneFollowing = true
-knowledge-gcdc16-rule-intersectionleft.forceScenarioStart = true
+knowledge-gcdc16-rule-intersectionleft.enableLaneFollowing = 1
+knowledge-gcdc16-rule-intersectionleft.forceScenarioStart = 1
 
 # knowledge-linguistics-v2vcam
 knowledge-linguistics-v2vcam.printOutbound = 0
