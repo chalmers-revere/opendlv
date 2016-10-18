@@ -86,8 +86,8 @@ perception-detectlane.screenWidth = 1280
 perception-detectlane.screenHeight = 720
 perception-detectlane.roiX = 205
 perception-detectlane.roiY = 195
-perception-detectlane.roiWidth = 1975
-perception-detectlane.roiHeight = 525
+perception-detectlane.roiWidth = 1075
+perception-detectlane.roiHeight = 515
 perception-detectlane.debug = 0
 
 # proxy-camera-axis
