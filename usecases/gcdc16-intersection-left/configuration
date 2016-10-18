@@ -88,7 +88,7 @@ action-setgroundspeed.patienceDuration = 4.0
 action-setgroundspeed.stimulusJerkThreshold = 0.5
 action-setgroundspeed.stimulusRateThreshold = 0.5
 action-setgroundspeed.stimulusThreshold = 1.0
-action-setgroundspeed.equilibrium = 10.0  # kph
+action-setgroundspeed.equilibrium = 14.0  # kph
 
 # action-setopticalrotation
 action-setopticalrotation.correctionGain = 0.2
@@ -125,15 +125,15 @@ knowledge-identity.rearAxleLocation = 5.0
 # knowledge-scene
 knowledge-scene.mergeDistance = 4.0
 knowledge-scene.validUntilDuration = 1
-knowledge-scene.memoryCapacity = 1.0 # seconds
+knowledge-scene.memoryCapacity = 5.0 # seconds
 knowledge-scene.debug = 1
 
 # perception-detectlane
 perception-detectlane.intensityThreshold = 200
-perception-detectlane.cannyThreshold = 60
-perception-detectlane.houghThreshold = 150
+perception-detectlane.cannyThreshold = 55
+perception-detectlane.houghThreshold = 145
 perception-detectlane.memThreshold = 0.5 #seconds
-perception-detectlane.upperLaneLimit = 270
+perception-detectlane.upperLaneLimit = 250
 perception-detectlane.lowerLaneLimit = 620
 perception-detectlane.screenWidth = 1280
 perception-detectlane.screenHeight = 720
