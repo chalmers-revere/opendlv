@@ -181,30 +181,30 @@ services:
         depends_on:
             - odsupercomponent
         ipc: host
-        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-camera-axis --cid=${CID} --freq=20"
+        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-camera-axis --cid=${CID} --freq=10"
 
     # micro service for proxy-fh16
-#    proxy-fh16:
-#        build: .
-#        network_mode: "host"
-#        restart: always
-#        devices:
-#        - "/dev/pcanpci2:/dev/pcan2"
-#        depends_on:
-#            - odsupercomponent
-#        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-fh16 --cid=${CID} --freq=100"
+    proxy-fh16:
+        build: .
+        network_mode: "host"
+        restart: always
+        devices:
+        - "/dev/pcanpci2:/dev/pcan2"
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-fh16 --cid=${CID} --freq=100"
 
     #microservice for proxy-sick
-#    proxy-sick:
-#        build: .
-#        network_mode: "host"
-#        restart: always
-#        user: root  # This parameter will be replaced as soon as group_add parameter is available in docker-compose, cf. https://github.com/docker/compose/pull/3709.
-#        devices:
-#            - "/dev/ttyS1:/dev/ttyS1"
-#        depends_on:
-#            - odsupercomponent
-#        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-sick --cid=${CID} --freq=2"
+    proxy-sick:
+        build: .
+        network_mode: "host"
+        restart: always
+        user: root  # This parameter will be replaced as soon as group_add parameter is available in docker-compose, cf. https://github.com/docker/compose/pull/3709.
+        devices:
+            - "/dev/ttyS1:/dev/ttyS1"
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-sick --cid=${CID} --freq=2"
     
     # microservice for proxy-v2v
     proxy-v2v:
