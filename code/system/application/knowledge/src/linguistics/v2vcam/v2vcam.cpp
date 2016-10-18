@@ -291,6 +291,7 @@ void V2vCam::nextContainer(odcore::data::Container &a_c)
        opendlv::proxy::GpsReading temp = a_c.getData<opendlv::proxy::GpsReading>();
        m_latitude = temp.getLatitude();
        m_longitude = temp.getLongitude();
+       m_heading = std::fmod(std::abs(temp.getNorthHeading()),2*M_PI);
   }
 }
 
