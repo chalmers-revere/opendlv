@@ -184,15 +184,15 @@ services:
         command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-camera-axis --cid=${CID} --freq=10"
 
     # micro service for proxy-fh16
-    proxy-fh16:
-        build: .
-        network_mode: "host"
-        restart: always
-        devices:
-        - "/dev/pcanpci2:/dev/pcan2"
-        depends_on:
-            - odsupercomponent
-        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-fh16 --cid=${CID} --freq=100"
+#    proxy-fh16:
+#        build: .
+#        network_mode: "host"
+#        restart: always
+#        devices:
+#        - "/dev/pcanpci2:/dev/pcan2"
+#        depends_on:
+#            - odsupercomponent
+#        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-fh16 --cid=${CID} --freq=100"
 
     #microservice for proxy-sick
     proxy-sick:

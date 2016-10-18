@@ -130,7 +130,7 @@ knowledge-identity.rearAxleLocation = 5.0
 knowledge-scene.mergeDistance = 4.0
 knowledge-scene.validUntilDuration = 1
 knowledge-scene.memoryCapacity = 5.0 # seconds
-knowledge-scene.debug = 1
+knowledge-scene.debug = 0
 
 # perception-detectlane
 perception-detectlane.intensityThreshold = 200
