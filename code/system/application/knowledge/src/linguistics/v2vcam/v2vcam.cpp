@@ -475,6 +475,7 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
       }
     }
     m_azimuth = m_azimuth - static_cast<float> (m_heading);
+    m_azimuth = m_azimuth%3.14159f;
     std::cout << "m_azimuth: " << m_azimuth << std::endl;
 
     double rearX = m_xOffset - (vehicleLength / 10.0);
