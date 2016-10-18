@@ -141,7 +141,7 @@ perception-detectlane.roiX = 310
 perception-detectlane.roiY = 195
 perception-detectlane.roiWidth = 805
 perception-detectlane.roiHeight = 525
-perception-detectlane.debug = 0
+perception-detectlane.debug = 1
 
 # sensation-audition
 

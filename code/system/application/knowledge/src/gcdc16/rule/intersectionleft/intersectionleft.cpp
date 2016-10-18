@@ -21,6 +21,7 @@
 #include <cstring>
 #include <cmath>
 #include <iostream>
+#include <limits>
 
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
@@ -98,6 +99,11 @@ void IntersectionLeft::ActOnMio(std::vector<opendlv::perception::Object> &a_list
         std::cout << "The MIO was found in azimuth " << azimuth << " at a distance of " << distance << " m." << std::endl;
 
 
+        float longitudinal = cos(azimuth) * distance;
+        float lateral = sin(azimuth) * distance;
+
+        std::cout << "  - Longitudinal: " << longitudinal << std::endl;
+        std::cout << "  - Lateral: " << lateral << std::endl;
       }
     }
   }
@@ -106,12 +112,13 @@ void IntersectionLeft::ActOnMio(std::vector<opendlv::perception::Object> &a_list
 void IntersectionLeft::ActOnLane(std::vector<opendlv::perception::Surface> &a_listOfSurfaces)
 {
   float azimuth_pre = m_previousAzimuthFollowed;
-  float azimuth_new = 0.0f;
+  float azimuth_new = std::numeric_limits<float>::max();
 
+  int32_t i = 0;
   for (auto surface : a_listOfSurfaces) {
     auto listOfEdges = surface.getListOfEdges();
 
-    if (listOfEdges.size() < 4) {
+    if (listOfEdges.size() == 4) {
       opendlv::model::Cartesian3 topLeftCorner = listOfEdges[0];
       opendlv::model::Cartesian3 topRightCorner = listOfEdges[3];
 
@@ -120,14 +127,19 @@ void IntersectionLeft::ActOnLane(std::vector<opendlv::perception::Surface> &a_li
 
       float azimuth = atan2(y_m, x_m); 
 
+      std::cout << "Azimuth of surface #" << i << ": " << azimuth << std::endl; 
+      i++;
+
       if (std::abs(azimuth_pre - azimuth) < std::abs(azimuth_pre - azimuth_new)) {
         azimuth_new = azimuth;
       }
     }
   }
 
-  m_previousAzimuthFollowed = azimuth_new;
-  ControlDirectionOfMovement(azimuth_new);
+  if (azimuth_new < std::numeric_limits<float>::max()) {
+    m_previousAzimuthFollowed = azimuth_new;
+    ControlDirectionOfMovement(azimuth_new);
+  }
 }
 
 void IntersectionLeft::nextContainer(odcore::data::Container &a_container)
