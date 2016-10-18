@@ -54,10 +54,16 @@ class IntersectionLeft : public odcore::base::module::TimeTriggeredConferenceCli
   void setUp();
   void tearDown();
 
+  std::string m_scenarioType;
   bool m_enableLaneFollowing;
   bool m_runScenario;
+  float m_crossingSafeAngle;
   float m_desiredGroundSpeed;
+  float m_desiredGroundSpeedMax;
   float m_previousAzimuthFollowed;
+  float m_lateralDiscardDistance;
+  float m_longitudinalDiscardDistance;
+  float m_timeToCollision;
 };
 
 } // intersectionleft

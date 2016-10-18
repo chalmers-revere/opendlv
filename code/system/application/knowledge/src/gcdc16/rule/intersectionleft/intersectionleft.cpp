@@ -47,10 +47,16 @@ namespace intersectionleft {
 IntersectionLeft::IntersectionLeft(int32_t const &a_argc, char **a_argv)
 : TimeTriggeredConferenceClientModule(
   a_argc, a_argv, "knowledge-gcdc16-rule-intersectionleft"),
+  m_scenarioType(""),
   m_enableLaneFollowing(),
   m_runScenario(false),
+  m_crossingSafeAngle(0.2f),
   m_desiredGroundSpeed(),
-  m_previousAzimuthFollowed()
+  m_desiredGroundSpeedMax(),
+  m_previousAzimuthFollowed(),
+  m_lateralDiscardDistance(300.0f),
+  m_longitudinalDiscardDistance(50.0f),
+  m_timeToCollision(10.0f)
 {
 }
 
@@ -98,12 +104,43 @@ void IntersectionLeft::ActOnMio(std::vector<opendlv::perception::Object> &a_list
         
         std::cout << "The MIO was found in azimuth " << azimuth << " at a distance of " << distance << " m." << std::endl;
 
-
         float longitudinal = cos(azimuth) * distance;
         float lateral = sin(azimuth) * distance;
 
         std::cout << "  - Longitudinal: " << longitudinal << std::endl;
         std::cout << "  - Lateral: " << lateral << std::endl;
+
+        if (std::abs(longitudinal) > m_longitudinalDiscardDistance || std::abs(lateral) > m_lateralDiscardDistance) {
+          return;
+        }
+
+        if (m_scenarioType == "") {
+          if (lateral > 0.0f) {
+            m_scenarioType = "mioLeftTurnCrossingPath";
+          } else {
+            m_scenarioType = "mioLeftTurnToLead";
+          }
+          std::cout << "SCENARIO: " << m_scenarioType << std::endl;
+        }
+
+        float speed_new;
+        
+        if (m_scenarioType == "midLeftTurnCrossingPath") {
+
+          if (longitudinal > 0.0f && azimuth < m_crossingSafeAngle) {
+            speed_new = std::min(m_desiredGroundSpeedMax, longitudinal / m_timeToCollision);
+            std::cout << "MIO in front and is CROSSING! New speed: " << speed_new << std::endl;
+          } else {
+            speed_new = m_desiredGroundSpeedMax;
+            std::cout << "MIO is in safe place. New speed: " << speed_new << std::endl;
+          }
+
+        } else if (m_scenarioType == "mioLeftTurnToLead") {
+            speed_new = std::min(m_desiredGroundSpeedMax, longitudinal / m_timeToCollision);
+            std::cout << "MIO is leading. New speed: " << speed_new << std::endl;
+        }
+       
+        m_desiredGroundSpeed = speed_new;
       }
     }
   }
@@ -186,14 +223,18 @@ void IntersectionLeft::ControlDirectionOfMovement(float a_azimuth)
 void IntersectionLeft::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
-  m_desiredGroundSpeed = static_cast<float>(kv.getValue<double>("knowledge-gcdc16-rule-intersectionleft.desiredGroundSpeed"));
+  m_crossingSafeAngle = static_cast<float>(kv.getValue<double>("knowledge-gcdc16-rule-intersectionleft.crossingSafeAngle"));
+  m_desiredGroundSpeedMax = static_cast<float>(kv.getValue<double>("knowledge-gcdc16-rule-intersectionleft.desiredGroundSpeed"));
+  m_lateralDiscardDistance = static_cast<float>(kv.getValue<double>("knowledge-gcdc16-rule-intersectionleft.lateralDiscardDistance"));
+  m_longitudinalDiscardDistance = static_cast<float>(kv.getValue<double>("knowledge-gcdc16-rule-intersectionleft.longitudinalDiscardDistance"));
+  m_timeToCollision = static_cast<float>(kv.getValue<double>("knowledge-gcdc16-rule-intersectionleft.timeToCollision"));
   m_enableLaneFollowing = kv.getValue<bool>("knowledge-gcdc16-rule-intersectionleft.enableLaneFollowing");
   bool forceScenarioStart = kv.getValue<bool>("knowledge-gcdc16-rule-intersectionleft.forceScenarioStart");
 
   std::cout << "Force scenario start: " << forceScenarioStart << " Enable lane following: " << m_enableLaneFollowing << std::endl;
-  //if (forceScenarioStart) {
+  if (forceScenarioStart) {
     m_runScenario = true;
-  //}
+  }
 }
 
 void IntersectionLeft::tearDown()
