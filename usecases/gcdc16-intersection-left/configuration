@@ -130,18 +130,18 @@ knowledge-scene.debug = 1
 
 # perception-detectlane
 perception-detectlane.intensityThreshold = 200
-perception-detectlane.cannyThreshold = 30
-perception-detectlane.houghThreshold = 140
+perception-detectlane.cannyThreshold = 80
+perception-detectlane.houghThreshold = 160
 perception-detectlane.memThreshold = 1.0 #seconds
 perception-detectlane.upperLaneLimit = 270
 perception-detectlane.lowerLaneLimit = 620
 perception-detectlane.screenWidth = 1280
 perception-detectlane.screenHeight = 720
-perception-detectlane.roiX = 310
+perception-detectlane.roiX = 205
 perception-detectlane.roiY = 195
-perception-detectlane.roiWidth = 805
+perception-detectlane.roiWidth = 1975
 perception-detectlane.roiHeight = 525
-perception-detectlane.debug = 1
+perception-detectlane.debug = 0
 
 # sensation-audition
 
