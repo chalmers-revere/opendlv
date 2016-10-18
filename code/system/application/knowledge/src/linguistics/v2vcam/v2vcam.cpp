@@ -475,6 +475,21 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
       }
     }
     m_azimuth = m_azimuth - static_cast<float> (m_heading);
+    if(m_azimuth > 3.14159f) {
+      m_azimuth -=  3.14159f;
+    } 
+    else if (m_azimuth < -3.14159f)
+    {
+      m_azimuth += 3.14159f;
+    }
+    if(m_azimuth > 3.14159f) {
+      m_azimuth -=  3.14159f;
+    } 
+    else if (m_azimuth < -3.14159f)
+    {
+      m_azimuth += 3.14159f;
+    }
+
     // m_azimuth = m_azimuth%3.14159f;
     std::cout << "m_azimuth: " << m_azimuth << std::endl;
 
