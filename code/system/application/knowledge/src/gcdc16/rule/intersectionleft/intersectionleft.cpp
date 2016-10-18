@@ -139,6 +139,10 @@ void IntersectionLeft::ActOnMio(std::vector<opendlv::perception::Object> &a_list
             speed_new = std::min(m_desiredGroundSpeedMax, longitudinal / m_timeToCollision);
             std::cout << "MIO is leading. New speed: " << speed_new << std::endl;
         }
+ 
+        if (speed_new < 0.0f) {
+          speed_new = 0.0f;
+        }
        
         m_desiredGroundSpeed = speed_new;
       }
@@ -193,10 +197,6 @@ void IntersectionLeft::nextContainer(odcore::data::Container &a_container)
     auto propulsion = a_container.getData<opendlv::proxy::reverefh16::Propulsion>();
     double speedKph = propulsion.getPropulsionShaftVehicleSpeed();
     float speed = static_cast<float>(speedKph / 3.6);
-
-    if (speed < 0.0f) {
-      speed = 0.0f;
-    }
 
     ControlGroundSpeed(speed);
   }
