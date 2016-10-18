@@ -127,10 +127,6 @@ void IntersectionLeft::ActOnLane(std::vector<opendlv::perception::Surface> &a_li
 
       float azimuth = atan2(y_m, x_m); 
 
-      std::cout << "topLeft x: " << topLeftCorner.getX() << " y: " << topLeftCorner.getY() << std::endl; 
-      std::cout << "topRight x: " << topRightCorner.getX() << " y: " << topRightCorner.getY() << std::endl; 
-      std::cout << "top mid x: " << x_m << " y: " << y_m << std::endl; 
-
       std::cout << "Azimuth of surface #" << i << ": " << azimuth << std::endl; 
       i++;
 
@@ -142,7 +138,7 @@ void IntersectionLeft::ActOnLane(std::vector<opendlv::perception::Surface> &a_li
 
   if (azimuth_new < std::numeric_limits<float>::max()) {
     m_previousAzimuthFollowed = azimuth_new;
-//    ControlDirectionOfMovement(azimuth_new);
+    ControlDirectionOfMovement(azimuth_new);
   }
 }
 
