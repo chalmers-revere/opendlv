@@ -122,8 +122,8 @@ void IntersectionLeft::ActOnLane(std::vector<opendlv::perception::Surface> &a_li
       opendlv::model::Cartesian3 topLeftCorner = listOfEdges[0];
       opendlv::model::Cartesian3 topRightCorner = listOfEdges[3];
 
-      float x_m = 0.5f * (topLeftCorner.getX() - topRightCorner.getX());
-      float y_m = 0.5f * (topLeftCorner.getY() - topRightCorner.getY());
+      float x_m = 0.5f * (topLeftCorner.getX() + topRightCorner.getX());
+      float y_m = 0.5f * (topLeftCorner.getY() + topRightCorner.getY());
 
       float azimuth = atan2(y_m, x_m); 
 
