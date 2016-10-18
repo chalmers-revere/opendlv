@@ -151,7 +151,7 @@ void IntersectionLeft::ActOnLane(std::vector<opendlv::perception::Surface> &a_li
   float azimuth_pre = m_previousAzimuthFollowed;
   float azimuth_new = std::numeric_limits<float>::max();
 
-  int32_t i = 0;
+ // int32_t i = 0;
   for (auto surface : a_listOfSurfaces) {
     auto listOfEdges = surface.getListOfEdges();
 
@@ -164,8 +164,8 @@ void IntersectionLeft::ActOnLane(std::vector<opendlv::perception::Surface> &a_li
 
       float azimuth = atan2(y_m, x_m); 
 
-      std::cout << "Azimuth of surface #" << i << ": " << azimuth << std::endl; 
-      i++;
+    //  std::cout << "Azimuth of surface #" << i << ": " << azimuth << std::endl; 
+    //  i++;
 
       if (std::abs(azimuth_pre - azimuth) < std::abs(azimuth_pre - azimuth_new)) {
         azimuth_new = azimuth;
