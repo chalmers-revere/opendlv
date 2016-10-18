@@ -483,7 +483,7 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
     }
 
 
-    // std::cout << "m_azimuth: " << m_azimuth << std::endl;
+    std::cout << "m_azimuth: " << m_azimuth << std::endl;
 
     double rearX = m_xOffset - (vehicleLength / 10.0);
     double leftRearY = m_yOffset + (vehicleWidth / 20.0);
