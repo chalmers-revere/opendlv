@@ -193,6 +193,11 @@ void IntersectionLeft::nextContainer(odcore::data::Container &a_container)
     auto propulsion = a_container.getData<opendlv::proxy::reverefh16::Propulsion>();
     double speedKph = propulsion.getPropulsionShaftVehicleSpeed();
     float speed = static_cast<float>(speedKph / 3.6);
+
+    if (speed < 0.0f) {
+      speed = 0.0f;
+    }
+
     ControlGroundSpeed(speed);
   }
 }
