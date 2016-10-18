@@ -104,8 +104,8 @@ void IntersectionLeft::ActOnMio(std::vector<opendlv::perception::Object> &a_list
         
         std::cout << "The MIO was found in azimuth " << azimuth << " at a distance of " << distance << " m." << std::endl;
 
-        float longitudinal = sin(azimuth) * distance;
-        float lateral = cos(azimuth) * distance;
+        float longitudinal = cos(azimuth) * distance;
+        float lateral = sin(azimuth) * distance;
 
         std::cout << "  - Longitudinal: " << longitudinal << std::endl;
         std::cout << "  - Lateral: " << lateral << std::endl;
