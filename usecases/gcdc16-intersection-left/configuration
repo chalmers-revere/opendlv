@@ -88,7 +88,7 @@ action-setgroundspeed.patienceDuration = 4.0
 action-setgroundspeed.stimulusJerkThreshold = 0.5
 action-setgroundspeed.stimulusRateThreshold = 0.5
 action-setgroundspeed.stimulusThreshold = 1.0
-action-setgroundspeed.equilibrium = 20.0  # kph
+action-setgroundspeed.equilibrium = 10.0  # kph
 
 # action-setopticalrotation
 action-setopticalrotation.correctionGain = 0.2
@@ -99,7 +99,7 @@ action-setopticalrotation.stimulusRateThreshold = 0.02
 action-setopticalrotation.stimulusThreshold = 0.02
 
 # knowledge-gcdc16-rule-intersectionleft
-knowledge-gcdc16-rule-intersectionleft.desiredGroundSpeed = 8.3
+knowledge-gcdc16-rule-intersectionleft.desiredGroundSpeed = 5 # 8.3 # m/s
 knowledge-gcdc16-rule-intersectionleft.enableLaneFollowing = 1
 knowledge-gcdc16-rule-intersectionleft.forceScenarioStart = 1
 
