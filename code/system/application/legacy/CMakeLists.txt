@@ -1,4 +1,4 @@
-# OpenDLV - Software for driverless vehicles realized with OpenDaVINCI
+# OpenDLV Action - Software component for decision-making and autonomy
 # Copyright (C) 2015 Chalmers REVERE
 #
 # This program is free software; you can redistribute it and/or
@@ -15,10 +15,27 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-project(opendlv-system-application)
+project(opendlv-system-application-legacy)
 
-add_subdirectory(action)
-add_subdirectory(knowledge)
-add_subdirectory(perception)
-add_subdirectory(sensation)
-add_subdirectory(legacy)
+# Set include directories
+include_directories(include)
+
+# Set libraries
+set(LIBRARIES ${LIBRARIES})
+
+# Build
+file(GLOB_RECURSE thisproject-sources 
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/simpledriver/*.cpp"
+  )
+
+add_library(${PROJECT_NAME}lib-static STATIC ${thisproject-sources})
+
+add_executable(${PROJECT_NAME}-simpledriver "${CMAKE_CURRENT_SOURCE_DIR}/src/simpledriver/main.cpp")
+target_link_libraries(${PROJECT_NAME}-simpledriver ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+
+# Test
+include(RunTests)
+
+# Install
+install(TARGETS ${PROJECT_NAME}-simpledriver RUNTIME DESTINATION bin COMPONENT system-application)
+
