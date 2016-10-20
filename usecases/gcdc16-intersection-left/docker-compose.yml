@@ -27,6 +27,21 @@ services:
         - .:/opt/opendlv.data
         command: "/opt/od4/bin/odsupercomponent --cid=${CID} --verbose=1 --configuration=/opt/opendlv.data/configuration"
 
+            
+    #odrecorder.
+    odrecorder:
+        build: .
+        depends_on:
+            - odsupercomponent
+        volumes:
+            - ~/recordings:/opt/recordings
+        user: odv
+        network_mode: host
+        ipc: host
+        working_dir: "/opt/recordings"
+        command: "/opt/od4/bin/odrecorderh264 --cid=${CID}"
+        
+
     # microservice for action-act
     action-act:
         build: .
