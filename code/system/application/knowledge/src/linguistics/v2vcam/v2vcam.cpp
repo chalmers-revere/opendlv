@@ -453,18 +453,18 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
     // std::cout << "y: "<< m_yOffset << std::endl;
     double azimuth;
 
-    azimuth = std::atan2(m_yOffset, m_xOffset) - M_PI*0.5;
+    azimuth = std::atan2(yOffset, xOffset) - M_PI*0.5;
     azimuth = azimuth - m_heading;    
     
-    while (m_azimuth < -3.14159f) {
-      azimuth += 2*3.14159f;
+    while (azimuth < -3.14159) {
+      azimuth += 2*3.14159;
     }
-    while (m_azimuth > 3.14159f) {
-      azimuth -= 2*3.14159f;
+    while (azimuth > 3.14159) {
+      azimuth -= 2*3.14159;
     }
 
 
-    std::cout << "m_azimuth: " << m_azimuth << std::endl;
+    std::cout << "m_azimuth: " << azimuth << std::endl;
 
 
     // TODO ANGULAR SIZE
@@ -489,7 +489,7 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
     float m_objectDirectionConfidence = 0.5f;
     opendlv::model::Direction m_objectDirectionRate(0.0f, 0.0f);
     float m_objectDirectionRateConfidence = -1.0f;
-    float m_distance = std::sqrt((m_xOffset * m_xOffset) + (m_yOffset * m_yOffset));
+    float m_distance = std::sqrt((xOffset * xOffset) + (yOffset * yOffset));
     float m_distanceConfidence = 0.5f;
     float m_angularSize = alpha;
     float m_angularSizeConfidence = -1.0f;
