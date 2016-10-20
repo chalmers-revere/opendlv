@@ -37,16 +37,6 @@ services:
             - odsupercomponent
         command: "/opt/opendlv/bin/opendlv-system-application-action-communicate --cid=${CID}"
 
-    # microservice for knowledge-gcdc16-rule-intersection-host
-    knowledge-gcdc16-rule-intersection-host:
-        build: .
-        network_mode: "host"
-        working_dir: "/opt/opendlv/bin"
-        restart: always
-        depends_on:
-            - odsupercomponent
-        command: "/opt/opendlv/bin/opendlv-system-application-knowledge-gcdc16-rule-intersectionhost --cid=${CID} --freq=10"
-
     # microservice for knowledge-gcdc16-v2viclcm
     knowledge-gcdc16-v2viclcm:
         build: .

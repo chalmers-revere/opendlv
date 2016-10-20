@@ -104,7 +104,7 @@ knowledge-gcdc16-rule-intersection.longitudinalDiscardDistance = 300.0
 knowledge-gcdc16-rule-intersection.lateralDiscardDistance = 50.0
 knowledge-gcdc16-rule-intersection.timeToCollision = 10.0
 knowledge-gcdc16-rule-intersection.crossingSafeAngle = 0.2
-knowledge-gcdc16-rule-intersection.isMioCrossingPath = 1   # 1 if the turning car is going to the other lane, 0 if going to the same lane
+knowledge-gcdc16-rule-intersection.isMioCrossingPath = 0   # 1 if the turning car is going to the other lane, 0 if going to the same lane
 knowledge-gcdc16-rule-intersection.enableLaneFollowing = 1
 knowledge-gcdc16-rule-intersection.forceScenarioStart = 1
 

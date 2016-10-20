@@ -17,8 +17,8 @@
  * USA.
  */
 
-#ifndef GCDC16_RULE_INTERSECTIONRIGHT_INTERSECTIONRIGHT_HPP_
-#define GCDC16_RULE_INTERSECTIONRIGHT_INTERSECTIONRIGHT_HPP_
+#ifndef GCDC16_RULE_INTERSECTION_INTERSECTION_HPP_
+#define GCDC16_RULE_INTERSECTION_INTERSECTION_HPP_
 
 #include <memory>
 
@@ -31,17 +31,17 @@ namespace opendlv {
 namespace knowledge {
 namespace gcdc16 {
 namespace rule {
-namespace intersectionright {
+namespace intersection {
 
 /**
  * This class provides...
  */
-class IntersectionRight : public odcore::base::module::TimeTriggeredConferenceClientModule {
+class Intersection : public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
-  IntersectionRight(int32_t const &, char **);
-  IntersectionRight(IntersectionRight const &) = delete;
-  IntersectionRight &operator=(IntersectionRight const &) = delete;
-  virtual ~IntersectionRight();
+  Intersection(int32_t const &, char **);
+  Intersection(Intersection const &) = delete;
+  Intersection &operator=(Intersection const &) = delete;
+  virtual ~Intersection();
   virtual void nextContainer(odcore::data::Container &);
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
@@ -53,14 +53,20 @@ class IntersectionRight : public odcore::base::module::TimeTriggeredConferenceCl
   void ControlGroundSpeed(float);
   void setUp();
   void tearDown();
-  
+
+  std::string m_scenarioType;
   bool m_enableLaneFollowing;
   bool m_runScenario;
+  float m_crossingSafeAngle;
   float m_desiredGroundSpeed;
+  float m_desiredGroundSpeedMax;
   float m_previousAzimuthFollowed;
+  float m_lateralDiscardDistance;
+  float m_longitudinalDiscardDistance;
+  float m_timeToCollision;
 };
 
-} // intersectionright
+} // intersection
 } // rule
 } // gcdc16
 } // knowledge
