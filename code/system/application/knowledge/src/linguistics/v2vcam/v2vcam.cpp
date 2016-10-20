@@ -282,9 +282,9 @@ void V2vCam::nextContainer(odcore::data::Container &a_c)
     ReadVoice(voice);
   }
   else if(a_c.getDataType() == opendlv::data::environment::WGS84Coordinate::ID()) {
-       // opendlv::data::environment::WGS84Coordinate temp = a_c.getData<opendlv::data::environment::WGS84Coordinate>();
-       // m_latitude = temp.getLatitude();
-       // m_longitude = temp.getLongitude();
+    opendlv::data::environment::WGS84Coordinate temp = a_c.getData<opendlv::data::environment::WGS84Coordinate>();
+    m_latitude = temp.getLatitude();
+    m_longitude = temp.getLongitude();
   }
   else if(a_c.getDataType() == opendlv::proxy::GpsReading::ID()) {
     opendlv::proxy::GpsReading temp = a_c.getData<opendlv::proxy::GpsReading>();
@@ -435,7 +435,7 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
         + "," + std::to_string(vehicleRole);
     m_receiveLog << std::endl; 
   }
-  if(latitude != 900000001 && longitude != 1800000001 && (m_heading > -M_PI && m_heading <= M_pi)) { //Dont make object if position is unavailable
+  if(latitude != 900000001 && longitude != 1800000001 && (m_heading > -M_PI && m_heading <= M_PI)) { //Dont make object if position is unavailable
     //This is where the objects are constructed which are to be sent out
     opendlv::data::environment::WGS84Coordinate ourGpsReference = 
         opendlv::data::environment::WGS84Coordinate(m_latitude, m_longitude);
