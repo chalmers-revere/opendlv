@@ -267,7 +267,6 @@ void V2vCam::nextContainer(odcore::data::Container &a_c)
         a_c.getData<opendlv::sensation::Geolocation>();
     ReadGeolocation(geolocation);
   } else if (a_c.getDataType() == opendlv::model::DynamicState::ID()) {
-
     opendlv::model::DynamicState dynamicState = 
         a_c.getData<opendlv::model::DynamicState>();
     int16_t frameId = dynamicState.getFrameId();
@@ -276,22 +275,27 @@ void V2vCam::nextContainer(odcore::data::Container &a_c)
     }
   } else if(a_c.getDataType() == opendlv::sensation::Voice::ID()) {
     opendlv::sensation::Voice voice = a_c.getData<opendlv::sensation::Voice>();
-    // if(strcmp(voice.getType().c_str(),"cam") != 0) {
-    //   std::cout << "Message type not CAM." << std::endl;
-    //   return;
-    // }
+    if(strcmp(voice.getType().c_str(),"cam") != 0) {
+      std::cout << "Message type not CAM." << std::endl;
+      return;
+    }
     ReadVoice(voice);
   }
   else if(a_c.getDataType() == opendlv::data::environment::WGS84Coordinate::ID()) {
-       opendlv::data::environment::WGS84Coordinate temp = a_c.getData<opendlv::data::environment::WGS84Coordinate>();
-       m_latitude = temp.getLatitude();
-       m_longitude = temp.getLongitude();
+       // opendlv::data::environment::WGS84Coordinate temp = a_c.getData<opendlv::data::environment::WGS84Coordinate>();
+       // m_latitude = temp.getLatitude();
+       // m_longitude = temp.getLongitude();
   }
   else if(a_c.getDataType() == opendlv::proxy::GpsReading::ID()) {
-       opendlv::proxy::GpsReading temp = a_c.getData<opendlv::proxy::GpsReading>();
-       m_latitude = temp.getLatitude();
-       m_longitude = temp.getLongitude();
-       m_heading = std::fmod(std::abs(temp.getNorthHeading()), 2*M_PI);
+    opendlv::proxy::GpsReading temp = a_c.getData<opendlv::proxy::GpsReading>();
+    m_latitude = temp.getLatitude();
+    m_longitude = temp.getLongitude();
+    // m_speed = temp.getSpeed();
+    if(temp.getHasHeading()) {
+      m_heading = temp.getNorthHeading();
+    } else {
+      m_heading = -1;
+    }
   }
 }
 
@@ -335,7 +339,8 @@ void V2vCam::ReadGeolocation(
   m_latitude = a_geolocation.getLatitude();
   m_longitude = a_geolocation.getLongitude();
   m_altitude = a_geolocation.getAltitude();
-  m_heading = a_geolocation.getHeading();
+  // TODO heading from Geolocation
+  // m_heading = a_geolocation.getHeading();
   // std::cout << a_geolocation.getHeading() << std::endl;
   m_headingConfidence = a_geolocation.getHeadingConfidence();
   // std::cout << a_geolocation.getHeadingConfidence() << std::endl;
@@ -430,85 +435,63 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
         + "," + std::to_string(vehicleRole);
     m_receiveLog << std::endl; 
   }
-  if(latitude != 900000001 && longitude != 1800000001) { //Dont make object if position is unavailable
+  if(latitude != 900000001 && longitude != 1800000001 && (m_heading > -M_PI && m_heading <= M_pi)) { //Dont make object if position is unavailable
     //This is where the objects are constructed which are to be sent out
-    opendlv::data::environment::WGS84Coordinate gpsReference;
+    opendlv::data::environment::WGS84Coordinate ourGpsReference = 
+        opendlv::data::environment::WGS84Coordinate(m_latitude, m_longitude);
 
-    gpsReference = opendlv::data::environment::WGS84Coordinate(
-        m_latitude,
-        m_longitude);
-
-    opendlv::data::environment::WGS84Coordinate currentLocation(
+    opendlv::data::environment::WGS84Coordinate theirGpsReference(
         latitude / std::pow(10,7),
         longitude / std::pow(10,7));
 
     opendlv::data::environment::Point3 currentObjectCartesianLocation =
-        gpsReference.transform(currentLocation);
+        ourGpsReference.transform(theirGpsReference);
 
-    double m_xOffset = currentObjectCartesianLocation.getY();
-    double m_yOffset = -currentObjectCartesianLocation.getX();
+    double xOffset = currentObjectCartesianLocation.getX();
+    double yOffset = currentObjectCartesianLocation.getY();
     // std::cout << "x: "<< m_xOffset << std::endl;
     // std::cout << "y: "<< m_yOffset << std::endl;
-    float m_azimuth;
+    double azimuth;
 
-    //TODO: Fix hardcoded constants and revising
-
-    // if (std::fabs(m_yOffset) < 0.001){
-    //   if (m_xOffset < 0.0){
-    //     m_azimuth = 3.14159f;
-    //   } else {
-    //     m_azimuth = 0.0f;
-    //   }
-    // } else if (std::fabs(m_xOffset) < 0.001){
-    //   if (m_yOffset < 0.0){
-    //     m_azimuth = -3.14159f / 2.0f;
-    //   } else {
-    //     m_azimuth = 3.14159f / 2.0f;
-    //   }
-    // } else {
-      m_azimuth = std::atan2(m_yOffset, m_xOffset);
-      // if(m_azimuth > 3.14159f) {
-      //   m_azimuth -= 2 * 3.14159f;
-      // } 
-      // else if (m_azimuth < -3.14159f)
-      // {
-      //   m_azimuth += 2*3.14159f;
-      // }
-    // }
-    m_azimuth = m_azimuth - static_cast<float> (m_heading);
+    azimuth = std::atan2(m_yOffset, m_xOffset) - M_PI*0.5;
+    azimuth = azimuth - m_heading;    
+    
     while (m_azimuth < -3.14159f) {
-       m_azimuth += 2*3.14159f;
+      azimuth += 2*3.14159f;
     }
     while (m_azimuth > 3.14159f) {
-       m_azimuth -= 2*3.14159f;
+      azimuth -= 2*3.14159f;
     }
 
 
     std::cout << "m_azimuth: " << m_azimuth << std::endl;
 
-    double rearX = m_xOffset - (vehicleLength / 10.0);
-    double leftRearY = m_yOffset + (vehicleWidth / 20.0);
-    double rightRearY = m_yOffset - (vehicleWidth / 20.0);
+
+    // TODO ANGULAR SIZE
+    // double rearX = m_xOffset - (vehicleLength / 10.0);
+    // double leftRearY = m_yOffset + (vehicleWidth / 20.0);
+    // double rightRearY = m_yOffset - (vehicleWidth / 20.0);
 
 
-    double leftLength = sqrt(leftRearY*leftRearY + rearX*rearX);
-    double rightLength = sqrt(rightRearY*rightRearY + rearX*rearX);
+    // double leftLength = sqrt(leftRearY*leftRearY + rearX*rearX);
+    // double rightLength = sqrt(rightRearY*rightRearY + rearX*rearX);
 
     // c² = a² + b²  - 2ab cos(alpha)
     // alpha = cos⁻1 ((a²+b² - c²) / (2ab))
 
-    double alpha = acos( (leftLength*leftLength +rightLength*rightLength - vehicleWidth*vehicleWidth) / (2*leftLength*rightLength));
+    // double alpha = acos( (leftLength*leftLength +rightLength*rightLength - vehicleWidth*vehicleWidth) / (2*leftLength*rightLength));
+    float alpha = 0;
 
     odcore::data::TimeStamp now;
     std::string m_type = "vehicle";
     float m_typeConfidence = 1.0f;
-    opendlv::model::Direction m_objectDirection(m_azimuth, 0.0f);
+    opendlv::model::Direction m_objectDirection(azimuth, 0.0f);
     float m_objectDirectionConfidence = 0.5f;
     opendlv::model::Direction m_objectDirectionRate(0.0f, 0.0f);
     float m_objectDirectionRateConfidence = -1.0f;
     float m_distance = std::sqrt((m_xOffset * m_xOffset) + (m_yOffset * m_yOffset));
     float m_distanceConfidence = 0.5f;
-    float m_angularSize = (float)alpha;
+    float m_angularSize = alpha;
     float m_angularSizeConfidence = -1.0f;
     float m_angularSizeRate = 0.0f;
     float m_angularSizeRateConfidence = -1.0f;
@@ -521,8 +504,23 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
     m_properties.push_back("Vehicle width: " + std::to_string(vehicleWidth));
     uint16_t m_objectId = -1;
     // std::cout << "Object send" << std::endl;
-    opendlv::perception::Object detectedObject(now, m_type, m_typeConfidence, m_objectDirection, m_objectDirectionConfidence, m_objectDirectionRate, m_objectDirectionRateConfidence,
-        m_distance, m_distanceConfidence, m_angularSize, m_angularSizeConfidence, m_angularSizeRate, m_angularSizeRateConfidence, m_confidence, m_sources, m_properties, m_objectId);
+    opendlv::perception::Object detectedObject(now,
+        m_type, 
+        m_typeConfidence, 
+        m_objectDirection, 
+        m_objectDirectionConfidence, 
+        m_objectDirectionRate, 
+        m_objectDirectionRateConfidence,
+        m_distance, 
+        m_distanceConfidence, 
+        m_angularSize,
+        m_angularSizeConfidence, 
+        m_angularSizeRate, 
+        m_angularSizeRateConfidence, 
+        m_confidence, 
+        m_sources, 
+        m_properties, 
+        m_objectId);
     odcore::data::Container objectContainer(detectedObject);
     getConference().send(objectContainer);
   }
@@ -665,7 +663,7 @@ int32_t V2vCam::GetHeading() const
 {
   double conversion = opendlv::Constants::RAD2DEG;
   int32_t scale = std::pow(10,1);
-  double val = m_heading*scale*conversion;
+  double val = (m_heading + M_PI)*scale*conversion;
   if(val < 0 || val > 3600 || std::isnan(val)){
     return 3601;
   }
