@@ -77,16 +77,16 @@ services:
             - odsupercomponent
         command: "/opt/opendlv/bin/opendlv-system-application-sensation-audition --cid=${CID}"
 
-    # micro service for proxy-roadscape.
-    proxy-roadscape:
-        image: chalmersrevere/copplar-core-on-opendlv-on-opendlv-core-on-opendavinci-ubuntu-16.04-complete:latest
-        network_mode: "host"
-        restart: always
-        devices:
-        - "/dev/pcan32:/dev/pcanusb0"
-        depends_on:
-            - odsupercomponent
-        command: "/opt/copplar.core/bin/opendlv-core-system-proxy-roadscape --cid=${CID}"
+#    # micro service for proxy-roadscape.
+#    proxy-roadscape:
+#        image: chalmersrevere/copplar-core-on-opendlv-on-opendlv-core-on-opendavinci-ubuntu-16.04-complete:latest
+#        network_mode: "host"
+#        restart: always
+#        devices:
+#        - "/dev/pcan32:/dev/pcanusb0"
+#        depends_on:
+#            - odsupercomponent
+#        command: "/opt/copplar.core/bin/opendlv-core-system-proxy-roadscape --cid=${CID}"
     
     # microservice for proxy-v2v
     proxy-v2v:
