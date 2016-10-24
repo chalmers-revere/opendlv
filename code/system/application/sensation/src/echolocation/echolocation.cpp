@@ -21,14 +21,16 @@
 #include <cstring>
 #include <cmath>
 
+#include <algorithm>
 #include <iostream>
+#include <vector>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
 #include <opendavinci/odcore/data/TimeStamp.h>
 
-#include "opendlvdata/GeneratedHeaders_opendlvdata.h"
+#include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
 
 #include "echolocation/echolocation.hpp"
 
@@ -45,9 +47,10 @@ namespace echolocation {
 Echolocation::Echolocation(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(
       a_argc, a_argv, "sensation-echolocation")
-    , m_angles()
-    , m_distances()
-    , m_times()
+    , m_listAzimuth()
+    , m_listZenith()
+    , m_listDistance()
+    , m_listTime()
     , m_memoryThreshold()
     , m_pointCloudRadius()
     , m_pointCloudSizeMinimum()
@@ -59,6 +62,12 @@ Echolocation::~Echolocation()
 {
 }
 
+
+/**
+ * Receives Point cloud data from lidar sick. 
+ * Sends Processed and interpreted objects that are detected
+ */
+
 void Echolocation::nextContainer(odcore::data::Container &a_c)
 {
   if (!m_initialised || a_c.getDataType() != opendlv::proxy::EchoReading::ID()){
@@ -66,39 +75,34 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
   }
   odcore::data::TimeStamp now;
 
-  if (m_times.size() > 0) {
-    odcore::data::TimeStamp diffStamp = now - m_times.back(); //Remove old data
-    float diffSeconds = diffStamp.toMicroseconds() / 1000000.0;
+  odcore::data::TimeStamp diffStamp = now - m_listTime.back(); //Remove old data
+  float diffSeconds = diffStamp.toMicroseconds() / 1000000.0;
 
-    while(diffSeconds > m_memoryThreshold) {
-      m_times.pop_back();
-      m_angles.pop_back();
-      m_distances.pop_back();
-      if(m_times.size() == 0){
-        break;;
-      }
-      diffStamp = now - m_times.back();
-      diffSeconds = diffStamp.toMicroseconds() / 1000000.0;
+  while(m_listTime.size() > 0 && diffSeconds > m_memoryThreshold) {
+    m_listAzimuth.pop_back();
+    m_listZenith.pop_back();
+    m_listDistance.pop_back();
+    m_listTime.pop_back();
+    if(m_listTime.size() == 0){
+      break;;
     }
+    diffStamp = now - m_listTime.back();
+    diffSeconds = diffStamp.toMicroseconds() / 1000000.0;
   }
-  // std::cout << "Size of m_distances: " << m_distances.size() << std::endl;
+  // std::cout << "Size of m_listDistance: " << m_listDistance.size() << std::endl;
 
 
   opendlv::proxy::EchoReading reading = a_c.getData<opendlv::proxy::EchoReading>(); //Read new data
+  uint32_t nNewPoints = reading.getNumberOfPoints();
   std::vector<opendlv::model::Direction> directions = reading.getListOfDirections();
   std::vector<double> distances = reading.getListOfRadii();
-  uint32_t nNewPoints = reading.getNumberOfPoints();
-
-  std::vector<float> angles;
-
+  
   for(uint32_t i = 0; i < nNewPoints; i++) {
-    angles.push_back(directions[i].getAzimuth());
+    m_listAzimuth.push_front(directions[i].getAzimuth());
+    m_listZenith.push_front(directions[i].getZenith());
+    m_listDistance.push_front(distances[i]);
+    m_listTime.push_front(now);
   }
-
-  m_angles.insert(m_angles.begin(), angles.begin(), angles.end());
-  m_distances.insert(m_distances.begin(), distances.begin(), distances.end());
-  m_times.insert(m_times.begin(),nNewPoints,now);
-
 
   
   std::vector<opendlv::perception::Object> identifiedObjects;
@@ -106,37 +110,45 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
   std::vector<uint32_t> usedPoints;
   std::vector<uint32_t> pointCloud;
   
-  uint32_t nPoints = m_angles.size();
+  uint32_t nPoints = m_listAzimuth.size();
   uint32_t objectCounter = 0;
 
   for(uint32_t k = 0; k < nPoints; k++) {
     pointCloud.clear();
     pointCloud.push_back(k);
-    if(!Contains(k, usedPoints)) {
+
+    std::vector<uint32_t>::iterator it = std::find(usedPoints.begin(),usedPoints.end(),k);
+    // if(!Contains(k, usedPoints)) {
+    // Cloud grouping
+    // if k is not in used points
+    if(it == usedPoints.end()) {
       for(uint32_t i = 0; i < pointCloud.size(); i++) {
         for(uint32_t j = 0; j < nPoints; j++) {
           uint32_t x = pointCloud[i];
-          double dist = PointDistance(m_angles[x], m_distances[x], m_angles[j], m_distances[j]);
-          if(dist < m_pointCloudRadius && !Contains(j,pointCloud)) {
+          double dist = PointDistance(m_listAzimuth[x], m_listDistance[x], m_listAzimuth[j], m_listDistance[j]);
+          it = std::find(pointCloud.begin(),pointCloud.end(),j);
+          //if j is within radius and not in pointcloud
+          if(dist < m_pointCloudRadius && it == pointCloud.end()) {
             pointCloud.push_back(j);
             usedPoints.push_back(j);
           }
         }
       }
+
       if(pointCloud.size() > m_pointCloudSizeMinimum) { 
-        double minDist = m_distances[pointCloud[0]];
-        float minAngle = m_angles[pointCloud[0]];
-        float maxAngle = m_angles[pointCloud[0]];
+        double minDist = m_listDistance[pointCloud[0]];
+        float minAngle = m_listAzimuth[pointCloud[0]];
+        float maxAngle = m_listAzimuth[pointCloud[0]];
 
         for(uint32_t i = 1; i < pointCloud.size(); i++) {
-          if(m_distances[pointCloud[i]] < minDist) {
-            minDist = m_distances[pointCloud[i]];
+          if(m_listDistance[pointCloud[i]] < minDist) {
+            minDist = m_listDistance[pointCloud[i]];
           }
-          if(m_angles[pointCloud[i]] < minAngle) {
-            minAngle = m_angles[pointCloud[i]];
+          if(m_listAzimuth[pointCloud[i]] < minAngle) {
+            minAngle = m_listAzimuth[pointCloud[i]];
           }
-          if(m_angles[pointCloud[i]] > maxAngle) {
-            maxAngle = m_angles[pointCloud[i]];
+          if(m_listAzimuth[pointCloud[i]] > maxAngle) {
+            maxAngle = m_listAzimuth[pointCloud[i]];
           }
         }
 
@@ -187,16 +199,6 @@ void Echolocation::nextContainer(odcore::data::Container &a_c)
 
 }
 
-bool Echolocation::Contains(uint32_t a_point, std::vector<uint32_t> a_cloud)
-{
-  uint32_t length = a_cloud.size();
-  for(uint32_t i = 0; i < length; i++) {
-    if(a_point == a_cloud[i]) {
-      return true;
-    }
-  }
-  return false;
-}
 
 double Echolocation::PointDistance(float a_angle1, double a_dist1, float a_angle2, double a_dist2)
 {

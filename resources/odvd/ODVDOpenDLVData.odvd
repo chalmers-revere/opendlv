@@ -1,0 +1,320 @@
+/*
+ * Copyright (C) 2015 Chalmers REVERE
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
+message opendlv.Constants [id = 150] {
+  const double PI = 3.141592653589793;
+  const double DEG2RAD = 0.017453292522222;  // PI/180.0
+  const double RAD2DEG = 57.295779513082325; // 1.0 / DEG2RAD;
+}
+
+message opendlv.model.Cartesian3 [id = 151] {
+  float x [id = 1];
+  float y [id = 2];
+  float z [id = 3];
+}
+
+message opendlv.model.Direction [id = 152] {
+  float azimuth [id = 1];
+  float zenith [id = 2];
+}
+
+message opendlv.model.State [id = 153] {
+  opendlv.model.Cartesian3 position [id = 1];
+  opendlv.model.Cartesian3 angularDisplacement [id = 2];
+  int16 frameId [id = 3];
+}
+
+message opendlv.model.DynamicState [id = 154] {
+  opendlv.model.Cartesian3 velocity [id = 1];
+  opendlv.model.Cartesian3 velocityConfidence [id = 2];
+
+  opendlv.model.Cartesian3 acceleration [id = 3];
+  opendlv.model.Cartesian3 accelerationConfidence [id = 4];
+
+  opendlv.model.Cartesian3 angularVelocity [id = 5];
+  opendlv.model.Cartesian3 angularVelocityConfidence [id = 6];
+
+  opendlv.model.Cartesian3 angularAcceleration [id = 7];
+  opendlv.model.Cartesian3 angularAccelerationConfidence [id = 8];
+  int16 frameId [id = 9];
+}
+
+message opendlv.proxy.ActuationRequest [id = 160] {
+  float acceleration [id = 1];
+  float steering [id = 2];
+  bool isValid [id = 3];
+}
+
+message opendlv.proxy.AccelerometerReading [id = 161] {
+  float acceleration[3] [id = 1];
+}
+
+message opendlv.proxy.AltimeterReading [id = 162] {
+  float altitude [id = 1];
+}
+
+message opendlv.proxy.CompassReading [id = 163] {
+  float heading[3] [id = 1];
+}
+
+message opendlv.proxy.ControlOverrideState [id = 164] {
+  bool isOverridden [id = 1];
+}
+
+message opendlv.proxy.ControlState [id = 165] {
+  bool isAutonomous [id = 1];
+}
+
+message opendlv.proxy.EchoReading [id = 166] {
+  list<opendlv.model.Direction> directions [id = 1];
+  list<double> radii [id = 2];
+  uint32 numberOfPoints [id = 3];
+}
+
+// This message is already migrated to OpenDLV.core. DO NOT CHANGE CONTENT OR IDENTIFIERS HERE!
+message opendlv.proxy.GpsReading [id = 167] {
+  double timestamp [id = 1];
+  double latitude [id = 2];
+  double longitude [id = 3];
+  double altitude [id = 4];
+  double northHeading [id = 5];
+  double speed [id = 6];
+  uint8 latitudeDirection [id = 7];
+  uint8 longitudeDirection [id = 8];
+  uint8 satelliteCount [id = 9];
+  bool hasHeading [id = 10];
+  bool hasRtk [id = 11];
+}
+
+message opendlv.proxy.GyroscopeReading [id = 168] {
+  float orientation[3] [id = 1];
+}
+
+message opendlv.proxy.LedRequest [id = 169] {
+  uint8 numberOfLeds [id = 1];
+  string data [id = 2];
+}
+
+message opendlv.proxy.RelayRequest [id = 170] {
+  bool relayValue [id = 1];
+  uint8 relayIndex [id = 2];
+  string deviceId [id = 3];
+}
+
+// This message is already migrated to OpenDLV.core. DO NOT CHANGE CONTENT OR IDENTIFIERS HERE!
+message opendlv.proxy.V2vReading [id = 171] {
+  uint32 size [id = 1];
+  string data [id = 2];
+}
+
+// This message is already migrated to OpenDLV.core. DO NOT CHANGE CONTENT OR IDENTIFIERS HERE!
+message opendlv.proxy.V2vRequest [id = 172] {
+  uint32 size [id = 1];
+  string data [id = 2];
+}
+
+message opendlv.sensation.Voice [id = 175] {
+  string type [id = 1];
+  uint32 size [id = 2];
+  string data [id = 3];
+}
+
+message opendlv.sensation.Geolocation [id = 176] {
+  double latitude [id = 1];
+  float latitudeConfidence [id = 2];
+  double longitude [id = 3];
+  float longitudeConfidence [id = 4];
+  float altitude [id = 5];
+  float heading [id = 6];
+  float headingConfidence [id = 7];
+}
+
+message opendlv.sensation.Looming [id = 177] {
+  uint16 numberOfPoints [id = 1];
+  list<opendlv.model.Direction> directions [id = 2];
+  list<float> expansion [id = 4];
+}
+
+message opendlv.sensation.OpticalFlow [id = 178] {
+  uint16 numberOfPoints [id = 1];
+  list<opendlv.model.Direction> directions [id = 2];
+  list<float> u [id = 3];
+  list<float> v [id = 4];
+}
+
+message opendlv.sensation.DirectionOfMovement [id = 179] {
+  opendlv.model.Direction direction [id = 1];
+}
+
+message opendlv.perception.Object [id = 181] {
+  odcore::data::TimeStamp identified [id = 1];
+  string type [id = 2];
+  float typeConfidence [id = 3];
+
+  opendlv.model.Direction direction [id = 4];
+  float directionConfidence [id = 5];
+  opendlv.model.Direction directionRate [id = 6];
+  float directionRateConfidence [id = 7];
+
+  float distance [id = 8];
+  float distanceConfidence [id = 9];
+
+  float angularSize [id = 10];
+  float angularSizeConfidence [id = 11];
+  float angularSizeRate [id = 12];
+  float angularSizeRateConfidence [id = 13];
+
+  float confidence [id = 14];
+  list<string> sources [id = 15];
+
+  list<string> properties [id = 16];
+
+  int16 objectId [id = 17];
+}
+
+message opendlv.perception.Environment [id = 189] {
+  odcore::data::TimeStamp validUntil [id = 1];
+  list<opendlv.perception.Object> objects [id = 2];
+  list<opendlv.perception.Surface> surfaces[id = 3];
+}
+
+message opendlv.perception.Surface [id = 184] {
+  odcore::data::TimeStamp identified [id = 1];
+  string type [id = 2];
+  float typeConfidence [id = 3];
+
+  list<opendlv.model.Cartesian3> edges [id = 4];
+  float edgesConfidence [id = 5];
+
+  bool traversable [id = 6];
+
+  float confidence [id = 7];
+  list<string> sources [id = 8];
+
+  list<string> properties [id = 9];
+
+  int16 surfaceId [id = 10];
+
+  list<int16> connectedWith [id = 11];
+  list<int16> traversableTo [id = 12];
+}
+
+message opendlv.perception.StimulusDirectionOfMovement [id = 180] {
+  odcore::data::TimeStamp identified [id = 1];
+  opendlv.model.Direction desiredDirectionOfMovement [id = 2];
+  opendlv.model.Direction directionOfMovement [id = 3];
+}
+
+message opendlv.perception.StimulusGroundSpeed [id = 174] {
+  odcore::data::TimeStamp identified [id = 1];
+  float desiredGroundSpeed [id = 2];
+  float groundSpeed [id = 3];
+}
+
+message opendlv.perception.StimulusDirectionAlignment [id = 182] {
+  odcore::data::TimeStamp identified [id = 1];
+  opendlv.model.Direction direction [id = 2];
+  opendlv.model.Direction desiredDirection [id = 3];
+}
+
+message opendlv.perception.StimulusAngularSizeAlignment [id = 183] {
+  odcore::data::TimeStamp identified [id = 1];
+  opendlv.model.Direction direction [id = 2];
+  float angularSize [id = 3];
+  float desiredAngularSize [id = 4];
+}
+
+message opendlv.knowledge.Message [id = 185] {
+  uint32 size [id = 1];
+  string data [id = 2];
+}
+
+message opendlv.knowledge.Insight [id = 187] {
+  odcore::data::TimeStamp insightTime [id = 1];
+  string insight [id = 2];
+}
+
+message opendlv.action.Correction [id = 186] {
+  odcore::data::TimeStamp startTime [id = 1];
+  string type [id = 2];
+  bool isInhibitory [id = 3];
+  float amplitude [id = 4];
+}
+
+message opendlv.proxy.reverefh16.ManualControl [id = 191] {
+    double accelerationPedalPosition [id = 1];
+    double brakePedalPosition [id = 2];
+    double torsionBarTorque [id = 3];
+    odcore::data::TimeStamp fromSensor [id = 4];
+}
+
+message opendlv.proxy.reverefh16.AccelerationRequest [id = 192] {
+    bool enableRequest [id = 1];
+    double accelerationPedalPosition [id = 2];
+}
+
+message opendlv.proxy.reverefh16.BrakeRequest [id = 193] {
+    bool enableRequest [id = 1];
+    double brake [id = 2];
+}
+
+message opendlv.proxy.reverefh16.SteeringRequest [id = 194] {
+    bool enableRequest [id = 1];
+    double steeringRoadWheelAngle [id = 2];
+    double steeringDeltaTorque [id = 3];
+}
+
+message opendlv.proxy.reverefh16.Axles [id = 195] {
+    double loadAxle11 [id = 1];
+    double loadAxle12 [id = 2];
+    double loadAxle13 [id = 3];
+    odcore::data::TimeStamp fromSensor [id = 4];
+}
+
+message opendlv.proxy.reverefh16.Propulsion [id = 196] {
+    double propulsionShaftVehicleSpeed [id = 1];
+    odcore::data::TimeStamp fromSensor [id = 2];
+}
+
+message opendlv.proxy.reverefh16.VehicleState [id = 197] {
+    double accelerationX [id = 1];
+    double accelerationY [id = 2];
+    double yawRate [id = 3];
+    odcore::data::TimeStamp fromSensor [id = 4];
+}
+
+message opendlv.proxy.reverefh16.Wheels [id = 198] {
+    double speedWheel111 [id = 1];
+    double speedWheel112 [id = 2];
+    double speedWheel121 [id = 3];
+    double speedWheel122 [id = 4];
+    double speedWheel131 [id = 5];
+    double speedWheel132 [id = 6];
+    odcore::data::TimeStamp fromSensor [id = 7];
+}
+
+message opendlv.proxy.reverefh16.Steering [id = 199] {
+    double roadwheelangle [id = 1];
+    double steeringwheelangle [id = 2];
+    odcore::data::TimeStamp fromSensor [id = 3];
+}
+
+// This message broadcasts the system's health as key/values.
+message opendlv.system.diagnostics.HealthStatus [id = 200] {
+    map<string,string> status [id = 1];
+}
