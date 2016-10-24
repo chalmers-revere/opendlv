@@ -73,9 +73,10 @@ odsupercomponent.pulsetimeack.exclude = odcockpit
 # knowledge-gcdc16-rule-intersectionhost
 
 # knowledge-gcdc16-v2viclcm
-knowledge-gcdc16-v2viclcm.printOutbound = 1
-knowledge-gcdc16-v2viclcm.printInbound = 1
+knowledge-gcdc16-v2viclcm.printOutbound = 0
+knowledge-gcdc16-v2viclcm.printInbound = 0
 knowledge-gcdc16-v2viclcm.record = 0
+knowledge-gcdc16-v2viclcm.participantsReady = 0
 
 # knowledge-identity
 knowledge-identity.stationId = 1
@@ -92,10 +93,11 @@ knowledge-linguistics-v2vcam.record = 0
 
 # sensation-audition
 
-# proxy-roadscape
-proxy-roadscape.devicenode = /dev/pcanusb0
+## proxy-roadscape
+proxy-roadscape.devicenode = /dev/pcanusb1
 
 # proxy-v2v
 proxy-v2v.comboxIp = 10.42.42.61
 proxy-v2v.comboxPort = 5003
 proxy-v2v.listenPort = 5000
+proxy-v2v.debug = 0
