@@ -27,7 +27,7 @@ global.buffer.memorySegmentSize = 2800000 # Size of a memory segment in bytes.
 global.buffer.numberOfMemorySegments = 4  # Number of memory segments.
 
 # The following key describes the list of modules expected to participate in this --cid session.
-global.session.expectedModules = action-act,action-communicate,action-removeloomingconflict,action-setgroundspeed,action-setopticalrotation,knowledge-gcdc16-rule-intersectionleft,knowledge-gcdc16-v2viclcm,knowledge-identity,knowledge-linguistics-v2vcam,knowledge-scene,perception-detectlane,sensation-audition,sensation-echolocation,proxy-trimble,proxy-camera-axis,proxy-fh16,proxy-sick,proxy-v2v
+global.session.expectedModules = action-act,action-communicate,action-removeloomingconflict,action-setgroundspeed,action-setopticalrotation,knowledge-gcdc16-rule-intersection,knowledge-gcdc16-v2viclcm,knowledge-identity,knowledge-linguistics-v2vcam,knowledge-scene,perception-detectlane,sensation-audition,sensation-echolocation,proxy-trimble,proxy-camera-axis,proxy-fh16,proxy-sick,proxy-v2v
 
 
 ###############################################################################
@@ -88,7 +88,7 @@ action-setgroundspeed.patienceDuration = 4.0
 action-setgroundspeed.stimulusJerkThreshold = 0.5
 action-setgroundspeed.stimulusRateThreshold = 0.5
 action-setgroundspeed.stimulusThreshold = 1.0
-action-setgroundspeed.equilibrium = 20.0  # kph
+action-setgroundspeed.equilibrium = 10.0  # kph
 
 # action-setopticalrotation
 action-setopticalrotation.correctionGain = 0.2
@@ -98,10 +98,15 @@ action-setopticalrotation.stimulusJerkThreshold =  0.02
 action-setopticalrotation.stimulusRateThreshold = 0.02
 action-setopticalrotation.stimulusThreshold = 0.02
 
-# knowledge-gcdc16-rule-intersectionleft
-knowledge-gcdc16-rule-intersectionleft.desiredGroundSpeed = 8.3
-knowledge-gcdc16-rule-intersectionleft.enableLaneFollowing = 1
-knowledge-gcdc16-rule-intersectionleft.forceScenarioStart = 1
+# knowledge-gcdc16-rule-intersection
+knowledge-gcdc16-rule-intersection.desiredGroundSpeed = 5.0 # 8.3 # m/s
+knowledge-gcdc16-rule-intersection.longitudinalDiscardDistance = 300.0
+knowledge-gcdc16-rule-intersection.lateralDiscardDistance = 50.0
+knowledge-gcdc16-rule-intersection.timeToCollision = 10.0
+knowledge-gcdc16-rule-intersection.crossingSafeAngle = 0.2
+knowledge-gcdc16-rule-intersection.isMioCrossingPath = 1   # 1 if the turning car is going to the other lane, 0 if going to the same lane
+knowledge-gcdc16-rule-intersection.enableLaneFollowing = 1
+knowledge-gcdc16-rule-intersection.forceScenarioStart = 1
 
 # knowledge-linguistics-v2vcam
 knowledge-linguistics-v2vcam.printOutbound = 0
@@ -125,23 +130,23 @@ knowledge-identity.rearAxleLocation = 5.0
 # knowledge-scene
 knowledge-scene.mergeDistance = 4.0
 knowledge-scene.validUntilDuration = 1
-knowledge-scene.memoryCapacity = 1.0 # seconds
+knowledge-scene.memoryCapacity = 5.0 # seconds
 knowledge-scene.debug = 0
 
 # perception-detectlane
 perception-detectlane.intensityThreshold = 200
-perception-detectlane.cannyThreshold = 60
-perception-detectlane.houghThreshold = 155
-perception-detectlane.memThreshold = 1.0 #seconds
-perception-detectlane.upperLaneLimit = 270
+perception-detectlane.cannyThreshold = 55
+perception-detectlane.houghThreshold = 145
+perception-detectlane.memThreshold = 0.5 #seconds
+perception-detectlane.upperLaneLimit = 250
 perception-detectlane.lowerLaneLimit = 620
 perception-detectlane.screenWidth = 1280
 perception-detectlane.screenHeight = 720
-perception-detectlane.roiX = 310
+perception-detectlane.roiX = 205
 perception-detectlane.roiY = 195
-perception-detectlane.roiWidth = 805
-perception-detectlane.roiHeight = 525
-perception-detectlane.debug = 1
+perception-detectlane.roiWidth = 1075
+perception-detectlane.roiHeight = 515
+perception-detectlane.debug = 0
 
 # sensation-audition
 

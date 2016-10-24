@@ -20,12 +20,21 @@
 version: '2'
 
 services:
+    odsupercomponent:
+        build: .
+        network_mode: "host"
+        volumes:
+        - .:/opt/opendlv.data
+        command: "/opt/od4/bin/odsupercomponent --cid=${CID} --verbose=1 --configuration=/opt/opendlv.data/configuration"
+
     # microservice for knowledge-scene
     knowledge-scene:
         build: .
         network_mode: "host"
         working_dir: "/opt/opendlv/bin"
         restart: always
+        depends_on:
+            - odsupercomponent
         command: "/opt/opendlv/bin/opendlv-system-application-knowledge-scene --cid=${CID} --freq=10"
 
     # microservice for perception-detectlane
@@ -33,8 +42,15 @@ services:
         build: .
         network_mode: "host"
         working_dir: "/opt/opendlv/bin"
+        environment:
+            - DISPLAY=$DISPLAY
+        volumes:
+            - /tmp/.X11-unix:/tmp/.X11-unix
         restart: always
-        command: "/opt/opendlv/bin/opendlv-system-application-perception-detectlane --cid=${CID}"
+        ipc: host
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv/bin/opendlv-system-application-perception-detectlane --cid=${CID} --freq=20"
 
     # microservice for proxy-camera-axis
     proxy-camera-axis:
@@ -42,4 +58,7 @@ services:
         network_mode: "host"
         working_dir: "/opt/opendlv.core/bin"
         restart: always
+        ipc: host
+        depends_on:
+            - odsupercomponent
         command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-camera-axis --cid=${CID} --freq=10"

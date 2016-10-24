@@ -67,6 +67,16 @@ services:
             - odsupercomponent
         command: "/opt/opendlv/bin/opendlv-system-application-knowledge-linguistics-v2vcam --cid=${CID} --freq=25"
 
+    # microservice for knowledge-scene
+    knowledge-scene:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv/bin"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv/bin/opendlv-system-application-knowledge-scene --cid=${CID} --freq=10"
+
     # microservice for sensation-audition
     sensation-audition:
         build: .
@@ -77,17 +87,16 @@ services:
             - odsupercomponent
         command: "/opt/opendlv/bin/opendlv-system-application-sensation-audition --cid=${CID}"
 
-#    # micro service for proxy-roadscape.
-#    proxy-roadscape:
-#        image: chalmersrevere/copplar-core-on-opendlv-on-opendlv-core-on-opendavinci-ubuntu-16.04-complete:latest
-#        network_mode: "host"
-#        restart: always
-#        devices:
-#        - "/dev/pcan32:/dev/pcanusb0"
-#        depends_on:
-#            - odsupercomponent
-#        command: "/opt/copplar.core/bin/opendlv-core-system-proxy-roadscape --cid=${CID}"
-    
+    # microservice for proxy-trimble
+    proxy-trimble:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv.core/bin"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-trimble --cid=${CID} --freq=20"
+
     # microservice for proxy-v2v
     proxy-v2v:
         build: .

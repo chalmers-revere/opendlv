@@ -1,5 +1,5 @@
-# OpenDLV - Software for driverless vehicles realized with OpenDaVINCI
-# Copyright (C) 2015 Chalmers REVERE
+# Dockerfile - Dockerfile to run OpenDLV software.
+# Copyright (C) 2016 Christian Berger
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -15,10 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-project(opendlv-system-application)
+# Date: 2016-09-09
 
-add_subdirectory(action)
-add_subdirectory(knowledge)
-add_subdirectory(perception)
-add_subdirectory(sensation)
-add_subdirectory(legacy)
+FROM seresearch/opendlv-on-opendlv-core-on-opendavinci-ubuntu-16.04-complete:latest
+
