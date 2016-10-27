@@ -435,6 +435,7 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
         + "," + std::to_string(vehicleRole);
     m_receiveLog << std::endl; 
   }
+  std::cout << "Our heading: " << m_heading << std::endl;
   if(latitude != 900000001 && longitude != 1800000001 && (m_heading > -M_PI && m_heading <= M_PI)) { //Dont make object if position is unavailable
     //This is where the objects are constructed which are to be sent out
     opendlv::data::environment::WGS84Coordinate ourGpsReference = 
