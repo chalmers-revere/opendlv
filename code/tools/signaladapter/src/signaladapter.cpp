@@ -78,15 +78,6 @@ SignalAdapter::SignalAdapter(int32_t const &a_argc, char **a_argv)
       m_listOfLibrariesToLoad(),
       m_listOfHelpers()
 {
-  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
-
-  std::string const searchPath = kv.getValue<std::string>("tools-signaladapter.directoriesForSharedLibaries");
-  std::cout << "Trying to find libodvd*.so files in: " << searchPath << std::endl;
-
-  std::vector<std::string> const paths = odcore::strings::StringToolbox::split(searchPath, ',');
-  m_listOfLibrariesToLoad = GetListOfLibrariesToLoad(paths);
-
-  FindAndLoadSharedLibraries();
 }
 
 SignalAdapter::~SignalAdapter()
@@ -182,6 +173,16 @@ void SignalAdapter::UnloadSharedLibraries()
 
 void SignalAdapter::setUp()
 {
+  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+
+  std::string const searchPath = kv.getValue<std::string>("tools-signaladapter.directoriesForSharedLibaries");
+  std::cout << "Trying to find libodvd*.so files in: " << searchPath << std::endl;
+
+  std::vector<std::string> const paths = odcore::strings::StringToolbox::split(searchPath, ',');
+  m_listOfLibrariesToLoad = GetListOfLibrariesToLoad(paths);
+
+  FindAndLoadSharedLibraries();
+
   SetUpReceivers();
   SetUpSenders();
 }
