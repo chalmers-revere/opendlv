@@ -17,7 +17,7 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-project(opendlv-system)
+project(opendlv-tools)
 
 ###########################################################################
 # Set the search path for .cmake files.
@@ -32,6 +32,11 @@ include(CompileFlags)
 ###########################################################################
 # Find CxxTest.
 include(CheckCxxTestEnvironment)
+
+##########################################################################
+# Find DL and CPPExperimental, for dynamic loading of libs
+FIND_PACKAGE (DL)
+FIND_PACKAGE (CPPexperimental)
 
 ###########################################################################
 # Find OpenDaVINCI.
@@ -67,6 +72,7 @@ include_directories(SYSTEM ${ODVDOPENDLVDATA_INCLUDE_DIRS})
 include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 include_directories(SYSTEM ${KALMAN_INCLUDE_DIR})
 include_directories(SYSTEM ${TINYCNN_INCLUDE_DIR})
+INCLUDE_DIRECTORIES(SYSTEM ${DL_INCLUDE_DIRS})
 
 ###########################################################################
 # Set libraries to link against.
@@ -74,7 +80,9 @@ set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
               ${OPENDLV_LIBRARIES}
               ${AUTOMOTIVEDATA_LIBRARIES}
               ${ODVDVEHICLE_LIBRARIES}
-              ${ODVDOPENDLVDATA_LIBRARIES})
+              ${ODVDOPENDLVDATA_LIBRARIES}
+              ${DL_LIBRARIES} 
+              ${CPPEXPERIMENTAL_LIBRARIES})
 
 #add_subdirectory(can)
 #add_subdirectory(vboreplay)

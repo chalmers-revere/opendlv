@@ -30,6 +30,8 @@ file(GLOB_RECURSE thisproject-sources
 
 add_library(${PROJECT_NAME}lib-static STATIC ${thisproject-sources})
 
+message("Library " ${LIBRARIES})
+
 add_executable(${PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
 target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 

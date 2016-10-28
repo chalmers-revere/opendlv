@@ -32,6 +32,7 @@
 
 #include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
 #include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData_Helper.h"
+#include "opendavinci/GeneratedHeaders_OpenDaVINCI_Helper.h"
 
 #include "samplebuffer.hpp"
 #include "samplevisitor.hpp"
@@ -259,9 +260,22 @@ void SignalAdapter::nextContainer(odcore::data::Container &a_container)
   if (is_served) {
     bool successfullyMapped = false;
     odcore::reflection::Message msg;
+
     if (!successfullyMapped) {
-      msg = GeneratedHeaders_ODVDOpenDLVData_Helper::__map(a_container,
-          successfullyMapped);
+      msg = GeneratedHeaders_OpenDaVINCI_Helper::__map(a_container, successfullyMapped);
+    }
+
+    if (!successfullyMapped) {
+      msg = GeneratedHeaders_ODVDOpenDLVData_Helper::__map(a_container, successfullyMapped);
+    }
+
+    if (!successfullyMapped && (m_listOfHelpers.size() > 0)) {
+      auto it = m_listOfHelpers.begin();
+      while ( (!successfullyMapped) && (it != m_listOfHelpers.end())) {
+        HelperEntry e = *it;
+        msg = e.m_helper->map(a_container, successfullyMapped);
+        it++;
+      }
     }
 
     std::cout << "Success: " << successfullyMapped << std::endl;
