@@ -115,10 +115,7 @@ std::vector<std::string> SignalAdapter::GetListOfLibrariesToLoad(std::vector<std
 
 void SignalAdapter::FindAndLoadSharedLibraries()
 {
-  auto it = m_listOfLibrariesToLoad.begin();
-  while (it != m_listOfLibrariesToLoad.end()) {
-    std::string const libraryToLoad = *it;
-    
+  for (auto libraryToLoad : m_listOfLibrariesToLoad) {
     HelperEntry e;
 
     std::cout << "Opening '" + libraryToLoad + "'..." << std::endl;
@@ -142,16 +139,12 @@ void SignalAdapter::FindAndLoadSharedLibraries()
         m_listOfHelpers.push_back(e);
       }
     }
-    it++;
   }
 }
 
 void SignalAdapter::UnloadSharedLibraries() 
 {
-  auto it = m_listOfHelpers.begin();
-  while (it != m_listOfHelpers.end()) {
-    HelperEntry e = *it;
-
+  for (auto e : m_listOfHelpers) {
     // Type to refer to the destroy method inside the shared library.
     typedef void deleteHelper_t(odcore::reflection::Helper *);
 
@@ -166,8 +159,6 @@ void SignalAdapter::UnloadSharedLibraries()
       delHelper(e.m_helper);
     }
     dlclose(e.m_dynamicObjectHandle);
-
-    it++;
   }
 }
 
@@ -270,12 +261,12 @@ void SignalAdapter::nextContainer(odcore::data::Container &a_container)
       msg = GeneratedHeaders_ODVDOpenDLVData_Helper::__map(a_container, successfullyMapped);
     }
 
-    if (!successfullyMapped && (m_listOfHelpers.size() > 0)) {
-      auto it = m_listOfHelpers.begin();
-      while ( (!successfullyMapped) && (it != m_listOfHelpers.end())) {
-        HelperEntry e = *it;
+    if (!successfullyMapped) {
+      for (auto e : m_listOfHelpers) {
         msg = e.m_helper->map(a_container, successfullyMapped);
-        it++;
+        if (successfullyMapped) {
+          break;
+        }
       }
     }
 

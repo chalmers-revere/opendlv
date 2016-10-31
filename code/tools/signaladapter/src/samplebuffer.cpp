@@ -69,9 +69,6 @@ uint8_t SampleBuffer::Iterator::ReadByte()
   uint8_t data = m_outer_buffer->m_bytes[m_read_pos];
   m_read_pos += data_length;
 
- // std::cout << " byte @" << m_read_pos-data_length << ": " << (int)data 
- //     << std::endl;
-
   return data;
 }
 
@@ -92,9 +89,6 @@ std::shared_ptr<std::vector<uint8_t>> SampleBuffer::Iterator::ReadBytes()
 
   m_read_pos += data_length;
 
-//  std::cout << " bytes @" << start_pos << "-" << end_pos << ": " << data << 
-//      std::endl;
-
   return data;
 }
 
@@ -106,9 +100,6 @@ float SampleBuffer::Iterator::ReadFloat32()
   float data = 0.0;
   memcpy(&data, &m_outer_buffer->m_bytes[m_read_pos], data_length);
   m_read_pos += data_length;
-
-//  std::cout << " float @" << m_read_pos-data_length << "-" << m_read_pos - 1 << ": " 
-//      << data << std::endl;
 
   return data;
 }
@@ -122,9 +113,6 @@ double SampleBuffer::Iterator::ReadFloat64()
   memcpy(&data, &m_outer_buffer->m_bytes[m_read_pos], data_length);
   m_read_pos += data_length;
 
-//  std::cout << " double @" << m_read_pos-data_length << "-" << m_read_pos - 1
-//      << ": " << data << std::endl;
-
   return data;
 }
 
@@ -136,9 +124,6 @@ int8_t SampleBuffer::Iterator::ReadInteger8()
   int8_t data = 0;
   memcpy(&data, &m_outer_buffer->m_bytes[m_read_pos], data_length);
   m_read_pos += data_length;
-
-//  std::cout << " int8 @" << m_read_pos-data_length <<  "-" << m_read_pos - 1
-//  << ": " << data << std::endl;
 
   return data;
 }
@@ -152,9 +137,6 @@ int16_t SampleBuffer::Iterator::ReadInteger16()
   memcpy(&data, &m_outer_buffer->m_bytes[m_read_pos], data_length);
   m_read_pos += data_length;
 
-//  std::cout << " int16 @" << m_read_pos-data_length <<  "-" << m_read_pos - 1
-//  << ": " << data << std::endl;
-
   return data;
 }
 
@@ -167,9 +149,6 @@ int32_t SampleBuffer::Iterator::ReadInteger32()
   memcpy(&data, &m_outer_buffer->m_bytes[m_read_pos], data_length);
   m_read_pos += data_length;
 
-//  std::cout << " int32 @" << m_read_pos-data_length <<  "-" << m_read_pos - 1 << ": "
-//      << data << std::endl;
-
   return data;
 }
 
@@ -181,9 +160,6 @@ int64_t SampleBuffer::Iterator::ReadInteger64()
   int64_t data = 0;
   memcpy(&data, &m_outer_buffer->m_bytes[m_read_pos], data_length);
   m_read_pos += data_length;
-
-//  std::cout << " int64 @" << m_read_pos-data_length <<  "-" << m_read_pos - 1
-//      << ": " << data << std::endl;
 
   return data;
 }
@@ -203,9 +179,6 @@ std::string SampleBuffer::Iterator::ReadString()
   std::string data = string_stream.str();
 
   m_read_pos += data_length;
-
-//  std::cout << " string @" << start_pos << "-" << end_pos << ": " << data << 
-//      std::endl;
 
   return data;
 }

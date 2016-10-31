@@ -1,5 +1,5 @@
 # OpenDLV - Software for driverless vehicles realized with OpenDaVINCI
-# Copyright (C) 2015 Chalmers REVERE
+# Copyright (C) 2015 Chalmers Revere
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
