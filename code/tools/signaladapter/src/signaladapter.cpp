@@ -279,19 +279,12 @@ void SignalAdapter::nextContainer(odcore::data::Container &a_container)
       }
     }
 
-    std::cout << "Success: " << successfullyMapped << std::endl;
     if (successfullyMapped) {
-      std::cout << msg.getLongName() << std::endl;
-      
       std::shared_ptr<SampleBuffer> sampleBuffer(new SampleBuffer);
       SampleVisitor sampleVisitor(sampleBuffer);
       msg.accept(sampleVisitor);
 
       std::string data = sampleBuffer->GetDataString();
-
-      std::cout << "Sending data: " << data << " (len: " << data.length() 
-        << ")" << std::endl;
-
       m_udpSenders[messageId]->send(data);
     }
   }

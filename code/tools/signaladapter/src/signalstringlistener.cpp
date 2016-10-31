@@ -19,6 +19,7 @@
 
 #include <cmath>
 
+#include <bitset>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -47,7 +48,7 @@ SignalStringListener::~SignalStringListener()
 void SignalStringListener::nextString(std::string const &a_string) 
 {
   SampleBuffer buffer;
-  buffer.AppendString(a_string);
+  buffer.AppendStringRaw(a_string);
 
   auto it = buffer.GetIterator();
   uint32_t messageId = it->ReadInteger32();
@@ -62,8 +63,6 @@ void SignalStringListener::nextString(std::string const &a_string)
         opendlv::proxy::ActuationRequest actuationRequest(acceleration, steering, isValid);
         odcore::data::Container actuationRequestContainer(actuationRequest);
         m_conference.send(actuationRequestContainer);
-
-        std::cout << "Actuation request sent." << std::endl;
 
         break;
       }
