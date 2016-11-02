@@ -54,12 +54,6 @@ message opendlv.model.DynamicState [id = 154] {
   int16 frameId [id = 9];
 }
 
-message opendlv.proxy.ActuationRequest [id = 160] {
-  float acceleration [id = 1];
-  float steering [id = 2];
-  bool isValid [id = 3];
-}
-
 message opendlv.proxy.AccelerometerReading [id = 161] {
   float acceleration[3] [id = 1];
 }
@@ -108,12 +102,6 @@ message opendlv.proxy.GyroscopeReading [id = 168] {
 message opendlv.proxy.LedRequest [id = 169] {
   uint8 numberOfLeds [id = 1];
   string data [id = 2];
-}
-
-message opendlv.proxy.RelayRequest [id = 170] {
-  bool relayValue [id = 1];
-  uint8 relayIndex [id = 2];
-  string deviceId [id = 3];
 }
 
 // This message is already migrated to OpenDLV.core. DO NOT CHANGE CONTENT OR IDENTIFIERS HERE!
