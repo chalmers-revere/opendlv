@@ -84,10 +84,5 @@ set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
               ${DL_LIBRARIES} 
               ${CPPEXPERIMENTAL_LIBRARIES})
 
-#add_subdirectory(can)
-#add_subdirectory(vboreplay)
 #add_subdirectory(vision)
-#add_subdirectory(simulation)
-#add_subdirectory(truckreplay)
-#add_subdirectory(dataspy)
 add_subdirectory(signaladapter)
