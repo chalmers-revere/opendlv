@@ -1,5 +1,5 @@
 # OpenDLV - Software for driverless vehicles realized with OpenDaVINCI
-# Copyright (C) 2015 Chalmers ReVeRe
+# Copyright (C) 2015 Chalmers Revere
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -33,15 +33,19 @@ include(CompileFlags)
 # Find CxxTest.
 include(CheckCxxTestEnvironment)
 
+##########################################################################
+# Find DL and CPPExperimental, for dynamic loading of libs
+FIND_PACKAGE (DL)
+FIND_PACKAGE (CPPexperimental)
+
 ###########################################################################
 # Find OpenDaVINCI.
 find_package(OpenDaVINCI REQUIRED)
 
 ###########################################################################
-# Find odcantools.
-set(AUTOMOTIVEDATA_DIR "${OPENDAVINCI_DIR}")
-set(ODCANTOOLS_DIR "${OPENDAVINCI_DIR}")
-find_package(odcantools REQUIRED)
+# Find AutomotiveData.
+SET(AUTOMOTIVEDATA_DIR "${OPENDAVINCI_DIR}")
+FIND_PACKAGE (AutomotiveData REQUIRED)
 
 ###########################################################################
 # Find OpenDLV.
@@ -49,36 +53,37 @@ set(OPENDLV_DIR "${OPENDAVINCI_DIR}")
 find_package(OpenDLV REQUIRED)
 
 ###########################################################################
-# Find reverefh16mapping.
-set(REVEREFH16MAPPING_DIR "${CMAKE_INSTALL_PREFIX}")
-find_package(reverefh16mapping REQUIRED)
-
-###########################################################################
 # Find OpenDLV data structures.
 set(OPENDLVDATA_DIR "${CMAKE_INSTALL_PREFIX}")
-find_package(opendlvdata REQUIRED)
+find_package(ODVDOpenDLVData REQUIRED)
+
+###########################################################################
+# Find ODVDVehicle.
+SET (CMAKE_MODULE_PATH "${ODVDVEHICLE_DIR}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules" ${CMAKE_MODULE_PATH})
+FIND_PACKAGE (ODVDVehicle REQUIRED)
 
 ###########################################################################
 # Set common include directories.
+INCLUDE_DIRECTORIES(SYSTEM ${AUTOMOTIVEDATA_INCLUDE_DIRS})
 include_directories(SYSTEM ${OPENDAVINCI_INCLUDE_DIRS})
 include_directories(SYSTEM ${OPENDLV_INCLUDE_DIRS})
-include_directories(SYSTEM ${ODCANTOOLS_INCLUDE_DIRS})
-include_directories(SYSTEM ${OPENDLVDATA_INCLUDE_DIRS})
-include_directories(SYSTEM ${REVEREFH16MAPPING_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(SYSTEM ${ODVDVEHICLE_INCLUDE_DIRS})
+include_directories(SYSTEM ${ODVDOPENDLVDATA_INCLUDE_DIRS})
 include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
+include_directories(SYSTEM ${KALMAN_INCLUDE_DIR})
+include_directories(SYSTEM ${TINYCNN_INCLUDE_DIR})
+INCLUDE_DIRECTORIES(SYSTEM ${DL_INCLUDE_DIRS})
 
 ###########################################################################
 # Set libraries to link against.
 set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
-              ${OPENDLV_LIBRARIES} 
-              ${ODCANTOOLS_LIBRARIES}
-              ${OPENDLVDATA_LIBRARIES}
-              ${REVEREFH16MAPPING_LIBRARIES})
+              ${OPENDLV_LIBRARIES}
+              ${AUTOMOTIVEDATA_LIBRARIES}
+              ${ODVDVEHICLE_LIBRARIES}
+              ${ODVDOPENDLVDATA_LIBRARIES}
+              ${DL_LIBRARIES} 
+              ${CPPEXPERIMENTAL_LIBRARIES})
 
-add_subdirectory(can)
-add_subdirectory(vboreplay)
-add_subdirectory(vision)
-add_subdirectory(simulation)
-add_subdirectory(truckreplay)
-add_subdirectory(dataspy)
 add_subdirectory(signalinjector)
+#add_subdirectory(vision)
+add_subdirectory(signaladapter)
