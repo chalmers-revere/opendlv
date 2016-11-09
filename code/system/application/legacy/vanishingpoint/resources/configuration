@@ -1,0 +1,20 @@
+# sample configuration for the vanishing point detection algorithm
+
+vanishingpoint.sharedimagename = DocumentationCamera0
+
+vanishingpoint.roi = topLeft(108,330), bottomRight(595,460)
+vanishingpoint.blurradius = 5
+vanishingpoint.threshold = 95
+
+# the scan regions are defined by four points. The points of each side (left or right) form an infinite line through these two points. The scan area is the triangle where points are right of the left border and left of the right border.
+vanishingpoint.leftscanregion = bottomLeft(55,452), topLeft(273,329), topRight(344,331), bottomRight(240,457)
+vanishingpoint.rightscanregion = bottomLeft(467,456), topLeft(393,325), topRight(482,326), bottomRight(608,420)
+
+vanishingpoint.maxlanemarkingwidth = 30
+vanishingpoint.maxmarkingrowcount = 80
+
+# how many pixels left or right to start the scan in the next row
+vanishingpoint.maxmarkinginclination = 3
+
+# how many pixels a contour must consist of before it is considered a lane marking
+vanishingpoint.minpixelcount = 20

@@ -1,0 +1,5 @@
+add_executable(LaneMarkingsVanishingPointDetectionModule LaneMarkingsVanishingPointDetectionModule.cpp)
+target_link_libraries(LaneMarkingsVanishingPointDetectionModule opendavinci opencv_core opencv_imgproc opencv_highgui)
+
+add_executable(ImageProcessingTestFixture ImageProcessingTestFixture.cpp)
+target_link_libraries(ImageProcessingTestFixture opencv_core opencv_imgproc opencv_highgui stdc++fs)
