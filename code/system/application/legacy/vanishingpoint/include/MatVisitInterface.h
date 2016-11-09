@@ -2,6 +2,7 @@
 #define MAT_VISIT_INTERFACE_H_
 
 #include <set>
+#include <memory>
 
 #include <opencv2/core/core.hpp>
 
@@ -12,46 +13,7 @@
 namespace lmvp {
 
 #ifndef NDEBUG
-// used for Debugging, copied from StackOverflow
-std::string type2str(int type) {
-    using std::string;
-    string r;
-
-    uchar depth = type & CV_MAT_DEPTH_MASK;
-    uchar chans = static_cast<uchar>(1 + (type >> CV_CN_SHIFT));
-
-    switch (depth) {
-    case CV_8U:
-        r = "8U";
-        break;
-    case CV_8S:
-        r = "8S";
-        break;
-    case CV_16U:
-        r = "16U";
-        break;
-    case CV_16S:
-        r = "16S";
-        break;
-    case CV_32S:
-        r = "32S";
-        break;
-    case CV_32F:
-        r = "32F";
-        break;
-    case CV_64F:
-        r = "64F";
-        break;
-    default:
-        r = "User";
-        break;
-    }
-
-    r += "C";
-    r += static_cast<char>(chans + '0');
-
-    return r;
-}
+std::string type2str(int type);
 #endif
 
 class RowVisitor {
@@ -103,7 +65,11 @@ public:
     RowVisit(PixelValue * row, ColumnIndex rowLength, RelativeDirection scanDirection)
         : row_(row)
         , rowLength_(rowLength)
-        , scanDirection_(scanDirection) { }
+        , scanDirection_(scanDirection)
+        , rowVisitors_() {}
+
+    RowVisit(const RowVisit &) = delete;
+    void operator=(const RowVisit &) = delete;
 
     void addVisitor(std::shared_ptr<RowVisitor> rowVisitor) {
         rowVisitors_.insert(rowVisitor);
@@ -207,7 +173,7 @@ private:
  */
 class MatVisit {
 public:
-    MatVisit(cv::Mat & image) : image_(image) {
+    MatVisit(cv::Mat & image) : image_(image), activeMatVisitors_() {
         if(image_.type() != CV_8UC1) {
             throw UnsupportedImageType("Only 8-bit single-channel images ares supported");
         }
@@ -215,6 +181,9 @@ public:
         activeMatVisitors_.emplace(RelativeDirection::LEFT, MatVisitors());
         activeMatVisitors_.emplace(RelativeDirection::RIGHT, MatVisitors());
     }
+
+    MatVisit(const MatVisit &) = delete;
+    void operator=(const MatVisit &) = delete;
 
     void addVisitor(std::shared_ptr<MatVisitor> matVisitor) {
         activeMatVisitors_.at(matVisitor->getScanDirection()).push_back(matVisitor);
@@ -235,7 +204,7 @@ public:
             bool allDone = true;
 
             // each line is iterated in both directions
-            for(RelativeDirection relativeDirection : SCAN_DIRECTIONS) {
+            for(RelativeDirection relativeDirection : RELATIVE_DIRECTIONS) {
                 // the iteration is guided by the RowVisit object
                 RowVisit rowVisit(row, size.width, relativeDirection);
 
@@ -292,16 +261,13 @@ private:
 
     static const std::vector<RelativeDirection> SCAN_DIRECTIONS;
 
-    std::map<RelativeDirection, MatVisitors> activeMatVisitors_;
     cv::Mat & image_;
+    std::map<RelativeDirection, MatVisitors> activeMatVisitors_;
 
 #ifndef NDEBUG
     cv::Mat * debugImage_ = NULL;
 #endif
 };
-
-const std::vector<RelativeDirection> MatVisit::SCAN_DIRECTIONS{RelativeDirection::LEFT,
-                                                               RelativeDirection::RIGHT};
 
 }
 

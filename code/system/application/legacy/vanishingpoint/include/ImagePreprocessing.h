@@ -38,7 +38,7 @@ public:
 
         cv::threshold(image, image, threshold_, 255, cv::THRESH_BINARY);
 
-        const int dilateRadius = 2;
+        //const int dilateRadius = 2;
         //cv::dilate(image, image, cv::getStructuringElement(cv::MORPH_ELLIPSE,
                  //                       cv::Size(2 * dilateRadius + 1, 2 * dilateRadius + 1)) );
 

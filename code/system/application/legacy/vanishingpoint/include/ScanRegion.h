@@ -42,10 +42,10 @@ public:
 
           denominator = other.direction_.x * direction_.y - other.direction_.y * direction_.x;
 
-        double parameter2 = static_cast<double>(numerator)/denominator,
+        double parameter2 = static_cast<double>(numerator)/static_cast<double>(denominator),
                // FIXME: use std::round on x and y when T == int
-               x = other.origin_.x + other.direction_.x * parameter2,
-               y = other.origin_.y + other.direction_.y * parameter2;
+               x = static_cast<double>(other.origin_.x) + static_cast<double>(other.direction_.x) * parameter2,
+               y = static_cast<double>(other.origin_.y) + static_cast<double>(other.direction_.y) * parameter2;
 
         return cv::Point_<T>(static_cast<T>(x), static_cast<T>(y));
     }
@@ -93,7 +93,7 @@ public:
     template<typename S>
     S getX(S y) const {
         // FIXME: use std::round in <int> specialization
-        return static_cast<S>(origin_.x + (y - static_cast<S>(origin_.y)) * getSlope());
+        return static_cast<S>(static_cast<double>(origin_.x) + static_cast<double>(y - static_cast<S>(origin_.y)) * getSlope());
     }
 
     /**
@@ -102,14 +102,14 @@ public:
     template<typename S>
     S getY(S x) const {
         // FIXME: use std::round in <int> specialization
-        return static_cast<S>(origin_.y + (x - static_cast<S>(origin_.x)) / getSlope());
+        return static_cast<S>(static_cast<double>(origin_.y) + static_cast<double>(x - static_cast<S>(origin_.x)) / getSlope());
     }
 
     /**
      * get the slope of the line
      */
     double getSlope() const {
-        return static_cast<double>(direction_.x)/direction_.y;
+        return static_cast<double>(direction_.x)/static_cast<double>(direction_.y);
     }
 
     /**
@@ -193,17 +193,14 @@ public:
     }
 
     ScanRegion(const cv::Point & lowerLeft, const cv::Point & upperLeft,
-               const cv::Point & upperRight, const cv::Point & lowerRight) {
+               const cv::Point & upperRight, const cv::Point & lowerRight)
+        : borders_() {
 
         borders_.insert(std::make_pair(RelativeDirection::LEFT,
                                        DirInfLinei(lowerLeft, upperLeft)));
 
         borders_.insert(std::make_pair(RelativeDirection::RIGHT,
                                        DirInfLinei(lowerRight, upperRight)));
-    }
-
-    cv::Point & shiftInside(cv::Point & point) {
-        throw std::runtime_error("not implemented");
     }
 
     /**

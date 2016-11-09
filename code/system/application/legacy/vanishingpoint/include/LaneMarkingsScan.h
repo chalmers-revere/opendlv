@@ -29,7 +29,9 @@ public:
         , maxMarkingRowCount_(maxMarkingRowCount)
         , maxMarkingInclination_(static_cast<int>(std::ceil(std::abs(maxMarkingInclination))))
         , minPixelCount_(minPixelCount)
-        , maxNumLaneMarkings_(maxNumLaneMarkings) {
+        , maxNumLaneMarkings_(maxNumLaneMarkings)
+        , previousRowVisitor_()
+        , laneMarkingContours_() {
 
         if(maxMarkingWidth < 0) {
             throw std::invalid_argument("maxMarkingWidth needs to be a positive value");
@@ -75,7 +77,7 @@ private:
 
     class LaneMarkingContour {
     public:
-        LaneMarkingContour(RowIndex startRow) : startRow_(startRow) {};
+        LaneMarkingContour(RowIndex startRow) : startRow_(startRow), scanLines_() {};
 
         std::vector<cv::Point> toCvContour() const {
             std::vector<cv::Point> cvContour;
@@ -198,7 +200,8 @@ public:
        : RowVisitor(startIndex)
        , endIndex_(endIndex)
        , maxScanLength_(maxScanLength)
-       , parent_(parent) {}
+       , parent_(parent)
+       , hit_() {}
 
    RowVisitor::Continuation visit(ColumnIndex columnIndex, const PixelValue & pixelValue) {
        ++visitCount_;

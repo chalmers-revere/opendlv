@@ -13,7 +13,7 @@ namespace lmvp {
 
 class LaneBorderLowpass {
 public:
-    LaneBorderLowpass(double dampingFactor) : dampingFactor_(dampingFactor) { }
+    LaneBorderLowpass(double dampingFactor) : dampingFactor_(dampingFactor), lastBorder_() { }
 
     std::shared_ptr<DirInfLinef> lowpass(std::shared_ptr<DirInfLinef> border) {
         if(!border) {
@@ -37,9 +37,9 @@ public:
     }
 
 private:
-    std::shared_ptr<DirInfLinef> lastBorder_;
-
     const double dampingFactor_;
+
+    std::shared_ptr<DirInfLinef> lastBorder_;
 };
 
 /**
@@ -184,7 +184,7 @@ private:
                         lastDash = cv::minAreaRect(*dashes.rbegin());
 
         if(dashes.size() == 1) {
-            if(firstDash.size.width * firstDash.size.height == 0.0) {
+            if(firstDash.size.width * firstDash.size.height < EPS) {
                 return std::shared_ptr<DirInfLinef>();
             }
         }

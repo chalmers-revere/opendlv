@@ -6,12 +6,15 @@
 
 #include <opencv2/core/core.hpp>
 
+// from http://stackoverflow.com/a/3599170
+#define LMVP_UNUSED(x) (void)(x)
+
 namespace lmvp {
 
 typedef uint8_t PixelValue;
 typedef int ColumnIndex;
 typedef int RowIndex;
-typedef std::vector<std::vector<cv::Point>> Contours;
+typedef std::vector<std::vector<cv::Point> > Contours;
 
 /**
  * Enum for left and right. Values are chosen to represent the human-perceived direction in the
@@ -34,18 +37,7 @@ public:
     InvalidRelativeDirection() : std::invalid_argument("Passed a direction that's neither LEFT nor RIGHT") {}
 };
 
-RelativeDirection oppositeDirection(RelativeDirection otherDirection) {
-    switch(otherDirection) {
-    case RelativeDirection::LEFT:
-        return RelativeDirection::RIGHT;
-
-    case RelativeDirection::RIGHT:
-        return RelativeDirection::LEFT;
-
-    default:
-        throw InvalidRelativeDirection();
-    }
-}
+RelativeDirection oppositeDirection(RelativeDirection otherDirection);
 
 /**
  * Calculates the sign of a number (-1 for negative, +1 for positive).
@@ -53,9 +45,11 @@ RelativeDirection oppositeDirection(RelativeDirection otherDirection) {
  * from http://stackoverflow.com/a/4609795
  */
 template <typename T>
-static int sgn(T val) {
+int sgn(T val) {
     return (T(0) < val) - (val < T(0));
 }
+
+const float EPS = 1e-6;
 
 }
 

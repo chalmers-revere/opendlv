@@ -12,7 +12,11 @@ struct Data {
 
 bool lButtonDown = false;
 
+void onMouse(int event, int x, int y, int flags, void * userdata);
+
 void onMouse(int event, int x, int y, int flags, void * userdata) {
+    UNUSED(flags);
+
     struct Data & data = *static_cast<struct Data *>(userdata);
 
     if(event == cv::EVENT_MOUSEMOVE) {

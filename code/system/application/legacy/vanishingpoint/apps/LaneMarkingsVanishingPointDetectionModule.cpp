@@ -22,7 +22,12 @@ using odcore::exceptions::ValueForKeyNotFoundException;
 using odcore::wrapper::SharedMemoryFactory;
 using odcore::wrapper::SharedMemory;
 
+void onMouse(int event, int x, int y, int flags, void * userdata);
+
 void onMouse(int event, int x, int y, int flags, void * userdata) {
+    LMVP_UNUSED(flags);
+    LMVP_UNUSED(userdata);
+
     if(event == cv::EVENT_MOUSEMOVE) {
         std::cout << "x: " << x << " y: " << y << std::endl;
     }
@@ -30,7 +35,7 @@ void onMouse(int event, int x, int y, int flags, void * userdata) {
 
 class VanishingPointLowPass {
 public:
-    VanishingPointLowPass(float dampingFactor) : dampingFactor_(dampingFactor) { }
+    VanishingPointLowPass(float dampingFactor) : dampingFactor_(dampingFactor), lastVanishingPoint_() { }
 
     std::shared_ptr<cv::Point2f> lowpass(std::shared_ptr<cv::Point2f> vanishingPoint) {
         if(!vanishingPoint) {
@@ -69,7 +74,7 @@ public:
  */
 class SharedImageCvAdapter {
 public:
-    SharedImageCvAdapter(const SharedImage & sharedImage) {
+    SharedImageCvAdapter(const SharedImage & sharedImage) : sharedImageMemory_(), imageHeader_() {
         attachToSharedMemory(sharedImage);
     }
 
@@ -100,7 +105,12 @@ class LaneMarkingsVanishingPointDetectionModule : public DataTriggeredConference
 public:
     LaneMarkingsVanishingPointDetectionModule(int32_t argc, char ** argv)
         : DataTriggeredConferenceClientModule(argc, argv, MODULE_NAME)
-        , lowpass_(.125f) {}
+        , lowpass_(.125f)
+        , sharedImageName_()
+        , leftScanRegion_()
+        , rightScanRegion_()
+        , vanishingPointDetection_()
+        , sharedImageAdapter_() {}
 
     void setUp() {
         sharedImageName_ = getSharedImageName();
@@ -244,6 +254,8 @@ private:
 
     bool pause_ = false;
 
+    VanishingPointLowPass lowpass_;
+
     std::string sharedImageName_;
 
     // the following members are defined as unique_ptr to allow for delayed initialization
@@ -254,7 +266,6 @@ private:
     std::unique_ptr<VanishingPointDetection> vanishingPointDetection_;
     std::unique_ptr<SharedImageCvAdapter> sharedImageAdapter_;
 
-    VanishingPointLowPass lowpass_;
 };
 
 const std::string LaneMarkingsVanishingPointDetectionModule::MODULE_NAME =

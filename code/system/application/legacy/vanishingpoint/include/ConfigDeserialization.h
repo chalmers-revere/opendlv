@@ -38,6 +38,8 @@ protected:
 
 class RoiBuilder : public BuilderParser<RegionOfInterestGeometry> {
 public:
+    RoiBuilder() : topLeft(), bottomRight() {}
+
     operator RegionOfInterestGeometry() const {
         return RegionOfInterestGeometry(cv::Rect(topLeft, bottomRight));
     }
@@ -63,6 +65,13 @@ private:
 
 class ScanRegionBuilder : public BuilderParser<ScanRegion> {
 public:
+    /**
+     * only exists due to a bug in GCCs -Weffc++
+     * http://stackoverflow.com/a/14002558
+     * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=16166#c3
+     */
+    ScanRegionBuilder() : bottomLeft(), topLeft(), topRight(), bottomRight() {}
+    
     operator ScanRegion() const {
         if(!valid) {
             throw Invalid();
