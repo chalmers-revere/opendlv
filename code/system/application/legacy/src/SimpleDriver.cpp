@@ -47,7 +47,7 @@
 
 #include <odvdvehicle/generated/opendlv/proxy/ActuationRequest.h>
 
-#include "simpledriver/SimpleDriver.h"
+#include "SimpleDriver.h"
 
 namespace opendlv {
 namespace legacy {

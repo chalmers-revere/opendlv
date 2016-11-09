@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-project(opendlv-system-application-legacy)
+project(opendlv-system-application-legacy-simpledriver)
 
 # Set include directories
 include_directories(include)
@@ -25,17 +25,17 @@ set(LIBRARIES ${LIBRARIES})
 
 # Build
 file(GLOB_RECURSE thisproject-sources 
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/simpledriver/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
   )
 
 add_library(${PROJECT_NAME}lib-static STATIC ${thisproject-sources})
 
-add_executable(${PROJECT_NAME}-simpledriver "${CMAKE_CURRENT_SOURCE_DIR}/src/simpledriver/main.cpp")
-target_link_libraries(${PROJECT_NAME}-simpledriver ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+add_executable(${PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
+target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
 # Test
 include(RunTests)
 
 # Install
-install(TARGETS ${PROJECT_NAME}-simpledriver RUNTIME DESTINATION bin COMPONENT system-application)
+install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin COMPONENT system-application)
 
