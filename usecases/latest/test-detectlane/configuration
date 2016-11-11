@@ -27,7 +27,7 @@ global.buffer.memorySegmentSize = 2800000 # Size of a memory segment in bytes.
 global.buffer.numberOfMemorySegments = 4  # Number of memory segments.
 
 # The following key describes the list of modules expected to participate in this --cid session.
-global.session.expectedModules = action-communicateknowledge-gcdc16-rule-intersectionright,knowledge-gcdc16-v2viclcm,knowledge-identity,knowledge-linguistics-v2vcam,knowledge-scene,perception-detectlane,sensation-audition,sensation-echolocation,proxy-trimble,proxy-camera-axis,proxy-fh16,proxy-sick,proxy-v2v,tools.cameraReplay
+global.session.expectedModules = knowledge-scene,perception-detectlane,core-tool-camera-replay
 
 
 ###############################################################################
@@ -45,11 +45,11 @@ global.session.expectedModules = action-communicateknowledge-gcdc16-rule-interse
 # about the supercomponent's real time by this increment per module. Thus, the
 # execution times per modules are better aligned with supercomponent and the
 # data exchange is somewhat more predictable.
-odsupercomponent.pulseshift.shift = 10000 # (in microseconds)
+#odsupercomponent.pulseshift.shift = 10000 # (in microseconds)
 
 # If the managed level is pulse_time_ack, this is the timeout for waiting for
 # an ACK message from a connected client.
-odsupercomponent.pulsetimeack.timeout = 5000 # (in milliseconds)
+#odsupercomponent.pulsetimeack.timeout = 5000 # (in milliseconds)
 
 # If the managed level is pulse_time_ack, the modules are triggered sequentially
 # by sending pulses and waiting for acknowledgment messages. To allow the modules
@@ -57,10 +57,10 @@ odsupercomponent.pulsetimeack.timeout = 5000 # (in milliseconds)
 # before supercomponent sends the pulse messages the next module in this execution
 # cycle. This value needs to be adjusted for networked simulations to ensure
 # deterministic execution. 
-odsupercomponent.pulsetimeack.yield = 5000 # (in microseconds)
+#odsupercomponent.pulsetimeack.yield = 5000 # (in microseconds)
 
 # List of modules (without blanks) that will not get a pulse message from odsupercomponent.
-odsupercomponent.pulsetimeack.exclude = odcockpit
+#odsupercomponent.pulsetimeack.exclude = odcockpit
 
 ###############################################################################
 ###############################################################################
@@ -70,31 +70,29 @@ odsupercomponent.pulsetimeack.exclude = odcockpit
 
 
 # knowledge-scene
-#knowledge-scene.mergeDistance = 4.0
-#knowledge-scene.validUntilDuration = 1
-#knowledge-scene.memoryCapacity = 5.0 # seconds
-#knowledge-scene.debug = 0
+knowledge-scene.mergeDistance = 4.0
+knowledge-scene.validUntilDuration = 1
+knowledge-scene.memoryCapacity = 5.0 # seconds
+knowledge-scene.debug = 0
 
 # perception-detectlane
-#perception-detectlane.intensityThreshold = 200
-#perception-detectlane.cannyThreshold = 60
-#perception-detectlane.houghThreshold = 150
-#perception-detectlane.memThreshold = 0.5 #seconds
-#perception-detectlane.upperLaneLimit = 270
-#perception-detectlane.lowerLaneLimit = 620
-#perception-detectlane.screenWidth = 1280
-#perception-detectlane.screenHeight = 720
-#perception-detectlane.roiX = 205
-#perception-detectlane.roiY = 195
-#perception-detectlane.roiWidth = 1075
-#perception-detectlane.roiHeight = 515
-#perception-detectlane.debug = 1
+perception-detectlane.intensityThreshold = 200
+perception-detectlane.cannyThreshold = 60
+perception-detectlane.houghThreshold = 150
+perception-detectlane.memThreshold = 0.5 #seconds
+perception-detectlane.upperLaneLimit = 500
+perception-detectlane.lowerLaneLimit = 620
+perception-detectlane.screenWidth = 1080
+perception-detectlane.screenHeight = 720
+perception-detectlane.roiX = 205
+perception-detectlane.roiY = 455
+perception-detectlane.roiWidth = 775
+perception-detectlane.roiHeight = 265
+perception-detectlane.debug = 1
 
-# Tool.cameraReplay
-core-tool-camera-replay.debug = 1
+
+core-tool-camera-replay.debug = 0       # 1 = show recording (requires X11), 0 = otherwise.
 core-tool-camera-replay.sourcename = AxisCamera0
 core-tool-camera-replay.filename = highway.avi
 core-tool-camera-replay.width = 1080
 core-tool-camera-replay.height = 720
-
-
