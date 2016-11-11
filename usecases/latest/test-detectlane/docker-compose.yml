@@ -53,12 +53,19 @@ services:
         command: "/opt/opendlv/bin/opendlv-system-application-perception-detectlane --cid=${CID} --freq=20"
 
     # microservice for proxy-camera-axis
-    proxy-camera-axis:
+    core-tool.camera-replay:
         build: .
-        network_mode: "host"
-        working_dir: "/opt/opendlv.core/bin"
-        restart: always
-        ipc: host
+        #group_add:
+        #    - video
         depends_on:
             - odsupercomponent
-        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-camera-axis --cid=${CID} --freq=10"
+        user: root
+        environment:
+            - DISPLAY=$DISPLAY
+        volumes:
+            - /tmp/.X11-unix:/tmp/.X11-unix
+            - .:/opt/opendlv.core.configuration
+            - ~/Videos/:/opt/Videos/
+        network_mode: "host"
+        ipc: host
+        command: "/opt/opendlv.core/bin/opendlv-core-tool-camera-replay --cid=${CID} --freq=20"
