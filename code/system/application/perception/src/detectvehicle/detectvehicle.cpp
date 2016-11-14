@@ -75,7 +75,7 @@ void DetectVehicle::setUp()
   // float scale = 1280.0f/800.0f;
   // m_scale = Eigen::Vector3d(scale, scale, 1);
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
-  m_sourceName = kv.getValue<std::string>("perception-detectvehicle.source");
+  m_sourceName = kv.getValue<std::string>("perception-detectvehicle.sourcesource");
 
   std::string path = "/opt/opendlv/share/opendlv/tools/vision/projection/";
 

@@ -1,0 +1,48 @@
+# docker-compose.yml - Micro-services to record one documentation camera.
+# Copyright (C) 2016 Hang Yin, Christian Berger
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+version: '2'
+
+services:
+    # Micro-service for odsupercomponent.
+    odsupercomponent:
+        build: .
+        image: seresearch/opendavinci-ubuntu-16.04-complete:latest
+        network_mode: host
+        volumes:
+            - .:/opt/opendlv.core.configuration
+        command: "/opt/od4/bin/odsupercomponent --cid=${CID} --verbose=1 --configuration=/opt/opendlv.core.configuration/configuration"
+
+
+    # Micro-service for core-tool-camera-replay:.
+    core-tool-camera-replay:
+        build: .
+#        group_add:
+#            - video
+        depends_on:
+            - odsupercomponent
+        user: root  # This parameter will be replaced as soon as group_add parameter is available in docker-compose, cf. https://github.com/docker/compose/pull/3709.
+        environment:
+            - DISPLAY=$DISPLAY
+        volumes:
+            - /tmp/.X11-unix:/tmp/.X11-unix
+            - .:/opt/opendlv.core.configuration
+            - ~/Videos/:/opt/Videos/
+        network_mode: host
+        ipc: host
+        command: "/opt/opendlv.core/bin/opendlv-core-tool-camera-replay --cid=${CID} --freq=20"
+
