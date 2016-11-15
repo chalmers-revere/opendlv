@@ -27,13 +27,30 @@ services:
         - .:/opt/opendlv.data
         command: "/opt/od4/bin/odsupercomponent --cid=${CID} --verbose=1 --configuration=/opt/opendlv.data/configuration"
 
+    # Micro-service for core-tool-camera-replay:.
+    core-tool-camera-replay:
+        build: .
+#        group_add:
+#            - video
+        depends_on:
+            - odsupercomponent
+        user: root  # This parameter will be replaced as soon as group_add parameter is available in docker-compose, cf. https://github.com/docker/compose/pull/3709.
+        environment:
+            - DISPLAY=$DISPLAY
+        volumes:
+            - /tmp/.X11-unix:/tmp/.X11-unix
+            - .:/opt/opendlv.core.configuration
+            - ~/Videos/:/opt/Videos/
+        network_mode: host
+        ipc: host
+        command: "/opt/opendlv.core/bin/opendlv-core-tool-camera-replay --cid=${CID} --freq=20"
 
 
     # microservice for perception-detectvehicle
     perception-detectvehicle:
         build: .
         network_mode: "host"
-        working_dir: "/opt/opendlv/bin"
+        working_dir: "/opt/opendlv"
         environment:
             - DISPLAY=$DISPLAY
         volumes:
