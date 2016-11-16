@@ -24,20 +24,25 @@
     
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
-#include <opendlv/data/environment/WGS84Coordinate.h>
+// #include <opendlv/data/environment/WGS84Coordinate.h>
 
 #include "kalman/ExtendedKalmanFilter.hpp"
 #include "geolocation/kinematicmodel.hpp"
 #include "geolocation/kinematicobservationmodel.hpp"
 
 #include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
+#include "odvdtrimble/GeneratedHeaders_ODVDTrimble.h"
+#include "odvdimu/GeneratedHeaders_ODVDIMU.h"
+#include "opendlv/data/environment/Point3.h"
+#include "opendlv/data/environment/WGS84Coordinate.h"
+
 
 namespace opendlv {
 namespace sensation {
 namespace geolocation {
 
 /**
- * This class provides...
+ * This class provides the vehicle dynamics such as position, velocity, and acceleration from vehicle model through a kalman filter.
  */
 class Geolocation
 : public odcore::base::module::TimeTriggeredConferenceClientModule {
@@ -51,45 +56,38 @@ class Geolocation
  private:
   void setUp();
   void tearDown();
+  void nextContainer(odcore::data::Container &);
 
-  /**
-    *  Accuracy of the geographical position m
-    *
-    */
-  double calculatePositionConfidence(bool a_filterSuccess);
+  // Accuracy of the geographical position m
+  double calculatePositionConfidence(bool &);
 
+  // The heading confidence in rad
+  double calculateHeadingConfidence(bool &);
 
-  /** The heading confidence in rad
-    */
-  double calculateHeadingConfidence(bool a_filterSuccess);
+  // The heading rate in rad/s.
+  double calculateHeadingRateConfidence(bool &);
 
-  /**   The heading rate in rad/s.
-    *
-    */
-  double calculateHeadingRateConfidence(bool a_filterSuccess);
+  // Speed confidence in m/s.
+  double calculateSpeedConfidence(bool &);
 
-  /**   Speed confidence in m/s.
-    *
-    */
-   double calculateSpeedConfidence(bool a_filterSuccess);
-
-   /**   Reset the EKF
-     *
-     */
-   void filterReset(opendlv::data::environment::Point3 a_currentCartesianLocation,
-                    opendlv::proxy::GpsReading a_currentWGS84Location );
+  void filterReset(opendlv::data::environment::Point3 &, opendlv::core::sensors::trimble::GpsReading &);
 
 
 
-   Kalman::ExtendedKalmanFilter<opendlv::sensation::geolocation::State<double>>
-       m_ekf;
+  Kalman::ExtendedKalmanFilter<opendlv::sensation::geolocation::State<double>> m_ekf;
+  opendlv::core::sensors::trimble::GpsReading m_gpsReading;
+  opendlv::proxy::MagnetometerReading m_magnetometerReading; 
+  opendlv::proxy::AccelerometerReading m_accelerometerReading;
+  opendlv::proxy::reverefh16::Steering m_steeringReading;
+  opendlv::proxy::reverefh16::Propulsion m_propulsionReading;
 
+  bool m_debug;
 
+  bool m_initialised;
+  // Displacement between the real position of the GPS and the CoG of the vehicle in [m]
+  double m_gpsToCoGDisplacement[3] = {-1.0f,-2.3f,-22.0f};
 
-   const double m_gpsToCoGDisplacement_x = -1.5; ///--> Displacement between the real position of the GPS and the CoG of the vehicle in [m]
-   const double m_gpsToCoGDisplacement_y = -1.0; ///--> Displacement between the real position of the GPS and the CoG of the vehicle in [m]
-   const double m_gpsToCoGDisplacement_z = -2.3; ///--> Displacement between the real position of the GPS and the CoG of the vehicle in [m]
-   const double m_steeringToWheelRatio = -22.0;  ///--> Ration between the steering wheel angle sensor and the actual wheels angle
+  double m_steeringToWheelRatio = -22.0f;  ///--> Ration between the steering wheel angle sensor and the actual wheels angle
 
 
 };
