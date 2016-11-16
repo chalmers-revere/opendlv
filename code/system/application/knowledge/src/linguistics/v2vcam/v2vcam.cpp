@@ -474,15 +474,15 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
         ourGeolocation.transform(theirGeolocation);
     double xOffset = currentObjectCartesianLocation.getX();
     double yOffset = currentObjectCartesianLocation.getY();
-    double heading = m_heading;
-    while (heading < -M_PI) {
-      heading += 2.0 * M_PI;
+    double heading1 = m_heading;
+    while (heading1 < -M_PI) {
+      heading1 += 2.0 * M_PI;
     }
-    while (heading > M_PI) {
-      heading -= 2.0 * M_PI;
+    while (heading1 > M_PI) {
+      heading1 -= 2.0 * M_PI;
     }
-    
-    double azimuth = std::atan2(yOffset, xOffset) - heading;
+
+    double azimuth = std::atan2(yOffset, xOffset) - heading1;
     while (azimuth < -M_PI) {
       azimuth += 2.0 * M_PI;
     }
