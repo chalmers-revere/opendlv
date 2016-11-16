@@ -88,11 +88,13 @@ knowledge-identity.rearAxleLocation = 1.1
 knowledge-linguistics-v2vcam.printOutbound = 0
 knowledge-linguistics-v2vcam.printInbound = 1
 knowledge-linguistics-v2vcam.record = 0
+knowledge-linguistics-v2vcam.debug = 1
 
 # sensation-audition
 
 ## proxy-roadscape
-proxy-roadscape.devicenode = /dev/pcanusb1
+proxy-applanix.ip = 10.42.42.40
+proxy-applanix.port = 5602
 
 # proxy-v2v
 proxy-v2v.comboxIp = 10.42.42.61
