@@ -154,7 +154,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 
     float heading = static_cast<float>(atan2(magneticField[1],magneticField[0]));
     if(m_debug){
-      std::cout << "Heading: " << 180*heading / M_PI << std::endl;
+      std::cout << "Heading: " << 180*heading / static_cast<float>(M_PI) << std::endl;
     }
 
     magneticField[0] = magneticField[0]*cosf(pitch)+magneticField[2]*sinf(pitch);
@@ -163,7 +163,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
     
     heading = static_cast<float>(atan2(magneticField[1],magneticField[0]));
     if(m_debug){
-      std::cout << "Tilt compensation: "<< 180*heading / M_PI << " (Pitch, Roll): " << pitch << "," << roll <<std::endl;
+      std::cout << "Tilt compensation: "<< 180*heading / static_cast<float>(M_PI) << " (Pitch, Roll): " << pitch << "," << roll <<std::endl;
     }
 
     float headingConfidence = 0.0f;
