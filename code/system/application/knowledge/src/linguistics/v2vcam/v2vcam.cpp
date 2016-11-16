@@ -489,6 +489,7 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
     double localXOffset = std::sin(azimuth) * static_cast<double>(distance);
     double localYOffset = std::cos(azimuth) * static_cast<double>(distance);
 
+    // TODO: Simplification where we assume that the other vehicle has the same heading as ourselves.
     double azimuthCorner = std::atan2(localYOffset - vehicleWidth / 2.0, localXOffset);
 
     float angularSize = static_cast<float>(2.0 * (azimuth - azimuthCorner));
