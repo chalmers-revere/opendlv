@@ -82,37 +82,37 @@ class V2vCam
   int32_t GetYawRateConfidence() const;
   int32_t GetVehicleRole() const;
 
-  bool m_initialised;
   std::ofstream m_sendLog;
   std::ofstream m_receiveLog;
   std::time_t m_timeType2004;
   bool m_printInbound;
   bool m_printOutbound;
   bool m_record;
+  bool m_debug;
+  bool m_receivedGeolocation;
 
-
-  unsigned char const m_messageId = 2;
-  int32_t m_stationId = 0;
-  int32_t m_generationDeltaTime = 0; 
-  unsigned char m_containerMask = 0;
-  int32_t m_stationType = 0;
-  double m_latitude = 90.0000001;
-  double m_longitude = 180.0000001;
-  double m_semiMajorConfidence = -1;
-  double m_semiMinorConfidence = -1;
-  double m_semiMajorOrientation = -1;
-  double m_altitude = 8000.01;
-  double m_heading = -1;
-  double m_headingConfidence = -1;
-  double m_speed = -1; //
-  double m_speedConfidence = -1;
-  double m_vehicleLength = -1;
-  double m_vehicleWidth = -1;
-  double m_longitudinalAcc = -1;
-  double m_longitudinalAccConf = -1;
-  double m_yawRateValue = 0;
-  double m_yawRateConfidence = -1;
-  int32_t m_vehicleRole = 0;
+  unsigned char const m_messageId;
+  int32_t m_stationId;
+  int32_t m_generationDeltaTime; 
+  unsigned char m_containerMask;
+  int32_t m_stationType;
+  double m_latitude;
+  double m_longitude;
+  double m_semiMajorConfidence;
+  double m_semiMinorConfidence;
+  double m_semiMajorOrientation;
+  double m_altitude;
+  double m_heading;
+  double m_headingConfidence;
+  double m_speed;
+  double m_speedConfidence;
+  double m_vehicleLength;
+  double m_vehicleWidth;
+  double m_longitudinalAcc;
+  double m_longitudinalAccConf;
+  double m_yawRateValue;
+  double m_yawRateConfidence;
+  int32_t m_vehicleRole;
 };
 
 } // v2vcam
