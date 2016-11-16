@@ -49,9 +49,18 @@ Geolocation::Geolocation(int32_t const &a_argc, char **a_argv)
     : TimeTriggeredConferenceClientModule(a_argc, a_argv, "sensation-geolocation")
     , m_ekf()
     , m_gpsReading()
+    , m_magnetometerReading()
+    , m_accelerometerReading()
     , m_steeringReading()
     , m_propulsionReading()
+    , m_debug()
+    , m_initialised(false)
 {
+  m_gpsReading = opendlv::core::sensors::trimble::GpsReading();
+  m_magnetometerReading = opendlv::proxy::MagnetometerReading();
+  float const acc[3] = {0,0,-9.82};
+  m_accelerometerReading = opendlv::proxy::AccelerometerReading(acc);
+  // m_accelerometerReading.setAcceleration();
 }
 
 Geolocation::~Geolocation()
@@ -60,7 +69,10 @@ Geolocation::~Geolocation()
 
 void Geolocation::setUp()
 {
+  odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+  m_debug = (kv.getValue< int32_t >("sensation-geolocation.debug") == 1);
   std::cout << "["<< getName() << "]: Geolocation module has started." << std::endl;
+  m_initialised = true;
 }
 
 void Geolocation::tearDown()
@@ -69,8 +81,15 @@ void Geolocation::tearDown()
 
 void Geolocation::nextContainer(odcore::data::Container &a_c)
 {
+  if(!m_initialised) {
+    return;
+  }
   if(a_c.getDataType() == opendlv::core::sensors::trimble::GpsReading::ID()) {
     m_gpsReading = a_c.getData<opendlv::core::sensors::trimble::GpsReading>();
+  } else if(a_c.getDataType() == opendlv::proxy::MagnetometerReading::ID()) {
+    m_magnetometerReading = a_c.getData<opendlv::proxy::MagnetometerReading>();
+  } else if(a_c.getDataType() == opendlv::proxy::AccelerometerReading::ID()) {
+    m_accelerometerReading = a_c.getData<opendlv::proxy::AccelerometerReading>();
   } else if(a_c.getDataType() == opendlv::proxy::reverefh16::Steering::ID()) {
     m_steeringReading = a_c.getData<opendlv::proxy::reverefh16::Steering>();
   } else if(a_c.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
@@ -80,30 +99,117 @@ void Geolocation::nextContainer(odcore::data::Container &a_c)
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 {
-  opendlv::data::environment::WGS84Coordinate gpsReference;
-  bool hasGpsReference = false;
+  
+  // opendlv::data::environment::WGS84Coordinate gpsReference;
+  // bool hasGpsReference = false;
 
-  odcore::data::TimeStamp previousTimestep;
-  odcore::data::TimeStamp previousDataTimestamp;
-  double velocityBefore = 0.0;
+  // odcore::data::TimeStamp previousTimestep;
+  // odcore::data::TimeStamp previousDataTimestamp;
+  // double velocityBefore = 0.0;
 
-  opendlv::data::environment::Point3 locationBefore(0.0, 0.0, 0.0);
+  // opendlv::data::environment::Point3 locationBefore(0.0, 0.0, 0.0);
 
-  double timestamp = 0.0;
-  double travelDistance = 0.0;
+  // double timestamp = 0.0;
+  // double travelDistance = 0.0;
 
-  Control<double> control;
+  // Control<double> control;
 
-  SystemModel<double> systemModel;
+  // SystemModel<double> systemModel;
 
-  State<double> state;
-  state.setZero();
-  m_ekf.init(state);
+  // State<double> state;
+  // state.setZero();
+  // m_ekf.init(state);
 
-  KinematicObservationModel<double> kinematicObservationModel(0.0, 0.0, 0.0);
+  // KinematicObservationModel<double> kinematicObservationModel(0.0, 0.0, 0.0);
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+    double latitude = m_gpsReading.getLatitude();
+    double longitude = m_gpsReading.getLongitude();
+    float altitude = static_cast<float>(m_gpsReading.getAltitude());
+    float positionConfidence = 0.0f;
 
+    float *tempAcc = m_accelerometerReading.getAcceleration();
+    float acc[3] = {tempAcc[0],tempAcc[1],tempAcc[2]};
+    float *tempMag = m_magnetometerReading.getMagneticField();
+    float magneticField[3] = {tempMag[0],tempMag[1],tempMag[2]};
+
+    // Tilt compensation
+    float roll = atan2(acc[1],acc[2])+static_cast<float>(M_PI);
+    while (roll < -static_cast<float>(M_PI)) {
+      roll += 2*static_cast<float>(M_PI);
+    }
+    while (roll > static_cast<float>(M_PI)) {
+      roll -= 2*static_cast<float>(M_PI);
+    }
+
+    float pitch = atan2(-acc[0], sqrt(acc[1]*acc[1]+acc[2]*acc[2]));
+    
+    // float roll = atan2(acc[1],acc[2]);
+    // float pitch = atan2(-acc[0], acc[1]*sinf(roll)+acc[2]*cosf(roll));
+    // float roll = asinf(-acc[0]);
+    // float pitch = asinf(acc[1]/cosf(roll));
+
+    float heading = static_cast<float>(180 * atan2(magneticField[1],magneticField[0]) / static_cast<float>(M_PI));
+    if(m_debug){
+      std::cout << "Heading: " << heading << std::endl;
+    }
+
+    magneticField[0] = magneticField[0]*cosf(pitch)+magneticField[2]*sinf(pitch);
+    magneticField[1] = magneticField[0]*sinf(pitch)*sinf(roll) + magneticField[1]*cosf(roll) - magneticField[2]*sinf(roll)*cosf(pitch);
+    magneticField[2] = -magneticField[0]*cosf(roll)*sinf(pitch) + magneticField[1]*sinf(roll) + magneticField[2]*cosf(roll)*cosf(pitch);
+    
+    heading = static_cast<float>(180 * atan2(magneticField[1],magneticField[0]) /static_cast<float>(M_PI));
+    if(m_debug){
+      std::cout << "Tilt compensation: "<< heading << " (Pitch, Roll): " << pitch << "," << roll <<std::endl;
+    }
+
+    float headingConfidence = 0.0f;
+    
+
+
+    opendlv::sensation::Geolocation geolocation(latitude,
+        positionConfidence,
+        longitude,
+        positionConfidence,
+        altitude,
+        heading,  
+        headingConfidence);
+      
+    odcore::data::Container msg(geolocation);
+    getConference().send(msg);
+
+    if(m_debug){
+      std::cout << geolocation.toString() << std::endl;
+    }
+
+    float const v = static_cast<float>(m_propulsionReading.getPropulsionShaftVehicleSpeed()/3.6);
+
+    opendlv::model::Cartesian3 velocity(v, 0.0f, 0.0f);
+    // opendlv::model::Cartesian3 velocity(gpsReading.getSpeed(), 0.0f, 0.0f);
+    opendlv::model::Cartesian3 velocityConfidence(0.0f, 0.0f, 0.0f);
+
+    opendlv::model::Cartesian3 acceleration(0.0f , 0.0f,0.0f);
+    opendlv::model::Cartesian3 accelerationConfidence(0.0f, 0.0f, 0.0f);
+    
+    opendlv::model::Cartesian3 angularVelocity(0.0f, 0.0f, 0.0f);
+    opendlv::model::Cartesian3 angularVelocityConfidence(0.0f, 0.0f, 0.0f);
+
+    opendlv::model::Cartesian3 angularAcceleration(0.0f, 0.0f, 0.0f);
+    opendlv::model::Cartesian3 angularAccelerationConfidence(0.0f, 0.0f, 0.0f);
+
+
+    int16_t frameId = 0;
+
+    opendlv::model::DynamicState dynamicState(velocity, velocityConfidence,
+        acceleration, accelerationConfidence, angularVelocity,
+        angularVelocityConfidence, angularAcceleration,
+        angularAccelerationConfidence, frameId);
+
+    odcore::data::Container dynamicStateContainer(dynamicState);
+    getConference().send(dynamicStateContainer);
+
+
+  /*
     odcore::data::TimeStamp now;
 
 
@@ -361,6 +467,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       //           << "\n\n" <<  std::endl;
       
     }
+    */
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }

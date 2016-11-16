@@ -32,6 +32,7 @@
 
 #include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
 #include "odvdtrimble/GeneratedHeaders_ODVDTrimble.h"
+#include "odvdimu/GeneratedHeaders_ODVDIMU.h"
 #include "opendlv/data/environment/Point3.h"
 #include "opendlv/data/environment/WGS84Coordinate.h"
 
@@ -75,9 +76,14 @@ class Geolocation
 
   Kalman::ExtendedKalmanFilter<opendlv::sensation::geolocation::State<double>> m_ekf;
   opendlv::core::sensors::trimble::GpsReading m_gpsReading;
+  opendlv::proxy::MagnetometerReading m_magnetometerReading; 
+  opendlv::proxy::AccelerometerReading m_accelerometerReading;
   opendlv::proxy::reverefh16::Steering m_steeringReading;
   opendlv::proxy::reverefh16::Propulsion m_propulsionReading;
 
+  bool m_debug;
+
+  bool m_initialised;
   // Displacement between the real position of the GPS and the CoG of the vehicle in [m]
   double m_gpsToCoGDisplacement[3] = {-1.0f,-2.3f,-22.0f};
 
