@@ -94,3 +94,18 @@ services:
         depends_on:
             - odsupercomponent
         command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-v2v --cid=${CID}"
+
+    #odrecorderh264
+    odrecorderh264:
+        build: .
+        image: seresearch/opendavinci-ubuntu-16.04-complete:latest
+        depends_on:
+            - odsupercomponent
+        volumes:
+            - ~/storage1:/opt/recordings
+        user: root  # This parameter will be replaced as soon as group_add parameter is available in docker-compose, cf. https://github.com/docker/compose/pull/3709.
+        network_mode: host
+        ipc: host
+        working_dir: "/opt/recordings"
+        command: "/opt/od4/bin/odrecorderh264 --cid=${CID}"
+
