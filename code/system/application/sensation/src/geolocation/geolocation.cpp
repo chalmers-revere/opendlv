@@ -25,8 +25,10 @@
 #include <iostream>
 #include <math.h>
 
-#include "opendavinci/odcore/data/Container.h"
-#include "opendavinci/odcore/data/TimeStamp.h"
+#include <opendavinci/odcore/data/Container.h>
+#include <opendavinci/odcore/data/TimeStamp.h>
+#include <opendlv/data/environment/WGS84Coordinate.h>
+
 
 // #include "opendlv/data/environment/Point3.h"
 // #include <fh16mapping/GeneratedHeaders_fh16mapping.h>
@@ -56,7 +58,7 @@ Geolocation::Geolocation(int32_t const &a_argc, char **a_argv)
     , m_debug()
     , m_initialised(false)
 {
-  m_gpsReading = opendlv::core::sensors::trimble::GpsReading();
+  m_gpsReading = opendlv::data::environment::WGS84Coordinate();
   m_magnetometerReading = opendlv::proxy::MagnetometerReading();
   float const acc[3] = {0,0,-9.82};
   m_accelerometerReading = opendlv::proxy::AccelerometerReading(acc);
@@ -84,8 +86,8 @@ void Geolocation::nextContainer(odcore::data::Container &a_c)
   if(!m_initialised) {
     return;
   }
-  if(a_c.getDataType() == opendlv::core::sensors::trimble::GpsReading::ID()) {
-    m_gpsReading = a_c.getData<opendlv::core::sensors::trimble::GpsReading>();
+  if(a_c.getDataType() == opendlv::data::environment::WGS84Coordinate::ID()) {
+    m_gpsReading = a_c.getData<opendlv::data::environment::WGS84Coordinate>();
   } else if(a_c.getDataType() == opendlv::proxy::MagnetometerReading::ID()) {
     m_magnetometerReading = a_c.getData<opendlv::proxy::MagnetometerReading>();
   } else if(a_c.getDataType() == opendlv::proxy::AccelerometerReading::ID()) {
@@ -125,7 +127,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
     double latitude = m_gpsReading.getLatitude();
     double longitude = m_gpsReading.getLongitude();
-    float altitude = static_cast<float>(m_gpsReading.getAltitude());
+//    float altitude = static_cast<float>(m_gpsReading.getAltitude());
+    float altitude = 0.0f; // TODO: Use a GPS format with altitude, for example GpsReading, which is also available from all GPSs.
     float positionConfidence = 0.0f;
 
     float *tempAcc = m_accelerometerReading.getAcceleration();
