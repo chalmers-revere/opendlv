@@ -299,7 +299,7 @@ void V2vCam::nextContainer(odcore::data::Container &a_c)
   } else if (a_c.getDataType() == opendlv::sensation::Voice::ID()) {
     opendlv::sensation::Voice voice = a_c.getData<opendlv::sensation::Voice>();
     if(strcmp(voice.getType().c_str(), "cam") != 0) {
-      std::cout << "Message type not CAM." << std::endl;
+      // std::cout << "Message type not CAM." << std::endl;
       return;
     }
     ReadVoice(voice);

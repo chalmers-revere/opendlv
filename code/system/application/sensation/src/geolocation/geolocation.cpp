@@ -149,18 +149,18 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
     // float roll = asinf(-acc[0]);
     // float pitch = asinf(acc[1]/cosf(roll));
 
-    float heading = static_cast<float>(180 * atan2(magneticField[1],magneticField[0]) / static_cast<float>(M_PI));
+    float heading = static_cast<float>(atan2(magneticField[1],magneticField[0]));
     if(m_debug){
-      std::cout << "Heading: " << heading << std::endl;
+      std::cout << "Heading: " << 180*heading / M_PI << std::endl;
     }
 
     magneticField[0] = magneticField[0]*cosf(pitch)+magneticField[2]*sinf(pitch);
     magneticField[1] = magneticField[0]*sinf(pitch)*sinf(roll) + magneticField[1]*cosf(roll) - magneticField[2]*sinf(roll)*cosf(pitch);
     magneticField[2] = -magneticField[0]*cosf(roll)*sinf(pitch) + magneticField[1]*sinf(roll) + magneticField[2]*cosf(roll)*cosf(pitch);
     
-    heading = static_cast<float>(180 * atan2(magneticField[1],magneticField[0]) /static_cast<float>(M_PI));
+    heading = static_cast<float>(atan2(magneticField[1],magneticField[0]));
     if(m_debug){
-      std::cout << "Tilt compensation: "<< heading << " (Pitch, Roll): " << pitch << "," << roll <<std::endl;
+      std::cout << "Tilt compensation: "<< 180*heading / M_PI << " (Pitch, Roll): " << pitch << "," << roll <<std::endl;
     }
 
     float headingConfidence = 0.0f;
