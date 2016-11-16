@@ -356,8 +356,13 @@ void V2vCam::ReadGeolocation(
   m_longitude = a_geolocation.getLongitude();
   m_altitude = a_geolocation.getAltitude();
   m_heading = a_geolocation.getHeading();
+  while (m_heading < 0) {
+    m_heading += 2.0 * M_PI;
+  }
+  while (m_heading > 2*M_PI) {
+    m_heading -= 2.0 * M_PI;
+  }
   m_headingConfidence = a_geolocation.getHeadingConfidence();
-
   m_semiMajorConfidence = a_geolocation.getLatitudeConfidence();
   m_semiMinorConfidence = a_geolocation.getLongitudeConfidence();
 
@@ -469,14 +474,22 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
         ourGeolocation.transform(theirGeolocation);
     double xOffset = currentObjectCartesianLocation.getX();
     double yOffset = currentObjectCartesianLocation.getY();
+    double heading = m_heading;
+    while (heading < -M_PI) {
+      heading += 2.0 * M_PI;
+    }
+    while (heading > M_PI) {
+      heading -= 2.0 * M_PI;
+    }
     
-    double azimuth = std::atan2(yOffset, xOffset) - m_heading;
-    while (azimuth < -3.14159) {
-      azimuth += 2.0 * 3.14159;
+    double azimuth = std::atan2(yOffset, xOffset) - heading;
+    while (azimuth < -M_PI) {
+      azimuth += 2.0 * M_PI;
     }
-    while (azimuth > 3.14159) {
-      azimuth -= 2.0 * 3.14159;
+    while (azimuth > M_PI) {
+      azimuth -= 2.0 * M_PI;
     }
+    
     opendlv::model::Direction objectDirection(azimuth, 0.0f);
     float objectDirectionConfidence = 0.5f;
 
@@ -674,7 +687,7 @@ int32_t V2vCam::GetHeading() const
 {
   double conversion = opendlv::Constants::RAD2DEG;
   int32_t scale = std::pow(10,1);
-  double val = (m_heading + M_PI)*scale*conversion;
+  double val = m_heading*scale*conversion;
   if(val < 0 || val > 3600 || std::isnan(val)){
     return 3601;
   }
