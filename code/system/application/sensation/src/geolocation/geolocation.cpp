@@ -27,7 +27,6 @@
 
 #include <opendavinci/odcore/data/Container.h>
 #include <opendavinci/odcore/data/TimeStamp.h>
-#include <opendlv/data/environment/WGS84Coordinate.h>
 
 
 // #include "opendlv/data/environment/Point3.h"

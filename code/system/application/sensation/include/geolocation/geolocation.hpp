@@ -24,7 +24,6 @@
     
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
-// #include <opendlv/data/environment/WGS84Coordinate.h>
 
 #include "kalman/ExtendedKalmanFilter.hpp"
 #include "geolocation/kinematicmodel.hpp"
@@ -75,7 +74,8 @@ class Geolocation
 
 
   Kalman::ExtendedKalmanFilter<opendlv::sensation::geolocation::State<double>> m_ekf;
-  opendlv::core::sensors::trimble::GpsReading m_gpsReading;
+  opendlv::data::environment::WGS84Coordinate m_gpsReading;
+
   opendlv::proxy::MagnetometerReading m_magnetometerReading; 
   opendlv::proxy::AccelerometerReading m_accelerometerReading;
   opendlv::proxy::reverefh16::Steering m_steeringReading;
