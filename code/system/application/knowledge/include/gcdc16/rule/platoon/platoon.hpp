@@ -46,40 +46,21 @@ class Platoon : public odcore::base::module::TimeTriggeredConferenceClientModule
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
  private:
+  void ActOnEnvironment(opendlv::perception::Environment &);
+  void ActOnMio(std::vector<opendlv::perception::Object> &);
+  void ActOnLane(std::vector<opendlv::perception::Surface> &);
+  void ControlDirectionOfMovement(float);
+  void ControlGroundSpeed(float);
   void setUp();
   void tearDown();
-  //double getDistances(double);
-  //bool euclideanDistance(double);
-
-  void receivedContainerMergeScenario(odcore::data::Container &a_container);
-  void receivedContainerIntersectionScenario(odcore::data::Container &a_container);
-  void bodyMergeScenario();
-  void bodyIntersectionScenario();
 
  private:
-
-  std::unique_ptr<opendlv::perception::Object> m_object;
-  opendlv::perception::Object m_closestObject;
-  opendlv::perception::Object m_secondClosestObject;
-  opendlv::perception::Object m_mostInterestingObject;
-  float m_desiredAzimuth;
-  float m_cruiseSpeed;
-  float m_desiredAngularSize;
-  float m_speed;
-  bool m_isAutonomous;
-  std::string m_platoonId;
-  std::string m_currentLane;
-  std::string m_isTail;
-  bool m_hasMerged;
-  bool m_isInitialized;
-  bool m_scenarioIsReady;
-  bool m_isLeader;
-  std::string m_scenarioType;
-  bool m_hasSetupBeenRun;
-  bool m_isCreatingGap;
-  //double standstillDistance;
-  //double headway;
-  //double minimumEuclideanDistance;
+  float m_desiredGroundSpeed;
+  float m_desiredGroundSpeedMax;
+  float m_previousAzimuthFollowed;
+  float m_lateralDiscardDistance;
+  float m_longitudinalDiscardDistance;
+  float m_timeToCollision;
 };
 
 } // platoon
