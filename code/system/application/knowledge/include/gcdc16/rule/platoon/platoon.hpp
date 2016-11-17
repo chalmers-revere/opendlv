@@ -55,11 +55,13 @@ class Platoon : public odcore::base::module::TimeTriggeredConferenceClientModule
   void tearDown();
 
  private:
+  bool m_steerTowardsMio;
   float m_desiredGroundSpeed;
   float m_desiredGroundSpeedMax;
   float m_previousAzimuthFollowed;
   float m_lateralDiscardDistance;
   float m_longitudinalDiscardDistance;
+  float m_steerTowardsMioThreshold;
   float m_timeToCollision;
 };
 

@@ -46,11 +46,13 @@ namespace platoon {
 Platoon::Platoon(int32_t const &a_argc, char **a_argv)
 : TimeTriggeredConferenceClientModule(
   a_argc, a_argv, "knowledge-gcdc16-platoon"),
+  m_steerTowardsMio(false),
   m_desiredGroundSpeed(),
   m_desiredGroundSpeedMax(),
   m_previousAzimuthFollowed(),
   m_lateralDiscardDistance(300.0f),
   m_longitudinalDiscardDistance(50.0f),
+  m_steerTowardsMioThreshold(0.1f),
   m_timeToCollision(10.0f)
 {
 }
@@ -73,6 +75,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Platoon::body()
 
 void Platoon::ActOnEnvironment(opendlv::perception::Environment &a_environment)
 {
+  m_steerTowardsMio = false;
+
   odcore::data::TimeStamp now;
   odcore::data::TimeStamp environmentValidUntil = a_environment.getValidUntil();
   if (now.toMicroseconds() - environmentValidUntil.toMicroseconds() > 0) {
@@ -83,10 +87,12 @@ void Platoon::ActOnEnvironment(opendlv::perception::Environment &a_environment)
   if (listOfObjects.size() > 0) {
     ActOnMio(listOfObjects);
   }
-  
-  auto listOfSurfaces = a_environment.getListOfSurfaces();
-  if (listOfSurfaces.size() > 0) {
-    ActOnLane(listOfSurfaces);
+ 
+  if (!m_steerTowardsMio) { 
+    auto listOfSurfaces = a_environment.getListOfSurfaces();
+    if (listOfSurfaces.size() > 0) {
+      ActOnLane(listOfSurfaces);
+    }
   }
 }
 
@@ -113,6 +119,14 @@ void Platoon::ActOnMio(std::vector<opendlv::perception::Object> &a_listOfObjects
 
         float speed_new = std::min(m_desiredGroundSpeedMax, longitudinal / m_timeToCollision);
         std::cout << "MIO is leading. New speed: " << speed_new << std::endl;
+
+        if (std::abs(azimuth) < m_steerTowardsMioThreshold) {
+          m_steerTowardsMio = true;
+          std::cout << "Steer towards MIO." << std::endl;
+    
+          m_previousAzimuthFollowed = azimuth;
+          ControlDirectionOfMovement(azimuth);
+        }
  
         if (speed_new < 0.0f) {
           speed_new = 0.0f;
@@ -152,6 +166,7 @@ void Platoon::ActOnLane(std::vector<opendlv::perception::Surface> &a_listOfSurfa
   }
 
   if (azimuth_new < std::numeric_limits<float>::max()) {
+    std::cout << "Steer towards lane " << azimuth_new << std::endl;
     m_previousAzimuthFollowed = azimuth_new;
     ControlDirectionOfMovement(azimuth_new);
   }
@@ -195,6 +210,7 @@ void Platoon::setUp()
   m_lateralDiscardDistance = static_cast<float>(kv.getValue<double>("knowledge-gcdc16-rule-platoon.lateralDiscardDistance"));
   m_longitudinalDiscardDistance = static_cast<float>(kv.getValue<double>("knowledge-gcdc16-rule-platoon.longitudinalDiscardDistance"));
   m_timeToCollision = static_cast<float>(kv.getValue<double>("knowledge-gcdc16-rule-platoon.timeToCollision"));
+  m_steerTowardsMioThreshold = static_cast<float>(kv.getValue<double>("knowledge-gcdc16-rule-platoon.steerTowardsMioThreshold"));
 }
 
 void Platoon::tearDown()
