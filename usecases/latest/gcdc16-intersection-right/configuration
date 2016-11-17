@@ -150,6 +150,9 @@ perception-detectlane.debug = 0
 
 # sensation-audition
 
+# sensation-geolocation
+sensation-geolocation.debug = 1
+
 # sensation-echolocation
 sensation-echolocation.memoryThreshold = 0
 sensation-echolocation.pointCloudSizeMinimum = 3 #number of points

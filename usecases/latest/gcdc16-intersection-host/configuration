@@ -109,6 +109,9 @@ knowledge-linguistics-v2vcam.debug = 0
 
 # sensation-audition
 
+# sensation-geolocation
+sensation-geolocation.debug = 1
+
 ## proxy-roadscape
 proxy-applanix.ip = 10.42.42.40
 proxy-applanix.port = 5602
