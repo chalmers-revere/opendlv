@@ -22,6 +22,7 @@
 
 #include <memory>
     
+#include "opendavinci/odcore/base/Mutex.h"
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
 
@@ -72,6 +73,7 @@ class Geolocation
   void filterReset(opendlv::data::environment::Point3 &, opendlv::core::sensors::trimble::GpsReading &);
 
 
+  odcore::base::Mutex m_gpsReadingMutex;
 
   Kalman::ExtendedKalmanFilter<opendlv::sensation::geolocation::State<double>> m_ekf;
   opendlv::data::environment::WGS84Coordinate m_gpsReading;

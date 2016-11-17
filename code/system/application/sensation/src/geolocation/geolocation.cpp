@@ -25,6 +25,7 @@
 #include <iostream>
 #include <math.h>
 
+#include "opendavinci/odcore/base/Lock.h"
 #include <opendavinci/odcore/data/Container.h>
 #include <opendavinci/odcore/data/TimeStamp.h>
 
@@ -48,6 +49,7 @@ namespace geolocation {
   */
 Geolocation::Geolocation(int32_t const &a_argc, char **a_argv)
     : TimeTriggeredConferenceClientModule(a_argc, a_argv, "sensation-geolocation")
+    , m_gpsReadingMutex()
     , m_ekf()
     , m_gpsReading()
     , m_magnetometerReading()
@@ -86,6 +88,7 @@ void Geolocation::nextContainer(odcore::data::Container &a_c)
     return;
   }
   if(a_c.getDataType() == opendlv::data::environment::WGS84Coordinate::ID()) {
+    odcore::base::Lock l(m_gpsReadingMutex);
     m_gpsReading = a_c.getData<opendlv::data::environment::WGS84Coordinate>();
   } else if(a_c.getDataType() == opendlv::proxy::MagnetometerReading::ID()) {
     m_magnetometerReading = a_c.getData<opendlv::proxy::MagnetometerReading>();
@@ -124,6 +127,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
   // KinematicObservationModel<double> kinematicObservationModel(0.0, 0.0, 0.0);
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+    
+    odcore::base::Lock l(m_gpsReadingMutex);
     double latitude = m_gpsReading.getLatitude();
     double longitude = m_gpsReading.getLongitude();
 //    float altitude = static_cast<float>(m_gpsReading.getAltitude());
