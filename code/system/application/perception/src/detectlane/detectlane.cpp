@@ -96,11 +96,11 @@ void DetectLane::tearDown()
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode DetectLane::body()
 {
-  int8_t sgn = 1;
+  //int8_t sgn = 1;
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
   odcore::data::dmcp::ModuleStateMessage::RUNNING)
   {
-    if(m_debug){
+    /*if(m_debug){
       char key = (char) cv::waitKey(1);
       switch(key) {
         case 'u':
@@ -209,7 +209,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode DetectLane::body()
         default:
           break;
       }
-    }
+    }*/
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
@@ -280,6 +280,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     m_visualMemory.pop_front();
   }
   cv::Mat exposedImage = m_visualMemory[0].second.clone();
+  
   if(m_visualMemory.size() > 1) {
     cv::Mat tmp;
     double alpha;
@@ -297,7 +298,12 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     }
   }
   cv::Mat cannyImg;
-  cv::Canny(exposedImage, cannyImg, m_cannyThreshold, m_cannyThreshold*3, 3);
+  cv::Canny(exposedImage, cannyImg, m_cannyThreshold/2, m_cannyThreshold/2*3, 3);
+
+
+  exposedImage = cannyImg;
+  int ddepth = -1;//cv::CV_16S;
+  cv::Sobel(exposedImage, cannyImg, ddepth, 1, 0, 3, 1,0,cv::BORDER_DEFAULT);
 
 
 
@@ -328,16 +334,18 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   cv::HoughLines(cannyImg, detectedLines, 1, opendlv::Constants::PI/180, m_houghThreshold);
   if(detectedLines.size() < 3){
     if(m_debug) {
-    cv::resize(cannyImg, display[0], cv::Size(windowWidth, windowHeight), 0, 0,
+    cv::resize(cannyImg, display[0], cv::Size(windowWidth*4, windowHeight*4), 0, 0,
       cv::INTER_CUBIC);
     cv::imshow("FOE", display[0]);
-    cv::resize(m_image, display[1], cv::Size(windowWidth*2, windowHeight*2), 0, 0,
+    cv::resize(m_image, display[1], cv::Size(windowWidth*4, windowHeight*4), 0, 0,
       cv::INTER_CUBIC);
     cv::imshow("FOE2", display[1]);
     cv::waitKey(1);
+
     }
     return;
   }
+  std::cout << "detectedLines: "<< detectedLines.size() << std::endl;
 
   // Filtering stuff out
   // std::cout << "Unfiltered: "<< detectedLines.size() << std::endl;
@@ -361,6 +369,11 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     for( size_t i = 0; i < detectedLines.size(); i++ ) {
       float rho = detectedLines[i][0];
       float theta = detectedLines[i][1];
+
+	  //std::cout << "rho: "<< rho << std::endl;
+      //std::cout << "theta: "<< theta << std::endl;
+
+
       float a = cos(theta), b = sin(theta);
       float x0 = a*rho, y0 = b*rho;
       cv::Point pt1(m_roi[0] + x0 + 2000*(-b), m_roi[1] + y0 + 2000*(a));
@@ -425,6 +438,8 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   std::vector<cv::Vec2f> xWorldP, yWorldP;
   GetPointsOnLine(xScreenP, yScreenP, xWorldP, yWorldP, p, m);
 
+  /* DETECT LANE STARTS HERE  */
+
   // Pair up lines to form a surface
   std::vector<int8_t> groupIds;
   GetLinePairs(xScreenP, groupIds);
@@ -443,10 +458,10 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
       }
       // std::cout << std::endl;
     }
-    cv::resize(cannyImg, display[0], cv::Size(windowWidth, windowHeight), 0, 0,
+    cv::resize(cannyImg, display[0], cv::Size(windowWidth*4, windowHeight*4), 0, 0,
       cv::INTER_CUBIC);
     cv::imshow("FOE", display[0]);
-    cv::resize(m_image, display[1], cv::Size(windowWidth*2, windowHeight*2), 0, 0,
+    cv::resize(m_image, display[1], cv::Size(windowWidth*4, windowHeight*4), 0, 0,
       cv::INTER_CUBIC);
     cv::imshow("FOE2", display[1]);
     cv::waitKey(1);
