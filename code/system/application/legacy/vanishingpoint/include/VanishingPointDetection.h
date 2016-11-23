@@ -72,6 +72,9 @@ public:
         }
     }
 
+    /**
+     * @param image Colored image
+     */
     std::shared_ptr<cv::Point2f> detectVanishingPoint(cv::Mat & image) {
         auto laneMarkings = detectLaneMarkings(image);
 
@@ -134,6 +137,9 @@ private:
     }
 #endif
 
+    /**
+     * @param image Colored image
+     */
     LaneMarkingsScan::LaneMarkings detectLaneMarkings(cv::Mat & image) {
         cv::Mat roi = image(roiGeometry_.get());
 
