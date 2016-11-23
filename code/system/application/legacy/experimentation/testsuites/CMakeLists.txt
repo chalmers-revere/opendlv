@@ -1,0 +1,2 @@
+# CXXTEST_ADD_TEST(host_testsuite host_testsuite.cpp ${CMAKE_CURRENT_SOURCE_DIR}/host_testsuite.h)
+# set_source_files_properties(host_testsuite.cpp PROPERTIES COMPILE_FLAGS "-Wno-effc++ -Wno-float-equal -Wno-switch-default -Wno-error=suggest-attribute=noreturn")

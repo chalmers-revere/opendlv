@@ -1,2 +1,2 @@
 add_executable(demo demo.cpp)
-target_link_libraries(demo ${EXPERIMENTATION_LIB} opendavinci)
+target_link_libraries(demo ${EXPERIMENTATION_LIB} ${LIBRARIES})

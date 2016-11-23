@@ -42,7 +42,7 @@ public:
  */
 class ParallelModule : public Service {
 public:
-    ParallelModule(std::shared_ptr<ClientModule> module) : module_(module) { }
+    ParallelModule(std::shared_ptr<ClientModule> module) : module_(module), exitCode_() { }
 
     /**
      * Get the exit code of the module. This throws if called before the module terminated.
@@ -111,7 +111,7 @@ public:
         ParallelModule guestService(guest_);
         guestService.start();
 
-        auto exitCode = HostBase::runModule();
+        HostBase::runModule();
         guestService.stop();
 
         return guestService.getExitCode();
