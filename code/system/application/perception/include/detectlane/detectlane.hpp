@@ -72,6 +72,7 @@ class DetectLane
   odcore::base::Mutex m_mtx;
   bool m_debug;
   Eigen::Matrix3d m_transformationMatrix;
+  int16_t m_counter;
 
   void GetGrouping(std::vector<cv::Vec2f> &, std::vector<cv::Vec2f> &, double);
   void GetParametricRepresentation(std::vector<cv::Vec2f> &,std::vector<cv::Vec2f> &,std::vector<cv::Vec2f> &);

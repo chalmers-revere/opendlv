@@ -76,23 +76,25 @@ knowledge-scene.memoryCapacity = 5.0 # seconds
 knowledge-scene.debug = 0
 
 # perception-detectlane
-perception-detectlane.intensityThreshold = 200
-perception-detectlane.cannyThreshold = 60
-perception-detectlane.houghThreshold = 150
+perception-detectlane.intensityThreshold = 20 # 200
+perception-detectlane.cannyThreshold = 290 #60
+perception-detectlane.houghThreshold = 100 #150
 perception-detectlane.memThreshold = 0.5 #seconds
-perception-detectlane.upperLaneLimit = 500
-perception-detectlane.lowerLaneLimit = 620
-perception-detectlane.screenWidth = 1080
+perception-detectlane.upperLaneLimit = 400
+perception-detectlane.lowerLaneLimit = 550
+perception-detectlane.screenWidth = 1280
 perception-detectlane.screenHeight = 720
-perception-detectlane.roiX = 205
-perception-detectlane.roiY = 455
-perception-detectlane.roiWidth = 775
-perception-detectlane.roiHeight = 265
 perception-detectlane.debug = 1
+
+perception-detectlane.roiX = 30 #205 Pixels away from the upper left corner in X
+perception-detectlane.roiWidth = 1000 #775 Done Pixel width of the captured box in X
+
+perception-detectlane.roiY = 200 #455, 200 Pixels away from the upper part of picture in Y
+perception-detectlane.roiHeight = 300 #265 Done Pixel height of the captured box in Y
 
 
 core-tool-camera-replay.debug = 0       # 1 = show recording (requires X11), 0 = otherwise.
 core-tool-camera-replay.sourcename = AxisCamera0
-core-tool-camera-replay.filename = highway.avi
-core-tool-camera-replay.width = 1080
+core-tool-camera-replay.filename = NewVideo.avi
+core-tool-camera-replay.width = 1280
 core-tool-camera-replay.height = 720

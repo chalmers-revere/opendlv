@@ -60,6 +60,7 @@ DetectLane::DetectLane(int32_t const &a_argc, char **a_argv)
     , m_mtx()
     , m_debug()
     , m_transformationMatrix()
+    , m_counter(0)
 
 {
 }
@@ -84,6 +85,7 @@ void DetectLane::setUp()
   m_roi[2] = kv.getValue<uint16_t>("perception-detectlane.roiWidth");
   m_roi[3] = kv.getValue<uint16_t>("perception-detectlane.roiHeight");
   m_debug = (kv.getValue<int32_t>("perception-detectlane.debug") == 1);
+  // Lägg in rätt namn på matrisen här
   m_transformationMatrix = ReadMatrix(
           "/opt/opendlv/share/opendlv/tools/vision/projection/leftCameraTransformationMatrix.csv",3,3);
   m_initialized = true;
@@ -96,11 +98,11 @@ void DetectLane::tearDown()
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode DetectLane::body()
 {
-  //int8_t sgn = 1;
+  int8_t sgn = 1;
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
   odcore::data::dmcp::ModuleStateMessage::RUNNING)
   {
-    /*if(m_debug){
+    if(m_debug){
       char key = (char) cv::waitKey(1);
       switch(key) {
         case 'u':
@@ -209,7 +211,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode DetectLane::body()
         default:
           break;
       }
-    }*/
+    }
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
@@ -221,6 +223,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode DetectLane::body()
  */
 void DetectLane::nextContainer(odcore::data::Container &a_c)
 {
+  // Increase the counter for each frame
+  m_counter++;
+
   if (!m_initialized || a_c.getDataType() != odcore::data::image::SharedImage::ID()) {
     return;
   }
@@ -271,7 +276,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
 
   const int32_t windowWidth = 640/2;
   const int32_t windowHeight = 400/2;
-  cv::Mat display[3];
+  cv::Mat display[4];
 
   cv::Mat visualImpression = croppedImg.clone();
   m_visualMemory.push_back(std::make_pair(now,visualImpression));
@@ -291,21 +296,22 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
       cv::addWeighted(exposedImage, alpha, m_visualMemory[i].second, beta, 0, tmp, -1);
       exposedImage = tmp;
     }
-    if(m_debug) {
+    /*if(m_debug) {
     cv::resize(exposedImage, display[2], cv::Size(windowWidth, windowHeight), 0, 0,
       cv::INTER_CUBIC);
     cv::imshow("FOE3", display[2]); 
-    }
+    }*/
   }
   cv::Mat cannyImg;
-  cv::Canny(exposedImage, cannyImg, m_cannyThreshold/2, m_cannyThreshold/2*3, 3);
-
+  cv::Mat tmpImg = m_visualMemory[0].second.clone();
+  cv::Canny(tmpImg, cannyImg, m_cannyThreshold/2, m_cannyThreshold/2*3, 3);
 
   exposedImage = cannyImg;
   int ddepth = -1;//cv::CV_16S;
   cv::Sobel(exposedImage, cannyImg, ddepth, 1, 0, 3, 1,0,cv::BORDER_DEFAULT);
 
-
+  //exposedImage = cannyImg;
+  //cv::cvtColor(exposedImage, cannyImg, CV_GRAY2BGR);
 
   if(m_debug) {
     cv::line(m_image, cv::Point(0,m_upperLaneLimit), cv::Point(m_screenSize[0],m_upperLaneLimit), cv::Scalar(255,0,0), 3, 1 );
@@ -318,26 +324,39 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   }
   // std::cout<< "Memory length: " << m_visualMmeory.size() << " Type: " << m_image.type()<< "," << m_image.depth() << "," << m_image.channels() << std::endl;
 
-  // cv::Mat intenImg;
-  // cv::Mat color_dst;
+   //cv::Mat intenImg;
+   //cv::Mat color_dst;
 
   //medianBlur(src,src,3);
-  // cv::inRange(m_image, cv::Scalar(m_intensityThreshold, m_intensityThreshold, m_intensityThreshold), cv::Scalar(255, 255, 255), intenImg);
+  //cv::inRange(m_image, cv::Scalar(m_intensityThreshold, m_intensityThreshold, m_intensityThreshold), cv::Scalar(255, 255, 255), intenImg);
 
   // Make output image into a 3 channel BGR image
-  // cv::cvtColor(m_image, color_dst, CV_GRAY2BGR);
+  //cv::cvtColor(m_image, color_dst, CV_GRAY2BGR);
 
+  /*
+  cv::vector<cv::Vec4i> detectedLines;
+  HoughLinesP(cannyImg, detectedLines, 1, opendlv::Constants::PI/180, 50, 50, 10 );
+  for( size_t i = 0; i < detectedLines.size(); i++ )
+  {
+    Vec4i l = detectedLines[i];
+    line( cannyImg, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0,0,255), 3, cv::CV_AA);
+  }
+  */
+  
   // Vector holder for each line (rho,theta)
   cv::vector<cv::Vec2f> detectedLines;
+
+  // temporary image to keep track of all filtered lines
+  cv::Mat tmp_img = m_image.clone();
 
   // OpenCV function that uses the Hough transform and finds the "strongest" lines in the transformation    
   cv::HoughLines(cannyImg, detectedLines, 1, opendlv::Constants::PI/180, m_houghThreshold);
   if(detectedLines.size() < 3){
     if(m_debug) {
-    cv::resize(cannyImg, display[0], cv::Size(windowWidth*4, windowHeight*4), 0, 0,
+    cv::resize(cannyImg, display[0], cv::Size(windowWidth*2, windowHeight*2), 0, 0,
       cv::INTER_CUBIC);
     cv::imshow("FOE", display[0]);
-    cv::resize(m_image, display[1], cv::Size(windowWidth*4, windowHeight*4), 0, 0,
+    cv::resize(m_image, display[1], cv::Size(windowWidth*2, windowHeight*2), 0, 0,
       cv::INTER_CUBIC);
     cv::imshow("FOE2", display[1]);
     cv::waitKey(1);
@@ -346,6 +365,24 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     return;
   }
   std::cout << "detectedLines: "<< detectedLines.size() << std::endl;
+
+    // Print out all detected lines
+    if(m_debug) {
+    for( size_t i = 0; i < detectedLines.size(); i++ ) {
+      float rho = detectedLines[i][0];
+      float theta = detectedLines[i][1];
+
+    //std::cout << "rho: "<< rho << std::endl;
+      //std::cout << "theta: "<< theta << std::endl;
+
+      float a = cos(theta), b = sin(theta);
+      float x0 = a*rho, y0 = b*rho;
+      cv::Point pt1(m_roi[0] + x0 + 2000*(-b), m_roi[1] + y0 + 2000*(a));
+      cv::Point pt2(m_roi[0] + x0 - 2000*(-b), m_roi[1] + y0 - 2000*(a));
+
+      cv::line(m_image, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
+      }
+    }
 
   // Filtering stuff out
   // std::cout << "Unfiltered: "<< detectedLines.size() << std::endl;
@@ -362,26 +399,30 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   std::vector<cv::Vec2f> groups;
   GetGrouping(groups, detectedLines,100);
   detectedLines = groups; 
-  // std::cout << "Filtered: "<< detectedLines.size() << std::endl;
+  std::cout << "Filtered: "<< detectedLines.size() << std::endl;
 
-
-  if(m_debug) {
+  // Print out all detected lines
+    if(m_debug) {
     for( size_t i = 0; i < detectedLines.size(); i++ ) {
       float rho = detectedLines[i][0];
       float theta = detectedLines[i][1];
 
-	  //std::cout << "rho: "<< rho << std::endl;
+    //std::cout << "rho: "<< rho << std::endl;
       //std::cout << "theta: "<< theta << std::endl;
-
 
       float a = cos(theta), b = sin(theta);
       float x0 = a*rho, y0 = b*rho;
       cv::Point pt1(m_roi[0] + x0 + 2000*(-b), m_roi[1] + y0 + 2000*(a));
       cv::Point pt2(m_roi[0] + x0 - 2000*(-b), m_roi[1] + y0 - 2000*(a));
 
-      cv::line(m_image, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
+      cv::line(tmp_img, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
+      }
+
+      cv::resize(tmp_img, display[3], cv::Size(windowWidth*2, windowHeight*2), 0, 0,
+      cv::INTER_CUBIC);
+      cv::imshow("FOE4", display[3]); 
     }
-  }
+
 
   //  FOR INTENSITY THRESHOLD
   // cv::HoughLines(intenImg, detectedLines, 1, 3.14f/180, m_houghThreshold );
@@ -447,21 +488,21 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     return;
   }
 
-  // std::cout << groupIds.size() << std::endl;
+  std::cout << "Group size: "<< groupIds.size() << std::endl;
 
 
   if(m_debug) {
     for(uint8_t i = 0; i < groupIds.size(); i++) {
       for(uint8_t k = 0; k < 2; k++) {
         cv::circle(m_image, cv::Point(xScreenP[groupIds[i]][k],yScreenP[groupIds[i]][k]), 10, cv::Scalar(0,255,0), 3, 8);
-        // std::cout << xWorldP[groupIds[i]][k] << "x" << yWorldP[groupIds[i]][k] << ",";
+        std::cout << xWorldP[groupIds[i]][k] << "x" << yWorldP[groupIds[i]][k] << ",";
       }
-      // std::cout << std::endl;
+      std::cout << std::endl;
     }
-    cv::resize(cannyImg, display[0], cv::Size(windowWidth*4, windowHeight*4), 0, 0,
+    cv::resize(cannyImg, display[0], cv::Size(windowWidth*2, windowHeight*2), 0, 0,
       cv::INTER_CUBIC);
     cv::imshow("FOE", display[0]);
-    cv::resize(m_image, display[1], cv::Size(windowWidth*4, windowHeight*4), 0, 0,
+    cv::resize(m_image, display[1], cv::Size(windowWidth*2, windowHeight*2), 0, 0,
       cv::INTER_CUBIC);
     cv::imshow("FOE2", display[1]);
     cv::waitKey(1);
@@ -502,6 +543,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   std::vector<int16_t> connectedWidth;
   std::vector<int16_t> traversableTo;
 
+  std::cout<<"Frame: " << m_counter << " detected!" << std::endl;
   opendlv::perception::Surface detectedSurface(imageTimeStamp,
       type,
       typeConfidence,
@@ -523,7 +565,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
 }
 
 
-
+// Gruppera linjer som är närliggande till en enda, en average linje som tar alla liknande
 void DetectLane::GetGrouping(std::vector<cv::Vec2f> &a_groups, std::vector<cv::Vec2f> &a_lines, double a_groupingRadius)
 {
   if(a_lines.size() < 1) {
@@ -563,6 +605,7 @@ void DetectLane::GetGrouping(std::vector<cv::Vec2f> &a_groups, std::vector<cv::V
   a_groups = groupMean;
 }
 
+// konvertera till räta linjens ekvation istället för rho och theta
 void DetectLane::GetParametricRepresentation(std::vector<cv::Vec2f> &a_p
     , std::vector<cv::Vec2f> &a_m
     , std::vector<cv::Vec2f> &a_groups)
@@ -579,6 +622,9 @@ void DetectLane::GetParametricRepresentation(std::vector<cv::Vec2f> &a_p
     a_m.push_back(cv::Vec2f(x0,y0));
   }
 }
+
+// hitta röda linjen med upper och lower lanelimit för de gröna prickarna
+// returnerar både världs och pixel koordinaterna
 void DetectLane::GetPointsOnLine(std::vector<cv::Vec2f> &a_xScreenP
     , std::vector<cv::Vec2f> &a_yScreenP
     , std::vector<cv::Vec2f> &a_xWorldP
@@ -615,9 +661,12 @@ void DetectLane::GetPointsOnLine(std::vector<cv::Vec2f> &a_xScreenP
     
   }
 }
+
+// Hitta mittersta paret för att hitta aktuell lane
 void DetectLane::GetLinePairs(std::vector<cv::Vec2f> &a_xPoints
   , std::vector<int8_t> &a_groupIds)
 {
+  // Den ska vara för två, borde gå att expandera för fler, hittar en left och right, men borde gå att lösa för att hitta fler
   // float leftId, rightId;
   // for(uint16_t i = 0; i < a_xPoints.size()-1; i++) {
   //   for(uint16_t j= i+1; j < a_xPoints.size(); j++) {
