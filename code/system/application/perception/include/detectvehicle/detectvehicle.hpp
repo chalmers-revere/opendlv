@@ -65,6 +65,7 @@ class DetectVehicle
   Eigen::Vector3d m_scale;
   std::string m_sourceName;
   bool m_debugMode;
+  int32_t verticalcut;
   Eigen::Matrix3d m_pixel2World;
 };
 

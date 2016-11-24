@@ -75,7 +75,7 @@ void DetectVehicle::setUp()
   // float scale = 1280.0f/800.0f;
   // m_scale = Eigen::Vector3d(scale, scale, 1);
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
-  m_sourceName = kv.getValue<std::string>("perception-detectvehicle.source");
+  m_sourceName = kv.getValue<std::string>("perception-detectvehicle.sourcesource");
 
   std::string path = "/opt/opendlv/share/opendlv/tools/vision/projection/";
 
@@ -88,10 +88,6 @@ void DetectVehicle::setUp()
   else {
     std::cout << "Cannot load transformation matrix for " << m_sourceName << ". Undefined camera source." << std::endl;
   }
-
-
-  verticalcut = kv.getValue<int32_t> ("perception-detectvehicle.verticalcut");
-  std::cout << "verticalcut: " << verticalcut << std::endl;
   m_debugMode = (kv.getValue<int32_t> ("perception-detectvehicle.debug") == 1);
   std::cout << "Debug mode: " << m_debugMode << std::endl;
   std::cout << "This DetectVehicle instance will receive images from " << m_sourceName << "." << std::endl;
@@ -166,9 +162,7 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   // TODO use something else as timestamp?
   //double timeStamp = ((double)c.getSentTimeStamp().toMicroseconds())/1000000;
   //std::cout << "timeStamp: " << timeStamp << std::endl;
- 
- 
-  cvSetImageROI(myIplImage, cvRect(100,imgHeight-verticalcut,imgWidth-200,verticalcut ));
+
 
   // odcore::data::TimeStamp start;
   m_convNeuralNet->Update(&myImage, m_debugMode);
@@ -323,7 +317,14 @@ void DetectVehicle::sendObjectInformation(std::vector<cv::Rect>* detections,
     std::cout << "    angSize (deg): " << (angularSize*static_cast<float>(opendlv::Constants::RAD2DEG)) << std::endl;
     std::cout << "    distance (m):  " << distance << std::endl;
     std::cout << "    width (m):     " << detectionWidth << std::endl;
-
+    /*
+    std::cout << "    size:          " << size << std::endl;
+    std::cout << "    angle (deg):   " << (angle*(float)opendlv::Constants::RAD2DEG) << std::endl;
+    std::cout << "    size (deg):    " << (size*(float)opendlv::Constants::RAD2DEG) << std::endl;
+    std::cout << "    objectIndex:   " << objectIndex << std::endl;
+    std::cout << "    azimuth:       " << azimuth << std::endl;
+    std::cout << "    angular size:  " << angularSize << std::endl;
+    */
   }
 }
 
