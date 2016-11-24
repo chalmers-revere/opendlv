@@ -1,3 +1,26 @@
+/*
+ * Copyright (C) 2016 Crispin Kirchner
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
+/**
+ * This app can be used for testing the vp detection outside of the opendavinci environment, by just
+ * supplying a folder with image files to loop through.
+ */
+
 #include <iostream>
 #include <experimental/filesystem>
 
@@ -5,7 +28,12 @@
 
 #include "../include/VanishingPointDetection.h"
 
+/**
+ * Composition of relevant data, to be able to use the entries in onMouse without declaring a global
+ * variable
+ */
 struct Data {
+    Data() : image() {}
     const std::string WINDOW_NAME = "LaneDetection";
     cv::Mat image;
 };
@@ -15,7 +43,7 @@ bool lButtonDown = false;
 void onMouse(int event, int x, int y, int flags, void * userdata);
 
 void onMouse(int event, int x, int y, int flags, void * userdata) {
-    UNUSED(flags);
+    LMVP_UNUSED(flags);
 
     struct Data & data = *static_cast<struct Data *>(userdata);
 
