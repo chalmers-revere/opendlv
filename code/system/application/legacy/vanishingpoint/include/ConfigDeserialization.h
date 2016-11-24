@@ -1,6 +1,9 @@
 #ifndef CONFIG_DESERIALIZATION_H_
 #define CONFIG_DESERIALIZATION_H_
 
+#include "RegionOfInterestGeometry.h"
+#include "ScanRegion.h"
+
 namespace lmvp {
 
 template<class T>

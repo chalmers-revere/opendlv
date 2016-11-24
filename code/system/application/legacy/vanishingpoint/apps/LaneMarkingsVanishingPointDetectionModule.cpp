@@ -1,3 +1,5 @@
+#include "LaneMarkingsVanishingPointDetectionModule.h"
+
 #include <cstdlib>
 #include <iostream>
 
@@ -9,8 +11,10 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-#include "VanishingPointDetection.h"
 #include "ConfigDeserialization.h"
+#include "VanishingPointDetection.h"
+#include "VanishingPointLowPass.h"
+#include "SharedImageCvAdapter.h"
 
 namespace lmvp {
 
@@ -22,8 +26,6 @@ using odcore::exceptions::ValueForKeyNotFoundException;
 using odcore::wrapper::SharedMemoryFactory;
 using odcore::wrapper::SharedMemory;
 
-void onMouse(int event, int x, int y, int flags, void * userdata);
-
 void onMouse(int event, int x, int y, int flags, void * userdata) {
     LMVP_UNUSED(flags);
     LMVP_UNUSED(userdata);
@@ -32,74 +34,6 @@ void onMouse(int event, int x, int y, int flags, void * userdata) {
         std::cout << "x: " << x << " y: " << y << std::endl;
     }
 }
-
-class VanishingPointLowPass {
-public:
-    VanishingPointLowPass(float dampingFactor) : dampingFactor_(dampingFactor), lastVanishingPoint_() { }
-
-    std::shared_ptr<cv::Point2f> lowpass(std::shared_ptr<cv::Point2f> vanishingPoint) {
-        if(!vanishingPoint) {
-            //lastVanishingPoint_ = vanishingPoint;
-            return vanishingPoint;
-        }
-
-        if(!lastVanishingPoint_) {
-            lastVanishingPoint_ = vanishingPoint;
-            return vanishingPoint;
-        }
-
-        cv::Point2f distance = *vanishingPoint - *lastVanishingPoint_;
-
-        lastVanishingPoint_ = std::make_shared<cv::Point2f>(dampingFactor_ * distance + *lastVanishingPoint_);
-
-        return lastVanishingPoint_;
-    }
-
-private:
-    const float dampingFactor_;
-
-    std::shared_ptr<cv::Point2f> lastVanishingPoint_;
-};
-
-class FailedAttachingToSharedMemoryException : public std::runtime_error {
-public:
-    FailedAttachingToSharedMemoryException(const std::string & name)
-        : std::runtime_error("Failed attaching to shared memory " + name) {
-    }
-};
-
-/**
- * Class linking a SharedImage to a cv::Mat. Attachment to the shared memory happens on construction.
- * Construction only succeeds when attaching to the shared memory was successful.
- */
-class SharedImageCvAdapter {
-public:
-    SharedImageCvAdapter(const SharedImage & sharedImage) : sharedImageMemory_(), imageHeader_() {
-        attachToSharedMemory(sharedImage);
-    }
-
-    cv::Mat fetchImage() {
-        Lock lock(sharedImageMemory_);
-
-        return imageHeader_.clone();
-    }
-
-private:
-    void attachToSharedMemory(const SharedImage & sharedImage) {
-        sharedImageMemory_ = SharedMemoryFactory::attachToSharedMemory(sharedImage.getName());
-
-        if(!sharedImageMemory_->isValid()) {
-            throw FailedAttachingToSharedMemoryException(sharedImage.getName());
-        }
-
-        imageHeader_ = cv::Mat(sharedImage.getHeight(), sharedImage.getWidth(),
-                               CV_MAKETYPE(CV_8U, sharedImage.getBytesPerPixel()),
-                               sharedImageMemory_->getSharedMemory());
-    }
-
-    std::shared_ptr<SharedMemory> sharedImageMemory_;
-    cv::Mat imageHeader_;
-};
 
 class LaneMarkingsVanishingPointDetectionModule : public DataTriggeredConferenceClientModule {
 public:
@@ -211,7 +145,6 @@ private:
         return true;
     }
 
-#ifndef NDEBUG
     static void drawVanishingPoint(cv::Mat & image, const cv::Point2f & vanishingPoint, const cv::Scalar & color) {
         int radius = 10;
         float offset = 1.5f * static_cast<float>(radius);
@@ -221,7 +154,6 @@ private:
         cv::line(image, vanishingPoint - cv::Point2f(offset, 0), vanishingPoint + cv::Point2f(offset, 0),
                  color, 1);
     }
-#endif
 
     void processImage(cv::Mat & image) {
         std::shared_ptr<cv::Point2f> vanishingPoint = vanishingPointDetection_->detectVanishingPoint(image);
@@ -268,8 +200,7 @@ private:
 
 };
 
-const std::string LaneMarkingsVanishingPointDetectionModule::MODULE_NAME =
-                "vanishingpoint";
+const std::string LaneMarkingsVanishingPointDetectionModule::MODULE_NAME("vanishingpoint");
 
 }
 
