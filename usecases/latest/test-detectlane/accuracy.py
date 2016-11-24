@@ -4,6 +4,9 @@ def main(argv):
 	if(len(argv) > 1):
 		print("Too many arguments, try again")
 		return
+	elif (len(argv == 0):
+		print("No file specified, try again")
+		return
 
 	with open(argv[0], 'r') as f:
 		lines = f.readlines()
