@@ -1,10 +1,10 @@
-#ifndef LANE_MARKINGS_DETECTION_H_
-#define LANE_MARKINGS_DETECTION_H_
+#ifndef OPENDLV_LEGACY_VANISHINGPOINT_VANISHING_POINT_DETECTION_H_
+#define OPENDLV_LEGACY_VANISHINGPOINT_VANISHING_POINT_DETECTION_H_
 
 #include <iostream>
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include "ImagePreprocessing.h"
+#include "RuralRoadImagePreprocessing.h"
 #include "LaneMarkingsScan.h"
 #include "RegionOfInterestGeometry.h"
 #include "ScanRegion.h"
@@ -259,7 +259,7 @@ private:
     const ScanRegion roiLeftScanRegion_,
                      roiRightScanRegion_;
 
-    AstaZeroImagePreprocessing imagePreprocessing_;
+    RuralRoadImagePreprocessing imagePreprocessing_;
     LaneMarkingsScan laneMarkingsScan_;
 
     LaneBorderLowpass leftLowpass_, rightLowpass_;
@@ -269,4 +269,4 @@ private:
 }
 }
 
-#endif
+#endif /* OPENDLV_LEGACY_VANISHINGPOINT_VANISHING_POINT_DETECTION_H_ */

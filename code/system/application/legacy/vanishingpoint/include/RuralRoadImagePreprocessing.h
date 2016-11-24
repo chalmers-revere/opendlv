@@ -16,28 +16,28 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef OPENDLV_LEGACY_VANISHINGPOINT_IMAGE_PREPROCESSING_H_
-#define OPENDLV_LEGACY_VANISHINGPOINT_IMAGE_PREPROCESSING_H_
+#ifndef OPENDLV_LEGACY_VANISHINGPOINT_RURAL_ROAD_IMAGE_PREPROCESSING_H_
+#define OPENDLV_LEGACY_VANISHINGPOINT_RURAL_ROAD_IMAGE_PREPROCESSING_H_
 
-#include <opencv2/imgproc/imgproc.hpp>
+#include "ImagePreprocessing.h"
 
 namespace opendlv {
 namespace legacy {
 namespace vanishingpoint {
 
-/**
- * Abstract base class to allow for different preprocessing implementations, e.g. for real roads and
- * the Carolo environment.
- */
-class ImagePreprocessing {
+class RuralRoadImagePreprocessing : public ImagePreprocessing {
 public:
-    virtual ~ImagePreprocessing() = default;
+    RuralRoadImagePreprocessing(int blurSize, uint8_t threshold);
 
-    virtual cv::Mat preprocessImage(cv::Mat &) const = 0;
+    cv::Mat preprocessImage(cv::Mat & coloredImage) const;
+
+private:
+    int blurSize_;
+    uint8_t threshold_;
 };
 
 }
 }
 }
 
-#endif
+#endif /* OPENDLV_LEGACY_VANISHINGPOINT_RURAL_ROAD_IMAGE_PREPROCESSING_H_ */
