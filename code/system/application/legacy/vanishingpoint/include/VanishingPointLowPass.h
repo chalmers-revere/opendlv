@@ -22,7 +22,9 @@
 #include <memory>
 #include <opencv2/core/core.hpp>
 
-namespace lmvp {
+namespace opendlv {
+namespace legacy {
+namespace vanishingpoint {
 
 class VanishingPointLowPass {
 public:
@@ -36,6 +38,8 @@ private:
     std::shared_ptr<cv::Point2f> lastVanishingPoint_;
 };
 
+}
+}
 }
 
 

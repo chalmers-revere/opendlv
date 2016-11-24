@@ -18,28 +18,32 @@
 
 #include "VanishingPointLowPass.h"
 
-namespace lmvp {
+namespace opendlv {
+namespace legacy {
+namespace vanishingpoint {
 
 VanishingPointLowPass::VanishingPointLowPass(float dampingFactor)
     : dampingFactor_(dampingFactor)
     , lastVanishingPoint_() { }
 
 std::shared_ptr<cv::Point2f> VanishingPointLowPass::lowpass(std::shared_ptr<cv::Point2f> vanishingPoint) {
-        if(!vanishingPoint) {
-            //lastVanishingPoint_ = vanishingPoint;
-            return vanishingPoint;
-        }
-
-        if(!lastVanishingPoint_) {
-            lastVanishingPoint_ = vanishingPoint;
-            return vanishingPoint;
-        }
-
-        cv::Point2f distance = *vanishingPoint - *lastVanishingPoint_;
-
-        lastVanishingPoint_ = std::make_shared<cv::Point2f>(dampingFactor_ * distance + *lastVanishingPoint_);
-
-        return lastVanishingPoint_;
+    if(!vanishingPoint) {
+        //lastVanishingPoint_ = vanishingPoint;
+        return vanishingPoint;
     }
 
+    if(!lastVanishingPoint_) {
+        lastVanishingPoint_ = vanishingPoint;
+        return vanishingPoint;
+    }
+
+    cv::Point2f distance = *vanishingPoint - *lastVanishingPoint_;
+
+    lastVanishingPoint_ = std::make_shared<cv::Point2f>(dampingFactor_ * distance + *lastVanishingPoint_);
+
+    return lastVanishingPoint_;
+}
+
+}
+}
 }

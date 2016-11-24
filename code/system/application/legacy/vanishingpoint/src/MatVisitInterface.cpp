@@ -1,8 +1,9 @@
 #include "MatVisitInterface.h"
 
-namespace lmvp {
+namespace opendlv {
+namespace legacy {
+namespace vanishingpoint {
 
-#ifndef NDEBUG
 // used for Debugging, copied from StackOverflow
 // http://stackoverflow.com/a/17820615
 std::string type2str(int type) {
@@ -45,5 +46,6 @@ std::string type2str(int type) {
     return r;
 }
 
-#endif
+}
+}
 }

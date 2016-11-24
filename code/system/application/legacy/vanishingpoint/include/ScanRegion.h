@@ -9,7 +9,9 @@
 #include "RegionOfInterestGeometry.h"
 #include "LmvpTypes.h"
 
-namespace lmvp {
+namespace opendlv {
+namespace legacy {
+namespace vanishingpoint {
 
 /**
  * Represents a directed infinite line.
@@ -264,6 +266,8 @@ private:
     std::map<RelativeDirection, DirInfLinei> borders_;
 };
 
+}
+}
 }
 
 #endif /* LANE_MARKINGS_SCAN_REGION_H_ */

@@ -1,7 +1,9 @@
 #ifndef DEBUG_SETTINGS_H_
 #define DEBUG_SETTINGS_H_
 
-namespace lmvp {
+namespace opendlv {
+namespace legacy {
+namespace vanishingpoint {
 
 #ifndef NDEBUG
 
@@ -33,6 +35,8 @@ const bool DEBUG_SHOW_VANISHING_POINT = false;
 
 #endif
 
+}
+}
 }
 
 #endif

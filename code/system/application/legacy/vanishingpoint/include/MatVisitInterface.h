@@ -10,7 +10,9 @@
 #include "ScanRegion.h"
 #include "DebugSettings.h"
 
-namespace lmvp {
+namespace opendlv {
+namespace legacy {
+namespace vanishingpoint {
 
 #ifndef NDEBUG
 std::string type2str(int type);
@@ -269,6 +271,8 @@ private:
 #endif
 };
 
+}
+}
 }
 
 #endif /* MAT_VISIT_INTERFACE_H_ */

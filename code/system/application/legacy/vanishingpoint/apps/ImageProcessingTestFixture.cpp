@@ -70,7 +70,7 @@ void onMouse(int event, int x, int y, int flags, void * userdata) {
 }
 
 int main(int argc, char ** argv) {
-    using namespace lmvp;
+    using namespace opendlv::legacy::vanishingpoint;
 
     if(argc <= 1) {
         return EXIT_FAILURE;

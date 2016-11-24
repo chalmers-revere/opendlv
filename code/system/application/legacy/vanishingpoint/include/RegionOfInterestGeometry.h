@@ -3,7 +3,9 @@
 
 #include <opencv2/core/core.hpp>
 
-namespace lmvp {
+namespace opendlv {
+namespace legacy {
+namespace vanishingpoint {
 
 class RegionOfInterestGeometry {
 public:
@@ -29,6 +31,8 @@ private:
     cv::Rect roi_;
 };
 
+}
+}
 }
 
 #endif /* REGION_OF_INTEREST_GEOMETRY_H_ */

@@ -33,7 +33,9 @@
 #include "RegionOfInterestGeometry.h"
 #include "ScanRegion.h"
 
-namespace lmvp {
+namespace opendlv {
+namespace legacy {
+namespace vanishingpoint {
 
 /**
  * Class containing the common parts of the two builders.
@@ -121,6 +123,8 @@ private:
     cv::Point bottomLeft, topLeft, topRight, bottomRight;
 };
 
+}
+}
 }
 
 #endif

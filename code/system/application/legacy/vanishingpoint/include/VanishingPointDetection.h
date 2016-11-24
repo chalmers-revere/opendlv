@@ -9,7 +9,9 @@
 #include "RegionOfInterestGeometry.h"
 #include "ScanRegion.h"
 
-namespace lmvp {
+namespace opendlv {
+namespace legacy {
+namespace vanishingpoint {
 
 class LaneBorderLowpass {
 public:
@@ -263,6 +265,8 @@ private:
     LaneBorderLowpass leftLowpass_, rightLowpass_;
 };
 
+}
+}
 }
 
 #endif

@@ -24,7 +24,9 @@
 
 #include "LmvpTypes.h"
 
-namespace lmvp {
+namespace opendlv {
+namespace legacy {
+namespace vanishingpoint {
 
 using odcore::base::module::DataTriggeredConferenceClientModule;
 using odcore::data::Container;
@@ -169,10 +171,12 @@ void LaneMarkingsVanishingPointDetectionModule::processImage(cv::Mat & image) {
     }
 }
 
-} /* namespace lmvp */
+}
+}
+}
 
 int32_t main(int32_t argc, char ** argv) {
-    using namespace lmvp;
+    using namespace opendlv::legacy::vanishingpoint;
 
     LaneMarkingsVanishingPointDetectionModule vpModule(argc, argv);
     vpModule.runModule();

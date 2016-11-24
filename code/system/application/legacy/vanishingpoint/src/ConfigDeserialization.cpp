@@ -18,7 +18,9 @@
 
 #include "ConfigDeserialization.h"
 
-namespace lmvp {
+namespace opendlv {
+namespace legacy {
+namespace vanishingpoint {
 
 RoiBuilder::RoiBuilder()
     : topLeft()
@@ -85,4 +87,6 @@ ScanRegionBuilder::Malformed::Malformed()
                          "bottomLeft(467,456), topLeft(393,325), "
                          "topRight(482,326), bottomRight(608,420)\"") {}
 
-} /* namespace lmvp */
+}
+}
+}

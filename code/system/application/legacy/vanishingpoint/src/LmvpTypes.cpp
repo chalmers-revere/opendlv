@@ -1,6 +1,8 @@
 #include "LmvpTypes.h"
 
-namespace lmvp {
+namespace opendlv {
+namespace legacy {
+namespace vanishingpoint {
 
 RelativeDirection oppositeDirection(RelativeDirection otherDirection) {
     switch(otherDirection) {
@@ -15,4 +17,6 @@ RelativeDirection oppositeDirection(RelativeDirection otherDirection) {
     }
 }
 
+}
+}
 }

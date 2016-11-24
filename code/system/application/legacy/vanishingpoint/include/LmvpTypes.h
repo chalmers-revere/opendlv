@@ -9,7 +9,9 @@
 // from http://stackoverflow.com/a/3599170
 #define LMVP_UNUSED(x) (void)(x)
 
-namespace lmvp {
+namespace opendlv {
+namespace legacy {
+namespace vanishingpoint {
 
 typedef uint8_t PixelValue;
 typedef int ColumnIndex;
@@ -51,6 +53,8 @@ int sgn(T val) {
 
 const float EPS = 1e-6;
 
+}
+}
 }
 
 #endif /* LMVP_TYPES_H_ */

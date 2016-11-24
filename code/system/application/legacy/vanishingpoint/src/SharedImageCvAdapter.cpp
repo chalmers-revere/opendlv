@@ -3,7 +3,9 @@
 #include <opendavinci/odcore/wrapper/SharedMemoryFactory.h>
 #include <opendavinci/odcore/base/Lock.h>
 
-namespace lmvp {
+namespace opendlv {
+namespace legacy {
+namespace vanishingpoint {
 
 using odcore::base::Lock;
 using odcore::data::image::SharedImage;
@@ -37,4 +39,6 @@ void SharedImageCvAdapter::attachToSharedMemory(const SharedImage & sharedImage)
                            sharedImageMemory_->getSharedMemory());
 }
 
+}
+}
 }

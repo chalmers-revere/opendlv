@@ -3,7 +3,9 @@
 
 #include <opencv2/imgproc/imgproc.hpp>
 
-namespace lmvp {
+namespace opendlv {
+namespace legacy {
+namespace vanishingpoint {
 
 class ImagePreprocessing {
 public:
@@ -51,6 +53,8 @@ private:
     uint8_t threshold_;
 };
 
+}
+}
 }
 
 #endif

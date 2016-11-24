@@ -10,7 +10,9 @@
 #include <opendavinci/generated/odcore/data/image/SharedImage.h>
 #include <opendavinci/odcore/wrapper/SharedMemory.h>
 
-namespace lmvp {
+namespace opendlv {
+namespace legacy {
+namespace vanishingpoint {
 
 class FailedAttachingToSharedMemoryException : public std::runtime_error {
 public:
@@ -34,6 +36,8 @@ private:
     cv::Mat imageHeader_;
 };
 
+}
+}
 }
 
 #endif /* OPENDLV_LEGACY_VANISHINGPOINT_SHARED_IMAGE_CV_ADAPTER_H_ */

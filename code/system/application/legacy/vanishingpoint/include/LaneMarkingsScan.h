@@ -5,7 +5,9 @@
 
 #include "MatVisitInterface.h"
 
-namespace lmvp {
+namespace opendlv {
+namespace legacy {
+namespace vanishingpoint {
 
 class LaneMarkingsScanner : public MatVisitor {
 public:
@@ -368,6 +370,8 @@ private:
 #endif
 };
 
+}
+}
 }
 
 #endif /* LANE_MARKINGS_SCAN_H_ */

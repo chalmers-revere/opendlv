@@ -33,7 +33,9 @@
 #include "VanishingPointDetection.h"
 #include "VanishingPointLowPass.h"
 
-namespace lmvp {
+namespace opendlv {
+namespace legacy {
+namespace vanishingpoint {
 
 void onMouse(int event, int x, int y, int flags, void * userdata);
 
@@ -96,6 +98,8 @@ private:
 
 };
 
+}
+}
 }
 
 #endif /* OPENDLV_LEGACY_VANISHINGPOINT_LANE_MARKINGS_VANISHING_POINT_DETECTION_MODULE_H_ */
