@@ -49,36 +49,14 @@ public:
 
 protected:
     template<class E>
-    static void consumeKeyword(std::istream & stream, const std::string & keyword) {
-        std::string keywordBuffer(keyword);
-
-        stream.read(&keywordBuffer[0], keyword.length());
-
-        if(0 != keywordBuffer.compare(keyword)) {
-            throw E();
-        }
-    }
+    static void consumeKeyword(std::istream & stream, const std::string & keyword);
 
     template<class E>
-    static cv::Point parsePoint(std::istream & stream) {
-        cv::Point point;
-
-        consumeKeyword<E>(stream, "(");
-        stream >> point.x;
-        consumeKeyword<E>(stream, ",");
-        stream >> point.y;
-        consumeKeyword<E>(stream, ")");
-
-        return point;
-    }
+    static cv::Point parsePoint(std::istream & stream);
 };
 
 template<class T>
-std::istream & operator>>(std::istream & stream, BuilderParser<T> & builder) {
-    builder.operator>>(stream);
-
-    return stream;
-}
+std::istream & operator>>(std::istream & stream, BuilderParser<T> & builder);
 
 class RoiBuilder : public BuilderParser<RegionOfInterestGeometry> {
 public:
@@ -126,5 +104,7 @@ private:
 }
 }
 }
+
+#include "BuilderParser_impl.h"
 
 #endif
