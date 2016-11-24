@@ -87,7 +87,7 @@ void DetectLane::setUp()
   m_debug = (kv.getValue<int32_t>("perception-detectlane.debug") == 1);
   // Lägg in rätt namn på matrisen här
   m_transformationMatrix = ReadMatrix(
-          "/opt/opendlv/share/opendlv/tools/vision/projection/leftCameraTransformationMatrix.csv",3,3);
+          "/opt/opendlv.data/front-left-pixel2word-matrix.csv",3,3);
   m_initialized = true;
 }
 
@@ -276,7 +276,9 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
 
   const int32_t windowWidth = 640/2;
   const int32_t windowHeight = 400/2;
-  cv::Mat display[4];
+
+  // Set number of windows to display
+  cv::Mat display[5];
 
   cv::Mat visualImpression = croppedImg.clone();
   m_visualMemory.push_back(std::make_pair(now,visualImpression));
@@ -343,6 +345,17 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   }
   */
   
+  // Victors implementation
+  
+  cv::Mat intenImg;
+  cv::Mat intenImgRes;
+  cv::medianBlur(intenImg,intenImg,3);
+  cv::inRange(tmpImg, cv::Scalar(m_intensityThreshold, m_intensityThreshold, m_intensityThreshold), cv::Scalar(255, 255, 255), intenImg);
+  //cv::cvtColor(m_image, intenImg, CV_GRAY2BGR);
+  
+  cv::adaptiveThreshold(intenImg,intenImgRes,255,cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY_INV,11,2);
+  
+
   // Vector holder for each line (rho,theta)
   cv::vector<cv::Vec2f> detectedLines;
 
@@ -350,7 +363,8 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   cv::Mat tmp_img = m_image.clone();
 
   // OpenCV function that uses the Hough transform and finds the "strongest" lines in the transformation    
-  cv::HoughLines(cannyImg, detectedLines, 1, opendlv::Constants::PI/180, m_houghThreshold);
+  //cv::HoughLines(cannyImg, detectedLines, 1, opendlv::Constants::PI/180, m_houghThreshold);
+  cv::HoughLines(intenImg, detectedLines, 1, opendlv::Constants::PI/180, m_houghThreshold);
   if(detectedLines.size() < 3){
     if(m_debug) {
     cv::resize(cannyImg, display[0], cv::Size(windowWidth*2, windowHeight*2), 0, 0,
@@ -359,6 +373,8 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     cv::resize(m_image, display[1], cv::Size(windowWidth*2, windowHeight*2), 0, 0,
       cv::INTER_CUBIC);
     cv::imshow("FOE2", display[1]);
+    cv::resize(intenImgRes, display[4], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
+    cv::imshow("intensityThreshold", display[4]);
     cv::waitKey(1);
 
     }
@@ -543,7 +559,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   std::vector<int16_t> connectedWidth;
   std::vector<int16_t> traversableTo;
 
-  std::cout<<"Frame: " << m_counter << " detected!" << std::endl;
+  std::cout<<"Detected frame: " << m_counter << std::endl;
   opendlv::perception::Surface detectedSurface(imageTimeStamp,
       type,
       typeConfidence,
