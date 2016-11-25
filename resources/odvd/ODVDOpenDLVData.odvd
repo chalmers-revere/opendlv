@@ -256,65 +256,8 @@ message opendlv.action.Correction [id = 186] {
   float amplitude [id = 4];
 }
 
-message opendlv.proxy.reverefh16.ManualControl [id = 191] {
-    double accelerationPedalPosition [id = 1];
-    double brakePedalPosition [id = 2];
-    double torsionBarTorque [id = 3];
-    odcore::data::TimeStamp fromSensor [id = 4];
-}
-
-message opendlv.proxy.reverefh16.AccelerationRequest [id = 192] {
-    bool enableRequest [id = 1];
-    double accelerationPedalPosition [id = 2];
-}
-
-message opendlv.proxy.reverefh16.BrakeRequest [id = 193] {
-    bool enableRequest [id = 1];
-    double brake [id = 2];
-}
-
-message opendlv.proxy.reverefh16.SteeringRequest [id = 194] {
-    bool enableRequest [id = 1];
-    double steeringRoadWheelAngle [id = 2];
-    double steeringDeltaTorque [id = 3];
-}
-
-message opendlv.proxy.reverefh16.Axles [id = 195] {
-    double loadAxle11 [id = 1];
-    double loadAxle12 [id = 2];
-    double loadAxle13 [id = 3];
-    odcore::data::TimeStamp fromSensor [id = 4];
-}
-
-message opendlv.proxy.reverefh16.Propulsion [id = 196] {
-    double propulsionShaftVehicleSpeed [id = 1];
-    odcore::data::TimeStamp fromSensor [id = 2];
-}
-
-message opendlv.proxy.reverefh16.VehicleState [id = 197] {
-    double accelerationX [id = 1];
-    double accelerationY [id = 2];
-    double yawRate [id = 3];
-    odcore::data::TimeStamp fromSensor [id = 4];
-}
-
-message opendlv.proxy.reverefh16.Wheels [id = 198] {
-    double speedWheel111 [id = 1];
-    double speedWheel112 [id = 2];
-    double speedWheel121 [id = 3];
-    double speedWheel122 [id = 4];
-    double speedWheel131 [id = 5];
-    double speedWheel132 [id = 6];
-    odcore::data::TimeStamp fromSensor [id = 7];
-}
-
-message opendlv.proxy.reverefh16.Steering [id = 199] {
-    double roadwheelangle [id = 1];
-    double steeringwheelangle [id = 2];
-    odcore::data::TimeStamp fromSensor [id = 3];
-}
-
 // This message broadcasts the system's health as key/values.
 message opendlv.system.diagnostics.HealthStatus [id = 200] {
     map<string,string> status [id = 1];
 }
+
