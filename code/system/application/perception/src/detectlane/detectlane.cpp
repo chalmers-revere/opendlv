@@ -306,7 +306,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   }
   cv::Mat cannyImg;
   cv::Mat tmpImg = m_visualMemory[0].second.clone();
-  cv::Canny(tmpImg, cannyImg, m_cannyThreshold/2, m_cannyThreshold/2*3, 3);
+  cv::Canny(tmpImg, cannyImg, m_cannyThreshold, m_cannyThreshold*3, 3);
 
   exposedImage = cannyImg;
   int ddepth = -1;//cv::CV_16S;
