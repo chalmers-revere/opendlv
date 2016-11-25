@@ -30,8 +30,7 @@
 #include <opendavinci/odcore/data/TimeStamp.h>
 
 
-// #include "opendlv/data/environment/Point3.h"
-// #include <fh16mapping/GeneratedHeaders_fh16mapping.h>
+#include <odvdfh16truck/GeneratedHeaders_ODVDFH16Truck.h>
 
 #include "geolocation/geolocation.hpp"
 

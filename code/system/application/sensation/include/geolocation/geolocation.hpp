@@ -30,6 +30,7 @@
 #include "geolocation/kinematicmodel.hpp"
 #include "geolocation/kinematicobservationmodel.hpp"
 
+#include <odvdfh16truck/GeneratedHeaders_ODVDFH16Truck.h>
 #include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
 #include "odvdtrimble/GeneratedHeaders_ODVDTrimble.h"
 #include "odvdimu/GeneratedHeaders_ODVDIMU.h"
