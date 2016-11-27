@@ -95,6 +95,6 @@ perception-detectlane.roiHeight = 300 #265 Done Pixel height of the captured box
 
 core-tool-camera-replay.debug = 0       # 1 = show recording (requires X11), 0 = otherwise.
 core-tool-camera-replay.sourcename = AxisCamera0
-core-tool-camera-replay.filename = NewVideo.avi
+core-tool-camera-replay.filename = highway.avi
 core-tool-camera-replay.width = 1280
 core-tool-camera-replay.height = 720

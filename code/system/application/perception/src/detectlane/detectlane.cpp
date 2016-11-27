@@ -278,7 +278,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   const int32_t windowHeight = 400/2;
 
   // Set number of windows to display
-  cv::Mat display[5];
+  cv::Mat display[6];
 
   cv::Mat visualImpression = croppedImg.clone();
   m_visualMemory.push_back(std::make_pair(now,visualImpression));
@@ -308,9 +308,9 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   cv::Mat tmpImg = m_visualMemory[0].second.clone();
   cv::Canny(tmpImg, cannyImg, m_cannyThreshold/2, m_cannyThreshold/2*3, 3);
 
-  exposedImage = cannyImg;
-  int ddepth = -1;//cv::CV_16S;
-  cv::Sobel(exposedImage, cannyImg, ddepth, 1, 0, 3, 1,0,cv::BORDER_DEFAULT);
+  //exposedImage = cannyImg;
+  //int ddepth = -1;//cv::CV_16S;
+  //cv::Sobel(exposedImage, cannyImg, ddepth, 1, 0, 3, 1,0,cv::BORDER_DEFAULT);
 
   //exposedImage = cannyImg;
   //cv::cvtColor(exposedImage, cannyImg, CV_GRAY2BGR);
@@ -495,6 +495,63 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   std::vector<cv::Vec2f> xWorldP, yWorldP;
   GetPointsOnLine(xScreenP, yScreenP, xWorldP, yWorldP, p, m);
 
+  /* Mathias TEST*/
+
+  cv::Mat currentLane; 
+  cv::Mat otherLane;
+
+  
+
+  cv::Rect rectROIa(0, 0, croppedImg.cols/2, croppedImg.rows/2);
+  
+  try {
+    odcore::base::Lock l(m_mtx);
+    otherLane = croppedImg(rectROIa);
+  } catch (cv::Exception& e) {
+    std::cerr << "Error cropping the image due to dimension size 2." << std::endl;
+    return;
+  }
+
+  /* SPLIT */
+
+
+  cv::Rect rectROIs(croppedImg.cols/2, croppedImg.rows/2, croppedImg.cols/2, croppedImg.rows/2);
+  
+  try {
+    odcore::base::Lock l(m_mtx);
+    currentLane = croppedImg(rectROIs);
+  } catch (cv::Exception& e) {
+    std::cerr << "Error cropping the image due to dimension size 3." << std::endl;
+    return;
+  }
+
+  /* SPLIT */
+  cv::Mat diffImage;
+  cv::absdiff(currentLane, otherLane, diffImage);
+
+  cv::Mat foregroundMask = cv::Mat::zeros(diffImage.rows, diffImage.cols, CV_8UC1);
+
+  float threshold = 45.0f;
+  float dist;
+
+  for(int j=0; j<diffImage.rows; ++j)
+      for(int i=0; i<diffImage.cols; ++i)
+      {
+          cv::Vec3b pix = diffImage.at<cv::Vec3b>(j,i);
+
+          dist = (pix[0]*pix[0] + pix[1]*pix[1] + pix[2]*pix[2]);
+          dist = sqrt(dist);
+
+          if(dist>threshold)
+          {
+              foregroundMask.at<unsigned char>(j,i) = 255;
+          }
+      }
+
+
+
+  /* TILL HIT */
+
   /* DETECT LANE STARTS HERE  */
 
   // Pair up lines to form a surface
@@ -521,6 +578,11 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     cv::resize(m_image, display[1], cv::Size(windowWidth*2, windowHeight*2), 0, 0,
       cv::INTER_CUBIC);
     cv::imshow("FOE2", display[1]);
+    //MathIAS
+    cv::resize(foregroundMask, display[5], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
+    cv::imshow("differenceTest", display[5]);
+
+    //STOP MATHIAS
     cv::waitKey(1);
   }
 
