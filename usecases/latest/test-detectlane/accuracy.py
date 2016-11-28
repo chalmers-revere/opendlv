@@ -1,10 +1,10 @@
 import sys
 
 def main(argv):
-	if(len(argv) > 1):
+	if (len(argv) > 1):
 		print("Too many arguments, try again")
 		return
-	elif (len(argv == 0):
+	elif (len(argv) == 0):
 		print("No file specified, try again")
 		return
 
