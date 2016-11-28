@@ -539,7 +539,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
 
   
 
-  cv::Rect rectROIa(0, 0, croppedImg.cols/2, croppedImg.rows/2);
+  cv::Rect rectROIa(croppedImg.cols/4, 0, croppedImg.cols/4, croppedImg.rows);
   
   try {
     odcore::base::Lock l(m_mtx);
@@ -552,7 +552,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   /* SPLIT */
 
 
-  cv::Rect rectROIs(croppedImg.cols/2, croppedImg.rows/2, croppedImg.cols/2, croppedImg.rows/2);
+  cv::Rect rectROIs(croppedImg.cols/2, 0, croppedImg.cols/4, croppedImg.rows);
   
   try {
     odcore::base::Lock l(m_mtx);
@@ -568,7 +568,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
 
   cv::Mat foregroundMask = cv::Mat::zeros(diffImage.rows, diffImage.cols, CV_8UC1);
 
-  float threshold = 45.0f;
+  float threshold = 100.0f;
   float dist;
 
   for(int j=0; j<diffImage.rows; ++j)
