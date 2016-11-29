@@ -17,9 +17,11 @@
  * USA.
  */
 
+#include <bitset>
 #include <iostream>
 #include <vector>
 #include <experimental/filesystem>
+#include <limits.h>
 
 #include <dlfcn.h>
 
@@ -287,7 +289,11 @@ void SignalAdapter::nextContainer(odcore::data::Container &a_container)
       if(m_debug) {
         std::cout << "Sending container message ID:" << messageId << ", size:" << sampleBuffer->GetSize() << "." << std::endl;
         std::cout << "Message: " << msg.toString() << std::endl;
-        std::cout << "Raw message in bits:" << data << "." << std::endl;
+        std::cout << "Raw message in bits:"; 
+        for(std::size_t i=0; i < data.size(); i++) {
+          std::cout << std::bitset<CHAR_BIT>(data[i]); 
+        }
+        std::cout << "." << std::endl;
       }
       m_udpSenders[messageId]->send(data);
     }
