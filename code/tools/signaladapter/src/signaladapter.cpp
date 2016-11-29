@@ -285,7 +285,7 @@ void SignalAdapter::nextContainer(odcore::data::Container &a_container)
 
       std::string data = sampleBuffer->GetDataString();
       if(m_debug) {
-        std::cout << "Sending container message ID:" << messageId << std::endl;
+        std::cout << "Sending container message ID:" << messageId << ", size:" << sampleBuffer->GetSize() << "." << std::endl;
       }
       m_udpSenders[messageId]->send(data);
     }
