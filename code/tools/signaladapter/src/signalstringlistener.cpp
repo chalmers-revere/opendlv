@@ -36,8 +36,9 @@ namespace opendlv {
 namespace tools {
 namespace signaladapter {
 
-SignalStringListener::SignalStringListener(odcore::io::conference::ContainerConference &a_conference)
+SignalStringListener::SignalStringListener(odcore::io::conference::ContainerConference &a_conference, bool &a_debug)
     : m_conference(a_conference)
+    , m_debug(a_debug)
 {
 }
 
@@ -59,6 +60,10 @@ void SignalStringListener::nextString(std::string const &a_string)
         float acceleration = it->ReadFloat32();
         float steering = it->ReadFloat32();
         bool isValid = it->ReadBoolean();
+
+        if(m_debug) {
+          std::cout << "Received a packet with message ID 160 (ActuationRequest), acceleration:" << acceleration << ", steering:" << steering << ", isValid:" << isValid << "." << std::endl;
+        }
 
         opendlv::proxy::ActuationRequest actuationRequest(acceleration, steering, isValid);
         odcore::data::Container actuationRequestContainer(actuationRequest);
