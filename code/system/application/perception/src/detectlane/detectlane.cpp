@@ -543,18 +543,14 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
 
   // --------------------- Merge Canny & threshold lines ---------------------------
   
-  //detectedLines = detectedLinesIntensitive;
-  detectedLines = detectedLinesCanny;
-  for(uint16_t i = 0; i < detectedLinesIntensitive.size(); i++){
-    detectedLines.push_back(detectedLinesIntensitive[i]);
-  }
-    //Grouping the vectors
-  std::vector<cv::Vec2f> groups3;
-  GetGrouping(groups3, detectedLines,100);
-  detectedLines = groups3;
+  detectedLines = detectedLinesIntensitive;
+  //detectedLines = detectedLinesCanny;
+
+  detectedLinesIntensitive.insert( detectedLinesIntensitive.end(), detectedLinesCanny.begin(), detectedLinesCanny.end() );
+  GetGrouping(groups2, detectedLinesIntensitive,100);
+  detectedLines = groups2;
   std::cout << "Merged lines: " << detectedLines.size() << std::endl;
 
-/*
   //  FOR INTENSITY THRESHOLD
   // cv::HoughLines(intenImg, detectedLines, 1, 3.14f/180, m_houghThreshold );
   // // std::cout << "Unfiltered: "<< detectedLines.size() << std::endl;
@@ -598,7 +594,6 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   // int v = 4;
   // const int* constCont = &v; 
   // cv::polylines(m_image, countours, constCont, 4, 1, cv::Scalar(0,255,0), 4, 8, 0);
-*/
 
   // Get parametric line representation
   std::vector<cv::Vec2f> p, m;
@@ -611,7 +606,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   GetPointsOnLine(xScreenP, yScreenP, xWorldP, yWorldP, p, m);
 
   /* Mathias TEST*/
-  
+  /*
   cv::Mat currentLane; 
   cv::Mat otherLane;
 
@@ -624,10 +619,10 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     std::cerr << "Error cropping the image due to dimension size 2." << std::endl;
     return;
   }
-  
+  */
   /* SPLIT */
 
-    
+  /*  
   cv::Rect rectROIs(croppedImg.cols/2, 0, croppedImg.cols/4, croppedImg.rows);
   
   try {
@@ -637,9 +632,9 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     std::cerr << "Error cropping the image due to dimension size 3." << std::endl;
     return;
   }
-  
+  */
   /* SPLIT */
-  
+  /*
   cv::Mat diffImage;
   cv::absdiff(currentLane, otherLane, diffImage);
 
@@ -663,7 +658,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
       }
 
 
-  
+  */
   /* TILL HIT */
 
   /* DETECT LANE STARTS HERE  */
