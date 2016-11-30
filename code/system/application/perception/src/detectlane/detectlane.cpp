@@ -226,6 +226,11 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   // Increase the counter for each frame
   m_counter++;
 
+  // Skip some frames to speed upp
+  if (m_counter % 6 != 0){
+    return;
+  }
+
   if (!m_initialized || a_c.getDataType() != odcore::data::image::SharedImage::ID()) {
     return;
   }
@@ -538,12 +543,16 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
 
   // --------------------- Merge Canny & threshold lines ---------------------------
   
-  detectedLines = detectedLinesIntensitive;
-  /*
+  //detectedLines = detectedLinesIntensitive;
+  detectedLines = detectedLinesCanny;
   for(uint16_t i = 0; i < detectedLinesIntensitive.size(); i++){
     detectedLines.push_back(detectedLinesIntensitive[i]);
   }
-  */
+    //Grouping the vectors
+  std::vector<cv::Vec2f> groups3;
+  GetGrouping(groups3, detectedLines,100);
+  detectedLines = groups3;
+  std::cout << "Merged lines: " << detectedLines.size() << std::endl;
 
 /*
   //  FOR INTENSITY THRESHOLD
@@ -661,14 +670,12 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
 
   // Pair up lines to form a surface
   std::vector<int8_t> groupIds;
-  GetLinePairs(xScreenP, groupIds);
+  //GetLinePairs(xScreenP, groupIds);
+  GetAllLines(xScreenP, groupIds);
   if(groupIds.size() == 0){
     std::cout << "No groups found, should close some matrixs" << std::endl;
     return;
   }
-
-  std::cout << "Group size: "<< groupIds.size() << std::endl;
-
 
   if(m_debug) {
     for(uint8_t i = 0; i < groupIds.size(); i++) {
@@ -704,6 +711,12 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
 
   std::vector<opendlv::model::Cartesian3> edges;
 
+  // Print out all lines found
+  for(uint8_t i=0; i < groupIds.size(); i++){
+    edges.push_back(opendlv::model::Cartesian3(xWorldP[groupIds[i]][0],yWorldP[groupIds[i]][0],0));
+    edges.push_back(opendlv::model::Cartesian3(xWorldP[groupIds[i]][1],yWorldP[groupIds[i]][1],0));
+  }
+  /*
   //topleft
   edges.push_back(opendlv::model::Cartesian3(xWorldP[groupIds[0]][0],yWorldP[groupIds[0]][0],0));
   //bottomleft
@@ -712,6 +725,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   edges.push_back(opendlv::model::Cartesian3(xWorldP[groupIds[1]][1],yWorldP[groupIds[1]][1],0));
   //topright
   edges.push_back(opendlv::model::Cartesian3(xWorldP[groupIds[1]][0],yWorldP[groupIds[1]][0],0));
+  */
   // std::cout << "+++++++++++++++++++++++++++" << std::endl;
   // for(uint8_t i = 0; i < edges.size(); i++) { 
   //   std::cout << edges[i].toString() << std::endl;
@@ -739,6 +753,9 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   display[3].release();
   display[4].release();
   */
+  if(edges.size() == 3){
+    std::cout << "Found all lines" << std::endl;
+  }
 
   std::cout<<"Detected frame: " << m_counter << std::endl;
   opendlv::perception::Surface detectedSurface(imageTimeStamp,
@@ -858,6 +875,17 @@ void DetectLane::GetPointsOnLine(std::vector<cv::Vec2f> &a_xScreenP
     
   }
 }
+
+// Hitta alla linjer
+void DetectLane::GetAllLines(std::vector<cv::Vec2f> &a_xPoints
+  , std::vector<int8_t> &a_groupIds){
+  
+  for(uint8_t i = 0; i < a_xPoints.size(); i++){    
+    a_groupIds.push_back(i);
+  }
+
+}
+
 
 // Hitta mittersta paret för att hitta aktuell lane
 void DetectLane::GetLinePairs(std::vector<cv::Vec2f> &a_xPoints

@@ -83,6 +83,7 @@ class DetectLane
     , std::vector<cv::Vec2f> &a_p
     , std::vector<cv::Vec2f> &a_m);
   void GetLinePairs(std::vector<cv::Vec2f> &, std::vector<int8_t> &);
+  void GetAllLines(std::vector<cv::Vec2f> &a_xPoints,std::vector<int8_t> &a_groupIds);
   Eigen::MatrixXd ReadMatrix(std::string fileName, uint8_t nRows, uint8_t nCols);
   void TransformPointToGlobalFrame(Eigen::Vector3d &point);
 
