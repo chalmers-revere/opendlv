@@ -537,8 +537,11 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   }
 
   // --------------------- Merge Canny & threshold lines ---------------------------
-  
-  detectedLines = detectedLinesIntensitive;
+  detectedLinesIntensitive.insert( detectedLinesIntensitive.end(), detectedLinesCanny.begin(), detectedLinesCanny.end() );
+  std::cout << "Canny and intensity together amount of lines : "<< detectedLinesIntensitive.size() << std::endl;
+  GetGrouping(groups2, detectedLinesIntensitive,100);
+  detectedLines = groups2;
+  std::cout << "After grouping them: "<< detectedLines.size() << std::endl;
   /*
   for(uint16_t i = 0; i < detectedLinesIntensitive.size(); i++){
     detectedLines.push_back(detectedLinesIntensitive[i]);
@@ -602,7 +605,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   GetPointsOnLine(xScreenP, yScreenP, xWorldP, yWorldP, p, m);
 
   /* Mathias TEST*/
-  
+  /*
   cv::Mat currentLane; 
   cv::Mat otherLane;
 
@@ -615,10 +618,10 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     std::cerr << "Error cropping the image due to dimension size 2." << std::endl;
     return;
   }
-  
+  */
   /* SPLIT */
 
-    
+  /*  
   cv::Rect rectROIs(croppedImg.cols/2, 0, croppedImg.cols/4, croppedImg.rows);
   
   try {
@@ -628,9 +631,9 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     std::cerr << "Error cropping the image due to dimension size 3." << std::endl;
     return;
   }
-  
+  */
   /* SPLIT */
-  
+  /*
   cv::Mat diffImage;
   cv::absdiff(currentLane, otherLane, diffImage);
 
@@ -654,7 +657,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
       }
 
 
-  
+  */
   /* TILL HIT */
 
   /* DETECT LANE STARTS HERE  */
