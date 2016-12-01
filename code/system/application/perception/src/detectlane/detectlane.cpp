@@ -227,9 +227,9 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   m_counter++;
 
   // Skip some frames to speed upp
-  if (m_counter % 6 != 0){
+  /*if (m_counter % 3 != 0){
     return;
-  }
+  }*/
 
   if (!m_initialized || a_c.getDataType() != odcore::data::image::SharedImage::ID()) {
     return;
@@ -284,7 +284,8 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   const int32_t windowHeight = 400/2;
 
   // Set number of windows to display
-  cv::Mat display[9];
+  //cv::Mat display[9];
+  cv::Mat display[1];
 
   cv::Mat visualImpression = croppedImg.clone();
    // Delete the Matrix
@@ -335,23 +336,23 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   cv::Mat tmpImg = m_visualMemory[0].second.clone();
   cv::Mat cannyImg;
   cv::Mat cannyImgRes;
-  
-  cv::Canny(tmpImg, cannyImg, m_cannyThreshold, m_cannyThreshold*3, 3);
+  cv::Mat blurredImg;
+  cv::medianBlur(tmpImg,blurredImg,3);
+
+  cv::Canny(blurredImg, cannyImg, m_cannyThreshold, m_cannyThreshold*3, 3);
 
   // Sobel function that reduce the noice from canny
   int ddepth = -1;//cv::CV_16S;
   cv::Sobel(cannyImg, cannyImgRes, ddepth, 1, 0, 3, 1,0,cv::BORDER_DEFAULT);
   cannyImg.release();
   // ------------------------ Adaptive Threshold ---------------------------
-  cv::Mat intenImg;
+
   cv::Mat intenImgRes;
   cv::Mat TresholdRes;
-  //cv::medianBlur(intenImg,intenImg,3);
-  cv::medianBlur(tmpImg,intenImg,3);
   tmpImg = intenImgRes;
-  cv::inRange(intenImg, cv::Scalar(m_intensityThreshold, m_intensityThreshold, m_intensityThreshold), cv::Scalar(255, 255, 255), tmpImg);
+  cv::inRange(blurredImg, cv::Scalar(m_intensityThreshold, m_intensityThreshold, m_intensityThreshold), cv::Scalar(255, 255, 255), tmpImg);
   //cv::cvtColor(m_image, intenImg, CV_GRAY2BGR);
-  intenImg.release();
+  blurredImg.release();
 
   cv::adaptiveThreshold(tmpImg,intenImgRes,255,cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY_INV,11,2);
   tmpImg.release();
@@ -391,19 +392,19 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
 
   // ------------------------ Print outs ---------------------------
   // Size was 3 before, should maybe be commented?
-  if(detectedLinesCanny.size() < 9){
+  /*if(detectedLinesCanny.size() < 9){
     if(m_debug) {
       cv::resize(cannyImgRes, display[1], cv::Size(windowWidth, windowHeight), 0, 0, cv::INTER_CUBIC);
       cv::imshow("Canny transform", display[1]);
       cv::waitKey(1);
     }
     //return;
-  }
+  }*/
 
   cannyImgRes.release();
   
   // Size was 3 before, should maybe be commented?
-  if(detectedLinesIntensitive.size() < 20){
+  /*if(detectedLinesIntensitive.size() < 20){
     if(m_debug) {
       //cv::resize(intenImgRes, display[4], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
       cv::resize(TresholdRes, display[2], cv::Size(windowWidth, windowHeight), 0, 0, cv::INTER_CUBIC);
@@ -411,7 +412,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
       cv::waitKey(1);
     }
     //return;
-  }
+  }*/
   TresholdRes.release();
   // ------------------------ Add all found lines to image & -------------------------
   //----------------------------- Grouping Canny lines -------------------------------
@@ -429,17 +430,18 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
       cv::Point pt2(m_roi[0] + x0 - 2000*(-b), m_roi[1] + y0 - 2000*(a));
 
       cv::line(Canny_res1, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
-  }
-  if(m_debug) {
-    //cv::resize(intenImgRes, display[4], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
-    cv::resize(Canny_res1, display[3], cv::Size(windowWidth, windowHeight), 0, 0, cv::INTER_CUBIC);
-    cv::imshow("Canny Unfiltered", display[3]);
-    cv::waitKey(1);
+    }
+    /*if(m_debug) {
+      //cv::resize(intenImgRes, display[4], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
+      cv::resize(Canny_res1, display[3], cv::Size(windowWidth, windowHeight), 0, 0, cv::INTER_CUBIC);
+      cv::imshow("Canny Unfiltered", display[3]);
+      cv::waitKey(1);
+    }*/
+
+    Canny_res1.release();
+    //cv::line(m_image, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
   }
 
-  Canny_res1.release();
-  //cv::line(m_image, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
-  }
   std::vector<cv::Vec2f> tmpVec;
   float angleTresh = 85 * opendlv::Constants::PI/180;
   for(uint16_t i = 0; i != detectedLines.size(); i++){
@@ -468,12 +470,12 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
 
       cv::line(Canny_res2, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
     }
-    if(m_debug) {
+    /*if(m_debug) {
       //cv::resize(intenImgRes, display[4], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
       cv::resize(Canny_res2, display[4], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
       cv::imshow("Canny Filtered", display[4]);
       cv::waitKey(1);
-    }
+    }*/
     Canny_res2.release();
       //cv::line(m_image, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
   }
@@ -496,10 +498,10 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
       //cv::line(m_image, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
       }
     
-    cv::resize(Thresh_res1, display[5], cv::Size(windowWidth, windowHeight), 0, 0,
+    /*cv::resize(Thresh_res1, display[5], cv::Size(windowWidth, windowHeight), 0, 0,
     cv::INTER_CUBIC);
     cv::imshow("Unfiltered Threshold", display[5]); 
-    cv::waitKey(1);
+    cv::waitKey(1);*/
     Thresh_res1.release();
   }
 
@@ -535,10 +537,10 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
       cv::line(Thresh_res2, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
     }
 
-    cv::resize(Thresh_res2, display[6], cv::Size(windowWidth*2, windowHeight*2), 0, 0,
+    /*cv::resize(Thresh_res2, display[6], cv::Size(windowWidth*2, windowHeight*2), 0, 0,
     cv::INTER_CUBIC);
     cv::imshow("Filtered Threshold", display[6]); 
-    cv::waitKey(1);
+    cv::waitKey(1);*/
   }
 
   // --------------------- Merge Canny & threshold lines ---------------------------
@@ -686,8 +688,8 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     */
 
     // Now considering the adaptive threshold algorithm only, should fix correct image to merge with canny
-    cv::resize(Thresh_res2, display[7], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
-    cv::imshow("Result", display[7]);
+    cv::resize(Thresh_res2, display[1], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
+    cv::imshow("Result", display[1]);
     
     //MathIAS
     //cv::resize(foregroundMask, display[8], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
