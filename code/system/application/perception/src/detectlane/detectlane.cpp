@@ -367,9 +367,9 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   cv::vector<cv::Vec2f> detectedLinesIntensitive;
 
   // images to keep track of all detected lines
-  cv::Mat Canny_res1 = m_image.clone();
-  cv::Mat Canny_res2 = m_image.clone();
-  cv::Mat Thresh_res1 = m_image.clone();
+  //cv::Mat Canny_res1 = m_image.clone();
+  //cv::Mat Canny_res2 = m_image.clone();
+  //cv::Mat Thresh_res1 = m_image.clone();
   cv::Mat Thresh_res2 = m_image.clone();
   m_image.release();
 
@@ -429,7 +429,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
       cv::Point pt1(m_roi[0] + x0 + 2000*(-b), m_roi[1] + y0 + 2000*(a));
       cv::Point pt2(m_roi[0] + x0 - 2000*(-b), m_roi[1] + y0 - 2000*(a));
 
-      cv::line(Canny_res1, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
+      //cv::line(Canny_res1, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
     }
     /*if(m_debug) {
       //cv::resize(intenImgRes, display[4], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
@@ -438,7 +438,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
       cv::waitKey(1);
     }*/
 
-    Canny_res1.release();
+    //Canny_res1.release();
     //cv::line(m_image, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
   }
 
@@ -468,7 +468,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
       cv::Point pt1(m_roi[0] + x0 + 2000*(-b), m_roi[1] + y0 + 2000*(a));
       cv::Point pt2(m_roi[0] + x0 - 2000*(-b), m_roi[1] + y0 - 2000*(a));
 
-      cv::line(Canny_res2, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
+      //cv::line(Canny_res2, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
     }
     /*if(m_debug) {
       //cv::resize(intenImgRes, display[4], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
@@ -476,7 +476,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
       cv::imshow("Canny Filtered", display[4]);
       cv::waitKey(1);
     }*/
-    Canny_res2.release();
+    //Canny_res2.release();
       //cv::line(m_image, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
   }
   // ------------------------ Add all found lines to image & ---------------------------
@@ -494,7 +494,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
       cv::Point pt1(m_roi[0] + x0 + 2000*(-b), m_roi[1] + y0 + 2000*(a));
       cv::Point pt2(m_roi[0] + x0 - 2000*(-b), m_roi[1] + y0 - 2000*(a));
 
-      cv::line(Thresh_res1, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
+      //cv::line(Thresh_res1, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
       //cv::line(m_image, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
       }
     
@@ -502,7 +502,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     cv::INTER_CUBIC);
     cv::imshow("Unfiltered Threshold", display[5]); 
     cv::waitKey(1);*/
-    Thresh_res1.release();
+    //Thresh_res1.release();
   }
 
   std::vector<cv::Vec2f> tmpVec2;
@@ -607,61 +607,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   std::vector<cv::Vec2f> xWorldP, yWorldP;
   GetPointsOnLine(xScreenP, yScreenP, xWorldP, yWorldP, p, m);
 
-  /* Mathias TEST*/
-  /*
-  cv::Mat currentLane; 
-  cv::Mat otherLane;
 
-  cv::Rect rectROIa(croppedImg.cols/4, 0, croppedImg.cols/4, croppedImg.rows);
-  
-  try {
-    odcore::base::Lock l(m_mtx);
-    otherLane = croppedImg(rectROIa);
-  } catch (cv::Exception& e) {
-    std::cerr << "Error cropping the image due to dimension size 2." << std::endl;
-    return;
-  }
-  */
-  /* SPLIT */
-
-  /*  
-  cv::Rect rectROIs(croppedImg.cols/2, 0, croppedImg.cols/4, croppedImg.rows);
-  
-  try {
-    odcore::base::Lock l(m_mtx);
-    currentLane = croppedImg(rectROIs);
-  } catch (cv::Exception& e) {
-    std::cerr << "Error cropping the image due to dimension size 3." << std::endl;
-    return;
-  }
-  */
-  /* SPLIT */
-  /*
-  cv::Mat diffImage;
-  cv::absdiff(currentLane, otherLane, diffImage);
-
-  cv::Mat foregroundMask = cv::Mat::zeros(diffImage.rows, diffImage.cols, CV_8UC1);
-
-  float threshold = 100.0f;
-  float dist;
-
-  for(int j=0; j<diffImage.rows; ++j)
-      for(int i=0; i<diffImage.cols; ++i)
-      {
-          cv::Vec3b pix = diffImage.at<cv::Vec3b>(j,i);
-
-          dist = (pix[0]*pix[0] + pix[1]*pix[1] + pix[2]*pix[2]);
-          dist = sqrt(dist);
-
-          if(dist>threshold)
-          {
-              foregroundMask.at<unsigned char>(j,i) = 255;
-          }
-      }
-
-
-  */
-  /* TILL HIT */
 
   /* DETECT LANE STARTS HERE  */
 
@@ -673,6 +619,71 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     std::cout << "No groups found, should close some matrixs" << std::endl;
     return;
   }
+/*
+  //MATHIAS START
+  if(groupIds.size()>2){
+  cv::Mat currentLane; 
+  cv::Mat otherLane;
+
+  cv::Rect rectROIa(xScreenP[groupIds[groupIds.size()-1]][1], yScreenP[groupIds[groupIds.size()-1]][1],
+   (xScreenP[groupIds[groupIds.size()-1]][1]-xScreenP[groupIds[groupIds.size()]][1]), -50);
+  
+  try {
+    odcore::base::Lock l(m_mtx);
+    currentLane = Thresh_res2(rectROIa);
+  } catch (cv::Exception& e) {
+  	std::cout<<"rectROIa: "<<xScreenP[groupIds[groupIds.size()-1]][1]<<std::endl;
+  	std::cout<<"rectROIa: "<<yScreenP[groupIds[groupIds.size()-1]][1]<<std::endl;
+  	std::cout<<"rectROIa: "<<xScreenP[groupIds[groupIds.size()]][1]<<std::endl;
+  	std::cout<<"rectROIa: "<<-50<<std::endl;
+    std::cerr << "Error cropping the image due to dimension size 2." << std::endl;
+    return;
+  }
+  
+  for(uint8_t i = 0; i < groupIds.size()-2; i++) {
+	cv::Rect rectROIs(xScreenP[groupIds[i]][1], yScreenP[groupIds[i]][1], xScreenP[groupIds[i+1]][1], -50);
+
+	try {
+	odcore::base::Lock l(m_mtx);
+	otherLane = Thresh_res2(rectROIs);
+	} catch (cv::Exception& e) {
+	std::cerr << "Error cropping the image due to dimension size 3." << std::endl;
+	return;
+	}
+
+
+
+	cv::Mat diffImage;
+	cv::absdiff(currentLane, otherLane, diffImage);
+
+	cv::Mat foregroundMask = cv::Mat::zeros(diffImage.rows, diffImage.cols, CV_8UC1);
+
+	float threshold = 100.0f;
+	float dist;
+
+	for(int j=0; j<diffImage.rows; ++j)
+	{
+	  for(int k=0; k<diffImage.cols; ++k)
+	  {
+	      cv::Vec3b pix = diffImage.at<cv::Vec3b>(j,k);
+
+	      dist = (pix[0]*pix[0] + pix[1]*pix[1] + pix[2]*pix[2]);
+	      dist = sqrt(dist);
+
+	      if(dist>threshold)
+	      {
+	          foregroundMask.at<unsigned char>(j,k) = 255;
+	      }
+	  }
+	}
+	int TotalNumberOfPixels = foregroundMask.rows * foregroundMask.cols;
+	int ZeroPixels = TotalNumberOfPixels - cv::countNonZero(foregroundMask);
+	std::cout<<"The number of pixels that are zero is "<<ZeroPixels<<std::endl;
+}
+}
+  
+  //MATHIAS END
+*/
 
   if(m_debug) {
     for(uint8_t i = 0; i < groupIds.size(); i++) {
