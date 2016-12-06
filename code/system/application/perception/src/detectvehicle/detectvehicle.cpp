@@ -21,14 +21,12 @@
 //---
 #include <ctype.h>
 #include <cstring>
-#include <cmath>
 #include <iostream>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-#include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/GeneratedHeaders_OpenDaVINCI.h"
 #include "opendavinci/odcore/wrapper/SharedMemoryFactory.h"
 #include "opendavinci/odcore/wrapper/SharedMemory.h"
@@ -52,89 +50,42 @@ DetectVehicle::DetectVehicle(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(
       a_argc, a_argv, "perception-detectvehicle")
     , m_initialised(false)
-    , m_convNeuralNet()
-    , m_scale(1, 1, 1)
-    , m_sourceName()
-    , m_debugMode()
-    , m_pixel2World()
+    , m_debug()
 {
-  m_convNeuralNet = std::shared_ptr<ConvNeuralNet>(
-      new ConvNeuralNet);
-
 }
 
 DetectVehicle::~DetectVehicle()
 {
-  std::cout << "DetectVehicle::~DetectVehicle()" << std::endl;
 }
 
 void DetectVehicle::setUp()
 {
-  std::cout << "DetectVehicle::setUp()" << std::endl;
-  m_convNeuralNet->SetUp();
-  // float scale = 1280.0f/800.0f;
-  // m_scale = Eigen::Vector3d(scale, scale, 1);
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
-  m_sourceName = kv.getValue<std::string>("perception-detectvehicle.source");
-
-  std::string path = "/opt/opendlv/share/opendlv/tools/vision/projection/";
-
-  if (m_sourceName == "front-left") {
-    m_pixel2World = ReadMatrix(path+"leftCameraTransformationMatrix.csv",3,3);
-  }
-  else if (m_sourceName == "front-right") {
-    m_pixel2World = ReadMatrix(path+"rightCameraTransformationMatrix.csv",3,3);
-  }
-  else {
-    std::cout << "Cannot load transformation matrix for " << m_sourceName << ". Undefined camera source." << std::endl;
-  }
-
-
-  verticalcut = kv.getValue<int32_t> ("perception-detectvehicle.verticalcut");
-  std::cout << "verticalcut: " << verticalcut << std::endl;
-  m_debugMode = (kv.getValue<int32_t> ("perception-detectvehicle.debug") == 1);
-  std::cout << "Debug mode: " << m_debugMode << std::endl;
-  std::cout << "This DetectVehicle instance will receive images from " << m_sourceName << "." << std::endl;
+  m_debug = (kv.getValue<int32_t> ("perception-detectvehicle.debug") == 1);
   std::cout << "Setup complete." << std::endl;
   m_initialised = true;
 }
-
+void DetectVehicle::tearDown()
+{
+}
 /**
  * Receives SharedImage from camera.
  * Sends .
  */
 void DetectVehicle::nextContainer(odcore::data::Container &c)
 {
-  if (!m_convNeuralNet->IsInitialized()) {
-    std::cout << "Convolutional Neural Net not yet initialized" << std::endl;
-    return;
-  }
-  // Return if we receive container that we don't care about or module hasn't been properly initialised
   if (c.getDataType() != odcore::data::image::SharedImage::ID() || !m_initialised) {
     return;
   }
 
 
-  odcore::data::image::SharedImage mySharedImg = 
-      c.getData<odcore::data::image::SharedImage>();
+  odcore::data::image::SharedImage mySharedImg = c.getData<odcore::data::image::SharedImage>();
 
 
   std::string cameraName = mySharedImg.getName();
   // std::cout << "Received image from camera " << cameraName  << "!" << std::endl;
 
-  // Receive image from a source that this instance should not care about
-  if (m_sourceName.compare(cameraName) != 0) {
-    //std::cout << "Received image came from wrong source. Expected " << m_sourceName << std::endl;
-    return;
-  }
-
-  odcore::data::TimeStamp timeStampOfImage = c.getReceivedTimeStamp();
-  // odcore::data::TimeStamp start;
-
-  //double tmpSeconds = (nowTimeStamp - timeStampOfImage).toMicroseconds() / 1000000.0;
-  //std::cout << "tmpSeconds: " << tmpSeconds << std::endl;
-  //std::cout << "timeStampOfImage: " << timeStampOfImage << std::endl;
-  //std::cout << "timeStampOfImage (s): " << (timeStampOfImage.toMicroseconds() / 1000000.0) << std::endl;
+  //TODO compare the source name to keep track different camera sources
 
   std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(
       odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(
@@ -153,83 +104,24 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
     return;
   }
   
-  sharedMem->lock();
   {
+    sharedMem->lock();
     memcpy(myImage.data, sharedMem->getSharedMemory(), 
         imgWidth*imgHeight*nrChannels);
+    sharedMem->unlock();
   }
-  sharedMem->unlock();
-
-  //////////////////////////////////////////////////////////////////////////////
-
-  // Nr of seconds
-  // TODO use something else as timestamp?
-  //double timeStamp = ((double)c.getSentTimeStamp().toMicroseconds())/1000000;
-  //std::cout << "timeStamp: " << timeStamp << std::endl;
- 
- 
-  cvSetImageROI(myIplImage, cvRect(100,imgHeight-verticalcut,imgWidth-200,verticalcut ));
-
-  // odcore::data::TimeStamp start;
-  m_convNeuralNet->Update(&myImage, m_debugMode);
-  // odcore::data::TimeStamp end;
-  // double duration = end.toMicroseconds() - start.toMicroseconds();
-  // std::cout << "The update took " << duration << " microseconds (" << duration/1000000 << " seconds)." << std::endl;
-
-  std::vector<cv::Rect> detections;
-  m_convNeuralNet->GetDetectedVehicles(&detections);
-
-  sendObjectInformation(&detections, timeStampOfImage);
 
   cvReleaseImage(&myIplImage);
 }
 
-void DetectVehicle::tearDown()
+
+
+void DetectVehicle::sendObjectInformation()
 {
-  std::cout << "DetectVehicle::tearDown()" << std::endl;
-  m_convNeuralNet->TearDown();
-}
+  //TODO: refactoring
 
-Eigen::MatrixXd DetectVehicle::ReadMatrix(std::string fileName, int nRows,
-    int nCols)
-{
-  std::ifstream file(fileName);
-  Eigen::MatrixXd matrix(nRows,nCols);
 
-  if (file.is_open()) {
-    for(int i = 0; i < nRows; i++){
-      for(int j = 0; j < nCols; j++){
-        double item = 0.0;
-        file >> item;
-        matrix(i,j) = item;
-      }
-    }
-  }  
-  file.close();
-  return matrix;
-}
-
-void DetectVehicle::TransformPointToGlobalFrame(Eigen::Vector3d &point)
-{
-  // std::cout<<"point before \n";
-  // std::cout<<point<<std::endl;
-  //Eigen::Vector3d scale(1.6, 1.6, 1);
-  point = point.cwiseProduct(m_scale);
-  // std::cout<<"point after 1\n";
-  // std::cout<<point<<std::endl;
-  point = m_pixel2World * point;
-
-  // std::cout<<"point final before \n";
-  // std::cout<<point<<std::endl;
-
-  point = point / point(2);
-  // std::cout<<"point final \n";
-  // std::cout<<point<<std::endl;
-}
-
-void DetectVehicle::sendObjectInformation(std::vector<cv::Rect>* detections, 
-    odcore::data::TimeStamp timeStampOfImage)
-{
+  /*
   for (uint32_t i=0; i<detections->size(); i++) {
     
     cv::Rect currentBoundingBox = detections->at(i);
@@ -325,8 +217,8 @@ void DetectVehicle::sendObjectInformation(std::vector<cv::Rect>* detections,
     std::cout << "    width (m):     " << detectionWidth << std::endl;
 
   }
+  */
 }
-
 
 } // detectvehicle
 } // perception

@@ -29,11 +29,6 @@
  
 #include <Eigen/Dense>
 
-#include "detectvehicle/convneuralnet.hpp"
-
-
-
-
 namespace opendlv {
 namespace perception {
 namespace detectvehicle {
@@ -55,18 +50,10 @@ class DetectVehicle
   void setUp();
   void tearDown();
 
-  Eigen::MatrixXd ReadMatrix(std::string fileName,int nRows, int nCols);
-  void TransformPointToGlobalFrame(Eigen::Vector3d &point);
-  void sendObjectInformation(std::vector<cv::Rect>* detections, 
-      odcore::data::TimeStamp timeStampOfImage);
+  void sendObjectInformation();
 
   bool m_initialised;
-  std::shared_ptr<ConvNeuralNet> m_convNeuralNet;
-  Eigen::Vector3d m_scale;
-  std::string m_sourceName;
-  bool m_debugMode;
-  int32_t verticalcut;
-  Eigen::Matrix3d m_pixel2World;
+  bool m_debug;
 };
 
 } // detectvehicle
