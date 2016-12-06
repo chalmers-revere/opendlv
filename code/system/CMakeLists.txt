@@ -82,14 +82,6 @@ set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
 add_subdirectory(application)
 
 #install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../config/configuration DESTINATION . COMPONENT system)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resources/system/application/perception/detectvehicle/trained_cnn DESTINATION ./share/opendlv/system/application/perception/detectvehicle/ COMPONENT system)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resources/system/application/perception/detectvehicle/normalization_constants DESTINATION ./share/opendlv/system/application/perception/detectvehicle/ COMPONENT system)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resources/tools/vision/projection/leftCameraTransformationMatrix.csv DESTINATION ./share/opendlv/tools/vision/projection/ COMPONENT system)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resources/tools/vision/projection/rightCameraTransformationMatrix.csv DESTINATION ./share/opendlv/tools/vision/projection/ COMPONENT system)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resources/tools/vision/projection/leftCameraWarpPoints.csv DESTINATION ./share/opendlv/tools/vision/projection/ COMPONENT system)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resources/tools/vision/projection/rightCameraWarpPoints.csv DESTINATION ./share/opendlv/tools/vision/projection/ COMPONENT system)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resources/tools/vision/projection/leftCameraTransformationMatrixWarped.csv DESTINATION ./share/opendlv/tools/vision/projection/ COMPONENT system)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resources/tools/vision/projection/rightCameraTransformationMatrixWarped.csv DESTINATION ./share/opendlv/tools/vision/projection/ COMPONENT system)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resources/system/application/perception/detectlane/leftCameraRegions.csv DESTINATION ./share/opendlv/system/application/perception/detectlane/ COMPONENT system)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../resources/system/application/perception/detectlane/rightCameraRegions.csv DESTINATION ./share/opendlv/system/application/perception/detectlane/ COMPONENT system)
 
