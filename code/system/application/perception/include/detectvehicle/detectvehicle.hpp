@@ -24,17 +24,30 @@
 #include <vector>
 #include <cmath>
 
+#include <string>
+#include <stdio.h>
+#include <math.h> /* sqrt */
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
+//#include "opencv2/objdetect/objdetect_c.h"
+ #include <opencv2/objdetect/objdetect.hpp>
+
+#include "detectvehicle/vehicle_s.hpp"
+
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
- 
+
 #include <Eigen/Dense>
 
 namespace opendlv {
 namespace perception {
 namespace detectvehicle {
 
+
+
 /**
- * This class provides a module with ability of detect vehicle. 
+ * This class provides a module with ability of detect vehicle.
  * It imports a trained ANN externally.
  */
 class DetectVehicle
@@ -45,15 +58,49 @@ class DetectVehicle
   DetectVehicle &operator=(DetectVehicle const &) = delete;
   virtual ~DetectVehicle();
   virtual void nextContainer(odcore::data::Container &);
+  /* --- GLOBALS(MEMBERS) ---*/
+std::vector<vehicle_t> vehicle_buffer = std::vector<vehicle_t>();
+CvHaarClassifierCascade* cascade;
+//CascadeClassifier cascade;
+CvMemStorage* storage;
+
 
  private:
   void setUp();
   void tearDown();
 
-  void sendObjectInformation();
+//void sendObjectInformation();
 
   bool m_initialised;
   bool m_debug;
+
+
+
+
+/* --- CONFIGURATIONS (USER DEFINED) ---*/
+int input_resize_percent = 90;
+int NEIGHBOURS=3;
+int SHOW_POINT = 3; // MINUMUM RANK
+int REMOVE_POINT = -3;
+int SUCCESS_POINT=30; //
+int SHOW_RIO=0;
+int HORIZON=400;
+int id_counter = 0;
+int MAX_DISTANCE = 30;  // 30 pixels shift at most for each car from one frame to another
+
+
+
+/* --- METHODS ---*/
+void init();
+int checkMatch(vehicle_t vehicle);
+void drawRec(IplImage* img, vehicle_t vehicle);
+void detect(IplImage* img);
+double distance(int x1, int x2, int y1, int y2);
+void updateBuffer();
+void drawROI(IplImage* frame);
+void sendVehicle(vehicle_t vehicle);  // TODO
+
+
 };
 
 } // detectvehicle

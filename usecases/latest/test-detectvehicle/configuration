@@ -79,7 +79,7 @@ core-tool-camera-replay.height = 720
 
 perception-detectvehicle.source=front-left
 perception-detectvehicle.debug=1
-perception-detectvehicle.verticalcut=600
+perception-detectvehicle.cascade=cars.xml
 
 
 
