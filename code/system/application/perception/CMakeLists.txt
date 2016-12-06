@@ -28,6 +28,7 @@ file(GLOB_RECURSE thisproject-sources
   "${CMAKE_CURRENT_SOURCE_DIR}/src/detectlane/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/detectvehicle/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/src/findsafeway/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/trackvehicle/*.cpp"
   )
 
 add_library(${PROJECT_NAME}lib-static STATIC ${thisproject-sources})
@@ -41,6 +42,9 @@ target_link_libraries(${PROJECT_NAME}-detectvehicle ${PROJECT_NAME}lib-static ${
 add_executable(${PROJECT_NAME}-findsafeway "${CMAKE_CURRENT_SOURCE_DIR}/src/findsafeway/main.cpp")
 target_link_libraries(${PROJECT_NAME}-findsafeway ${PROJECT_NAME}lib-static ${LIBRARIES}) 
 
+add_executable(${PROJECT_NAME}-trackvehicle "${CMAKE_CURRENT_SOURCE_DIR}/src/trackvehicle/main.cpp")
+target_link_libraries(${PROJECT_NAME}-trackvehicle ${PROJECT_NAME}lib-static ${LIBRARIES}) 
+
 # Test
 include(RunTests)
 
@@ -48,3 +52,4 @@ include(RunTests)
 install(TARGETS ${PROJECT_NAME}-detectlane RUNTIME DESTINATION bin COMPONENT system-application)
 install(TARGETS ${PROJECT_NAME}-detectvehicle RUNTIME DESTINATION bin COMPONENT system-application)
 install(TARGETS ${PROJECT_NAME}-findsafeway RUNTIME DESTINATION bin COMPONENT system-application)
+install(TARGETS ${PROJECT_NAME}-trackvehicle RUNTIME DESTINATION bin COMPONENT system-application)
