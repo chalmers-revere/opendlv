@@ -52,6 +52,7 @@ DetectLane::DetectLane(int32_t const &a_argc, char **a_argv)
     , m_intensityThreshold()
     , m_cannyThreshold()
     , m_houghThreshold()
+    , m_lineDiff()
     , m_memThreshold()
     , m_upperLaneLimit()
     , m_lowerLaneLimit()
@@ -75,6 +76,7 @@ void DetectLane::setUp()
   m_intensityThreshold = kv.getValue<uint16_t>("perception-detectlane.intensityThreshold");
   m_cannyThreshold = kv.getValue<uint16_t>("perception-detectlane.cannyThreshold");
   m_houghThreshold = kv.getValue<uint16_t>("perception-detectlane.houghThreshold");
+  m_lineDiff = kv.getValue<float>("perception-detectlane.lineDiff");
   m_memThreshold = kv.getValue<double>("perception-detectlane.memThreshold");
   m_upperLaneLimit = kv.getValue<uint16_t>("perception-detectlane.upperLaneLimit");
   m_lowerLaneLimit = kv.getValue<uint16_t>("perception-detectlane.lowerLaneLimit");
@@ -121,9 +123,20 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     return;
   }*/
 
-  if (!m_initialized || a_c.getDataType() != odcore::data::image::SharedImage::ID()) {
+  if (!m_initialized){
+    std::cout << "Return from line 127" << std::endl;
     return;
   }
+  if (a_c.getDataType() != odcore::data::image::SharedImage::ID()){
+    std::cout << "Return from line 132" << std::endl;
+    //std::cout << "ac: " << a_c.getDataType() << std::endl;
+    
+    return;
+  }
+  /*else{
+    std::cout << "ac: " << a_c.getDataType() << std::endl;
+  }*/
+
   odcore::data::TimeStamp now;
 
   odcore::data::image::SharedImage mySharedImg =
@@ -142,6 +155,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   cv::Mat tmpImage = cv::Mat(myIplImage);
 
   if(!sharedMem->isValid()){
+    std::cout << "Return from line 148" << std::endl;
     return;
   }
 
@@ -166,6 +180,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     croppedImg = m_image(rectROI);
   } catch (cv::Exception& e) {
     std::cerr << "Error cropping the image due to dimension size." << std::endl;
+    std::cout << "Return from line 173" << std::endl;
     return;
   }
 
@@ -443,7 +458,68 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   detectedLines = groups2;
   std::cout << "Merged lines: " << detectedLines.size() << std::endl;
 
-  // Print out all detected lines
+  // Get parametric line representation
+  std::vector<cv::Vec2f> p, m;
+
+  GetParametricRepresentation(p, m, detectedLines);
+
+  // Get points on lines
+  std::vector<cv::Vec2f> xScreenP,yScreenP;
+  std::vector<cv::Vec2f> xWorldP, yWorldP;
+  GetPointsOnLine(xScreenP, yScreenP, xWorldP, yWorldP, p, m);
+  
+  /*
+  std::cout << "Coordinates: ";
+  for(uint8_t i = 0; i < yWorldP.size(); i++){
+    std::cout << yWorldP[i][1] << " , ";
+  } 
+  std::cout << std::endl;
+  */
+
+  //std::cout << "Coordinates:: " << yWorldP.size() << std::endl;
+  
+  // Filter out lines that are close to each other
+  std::vector<int> toBeRemoved;
+  for(uint8_t i = 0; i < yWorldP.size(); i++){
+    for(uint8_t j = i+1; j < yWorldP.size(); j++){
+      if( (yWorldP[i][1] < 0) && (yWorldP[j][1] < 0) ){ // if smaller than 0, it is a negative number
+        //std::cout << "Two negative coordinates: " << yWorldP[i][1] << ", " << yWorldP[j][1] << std::endl;
+        if(std::abs(yWorldP[i][1] - yWorldP[j][1]) < m_lineDiff ){
+          // Remove the one that is largest
+          //std::cout << "Small diff, remove a line" << std::endl;
+          if(yWorldP[i][1] > yWorldP[j][1]){
+            toBeRemoved.push_back(yWorldP[j][1]);
+            std::cout << "Removed: " << yWorldP[j][1] << std::endl;
+            continue;
+          }
+          else{
+            toBeRemoved.push_back(yWorldP[i][1]);
+            std::cout << "Removed: " << yWorldP[i][1] << std::endl;
+            continue;
+          }
+        }
+      }
+      else if(yWorldP[i][1] > 0 && yWorldP[j][1] > 0){ // if bigger than 0, it is a positive number
+        //std::cout << "Two positive coordinates: " << yWorldP[i][1] << ", " << yWorldP[j][1] << std::endl;
+        if(std::abs(yWorldP[i][1] - yWorldP[j][1]) < m_lineDiff ){
+          // Remove the one that is smallest
+          //std::cout << "Small diff, remove a line" << std::endl;
+          if(yWorldP[i][1] > yWorldP[j][1]){
+            toBeRemoved.push_back(yWorldP[i][1]);
+            std::cout << "Removed: " << yWorldP[i][1] << std::endl;
+            continue;
+          }
+          else{
+            toBeRemoved.push_back(yWorldP[j][1]);
+            std::cout << "Removed: " << yWorldP[j][1] << std::endl;
+            continue;
+          }
+        }
+      }
+    }
+  }
+
+  // Print out all lines
   if(m_debug) {
     for( size_t i = 0; i < detectedLines.size(); i++ ) {
       float rho = detectedLines[i][0];
@@ -458,29 +534,32 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     }
   }
 
-  // Get parametric line representation
-  std::vector<cv::Vec2f> p, m;
-
-  GetParametricRepresentation(p, m, detectedLines);
-
-  // Get points on lines
-  std::vector<cv::Vec2f> xScreenP,yScreenP;
-  std::vector<cv::Vec2f> xWorldP, yWorldP;
-  GetPointsOnLine(xScreenP, yScreenP, xWorldP, yWorldP, p, m);
-  
-  // xWorld var en vektor med två punkter i varje element
-  for(uint8_t i= 0; i < xWorldP.size(); i++){
-    
-    std::cout << "Y world coordinate pair: " << yWorldP[i][1] << std::endl;
-  }
   /* DETECT LANE STARTS HERE  */
 
   // Pair up lines to form a surface
   std::vector<int8_t> groupIds;
   //GetLinePairs(xScreenP, groupIds);
-  GetAllLines(xScreenP, groupIds);
+  //GetAllLines(xScreenP, groupIds);
+
+  for(uint8_t i = 0; i < xScreenP.size(); i++){    
+    bool hit = false;
+    for(uint8_t j = 0; j < toBeRemoved.size(); j++){
+      if(j == i){
+        hit = true;
+      }
+    }
+    if(!hit){
+      groupIds.push_back(i);  
+    }
+    else{
+      std::cout << "Skipped line: " << i << std::endl;
+    }
+    
+  }
+
   if(groupIds.size() == 0){
     std::cout << "No groups found" << std::endl;
+    std::cout << "Return from line 546" << std::endl;
     return;
   }
 
@@ -559,6 +638,9 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   if(edges.size() == 6){
     std::cout << "Found all lines" << std::endl;
     std::cout<<"Detected frame: " << m_counter << std::endl;
+  }
+  else{
+    std::cout << "Failed, detected: " << (edges.size()/2) << std::endl;
   }
 
   opendlv::perception::Surface detectedSurface(imageTimeStamp,
