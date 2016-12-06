@@ -89,8 +89,8 @@ perception-detectlane.debug = 1
 perception-detectlane.roiX = 30 #205 Pixels away from the upper left corner in X
 perception-detectlane.roiWidth = 1000 #775 Done Pixel width of the captured box in X
 
-perception-detectlane.roiY = 200 #455, 200 Pixels away from the upper part of picture in Y
-perception-detectlane.roiHeight = 300 #265 Done Pixel height of the captured box in Y
+perception-detectlane.roiY = 150 #455, 200 Pixels away from the upper part of picture in Y
+perception-detectlane.roiHeight = 400 #265 Done Pixel height of the captured box in Y
 
 
 core-tool-camera-replay.debug = 0       # 1 = show recording (requires X11), 0 = otherwise.
