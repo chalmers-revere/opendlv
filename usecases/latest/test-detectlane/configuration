@@ -77,7 +77,7 @@ knowledge-scene.debug = 0
 
 # perception-detectlane
 perception-detectlane.intensityThreshold = 210 #200
-perception-detectlane.cannyThreshold = 150
+perception-detectlane.cannyThreshold = 130
 perception-detectlane.houghThreshold = 100 #150
 perception-detectlane.memThreshold = 0.5 #seconds
 perception-detectlane.upperLaneLimit = 250
