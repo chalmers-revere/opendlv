@@ -53,6 +53,7 @@ DetectLane::DetectLane(int32_t const &a_argc, char **a_argv)
     , m_cannyThreshold()
     , m_houghThreshold()
     , m_lineDiff()
+    , m_blur()
     , m_memThreshold()
     , m_upperLaneLimit()
     , m_lowerLaneLimit()
@@ -78,6 +79,7 @@ void DetectLane::setUp()
   m_cannyThreshold = kv.getValue<uint16_t>("perception-detectlane.cannyThreshold");
   m_houghThreshold = kv.getValue<uint16_t>("perception-detectlane.houghThreshold");
   m_lineDiff = kv.getValue<float>("perception-detectlane.lineDiff");
+  m_blur = kv.getValue<uint16_t>("perception-detectlane.blurStrength");
   m_memThreshold = kv.getValue<double>("perception-detectlane.memThreshold");
   m_upperLaneLimit = kv.getValue<uint16_t>("perception-detectlane.upperLaneLimit");
   m_lowerLaneLimit = kv.getValue<uint16_t>("perception-detectlane.lowerLaneLimit");
@@ -245,7 +247,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   cv::Mat cannyImg;
   cv::Mat cannyImgRes;
   cv::Mat blurredImg;
-  cv::medianBlur(tmpImg,blurredImg,3);
+  cv::medianBlur(tmpImg,blurredImg,m_blur);
   
   cv::Canny(blurredImg, cannyImg, m_cannyThreshold, m_cannyThreshold*3, 3);
 
@@ -475,13 +477,13 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   std::vector<cv::Vec2f> xWorldP, yWorldP;
   GetPointsOnLine(xScreenP, yScreenP, xWorldP, yWorldP, p, m);
   
-  /*
+  
   std::cout << "Coordinates: ";
   for(uint8_t i = 0; i < yWorldP.size(); i++){
     std::cout << yWorldP[i][1] << " , ";
   } 
   std::cout << std::endl;
-  */
+  
 
   //std::cout << "Coordinates:: " << yWorldP.size() << std::endl;
   
