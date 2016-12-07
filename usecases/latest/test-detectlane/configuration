@@ -79,19 +79,20 @@ knowledge-scene.debug = 0
 perception-detectlane.intensityThreshold = 210 #200
 perception-detectlane.cannyThreshold = 120
 perception-detectlane.houghThreshold = 100 #150
-perception-detectlane.lineDiff = 1.6 # 1.1
+perception-detectlane.lineDiff = 1.1
 perception-detectlane.memThreshold = 0.5 #seconds
 perception-detectlane.upperLaneLimit = 250
 perception-detectlane.lowerLaneLimit = 450
 perception-detectlane.screenWidth = 1280
 perception-detectlane.screenHeight = 720
 perception-detectlane.debug = 1
+perception-detectlane.camera = frontLeft
 
 perception-detectlane.roiX = 30 #205 Pixels away from the upper left corner in X
 perception-detectlane.roiWidth = 1000 #775 Done Pixel width of the captured box in X
 
-perception-detectlane.roiY = 150 # Pixels away from the upper part of picture in Y
-perception-detectlane.roiHeight = 400 #Pixel height of the captured box in Y
+perception-detectlane.roiY = 200 # Pixels away from the upper part of picture in Y
+perception-detectlane.roiHeight = 300 #Pixel height of the captured box in Y
 
 
 core-tool-camera-replay.debug = 0       # 1 = show recording (requires X11), 0 = otherwise.

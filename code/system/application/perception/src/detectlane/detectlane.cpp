@@ -60,6 +60,7 @@ DetectLane::DetectLane(int32_t const &a_argc, char **a_argv)
     , m_roi()
     , m_mtx()
     , m_debug()
+    , m_camera()
     , m_transformationMatrix()
     , m_counter(0)
 
@@ -87,9 +88,13 @@ void DetectLane::setUp()
   m_roi[2] = kv.getValue<uint16_t>("perception-detectlane.roiWidth");
   m_roi[3] = kv.getValue<uint16_t>("perception-detectlane.roiHeight");
   m_debug = (kv.getValue<int32_t>("perception-detectlane.debug") == 1);
-  // Lägg in rätt namn på matrisen här
+  m_camera = kv.getValue<std::string>("perception-detectlane.camera");
+  // Insert correct transformation matrix depending on which camera 
+  if(m_camera == "frontLeft"){
   m_transformationMatrix = ReadMatrix(
           "/opt/opendlv.data/front-left-pixel2world-matrix.csv",3,3);
+    std::cout << "chose correct matrix" << std::endl;
+  }
   m_initialized = true;
 }
 
@@ -115,8 +120,6 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode DetectLane::body()
  */
 void DetectLane::nextContainer(odcore::data::Container &a_c)
 {
-  // Increase the counter for each frame
-  m_counter++;
 
   // Skip some frames to speed upp
   /*if (m_counter % 3 != 0){
@@ -133,6 +136,10 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     
     return;
   }
+
+  // Increase the counter for each frame
+  m_counter++;
+
   /*else{
     std::cout << "ac: " << a_c.getDataType() << std::endl;
   }*/
@@ -635,7 +642,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   std::vector<int16_t> connectedWidth;
   std::vector<int16_t> traversableTo;
 
-  if(edges.size() == 6){
+  if(edges.size() == 6 || edges.size() == 4){
     std::cout << "Found all lines" << std::endl;
     std::cout<<"Detected frame: " << m_counter << std::endl;
   }

@@ -72,6 +72,7 @@ class DetectLane
   int16_t m_roi[4];
   odcore::base::Mutex m_mtx;
   bool m_debug;
+  std::string m_camera; 
   Eigen::Matrix3d m_transformationMatrix;
   int16_t m_counter;
 
