@@ -219,7 +219,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
 
   // Sobel function that reduce the noice from canny
   int ddepth = -1;//cv::CV_16S;
-  cv::Sobel(cannyImg, cannyImgRes, ddepth, 1, 0, 3, 1,0,cv::BORDER_DEFAULT);
+  cv::Sobel(cannyImg, cannyImgRes, ddepth, 0, 1, 3, 1,0,cv::BORDER_DEFAULT);
   cannyImg.release();
   // ------------------------ Adaptive Threshold ---------------------------
   cv::Mat intenImgRes;
@@ -232,7 +232,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   cv::adaptiveThreshold(tmpImg,intenImgRes,255,cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY_INV,11,2);
   tmpImg.release();
   // Use sobel here as well? for the adaptive threshold
-  cv::Sobel(intenImgRes, TresholdRes, ddepth, 1, 0, 3, 1,0,cv::BORDER_DEFAULT); 
+  cv::Sobel(intenImgRes, TresholdRes, ddepth, 0, 1, 3, 1,0,cv::BORDER_DEFAULT); 
   intenImgRes.release();
 
   // ------------------------ Hough Transform ---------------------------
