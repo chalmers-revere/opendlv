@@ -123,28 +123,12 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode DetectLane::body()
 void DetectLane::nextContainer(odcore::data::Container &a_c)
 {
 
-  // Skip some frames to speed upp
-  /*if (m_counter % 3 != 0){
-    return;
-  }*/
-
-  if (!m_initialized){
-    std::cout << "Return from line 127" << std::endl;
-    return;
-  }
-  if (a_c.getDataType() != odcore::data::image::SharedImage::ID()){
-    std::cout << "Return from line 132" << std::endl;
-    //std::cout << "ac: " << a_c.getDataType() << std::endl;
-    
+  if (!m_initialized || a_c.getDataType() != odcore::data::image::SharedImage::ID()){
     return;
   }
 
   // Increase the counter for each frame
   m_counter++;
-
-  /*else{
-    std::cout << "ac: " << a_c.getDataType() << std::endl;
-  }*/
 
   odcore::data::TimeStamp now;
 
@@ -198,7 +182,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
 
   // Set number of windows to display
   //cv::Mat display[9];
-  cv::Mat display[1];
+  cv::Mat display[3];
 
   cv::Mat visualImpression = croppedImg.clone();
    // Delete the Matrix
@@ -211,24 +195,6 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   while(m_visualMemory.size() > 0 && (now-m_visualMemory[0].first).toMicroseconds()/1000000.0 > m_memThreshold){
     m_visualMemory.pop_front();
   }
-  /*cv::Mat exposedImage = m_visualMemory[0].second.clone();
-  
-  if(m_visualMemory.size() > 1) {
-    cv::Mat tmp;
-    double alpha;
-    double beta;
-    for(uint16_t i = 1; i < m_visualMemory.size(); i++){
-      alpha = i/(i+1.0);
-      beta = 1-alpha;
-      cv::addWeighted(exposedImage, alpha, m_visualMemory[i].second, beta, 0, tmp, -1);
-      exposedImage = tmp;
-      tmp.release();
-    }
-  }
-  exposedImage.release();
-  */
-
-  
 
   // Add the limitation lines to the picture
   if(m_debug) {
@@ -256,7 +222,6 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   cv::Sobel(cannyImg, cannyImgRes, ddepth, 1, 0, 3, 1,0,cv::BORDER_DEFAULT);
   cannyImg.release();
   // ------------------------ Adaptive Threshold ---------------------------
-
   cv::Mat intenImgRes;
   cv::Mat TresholdRes;
   tmpImg = intenImgRes;
@@ -276,13 +241,6 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   cv::vector<cv::Vec2f> detectedLinesCanny;
   cv::vector<cv::Vec2f> detectedLinesIntensitive;
 
-  // images to keep track of all detected lines
-  //cv::Mat Canny_res1 = m_image.clone();
-  //cv::Mat Canny_res2 = m_image.clone();
-  //cv::Mat Thresh_res1 = m_image.clone();
-  //cv::Mat Thresh_res2 = m_image.clone();
-  //m_image.release();
-
   // OpenCV function that uses the Hough transform and finds the "strongest" lines in the transformation    
   cv::HoughLines(cannyImgRes, detectedLinesCanny, 1, opendlv::Constants::PI/180, m_houghThreshold);
   cv::HoughLines(TresholdRes, detectedLinesIntensitive, 1, opendlv::Constants::PI/180, m_houghThreshold);
@@ -290,20 +248,8 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   std::cout << "From Hough, detectedLinesCanny: "<< detectedLinesCanny.size() << std::endl;
   std::cout << "From Hough, detectedLinesIntensitive: "<< detectedLinesIntensitive.size() << std::endl;
 
-  
-  /*if(m_debug) {
-    cv::resize(m_image, display[0], cv::Size(windowWidth*2, windowHeight*2), 0, 0,
-      cv::INTER_CUBIC);
-    cv::imshow("Overview", display[0]);
-    
-    cv::waitKey(1);
-  }
-  */
-
   // ------------------------ Print outs ---------------------------
-  // Size was 3 before, should maybe be commented?
-  /*if(detectedLinesCanny.size() < 9){
-    if(m_debug) {
+  /*if(m_debug) {
       cv::resize(cannyImgRes, display[1], cv::Size(windowWidth, windowHeight), 0, 0, cv::INTER_CUBIC);
       cv::imshow("Canny transform", display[1]);
       cv::waitKey(1);
@@ -311,46 +257,12 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     //return;
   }*/
 
-  cannyImgRes.release();
-  
-  // Size was 3 before, should maybe be commented?
-  /*if(detectedLinesIntensitive.size() < 20){
-    if(m_debug) {
-      //cv::resize(intenImgRes, display[4], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
-      cv::resize(TresholdRes, display[2], cv::Size(windowWidth, windowHeight), 0, 0, cv::INTER_CUBIC);
-      cv::imshow("Threshold transform", display[2]);
-      cv::waitKey(1);
-    }
-    //return;
-  }*/
+  cannyImgRes.release();  
   TresholdRes.release();
   // ------------------------ Add all found lines to image & -------------------------
   //----------------------------- Grouping Canny lines -------------------------------
 
   detectedLines = detectedLinesCanny;
-  /*if(m_debug) {
-    for( size_t i = 0; i < detectedLines.size(); i++ ) {
-      float rho = detectedLines[i][0];
-      float theta = detectedLines[i][1];
-      //std::cout << "rho: "<< rho << std::endl;
-      //std::cout << "theta: "<< theta << std::endl;
-      float a = cos(theta), b = sin(theta);
-      float x0 = a*rho, y0 = b*rho;
-      cv::Point pt1(m_roi[0] + x0 + 2000*(-b), m_roi[1] + y0 + 2000*(a));
-      cv::Point pt2(m_roi[0] + x0 - 2000*(-b), m_roi[1] + y0 - 2000*(a));
-
-      //cv::line(Canny_res1, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
-    }
-    //if(m_debug) {
-      ////cv::resize(intenImgRes, display[4], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
-      //cv::resize(Canny_res1, display[3], cv::Size(windowWidth, windowHeight), 0, 0, cv::INTER_CUBIC);
-      //cv::imshow("Canny Unfiltered", display[3]);
-      //cv::waitKey(1);
-    }
-
-    //Canny_res1.release();
-    //cv::line(m_image, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
-  }*/
 
   std::vector<cv::Vec2f> tmpVec;
   float angleTresh = 85 * opendlv::Constants::PI/180;
@@ -366,55 +278,11 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   detectedLinesCanny = groups; 
   
   std::cout << "Filtered Canny: "<< detectedLinesCanny.size() << std::endl;
-  /*
-  if(m_debug) {
-    for( size_t i = 0; i < detectedLinesCanny.size(); i++ ) {
-      float rho = detectedLinesCanny[i][0];
-      float theta = detectedLinesCanny[i][1];
-      //std::cout << "rho: "<< rho << std::endl;
-      //std::cout << "theta: "<< theta << std::endl;
-      float a = cos(theta), b = sin(theta);
-      float x0 = a*rho, y0 = b*rho;
-      cv::Point pt1(m_roi[0] + x0 + 2000*(-b), m_roi[1] + y0 + 2000*(a));
-      cv::Point pt2(m_roi[0] + x0 - 2000*(-b), m_roi[1] + y0 - 2000*(a));
-
-      //cv::line(Canny_res2, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
-    }
-    if(m_debug) {
-      ////cv::resize(intenImgRes, display[4], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
-      //cv::resize(Canny_res2, display[4], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
-      //cv::imshow("Canny Filtered", display[4]);
-      //cv::waitKey(1);
-    }
-    //Canny_res2.release();
-      //cv::line(m_image, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
-  }*/
 
   // ------------------------ Add all found lines to image & ---------------------------
   //---------------------------- Grouping Threshold lines ------------------------------
 
   detectedLines = detectedLinesIntensitive;
-  /*if(m_debug) {
-    for( size_t i = 0; i < detectedLines.size(); i++ ) {
-      float rho = detectedLines[i][0];
-      float theta = detectedLines[i][1];
-      //std::cout << "rho: "<< rho << std::endl;
-      //std::cout << "theta: "<< theta << std::endl;
-      float a = cos(theta), b = sin(theta);
-      float x0 = a*rho, y0 = b*rho;
-      cv::Point pt1(m_roi[0] + x0 + 2000*(-b), m_roi[1] + y0 + 2000*(a));
-      cv::Point pt2(m_roi[0] + x0 - 2000*(-b), m_roi[1] + y0 - 2000*(a));
-
-      //cv::line(Thresh_res1, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
-      //cv::line(m_image, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
-      }
-    
-    //cv::resize(Thresh_res1, display[5], cv::Size(windowWidth, windowHeight), 0, 0,
-    //cv::INTER_CUBIC);
-    //cv::imshow("Unfiltered Threshold", display[5]); 
-    //cv::waitKey(1);
-    //Thresh_res1.release();
-  }*/
 
   std::vector<cv::Vec2f> tmpVec2;
   for(uint16_t i = 0; i != detectedLines.size(); i++){
@@ -423,49 +291,62 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     }
   }
   detectedLines = tmpVec2;
-
-  //Grouping the vectors
-  std::vector<cv::Vec2f> groups2;
-  GetGrouping(groups2, detectedLines,100);
-  detectedLinesIntensitive = groups2; 
-
-  std::cout << "Filtered Threshold: "<< detectedLinesIntensitive.size() << std::endl;
-
-  // Print out all detected lines
-  /*if(m_debug) {
+  
+  cv::Mat img1 = m_image.clone();
+  cv::Mat img2 = m_image.clone();
+  // Print out all lines
+  if(m_debug) {
     
-    for( size_t i = 0; i < detectedLinesIntensitive.size(); i++ ) {
-      float rho = detectedLinesIntensitive[i][0];
-      float theta = detectedLinesIntensitive[i][1];
-
-      //std::cout << "rho: "<< rho << std::endl;
-      //std::cout << "theta: "<< theta << std::endl;
+    for( size_t i = 0; i < detectedLines.size(); i++ ) {
+      float rho = detectedLines[i][0];
+      float theta = detectedLines[i][1];
 
       float a = cos(theta), b = sin(theta);
       float x0 = a*rho, y0 = b*rho;
       cv::Point pt1(m_roi[0] + x0 + 2000*(-b), m_roi[1] + y0 + 2000*(a));
       cv::Point pt2(m_roi[0] + x0 - 2000*(-b), m_roi[1] + y0 - 2000*(a));
 
-      //cv::line(Thresh_res2, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
-      //cv::line(m_image, pt1, pt2, cv::Scalar(0,0,255), 1, 1 );
+      cv::line(img1, pt1, pt2, cv::Scalar(0,0,255), 2, 1 );
     }
-    
-    //cv::resize(Thresh_res2, display[6], cv::Size(windowWidth*2, windowHeight*2), 0, 0,
-    //cv::INTER_CUBIC);
-    //cv::imshow("Filtered Threshold", display[6]); 
-    //cv::waitKey(1);
-  }*/
+  }
 
+  //Grouping the vectors
+  std::vector<cv::Vec2f> groups2;
+  GetGrouping(groups2, detectedLines,100);
+  detectedLinesIntensitive = groups2; 
+
+    // Print out all lines
+  if(m_debug) {
+    for( size_t i = 0; i < detectedLinesIntensitive.size(); i++ ) {
+      float rho = detectedLinesIntensitive[i][0];
+      float theta = detectedLinesIntensitive[i][1];
+
+      float a = cos(theta), b = sin(theta);
+      float x0 = a*rho, y0 = b*rho;
+      cv::Point pt1(m_roi[0] + x0 + 2000*(-b), m_roi[1] + y0 + 2000*(a));
+      cv::Point pt2(m_roi[0] + x0 - 2000*(-b), m_roi[1] + y0 - 2000*(a));
+
+      cv::line(img2, pt1, pt2, cv::Scalar(0,0,255), 2, 1 );
+    }
+  }
+  if(m_debug) {
+  cv::resize(img1, display[1], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
+  cv::imshow("Unfiltered", display[1]);
+  cv::resize(img2, display[2], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
+  cv::imshow("Filtered", display[2]);
+  
+  cv::waitKey(1);
+  }
+  std::cout << "Filtered Threshold: "<< detectedLinesIntensitive.size() << std::endl;
   // --------------------- Merge Canny & threshold lines ---------------------------
   
   detectedLines = detectedLinesIntensitive;
   //detectedLines = detectedLinesCanny;
 
-  detectedLinesIntensitive.insert( detectedLinesIntensitive.end(), detectedLinesCanny.begin(), detectedLinesCanny.end() );
+  //detectedLinesIntensitive.insert( detectedLinesIntensitive.end(), detectedLinesCanny.begin(), detectedLinesCanny.end() );
   //GetGrouping(groups2, detectedLinesIntensitive,100);
-  GetGrouping(groups2, detectedLinesIntensitive,100);
-  detectedLines = groups2;
-  std::cout << "Merged lines: " << detectedLines.size() << std::endl;
+  //detectedLines = groups2;
+  //std::cout << "Merged lines: " << detectedLines.size() << std::endl;
 
   // Get parametric line representation
   std::vector<cv::Vec2f> p, m;
@@ -547,7 +428,8 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
 
   // Pair up lines to form a surface
   std::vector<int8_t> groupIds;
-  //GetLinePairs(xScreenP, groupIds);
+  std::vector<int8_t> groupIdsCurrentLane;
+  GetLinePairs(xScreenP, groupIdsCurrentLane);
   //GetAllLines(xScreenP, groupIds);
 
   for(uint8_t i = 0; i < xScreenP.size(); i++){    
@@ -581,6 +463,14 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
       }
       //std::cout << std::endl;
     }
+    for(uint8_t i = 0; i < groupIdsCurrentLane.size(); i++) {
+      for(uint8_t k = 0; k < 2; k++) {
+        //cv::circle(Thresh_res2, cv::Point(xScreenP[groupIds[i]][k],yScreenP[groupIds[i]][k]), 10, cv::Scalar(0,255,0), 3, 8);
+        cv::circle(m_image, cv::Point(xScreenP[groupIdsCurrentLane[i]][k],yScreenP[groupIdsCurrentLane[i]][k]), 10, cv::Scalar(0,0,255), 3, 8);
+        //std::cout << xWorldP[groupIds[i]][k] << "x" << yWorldP[groupIds[i]][k] << ",";
+      }
+      //std::cout << std::endl;
+    }
     //cv::resize(cannyImgRes, display[1], cv::Size(windowWidth*2, windowHeight*2), 0, 0,
     //cv::INTER_CUBIC);
     //cv::imshow("Canny2", display[1]);
@@ -588,13 +478,9 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
 
     // Now considering the adaptive threshold algorithm only, should fix correct image to merge with canny
     //cv::resize(Thresh_res2, display[1], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
-    cv::resize(m_image, display[1], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
-    cv::imshow("Result", display[1]);
+    cv::resize(m_image, display[0], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
+    cv::imshow("Result", display[0]);
     
-    //MathIAS
-    //cv::resize(foregroundMask, display[8], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
-    //cv::imshow("differenceTest", display[8]);
-
     cv::waitKey(1);
   }
   //Thresh_res2.release();
