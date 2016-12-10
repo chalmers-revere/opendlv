@@ -55,6 +55,7 @@ services:
             - DISPLAY=$DISPLAY
         volumes:
             - /tmp/.X11-unix:/tmp/.X11-unix
+            - ~/Cascade/:/opt/Cascade/
         restart: always
         ipc: host
         depends_on:

@@ -58,16 +58,19 @@ class DetectVehicle
   DetectVehicle &operator=(DetectVehicle const &) = delete;
   virtual ~DetectVehicle();
   virtual void nextContainer(odcore::data::Container &);
+
+
+
+ private:
+  void setUp();
+  void tearDown();
+
   /* --- GLOBALS(MEMBERS) ---*/
 std::vector<vehicle_t> vehicle_buffer = std::vector<vehicle_t>();
 CvHaarClassifierCascade* cascade;
 //CascadeClassifier cascade;
 CvMemStorage* storage;
 
-
- private:
-  void setUp();
-  void tearDown();
 
 //void sendObjectInformation();
 
@@ -94,11 +97,11 @@ int MAX_DISTANCE = 30;  // 30 pixels shift at most for each car from one frame t
 void init();
 int checkMatch(vehicle_t vehicle);
 void drawRec(IplImage* img, vehicle_t vehicle);
-void detect(IplImage* img);
+void detect(IplImage* img,odcore::data::TimeStamp timeStampOfFrame);
 double distance(int x1, int x2, int y1, int y2);
 void updateBuffer();
 void drawROI(IplImage* frame);
-void sendVehicle(vehicle_t vehicle);  // TODO
+void sendVehicle(vehicle_t vehicle,odcore::data::TimeStamp timeStampOfFrame);  // TODO
 
 
 };
