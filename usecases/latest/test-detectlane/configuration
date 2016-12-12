@@ -76,9 +76,9 @@ knowledge-scene.memoryCapacity = 5.0 # seconds
 knowledge-scene.debug = 0
 
 # perception-detectlane
-perception-detectlane.intensityThreshold = 210 #210
+perception-detectlane.intensityThreshold = 200 #210
 perception-detectlane.cannyThreshold = 120 #200
-perception-detectlane.houghThreshold = 90 #100
+perception-detectlane.houghThreshold = 80 #100
 perception-detectlane.lineDiff = 1.1
 perception-detectlane.memThreshold = 0.5 #seconds
 perception-detectlane.upperLaneLimit = 250
