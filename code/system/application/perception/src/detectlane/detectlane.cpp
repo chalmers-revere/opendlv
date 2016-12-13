@@ -341,13 +341,13 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   // --------------------- Merge Canny & threshold lines ---------------------------
   
   detectedLines = detectedLinesIntensitive;
-  //detectedLines = detectedLinesCanny;
+  detectedLines = detectedLinesCanny;
 
-  //detectedLinesIntensitive.insert( detectedLinesIntensitive.end(), detectedLinesCanny.begin(), detectedLinesCanny.end() );
-  //GetGrouping(groups2, detectedLinesIntensitive,100);
-  //detectedLines = groups2;
-  //std::cout << "Merged lines: " << detectedLines.size() << std::endl;
-
+  detectedLinesIntensitive.insert( detectedLinesIntensitive.end(), detectedLinesCanny.begin(), detectedLinesCanny.end() );
+  GetGrouping(groups2, detectedLinesIntensitive,100);
+  detectedLines = groups2;
+  std::cout << "Merged lines: " << detectedLines.size() << std::endl;
+  
   // Get parametric line representation
   std::vector<cv::Vec2f> p, m;
 
@@ -360,23 +360,31 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   
   
   std::cout << "Coordinates: ";
+  std::cout  << " Close y values"<< std::endl;
+  for(uint8_t i = 0; i < yWorldP.size(); i++){
+    std::cout << yWorldP[i][0] << " , ";
+  } 
+  std::cout << std::endl << " Close y values" << std::endl;
   for(uint8_t i = 0; i < yWorldP.size(); i++){
     std::cout << yWorldP[i][1] << " , ";
   } 
   std::cout << std::endl;
-  
 
-  //std::cout << "Coordinates:: " << yWorldP.size() << std::endl;
+  std::cout << "Coordinates:: " << yWorldP.size() << std::endl;
   
   // Filter out lines that are close to each other
   std::vector<int> toBeRemoved;
   for(uint8_t i = 0; i < yWorldP.size(); i++){
     for(uint8_t j = i+1; j < yWorldP.size(); j++){
-      if( (yWorldP[i][1] < 0) && (yWorldP[j][1] < 0) ){ // if smaller than 0, it is a negative number
-        //std::cout << "Two negative coordinates: " << yWorldP[i][1] << ", " << yWorldP[j][1] << std::endl;
+      if( (yWorldP[i][1] - yWorldP[j][1]) > 5 ){
+        toBeRemoved.push_back(yWorldP[j][1]);
+        std::cout << "Too big diff between the line itself: " << yWorldP[i][0] << " , " << yWorldP[i][1] << std::endl;
+      }
+      else if( (yWorldP[i][1] < 0) && (yWorldP[j][1] < 0) ){ // if smaller than 0, it is a negative number
+        std::cout << "Two negative coordinates: " << yWorldP[i][1] << ", " << yWorldP[j][1] << std::endl;
         if(std::abs(yWorldP[i][1] - yWorldP[j][1]) < m_lineDiff ){
           // Remove the one that is largest
-          //std::cout << "Small diff, remove a line" << std::endl;
+          std::cout << "Small diff, remove a line" << std::endl;
           if(yWorldP[i][1] > yWorldP[j][1]){
             toBeRemoved.push_back(yWorldP[j][1]);
             std::cout << "Removed: " << yWorldP[j][1] << std::endl;
@@ -390,10 +398,10 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
         }
       }
       else if(yWorldP[i][1] > 0 && yWorldP[j][1] > 0){ // if bigger than 0, it is a positive number
-        //std::cout << "Two positive coordinates: " << yWorldP[i][1] << ", " << yWorldP[j][1] << std::endl;
+        std::cout << "Two positive coordinates: " << yWorldP[i][0] << ", " << yWorldP[j][0] << std::endl;
         if(std::abs(yWorldP[i][1] - yWorldP[j][1]) < m_lineDiff ){
           // Remove the one that is smallest
-          //std::cout << "Small diff, remove a line" << std::endl;
+          std::cout << "Small diff, remove a line" << std::endl;
           if(yWorldP[i][1] > yWorldP[j][1]){
             toBeRemoved.push_back(yWorldP[i][1]);
             std::cout << "Removed: " << yWorldP[i][1] << std::endl;
@@ -530,12 +538,17 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   std::vector<int16_t> connectedWidth;
   std::vector<int16_t> traversableTo;
 
-  if(edges.size() == 6 || edges.size() == 4){
-    std::cout << "Found all lines" << std::endl;
-    std::cout<<"Detected frame: " << m_counter << std::endl;
+  if(edges.size() == 6){
+    std::cout<<"Detected frame3: " << m_counter << std::endl;
   }
-  else{
-    std::cout << "Failed, detected: " << (edges.size()/2) << std::endl;
+  else if(edges.size() == 4){
+    std::cout<<"Detected frame2: " << m_counter << std::endl;
+  }
+  else if (edges.size() < 4){
+    std::cout << "Missed: "  << m_counter << std::endl;
+  }
+  else if (edges.size() > 6){
+    std::cout << "Overhit: "  << m_counter << std::endl;
   }
 
   opendlv::perception::Surface detectedSurface(imageTimeStamp,
