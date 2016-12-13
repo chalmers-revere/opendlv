@@ -21,10 +21,19 @@
 #define TRACKVEHICLE_TRACKVEHICLE_HPP_
 
 #include <memory>
+#include <string>
+#include <stdio.h>
+
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include "detectvehicle/vehicle_s.hpp"
+#include "trackvehicle/vehicle_tex.hpp"
+
 
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
- 
+
 
 namespace opendlv {
 namespace perception {
@@ -48,6 +57,17 @@ class TrackVehicle
 
   bool m_initialised;
   bool m_debug;
+
+  std::vector<vehicle_tex> vehicle_buffer = std::vector<vehicle_tex>();
+  std::vector<vehicle_t> vehicle_buffer_t = std::vector<vehicle_t>();
+
+  void pushToBuffer(vehicle_tex data);
+  void updateBuffer(vehicle_t data);
+  void doTrack(cv::Mat frame);
+  cv::Mat getVehicleFromFrame(cv::Mat frame, vehicle_t data);
+  cv::Mat matchFeatures(cv::Mat img_object, cv::Mat img_scene);
+//  void doTrack(cv::Mat frame);
+
 };
 
 } // trackvehicle

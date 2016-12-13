@@ -29,7 +29,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
-
+#include <opencv2/imgproc/imgproc_c.h>
 #include "opendavinci/GeneratedHeaders_OpenDaVINCI.h"
 #include "opendavinci/odcore/wrapper/SharedMemoryFactory.h"
 #include "opendavinci/odcore/wrapper/SharedMemory.h"
@@ -103,7 +103,7 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
 
 
   std::string cameraName = mySharedImg.getName();
-  std::cout << "Received image from camera " << cameraName  << "!" << std::endl;
+  //std::cout << "Received image from camera " << cameraName  << "!" << std::endl;
 
   //TODO compare the source name to keep track different camera sources
 
@@ -134,23 +134,27 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
   }
 
 
-  IplImage* frame = cvCreateImage(cvSize(myImage.cols, myImage.rows), 8, 3);
+//COPY MAT TO IPLIMAGE
+IplImage* frame = cvCreateImage(cvSize(myImage.cols, myImage.rows), 8, 3);
 IplImage frame2 = myImage;
 cvCopy(&frame2, frame);
-cvShowImage("video0", frame);
-//  IplImage* frame = new IplImage( myImage );
-  IplImage* frame1;
 
+
+//  IplImage* frame = new IplImage( myImage );
+
+//THE RESIZE FRAME
+  IplImage* frame1;
   frame1 = cvCreateImage(
       cvSize((int)((frame->width * input_resize_percent) / 100),
              (int)((frame->height * input_resize_percent) / 100)),
       frame->depth, frame->nChannels);
-  //cvResize(myIplImage, frame);
+  cvResize(frame, frame1);
 
-    std::cout << "DETECTING!" << std::endl;
+  //std::cout << "DETECTING!" << std::endl;
 
   detect(frame1,c.getReceivedTimeStamp());
-
+cv::waitKey(1);
+//cvWaitKey(1);
   cvReleaseImage(&myIplImage);
 }
 
@@ -220,6 +224,9 @@ void DetectVehicle::detect(IplImage* img,odcore::data::TimeStamp timeStampOfFram
       }
     }
   }
+  if(active_tracking==0 && active_sccess==0){
+    id_counter=0;
+  }
 
   CvFont font;
   cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 0.5, 0.5, 0, 2, CV_AA);
@@ -230,7 +237,7 @@ void DetectVehicle::detect(IplImage* img,odcore::data::TimeStamp timeStampOfFram
   cvPutText(img, buffer2, cvPoint(0, img->height - 10), &font,
             cvScalar(0x0, 0x0, 0x0));
 
-
+ /*
   if(active_tracking==0){
     cvPutText(img, "EMPTY ROAD", cvPoint(0,20), &font,
             cvScalar(0x0, 0xff, 0x0));
@@ -240,8 +247,9 @@ void DetectVehicle::detect(IplImage* img,odcore::data::TimeStamp timeStampOfFram
   }else if( active_sccess>0){
     cvPutText(img, "OCCUPIED ROAD", cvPoint(0, 20), &font,
             cvScalar(0x0, 0x0, 0xff));
-  }
-  std::cout << "SHOWING IMAGE!" << std::endl;
+  }*/
+
+  //std::cout << "SHOWING IMAGE!" << std::endl;
   cvShowImage("video", img);
   if (SHOW_RIO)
      drawROI(img);
@@ -344,6 +352,7 @@ void DetectVehicle::drawROI(IplImage* frame){
   * Message [id=201 ] VehicleVision
   */
 void DetectVehicle::sendVehicle(vehicle_t vehicle,odcore::data::TimeStamp timeStampOfFrame){
+std::cout << "BRODCASTING VEHICLE ID=" << vehicle.id << std::endl;
   opendlv::perception::VehicleVision detectedObject(
       timeStampOfFrame,
       vehicle.id,
@@ -353,8 +362,6 @@ void DetectVehicle::sendVehicle(vehicle_t vehicle,odcore::data::TimeStamp timeSt
       vehicle.h,
       vehicle.found);
   odcore::data::Container objectContainer(detectedObject);
-
-  std::cout << "BRODCASTING VEHICLE ID=" << vehicle.id << std::endl;
   getConference().send(objectContainer);
 
 }

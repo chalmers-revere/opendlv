@@ -82,4 +82,7 @@ perception-detectvehicle.debug=1
 perception-detectvehicle.cascade=cars.xml
 
 
+# perception-trackvehicle
+perception-trackvehicle.debug=1
+
 
