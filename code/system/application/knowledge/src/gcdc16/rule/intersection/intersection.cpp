@@ -186,7 +186,7 @@ void Intersection::nextContainer(odcore::data::Container &a_container)
     ActOnEnvironment(message);
   } else if (a_container.getDataType() == opendlv::proxy::reverefh16::VehicleSpeed::ID()) {
     auto propulsion = a_container.getData<opendlv::proxy::reverefh16::VehicleSpeed>();
-    double speedKph = propulsion.getVehicleSpeedShaftVehicleSpeed();
+    double speedKph = propulsion.getPropulsionShaftVehicleSpeed();
     float speed = static_cast<float>(speedKph / 3.6);
 
     ControlGroundSpeed(speed);
