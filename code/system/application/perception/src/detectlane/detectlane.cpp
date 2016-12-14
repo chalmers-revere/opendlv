@@ -239,7 +239,12 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   // Use sobel here as well? for the adaptive threshold
   cv::Sobel(intenImgRes, TresholdRes, ddepth, 0, 1, 3, 1,0,cv::BORDER_DEFAULT); 
   intenImgRes.release();
-
+  /*if(m_debug) {
+      cv::resize(TresholdRes, display[2], cv::Size(windowWidth, windowHeight), 0, 0, cv::INTER_CUBIC);
+      cv::imshow("Threshold", display[2]);
+      cv::waitKey(1);
+    }
+  */
   // ------------------------ Hough Transform ---------------------------
   // Vector holder for each line (rho,theta)
   cv::vector<cv::Vec2f> detectedLines;
@@ -384,7 +389,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   std::vector<int> toBeRemoved;
   for(uint8_t i = 0; i < yWorldP.size(); i++){
     if( ( (float) yWorldP[i][0] - (float) yWorldP[i][1] ) > m_OneLineDiff ){
-      toBeRemoved.push_back(yWorldP[i][1]);
+      toBeRemoved.push_back(i);
       std::cout << "Too big diff between the line itself: " << (yWorldP[i][0] - yWorldP[i][1]) << " numbers: " << yWorldP[i][0] << " , " << yWorldP[i][1] << std::endl;
       continue;
     }
@@ -395,12 +400,12 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
           // Remove the one that is largest
           std::cout << "Small diff, remove a negative line" << std::endl;
           if(yWorldP[i][1] > yWorldP[j][1]){
-            toBeRemoved.push_back(yWorldP[j][1]);
+            toBeRemoved.push_back(j);
             std::cout << "Removed: " << yWorldP[j][1] << std::endl;
             continue;
           }
           else{
-            toBeRemoved.push_back(yWorldP[i][1]);
+            toBeRemoved.push_back(i);
             std::cout << "Removed: " << yWorldP[i][1] << std::endl;
             continue;
           }
@@ -412,12 +417,12 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
           // Remove the one that is smallest
           std::cout << "Small diff, remove a positive line" << std::endl;
           if(yWorldP[i][1] > yWorldP[j][1]){
-            toBeRemoved.push_back(yWorldP[i][1]);
+            toBeRemoved.push_back(i);
             std::cout << "Removed: " << yWorldP[i][1] << std::endl;
             continue;
           }
           else{
-            toBeRemoved.push_back(yWorldP[j][1]);
+            toBeRemoved.push_back(j);
             std::cout << "Removed: " << yWorldP[j][1] << std::endl;
             continue;
           }
@@ -449,17 +454,22 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   GetLinePairs(xScreenP, groupIdsCurrentLane);
   //GetAllLines(xScreenP, groupIds);
 
+  // Loop through all coordinates 
   for(uint8_t i = 0; i < xScreenP.size(); i++){    
     bool hit = false;
+    // Loop through and check if the coordinate should be removed or not
     for(uint8_t j = 0; j < toBeRemoved.size(); j++){
-      if(j == i){
+      //std::cout << "Coordinates: Y" << yWorldP[i][1] << " =? "
+      //if( ( std::abs(yWorldP[i][1]) - std::abs(toBeRemoved[j]) ) < (float) 0.00001 ){
+      if (i == toBeRemoved[j]){
         hit = true;
       }
     }
     if(!hit){
-      groupIds.push_back(i); 
+      groupIds.push_back(i);
       cv::line(m_image_tmp, cv::Point(xScreenP[groupIds[i]][0],yScreenP[groupIds[i]][0]), cv::Point(xScreenP[groupIds[i]][1],yScreenP[groupIds[i]][1]), cv::Scalar(0,255,0), 3, 1 );
-     
+      std::cout << "Coordinates: Y: " << yWorldP[i][0] <<", " << yWorldP[i][1] << " and X: " << xWorldP[i][0] << " , " << xWorldP[i][1] << std::endl;
+      
     }
     else{
       std::cout << "Skipped line: " << i << std::endl;
@@ -472,7 +482,6 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     std::cout << "Return from line 546" << std::endl;
     return;
   }
-
   if(m_debug) {
     for(uint8_t i = 0; i < groupIds.size(); i++) {
       for(uint8_t k = 0; k < 2; k++) {
@@ -565,6 +574,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     std::cout << "Overhit: "  << m_counter << std::endl;
   }
 
+  std::cout << "=========================================" << std::endl;
   opendlv::perception::Surface detectedSurface(imageTimeStamp,
       type,
       typeConfidence,

@@ -17,7 +17,7 @@ def main(argv):
 	toSmall = []
 	toBig = []
 	ExtremeBig = []
-	
+
 	for line in lines:
 		if "frame2" in line:			
 			number = (line.split('Detected frame2: ')[1]).split('\n')[0]
@@ -76,7 +76,7 @@ def main(argv):
 		else:
 			if ConnectedFrames > maxConnected:
 				maxConnected = ConnectedFrames
-			if ConnectedFrames > 3:
+			if ConnectedFrames > 2:
 				AllConnectedFrames.append(ConnectedFrames)
 			ConnectedFrames = 0
 	print("All connected frames: " + str(AllConnectedFrames))
