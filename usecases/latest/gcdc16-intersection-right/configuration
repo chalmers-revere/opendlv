@@ -65,26 +65,6 @@ odsupercomponent.pulsetimeack.exclude = odcockpit
 ###############################################################################
 ###############################################################################
 #
-# CONFIGURATION FOR ODRECORDER
-#
-odrecorder.output = file://recorder.rec
-odrecorder.remoteControl = 0 # 0 = no remote control, 1 = allowing remote control (i.e. start and stop recording)
-odrecorder.dumpSharedData = 1 # 0 = do not dump shared images and shared images, 1 = otherwise
-
-###############################################################################
-###############################################################################
-#
-# CONFIGURATION FOR ODRECORDERH264
-#
-#odrecorderh264.output = file://recorder.rec # If this parameter is not present, odrecorderh264 will autogenerate a filename.
-odrecorderh264.remoteControl = 0 # 0 = no remote control, 1 = allowing remote control (i.e. start and stop recording)
-odrecorderh264.dumpSharedData = 0 # 0 = do not dump shared images and shared images, 1 = otherwise
-odrecorderh264.lossless = 1 # Set to 1 to enable h264 lossless encoding.
-odrecorderh264.portbaseforchildprocesses = 29000 # Every spawned child processes is connecting to the parent process via TCP using the base port plus its increasing ID.
-
-###############################################################################
-###############################################################################
-#
 # NEXT, THE CONFIGURATION FOR OPENDLV SOFTWARE FOLLOWS. 
 #
 
@@ -124,7 +104,7 @@ knowledge-gcdc16-rule-intersection.longitudinalDiscardDistance = 300.0
 knowledge-gcdc16-rule-intersection.lateralDiscardDistance = 50.0
 knowledge-gcdc16-rule-intersection.timeToCollision = 10.0
 knowledge-gcdc16-rule-intersection.crossingSafeAngle = 0.2
-knowledge-gcdc16-rule-intersection.isMioCrossingPath = 1   # 1 if the turning car is going to the other lane, 0 if going to the same lane
+knowledge-gcdc16-rule-intersection.isMioCrossingPath = 0   # 1 if the turning car is going to the other lane, 0 if going to the same lane
 knowledge-gcdc16-rule-intersection.enableLaneFollowing = 1
 knowledge-gcdc16-rule-intersection.forceScenarioStart = 1
 
@@ -201,6 +181,7 @@ proxy-camera-axis.debug = 0
 proxy-fh16.devicenode = /dev/pcan2 # PEAK CAN device.
 proxy-fh16.record_gcm = 0           # 1 = dump generic CAN messages.
 proxy-fh16.record_mapped_data = 0   # 1 = record mapped containers.
+proxy-fh16.read-only = 0            # 1 = read-only , 0 = read/write
 
 # proxy-sick
 proxy-sick.type = sick
