@@ -228,9 +228,9 @@ void Platoon::receivedContainerMergeScenario(odcore::data::Container &a_containe
 
   //m_speed = 7; // hardcoded for testing
 
-  if (a_container.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
-    auto propulsion = a_container.getData<opendlv::proxy::reverefh16::Propulsion>();
-    double speedKph = propulsion.getPropulsionShaftVehicleSpeed();
+  if (a_container.getDataType() == opendlv::proxy::reverefh16::VehicleSpeed::ID()) {
+    auto propulsion = a_container.getData<opendlv::proxy::reverefh16::VehicleSpeed>();
+    double speedKph = propulsion.getVehicleSpeedShaftVehicleSpeed();
     m_speed = (float) speedKph / 3.6f;
   }
 
