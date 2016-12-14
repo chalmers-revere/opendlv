@@ -53,6 +53,8 @@ DetectLane::DetectLane(int32_t const &a_argc, char **a_argv)
     , m_cannyThreshold()
     , m_houghThreshold()
     , m_lineDiff()
+    , m_OneLineDiff()
+    , m_LineThreshold()
     , m_blur()
     , m_memThreshold()
     , m_upperLaneLimit()
@@ -79,6 +81,8 @@ void DetectLane::setUp()
   m_cannyThreshold = kv.getValue<uint16_t>("perception-detectlane.cannyThreshold");
   m_houghThreshold = kv.getValue<uint16_t>("perception-detectlane.houghThreshold");
   m_lineDiff = kv.getValue<float>("perception-detectlane.lineDiff");
+  m_OneLineDiff = kv.getValue<float>("perception-detectlane.OneLineDiff");
+  m_LineThreshold = kv.getValue<float>("perception-detectlane.LineThreshold");
   m_blur = kv.getValue<uint16_t>("perception-detectlane.blurStrength");
   m_memThreshold = kv.getValue<double>("perception-detectlane.memThreshold");
   m_upperLaneLimit = kv.getValue<uint16_t>("perception-detectlane.upperLaneLimit");
@@ -205,8 +209,9 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     cv::line(m_image, cv::Point(m_roi[0]+m_roi[2],0), cv::Point(m_roi[0]+m_roi[2],m_screenSize[1]), cv::Scalar(255,255,0), 3, 1 );
     cv::line(m_image, cv::Point(0,m_roi[1]), cv::Point(m_screenSize[0],m_roi[1]), cv::Scalar(255,255,0), 3, 1 );
     cv::line(m_image, cv::Point(0,m_roi[1]+m_roi[3]), cv::Point(m_screenSize[0],m_roi[1]+m_roi[3]), cv::Scalar(255,255,0), 3, 1 ); 
-  }
 
+  }
+    cv::Mat m_image_tmp = m_image.clone();
  // =================================== OUR IMPLEMENTATION =====================================
   // ------------------------ Canny transformation ---------------------------
   cv::Mat tmpImg = visualImpression; // m_visualMemory[0].second.clone();
@@ -329,14 +334,14 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
       cv::line(img2, pt1, pt2, cv::Scalar(0,0,255), 2, 1 );
     }
   }
-  if(m_debug) {
+  /*if(m_debug) {
   cv::resize(img1, display[1], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
   cv::imshow("Unfiltered", display[1]);
   cv::resize(img2, display[2], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
   cv::imshow("Filtered", display[2]);
   
   cv::waitKey(1);
-  }
+  }*/
   std::cout << "Filtered Threshold: "<< detectedLinesIntensitive.size() << std::endl;
   // --------------------- Merge Canny & threshold lines ---------------------------
   
@@ -348,6 +353,11 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   detectedLines = groups2;
   std::cout << "Merged lines: " << detectedLines.size() << std::endl;
   
+  if(detectedLines.size() > m_LineThreshold){
+    std::cout<<"Tooo many lines detected: " << m_counter << std::endl;
+    return;
+  }
+
   // Get parametric line representation
   std::vector<cv::Vec2f> p, m;
 
@@ -358,33 +368,32 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   std::vector<cv::Vec2f> xWorldP, yWorldP;
   GetPointsOnLine(xScreenP, yScreenP, xWorldP, yWorldP, p, m);
   
-  
-  std::cout << "Coordinates: ";
-  std::cout  << " Close y values"<< std::endl;
+  std::cout  << "Coordinates: Close y values"<< std::endl;
   for(uint8_t i = 0; i < yWorldP.size(); i++){
     std::cout << yWorldP[i][0] << " , ";
-  } 
-  std::cout << std::endl << " Close y values" << std::endl;
+  }
+  std::cout << std::endl << "Close y values" << std::endl;
   for(uint8_t i = 0; i < yWorldP.size(); i++){
     std::cout << yWorldP[i][1] << " , ";
   } 
   std::cout << std::endl;
 
-  std::cout << "Coordinates:: " << yWorldP.size() << std::endl;
+  std::cout << "Coordinates: " << yWorldP.size() << std::endl;
   
   // Filter out lines that are close to each other
   std::vector<int> toBeRemoved;
   for(uint8_t i = 0; i < yWorldP.size(); i++){
+    if( ( (float) yWorldP[i][0] - (float) yWorldP[i][1] ) > m_OneLineDiff ){
+      toBeRemoved.push_back(yWorldP[i][1]);
+      std::cout << "Too big diff between the line itself: " << (yWorldP[i][0] - yWorldP[i][1]) << " numbers: " << yWorldP[i][0] << " , " << yWorldP[i][1] << std::endl;
+      continue;
+    }
     for(uint8_t j = i+1; j < yWorldP.size(); j++){
-      if( (yWorldP[i][1] - yWorldP[j][1]) > 5 ){
-        toBeRemoved.push_back(yWorldP[j][1]);
-        std::cout << "Too big diff between the line itself: " << yWorldP[i][0] << " , " << yWorldP[i][1] << std::endl;
-      }
-      else if( (yWorldP[i][1] < 0) && (yWorldP[j][1] < 0) ){ // if smaller than 0, it is a negative number
-        std::cout << "Two negative coordinates: " << yWorldP[i][1] << ", " << yWorldP[j][1] << std::endl;
+      if( (yWorldP[i][1] < 0) && (yWorldP[j][1] < 0) ){ // if smaller than 0, it is a negative number
+        //std::cout << "Two negative coordinates: " << yWorldP[i][1] << ", " << yWorldP[j][1] << std::endl;
         if(std::abs(yWorldP[i][1] - yWorldP[j][1]) < m_lineDiff ){
           // Remove the one that is largest
-          std::cout << "Small diff, remove a line" << std::endl;
+          std::cout << "Small diff, remove a negative line" << std::endl;
           if(yWorldP[i][1] > yWorldP[j][1]){
             toBeRemoved.push_back(yWorldP[j][1]);
             std::cout << "Removed: " << yWorldP[j][1] << std::endl;
@@ -398,10 +407,10 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
         }
       }
       else if(yWorldP[i][1] > 0 && yWorldP[j][1] > 0){ // if bigger than 0, it is a positive number
-        std::cout << "Two positive coordinates: " << yWorldP[i][0] << ", " << yWorldP[j][0] << std::endl;
+        //std::cout << "Two positive coordinates: " << yWorldP[i][0] << ", " << yWorldP[j][0] << std::endl;
         if(std::abs(yWorldP[i][1] - yWorldP[j][1]) < m_lineDiff ){
           // Remove the one that is smallest
-          std::cout << "Small diff, remove a line" << std::endl;
+          std::cout << "Small diff, remove a positive line" << std::endl;
           if(yWorldP[i][1] > yWorldP[j][1]){
             toBeRemoved.push_back(yWorldP[i][1]);
             std::cout << "Removed: " << yWorldP[i][1] << std::endl;
@@ -448,7 +457,9 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
       }
     }
     if(!hit){
-      groupIds.push_back(i);  
+      groupIds.push_back(i); 
+      cv::line(m_image_tmp, cv::Point(xScreenP[groupIds[i]][0],yScreenP[groupIds[i]][0]), cv::Point(xScreenP[groupIds[i]][1],yScreenP[groupIds[i]][1]), cv::Scalar(0,255,0), 3, 1 );
+     
     }
     else{
       std::cout << "Skipped line: " << i << std::endl;
@@ -467,6 +478,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
       for(uint8_t k = 0; k < 2; k++) {
         //cv::circle(Thresh_res2, cv::Point(xScreenP[groupIds[i]][k],yScreenP[groupIds[i]][k]), 10, cv::Scalar(0,255,0), 3, 8);
         cv::circle(m_image, cv::Point(xScreenP[groupIds[i]][k],yScreenP[groupIds[i]][k]), 10, cv::Scalar(0,255,0), 3, 8);
+
         //std::cout << xWorldP[groupIds[i]][k] << "x" << yWorldP[groupIds[i]][k] << ",";
       }
       //std::cout << std::endl;
@@ -488,6 +500,8 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     //cv::resize(Thresh_res2, display[1], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
     cv::resize(m_image, display[0], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
     cv::imshow("Result", display[0]);
+    cv::resize(m_image_tmp, display[1], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
+    cv::imshow("Final", display[1]);
     
     cv::waitKey(1);
   }

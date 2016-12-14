@@ -16,6 +16,8 @@ def main(argv):
 	hit = []
 	toSmall = []
 	toBig = []
+	ExtremeBig = []
+	
 	for line in lines:
 		if "frame2" in line:			
 			number = (line.split('Detected frame2: ')[1]).split('\n')[0]
@@ -28,24 +30,32 @@ def main(argv):
 			toSmall.append(int(numS))	
 		elif "Overhit" in line:			
 			numB = (line.split('Overhit: ')[1]).split('\n')[0]
-			toBig.append(int(numB))		
+			toBig.append(int(numB))	
+		elif "Tooo" in line:			
+			numE = (line.split('detected: ')[1]).split('\n')[0]
+			ExtremeBig.append(int(numE))		
 
-	total = len(hit2) + len(hit3)
+	#total = len(hit2) + len(hit3)
 
 	hit = hit2 + hit3	
 	max_val = 0
-	for num in hit:
+
+	allLists = hit2 + hit3 + toSmall + toBig + ExtremeBig
+	total = (len(allLists))
+
+	for num in allLists:
 		if int(num) > max_val:
 			max_val = int(num)
-	
-	total_hit = float(total) / float(max_val)
+
+	total_hit = float(len(hit)) / float(max_val)
 	false_hit = float(len(toBig)) / float(max_val)
 	
 	print("Hitrate: %.2f%%" % (total_hit*100))
 	print("Frames with 2 lines: " + str(len(hit2)))
 	print("Frames with 3 lines: " + str(len(hit3)))
 	print("Number of frames: " + str(max_val))
-	print("False Positive: " + str(len(toBig)))
+	print("Extremely big: " + str(len(ExtremeBig)))
+	print("False Positive: " + str(len(toBig) + len(ExtremeBig)))
 	print("False Positive rate: %.3f%%" % (false_hit))
 
 	excluded = []
