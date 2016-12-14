@@ -82,7 +82,7 @@ class Geolocation
   opendlv::proxy::MagnetometerReading m_magnetometerReading; 
   opendlv::proxy::AccelerometerReading m_accelerometerReading;
   opendlv::proxy::reverefh16::Steering m_steeringReading;
-  opendlv::proxy::reverefh16::Propulsion m_propulsionReading;
+  opendlv::proxy::reverefh16::VehicleSpeed m_propulsionReading;
 
   bool m_debug;
 
