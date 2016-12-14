@@ -30,8 +30,7 @@
 #include <opendavinci/odcore/data/TimeStamp.h>
 
 
-// #include "opendlv/data/environment/Point3.h"
-// #include <fh16mapping/GeneratedHeaders_fh16mapping.h>
+#include <odvdfh16truck/GeneratedHeaders_ODVDFH16Truck.h>
 
 #include "geolocation/geolocation.hpp"
 
@@ -96,8 +95,8 @@ void Geolocation::nextContainer(odcore::data::Container &a_c)
     m_accelerometerReading = a_c.getData<opendlv::proxy::AccelerometerReading>();
   } else if(a_c.getDataType() == opendlv::proxy::reverefh16::Steering::ID()) {
     m_steeringReading = a_c.getData<opendlv::proxy::reverefh16::Steering>();
-  } else if(a_c.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
-    m_propulsionReading = a_c.getData<opendlv::proxy::reverefh16::Propulsion>();
+  } else if(a_c.getDataType() == opendlv::proxy::reverefh16::VehicleSpeed::ID()) {
+    m_propulsionReading = a_c.getData<opendlv::proxy::reverefh16::VehicleSpeed>();
   }
 } 
 
@@ -246,17 +245,17 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       odcore::data::TimeStamp durationAfterGpsReading = timeAfterGpsReading - now;
 
       auto propulsionContainer = getKeyValueDataStore().get(
-          opendlv::proxy::reverefh16::Propulsion::ID());
+          opendlv::proxy::reverefh16::VehicleSpeed::ID());
       auto propulsion = propulsionContainer.getData<
-          opendlv::proxy::reverefh16::Propulsion>();
+          opendlv::proxy::reverefh16::VehicleSpeed>();
 
       if (propulsionContainer.getReceivedTimeStamp().getSeconds() > 0) {
-        control.v() = propulsion.getPropulsionShaftVehicleSpeed()/3.6;
+        control.v() = propulsion.getVehicleSpeedShaftVehicleSpeed()/3.6;
         // TODO: to m/s --- get the message in si unit
       }
 
 
-      if (propulsion.getPropulsionShaftVehicleSpeed() < 0.1) {
+      if (propulsion.getVehicleSpeedShaftVehicleSpeed() < 0.1) {
           control.v() = 0.0;
       // if we don't get any data from the CAN,
       // we try to fill the speed from GPS data
