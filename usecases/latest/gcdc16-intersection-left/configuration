@@ -201,6 +201,7 @@ proxy-camera-axis.debug = 0
 proxy-fh16.devicenode = /dev/pcan2 # PEAK CAN device.
 proxy-fh16.record_gcm = 0           # 1 = dump generic CAN messages.
 proxy-fh16.record_mapped_data = 0   # 1 = record mapped containers.
+proxy-fh16.read-only = 0            # 1 = read-only , 0 = read/write
 
 # proxy-sick
 proxy-sick.type = sick
