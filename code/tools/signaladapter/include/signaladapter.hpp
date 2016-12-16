@@ -73,6 +73,7 @@ class SignalAdapter
   std::unique_ptr<SignalStringListener> m_signalStringListener;
   std::vector<std::string> m_listOfLibrariesToLoad;
   std::vector<HelperEntry> m_listOfHelpers;
+  bool m_debug;
 };
 
 } // signaladapter

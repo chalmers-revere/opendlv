@@ -17,9 +17,11 @@
  * USA.
  */
 
+#include <bitset>
 #include <iostream>
 #include <vector>
 #include <experimental/filesystem>
+#include <limits.h>
 
 #include <dlfcn.h>
 
@@ -74,9 +76,10 @@ SignalAdapter::SignalAdapter(int32_t const &a_argc, char **a_argv)
       a_argc, a_argv, "tools-signaladapter"),
       m_udpReceivers(),
       m_udpSenders(),
-      m_signalStringListener(new SignalStringListener(getConference())),
+      m_signalStringListener(),
       m_listOfLibrariesToLoad(),
-      m_listOfHelpers()
+      m_listOfHelpers(),
+      m_debug()
 {
 }
 
@@ -165,6 +168,7 @@ void SignalAdapter::UnloadSharedLibraries()
 void SignalAdapter::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+  m_debug = (kv.getValue<int32_t>("tools-signaladapter.debug")==1);
 
   std::string const searchPath = kv.getValue<std::string>("tools-signaladapter.directoriesForSharedLibaries");
   std::cout << "Trying to find libodvd*.so files in: " << searchPath << std::endl;
@@ -176,6 +180,7 @@ void SignalAdapter::setUp()
 
   SetUpReceivers();
   SetUpSenders();
+
 }
 
 void SignalAdapter::SetUpReceivers()
@@ -195,6 +200,8 @@ void SignalAdapter::SetUpReceivers()
     // TODO: How to properly handle errors in OpenDLV?
     std::cerr << "Number of output messages and ports mismatch." << std::endl; 
   }
+  m_signalStringListener = std::unique_ptr<SignalStringListener>(new SignalStringListener(getConference(), m_debug));
+
   for (uint16_t i = 0; i < messageIdStrings.size(); i++) {
     int32_t messageId = std::stoi(messageIdStrings[i]);
     uint16_t port = std::stoi(portStrings[i]);
@@ -248,6 +255,9 @@ void SignalAdapter::nextContainer(odcore::data::Container &a_container)
 {
   int32_t messageId = a_container.getDataType();
   bool is_served = m_udpSenders.count(messageId);
+  if(m_debug) {
+    std::cout << "Received container, ID:" << messageId << ", is_served:" << is_served << "." << std::endl;
+  }
 
   if (is_served) {
     bool successfullyMapped = false;
@@ -276,6 +286,15 @@ void SignalAdapter::nextContainer(odcore::data::Container &a_container)
       msg.accept(sampleVisitor);
 
       std::string data = sampleBuffer->GetDataString();
+      if(m_debug) {
+        std::cout << "Sending container message ID:" << messageId << ", size:" << sampleBuffer->GetSize() << "." << std::endl;
+        std::cout << "Message: " << msg.toString() << std::endl;
+        std::cout << "Raw message in bits:"; 
+        for(std::size_t i=0; i < data.size(); i++) {
+          std::cout << std::bitset<CHAR_BIT>(data[i]); 
+        }
+        std::cout << "." << std::endl;
+      }
       m_udpSenders[messageId]->send(data);
     }
   }
