@@ -73,6 +73,7 @@ tools-signaladapter.directoriesForSharedLibaries = /opt/opendlv.core/lib
 tools-signaladapter.sender.address = 10.42.170.108
 tools-signaladapter.sender.messages = 160
 tools-signaladapter.sender.ports = 6702
+tools-signaladapter.sender.buffered = 1
 tools-signaladapter.receiver.messages = 160
 tools-signaladapter.receiver.ports = 6800
 tools-signaladapter.debug = 1

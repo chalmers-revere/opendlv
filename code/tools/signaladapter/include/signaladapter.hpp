@@ -68,9 +68,9 @@ class SignalAdapter
   void UnloadSharedLibraries();
   std::vector<std::string> GetListOfLibrariesToLoad(std::vector<std::string> const &);
 
-  std::map<uint32_t, std::shared_ptr<odcore::io::udp::UDPReceiver>> m_udpReceivers;
   std::map<uint32_t, std::shared_ptr<odcore::io::udp::UDPSender>> m_udpSenders;
   std::unique_ptr<SignalStringListener> m_signalStringListener;
+  std::vector<std::shared_ptr<odcore::io::udp::UDPReceiver>> m_udpReceivers;
   std::vector<std::string> m_listOfLibrariesToLoad;
   std::vector<HelperEntry> m_listOfHelpers;
   bool m_debug;

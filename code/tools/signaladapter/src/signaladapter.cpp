@@ -74,9 +74,9 @@ HelperEntry::~HelperEntry()
 SignalAdapter::SignalAdapter(int32_t const &a_argc, char **a_argv)
     : odcore::base::module::DataTriggeredConferenceClientModule(
       a_argc, a_argv, "tools-signaladapter"),
-      m_udpReceivers(),
       m_udpSenders(),
       m_signalStringListener(),
+      m_udpReceivers(),
       m_listOfLibrariesToLoad(),
       m_listOfHelpers(),
       m_debug()
@@ -185,7 +185,7 @@ void SignalAdapter::setUp()
 
 void SignalAdapter::SetUpReceivers()
 {
-  std::string address = "0.0.0.0";
+  std::string const address = "0.0.0.0";
 
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
   std::string const messageIds = 
@@ -197,21 +197,22 @@ void SignalAdapter::SetUpReceivers()
   std::vector<std::string> portStrings = 
       odcore::strings::StringToolbox::split(ports, ',');
   if (messageIdStrings.size() != portStrings.size()) {
-    // TODO: How to properly handle errors in OpenDLV?
     std::cerr << "Number of output messages and ports mismatch." << std::endl; 
   }
-  m_signalStringListener = std::unique_ptr<SignalStringListener>(new SignalStringListener(getConference(), m_debug));
+  m_signalStringListener = std::unique_ptr<SignalStringListener>(
+      new SignalStringListener(getConference(), m_debug));
 
   for (uint16_t i = 0; i < messageIdStrings.size(); i++) {
     int32_t messageId = std::stoi(messageIdStrings[i]);
     uint16_t port = std::stoi(portStrings[i]);
     auto udpReceiver = odcore::io::udp::UDPFactory::createUDPReceiver(address, port);
-    std::cout << "Receiving message '" << messageId << "' on port " << port << std::endl;
+    std::cout << "Will receive message '" << messageId << "' on port " 
+      << port << std::endl;
 
     udpReceiver->setStringListener(m_signalStringListener.get());
     udpReceiver->start();
 
-    m_udpReceivers[messageId] = udpReceiver;
+    m_udpReceivers.push_back(udpReceiver);
   }
 }
 
@@ -230,15 +231,14 @@ void SignalAdapter::SetUpSenders()
   std::vector<std::string> portStrings = 
       odcore::strings::StringToolbox::split(ports, ',');
   if (messageIdStrings.size() != portStrings.size()) {
-    // TODO: How to properly handle errors in OpenDLV?
     std::cerr << "Number of output messages and ports mismatch." << std::endl; 
   }
   for (uint16_t i = 0; i < messageIdStrings.size(); i++) {
     int32_t messageId = std::stoi(messageIdStrings[i]);
     uint16_t port = std::stoi(portStrings[i]);
     auto udpSender = odcore::io::udp::UDPFactory::createUDPSender(address, port);
-    std::cout << "Sending message '" << messageId << "' to " << address << ":" << port << std::endl;
-
+    std::cout << "Will send message '" << messageId << "' to " 
+      << address << ":" << port << std::endl;
     m_udpSenders[messageId] = udpSender;
   }
 }
@@ -246,7 +246,7 @@ void SignalAdapter::SetUpSenders()
 void SignalAdapter::tearDown()
 {
   for (auto receiver : m_udpReceivers) {
-    receiver.second->stop();
+    receiver->stop();
   }
 }
 
@@ -255,20 +255,19 @@ void SignalAdapter::nextContainer(odcore::data::Container &a_container)
 {
   int32_t messageId = a_container.getDataType();
   bool is_served = m_udpSenders.count(messageId);
-  if(m_debug) {
-    std::cout << "Received container, ID:" << messageId << ", is_served:" << is_served << "." << std::endl;
-  }
 
   if (is_served) {
     bool successfullyMapped = false;
     odcore::reflection::Message msg;
 
     if (!successfullyMapped) {
-      msg = GeneratedHeaders_OpenDaVINCI_Helper::__map(a_container, successfullyMapped);
+      msg = GeneratedHeaders_OpenDaVINCI_Helper::__map(a_container,
+          successfullyMapped);
     }
 
     if (!successfullyMapped) {
-      msg = GeneratedHeaders_ODVDOpenDLVData_Helper::__map(a_container, successfullyMapped);
+      msg = GeneratedHeaders_ODVDOpenDLVData_Helper::__map(a_container,
+          successfullyMapped);
     }
 
     if (!successfullyMapped) {
@@ -287,9 +286,8 @@ void SignalAdapter::nextContainer(odcore::data::Container &a_container)
 
       std::string data = sampleBuffer->GetDataString();
       if(m_debug) {
-        std::cout << "Sending container message ID: " << messageId << ", size:" << sampleBuffer->GetSize() << "." << std::endl;
-        std::cout << "Message: " << msg.toString() << std::endl;
-        std::cout << "Sent message in bits:"; 
+        std::cout << "Sending message '" << msg.toString() 
+          << "' (" << messageId << "): " << std::endl;
         for(std::size_t i = 0; i < data.size(); i++) {
           std::cout << std::bitset<CHAR_BIT>(data[i]) << " ";
         }

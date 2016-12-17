@@ -51,9 +51,18 @@ void SignalStringListener::nextString(std::string const &a_string)
 {
   SampleBuffer buffer;
   buffer.AppendStringRaw(a_string);
-
+  
   auto it = buffer.GetIterator();
   uint32_t messageId = it->ReadInteger32();
+
+  if(m_debug) {
+    auto data = buffer.GetData();
+    std::cout << "Receiving message (" << messageId << "): " << std::endl;
+    for(std::size_t i = 0; i < data.size(); i++) {
+      std::cout << std::bitset<CHAR_BIT>(data[i]) << " ";
+    }
+    std::cout << std::endl;
+  }
 
   switch (messageId) {
     case 160:
@@ -61,19 +70,8 @@ void SignalStringListener::nextString(std::string const &a_string)
         float acceleration = it->ReadFloat32();
         float steering = it->ReadFloat32();
         bool isValid = it->ReadBoolean();
-
-        if(m_debug) {
-          std::cout << "Received a packet with message ID 160 (ActuationRequest) of size " << buffer.GetSize() << ", acceleration:" << acceleration << ", steering:" << steering << ", isValid:" << isValid << "." << std::endl;
-         
-          auto data = buffer.GetData();
-          std::cout << "Received message in bits:"; 
-          for(std::size_t i = 0; i < data.size(); i++) {
-            std::cout << std::bitset<CHAR_BIT>(data[i]) << " ";
-          }
-          std::cout << std::endl;
-        }
-
-        opendlv::proxy::ActuationRequest actuationRequest(acceleration, steering, isValid);
+        opendlv::proxy::ActuationRequest actuationRequest(
+            acceleration, steering, isValid);
         odcore::data::Container actuationRequestContainer(actuationRequest);
         m_conference.send(actuationRequestContainer);
 
@@ -81,7 +79,8 @@ void SignalStringListener::nextString(std::string const &a_string)
       }
     default:
       {
-        std::cout << "Unknown message received (" << messageId << ")." << std::endl;
+        std::cout << "WARNING: Unknown message received (" 
+          << messageId << ")" << std::endl;
       }
   }
 }
