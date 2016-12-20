@@ -202,7 +202,7 @@ void SignalSender::AddContainer(odcore::data::Container &a_container)
     }
 
     if (successfullyMapped) {
-      SendMessage(msg);
+      AddMappedMessage(msg);
     }
   }
 }

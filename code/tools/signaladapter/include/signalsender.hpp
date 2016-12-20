@@ -51,7 +51,8 @@ class SignalSender {
   virtual ~SignalSender();
 
   void AddContainer(odcore::data::Container &);
-  virtual void SendMessage(odcore::reflection::Message &) = 0;
+  virtual void AddMappedMessage(odcore::reflection::Message &) = 0;
+  virtual void Update() = 0;
 
  protected:
   std::vector<int32_t> m_messageIds;

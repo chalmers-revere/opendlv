@@ -17,8 +17,10 @@
  * USA.
  */
 
-#ifndef SIGNALADAPTER_SIGNALSENDERMULTIPORT_HPP_
-#define SIGNALADAPTER_SIGNALSENDERMULTIPORT_HPP_
+#ifndef SIGNALADAPTER_SIGNALSENDERBUFFERED_HPP_
+#define SIGNALADAPTER_SIGNALSENDERBUFFERED_HPP_
+
+#include <opendavinci/odcore/base/Mutex.h>
 
 #include "signalsender.hpp"
 
@@ -26,19 +28,22 @@ namespace opendlv {
 namespace tools {
 namespace signaladapter {
 
-class SignalSenderMultiPort : public SignalSender {
+class SignalSenderBuffered : public SignalSender {
  public:
-  SignalSenderMultiPort(std::string const &, std::string const &, 
+  SignalSenderBuffered(std::string const &, std::string const &, 
       std::string const &, std::string const &, bool);
-  SignalSenderMultiPort(SignalSenderMultiPort const &) = delete;
-  SignalSenderMultiPort &operator=(SignalSenderMultiPort const &) = delete;
-  virtual ~SignalSenderMultiPort();
+  SignalSenderBuffered(SignalSenderBuffered const &) = delete;
+  SignalSenderBuffered &operator=(SignalSenderBuffered const &) = delete;
+  virtual ~SignalSenderBuffered();
 
   void AddMappedMessage(odcore::reflection::Message &);
   void Update();
 
  private:
-  std::map<uint32_t, std::shared_ptr<odcore::io::udp::UDPSender>> m_udpSenders;
+  std::map<uint32_t, std::string> m_buffers;
+  std::map<uint32_t, bool> m_isFresh;
+  std::shared_ptr<odcore::io::udp::UDPSender> m_udpSender;
+  odcore::base::Mutex m_mutex;
 };
 
 } // signaladapter

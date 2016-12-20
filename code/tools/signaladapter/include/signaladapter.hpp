@@ -23,7 +23,7 @@
 #include <map>
 #include <memory>
 
-#include <opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h>
+#include <opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h>
 #include <opendavinci/odcore/data/Container.h>
 #include <opendavinci/odcore/io/udp/UDPReceiver.h>
 
@@ -35,19 +35,21 @@ class SignalSender;
 class SignalStringListener;
 
 class SignalAdapter
-: public odcore::base::module::DataTriggeredConferenceClientModule {
+: public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
   SignalAdapter(int32_t const &, char **);
   SignalAdapter(SignalAdapter const &) = delete;
   SignalAdapter &operator=(SignalAdapter const &) = delete;
   virtual ~SignalAdapter();
 
+  virtual odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
   virtual void nextContainer(odcore::data::Container &);
 
  private:
   void setUp();
   void tearDown();
   
+  void SetUpSender();
   void SetUpReceivers();
 
   std::unique_ptr<SignalSender> m_signalSender;

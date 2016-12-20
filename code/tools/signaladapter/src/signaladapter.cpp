@@ -34,6 +34,7 @@
 
 #include "signaladapter.hpp"
 #include "signalsendermultiport.hpp"
+#include "signalsenderbuffered.hpp"
 #include "signalstringlistener.hpp"
 
 namespace opendlv {
@@ -41,7 +42,7 @@ namespace tools {
 namespace signaladapter {
 
 SignalAdapter::SignalAdapter(int32_t const &a_argc, char **a_argv)
-    : odcore::base::module::DataTriggeredConferenceClientModule(
+    : odcore::base::module::TimeTriggeredConferenceClientModule(
       a_argc, a_argv, "tools-signaladapter"),
       m_signalSender(),
       m_signalStringListener(),
@@ -56,6 +57,12 @@ SignalAdapter::~SignalAdapter()
 
 void SignalAdapter::setUp()
 {
+  SetUpSender();
+  SetUpReceivers();
+}
+
+void SignalAdapter::SetUpSender()
+{
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
   m_debug = kv.getValue<bool>("tools-signaladapter.debug");
   std::string const searchPath = 
@@ -69,10 +76,18 @@ void SignalAdapter::setUp()
   std::string const ports =
     kv.getValue<std::string>("tools-signaladapter.sender.ports");
 
-  m_signalSender.reset(new SignalSenderMultiPort(messageIds, address, ports,
-        searchPath, m_debug));
+  std::string const mode =
+    kv.getValue<std::string>("tools-signaladapter.sender.mode");
 
-  SetUpReceivers();
+  if (mode == "multiport") {
+    m_signalSender.reset(new SignalSenderMultiPort(messageIds, address, ports,
+        searchPath, m_debug));
+  } else if (mode == "buffered") {
+    m_signalSender.reset(new SignalSenderBuffered(messageIds, address, ports,
+        searchPath, m_debug));
+  } else {
+    std::cerr << "ERROR: Unrecognized mode '" << mode << "'." << std::endl;
+  }
 }
 
 void SignalAdapter::SetUpReceivers()
@@ -115,6 +130,14 @@ void SignalAdapter::tearDown()
   }
 }
 
+odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SignalAdapter::body()
+{
+  while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
+    m_signalSender->Update();
+  }
+
+  return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
+}
 
 void SignalAdapter::nextContainer(odcore::data::Container &a_container)
 {

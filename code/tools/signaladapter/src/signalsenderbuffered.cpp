@@ -28,6 +28,7 @@
 #include <opendavinci/odcore/data/Container.h>
 #include <opendavinci/odcore/data/TimeStamp.h>
 #include <opendavinci/odcore/base/KeyValueConfiguration.h>
+#include <opendavinci/odcore/base/Lock.h>
 #include <opendavinci/odcore/strings/StringToolbox.h>
 #include <opendavinci/odcore/io/udp/UDPFactory.h>
 #include "opendavinci/odcore/reflection/Message.h"
@@ -38,41 +39,57 @@
 
 #include "samplebuffer.hpp"
 #include "samplevisitor.hpp"
-#include "signalsendermultiport.hpp"
+#include "signalsenderbuffered.hpp"
 
 namespace opendlv {
 namespace tools {
 namespace signaladapter {
 
-SignalSenderMultiPort::SignalSenderMultiPort(std::string const &a_messageIds,
+SignalSenderBuffered::SignalSenderBuffered(std::string const &a_messageIds,
     std::string const &a_address, std::string const &a_ports,
     std::string const &a_libraryPath, bool a_debug)
     : SignalSender(a_messageIds, a_libraryPath, a_debug),
-      m_udpSenders()
+      m_buffers(),
+      m_isFresh(),
+      m_udpSender(), 
+      m_mutex()
+
 {
   std::vector<std::string> portStrings = 
     odcore::strings::StringToolbox::split(a_ports, ',');
   
-  if (m_messageIds.size() != portStrings.size()) {
-    std::cerr << "Number of output messages and ports mismatch." << std::endl; 
+  if (portStrings.size() < 1) {
+    std::cerr << "No port specified." << std::endl; 
+    return;
   }
+
+  int32_t port = std::stoi(portStrings[0]);
+
+  std::cout << "Will send buffered messages '";
+  for (auto messageId : m_messageIds) {
+    std::cout << messageId << ",";
+  }
+  std::cout << "' to " << a_address << ":" << port << std::endl;
+
+  // TODO: Initiate the map with empty messages, based on the ids
+  for (auto messageId : m_messageIds) {
+
+    std::string data;
+    m_buffers[messageId] = data;
+    m_isFresh[messageId] = false;
+  }
+
+  m_udpSender = odcore::io::udp::UDPFactory::createUDPSender(a_address, port);
+}
+
+SignalSenderBuffered::~SignalSenderBuffered()
+{
+}
+
+void SignalSenderBuffered::AddMappedMessage(odcore::reflection::Message &a_message)
+{
+  odcore::base::Lock l(m_mutex);
   
-  for (uint16_t i = 0; i < portStrings.size(); i++) {
-    int32_t messageId = m_messageIds[i];
-    int32_t port = std::stoi(portStrings[i]);
-    auto udpSender = odcore::io::udp::UDPFactory::createUDPSender(a_address, port);
-    std::cout << "Will send message '" << messageId << "' to " 
-      << a_address << ":" << port << std::endl;
-    m_udpSenders[messageId] = udpSender;
-  }
-}
-
-SignalSenderMultiPort::~SignalSenderMultiPort()
-{
-}
-
-void SignalSenderMultiPort::AddMappedMessage(odcore::reflection::Message &a_message)
-{
   int32_t messageId = a_message.getID();
 
   std::shared_ptr<SampleBuffer> sampleBuffer(new SampleBuffer);
@@ -80,19 +97,42 @@ void SignalSenderMultiPort::AddMappedMessage(odcore::reflection::Message &a_mess
   a_message.accept(sampleVisitor);
 
   std::string data = sampleBuffer->GetDataString();
+
+  m_buffers[messageId] = data;
+  m_isFresh[messageId] = true;
+}
+
+void SignalSenderBuffered::Update()
+{
+  odcore::base::Lock l(m_mutex);
+
+  SampleBuffer buffer;
+  buffer.AppendByte(static_cast<uint8_t>(m_messageIds.size()));
+
+  for (auto messageId : m_messageIds) {
+    buffer.AppendInteger32(static_cast<uint32_t>(messageId));
+    
+    bool status = m_isFresh[messageId];     
+    buffer.AppendBoolean(status);
+
+    std::string msg = m_buffers[messageId];
+    buffer.AppendByte(static_cast<uint8_t>(msg.length()));
+    buffer.AppendStringRaw(msg);
+
+    m_isFresh[messageId] = false;
+  }
+
+  std::string data = buffer.GetDataString();
+
   if(m_debug) {
-    std::cout << "Sending message '" << a_message.toString() 
-      << "' (" << messageId << "): " << std::endl;
+    std::cout << "Sending buffered message: " << std::endl;
     for(std::size_t i = 0; i < data.size(); i++) {
       std::cout << std::bitset<CHAR_BIT>(data[i]) << " ";
     }
     std::cout << std::endl;
   }
-  m_udpSenders[messageId]->send(data);
-}
 
-void SignalSenderMultiPort::Update()
-{
+  m_udpSender->send(data);
 }
 
 } // signaladapter
