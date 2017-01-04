@@ -20,7 +20,7 @@
 #include <bitset>
 #include <iostream>
 #include <vector>
-#include <experimental/filesystem>
+//#include <experimental/filesystem>
 #include <limits.h>
 
 #include <dlfcn.h>
@@ -95,10 +95,10 @@ SignalSender::~SignalSender()
   UnloadSharedLibraries();
 }
 
-std::vector<std::string> SignalSender::GetListOfLibrariesToLoad(std::vector<std::string> const &a_paths) 
+std::vector<std::string> SignalSender::GetListOfLibrariesToLoad(std::vector<std::string> const &) 
 {
   std::vector<std::string> librariesToLoad;
-  for (auto pathToSearch : a_paths) {
+/*  for (auto pathToSearch : a_paths) {
     try {
       for (auto &pathElement : std::experimental::filesystem::recursive_directory_iterator(pathToSearch)) {
         std::stringstream sstr;
@@ -119,7 +119,7 @@ std::vector<std::string> SignalSender::GetListOfLibrariesToLoad(std::vector<std:
       }
     } catch(...) {
     }
-  }
+  }*/
   return librariesToLoad;
 }
 
