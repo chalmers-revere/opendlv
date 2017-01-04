@@ -84,5 +84,6 @@ set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
               ${DL_LIBRARIES} 
               ${CPPEXPERIMENTAL_LIBRARIES})
 
+add_subdirectory(signalinjector)
 #add_subdirectory(vision)
 add_subdirectory(signaladapter)
