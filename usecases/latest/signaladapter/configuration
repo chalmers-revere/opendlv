@@ -71,7 +71,10 @@ odsupercomponent.pulsetimeack.exclude = odcockpit
 # tools-signaladapter
 tools-signaladapter.directoriesForSharedLibaries = /opt/opendlv.core/lib
 tools-signaladapter.sender.address = 10.42.170.108
-tools-signaladapter.sender.messages = 518,521,160
-tools-signaladapter.sender.ports = 6700,6701,6702
-tools-signaladapter.receiver.messages = 160,
-tools-signaladapter.receiver.ports = 6800,
+tools-signaladapter.sender.messageIds = 160
+tools-signaladapter.sender.ports = 6702
+tools-signaladapter.sender.mode = buffered # buffered, multiport
+tools-signaladapter.receiver.messageIds = 160
+tools-signaladapter.receiver.ports = 6800
+tools-signaladapter.debug = 1
+
