@@ -34,4 +34,4 @@ services:
         restart: always
         depends_on:
             - odsupercomponent
-        command: "/opt/opendlv/bin/opendlv-tools-signaladapter --cid=${CID}"
+        command: "/opt/opendlv/bin/opendlv-tools-signaladapter --cid=${CID} --freq=10"

@@ -23,56 +23,39 @@
 #include <map>
 #include <memory>
 
-#include <opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h>
+#include <opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h>
 #include <opendavinci/odcore/data/Container.h>
 #include <opendavinci/odcore/io/udp/UDPReceiver.h>
-#include <opendavinci/odcore/io/udp/UDPSender.h>
-#include <opendavinci/odcore/reflection/Helper.h>
 
 namespace opendlv {
 namespace tools {
 namespace signaladapter {
 
+class SignalSender;
 class SignalStringListener;
 
-class HelperEntry {
- public:
-  HelperEntry();
-  HelperEntry(HelperEntry const &);
-  HelperEntry &operator=(HelperEntry const &);
-  virtual ~HelperEntry();
-
-  std::string m_library;
-  void *m_dynamicObjectHandle;
-  odcore::reflection::Helper *m_helper;
-};
-
 class SignalAdapter
-: public odcore::base::module::DataTriggeredConferenceClientModule {
+: public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
   SignalAdapter(int32_t const &, char **);
   SignalAdapter(SignalAdapter const &) = delete;
   SignalAdapter &operator=(SignalAdapter const &) = delete;
   virtual ~SignalAdapter();
 
+  virtual odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
   virtual void nextContainer(odcore::data::Container &);
 
  private:
   void setUp();
   void tearDown();
   
+  void SetUpSender();
   void SetUpReceivers();
-  void SetUpSenders();
 
-  void FindAndLoadSharedLibraries();
-  void UnloadSharedLibraries();
-  std::vector<std::string> GetListOfLibrariesToLoad(std::vector<std::string> const &);
-
-  std::map<uint32_t, std::shared_ptr<odcore::io::udp::UDPReceiver>> m_udpReceivers;
-  std::map<uint32_t, std::shared_ptr<odcore::io::udp::UDPSender>> m_udpSenders;
+  std::unique_ptr<SignalSender> m_signalSender;
   std::unique_ptr<SignalStringListener> m_signalStringListener;
-  std::vector<std::string> m_listOfLibrariesToLoad;
-  std::vector<HelperEntry> m_listOfHelpers;
+  std::vector<std::shared_ptr<odcore::io::udp::UDPReceiver>> m_udpReceivers;
+  bool m_debug;
 };
 
 } // signaladapter
