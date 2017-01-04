@@ -1,0 +1,74 @@
+version: '2'
+# Please note that docker-compose does not prescribe a startup order
+
+#This docker-compose file makes camera-proxy and odrecorderh264 run in headless mode, i.e., recording videos without display. In this mode, the debug parameter of proxy-camera in the configuration file needs to be set to 0. If a displayer is available, it is possible to view what is being recorded by (1) setting the debug parameter of proxy-camera in the configuration file to 1; and (2) add the following to services proxy1, proxy2, and proxy3:
+
+#environment:
+#- DISPLAY=$DISPLAY
+#volumes:
+#- /tmp/.X11-unix:/tmp/.X11-unix
+
+#In addition, run "xhost +" to grant access to your Xserver before running docker-compose up.
+############################
+#To be updated: Root user is required to access video devices. This is why root user is used for proxy1, proxy2, and proxy3. The OpenDaVINCI base image "seresearch/opendavinci-ubuntu-16.04-complete" defines odv as a normal user. It is possible to run proxy1, proxy2, and proxy3 with odv as the user by adding odv to the video user group during docker run:
+
+#docker run -ti --rm --net=host -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix --ipc=host --user=odv --group-add video --device=/dev/video0:/dev/video0 seresearch/opendlv-core-on-opendavinci-ubuntu-16.04-complete:latest /opt/opendlv.core/bin/opendlv-core-system-proxy-camera --cid=111  --id=1 --freq=20
+
+#However, currently "--group-add" is not supported by docker-compose yet. This docker-compose file will be updated with "--group-add" when docker-compose starts to include this feature in future releases.
+############################
+#Run the following to replay the recordings (or follow the instructions of another use case replay.videos):
+#docker run -ti --rm --net=host -v $HOME/recordings:/opt/recordings seresearch/opendavinci-ubuntu-16.04-complete:latest /opt/od4/bin/odsupercomponent --cid=111 --verbose=1  --configuration=/opt/recordings/configuration
+
+#docker run -ti --rm --net=host --ipc=host --user=root -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v $HOME/recordings:/opt/recordings seresearch/opendavinci-ubuntu-16.04-complete:latest /opt/od4/bin/odcockpit --cid=111
+
+#docker run -ti --rm --net=host --ipc=host --user=root -v $HOME/recordings:/opt/recordings -w /opt/recordings seresearch/opendavinci-ubuntu-16.04-complete:latest /opt/od4/bin/odplayerh264 --cid=111
+
+services:
+    #odsupercomponent
+    odsupercomponent:
+        build: .
+        network_mode: host
+        volumes:
+            - .:/opt/opendlv.core.configuration
+        command: "/opt/od4/bin/odsupercomponent --cid=${CID} --verbose=1 --configuration=/opt/opendlv.core.configuration/configuration"
+
+
+    # micro service for proxy-trimble.
+    proxy-trimble:
+        build: .
+        network_mode: "host"
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-trimble --cid=${CID} --id=1"
+
+    proxy-trimble:
+        build: .
+        network_mode: "host"
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-trimble --cid=${CID} --id=2"
+
+
+    # micro service for proxy-fh16.
+    proxy-fh16:
+        build: .
+        network_mode: "host"
+        devices:
+           - "/dev/pcanpci2:/dev/pcan2"
+        depends_on:
+           - odsupercomponent
+        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-fh16 --cid=${CID} --freq=100"
+
+    #odrecorderh264
+    odrecorderh264:
+        build: .
+        depends_on:
+            - odsupercomponent
+        volumes:
+            - ~/storage1:/opt/recordings
+        user: root  # This parameter will be replaced as soon as group_add parameter is available in docker-compose, cf. https://github.com/docker/compose/pull/3709.
+        network_mode: host
+        ipc: host
+        working_dir: "/opt/recordings"
+        command: "/opt/od4/bin/odrecorderh264 --cid=${CID} --freq=30"
+

@@ -1,0 +1,103 @@
+# This is the "one-and-only" configuration for OpenDaVINCI.
+# Its format is like:
+#
+# section.key=value
+#
+# If you have several modules of the same type, the following configuration
+# scheme applies:
+#
+# global.key=value # <-- This configuration applies for all modules.
+#
+# section.key=value # <-- This configuration applies for all modules of type "section".
+#
+# section:ID.key=value # <-- This configuration applies for the module "ID" of type "section".
+
+
+###############################################################################
+###############################################################################
+#
+# GLOBAL CONFIGURATION
+#
+
+# The following attributes define the buffer sizes for recording and
+# replaying. You need to adjust these parameters depending on the
+# camera resolution for example (640x480x3 --> 1000000 for memorySegment,
+# 1280x720x3 --> 2800000).
+global.buffer.memorySegmentSize = 2800000 # Size of a memory segment in bytes.
+global.buffer.numberOfMemorySegments = 20 # Number of memory segments.
+
+# The following key describes the list of modules expected to participate in this --cid session.
+global.session.expectedModules = odrecorderh264,proxy-camera:1,proxy-camera:2,proxy-camera:3,proxy-camera:4,proxy-camera:5
+
+
+###############################################################################
+###############################################################################
+#
+# NEXT, THE CONFIGURATION FOR OpenDaVINCI TOOLS FOLLOWS. 
+#
+###############################################################################
+###############################################################################
+#
+# CONFIGURATION FOR ODSUPERCOMPONENT
+#
+
+# If the managed level is pulse_shift, all connected modules will be informed
+# about the supercomponent's real time by this increment per module. Thus, the
+# execution times per modules are better aligned with supercomponent and the
+# data exchange is somewhat more predictable.
+odsupercomponent.pulseshift.shift = 10000 # (in microseconds)
+
+# If the managed level is pulse_time_ack, this is the timeout for waiting for
+# an ACK message from a connected client.
+odsupercomponent.pulsetimeack.timeout = 5000 # (in milliseconds)
+
+# If the managed level is pulse_time_ack, the modules are triggered sequentially
+# by sending pulses and waiting for acknowledgment messages. To allow the modules
+# to deliver their respective containers, this yielding time is used to sleep
+# before supercomponent sends the pulse messages the next module in this execution
+# cycle. This value needs to be adjusted for networked simulations to ensure
+# deterministic execution. 
+odsupercomponent.pulsetimeack.yield = 5000 # (in microseconds)
+
+# List of modules (without blanks) that will not get a pulse message from odsupercomponent.
+odsupercomponent.pulsetimeack.exclude = odcockpit
+
+
+###############################################################################
+###############################################################################
+#
+# CONFIGURATION FOR ODPLAYER
+#
+odplayer.input = file://recorder.rec
+odplayer.autoRewind = 0 # 0 = no rewind in the case of EOF, 1 = rewind.
+odplayer.remoteControl = 0 # 0 = no remote control, 1 = allowing remote control (i.e. play, pause, rewind, step_forward)
+odplayer.timeScale = 1.0 # A time scale factor of 1.0 means real time, a factor of 0 means as fast as possible. The smaller the time scale factor is the faster runs the replay.
+
+
+###############################################################################
+###############################################################################
+#
+# CONFIGURATION FOR ODRECORDER
+#
+#odrecorder.output = file://recorder.rec
+odrecorder.remoteControl = 0 # 0 = no remote control, 1 = allowing remote control (i.e. start and stop recording)
+odrecorder.dumpSharedData = 1 # 0 = do not dump shared images and shared images, 1 = otherwise
+
+###############################################################################
+###############################################################################
+#
+# CONFIGURATION FOR PROXY
+#
+
+proxy-fh16.devicenode = /dev/pcan2  # PEAK CAN device.
+proxy-fh16.record_gcm = 0           # 1 = dump generic CAN messages.
+proxy-fh16.record_mapped_data = 0   # 1 = record mapped containers.
+
+proxy-trimble:1.ip = 10.42.42.112    # Change to Trimble IP.
+proxy-trimble:1.port = 9999          # Change to Trimble TCP port.
+proxy-trimble:1.debug = 0
+
+proxy-trimble:2.ip = 10.42.42.113    # Change to Trimble IP.
+proxy-trimble:2.port = 9999          # Change to Trimble TCP port.
+proxy-trimble:2.debug = 0
+
