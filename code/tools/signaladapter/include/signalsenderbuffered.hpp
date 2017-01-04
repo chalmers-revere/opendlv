@@ -17,35 +17,33 @@
  * USA.
  */
 
-#ifndef SIGNALADAPTER_SIGNALSTRINGLISTENER_HPP
-#define SIGNALADAPTER_SIGNALSTRINGLISTENER_HPP
+#ifndef SIGNALADAPTER_SIGNALSENDERBUFFERED_HPP_
+#define SIGNALADAPTER_SIGNALSENDERBUFFERED_HPP_
 
-#include <sstream>
+#include <opendavinci/odcore/base/Mutex.h>
 
-#include <opendavinci/odcore/io/StringListener.h>
-#include <opendavinci/odcore/io/conference/ContainerConference.h>
+#include "signalsender.hpp"
 
 namespace opendlv {
 namespace tools {
 namespace signaladapter {
 
-/**
- * This class decodes data from open udp port.
- */
-class SignalStringListener : public odcore::io::StringListener {
-   private:
-    SignalStringListener(SignalStringListener const &) = delete;
-    SignalStringListener &operator=(SignalStringListener const &) = delete;
+class SignalSenderBuffered : public SignalSender {
+ public:
+  SignalSenderBuffered(std::string const &, std::string const &, 
+      std::string const &, std::string const &, bool);
+  SignalSenderBuffered(SignalSenderBuffered const &) = delete;
+  SignalSenderBuffered &operator=(SignalSenderBuffered const &) = delete;
+  virtual ~SignalSenderBuffered();
 
-   public:
-    SignalStringListener(odcore::io::conference::ContainerConference &, bool &);
-    virtual ~SignalStringListener();
+  void AddMappedMessage(odcore::reflection::Message &);
+  void Update();
 
-    virtual void nextString(const std::string &);
-
-   private:
-    odcore::io::conference::ContainerConference &m_conference;
-    bool &m_debug;
+ private:
+  std::map<uint32_t, std::string> m_buffers;
+  std::map<uint32_t, bool> m_isFresh;
+  std::shared_ptr<odcore::io::udp::UDPSender> m_udpSender;
+  odcore::base::Mutex m_mutex;
 };
 
 } // signaladapter
