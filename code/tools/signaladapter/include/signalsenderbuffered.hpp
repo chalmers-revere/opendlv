@@ -31,17 +31,20 @@ namespace signaladapter {
 class SignalSenderBuffered : public SignalSender {
  public:
   SignalSenderBuffered(std::string const &, std::string const &, 
-      std::string const &, std::string const &, bool);
+      std::string const &, std::string const &, std::string const &, bool);
   SignalSenderBuffered(SignalSenderBuffered const &) = delete;
   SignalSenderBuffered &operator=(SignalSenderBuffered const &) = delete;
   virtual ~SignalSenderBuffered();
 
-  void AddMappedMessage(odcore::reflection::Message &);
+  void AddMappedMessage(odcore::reflection::Message &, uint32_t);
   void Update();
 
  private:
-  std::map<uint32_t, std::string> m_buffers;
-  std::map<uint32_t, bool> m_isFresh;
+  bool IsAllMessagesSeen();
+
+  std::map<uint16_t, std::string> m_buffers;
+  std::map<uint16_t, bool> m_isFresh;
+  std::map<uint16_t, bool> m_isSeen;
   std::shared_ptr<odcore::io::udp::UDPSender> m_udpSender;
   odcore::base::Mutex m_mutex;
 };

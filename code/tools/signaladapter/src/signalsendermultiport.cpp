@@ -44,9 +44,10 @@ namespace tools {
 namespace signaladapter {
 
 SignalSenderMultiPort::SignalSenderMultiPort(std::string const &a_messageIds,
-    std::string const &a_address, std::string const &a_ports,
+    std::string const &a_senderStamps, std::string const &a_address, 
+    std::string const &a_ports,
     std::string const &a_libraryPath, bool a_debug)
-    : SignalSender(a_messageIds, a_libraryPath, a_debug),
+    : SignalSender(a_messageIds, a_senderStamps, a_libraryPath, a_debug),
       m_udpSenders()
 {
   std::vector<std::string> portStrings = 
@@ -58,10 +59,11 @@ SignalSenderMultiPort::SignalSenderMultiPort(std::string const &a_messageIds,
   
   for (uint16_t i = 0; i < portStrings.size(); i++) {
     int32_t messageId = m_messageIds[i];
+    int32_t senderStamp = m_senderStamps[i];
     int32_t port = std::stoi(portStrings[i]);
     auto udpSender = odcore::io::udp::UDPFactory::createUDPSender(a_address, port);
-    std::cout << "Will send message '" << messageId << "' to " 
-      << a_address << ":" << port << std::endl;
+    std::cout << "Will send message '" << messageId << "' from sender '" 
+      << senderStamp << "' to " << a_address << ":" << port << std::endl;
     m_udpSenders[messageId] = udpSender;
   }
 }
@@ -70,11 +72,15 @@ SignalSenderMultiPort::~SignalSenderMultiPort()
 {
 }
 
-void SignalSenderMultiPort::AddMappedMessage(odcore::reflection::Message &a_message)
+void SignalSenderMultiPort::AddMappedMessage(odcore::reflection::Message &a_message, uint32_t a_senderStamp)
 {
   int32_t messageId = a_message.getID();
 
   std::shared_ptr<SampleBuffer> sampleBuffer(new SampleBuffer);
+
+  sampleBuffer->AppendInteger32(a_senderStamp);
+  sampleBuffer->AppendInteger32(messageId);
+
   SampleVisitor sampleVisitor(sampleBuffer);
   a_message.accept(sampleVisitor);
 
