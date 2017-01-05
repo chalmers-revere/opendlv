@@ -27,7 +27,7 @@ global.buffer.memorySegmentSize = 2800000 # Size of a memory segment in bytes.
 global.buffer.numberOfMemorySegments = 20 # Number of memory segments.
 
 # The following key describes the list of modules expected to participate in this --cid session.
-global.session.expectedModules = odrecorderh264,proxy-camera:1,proxy-camera:2,proxy-camera:3,proxy-camera:4,proxy-camera:5
+global.session.expectedModules = odrecorder,proxy-fh16,proxy-badger-kingpin,proxy-badger-ets:1,proxy-badger-ets:2,proxy-trimble:1,proxy-trimble:2,proxy-anglesensor:1,proxy-anglesensor:2,proxy-anglesensor:3,proxy-imu:2,proxy-imu:3,proxy-imu:4,proxy-imu:5,proxy-imu:6,proxy-imu:7,proxy-imu:8,proxy-imu:9,proxy-imu:10,proxy-imu:11
 
 
 ###############################################################################
@@ -125,6 +125,17 @@ proxy-anglesensor:3.setUpCalibration = 0
 proxy-anglesensor:3.calibrationfile = /opt/opendlv.core.configuration/anglesensor2calibration.txt
 proxy-anglesensor:3.debug = 0
 
+proxy-imu:1.type = pololu.altimu10
+proxy-imu:1.pololu.altimu10.device_node = /dev/i2c-2
+proxy-imu:1.pololu.altimu10.address_type = high
+proxy-imu:1.calibration_file = /opt/opendlv.core.configuration/calibration-high.txt
+proxy-imu:1.lockcalibration = 1
+proxy-imu:1.calibration_number_of_samples = 10000
+proxy-imu:1.mount.roll = 0.0
+proxy-imu:1.mount.pitch = 0.0
+proxy-imu:1.mount.yaw = 0.0
+proxy-imu:1.debug = 0
+
 proxy-imu:2.type = pololu.altimu10
 proxy-imu:2.pololu.altimu10.device_node = /dev/i2c-2
 proxy-imu:2.pololu.altimu10.address_type = high
@@ -133,7 +144,7 @@ proxy-imu:2.lockcalibration = 1
 proxy-imu:2.calibration_number_of_samples = 10000
 proxy-imu:2.mount.roll = 0.0
 proxy-imu:2.mount.pitch = 0.0
-proxy-imu:2.mount.yaw = 0.0
+proxy-imu:2.mount.yaw = 180.0
 proxy-imu:2.debug = 0
 
 proxy-imu:3.type = pololu.altimu10
@@ -144,7 +155,7 @@ proxy-imu:3.lockcalibration = 1
 proxy-imu:3.calibration_number_of_samples = 10000
 proxy-imu:3.mount.roll = 0.0
 proxy-imu:3.mount.pitch = 0.0
-proxy-imu:3.mount.yaw = 0.0
+proxy-imu:3.mount.yaw = 180.0
 proxy-imu:3.debug = 0
 
 proxy-imu:4.type = pololu.altimu10
@@ -155,7 +166,7 @@ proxy-imu:4.lockcalibration = 1
 proxy-imu:4.calibration_number_of_samples = 10000
 proxy-imu:4.mount.roll = 0.0
 proxy-imu:4.mount.pitch = 0.0
-proxy-imu:4.mount.yaw = 0.0
+proxy-imu:4.mount.yaw = 180.0
 proxy-imu:4.debug = 0
 
 proxy-imu:5.type = pololu.altimu10
@@ -166,8 +177,10 @@ proxy-imu:5.lockcalibration = 1
 proxy-imu:5.calibration_number_of_samples = 10000
 proxy-imu:5.mount.roll = 0.0
 proxy-imu:5.mount.pitch = 0.0
-proxy-imu:5.mount.yaw = 0.0
+proxy-imu:5.mount.yaw = 180.0
 proxy-imu:5.debug = 0
+
+#trailer 1
 
 proxy-imu:6.type = pololu.altimu10
 proxy-imu:6.pololu.altimu10.device_node = /dev/i2c-2
@@ -176,7 +189,7 @@ proxy-imu:6.calibration_file = /opt/opendlv.core.configuration/calibration-high.
 proxy-imu:6.lockcalibration = 1
 proxy-imu:6.calibration_number_of_samples = 10000
 proxy-imu:6.mount.roll = 0.0
-proxy-imu:6.mount.pitch = 0.0
+proxy-imu:6.mount.pitch = 5.0
 proxy-imu:6.mount.yaw = 0.0
 proxy-imu:6.debug = 0
 
@@ -187,9 +200,11 @@ proxy-imu:7.calibration_file = /opt/opendlv.core.configuration/calibration-low.t
 proxy-imu:7.lockcalibration = 1
 proxy-imu:7.calibration_number_of_samples = 10000
 proxy-imu:7.mount.roll = 0.0
-proxy-imu:7.mount.pitch = 0.0
+proxy-imu:7.mount.pitch = 5.0
 proxy-imu:7.mount.yaw = 0.0
 proxy-imu:7.debug = 0
+
+#badger
 
 proxy-imu:8.type = pololu.altimu10
 proxy-imu:8.pololu.altimu10.device_node = /dev/i2c-2
@@ -198,8 +213,8 @@ proxy-imu:8.calibration_file = /opt/opendlv.core.configuration/calibration-high.
 proxy-imu:8.lockcalibration = 1
 proxy-imu:8.calibration_number_of_samples = 10000
 proxy-imu:8.mount.roll = 0.0
-proxy-imu:8.mount.pitch = 0.0
-proxy-imu:8.mount.yaw = 0.0
+proxy-imu:8.mount.pitch = 90.0
+proxy-imu:8.mount.yaw = 180.0
 proxy-imu:8.debug = 0
 
 proxy-imu:9.type = pololu.altimu10
@@ -209,9 +224,11 @@ proxy-imu:9.calibration_file = /opt/opendlv.core.configuration/calibration-low.t
 proxy-imu:9.lockcalibration = 1
 proxy-imu:9.calibration_number_of_samples = 10000
 proxy-imu:9.mount.roll = 0.0
-proxy-imu:9.mount.pitch = 0.0
-proxy-imu:9.mount.yaw = 0.0
+proxy-imu:9.mount.pitch = 90.0
+proxy-imu:9.mount.yaw = 180.0
 proxy-imu:9.debug = 0
+
+#trailer 2
 
 proxy-imu:10.type = pololu.altimu10
 proxy-imu:10.pololu.altimu10.device_node = /dev/i2c-2
@@ -219,9 +236,9 @@ proxy-imu:10.pololu.altimu10.address_type = high
 proxy-imu:10.calibration_file = /opt/opendlv.core.configuration/calibration-high.txt
 proxy-imu:10.lockcalibration = 1
 proxy-imu:10.calibration_number_of_samples = 10000
-proxy-imu:10.mount.roll = 0.0
+proxy-imu:10.mount.roll = -90.0
 proxy-imu:10.mount.pitch = 0.0
-proxy-imu:10.mount.yaw = 0.0
+proxy-imu:10.mount.yaw = -90.0
 proxy-imu:10.debug = 0
 
 proxy-imu:11.type = pololu.altimu10
@@ -230,7 +247,7 @@ proxy-imu:11.pololu.altimu10.address_type = low
 proxy-imu:11.calibration_file = /opt/opendlv.core.configuration/calibration-low.txt
 proxy-imu:11.lockcalibration = 1
 proxy-imu:11.calibration_number_of_samples = 10000
-proxy-imu:11.mount.roll = 0.0
+proxy-imu:11.mount.roll = -90.0
 proxy-imu:11.mount.pitch = 0.0
-proxy-imu:11.mount.yaw = 0.0
+proxy-imu:11.mount.yaw = -90.0
 proxy-imu:11.debug = 0
