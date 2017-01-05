@@ -104,9 +104,6 @@ void SignalSenderBuffered::AddMappedMessage(odcore::reflection::Message &a_messa
   if (index != -1) {
     std::shared_ptr<SampleBuffer> sampleBuffer(new SampleBuffer);
     
-    sampleBuffer->AppendInteger32(a_senderStamp);
-    sampleBuffer->AppendInteger32(messageId);
-    
     SampleVisitor sampleVisitor(sampleBuffer);
     a_message.accept(sampleVisitor);
 
@@ -152,8 +149,11 @@ void SignalSenderBuffered::Update()
 
   for (uint16_t i = 0; i < m_messageIds.size(); i++) {
     uint32_t messageId = m_messageIds[i];
+    uint32_t senderStamp = m_senderStamps[i];
+    bool status = m_isFresh[i];     
 
-    bool status = m_isFresh[messageId];     
+    buffer.AppendInteger32(messageId);
+    buffer.AppendInteger32(senderStamp);
     buffer.AppendBoolean(status);
 
     std::string msg = m_buffers[messageId];
