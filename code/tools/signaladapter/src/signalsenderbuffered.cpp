@@ -65,18 +65,15 @@ SignalSenderBuffered::SignalSenderBuffered(std::string const &a_messageIds,
 
   int32_t port = std::stoi(portStrings[0]);
 
-  std::cout << "Will send buffered messages ";
   for (uint16_t i = 0; i < m_messageIds.size(); i++) {
     uint32_t messageId = m_messageIds[i];
     uint32_t senderStamp = m_senderStamps[i];
-    std::cout << messageId << " from " << senderStamp << ", ";
 
     std::string data;
     m_buffers[i] = data;
     m_isFresh[i] = false;
     m_isSeen[i] = false;
   }
-  std::cout << " to " << a_address << ":" << port << std::endl;
 
   m_udpSender = odcore::io::udp::UDPFactory::createUDPSender(a_address, port);
 }
@@ -98,7 +95,6 @@ void SignalSenderBuffered::AddMappedMessage(odcore::reflection::Message &a_messa
   for (uint16_t i = 0; i < m_messageIds.size(); i++) {
     if (m_messageIds[i] == messageId && m_senderStamps[i] == a_senderStamp) {
       index = i;
-      std::cout << "  in buffered sender, found at index: " << index << std::endl;
       break;
     }
   }
