@@ -107,49 +107,37 @@ std::vector<std::string> SignalSender::GetListOfLibrariesToLoad(std::vector<std:
   std::vector<std::string> librariesToLoad;
   for (auto pathToSearch : a_paths) {
 
- //   try {
-      DIR *dir;
-      struct dirent *ent;
-      if ((dir = opendir(pathToSearch.c_str())) != nullptr) {
-        while ((ent = readdir (dir)) != nullptr) {
-          bool isOdvdLib = false;
-          
-          std::string pathElement = ent->d_name;
+    if (m_debug) {
+      std::cout << "Searching " << pathToSearch << " for ODVD libraries:";
+    }
 
-          std::stringstream sstr;
-          sstr << pathElement;
-          std::string entry = sstr.str();
-          if (entry.find("libodvd") != string::npos) {
-            if (entry.find(".so") != string::npos) {
-              std::vector<string> path = odcore::strings::StringToolbox::split(entry, '/');
-              if (path.size() > 0) {
-                std::string lib = path[path.size() - 1];
-                if (lib.size() > 0) {
-                  lib = lib.substr(0, lib.size());
-                  librariesToLoad.push_back(lib);
-                  isOdvdLib = true;
+    DIR *dir;
+    struct dirent *ent;
+    if ((dir = opendir(pathToSearch.c_str())) != nullptr) {
+      while ((ent = readdir(dir)) != nullptr) {
+        std::string pathElement = ent->d_name;
+
+        std::stringstream sstr;
+        sstr << pathElement;
+        std::string entry = sstr.str();
+        if (entry.find("libodvd") != string::npos) {
+          if (entry.find(".so") != string::npos) {
+            std::vector<string> path = odcore::strings::StringToolbox::split(entry, '/');
+            if (path.size() > 0) {
+              std::string lib = path[path.size() - 1];
+              if (lib.size() > 0) {
+                lib = lib.substr(0, lib.size());
+                librariesToLoad.push_back(lib);
+                if (m_debug) {
+                  std::cout << "  found library " << lib << ".";
                 }
               }
             }
           }
-        
-          if (m_debug) {
-            std::cout << "Checking if file " << pathElement << " is ODVD library: ";
-            if (isOdvdLib) {
-              std::cout << "YES" << std::endl;
-            } else {
-              std::cout << "NO" << std::endl;
-            }
-          }
-        
         }
-        closedir(dir);
       }
- //   } catch(...) {
- //     if (m_debug) {
- //       std::cout << "NO" << std::endl;
- //     }
- //   }
+      closedir(dir);
+    }
   }
   return librariesToLoad;
 }
