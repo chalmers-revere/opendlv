@@ -59,16 +59,14 @@ services:
            - odsupercomponent
         command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-fh16 --cid=${CID} --freq=100"
 
-    #odrecorderh264
     odrecorderh264:
         build: .
         depends_on:
             - odsupercomponent
         volumes:
-            - ~/storage1:/opt/recordings
-        user: root  # This parameter will be replaced as soon as group_add parameter is available in docker-compose, cf. https://github.com/docker/compose/pull/3709.
+            - ~/recordings:/opt/recordings
+        user: root
         network_mode: host
         ipc: host
         working_dir: "/opt/recordings"
-        command: "/opt/od4/bin/odrecorderh264 --cid=${CID} --freq=30"
-
+        command: "/opt/od4/bin/odrecorderh264 --cid=${CID}"
