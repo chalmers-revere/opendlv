@@ -59,9 +59,6 @@ Geolocation::Geolocation(int32_t const &a_argc, char **a_argv)
     , m_initialised(false)
 {
   m_gpsReading = opendlv::data::environment::WGS84Coordinate();
-  m_magnetometerReading = opendlv::proxy::MagnetometerReading();
-  float const acc[3] = {0,0,-9.82};
-  m_accelerometerReading = opendlv::proxy::AccelerometerReading(acc);
   // m_accelerometerReading.setAcceleration();
 }
 
