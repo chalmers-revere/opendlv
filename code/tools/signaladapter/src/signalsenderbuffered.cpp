@@ -45,11 +45,12 @@ namespace tools {
 namespace signaladapter {
 
 SignalSenderBuffered::SignalSenderBuffered(std::string const &a_messageIds,
-    std::string const &a_address, std::string const &a_ports,
-    std::string const &a_libraryPath, bool a_debug)
-    : SignalSender(a_messageIds, a_libraryPath, a_debug),
+    std::string const &a_senderStamps, std::string const &a_address, 
+    std::string const &a_ports, std::string const &a_libraryPath, bool a_debug)
+    : SignalSender(a_messageIds, a_senderStamps, a_libraryPath, a_debug),
       m_buffers(),
       m_isFresh(),
+      m_isSeen(),
       m_udpSender(), 
       m_mutex()
 
@@ -64,19 +65,18 @@ SignalSenderBuffered::SignalSenderBuffered(std::string const &a_messageIds,
 
   int32_t port = std::stoi(portStrings[0]);
 
-  std::cout << "Will send buffered messages '";
-  for (auto messageId : m_messageIds) {
-    std::cout << messageId << ",";
-  }
-  std::cout << "' to " << a_address << ":" << port << std::endl;
-
-  // TODO: Initiate the map with empty messages, based on the ids
-  for (auto messageId : m_messageIds) {
+  std::cout << "Will send buffered messages ";
+  for (uint16_t i = 0; i < m_messageIds.size(); i++) {
+    uint32_t messageId = m_messageIds[i];
+    uint32_t senderStamp = m_senderStamps[i];
+    std::cout << messageId << " from " << senderStamp << ", ";
 
     std::string data;
-    m_buffers[messageId] = data;
-    m_isFresh[messageId] = false;
+    m_buffers[i] = data;
+    m_isFresh[i] = false;
+    m_isSeen[i] = false;
   }
+  std::cout << " to " << a_address << ":" << port << std::endl;
 
   m_udpSender = odcore::io::udp::UDPFactory::createUDPSender(a_address, port);
 }
@@ -85,33 +85,75 @@ SignalSenderBuffered::~SignalSenderBuffered()
 {
 }
 
-void SignalSenderBuffered::AddMappedMessage(odcore::reflection::Message &a_message)
+void SignalSenderBuffered::AddMappedMessage(odcore::reflection::Message &a_message,
+    uint32_t a_senderStamp)
 {
   odcore::base::Lock l(m_mutex);
   
-  int32_t messageId = a_message.getID();
+  uint32_t messageId = a_message.getID();
 
-  std::shared_ptr<SampleBuffer> sampleBuffer(new SampleBuffer);
-  SampleVisitor sampleVisitor(sampleBuffer);
-  a_message.accept(sampleVisitor);
+  int16_t index = -1;
 
-  std::string data = sampleBuffer->GetDataString();
+  for (uint16_t i = 0; i < m_messageIds.size(); i++) {
+    if (m_messageIds[i] == messageId && m_senderStamps[i] == a_senderStamp) {
+      index = i;
+      break;
+    }
+  }
 
-  m_buffers[messageId] = data;
-  m_isFresh[messageId] = true;
+  if (index != -1) {
+    std::shared_ptr<SampleBuffer> sampleBuffer(new SampleBuffer);
+    
+    SampleVisitor sampleVisitor(sampleBuffer);
+    a_message.accept(sampleVisitor);
+
+    std::string data = sampleBuffer->GetDataString();
+
+    m_buffers[index] = data;
+    m_isFresh[index] = true;
+    m_isSeen[index] = true;
+  }
+}
+
+bool SignalSenderBuffered::IsAllMessagesSeen()
+{
+  bool allSeen = true;
+  for (uint16_t i = 0; i < m_messageIds.size(); i++) {
+    bool isSeen = m_isSeen[i];
+    if (!isSeen) {
+      if (m_debug) {
+        std::cout << "Waiting for message " << m_messageIds[i] << " from sender " 
+          << m_senderStamps[i] << std::endl;
+      }
+      allSeen = false;
+    }
+  } 
+  return allSeen;
 }
 
 void SignalSenderBuffered::Update()
 {
   odcore::base::Lock l(m_mutex);
 
+  if (m_debug) {
+    std::cout << "Try to send buffered message..." << std::endl;
+  }
+
+  bool allSeen = IsAllMessagesSeen();
+  if (!allSeen) {
+    return;
+  }
+
   SampleBuffer buffer;
   buffer.AppendByte(static_cast<uint8_t>(m_messageIds.size()));
 
-  for (auto messageId : m_messageIds) {
-    buffer.AppendInteger32(static_cast<uint32_t>(messageId));
-    
-    bool status = m_isFresh[messageId];     
+  for (uint16_t i = 0; i < m_messageIds.size(); i++) {
+    uint32_t messageId = m_messageIds[i];
+    uint32_t senderStamp = m_senderStamps[i];
+    bool status = m_isFresh[i];     
+
+    buffer.AppendInteger32(messageId);
+    buffer.AppendInteger32(senderStamp);
     buffer.AppendBoolean(status);
 
     std::string msg = m_buffers[messageId];
@@ -123,7 +165,7 @@ void SignalSenderBuffered::Update()
 
   std::string data = buffer.GetDataString();
 
-  if(m_debug) {
+  if (m_debug) {
     std::cout << "Sending buffered message: " << std::endl;
     for(std::size_t i = 0; i < data.size(); i++) {
       std::cout << std::bitset<CHAR_BIT>(data[i]) << " ";
