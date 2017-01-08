@@ -101,6 +101,19 @@ message opendlv.proxy.RelayRequest [id = 170] {
   string deviceId [id = 3];
 }
 
+// In core.
+message opendlv.proxy.V2vReading [id = 171] {
+  uint32 size [id = 1];
+  string data [id = 2];
+}
+
+// In core.
+message opendlv.proxy.V2vRequest [id = 172] {
+  uint32 size [id = 1];
+  string data [id = 2];
+}
+
+
 message opendlv.sensation.Voice [id = 175] {
   string type [id = 1];
   uint32 size [id = 2];
