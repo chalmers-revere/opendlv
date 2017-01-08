@@ -126,7 +126,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
   // KinematicObservationModel<double> kinematicObservationModel(0.0, 0.0, 0.0);
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
-    
+   /* 
     odcore::base::Lock l(m_gpsReadingMutex);
     double latitude = m_gpsReading.getLatitude();
     double longitude = m_gpsReading.getLongitude();
@@ -213,7 +213,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 
     odcore::data::Container dynamicStateContainer(dynamicState);
     getConference().send(dynamicStateContainer);
-
+*/
 
   /*
     odcore::data::TimeStamp now;
