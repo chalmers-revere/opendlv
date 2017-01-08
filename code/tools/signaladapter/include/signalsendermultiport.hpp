@@ -29,12 +29,12 @@ namespace signaladapter {
 class SignalSenderMultiPort : public SignalSender {
  public:
   SignalSenderMultiPort(std::string const &, std::string const &, 
-      std::string const &, std::string const &, bool);
+      std::string const &, std::string const &, std::string const &, bool);
   SignalSenderMultiPort(SignalSenderMultiPort const &) = delete;
   SignalSenderMultiPort &operator=(SignalSenderMultiPort const &) = delete;
   virtual ~SignalSenderMultiPort();
 
-  void AddMappedMessage(odcore::reflection::Message &);
+  void AddMappedMessage(odcore::reflection::Message &, uint32_t);
   void Update();
 
  private:

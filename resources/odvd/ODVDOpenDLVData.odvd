@@ -72,8 +72,9 @@ message opendlv.proxy.CompassReading [id = 163] {
   float heading[3] [id = 1];
 }
 
-message opendlv.proxy.ControlOverrideState [id = 164] {
-  bool isOverridden [id = 1];
+message opendlv.proxy.AnalogRequest [id = 164] {
+  double value [id = 1];
+  uint32 target [id = 2];
 }
 
 message opendlv.proxy.ControlState [id = 165] {

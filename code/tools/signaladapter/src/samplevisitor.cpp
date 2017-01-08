@@ -50,12 +50,12 @@ void SampleVisitor::endVisit()
 }
 
 void SampleVisitor::visit(uint32_t const &, std::string const &, 
-    std::string const &, odcore::serialization::Serializable &a_v) 
+    std::string const &, odcore::serialization::Serializable &) 
 {
   try {
-    odcore::data::SerializableData& tmp = 
-        dynamic_cast<odcore::data::SerializableData&>(a_v);
-    m_sampleBuffer->AppendString(tmp.toString());
+ //   odcore::data::SerializableData& tmp = 
+ //       dynamic_cast<odcore::data::SerializableData&>(a_v);
+ //   m_sampleBuffer->AppendString(tmp.toString());
   } catch(...) {
   }
 }
