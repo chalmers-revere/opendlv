@@ -32,6 +32,7 @@
 #include <opendavinci/odcore/io/udp/UDPFactory.h>
 #include "opendavinci/odcore/reflection/Message.h"
 
+#include "automotivedata/GeneratedHeaders_AutomotiveData_Helper.h"
 #include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
 #include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData_Helper.h"
 #include "opendavinci/GeneratedHeaders_OpenDaVINCI_Helper.h"
@@ -228,6 +229,14 @@ void SignalSender::AddContainer(odcore::data::Container &a_container)
           successfullyMapped);
       if (successfullyMapped) {
         std::cout << "  was successfully mapped from OpenDaVINCI." << std::endl;
+      }
+    }
+    
+    if (!successfullyMapped) {
+      msg = GeneratedHeaders_AutomotiveData_Helper::__map(a_container,
+          successfullyMapped);
+      if (successfullyMapped) {
+        std::cout << "  was successfully mapped from AutomotiveData." << std::endl;
       }
     }
 
