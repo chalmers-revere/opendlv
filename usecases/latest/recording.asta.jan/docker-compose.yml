@@ -59,12 +59,22 @@ services:
            - odsupercomponent
         command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-fh16 --cid=${CID} --freq=100"
 
+    # micro service for tools-signaladapter
+    tools-signaladapter:
+        build: .
+        network_mode: "host"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv/bin/opendlv-tools-signaladapter --cid=${CID} --freq=100"
+
+
     odrecorderh264:
         build: .
         depends_on:
             - odsupercomponent
         volumes:
-            - ~/recordings:/opt/recordings
+            - ~/storage1:/opt/recordings
         user: root
         network_mode: host
         ipc: host

@@ -259,3 +259,20 @@ proxy-imu:11.mount.roll = -90.0
 proxy-imu:11.mount.pitch = 0.0
 proxy-imu:11.mount.yaw = -90.0
 proxy-imu:11.debug = 0
+
+###############################################################################
+###############################################################################
+#
+# NEXT, THE CONFIGURATION FOR OPENDLV SOFTWARE FOLLOWS. 
+#
+
+# tools-signaladapter
+tools-signaladapter.directoriesForSharedLibaries = /opt/opendlv.core/lib
+tools-signaladapter.sender.address = 10.42.42.200
+tools-signaladapter.sender.messageIds = 191,196,199,200,19,19,188,188,188,161,168,161,168,161,168,161,168,161,168,161,168,161,168,161,168,161,168,161,168
+tools-signaladapter.sender.senderStamps = 1,1,1,1,1,2,1,2,3,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11
+tools-signaladapter.sender.ports = 6702
+tools-signaladapter.sender.mode = buffered # buffered, multiport
+tools-signaladapter.receiver.messageIds = 160
+tools-signaladapter.receiver.ports = 6800
+tools-signaladapter.debug = 1
