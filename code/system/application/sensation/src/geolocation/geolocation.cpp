@@ -95,8 +95,8 @@ void Geolocation::nextContainer(odcore::data::Container &a_c)
     m_accelerometerReading = a_c.getData<opendlv::proxy::AccelerometerReading>();
   } else if(a_c.getDataType() == opendlv::proxy::reverefh16::Steering::ID()) {
     m_steeringReading = a_c.getData<opendlv::proxy::reverefh16::Steering>();
-  } else if(a_c.getDataType() == opendlv::proxy::reverefh16::VehicleSpeed::ID()) {
-    m_propulsionReading = a_c.getData<opendlv::proxy::reverefh16::VehicleSpeed>();
+  } else if(a_c.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
+    m_propulsionReading = a_c.getData<opendlv::proxy::reverefh16::Propulsion>();
   }
 } 
 
@@ -245,9 +245,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       odcore::data::TimeStamp durationAfterGpsReading = timeAfterGpsReading - now;
 
       auto propulsionContainer = getKeyValueDataStore().get(
-          opendlv::proxy::reverefh16::VehicleSpeed::ID());
+          opendlv::proxy::reverefh16::Propulsion::ID());
       auto propulsion = propulsionContainer.getData<
-          opendlv::proxy::reverefh16::VehicleSpeed>();
+          opendlv::proxy::reverefh16::Propulsion>();
 
       if (propulsionContainer.getReceivedTimeStamp().getSeconds() > 0) {
         control.v() = propulsion.getVehicleSpeedShaftVehicleSpeed()/3.6;
