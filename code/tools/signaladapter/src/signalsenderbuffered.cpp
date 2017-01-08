@@ -92,11 +92,14 @@ void SignalSenderBuffered::AddMappedMessage(odcore::reflection::Message &a_messa
   
   uint32_t messageId = a_message.getID();
 
+  std::cout << "Got message: " << messageId << " from " << a_senderStamp << std::endl;
+
   int16_t index = -1;
 
   for (uint16_t i = 0; i < m_messageIds.size(); i++) {
     if (m_messageIds[i] == messageId && m_senderStamps[i] == a_senderStamp) {
       index = i;
+      std::cout << "  found at index: " << index << std::endl;
       break;
     }
   }
