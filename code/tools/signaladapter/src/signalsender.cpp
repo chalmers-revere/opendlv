@@ -124,7 +124,7 @@ std::vector<std::string> SignalSender::GetListOfLibrariesToLoad(std::vector<std:
               if (path.size() > 0) {
                 std::string lib = path[path.size() - 1];
                 if (lib.size() > 0) {
-                  lib = lib.substr(0, lib.size() - 1);
+                  lib = lib.substr(0, lib.size());
                   librariesToLoad.push_back(lib);
                   isOdvdLib = true;
                 }
