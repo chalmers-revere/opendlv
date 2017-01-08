@@ -206,11 +206,15 @@ void SignalSender::AddContainer(odcore::data::Container &a_container)
 {
   uint32_t messageId = a_container.getDataType();
   uint32_t senderStamp = a_container.getSenderStamp();
-  
+ 
+  std::cout << "Got message: " << messageId << " from " << senderStamp << std::endl;
+
   bool isServed = false;
   for (uint16_t i = 0; i < m_messageIds.size(); i++) {
     if (m_messageIds[i] == messageId && m_senderStamps[i] == senderStamp) {
       isServed = true;
+      
+      std::cout << "  is served, at index " << i << std::endl;
       break;
     }
   }
@@ -222,11 +226,17 @@ void SignalSender::AddContainer(odcore::data::Container &a_container)
     if (!successfullyMapped) {
       msg = GeneratedHeaders_OpenDaVINCI_Helper::__map(a_container,
           successfullyMapped);
+      if (successfullyMapped) {
+        std::cout << "  was successfully mapped from OpenDaVINCI." << std::endl;
+      }
     }
 
     if (!successfullyMapped) {
       msg = GeneratedHeaders_ODVDOpenDLVData_Helper::__map(a_container,
           successfullyMapped);
+      if (successfullyMapped) {
+        std::cout << "  was successfully mapped from OpenDLV." << std::endl;
+      }
     }
 
     if (!successfullyMapped) {
@@ -236,6 +246,10 @@ void SignalSender::AddContainer(odcore::data::Container &a_container)
           break;
         }
       }
+    }
+      
+    if (!successfullyMapped) {
+      std::cout << "  was not successfully mapped." << std::endl;
     }
 
     if (successfullyMapped) {
