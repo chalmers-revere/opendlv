@@ -34,14 +34,14 @@ services:
 
 
     # micro service for proxy-trimble.
-    proxy-trimble:
+    proxy-trimble1:
         build: .
         network_mode: "host"
         depends_on:
             - odsupercomponent
         command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-trimble --cid=${CID} --id=1"
 
-    proxy-trimble:
+    proxy-trimble2:
         build: .
         network_mode: "host"
         depends_on:
