@@ -155,11 +155,11 @@ void SignalSenderBuffered::Update()
     buffer.AppendInteger32(senderStamp);
     buffer.AppendBoolean(status);
 
-    std::string msg = m_buffers[messageId];
+    std::string msg = m_buffers[i];
     buffer.AppendByte(static_cast<uint8_t>(msg.length()));
     buffer.AppendStringRaw(msg);
 
-    m_isFresh[messageId] = false;
+    m_isFresh[i] = false;
   }
 
   std::string data = buffer.GetDataString();
