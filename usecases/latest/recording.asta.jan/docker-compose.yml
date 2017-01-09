@@ -57,7 +57,7 @@ services:
            - "/dev/pcanpci2:/dev/pcan2"
         depends_on:
            - odsupercomponent
-        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-fh16 --cid=${CID} --freq=100"
+        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-fh16 --cid=${CID} --freq=100 --id=1"
 
     # micro service for tools-signaladapter
     tools-signaladapter:
