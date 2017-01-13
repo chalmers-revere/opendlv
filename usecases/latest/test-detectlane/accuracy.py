@@ -65,9 +65,13 @@ def main(argv):
 
 	#print(excluded)
 
-	ConnectedFrames = 0
+	ConnectedFrames = 1
 	maxConnected = 0
 	AllConnectedFrames = []
+	onehit = 0 # number of just one connected miss
+	twohit = 0 # number of two connected misses
+	threehit = 0 # number of three connected misses
+	fourup = 0 # number of four or more connected misses
 	for i in range (0, len(excluded)-1):
 		if excluded[i]+1 == excluded[i+1]:
 			#print(str(excluded[i]) + " is connected to " + str(excluded[i+1]))
@@ -76,11 +80,34 @@ def main(argv):
 		else:
 			if ConnectedFrames > maxConnected:
 				maxConnected = ConnectedFrames
-			if ConnectedFrames > 2:
+			if ConnectedFrames > 2: # Filter out smaller amount of missed frames
 				AllConnectedFrames.append(ConnectedFrames)
-			ConnectedFrames = 0
-	print("All connected frames: " + str(AllConnectedFrames))
-	print("Maximum frames connected is : " + str(maxConnected))
+			
+			if ConnectedFrames == 1:
+				onehit += 1
+			elif ConnectedFrames == 2:
+				twohit += 1	
+			elif ConnectedFrames == 3:
+				threehit += 1
+			elif ConnectedFrames > 4:
+				fourup += 1		
+			ConnectedFrames = 1
 
+	print("All consecutive frames: " + str(AllConnectedFrames))
+	print("Maximum consecutive frames : " + str(maxConnected))
+
+	print("1 misses: " + str(onehit))
+	print("2 misses: " + str(twohit))
+	print("3 misses: " + str(threehit))
+	print("4 or more misses: " + str(fourup))
+
+	histogram = []
+	for i in range (0, max_val):
+		if i in excluded:
+			histogram.append((i,0))
+		else:
+			histogram.append((i,1))
+
+	#print(histogram)
 if __name__ == "__main__":
     main(sys.argv[1:])

@@ -67,6 +67,7 @@ class DetectLane
   float m_lineDiff;
   float m_OneLineDiff;
   uint16_t m_LineThreshold;
+  float m_HorisontalLimit;
   uint16_t m_blur; 
   double m_memThreshold;
   double m_upperLaneLimit;

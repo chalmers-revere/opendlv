@@ -55,6 +55,7 @@ DetectLane::DetectLane(int32_t const &a_argc, char **a_argv)
     , m_lineDiff()
     , m_OneLineDiff()
     , m_LineThreshold()
+    , m_HorisontalLimit()
     , m_blur()
     , m_memThreshold()
     , m_upperLaneLimit()
@@ -83,6 +84,7 @@ void DetectLane::setUp()
   m_lineDiff = kv.getValue<float>("perception-detectlane.lineDiff");
   m_OneLineDiff = kv.getValue<float>("perception-detectlane.OneLineDiff");
   m_LineThreshold = kv.getValue<float>("perception-detectlane.LineThreshold");
+  m_HorisontalLimit = kv.getValue<float>("perception-detectlane.HorisontalLimit");
   m_blur = kv.getValue<uint16_t>("perception-detectlane.blurStrength");
   m_memThreshold = kv.getValue<double>("perception-detectlane.memThreshold");
   m_upperLaneLimit = kv.getValue<uint16_t>("perception-detectlane.upperLaneLimit");
@@ -393,6 +395,12 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
       std::cout << "Too big diff between the line itself: " << (yWorldP[i][0] - yWorldP[i][1]) << " numbers: " << yWorldP[i][0] << " , " << yWorldP[i][1] << std::endl;
       continue;
     }
+    else if ( ( std::abs(yWorldP[i][0]) > m_HorisontalLimit ) || ( std::abs(yWorldP[i][1]) > m_HorisontalLimit) ){
+      toBeRemoved.push_back(i);
+      std::cout << "Out of scope, more than : " << m_HorisontalLimit << "m away from the truck" << std::endl;
+      continue;
+    }
+    
     for(uint8_t j = i+1; j < yWorldP.size(); j++){
       if( (yWorldP[i][1] < 0) && (yWorldP[j][1] < 0) ){ // if smaller than 0, it is a negative number
         //std::cout << "Two negative coordinates: " << yWorldP[i][1] << ", " << yWorldP[j][1] << std::endl;
@@ -467,12 +475,15 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     }
     if(!hit){
       groupIds.push_back(i);
-      cv::line(m_image_tmp, cv::Point(xScreenP[groupIds[i]][0],yScreenP[groupIds[i]][0]), cv::Point(xScreenP[groupIds[i]][1],yScreenP[groupIds[i]][1]), cv::Scalar(0,255,0), 3, 1 );
-      std::cout << "Coordinates: Y: " << yWorldP[i][0] <<", " << yWorldP[i][1] << " and X: " << xWorldP[i][0] << " , " << xWorldP[i][1] << std::endl;
-      
+      if( yScreenP[groupIds[i]][0] > (float) 0.1 || yScreenP[groupIds[i]][1] > (float) 0.1 ){
+        cv::line(m_image_tmp, cv::Point(xScreenP[groupIds[i]][0],yScreenP[groupIds[i]][0]), cv::Point(xScreenP[groupIds[i]][1],yScreenP[groupIds[i]][1]), cv::Scalar(0,255,0), 3, 1 );
+        std::cout << "Coordinates: Y: " << yWorldP[i][0] <<", " << yWorldP[i][1] << " and Screen: " << xScreenP[groupIds[i]][0] << " , " << xScreenP[groupIds[i]][1] << std::endl;
+      }
     }
     else{
-      std::cout << "Skipped line: " << i << std::endl;
+      std::cout << "Skipped line start: " << std::endl;
+      std::cout << "Coordinates: Y: " << yWorldP[i][0] <<", " << yWorldP[i][1] << " and Screen: " << xScreenP[groupIds[i]][0] << " , " << xScreenP[groupIds[i]][1] << std::endl;
+      std::cout << "Skipped line done: " << std::endl;
     }
     
   }
@@ -530,22 +541,6 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     edges.push_back(opendlv::model::Cartesian3(xWorldP[groupIds[i]][0],yWorldP[groupIds[i]][0],0));
     edges.push_back(opendlv::model::Cartesian3(xWorldP[groupIds[i]][1],yWorldP[groupIds[i]][1],0));
   }
-
-  /*
-  //topleft
-  edges.push_back(opendlv::model::Cartesian3(xWorldP[groupIds[0]][0],yWorldP[groupIds[0]][0],0));
-  //bottomleft
-  edges.push_back(opendlv::model::Cartesian3(xWorldP[groupIds[0]][1],yWorldP[groupIds[0]][1],0));
-  //bottomright
-  edges.push_back(opendlv::model::Cartesian3(xWorldP[groupIds[1]][1],yWorldP[groupIds[1]][1],0));
-  //topright
-  edges.push_back(opendlv::model::Cartesian3(xWorldP[groupIds[1]][0],yWorldP[groupIds[1]][0],0));
-  */
-  // std::cout << "+++++++++++++++++++++++++++" << std::endl;
-  // for(uint8_t i = 0; i < edges.size(); i++) { 
-  //   std::cout << edges[i].toString() << std::endl;
-  // }
-  // std::cout << "+++++++++++++++++++++++++++" << std::endl;
 
   float edgesConfidence = 1;
 
