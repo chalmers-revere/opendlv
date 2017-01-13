@@ -352,8 +352,8 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   std::cout << "Filtered Threshold: "<< detectedLinesIntensitive.size() << std::endl;
   // --------------------- Merge Canny & threshold lines ---------------------------
   
-  detectedLines = detectedLinesIntensitive;
-  detectedLines = detectedLinesCanny;
+  //detectedLines = detectedLinesIntensitive;
+  //detectedLines = detectedLinesCanny;
 
   detectedLinesIntensitive.insert( detectedLinesIntensitive.end(), detectedLinesCanny.begin(), detectedLinesCanny.end() );
   GetGrouping(groups2, detectedLinesIntensitive,100);
@@ -362,7 +362,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   
   if(detectedLines.size() > m_LineThreshold){
     std::cout<<"Tooo many lines detected: " << m_counter << std::endl;
-    return;
+    //return;
   }
 
   // Get parametric line representation

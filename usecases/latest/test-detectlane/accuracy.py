@@ -107,7 +107,6 @@ def main(argv):
 			histogram.append((i,0))
 		else:
 			histogram.append((i,1))
-
-	#print(histogram)
+#	print '. '.join(map(str, histogram))
 if __name__ == "__main__":
     main(sys.argv[1:])
