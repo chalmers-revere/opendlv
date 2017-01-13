@@ -388,7 +388,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   std::cout << "Coordinates: " << yWorldP.size() << std::endl;
   
   // Filter out lines that are close to each other
-  std::vector<int> toBeRemoved;
+  std::vector<uint8_t> toBeRemoved;
   for(uint8_t i = 0; i < yWorldP.size(); i++){
     if( ( (float) yWorldP[i][0] - (float) yWorldP[i][1] ) > m_OneLineDiff ){
       toBeRemoved.push_back(i);
@@ -471,21 +471,25 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
       //if( ( std::abs(yWorldP[i][1]) - std::abs(toBeRemoved[j]) ) < (float) 0.00001 ){
       if (i == toBeRemoved[j]){
         hit = true;
+        continue;
       }
     }
     if(!hit){
       groupIds.push_back(i);
-      if( yScreenP[groupIds[i]][0] > (float) 0.1 || yScreenP[groupIds[i]][1] > (float) 0.1 ){
+    }
+    else{
+      //std::cout << "Skipped line start: " << std::endl;
+      //std::cout << "Coordinates: Y: " << yWorldP[i][0] <<", " << yWorldP[i][1] << " and Screen: " << xScreenP[groupIds[i]][0] << " , " << xScreenP[groupIds[i]][1] << std::endl;
+      //std::cout << "Skipped line done: " << std::endl;
+    }
+    
+  }
+
+  for(uint8_t i = 0; i < groupIds.size(); i++){
+    if( yScreenP[groupIds[i]][0] > (float) 0.1 || yScreenP[groupIds[i]][1] > (float) 0.1 ){
         cv::line(m_image_tmp, cv::Point(xScreenP[groupIds[i]][0],yScreenP[groupIds[i]][0]), cv::Point(xScreenP[groupIds[i]][1],yScreenP[groupIds[i]][1]), cv::Scalar(0,255,0), 3, 1 );
         std::cout << "Coordinates: Y: " << yWorldP[i][0] <<", " << yWorldP[i][1] << " and Screen: " << xScreenP[groupIds[i]][0] << " , " << xScreenP[groupIds[i]][1] << std::endl;
       }
-    }
-    else{
-      std::cout << "Skipped line start: " << std::endl;
-      std::cout << "Coordinates: Y: " << yWorldP[i][0] <<", " << yWorldP[i][1] << " and Screen: " << xScreenP[groupIds[i]][0] << " , " << xScreenP[groupIds[i]][1] << std::endl;
-      std::cout << "Skipped line done: " << std::endl;
-    }
-    
   }
 
   if(groupIds.size() == 0){
