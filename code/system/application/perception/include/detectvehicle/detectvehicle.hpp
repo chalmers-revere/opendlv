@@ -34,7 +34,7 @@
  #include <opencv2/objdetect/objdetect.hpp>
 
 #include "detectvehicle/vehicle_s.hpp"
-#include "trackvehicle/vehicle_tex.hpp"
+
 
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"

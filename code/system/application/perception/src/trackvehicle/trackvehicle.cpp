@@ -22,9 +22,11 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
+
 #include "opencv2/calib3d/calib3d.hpp"
-#include "opencv2/nonfree/nonfree.hpp"
 #include "opencv2/features2d/features2d.hpp"
+//#include "opencv2/nonfree/nonfree.hpp"
+
 
 
 #include "opendavinci/GeneratedHeaders_OpenDaVINCI.h"
@@ -34,9 +36,9 @@
 #include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
 
 #include "detectvehicle/vehicle_s.hpp"
-
-#include "trackvehicle/trackvehicle.hpp"
 #include "trackvehicle/vehicle_tex.hpp"
+#include "trackvehicle/trackvehicle.hpp"
+
 
 namespace opendlv {
 namespace perception {
@@ -196,6 +198,8 @@ void TrackVehicle::pushToBuffer(vehicle_tex data){
 
 // returns img_matches
 cv::Mat TrackVehicle::matchFeatures(cv::Mat img_object,cv::Mat img_scene){
+/*
+
   //-- Step 1: Detect the keypoints using SURF Detector
   int minHessian = 10;
 
@@ -277,6 +281,8 @@ cv::Mat TrackVehicle::matchFeatures(cv::Mat img_object,cv::Mat img_scene){
   line( img_matches, scene_corners[3] + Point2f( img_object.cols, 0), scene_corners[0] + Point2f( img_object.cols, 0), Scalar( 0, 255, 0), 4 );
 
   return img_matches;
+
+  */
 }
 
 
