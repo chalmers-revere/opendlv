@@ -58,12 +58,30 @@ SET (CMAKE_MODULE_PATH "${ODVDVEHICLE_DIR}/share/cmake-${CMAKE_MAJOR_VERSION}.${
 FIND_PACKAGE (ODVDVehicle REQUIRED)
 
 ###########################################################################
+# Find ODVDVehicle.
+SET (CMAKE_MODULE_PATH "${ODVDFH16TRUCK_DIR}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules" ${CMAKE_MODULE_PATH})
+FIND_PACKAGE (ODVDFH16Truck REQUIRED)
+
+###########################################################################
+# Find ODVDTrimble.
+SET (CMAKE_MODULE_PATH "${ODVDTRIMBLE_DIR}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules" ${CMAKE_MODULE_PATH})
+FIND_PACKAGE (ODVDTrimble REQUIRED)
+
+###########################################################################
+# Find ODVDIMU.
+SET (CMAKE_MODULE_PATH "${ODVDIMU_DIR}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules" ${CMAKE_MODULE_PATH})
+FIND_PACKAGE (ODVDIMU REQUIRED)
+
+###########################################################################
 # Set common include directories.
 INCLUDE_DIRECTORIES(SYSTEM ${AUTOMOTIVEDATA_INCLUDE_DIRS})
 include_directories(SYSTEM ${OPENDAVINCI_INCLUDE_DIRS})
 include_directories(SYSTEM ${OPENDLV_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(SYSTEM ${ODVDVEHICLE_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(SYSTEM ${ODVDFH16TRUCK_INCLUDE_DIRS})
 include_directories(SYSTEM ${ODVDOPENDLVDATA_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(SYSTEM ${ODVDTRIMBLE_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(SYSTEM ${ODVDIMU_INCLUDE_DIRS})
 include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 include_directories(SYSTEM ${KALMAN_INCLUDE_DIR})
 include_directories(SYSTEM ${TINYCNN_INCLUDE_DIR})
@@ -74,7 +92,10 @@ set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
               ${OPENDLV_LIBRARIES}
               ${AUTOMOTIVEDATA_LIBRARIES}
               ${ODVDVEHICLE_LIBRARIES}
-              ${ODVDOPENDLVDATA_LIBRARIES})
+              ${ODVDFH16TRUCK_LIBRARIES}
+              ${ODVDOPENDLVDATA_LIBRARIES}
+              ${ODVDTRIMBLE_LIBRARIES}
+              ${ODVDIMU_LIBRARIES})
 
 ###########################################################################
 # Add subfolders with sources.

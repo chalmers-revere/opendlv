@@ -25,7 +25,7 @@
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
 
-#include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
+#include <odvdfh16truck/GeneratedHeaders_ODVDFH16Truck.h>
 
 #include "opendavinci/odcore/strings/StringToolbox.h"
 
@@ -228,8 +228,8 @@ void Platoon::receivedContainerMergeScenario(odcore::data::Container &a_containe
 
   //m_speed = 7; // hardcoded for testing
 
-  if (a_container.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
-    auto propulsion = a_container.getData<opendlv::proxy::reverefh16::Propulsion>();
+  if (a_container.getDataType() == opendlv::proxy::reverefh16::VehicleSpeed::ID()) {
+    auto propulsion = a_container.getData<opendlv::proxy::reverefh16::VehicleSpeed>();
     double speedKph = propulsion.getPropulsionShaftVehicleSpeed();
     m_speed = (float) speedKph / 3.6f;
   }

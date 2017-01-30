@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-# Date: 2016-10-13
+# Date: 2016-10-16
 
 version: '2'
 
@@ -26,12 +26,23 @@ services:
         volumes:
         - .:/opt/opendlv.data
         command: "/opt/od4/bin/odsupercomponent --cid=${CID} --verbose=1 --configuration=/opt/opendlv.data/configuration"
-
-    # micro service for tools-signaladapter
-    tools-signaladapter:
+        
+    sensation-geolocation:
         build: .
         network_mode: "host"
+        working_dir: "/opt/opendlv/bin"
         restart: always
         depends_on:
             - odsupercomponent
-        command: "/opt/opendlv/bin/opendlv-tools-signaladapter --cid=${CID} --freq=10"
+        command: "/opt/opendlv/bin/opendlv-system-application-sensation-geolocation --cid=${CID} --freq=2"
+
+    # microservice for proxy-trimble
+    proxy-trimble:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv.core/bin"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-trimble --cid=${CID} --freq=20"
+
