@@ -115,22 +115,22 @@ proxy-trimble:2.ip = 10.42.42.113    # Change to Trimble IP.
 proxy-trimble:2.port = 9999          # Change to Trimble TCP port.
 proxy-trimble:2.debug = 0
 
-proxy-anglesensor:1.pin = 0
+proxy-anglesensor:1.pin = 2
 proxy-anglesensor:1.anglesminmax = -60,60
 proxy-anglesensor:1.setUpCalibration = 0
-proxy-anglesensor:1.calibrationfile = /opt/opendlv.core.configuration/anglesensor0calibration.txt
+proxy-anglesensor:1.calibrationfile = /opt/opendlv.core.configuration/anglesensor2calibration.txt
 proxy-anglesensor:1.debug = 0
 
-proxy-anglesensor:2.pin = 1
+proxy-anglesensor:2.pin = 0
 proxy-anglesensor:2.anglesminmax = -60,60
 proxy-anglesensor:2.setUpCalibration = 0
-proxy-anglesensor:2.calibrationfile = /opt/opendlv.core.configuration/anglesensor1calibration.txt
+proxy-anglesensor:2.calibrationfile = /opt/opendlv.core.configuration/anglesensor0calibration.txt
 proxy-anglesensor:2.debug = 0
 
-proxy-anglesensor:3.pin = 2
+proxy-anglesensor:3.pin = 1
 proxy-anglesensor:3.anglesminmax = -60,60
 proxy-anglesensor:3.setUpCalibration = 0
-proxy-anglesensor:3.calibrationfile = /opt/opendlv.core.configuration/anglesensor2calibration.txt
+proxy-anglesensor:3.calibrationfile = /opt/opendlv.core.configuration/anglesensor1calibration.txt
 proxy-anglesensor:3.debug = 0
 
 proxy-imu:1.type = pololu.altimu10
