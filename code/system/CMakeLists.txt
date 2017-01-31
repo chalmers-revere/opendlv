@@ -98,15 +98,12 @@ set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
               ${OPENDLV_LIBRARIES}
               ${AUTOMOTIVEDATA_LIBRARIES}
               ${ODVDVEHICLE_LIBRARIES}
-<<<<<<< HEAD
-              ${ODVDV2V_LIBRARIES}
               ${ODVDOPENDLVDATA_LIBRARIES})
-=======
               ${ODVDFH16TRUCK_LIBRARIES}
               ${ODVDOPENDLVDATA_LIBRARIES}
               ${ODVDTRIMBLE_LIBRARIES}
               ${ODVDIMU_LIBRARIES})
->>>>>>> fff151adfecaaeb859e9144b70095beeefe2c539
+              ${ODVDV2V_LIBRARIES}
 
 ###########################################################################
 # Add subfolders with sources.
