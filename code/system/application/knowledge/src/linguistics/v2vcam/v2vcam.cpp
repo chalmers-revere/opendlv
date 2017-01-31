@@ -499,6 +499,10 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
     float distance = std::sqrt((xOffset * xOffset) + (yOffset * yOffset));
     float distanceConfidence = 0.5f;
 
+    if(m_debug) {
+      std::cout << "Snowfox position: (" << xOffset << "," << yOffset << "), distance: " << distance << ", azmiuth: " << azimuth <<  ", our heading: " << heading1  << std::endl;
+    }
+    
     double localXOffset = std::sin(azimuth) * static_cast<double>(distance);
     double localYOffset = std::cos(azimuth) * static_cast<double>(distance);
 
