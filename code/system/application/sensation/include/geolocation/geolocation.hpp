@@ -30,6 +30,7 @@
 #include "geolocation/kinematicmodel.hpp"
 #include "geolocation/kinematicobservationmodel.hpp"
 
+#include <odvdfh16truck/GeneratedHeaders_ODVDFH16Truck.h>
 #include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
 #include "odvdtrimble/GeneratedHeaders_ODVDTrimble.h"
 #include "odvdimu/GeneratedHeaders_ODVDIMU.h"
@@ -81,7 +82,7 @@ class Geolocation
   opendlv::proxy::MagnetometerReading m_magnetometerReading; 
   opendlv::proxy::AccelerometerReading m_accelerometerReading;
   opendlv::proxy::reverefh16::Steering m_steeringReading;
-  opendlv::proxy::reverefh16::Propulsion m_propulsionReading;
+  opendlv::proxy::reverefh16::VehicleSpeed m_propulsionReading;
 
   bool m_debug;
 
