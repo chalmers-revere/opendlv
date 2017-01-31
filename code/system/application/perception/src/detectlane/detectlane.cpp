@@ -98,9 +98,10 @@ void DetectLane::setUp()
   m_debug = (kv.getValue<int32_t>("perception-detectlane.debug") == 1);
   m_camera = kv.getValue<std::string>("perception-detectlane.camera");
   // Insert correct transformation matrix depending on which camera 
-  if(m_camera == "frontLeft"){
-  m_transformationMatrix = ReadMatrix(
-          "/opt/opendlv.data/front-left-pixel2world-matrix.csv",3,3);
+  if(m_camera == "front-left"){
+    m_transformationMatrix = ReadMatrix("/opt/opendlv.data/front-left-pixel2world-matrix.csv",3,3);
+    // std::cout << "chose correct matrix" << std::endl;
+  } else {
     std::cout << "chose correct matrix" << std::endl;
   }
   m_initialized = true;

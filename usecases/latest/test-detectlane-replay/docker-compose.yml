@@ -50,16 +50,14 @@ services:
         ipc: host
         depends_on:
             - odsupercomponent
-        command: "/opt/opendlv/bin/opendlv-system-application-perception-detectlane --cid=${CID} --freq=20"
+        command: "/opt/opendlv/bin/opendlv-system-application-perception-detectlane --cid=${CID} --freq=1"
 
     # microservice for proxy-camera-axis
     core-tool-camera-replay:
         build: .
-#        group_add:
-#            - video
         depends_on:
             - odsupercomponent
-        user: root  # This parameter will be replaced as soon as group_add parameter is available in docker-compose, cf. https://github.com/docker/compose/pull/3709.
+        user: odv
         environment:
             - DISPLAY=$DISPLAY
         volumes:
