@@ -26,7 +26,7 @@
 #include <iostream>
 
 #include "opendavinci/odcore/data/TimeStamp.h"
-#include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
+#include <odvdfh16truck/GeneratedHeaders_ODVDFH16Truck.h>
 
 namespace opendlv {
 namespace knowledge {
@@ -109,8 +109,8 @@ void Ivrule::nextContainer(odcore::data::Container &a_container)
   if(a_container.getDataType() == opendlv::perception::Environment::ID()) {
     opendlv::perception::Environment message = a_container.getData<opendlv::perception::Environment>();
     ReadEnvironment(message);
-  } else  if (a_container.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
-    auto propulsion = a_container.getData<opendlv::proxy::reverefh16::Propulsion>();
+  } else  if (a_container.getDataType() == opendlv::proxy::reverefh16::VehicleSpeed::ID()) {
+    auto propulsion = a_container.getData<opendlv::proxy::reverefh16::VehicleSpeed>();
     double speedKph = propulsion.getPropulsionShaftVehicleSpeed();
     m_speed = static_cast<float>(speedKph / 3.6);
   }

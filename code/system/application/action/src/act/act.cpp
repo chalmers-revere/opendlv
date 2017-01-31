@@ -22,7 +22,7 @@
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
 
-#include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
+#include <odvdfh16truck/GeneratedHeaders_ODVDFH16Truck.h>
 
 #include "act/act.hpp"
 
@@ -203,20 +203,20 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Act::body()
     if (m_brakeValue > 0.0f) {
       // std::cout << "Sent actuation request" << std::endl;
       opendlv::proxy::ActuationRequest actuationRequest(m_brakeValue, 
-          m_steeringValue, false);
-      odcore::data::Container actuationContainer(actuationRequest,opendlv::proxy::ActuationRequest::ID()+300);
+          m_steeringValue, true);
+      odcore::data::Container actuationContainer(actuationRequest,opendlv::proxy::ActuationRequest::ID());
       getConference().send(actuationContainer);
 
-      std::cout << "Send steering " << m_steeringValue << " brake " << m_brakeValue << std::endl;
+     // std::cout << "Send steering " << m_steeringValue << " brake " << m_brakeValue << std::endl;
 
     } else {
       // std::cout << "Sent actuation request" << std::endl;
       opendlv::proxy::ActuationRequest actuationRequest(m_accelerationValue, 
-          m_steeringValue, false);
-      odcore::data::Container actuationContainer(actuationRequest,opendlv::proxy::ActuationRequest::ID()+300);
+          m_steeringValue, true);
+      odcore::data::Container actuationContainer(actuationRequest,opendlv::proxy::ActuationRequest::ID());
       getConference().send(actuationContainer);
       
-      std::cout << "Send steering " << m_steeringValue << " acceleration " << m_accelerationValue << std::endl;
+     // std::cout << "Send steering " << m_steeringValue << " acceleration " << m_accelerationValue << std::endl;
     }
   }
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;

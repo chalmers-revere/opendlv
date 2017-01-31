@@ -70,6 +70,8 @@ void SetGroundSpeed::nextContainer(odcore::data::Container &a_container)
   }
   if (a_container.getDataType() == opendlv::perception::StimulusGroundSpeed::ID()) {
 
+    std::cout << "Stimulus received" << std::endl;
+
     // TODO: Should receive timestamp from sensors.
     auto stimulusTime = a_container.getSentTimeStamp();
     auto stimulusGroundSpeed = a_container.getData<opendlv::perception::StimulusGroundSpeed>();
