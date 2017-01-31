@@ -1,3 +1,5 @@
+0.4.4 - Propagating compilation fix for 32bit
+0.4.3 - Updated base image to OpenDLV.core v0.8.4
 0.4.2 - Propagating updated OpenDLV.core to OpenDLV
 0.4.1 - Propogating update from opendlv.core to opendlv
 0.4.0 - Changes due to Rhino's updated DBC file
