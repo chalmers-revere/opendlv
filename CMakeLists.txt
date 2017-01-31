@@ -21,6 +21,8 @@ cmake_minimum_required(VERSION 2.8)
 #
 # PATH=/opt/od4/bin:$PATH cmake -D CMAKE_INSTALL_PREFIX=<Where shall Chalmers.Revere.OpenDLV be installed?> 
 #                               -D OPENDAVINCI_DIR=<Where is OpenDaVINCI installed?> 
+#                               -D ODVDVEHICLE_DIR=<Where is ODVDVEHICLE_DIR installed?> 
+#                               -D ODVDV2V_DIR=<Where is ODVDV2V_DIR installed?> 
 #                               -D KALMAN_INCLUDE_DIR=<Where is Kalman installed?> 
 #                               -D TINYCNN_INCLUDE_DIR=<Where is TinyCNN installed?> 
 #                               -D CXXTEST_INCLUDE_DIR=<Where is CxxTest installed?> ..
@@ -120,6 +122,7 @@ ExternalProject_Add(system
     CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
     CMAKE_ARGS "-DOPENDAVINCI_DIR=${OPENDAVINCI_DIR}"
     CMAKE_ARGS "-DODVDVEHICLE_DIR=${ODVDVEHICLE_DIR}"
+    CMAKE_ARGS "-DODVDV2V_DIR=${ODVDV2V_DIR}"
     CMAKE_ARGS "-DODVDFH16TRUCK_DIR=${ODVDFH16TRUCK_DIR}"
     CMAKE_ARGS "-DODVDTRIMBLE_DIR=${ODVDTRIMBLE_DIR}"
     CMAKE_ARGS "-DODVDIMU_DIR=${ODVDIMU_DIR}"
