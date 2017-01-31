@@ -25,7 +25,8 @@
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
 
-#include <odvdfh16truck/GeneratedHeaders_ODVDFH16Truck.h>
+#include "odvdfh16truck/GeneratedHeaders_ODVDFH16Truck.h"
+#include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
 
 #include "opendavinci/odcore/strings/StringToolbox.h"
 
@@ -116,63 +117,6 @@ void Platoon::ActOnMio(std::vector<opendlv::perception::Object> &a_listOfObjects
         if (std::abs(longitudinal) > m_longitudinalDiscardDistance || std::abs(lateral) > m_lateralDiscardDistance) {
           return;
         }
-      }
-      else if (!strVector.empty() && strVector.at(0) == "Station") {
-        std::cout << "Found vehicle WITH stationID (" << properties.at(0)  << ") that is NOT in front of us." << std::endl;
-      }
-    }
-
-    if (fabs(secondClosestObject.getDirection().getAzimuth()) < fabs(closestObject.getDirection().getAzimuth())) {
-      // This is expected
-    } 
-    else {
-      std::cout << "UNEXPECTED: closestObject has smaller azimuth than secondClosestObject..." <<  std::endl;
-    }
-
-    if (foundSomething) {
-      m_closestObject = closestObject;
-      m_secondClosestObject = secondClosestObject;
-      m_isInitialized = true;
-    }
-  }
-
-
-
-  //m_speed = 7; // hardcoded for testing
-
-  if (a_container.getDataType() == opendlv::proxy::reverefh16::VehicleSpeed::ID()) {
-    auto propulsion = a_container.getData<opendlv::proxy::reverefh16::VehicleSpeed>();
-    double speedKph = propulsion.getPropulsionShaftVehicleSpeed();
-    m_speed = (float) speedKph / 3.6f;
-  }
-
-
-
-
-  odcore::data::TimeStamp timestamp;
-
-  if (a_container.getDataType() == (opendlv::knowledge::Insight::ID() + 300)) {
-    opendlv::knowledge::Insight insight = a_container.getData<opendlv::knowledge::Insight>();
-    std::string whatInsight = insight.getInsight();
-
-
-
-    std::vector<std::string> strVector = 
-        odcore::strings::StringToolbox::split(whatInsight, '=');
-
-    if (strVector.size() > 1) {
-      if (strVector[0] == "cruiseSpeed") {
-        // assuming recieving is km/h
-        m_cruiseSpeed = std::stof(strVector[1]) / 3.6f;
-
-
-      }
-    } else {
-
-      if (whatInsight == "scenarioReady") {
-        m_scenarioIsReady = true;
-      }
->>>>>>> fff151adfecaaeb859e9144b70095beeefe2c539
 
         float speed_new = std::min(m_desiredGroundSpeedMax, longitudinal / m_timeToCollision);
         std::cout << "MIO is leading. New speed: " << speed_new << std::endl;
@@ -234,9 +178,9 @@ void Platoon::nextContainer(odcore::data::Container &a_container)
   if (a_container.getDataType() == opendlv::perception::Environment::ID()) {
     opendlv::perception::Environment message = a_container.getData<opendlv::perception::Environment>();
     ActOnEnvironment(message);
-  } else if (a_container.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
-    auto propulsion = a_container.getData<opendlv::proxy::reverefh16::Propulsion>();
-    double speedKph = propulsion.getPropulsionShaftVehicleSpeed();
+  } else if (a_container.getDataType() == opendlv::proxy::reverefh16::VehicleSpeed::ID()) {
+    auto vehicleSpeed = a_container.getData<opendlv::proxy::reverefh16::VehicleSpeed>();
+    double speedKph = vehicleSpeed.getPropulsionShaftVehicleSpeed();
     float speed = static_cast<float>(speedKph / 3.6);
 
     ControlGroundSpeed(speed);
