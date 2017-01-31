@@ -26,6 +26,7 @@
 #include "opendavinci/odcore/data/TimeStamp.h"
 
 #include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
+#include "odvdv2v/GeneratedHeaders_ODVDV2V.h"
 
 #include "communicate/communicate.hpp"
 

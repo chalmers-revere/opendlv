@@ -27,6 +27,21 @@ services:
         - .:/opt/opendlv.data
         command: "/opt/od4/bin/odsupercomponent --cid=${CID} --verbose=1 --configuration=/opt/opendlv.data/configuration"
 
+            
+    #odrecorder.
+    odrecorder:
+        build: .
+        depends_on:
+            - odsupercomponent
+        volumes:
+            - ~/recordings:/opt/recordings
+        user: odv
+        network_mode: host
+        ipc: host
+        working_dir: "/opt/recordings"
+        command: "/opt/od4/bin/odrecorderh264 --cid=${CID}"
+        
+
     # microservice for action-act
     action-act:
         build: .
@@ -67,25 +82,15 @@ services:
             - odsupercomponent
         command: "/opt/opendlv/bin/opendlv-system-application-action-setopticalrotation --cid=${CID}"
 
-    # microservice for knowledge-gcdc16-rule-intersection
-    knowledge-gcdc16-rule-intersection:
+    # microservice for knowledge-gcdc16-rule-platoon
+    knowledge-gcdc16-rule-platoon:
         build: .
         network_mode: "host"
         working_dir: "/opt/opendlv/bin"
         restart: always
         depends_on:
             - odsupercomponent
-        command: "/opt/opendlv/bin/opendlv-system-application-knowledge-gcdc16-rule-intersection --cid=${CID} --freq=10"
-
-    # microservice for knowledge-gcdc16-v2viclcm
-    knowledge-gcdc16-v2viclcm:
-        build: .
-        network_mode: "host"
-        working_dir: "/opt/opendlv/bin"
-        restart: always
-        depends_on:
-            - odsupercomponent
-        command: "/opt/opendlv/bin/opendlv-system-application-knowledge-gcdc16-v2viclcm --cid=${CID} --freq=10"
+        command: "/opt/opendlv/bin/opendlv-system-application-knowledge-gcdc16-rule-platoon --cid=${CID} --freq=10"
 
     # microservice for knowledge-identity
     knowledge-identity:
@@ -152,16 +157,6 @@ services:
             - odsupercomponent
         command: "/opt/opendlv/bin/opendlv-system-application-sensation-geolocation --cid=${CID} --freq=20"
 
-    # microservice for sensation-echolocation to create objects from lidar input
-    sensation-echolocation:
-        build: .
-        network_mode: "host"
-        working_dir: "/opt/opendlv/bin"
-        restart: always
-        depends_on:
-            - odsupercomponent
-        command: "/opt/opendlv/bin/opendlv-system-application-sensation-echolocation --cid=${CID} --freq=11"
-
     # microservice for proxy-trimble
     proxy-trimble:
         build: .
@@ -194,18 +189,6 @@ services:
             - odsupercomponent
         command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-fh16 --cid=${CID} --freq=100"
 
-    #microservice for proxy-sick
-    proxy-sick:
-        build: .
-        network_mode: "host"
-        restart: always
-        user: root  # This parameter will be replaced as soon as group_add parameter is available in docker-compose, cf. https://github.com/docker/compose/pull/3709.
-        devices:
-            - "/dev/ttyS1:/dev/ttyS1"
-        depends_on:
-            - odsupercomponent
-        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-sick --cid=${CID} --freq=2"
-    
     # microservice for proxy-v2v
     proxy-v2v:
         build: .
