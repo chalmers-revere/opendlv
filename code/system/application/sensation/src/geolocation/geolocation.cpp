@@ -60,8 +60,7 @@ Geolocation::Geolocation(int32_t const &a_argc, char **a_argv)
 {
   m_gpsReading = opendlv::data::environment::WGS84Coordinate();
   m_magnetometerReading = opendlv::proxy::MagnetometerReading();
-  float const acc[3] = {0,0,-9.82};
-  m_accelerometerReading = opendlv::proxy::AccelerometerReading(acc);
+  m_accelerometerReading = opendlv::proxy::AccelerometerReading(0,0,-9.82);
   // m_accelerometerReading.setAcceleration();
 }
 
@@ -98,8 +97,8 @@ void Geolocation::nextContainer(odcore::data::Container &a_c)
     m_accelerometerReading = a_c.getData<opendlv::proxy::AccelerometerReading>();
   } else if(a_c.getDataType() == opendlv::proxy::reverefh16::Steering::ID()) {
     m_steeringReading = a_c.getData<opendlv::proxy::reverefh16::Steering>();
-  } else if(a_c.getDataType() == opendlv::proxy::reverefh16::VehicleSpeed::ID()) {
-    m_propulsionReading = a_c.getData<opendlv::proxy::reverefh16::VehicleSpeed>();
+  } else if(a_c.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
+    m_propulsionReading = a_c.getData<opendlv::proxy::reverefh16::Propulsion>();
   }
 } 
 
@@ -142,10 +141,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
     float altitude = 0.0f; // TODO: Use a GPS format with altitude, for example GpsReading, which is also available from all GPSs.
     float positionConfidence = 0.0f;
 
-    float *tempAcc = m_accelerometerReading.getAcceleration();
-    float acc[3] = {tempAcc[0],tempAcc[1],tempAcc[2]};
-    float *tempMag = m_magnetometerReading.getMagneticField();
-    float magneticField[3] = {tempMag[0],tempMag[1],tempMag[2]};
+    // float *tempAcc = m_accelerometerReading.getAcceleration();
+    float acc[3] = {m_accelerometerReading.getAccelerationX(),m_accelerometerReading.getAccelerationY(),m_accelerometerReading.getAccelerationZ()};
+    // float *tempMag = m_magnetometerReading.getMagneticField();
+    float magneticField[3] = {m_magnetometerReading.getMagneticFieldX(),m_magnetometerReading.getMagneticFieldY(),m_magnetometerReading.getMagneticFieldZ()};
 
     // Tilt compensation
     float roll = atan2(acc[1],acc[2])+static_cast<float>(M_PI);

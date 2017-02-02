@@ -55,8 +55,9 @@ Balance::~Balance()
  * Receives .
  * Sends .
  */
-void Balance::nextContainer(odcore::data::Container &a_accContainer)//, odcore::data::Container &a_gyroContainer)
+void Balance::nextContainer(odcore::data::Container &)//, odcore::data::Container &a_gyroContainer)
 {
+  /* Broken dependency
  float *accelerometerValue;
  float gyroscopeValue = 0.0;
 
@@ -71,7 +72,7 @@ void Balance::nextContainer(odcore::data::Container &a_accContainer)//, odcore::
     }
 
 
-  /*  if (a_gyroContainer.getDataType() == opendlv::proxy::AccelerometerReading::ID()) {
+    if (a_gyroContainer.getDataType() == opendlv::proxy::AccelerometerReading::ID()) {
       opendlv::proxy::GyroscopeReading GyroscopeReading =
       a_container.getData<opendlv::proxy::GyroscopeReading>();
 
@@ -93,9 +94,9 @@ void Balance::nextContainer(odcore::data::Container &a_accContainer)//, odcore::
 //    auto magnetometerReading = gyroscopeReadingContainer.getData<opendlv::proxy::MagnetometerReading>();
 
 
-    std::cout << getName()
-             << "\n acceleration value " << &accelerometerValue
-             << "\n gyroscope value " << gyroscopeValue <<  std::endl;
+    // std::cout << getName()
+    //          << "\n acceleration value " << &accelerometerValue
+    //          << "\n gyroscope value " << gyroscopeValue <<  std::endl;
 
 
 }
