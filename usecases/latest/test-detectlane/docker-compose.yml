@@ -60,7 +60,7 @@ services:
 #            - video
         depends_on:
             - odsupercomponent
-        user: root  # This parameter will be replaced as soon as group_add parameter is available in docker-compose, cf. https://github.com/docker/compose/pull/3709.
+        user: root 
         environment:
             - DISPLAY=$DISPLAY
         volumes:
@@ -69,5 +69,5 @@ services:
             - ~/Videos/:/opt/Videos/
         network_mode: host
         ipc: host
-        command: "/opt/opendlv.core/bin/opendlv-core-tool-camera-replay --cid=${CID} --freq=20"
+        command: "/opt/opendlv.core/bin/opendlv-core-tool-camera-replay --cid=${CID} --freq=10"
 

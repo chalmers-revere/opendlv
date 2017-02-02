@@ -76,20 +76,20 @@ knowledge-scene.memoryCapacity = 5.0 # seconds
 knowledge-scene.debug = 0
 
 # perception-detectlane
-perception-detectlane.intensityThreshold = 200
+perception-detectlane.intensityThreshold = 140
 perception-detectlane.cannyThreshold = 180 #220
 perception-detectlane.houghThreshold = 80 #80,100
 perception-detectlane.lineDiff = 2.1 #1.6
 perception-detectlane.OneLineDiff = 5.0 #how much a line can differ between the two points
 perception-detectlane.LineThreshold = 10 # Number of maximum allowed lines
 perception-detectlane.HorisontalLimit = 12 # meters on each side we should consider
-perception-detectlane.memThreshold = 0.5 #seconds
+perception-detectlane.memThreshold = 1.5 #seconds
 perception-detectlane.upperLaneLimit = 250
 perception-detectlane.lowerLaneLimit = 450
 perception-detectlane.screenWidth = 1280
 perception-detectlane.screenHeight = 720
 perception-detectlane.debug = 1
-perception-detectlane.camera = frontLeft
+perception-detectlane.camera = front-left
 perception-detectlane.blurStrength = 5
 
 perception-detectlane.roiX = 30 #205 Pixels away from the upper left corner in X
@@ -100,7 +100,7 @@ perception-detectlane.roiHeight = 550 #300 Pixel height of the captured box in Y
 
 
 core-tool-camera-replay.debug = 0       # 1 = show recording (requires X11), 0 = otherwise.
-core-tool-camera-replay.sourcename = AxisCamera0
-core-tool-camera-replay.filename = highway.avi
+core-tool-camera-replay.sourcename = front-left
+core-tool-camera-replay.filename = test.h264
 core-tool-camera-replay.width = 1280
 core-tool-camera-replay.height = 720

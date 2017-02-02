@@ -104,6 +104,9 @@ void DetectLane::setUp()
   } else {
     std::cout << "chose correct matrix" << std::endl;
   }
+
+  cv::namedWindow("Result", cv::WINDOW_AUTOSIZE);
+  cv::namedWindow("Final", cv::WINDOW_AUTOSIZE);
   m_initialized = true;
 }
 
@@ -155,7 +158,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
   cv::Mat tmpImage = cv::Mat(myIplImage);
 
   if(!sharedMem->isValid()){
-    std::cout << "Return from line 148" << std::endl;
+    // std::cout << "Return from line 148" << std::endl;
     return;
   }
 
@@ -179,8 +182,8 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     odcore::base::Lock l(m_mtx);
     croppedImg = m_image(rectROI);
   } catch (cv::Exception& e) {
-    std::cerr << "Error cropping the image due to dimension size." << std::endl;
-    std::cout << "Return from line 173" << std::endl;
+    // std::cerr << "Error cropping the image due to dimension size." << std::endl;
+    // std::cout << "Return from line 173" << std::endl;
     return;
   }
 
@@ -525,9 +528,10 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     //cv::resize(Thresh_res2, display[1], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
     cv::resize(m_image, display[0], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
     cv::imshow("Result", display[0]);
+    cv::updateWindow("Result");
     cv::resize(m_image_tmp, display[1], cv::Size(windowWidth*2, windowHeight*2), 0, 0, cv::INTER_CUBIC);
     cv::imshow("Final", display[1]);
-    
+    cv::updateWindow("Final");
     cv::waitKey(1);
   }
   //Thresh_res2.release();
