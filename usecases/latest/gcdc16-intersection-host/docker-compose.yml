@@ -77,6 +77,16 @@ services:
             - odsupercomponent
         command: "/opt/opendlv/bin/opendlv-system-application-sensation-audition --cid=${CID}"
 
+    #microservice for sensation-geolocation
+    sensation-geolocation:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv/bin"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv/bin/opendlv-system-application-sensation-geolocation --cid=${CID} --freq=20"
+
     # micro service for proxy-applanix
     proxy-applanix:
         build: .
