@@ -1,8 +1,5 @@
-/**
- * simpledriver is an example application to demonstrate how to 
- *              generate driving commands from an application realized
- *              with OpenDaVINCI
- * Copyright (C) 2015 Christian Berger
+/*
+ * Copyright (C) 2016 Crispin Kirchner
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,9 +16,28 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#include "simpledriver/SimpleDriver.h"
+#ifndef OPENDLV_LEGACY_VANISHINGPOINT_RURAL_ROAD_IMAGE_PREPROCESSING_H_
+#define OPENDLV_LEGACY_VANISHINGPOINT_RURAL_ROAD_IMAGE_PREPROCESSING_H_
 
-int32_t main(int32_t argc, char **argv) {
-    opendlv::legacy::SimpleDriver sd(argc, argv);
-    return sd.runModule();
+#include "ImagePreprocessing.h"
+
+namespace opendlv {
+namespace legacy {
+namespace vanishingpoint {
+
+class RuralRoadImagePreprocessing : public ImagePreprocessing {
+public:
+    RuralRoadImagePreprocessing(int blurSize, uint8_t threshold);
+
+    cv::Mat preprocessImage(cv::Mat & coloredImage) const;
+
+private:
+    int blurSize_;
+    uint8_t threshold_;
+};
+
 }
+}
+}
+
+#endif /* OPENDLV_LEGACY_VANISHINGPOINT_RURAL_ROAD_IMAGE_PREPROCESSING_H_ */
