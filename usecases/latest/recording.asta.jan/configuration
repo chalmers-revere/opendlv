@@ -1,0 +1,278 @@
+# This is the "one-and-only" configuration for OpenDaVINCI.
+# Its format is like:
+#
+# section.key=value
+#
+# If you have several modules of the same type, the following configuration
+# scheme applies:
+#
+# global.key=value # <-- This configuration applies for all modules.
+#
+# section.key=value # <-- This configuration applies for all modules of type "section".
+#
+# section:ID.key=value # <-- This configuration applies for the module "ID" of type "section".
+
+
+###############################################################################
+###############################################################################
+#
+# GLOBAL CONFIGURATION
+#
+
+# The following attributes define the buffer sizes for recording and
+# replaying. You need to adjust these parameters depending on the
+# camera resolution for example (640x480x3 --> 1000000 for memorySegment,
+# 1280x720x3 --> 2800000).
+global.buffer.memorySegmentSize = 2800000 # Size of a memory segment in bytes.
+global.buffer.numberOfMemorySegments = 20 # Number of memory segments.
+
+# The following key describes the list of modules expected to participate in this --cid session.
+global.session.expectedModules = odrecorder,proxy-fh16,proxy-badger-kingpin,proxy-badger-ets:1,proxy-badger-ets:2,proxy-trimble:1,proxy-trimble:2,proxy-anglesensor:1,proxy-anglesensor:2,proxy-anglesensor:3,proxy-imu:2,proxy-imu:3,proxy-imu:4,proxy-imu:5,proxy-imu:6,proxy-imu:7,proxy-imu:8,proxy-imu:9,proxy-imu:10,proxy-imu:11
+
+
+###############################################################################
+###############################################################################
+#
+# NEXT, THE CONFIGURATION FOR OpenDaVINCI TOOLS FOLLOWS. 
+#
+###############################################################################
+###############################################################################
+#
+# CONFIGURATION FOR ODSUPERCOMPONENT
+#
+
+# If the managed level is pulse_shift, all connected modules will be informed
+# about the supercomponent's real time by this increment per module. Thus, the
+# execution times per modules are better aligned with supercomponent and the
+# data exchange is somewhat more predictable.
+odsupercomponent.pulseshift.shift = 10000 # (in microseconds)
+
+# If the managed level is pulse_time_ack, this is the timeout for waiting for
+# an ACK message from a connected client.
+odsupercomponent.pulsetimeack.timeout = 5000 # (in milliseconds)
+
+# If the managed level is pulse_time_ack, the modules are triggered sequentially
+# by sending pulses and waiting for acknowledgment messages. To allow the modules
+# to deliver their respective containers, this yielding time is used to sleep
+# before supercomponent sends the pulse messages the next module in this execution
+# cycle. This value needs to be adjusted for networked simulations to ensure
+# deterministic execution. 
+odsupercomponent.pulsetimeack.yield = 5000 # (in microseconds)
+
+# List of modules (without blanks) that will not get a pulse message from odsupercomponent.
+odsupercomponent.pulsetimeack.exclude = odcockpit
+
+
+###############################################################################
+###############################################################################
+#
+# CONFIGURATION FOR ODPLAYER
+#
+odplayer.input = file://recorder.rec
+odplayer.autoRewind = 0 # 0 = no rewind in the case of EOF, 1 = rewind.
+odplayer.remoteControl = 0 # 0 = no remote control, 1 = allowing remote control (i.e. play, pause, rewind, step_forward)
+odplayer.timeScale = 1.0 # A time scale factor of 1.0 means real time, a factor of 0 means as fast as possible. The smaller the time scale factor is the faster runs the replay.
+
+
+###############################################################################
+###############################################################################
+#
+# CONFIGURATION FOR ODRECORDER
+#
+#odrecorderh264.output = file://recorder.rec
+odrecorderh264.remoteControl = 0 # 0 = no remote control, 1 = allowing remote control (i.e. start and stop recording)
+odrecorderh264.dumpSharedData = 1 # 0 = do not dump shared images and shared images, 1 = otherwise
+odrecorderh264.lossless = 1 # Set to 1 to enable h264 lossless encoding.
+odrecorderh264.portbaseforchildprocesses = 29000 # Every spawned child processes is connecting to the parent process via TCP using the base port plus its increasing ID.
+
+##############################################################################
+###############################################################################
+#
+# CONFIGURATION FOR PROXY
+#
+
+proxy-fh16.devicenode = /dev/pcan2  # PEAK CAN device.
+proxy-fh16.record_gcm = 0           # 1 = dump generic CAN messages.
+proxy-fh16.record_mapped_data = 0   # 1 = record mapped containers.
+proxy-fh16.enableActuationBrake = 0
+proxy-fh16.enableActuationSteering = 1
+proxy-fh16.enableActuationThrottle = 0
+
+proxy-badger-kingpin.devicenode = /dev/pcan1 # PEAK CAN device.
+proxy-badger-kingpin.debug = 0
+
+proxy-badger-ets:1.devicenode = /dev/pcan2 # PEAK CAN device.
+proxy-badger-ets:1.debug = 0
+
+proxy-badger-ets:2.devicenode = /dev/pcan3 # PEAK CAN device.
+proxy-badger-ets:2.debug = 0
+
+proxy-trimble:1.ip = 10.42.42.112    # Change to Trimble IP.
+proxy-trimble:1.port = 9999          # Change to Trimble TCP port.
+proxy-trimble:1.debug = 0
+
+proxy-trimble:2.ip = 10.42.42.113    # Change to Trimble IP.
+proxy-trimble:2.port = 9999          # Change to Trimble TCP port.
+proxy-trimble:2.debug = 0
+
+proxy-anglesensor:1.pin = 2
+proxy-anglesensor:1.anglesminmax = -60,60
+proxy-anglesensor:1.setUpCalibration = 0
+proxy-anglesensor:1.calibrationfile = /opt/opendlv.core.configuration/anglesensor2calibration.txt
+proxy-anglesensor:1.debug = 0
+
+proxy-anglesensor:2.pin = 0
+proxy-anglesensor:2.anglesminmax = -60,60
+proxy-anglesensor:2.setUpCalibration = 0
+proxy-anglesensor:2.calibrationfile = /opt/opendlv.core.configuration/anglesensor0calibration.txt
+proxy-anglesensor:2.debug = 0
+
+proxy-anglesensor:3.pin = 1
+proxy-anglesensor:3.anglesminmax = -60,60
+proxy-anglesensor:3.setUpCalibration = 0
+proxy-anglesensor:3.calibrationfile = /opt/opendlv.core.configuration/anglesensor1calibration.txt
+proxy-anglesensor:3.debug = 0
+
+proxy-imu:1.type = pololu.altimu10
+proxy-imu:1.pololu.altimu10.device_node = /dev/i2c-2
+proxy-imu:1.pololu.altimu10.address_type = high
+proxy-imu:1.calibration_file = /opt/opendlv.core.configuration/calibration-high.txt
+proxy-imu:1.lockcalibration = 1
+proxy-imu:1.calibration_number_of_samples = 10000
+proxy-imu:1.mount.roll = 0.0
+proxy-imu:1.mount.pitch = 0.0
+proxy-imu:1.mount.yaw = 0.0
+proxy-imu:1.debug = 0
+
+proxy-imu:2.type = pololu.altimu10
+proxy-imu:2.pololu.altimu10.device_node = /dev/i2c-2
+proxy-imu:2.pololu.altimu10.address_type = high
+proxy-imu:2.calibration_file = /opt/opendlv.core.configuration/calibration-high.txt
+proxy-imu:2.lockcalibration = 1
+proxy-imu:2.calibration_number_of_samples = 10000
+proxy-imu:2.mount.roll = 0.0
+proxy-imu:2.mount.pitch = 0.0
+proxy-imu:2.mount.yaw = 180.0
+proxy-imu:2.debug = 0
+
+proxy-imu:3.type = pololu.altimu10
+proxy-imu:3.pololu.altimu10.device_node = /dev/i2c-2
+proxy-imu:3.pololu.altimu10.address_type = low
+proxy-imu:3.calibration_file = /opt/opendlv.core.configuration/calibration-low.txt
+proxy-imu:3.lockcalibration = 1
+proxy-imu:3.calibration_number_of_samples = 10000
+proxy-imu:3.mount.roll = 0.0
+proxy-imu:3.mount.pitch = 0.0
+proxy-imu:3.mount.yaw = 180.0
+proxy-imu:3.debug = 0
+
+proxy-imu:4.type = pololu.altimu10
+proxy-imu:4.pololu.altimu10.device_node = /dev/i2c-2
+proxy-imu:4.pololu.altimu10.address_type = high
+proxy-imu:4.calibration_file = /opt/opendlv.core.configuration/calibration-high.txt
+proxy-imu:4.lockcalibration = 1
+proxy-imu:4.calibration_number_of_samples = 10000
+proxy-imu:4.mount.roll = 0.0
+proxy-imu:4.mount.pitch = 0.0
+proxy-imu:4.mount.yaw = 180.0
+proxy-imu:4.debug = 0
+
+proxy-imu:5.type = pololu.altimu10
+proxy-imu:5.pololu.altimu10.device_node = /dev/i2c-2
+proxy-imu:5.pololu.altimu10.address_type = low
+proxy-imu:5.calibration_file = /opt/opendlv.core.configuration/calibration-low.txt
+proxy-imu:5.lockcalibration = 1
+proxy-imu:5.calibration_number_of_samples = 10000
+proxy-imu:5.mount.roll = 0.0
+proxy-imu:5.mount.pitch = 0.0
+proxy-imu:5.mount.yaw = 180.0
+proxy-imu:5.debug = 0
+
+#trailer 1
+
+proxy-imu:6.type = pololu.altimu10
+proxy-imu:6.pololu.altimu10.device_node = /dev/i2c-2
+proxy-imu:6.pololu.altimu10.address_type = high
+proxy-imu:6.calibration_file = /opt/opendlv.core.configuration/calibration-high.txt
+proxy-imu:6.lockcalibration = 1
+proxy-imu:6.calibration_number_of_samples = 10000
+proxy-imu:6.mount.roll = 0.0
+proxy-imu:6.mount.pitch = 5.0
+proxy-imu:6.mount.yaw = 0.0
+proxy-imu:6.debug = 0
+
+proxy-imu:7.type = pololu.altimu10
+proxy-imu:7.pololu.altimu10.device_node = /dev/i2c-2
+proxy-imu:7.pololu.altimu10.address_type = low
+proxy-imu:7.calibration_file = /opt/opendlv.core.configuration/calibration-low.txt
+proxy-imu:7.lockcalibration = 1
+proxy-imu:7.calibration_number_of_samples = 10000
+proxy-imu:7.mount.roll = 0.0
+proxy-imu:7.mount.pitch = 5.0
+proxy-imu:7.mount.yaw = 0.0
+proxy-imu:7.debug = 0
+
+#badger
+
+proxy-imu:8.type = pololu.altimu10
+proxy-imu:8.pololu.altimu10.device_node = /dev/i2c-2
+proxy-imu:8.pololu.altimu10.address_type = high
+proxy-imu:8.calibration_file = /opt/opendlv.core.configuration/calibration-high.txt
+proxy-imu:8.lockcalibration = 1
+proxy-imu:8.calibration_number_of_samples = 10000
+proxy-imu:8.mount.roll = 0.0
+proxy-imu:8.mount.pitch = 90.0
+proxy-imu:8.mount.yaw = 180.0
+proxy-imu:8.debug = 0
+
+proxy-imu:9.type = pololu.altimu10
+proxy-imu:9.pololu.altimu10.device_node = /dev/i2c-2
+proxy-imu:9.pololu.altimu10.address_type = low
+proxy-imu:9.calibration_file = /opt/opendlv.core.configuration/calibration-low.txt
+proxy-imu:9.lockcalibration = 1
+proxy-imu:9.calibration_number_of_samples = 10000
+proxy-imu:9.mount.roll = 0.0
+proxy-imu:9.mount.pitch = 90.0
+proxy-imu:9.mount.yaw = 180.0
+proxy-imu:9.debug = 0
+
+#trailer 2
+
+proxy-imu:10.type = pololu.altimu10
+proxy-imu:10.pololu.altimu10.device_node = /dev/i2c-2
+proxy-imu:10.pololu.altimu10.address_type = high
+proxy-imu:10.calibration_file = /opt/opendlv.core.configuration/calibration-high.txt
+proxy-imu:10.lockcalibration = 1
+proxy-imu:10.calibration_number_of_samples = 10000
+proxy-imu:10.mount.roll = -90.0
+proxy-imu:10.mount.pitch = 0.0
+proxy-imu:10.mount.yaw = -90.0
+proxy-imu:10.debug = 0
+
+proxy-imu:11.type = pololu.altimu10
+proxy-imu:11.pololu.altimu10.device_node = /dev/i2c-2
+proxy-imu:11.pololu.altimu10.address_type = low
+proxy-imu:11.calibration_file = /opt/opendlv.core.configuration/calibration-low.txt
+proxy-imu:11.lockcalibration = 1
+proxy-imu:11.calibration_number_of_samples = 10000
+proxy-imu:11.mount.roll = -90.0
+proxy-imu:11.mount.pitch = 0.0
+proxy-imu:11.mount.yaw = -90.0
+proxy-imu:11.debug = 0
+
+###############################################################################
+###############################################################################
+#
+# NEXT, THE CONFIGURATION FOR OPENDLV SOFTWARE FOLLOWS. 
+#
+
+# tools-signaladapter
+tools-signaladapter.directoriesForSharedLibaries = /opt/opendlv.core/lib
+tools-signaladapter.sender.address = 10.42.42.200
+tools-signaladapter.sender.messageIds = 191,196,199,19,19,188,188,188,161,168,161,168,161,168,161,168,161,168,161,168,161,168,161,168,161,168,161,168,918,918
+tools-signaladapter.sender.senderStamps = 1,1,1,1,2,1,2,3,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,1,2
+tools-signaladapter.sender.ports = 6701
+tools-signaladapter.sender.mode = buffered # buffered, multiport
+tools-signaladapter.receiver.messageIds = 160,164,164
+tools-signaladapter.receiver.ports = 6800,6800,6800
+tools-signaladapter.debug = 1

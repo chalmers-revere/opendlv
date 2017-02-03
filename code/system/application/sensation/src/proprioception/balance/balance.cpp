@@ -65,10 +65,6 @@ void Balance::nextContainer(odcore::data::Container &)//, odcore::data::Containe
       opendlv::proxy::AccelerometerReading accelerometerReading =
       a_accContainer.getData<opendlv::proxy::AccelerometerReading>();
 
-
-
-      accelerometerValue = accelerometerReading.getAcceleration();
-
     }
 
 
@@ -84,7 +80,6 @@ void Balance::nextContainer(odcore::data::Container &)//, odcore::data::Containe
 
       gyroscopeValue = GyroscopeReading.getOrientation();
 
-    }*/
 
 
 
@@ -98,7 +93,7 @@ void Balance::nextContainer(odcore::data::Container &)//, odcore::data::Containe
     //          << "\n acceleration value " << &accelerometerValue
     //          << "\n gyroscope value " << gyroscopeValue <<  std::endl;
 
-
+  */
 }
 
 double Balance::moving_average (std::vector<double> _signal)

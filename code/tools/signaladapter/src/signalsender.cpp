@@ -20,7 +20,7 @@
 #include <bitset>
 #include <iostream>
 #include <vector>
-//#include <experimental/filesystem>
+#include <dirent.h>
 #include <limits.h>
 
 #include <dlfcn.h>
@@ -32,6 +32,7 @@
 #include <opendavinci/odcore/io/udp/UDPFactory.h>
 #include "opendavinci/odcore/reflection/Message.h"
 
+#include "automotivedata/GeneratedHeaders_AutomotiveData_Helper.h"
 #include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
 #include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData_Helper.h"
 #include "opendavinci/GeneratedHeaders_OpenDaVINCI_Helper.h"
@@ -69,8 +70,10 @@ HelperEntry::~HelperEntry()
 }
 
 SignalSender::SignalSender(std::string const &a_messageIds,
+    std::string const &a_senderStamps,
     std::string const &a_libraryPath, bool a_debug)
   : m_messageIds(),
+    m_senderStamps(),
     m_debug(a_debug),
     m_listOfLibrariesToLoad(),
     m_listOfHelpers()
@@ -84,9 +87,13 @@ SignalSender::SignalSender(std::string const &a_messageIds,
 
   std::vector<std::string> messageIdStrings = 
     odcore::strings::StringToolbox::split(a_messageIds, ',');
+  std::vector<std::string> senderStampStrings = 
+    odcore::strings::StringToolbox::split(a_senderStamps, ',');
   for (uint16_t i = 0; i < messageIdStrings.size(); i++) {
     int32_t messageId = std::stoi(messageIdStrings[i]);
+    int32_t senderStamp = std::stoi(senderStampStrings[i]);
     m_messageIds.push_back(messageId);
+    m_senderStamps.push_back(senderStamp);
   }
 }
 
@@ -95,12 +102,21 @@ SignalSender::~SignalSender()
   UnloadSharedLibraries();
 }
 
-std::vector<std::string> SignalSender::GetListOfLibrariesToLoad(std::vector<std::string> const &) 
+std::vector<std::string> SignalSender::GetListOfLibrariesToLoad(std::vector<std::string> const &a_paths) 
 {
   std::vector<std::string> librariesToLoad;
-/*  for (auto pathToSearch : a_paths) {
-    try {
-      for (auto &pathElement : std::experimental::filesystem::recursive_directory_iterator(pathToSearch)) {
+  for (auto pathToSearch : a_paths) {
+
+    if (m_debug) {
+      std::cout << "Searching " << pathToSearch << " for ODVD libraries:";
+    }
+
+    DIR *dir;
+    struct dirent *ent;
+    if ((dir = opendir(pathToSearch.c_str())) != nullptr) {
+      while ((ent = readdir(dir)) != nullptr) {
+        std::string pathElement = ent->d_name;
+
         std::stringstream sstr;
         sstr << pathElement;
         std::string entry = sstr.str();
@@ -110,16 +126,19 @@ std::vector<std::string> SignalSender::GetListOfLibrariesToLoad(std::vector<std:
             if (path.size() > 0) {
               std::string lib = path[path.size() - 1];
               if (lib.size() > 0) {
-                lib = lib.substr(0, lib.size() - 1);
+                lib = lib.substr(0, lib.size());
                 librariesToLoad.push_back(lib);
+                if (m_debug) {
+                  std::cout << "  found library " << lib << ".";
+                }
               }
             }
           }
         }
       }
-    } catch(...) {
+      closedir(dir);
     }
-  }*/
+  }
   return librariesToLoad;
 }
 
@@ -174,16 +193,28 @@ void SignalSender::UnloadSharedLibraries()
 
 void SignalSender::AddContainer(odcore::data::Container &a_container)
 {
-  int32_t messageId = a_container.getDataType();
-  bool is_served = (std::find(m_messageIds.begin(), m_messageIds.end(), 
-        messageId) != m_messageIds.end());
+  uint32_t messageId = a_container.getDataType();
+  uint32_t senderStamp = a_container.getSenderStamp();
+ 
+  bool isServed = false;
+  for (uint16_t i = 0; i < m_messageIds.size(); i++) {
+    if (m_messageIds[i] == messageId && m_senderStamps[i] == senderStamp) {
+      isServed = true;
+      break;
+    }
+  }
 
-  if (is_served) {
+  if (isServed) {
     bool successfullyMapped = false;
     odcore::reflection::Message msg;
 
     if (!successfullyMapped) {
       msg = GeneratedHeaders_OpenDaVINCI_Helper::__map(a_container,
+          successfullyMapped);
+    }
+    
+    if (!successfullyMapped) {
+      msg = GeneratedHeaders_AutomotiveData_Helper::__map(a_container,
           successfullyMapped);
     }
 
@@ -200,9 +231,9 @@ void SignalSender::AddContainer(odcore::data::Container &a_container)
         }
       }
     }
-
+      
     if (successfullyMapped) {
-      AddMappedMessage(msg);
+      AddMappedMessage(msg, senderStamp);
     }
   }
 }

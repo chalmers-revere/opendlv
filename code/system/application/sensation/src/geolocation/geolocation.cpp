@@ -61,7 +61,6 @@ Geolocation::Geolocation(int32_t const &a_argc, char **a_argv)
   m_gpsReading = opendlv::data::environment::WGS84Coordinate();
   m_magnetometerReading = opendlv::proxy::MagnetometerReading();
   m_accelerometerReading = opendlv::proxy::AccelerometerReading(0,0,-9.82);
-  // m_accelerometerReading.setAcceleration();
 }
 
 Geolocation::~Geolocation()
@@ -128,7 +127,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
   // KinematicObservationModel<double> kinematicObservationModel(0.0, 0.0, 0.0);
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
-    
+   
     odcore::base::Lock l(m_gpsReadingMutex);
     double latitude = m_gpsReading.getLatitude();
     double longitude = m_gpsReading.getLongitude();
@@ -221,7 +220,6 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
     odcore::data::Container dynamicStateContainer(dynamicState);
     getConference().send(dynamicStateContainer);
 
-
   /*
     odcore::data::TimeStamp now;
 
@@ -252,9 +250,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       odcore::data::TimeStamp durationAfterGpsReading = timeAfterGpsReading - now;
 
       auto propulsionContainer = getKeyValueDataStore().get(
-          opendlv::proxy::reverefh16::VehicleSpeed::ID());
+          opendlv::proxy::reverefh16::Propulsion::ID());
       auto propulsion = propulsionContainer.getData<
-          opendlv::proxy::reverefh16::VehicleSpeed>();
+          opendlv::proxy::reverefh16::Propulsion>();
 
       if (propulsionContainer.getReceivedTimeStamp().getSeconds() > 0) {
         control.v() = propulsion.getVehicleSpeedShaftVehicleSpeed()/3.6;
