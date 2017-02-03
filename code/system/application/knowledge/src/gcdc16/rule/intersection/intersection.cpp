@@ -184,8 +184,8 @@ void Intersection::nextContainer(odcore::data::Container &a_container)
   } else if (a_container.getDataType() == opendlv::perception::Environment::ID()) {
     opendlv::perception::Environment message = a_container.getData<opendlv::perception::Environment>();
     ActOnEnvironment(message);
-  } else if (a_container.getDataType() == opendlv::proxy::reverefh16::VehicleSpeed::ID()) {
-    auto propulsion = a_container.getData<opendlv::proxy::reverefh16::VehicleSpeed>();
+  } else if (a_container.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
+    auto propulsion = a_container.getData<opendlv::proxy::reverefh16::Propulsion>();
     double speedKph = propulsion.getPropulsionShaftVehicleSpeed();
     float speed = static_cast<float>(speedKph / 3.6);
 

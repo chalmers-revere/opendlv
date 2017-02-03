@@ -77,6 +77,17 @@ void SignalStringListener::nextString(std::string const &a_string)
 
         break;
       }
+    case 164:
+      {
+        double value = it->ReadFloat64();
+        uint32_t target = it->ReadInteger32();
+        opendlv::proxy::AnalogRequest analogRequest(
+            value, target);
+        odcore::data::Container analogRequestContainer(analogRequest);
+        m_conference.send(analogRequestContainer);
+
+        break;
+      }
     default:
       {
         std::cout << "WARNING: Unknown message received (" 
