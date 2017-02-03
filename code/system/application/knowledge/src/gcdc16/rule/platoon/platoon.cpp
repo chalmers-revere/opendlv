@@ -178,8 +178,8 @@ void Platoon::nextContainer(odcore::data::Container &a_container)
   if (a_container.getDataType() == opendlv::perception::Environment::ID()) {
     opendlv::perception::Environment message = a_container.getData<opendlv::perception::Environment>();
     ActOnEnvironment(message);
-  } else if (a_container.getDataType() == opendlv::proxy::reverefh16::VehicleSpeed::ID()) {
-    auto vehicleSpeed = a_container.getData<opendlv::proxy::reverefh16::VehicleSpeed>();
+  } else if (a_container.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
+    auto vehicleSpeed = a_container.getData<opendlv::proxy::reverefh16::Propulsion>();
     double speedKph = vehicleSpeed.getPropulsionShaftVehicleSpeed();
     float speed = static_cast<float>(speedKph / 3.6);
 

@@ -57,10 +57,11 @@ Balance::~Balance()
  */
 void Balance::nextContainer(odcore::data::Container &)//, odcore::data::Container &a_gyroContainer)
 {
-// float *accelerometerValue;
-// float gyroscopeValue = 0.0;
+  /* Broken dependency
+ float *accelerometerValue;
+ float gyroscopeValue = 0.0;
 
-  /*  if (a_accContainer.getDataType() == opendlv::proxy::AccelerometerReading::ID()) {
+    if (a_accContainer.getDataType() == opendlv::proxy::AccelerometerReading::ID()) {
       opendlv::proxy::AccelerometerReading accelerometerReading =
       a_accContainer.getData<opendlv::proxy::AccelerometerReading>();
 
@@ -79,7 +80,6 @@ void Balance::nextContainer(odcore::data::Container &)//, odcore::data::Containe
 
       gyroscopeValue = GyroscopeReading.getOrientation();
 
-    }*/
 
 
 
@@ -89,11 +89,11 @@ void Balance::nextContainer(odcore::data::Container &)//, odcore::data::Containe
 //    auto magnetometerReading = gyroscopeReadingContainer.getData<opendlv::proxy::MagnetometerReading>();
 
 
-/*    std::cout << getName()
-             << "\n acceleration value " << &accelerometerValue
-             << "\n gyroscope value " << gyroscopeValue <<  std::endl;
+    // std::cout << getName()
+    //          << "\n acceleration value " << &accelerometerValue
+    //          << "\n gyroscope value " << gyroscopeValue <<  std::endl;
 
-*/
+  */
 }
 
 double Balance::moving_average (std::vector<double> _signal)
