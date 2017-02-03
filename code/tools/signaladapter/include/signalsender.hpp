@@ -45,17 +45,19 @@ class HelperEntry {
 
 class SignalSender {
  public:
-  SignalSender(std::string const &, std::string const &, bool);
+  SignalSender(std::string const &, std::string const &, std::string const &,
+      bool);
   SignalSender(SignalSender const &) = delete;
   SignalSender &operator=(SignalSender const &) = delete;
   virtual ~SignalSender();
 
   void AddContainer(odcore::data::Container &);
-  virtual void AddMappedMessage(odcore::reflection::Message &) = 0;
+  virtual void AddMappedMessage(odcore::reflection::Message &, uint32_t) = 0;
   virtual void Update() = 0;
 
  protected:
-  std::vector<int32_t> m_messageIds;
+  std::vector<uint32_t> m_messageIds;
+  std::vector<uint32_t> m_senderStamps;
   bool m_debug;
 
  private:

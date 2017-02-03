@@ -72,6 +72,8 @@ void SignalAdapter::SetUpSender()
 
   std::string const messageIds = 
     kv.getValue<std::string>("tools-signaladapter.sender.messageIds");
+  std::string const senderStamps = 
+    kv.getValue<std::string>("tools-signaladapter.sender.senderStamps");
   std::string const ports =
     kv.getValue<std::string>("tools-signaladapter.sender.ports");
 
@@ -79,11 +81,11 @@ void SignalAdapter::SetUpSender()
     kv.getValue<std::string>("tools-signaladapter.sender.mode");
 
   if (mode == "multiport") {
-    m_signalSender.reset(new SignalSenderMultiPort(messageIds, address, ports,
-        searchPath, m_debug));
+    m_signalSender.reset(new SignalSenderMultiPort(messageIds, senderStamps, 
+        address, ports, searchPath, m_debug));
   } else if (mode == "buffered") {
-    m_signalSender.reset(new SignalSenderBuffered(messageIds, address, ports,
-        searchPath, m_debug));
+    m_signalSender.reset(new SignalSenderBuffered(messageIds, senderStamps, 
+        address, ports, searchPath, m_debug));
   } else {
     std::cerr << "ERROR: Unrecognized mode '" << mode << "'." << std::endl;
   }

@@ -60,9 +60,7 @@ Geolocation::Geolocation(int32_t const &a_argc, char **a_argv)
 {
   m_gpsReading = opendlv::data::environment::WGS84Coordinate();
   m_magnetometerReading = opendlv::proxy::MagnetometerReading();
-  float const acc[3] = {0,0,-9.82};
-  m_accelerometerReading = opendlv::proxy::AccelerometerReading(acc);
-  // m_accelerometerReading.setAcceleration();
+  m_accelerometerReading = opendlv::proxy::AccelerometerReading(0,0,-9.82);
 }
 
 Geolocation::~Geolocation()
@@ -98,8 +96,8 @@ void Geolocation::nextContainer(odcore::data::Container &a_c)
     m_accelerometerReading = a_c.getData<opendlv::proxy::AccelerometerReading>();
   } else if(a_c.getDataType() == opendlv::proxy::reverefh16::Steering::ID()) {
     m_steeringReading = a_c.getData<opendlv::proxy::reverefh16::Steering>();
-  } else if(a_c.getDataType() == opendlv::proxy::reverefh16::VehicleSpeed::ID()) {
-    m_propulsionReading = a_c.getData<opendlv::proxy::reverefh16::VehicleSpeed>();
+  } else if(a_c.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()) {
+    m_propulsionReading = a_c.getData<opendlv::proxy::reverefh16::Propulsion>();
   }
 } 
 
@@ -129,7 +127,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
   // KinematicObservationModel<double> kinematicObservationModel(0.0, 0.0, 0.0);
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
-    
+   
     odcore::base::Lock l(m_gpsReadingMutex);
     double latitude = m_gpsReading.getLatitude();
     double longitude = m_gpsReading.getLongitude();
@@ -142,10 +140,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
     float altitude = 0.0f; // TODO: Use a GPS format with altitude, for example GpsReading, which is also available from all GPSs.
     float positionConfidence = 0.0f;
 
-    float *tempAcc = m_accelerometerReading.getAcceleration();
-    float acc[3] = {tempAcc[0],tempAcc[1],tempAcc[2]};
-    float *tempMag = m_magnetometerReading.getMagneticField();
-    float magneticField[3] = {tempMag[0],tempMag[1],tempMag[2]};
+    // float *tempAcc = m_accelerometerReading.getAcceleration();
+    float acc[3] = {m_accelerometerReading.getAccelerationX(),m_accelerometerReading.getAccelerationY(),m_accelerometerReading.getAccelerationZ()};
+    // float *tempMag = m_magnetometerReading.getMagneticField();
+    float magneticField[3] = {m_magnetometerReading.getMagneticFieldX(),m_magnetometerReading.getMagneticFieldY(),m_magnetometerReading.getMagneticFieldZ()};
 
     // Tilt compensation
     float roll = atan2(acc[1],acc[2])+static_cast<float>(M_PI);
@@ -222,7 +220,6 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
     odcore::data::Container dynamicStateContainer(dynamicState);
     getConference().send(dynamicStateContainer);
 
-
   /*
     odcore::data::TimeStamp now;
 
@@ -253,9 +250,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
       odcore::data::TimeStamp durationAfterGpsReading = timeAfterGpsReading - now;
 
       auto propulsionContainer = getKeyValueDataStore().get(
-          opendlv::proxy::reverefh16::VehicleSpeed::ID());
+          opendlv::proxy::reverefh16::Propulsion::ID());
       auto propulsion = propulsionContainer.getData<
-          opendlv::proxy::reverefh16::VehicleSpeed>();
+          opendlv::proxy::reverefh16::Propulsion>();
 
       if (propulsionContainer.getReceivedTimeStamp().getSeconds() > 0) {
         control.v() = propulsion.getVehicleSpeedShaftVehicleSpeed()/3.6;
