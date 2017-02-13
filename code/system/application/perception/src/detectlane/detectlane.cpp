@@ -213,7 +213,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
         connectedWidth,
         traversableTo);
     odcore::data::Container c(detectedSurface);
-    // getConference().getSenderStamp();
+    // getConference().send(detectedSurface);
   }
 }
 
