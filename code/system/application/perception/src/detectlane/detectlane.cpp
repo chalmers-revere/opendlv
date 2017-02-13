@@ -212,8 +212,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
         surfaceId,
         connectedWidth,
         traversableTo);
-    opendlv::perception::Surface detectedSurface1();
-    odcore::data::Container c(opendlv::model::Cartesian3(0,0,0));
+    odcore::data::Container c(detectedSurface);
     // getConference().getSenderStamp();
   }
 }
