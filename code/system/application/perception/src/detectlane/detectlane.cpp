@@ -115,12 +115,12 @@ void DetectLane::setUp()
   m_roi[3] = kv.getValue<uint16_t>("perception-detectlane.roiHeight");
   m_debug = (kv.getValue<int32_t>("perception-detectlane.debug") == 1);
   m_cameraName = kv.getValue<std::string>("perception-detectlane.camera");
-  if(m_cameraName == "front-left"){
+  if (m_cameraName == "front-left") {
     std::string const projectionFilename = 
         "/opt/opendlv.data/" + m_cameraName + "-pixel2world-matrix.csv";
     m_transformationMatrix = ReadMatrix(projectionFilename,3,3);
   } else {
-    std::cout << "[Lane detection] Projection matrix not available." << std::endl;
+    std::cout << "[" << getName() << "] " << "Projection matrix not available." << std::endl;
   }
   m_initialized = true;
 }
@@ -128,15 +128,6 @@ void DetectLane::setUp()
 void DetectLane::tearDown()
 {
 }
-
-
-// odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode DetectLane::body()
-// {
-//   while (getModuleStateAndWaitForRemainingTimeInTimeslice() ==
-//   odcore::data::dmcp::ModuleStateMessage::RUNNING)
-//   {}
-//   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
-// }
 
 /**
  * Receives images from vision source and detect lanes.
@@ -151,7 +142,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     odcore::data::image::SharedImage sharedImg =
         a_c.getData<odcore::data::image::SharedImage>();
     if (!ExtractSharedImage(&sharedImg)) {
-      std::cout << "[Lane detection] Unable to extract shared image."
+      std::cout << "[" << getName() << "] " << "[Unable to extract shared image."
           << std::endl;
       return;
     }
@@ -170,7 +161,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     m_currentLaneLineIds = GetCurrentLane();
 
     
-    if(m_debug) {
+    if (m_debug) {
       DrawWindows();
     }
 
@@ -181,7 +172,7 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     std::vector<opendlv::model::Cartesian3> edges;
 
     // Print out all lines found
-    for(auto it = m_currentLaneLineIds.begin(); it != m_currentLaneLineIds.end(); it++){
+    for (auto it = m_currentLaneLineIds.begin(); it != m_currentLaneLineIds.end(); it++) {
       edges.push_back(opendlv::model::Cartesian3(m_xWorldP[*it][0], m_yWorldP[*it][0],0));
       edges.push_back(opendlv::model::Cartesian3(m_xWorldP[*it][1], m_yWorldP[*it][1],0));
     }
@@ -224,7 +215,7 @@ bool DetectLane::ExtractSharedImage(
   std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(
       odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(
           a_sharedImage->getName()));
-  if(sharedMem->isValid()){
+  if (sharedMem->isValid()) {
     const uint32_t nrChannels = a_sharedImage->getBytesPerPixel();
     const uint32_t imgWidth = a_sharedImage->getWidth();
     const uint32_t imgHeight = a_sharedImage->getHeight();
@@ -243,7 +234,7 @@ bool DetectLane::ExtractSharedImage(
     cvReleaseImage(&myIplImage);
     isExtracted = true;
   } else {
-    std::cout << "[Detect lane] Sharedmem is not valid." << std::endl;
+    std::cout << "[" << getName() << "] " << "Sharedmem is not valid." << std::endl;
   }
   return isExtracted;
 }
@@ -256,7 +247,7 @@ void DetectLane::UpdateVisualMemory() {
     odcore::base::Lock l(m_mtx);
     visualImpression = m_currentImg(rectROI).clone();
   } catch (cv::Exception& e) {
-    std::cerr << "[Detect lane] Error cropping the image due to dimension size. " << std::endl;
+    std::cerr << "[" << getName() << "] " << "Error cropping the image due to dimension size. " << std::endl;
     return;
   }
   
@@ -264,20 +255,23 @@ void DetectLane::UpdateVisualMemory() {
   cv::medianBlur(visualImpression, visualImpression, m_blurKernelSize);
   
   m_visualMemory.push_back(std::make_pair(now, visualImpression));
-  // Delete old mem
-  while(m_visualMemory.size() > 0 && (now-m_visualMemory[0].first).toMicroseconds()/1000000.0 > m_memThreshold){
+  // Delete old mem, comparison in microseconds in the timestamps
+  int64_t const MEMCAP_IN_MICROSECONDS = static_cast<int64_t>(m_memThreshold*1000000.0);
+  bool memoryIsTooOld = (now - m_visualMemory.front().first).toMicroseconds() > MEMCAP_IN_MICROSECONDS;
+  while (!m_visualMemory.empty() && memoryIsTooOld) {
     m_visualMemory.pop_front();
+    memoryIsTooOld = (now - m_visualMemory.front().first).toMicroseconds() > MEMCAP_IN_MICROSECONDS;
   }
 }
 
 // Grouping or lumping close lying lines into groups
 // This can be improved and optimized
-void DetectLane::GetGrouping(std::vector<cv::Vec2f> &a_groups, std::vector<cv::Vec2f> a_lines, double a_groupingRadius)
+std::vector<cv::Vec2f> DetectLane::GetGrouping(std::vector<cv::Vec2f> a_lines, double a_groupingRadius)
 {
-  if(a_lines.size() < 1) {
-    return;
+  if (a_lines.empty()) {
+    return a_lines;
   }
-  std::vector< std::vector<cv::Vec2f> > group;
+  std::vector<std::vector<cv::Vec2f>> group;
   std::vector<cv::Vec2f> groupMean;
   std::vector<cv::Vec2f> groupSum;
   std::vector<cv::Vec2f> empty;
@@ -286,14 +280,14 @@ void DetectLane::GetGrouping(std::vector<cv::Vec2f> &a_groups, std::vector<cv::V
   groupMean.push_back(group.at(0).at(0));
   groupSum.push_back(group.at(0).at(0));
   
-  for(uint16_t i = 1; i < a_lines.size(); i++) {
+  for (uint16_t i = 1; i < a_lines.size(); i++) {
     bool groupAssigned = false;
-    for(uint16_t j = 0; j < group.size() && !groupAssigned; j++) {
+    for (uint16_t j = 0; j < group.size() && !groupAssigned; j++) {
       double xDiff = a_lines[i][0] - groupMean[j][0];
       double yDiff = a_lines[i][1] - groupMean[j][1];
-      double absDiff = sqrt(pow(xDiff,2) + pow(yDiff,2));
+      double absDiff = sqrt(pow(xDiff, 2) + pow(yDiff, 2));
 
-      if( absDiff <= a_groupingRadius) {
+      if (absDiff <= a_groupingRadius) {
         group.at(j).push_back(a_lines.at(i));
         groupSum.at(j) += a_lines.at(i);
         groupMean.at(j)[0] = groupSum.at(j)[0] / group.at(j).size();
@@ -301,29 +295,27 @@ void DetectLane::GetGrouping(std::vector<cv::Vec2f> &a_groups, std::vector<cv::V
         groupAssigned = true;
       }
     }
-    if(!groupAssigned) {
+    if (!groupAssigned) {
       group.push_back(empty);
       group.back().push_back(a_lines.at(i));
       groupMean.push_back(a_lines.at(i));
       groupSum.push_back(a_lines.at(i));
     }
   }
-  a_groups = groupMean;
+  return groupMean;
 }
 // Converting to the conventional line representation
 std::vector<std::pair<cv::Vec2f, cv::Vec2f>> DetectLane::GetParametricRepresentation(
     std::vector<cv::Vec2f> a_groups)
 {
   std::vector<std::pair<cv::Vec2f, cv::Vec2f>> lineParamRep;
-  for(uint i = 0; i < a_groups.size(); i++){
+  for (uint i = 0; i < a_groups.size(); i++) {
     float rho = a_groups[i][0];
     float theta = a_groups[i][1];
     float x0 = cosf(theta)*rho;
     float y0 = sinf(theta)*rho;
     float heading = -(static_cast<float>(opendlv::Constants::PI) / 2.0f - theta);
     lineParamRep.push_back(std::make_pair(cv::Vec2f(cos(heading),sin(heading)), cv::Vec2f(x0,y0)));
-    // a_p.push_back(cv::Vec2f(cos(heading),sin(heading)));
-    // a_m.push_back(cv::Vec2f(x0,y0));
   }
   return lineParamRep;
 }
@@ -338,7 +330,7 @@ void DetectLane::UpdatePointsOnLines(std::vector<std::pair<cv::Vec2f, cv::Vec2f>
     float t1;
     float t2;
     // To handle special case of dividing 0  
-    if(fabs((*it).first[1]) > 0.000001f){
+    if (fabs((*it).first[1]) > 0.000001f) {
       t1 =  (static_cast<float>(m_upperLaneLimit - m_roi[1]) - (*it).second[1]) / sin((*it).first[1]);
       t2 =  (static_cast<float>(m_lowerLaneLimit - m_roi[1]) - (*it).second[1]) / sin((*it).first[1]);
     } else {
@@ -385,15 +377,10 @@ void DetectLane::UpdateVisualLines()
   // OpenCV function that uses the Hough transform and finds the "strongest" lines in the transformation    
   cv::HoughLines(m_cannyImg, detectedLinesCanny, 1, opendlv::Constants::PI/180.0, m_houghThreshold);
   cv::HoughLines(m_adapThreshImg, detectedLinesAdapThresh, 1, opendlv::Constants::PI/180.0, m_houghThreshold);
-  //cv::HoughLinesP(TresholdRes, detectedLinesAdapThresh, 1, opendlv::Constants::PI/180, 80, 30, 10 );
-  // std::cout << "From Hough, detectedLinesCanny: "<< detectedLinesCanny.size() << std::endl;
-  // std::cout << "From Hough, detectedLinesAdapThresh: "<< detectedLinesAdapThresh.size() << std::endl;
   m_linesRaw = detectedLinesCanny;
   m_linesRaw.insert(m_linesRaw.end(), detectedLinesAdapThresh.begin(), detectedLinesAdapThresh.end());
-
-  GetGrouping(m_linesProcessed, m_linesRaw,100);
-  // std::cout << "Filtered: "<< m_linesRaw.size() - m_linesProcessed.size() << std::endl;
-  // std::cout << "m_linesProcessed size: " << m_linesProcessed.size() << std::endl;
+  double const DIST_RADIUS = 100.0;
+  m_linesProcessed = GetGrouping(m_linesRaw, DIST_RADIUS);
 }
 
 std::vector<uint16_t> DetectLane::GetLanes() const
@@ -402,22 +389,22 @@ std::vector<uint16_t> DetectLane::GetLanes() const
   // Filter out lines that are close to each other
   // This could be greatly improved and revised
   std::vector<uint16_t> toBeRemoved;
-  for(uint16_t i = 0; i < m_yWorldP.size(); i++){
+  for (uint16_t i = 0; i < m_yWorldP.size(); i++) {
     bool check = true;
-    if(std::abs(m_yWorldP[i][0] - m_yWorldP[i][1]) > m_OneLineDiff ) {
+    if (std::abs(m_yWorldP[i][0] - m_yWorldP[i][1]) > m_OneLineDiff ) {
       toBeRemoved.push_back(i);
       // std::cout << "Too big diff between the line itself: " << (m_yWorldP[i][0] - m_yWorldP[i][1]) << " numbers: " << m_yWorldP[i][0] << " , " << m_yWorldP[i][1] << std::endl;
       check = false;
     }
-    else if ((std::abs(m_yWorldP[i][0]) > m_HorisontalLimit) || (std::abs(m_yWorldP[i][1]) > m_HorisontalLimit)){
+    else if ((std::abs(m_yWorldP[i][0]) > m_HorisontalLimit) || (std::abs(m_yWorldP[i][1]) > m_HorisontalLimit)) {
       toBeRemoved.push_back(i);
       // std::cout << "Out of scope, more than : " << m_HorisontalLimit << "m away from the truck" << std::endl;
       check = false;
     }
     // Finding the closest Y-axis point to the truck and removing the ones who are not
-    for(uint16_t j = i+1; j < m_yWorldP.size() && check; j++) {
-      if(m_yWorldP[i][1] * m_yWorldP[j][1] > 0 && std::abs(m_yWorldP[i][1] - m_yWorldP[j][1]) < m_lineDiff){
-        if(std::abs(m_yWorldP[i][1]) > std::abs(m_yWorldP[j][1])) {
+    for (uint16_t j = i+1; j < m_yWorldP.size() && check; j++) {
+      if (m_yWorldP[i][1] * m_yWorldP[j][1] > 0 && std::abs(m_yWorldP[i][1] - m_yWorldP[j][1]) < m_lineDiff) {
+        if (std::abs(m_yWorldP[i][1]) > std::abs(m_yWorldP[j][1])) {
           toBeRemoved.push_back(i);
         } else {
           toBeRemoved.push_back(j);
@@ -426,20 +413,20 @@ std::vector<uint16_t> DetectLane::GetLanes() const
     }
   }
   // std::cout << "To be removed ID: ";
-  // for(uint16_t i = 0; i < toBeRemoved.size(); i++) {
+  // for (uint16_t i = 0; i < toBeRemoved.size(); i++) {
   //   std::cout << toBeRemoved.at(i) << ", ";
   // }
   // std::cout << std::endl;
   // Loop through all coordinates 
-  for(uint16_t i = 0; i < m_xScreenP.size(); i++){    
+  for (uint16_t i = 0; i < m_xScreenP.size(); i++) {    
     bool hit = false;
     // Loop through and check if the coordinate should be removed or not
-    for(auto it = toBeRemoved.begin(); it != toBeRemoved.end() && !hit; it++){
-      if (i == *it){
+    for (auto it = toBeRemoved.begin(); it != toBeRemoved.end() && !hit; it++) {
+      if (i == *it) {
         hit = true;
       }
     }
-    if(!hit){
+    if (!hit) {
       laneLineIds.push_back(i);
     }
   }
@@ -453,41 +440,41 @@ std::vector<uint16_t> DetectLane::GetCurrentLane() const
   std::vector<uint16_t> lineIds;
   int8_t leftLineId = -1;
   int8_t rightLineId = -1;
-  for(uint8_t i = 0; i < m_yWorldP.size(); i++){
-    if(m_yWorldP[i][1] < 0) {
-      if(leftLineId == -1 || m_yWorldP[i][1] > m_yWorldP[leftLineId][1]) {
+  for (uint8_t i = 0; i < m_yWorldP.size(); i++) {
+    if (m_yWorldP[i][1] < 0) {
+      if (leftLineId == -1 || m_yWorldP[i][1] > m_yWorldP[leftLineId][1]) {
         leftLineId = i;
       }
     } else {
-      if(rightLineId == -1 ||m_yWorldP[i][1] < m_yWorldP[rightLineId][1]) {
+      if (rightLineId == -1 ||m_yWorldP[i][1] < m_yWorldP[rightLineId][1]) {
         rightLineId = i;
       }
     }
   }
-  if(leftLineId != rightLineId && leftLineId != -1 && rightLineId != -1) {
+  if (leftLineId != rightLineId && leftLineId != -1 && rightLineId != -1) {
     lineIds.push_back(leftLineId);
     lineIds.push_back(rightLineId);
   }
   return lineIds;
 }
 
-Eigen::MatrixXd DetectLane::ReadMatrix(std::string const fileName
-    , uint8_t const nRows
-    , uint8_t const nCols)
+Eigen::MatrixXd DetectLane::ReadMatrix(std::string const a_fileName
+    , uint8_t const a_nRows
+    , uint8_t const a_nCols) const
 {
-  std::ifstream file(fileName);
-  Eigen::MatrixXd matrix(nRows,nCols);
+  std::ifstream file(a_fileName);
+  Eigen::MatrixXd matrix(a_nRows, a_nCols);
   if (file.is_open()) {
-    for(int i = 0; i < nRows; i++){
-      for(int j = 0; j < nCols; j++){
+    for (int i = 0; i < a_nRows; i++) {
+      for (int j = 0; j < a_nCols; j++) {
         double item = 0.0;
         file >> item;
         matrix(i,j) = item;
       }
     }
-    std::cout << "Read the projection matrix: " << matrix << std::endl;
+    std::cout << "[" << getName() << "] " << "Read the projection matrix: " << matrix << std::endl;
   } else {
-    std::cout << "Couldn't read the projection matrix." << std::endl;
+    std::cout << "[" << getName() << "] " << "Couldn't read the projection matrix." << std::endl;
   }
   file.close();
   return matrix;
@@ -502,7 +489,7 @@ Eigen::Vector3d DetectLane::TransformPointToGlobalFrame(Eigen::Vector3d a_point)
 void DetectLane::DrawWindows()
 {
   // Print out all detected lines
-  for(uint16_t i = 0; i < m_linesProcessed.size(); i++) {
+  for (uint16_t i = 0; i < m_linesProcessed.size(); i++) {
     float rho = m_linesProcessed[i][0];
     float theta = m_linesProcessed[i][1];
 
@@ -515,14 +502,14 @@ void DetectLane::DrawWindows()
   }
 
   // Printing out screen points
-  for(uint8_t i = 0; i < m_laneLineIds.size(); i++) {
-    for(uint8_t k = 0; k < 2; k++) {
+  for (uint8_t i = 0; i < m_laneLineIds.size(); i++) {
+    for (uint8_t k = 0; k < 2; k++) {
       cv::circle(m_currentImg, cv::Point(m_xScreenP[m_laneLineIds[i]][k], m_yScreenP[m_laneLineIds[i]][k]), 10, cv::Scalar(0,255,0), 3, 8);
     }
   }
   // Printing out current lane points
-  for(uint8_t i = 0; i < m_currentLaneLineIds.size(); i++) {
-    for(uint8_t k = 0; k < 2; k++) {
+  for (uint8_t i = 0; i < m_currentLaneLineIds.size(); i++) {
+    for (uint8_t k = 0; k < 2; k++) {
       cv::circle(m_currentImg, cv::Point(m_xScreenP[m_currentLaneLineIds[i]][k],m_yScreenP[m_currentLaneLineIds[i]][k]), 10, cv::Scalar(0,0,255), 3, 8);
     }
   }

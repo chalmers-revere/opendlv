@@ -58,7 +58,18 @@ class DetectLane
  private:
   void setUp();
   void tearDown();
-  // odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+
+  bool ExtractSharedImage(odcore::data::image::SharedImage *);
+  void UpdateVisualMemory();
+  void UpdateVisualLines();
+  std::vector<cv::Vec2f> GetGrouping(std::vector<cv::Vec2f>, double);
+  std::vector<std::pair<cv::Vec2f, cv::Vec2f>> GetParametricRepresentation(std::vector<cv::Vec2f>);
+  void UpdatePointsOnLines(std::vector<std::pair<cv::Vec2f, cv::Vec2f>>);
+  std::vector<uint16_t> GetLanes() const;
+  std::vector<uint16_t> GetCurrentLane() const;
+  Eigen::MatrixXd ReadMatrix(std::string const, uint8_t const, uint8_t const) const;
+  Eigen::Vector3d TransformPointToGlobalFrame(Eigen::Vector3d) const;
+  void DrawWindows();
 
   bool m_initialized;
   cv::Mat m_currentImg;
@@ -90,21 +101,6 @@ class DetectLane
   bool m_debug;
   std::string m_cameraName; 
   Eigen::Matrix3d m_transformationMatrix;
-
-  bool ExtractSharedImage(odcore::data::image::SharedImage *);
-  void UpdateVisualMemory();
-  void UpdateVisualLines();
-  void GetGrouping(std::vector<cv::Vec2f> &, std::vector<cv::Vec2f>, double);
-  std::vector<std::pair<cv::Vec2f, cv::Vec2f>> GetParametricRepresentation(std::vector<cv::Vec2f>);
-  void UpdatePointsOnLines(std::vector<std::pair<cv::Vec2f, cv::Vec2f>>);
-  std::vector<uint16_t> GetLanes() const;
-  std::vector<uint16_t> GetCurrentLane() const;
-  Eigen::MatrixXd ReadMatrix(std::string const, uint8_t const, uint8_t const);
-  Eigen::Vector3d TransformPointToGlobalFrame(Eigen::Vector3d) const;
-  void DrawWindows();
-
-
-
 
 };
 
