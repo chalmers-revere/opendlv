@@ -1,3 +1,4 @@
+0.4.7 - Propagating OpenDLV.core v0.8.8 to OpenDLV
 0.4.6 - Signal adapter with buffered messages, revert to Rhino dbc v5
 0.4.5 - Preparing v0.4.5
 0.4.4 - Propagating compilation fix for 32bit
