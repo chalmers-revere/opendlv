@@ -19,6 +19,7 @@
 
 BUILD_AS=$1
 UID_AS=$2
+PACKAGING_ENABLED=$3
 
 # Adding user for building.
 groupadd $BUILD_AS
@@ -33,7 +34,7 @@ cd /opt/opendlv.build
 
 echo "[opendlv Docker builder] Complete build."
 cmake -E remove_directory .
-CCACHE_DIR=/opt/ccache PATH=/usr/lib/ccache:/opt/od4/bin:$PATH cmake -D CXXTEST_INCLUDE_DIR=/opt/opendlv.sources/thirdparty/cxxtest -D OPENDAVINCI_DIR=/opt/od4 -D ODVDVEHICLE_DIR=/opt/opendlv.core -D ODVDFH16TRUCK_DIR=/opt/opendlv.core -D ODVDTRIMBLE_DIR=/opt/opendlv.core -D ODVDIMU_DIR=/opt/opendlv.core -D ODVDV2V_DIR=/opt/opendlv.core -D KALMAN_INCLUDE_DIR=/opt/opendlv.sources/thirdparty/kalman/include -D TINYCNN_INCLUDE_DIR=/opt/opendlv.sources/thirdparty/tiny-cnn -D CMAKE_INSTALL_PREFIX=/opt/opendlv /opt/opendlv.sources
+CCACHE_DIR=/opt/ccache PATH=/usr/lib/ccache:/opt/od4/bin:$PATH cmake -D CXXTEST_INCLUDE_DIR=/opt/opendlv.sources/thirdparty/cxxtest -D OPENDAVINCI_DIR=/opt/od4 -D PACKAGING_ENABLED=$PACKAGING_ENABLED -D ODVDVEHICLE_DIR=/opt/opendlv.core -D ODVDFH16TRUCK_DIR=/opt/opendlv.core -D ODVDTRIMBLE_DIR=/opt/opendlv.core -D ODVDIMU_DIR=/opt/opendlv.core -D ODVDV2V_DIR=/opt/opendlv.core -D KALMAN_INCLUDE_DIR=/opt/opendlv.sources/thirdparty/kalman/include -D TINYCNN_INCLUDE_DIR=/opt/opendlv.sources/thirdparty/tiny-cnn -D CMAKE_INSTALL_PREFIX=/opt/opendlv /opt/opendlv.sources
 
 CCACHE_DIR=/opt/ccache PATH=/usr/lib/ccache:/opt/od4/bin:$PATH make -j4
 EOF
