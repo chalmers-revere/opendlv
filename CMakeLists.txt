@@ -38,13 +38,14 @@ project(chalmersrevere.opendlv)
 # If dpkg and rpmbuild are available, .deb and .rpm packages will be
 # created. Otherwise, the software is simply installed.
 IF(     NOT("${DPKG_EXECUTABLE}" STREQUAL "DPKG_EXECUTABLE-NOTFOUND")
-    AND NOT("${RPMBUILD_EXECUTABLE}" STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND") )
+    AND NOT("${RPMBUILD_EXECUTABLE}" STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
+    AND ("${PACKAGING_ENABLED}" STREQUAL "YES") )
     MESSAGE(STATUS "Enabling building .deb and .rpm packages.")
     SET(MAKE_PACKAGE package)
 ELSE()
     # If the platform does not provide dpkg and rpmbuild, make package is
-    # replaced with make install.
-    SET(MAKE_PACKAGE install)
+    # replaced with make help to simply have a no-op.
+    SET(MAKE_PACKAGE help)
 ENDIF()
 
 ###########################################################################
