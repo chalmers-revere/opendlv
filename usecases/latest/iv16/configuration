@@ -1,0 +1,140 @@
+# This is the "one-and-only" configuration for OpenDaVINCI.
+# Its format is like:
+#
+# section.key=value
+#
+# If you have several modules of the same type, the following configuration
+# scheme applies:
+#
+# global.key=value # <-- This configuration applies for all modules.
+#
+# section.key=value # <-- This configuration applies for all modules of type "section".
+#
+# section:ID.key=value # <-- This configuration applies for the module "ID" of type "section".
+
+
+###############################################################################
+###############################################################################
+#
+# GLOBAL CONFIGURATION
+#
+
+# The following attributes define the buffer sizes for recording and
+# replaying. You need to adjust these parameters depending on the
+# camera resolution for example (640x480x3 --> 1000000 for memorySegment,
+# 1280x720x3 --> 2800000).
+global.buffer.memorySegmentSize = 2800000 # Size of a memory segment in bytes.
+global.buffer.numberOfMemorySegments = 4  # Number of memory segments.
+
+# The following key describes the list of modules expected to participate in this --cid session.
+global.session.expectedModules = knowledge-scene,knowledge-ivrule,sensation-echolocation,proxy-ledstrip,proxy-lidar,action-act,proxy-fh16
+
+
+###############################################################################
+###############################################################################
+#
+# NEXT, THE CONFIGURATION FOR OpenDaVINCI TOOLS FOLLOWS. 
+#
+###############################################################################
+###############################################################################
+#
+# CONFIGURATION FOR ODSUPERCOMPONENT
+#
+
+# If the managed level is pulse_shift, all connected modules will be informed
+# about the supercomponent's real time by this increment per module. Thus, the
+# execution times per modules are better aligned with supercomponent and the
+# data exchange is somewhat more predictable.
+odsupercomponent.pulseshift.shift = 10000 # (in microseconds)
+
+# If the managed level is pulse_time_ack, this is the timeout for waiting for
+# an ACK message from a connected client.
+odsupercomponent.pulsetimeack.timeout = 5000 # (in milliseconds)
+
+# If the managed level is pulse_time_ack, the modules are triggered sequentially
+# by sending pulses and waiting for acknowledgment messages. To allow the modules
+# to deliver their respective containers, this yielding time is used to sleep
+# before supercomponent sends the pulse messages the next module in this execution
+# cycle. This value needs to be adjusted for networked simulations to ensure
+# deterministic execution. 
+odsupercomponent.pulsetimeack.yield = 5000 # (in microseconds)
+
+# List of modules (without blanks) that will not get a pulse message from odsupercomponent.
+odsupercomponent.pulsetimeack.exclude = odcockpit
+
+###############################################################################
+###############################################################################
+#
+# NEXT, THE CONFIGURATION FOR OPENDLV SOFTWARE FOLLOWS. 
+#
+
+###############################################################################
+#
+# CONFIGURATION FOR proxy-fh16
+#
+proxy-fh16.devicenode = can2        # SocketCAN device.
+proxy-fh16.record_gcm = 0           # 1 = dump generic CAN messages.
+proxy-fh16.record_mapped_data = 0   # 1 = record mapped containers.
+proxy-fh16.read-only = 0            # 1 = read-only , 0 = read/write
+
+proxy-lidar.type = sick
+proxy-lidar.port = /dev/ttyS1
+proxy-lidar.baudrate = 9600
+proxy-lidar.mount.x = 1.25
+proxy-lidar.mount.y = 0.0
+proxy-lidar.mount.z = 1.0
+proxy-lidar.mount.roll = 0.0
+proxy-lidar.mount.pitch = 0.0
+proxy-lidar.mount.yaw = 0.0
+proxy-lidar.record = 1  # Set to 1 to dump Lidar data in .rec format.
+
+
+###############################################################################
+###############################################################################
+# Scene
+knowledge-scene.mergeDistance = 4.0
+knowledge-scene.validUntilDuration = 1
+knowledge-scene.memoryCapacity = 1.0 # seconds
+
+
+###############################################################################
+###############################################################################
+# Ivrule
+knowledge-ivrule.mioAngleRange = 45.0 #degrees
+knowledge-ivrule.mioDistanceRange = 50.0 #meters
+knowledge-ivrule.memoryDuration = 1 #seconds
+knowledge-ivrule.desiredAngularSize = 4 #degrees
+knowledge-ivrule.desiredOpticalFlow = 5.6 #meters/s
+
+
+###############################################################################
+###############################################################################
+# Echolocation
+sensation-echolocation.memoryThreshold = 0
+sensation-echolocation.pointCloudSizeMinimum = 3 #number of points
+sensation-echolocation.pointCloudRadius = 2 # meters
+
+
+action-keepobjectsize.correctionGain = 0.4
+action-keepobjectsize.maxStimulusAge = 0.5
+action-keepobjectsize.patienceDuration = 0.4
+action-keepobjectsize.stimulusJerkThreshold = 0.02
+action-keepobjectsize.stimulusRateThreshold = 0.02
+action-keepobjectsize.stimulusThreshold = 0.02
+action-keepobjectsize.equilibrium = 20.0
+
+action-setopticalflow.correctionGain = 5.0
+action-setopticalflow.maxStimulusAge = 4.1
+action-setopticalflow.patienceDuration = 4.0
+action-setopticalflow.stimulusJerkThreshold = 0.5
+action-setopticalflow.stimulusRateThreshold = 0.5
+action-setopticalflow.stimulusThreshold = 1.0
+action-setopticalflow.equilibrium = 20.0
+
+action-setopticalrotation.correctionGain = 0.2
+action-setopticalrotation.maxStimulusAge =  1.0
+action-setopticalrotation.patienceDuration = 0.2
+action-setopticalrotation.stimulusJerkThreshold =  0.02
+action-setopticalrotation.stimulusRateThreshold = 0.02
+action-setopticalrotation.stimulusThreshold = 0.02
+

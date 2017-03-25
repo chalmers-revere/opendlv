@@ -1,0 +1,231 @@
+# docker-compose.yml - Composition of micro-services to run OpenDLV software.
+# Copyright (C) 2016 Christian Berger
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+# Date: 2016-10-13
+
+version: '2'
+
+services:
+    odsupercomponent:
+        build: .
+        network_mode: "host"
+        volumes:
+        - .:/opt/opendlv.data
+        command: "/opt/od4/bin/odsupercomponent --cid=${CID} --verbose=1 --configuration=/opt/opendlv.data/configuration"
+
+            
+    #odrecorder.
+    odrecorder:
+        build: .
+        depends_on:
+            - odsupercomponent
+        volumes:
+            - ~/recordings:/opt/recordings
+        user: odv
+        network_mode: host
+        ipc: host
+        working_dir: "/opt/recordings"
+        command: "/opt/od4/bin/odrecorderh264 --cid=${CID}"
+        
+
+    # microservice for action-act
+    action-act:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv/bin"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv/bin/opendlv-system-application-action-act --cid=${CID} --freq=100"
+
+    # microservice for action-communicate
+    action-communicate:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv/bin"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv/bin/opendlv-system-application-action-communicate --cid=${CID}"
+
+    # microservice for action-setgroundspeed
+    action-setgroundspeed:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv/bin"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv/bin/opendlv-system-application-action-setgroundspeed --cid=${CID}"
+
+    # microservice for action-setopticalrotation
+    action-setopticalrotation:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv/bin"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv/bin/opendlv-system-application-action-setopticalrotation --cid=${CID}"
+
+    # microservice for knowledge-gcdc16-rule-intersection
+    knowledge-gcdc16-rule-intersection:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv/bin"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv/bin/opendlv-system-application-knowledge-gcdc16-rule-intersection --cid=${CID} --freq=10"
+
+    # microservice for knowledge-gcdc16-v2viclcm
+    knowledge-gcdc16-v2viclcm:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv/bin"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv/bin/opendlv-system-application-knowledge-gcdc16-v2viclcm --cid=${CID} --freq=10"
+
+    # microservice for knowledge-identity
+    knowledge-identity:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv/bin"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv/bin/opendlv-system-application-knowledge-identity --cid=${CID} --freq=1"
+
+    # microservice for knowledge-linguistics-v2vcam
+    knowledge-linguistics-v2vcam:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv/bin"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv/bin/opendlv-system-application-knowledge-linguistics-v2vcam --cid=${CID} --freq=25"
+
+    # microservice for knowledge-scene
+    knowledge-scene:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv/bin"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv/bin/opendlv-system-application-knowledge-scene --cid=${CID} --freq=10"
+
+    # microservice for perception-detectlane
+    perception-detectlane:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv/bin"
+        restart: always
+        ipc: host
+        environment:
+            - DISPLAY=$DISPLAY
+        volumes:
+            - /tmp/.X11-unix:/tmp/.X11-unix
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv/bin/opendlv-system-application-perception-detectlane --cid=${CID} --freq=20"
+
+    # microservice for sensation-audition
+    sensation-audition:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv/bin"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv/bin/opendlv-system-application-sensation-audition --cid=${CID}"
+    
+    #microservice for sensation-geolocation
+    sensation-geolocation:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv/bin"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv/bin/opendlv-system-application-sensation-geolocation --cid=${CID} --freq=20"
+
+    # microservice for sensation-echolocation to create objects from lidar input
+    sensation-echolocation:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv/bin"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv/bin/opendlv-system-application-sensation-echolocation --cid=${CID} --freq=11"
+
+    # microservice for proxy-trimble
+    proxy-trimble:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv.core/bin"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-trimble --cid=${CID} --freq=20"
+
+    # microservice for proxy-camera-axis
+    proxy-camera-axis:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv.core/bin"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        ipc: host
+        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-camera-axis --cid=${CID} --freq=10"
+
+    # micro service for proxy-fh16
+    proxy-fh16:
+        build: .
+        network_mode: "host"
+        restart: always
+        privileged: true
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-fh16 --cid=${CID} --freq=100"
+
+    #microservice for proxy-sick
+    proxy-sick:
+        build: .
+        network_mode: "host"
+        restart: always
+        user: root  # This parameter will be replaced as soon as group_add parameter is available in docker-compose, cf. https://github.com/docker/compose/pull/3709.
+        devices:
+            - "/dev/ttyS1:/dev/ttyS1"
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-sick --cid=${CID} --freq=2"
+    
+    # microservice for proxy-v2v
+    proxy-v2v:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv.core/bin"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-v2v --cid=${CID}"

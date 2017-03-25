@@ -36,7 +36,7 @@ include(CheckCxxTestEnvironment)
 ##########################################################################
 # Find DL and CPPExperimental, for dynamic loading of libs
 FIND_PACKAGE (DL)
-FIND_PACKAGE (CPPexperimental)
+#FIND_PACKAGE (CPPexperimental)
 
 ###########################################################################
 # Find OpenDaVINCI.

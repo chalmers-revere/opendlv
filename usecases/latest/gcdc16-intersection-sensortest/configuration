@@ -1,0 +1,166 @@
+# This is the "one-and-only" configuration for OpenDaVINCI.
+# Its format is like:
+#
+# section.key=value
+#
+# If you have several modules of the same type, the following configuration
+# scheme applies:
+#
+# global.key=value # <-- This configuration applies for all modules.
+#
+# section.key=value # <-- This configuration applies for all modules of type "section".
+#
+# section:ID.key=value # <-- This configuration applies for the module "ID" of type "section".
+
+
+###############################################################################
+###############################################################################
+#
+# GLOBAL CONFIGURATION
+#
+
+# The following attributes define the buffer sizes for recording and
+# replaying. You need to adjust these parameters depending on the
+# camera resolution for example (640x480x3 --> 1000000 for memorySegment,
+# 1280x720x3 --> 2800000).
+global.buffer.memorySegmentSize = 2800000 # Size of a memory segment in bytes.
+global.buffer.numberOfMemorySegments = 4  # Number of memory segments.
+
+# The following key describes the list of modules expected to participate in this --cid session.
+global.session.expectedModules = action-communicateknowledge-gcdc16-rule-intersectionright,knowledge-gcdc16-v2viclcm,knowledge-identity,knowledge-linguistics-v2vcam,knowledge-scene,perception-detectlane,sensation-audition,sensation-echolocation,proxy-trimble,proxy-camera-axis,proxy-fh16,proxy-sick,proxy-v2v
+
+
+###############################################################################
+###############################################################################
+#
+# NEXT, THE CONFIGURATION FOR OpenDaVINCI TOOLS FOLLOWS. 
+#
+###############################################################################
+###############################################################################
+#
+# CONFIGURATION FOR ODSUPERCOMPONENT
+#
+
+# If the managed level is pulse_shift, all connected modules will be informed
+# about the supercomponent's real time by this increment per module. Thus, the
+# execution times per modules are better aligned with supercomponent and the
+# data exchange is somewhat more predictable.
+odsupercomponent.pulseshift.shift = 10000 # (in microseconds)
+
+# If the managed level is pulse_time_ack, this is the timeout for waiting for
+# an ACK message from a connected client.
+odsupercomponent.pulsetimeack.timeout = 5000 # (in milliseconds)
+
+# If the managed level is pulse_time_ack, the modules are triggered sequentially
+# by sending pulses and waiting for acknowledgment messages. To allow the modules
+# to deliver their respective containers, this yielding time is used to sleep
+# before supercomponent sends the pulse messages the next module in this execution
+# cycle. This value needs to be adjusted for networked simulations to ensure
+# deterministic execution. 
+odsupercomponent.pulsetimeack.yield = 5000 # (in microseconds)
+
+# List of modules (without blanks) that will not get a pulse message from odsupercomponent.
+odsupercomponent.pulsetimeack.exclude = odcockpit
+
+###############################################################################
+###############################################################################
+#
+# NEXT, THE CONFIGURATION FOR OPENDLV SOFTWARE FOLLOWS. 
+#
+
+# action-communicate
+
+# knowledge-gcdc16-rule-intersectionright
+
+# knowledge-linguistics-v2vcam
+knowledge-linguistics-v2vcam.printOutbound = 0
+knowledge-linguistics-v2vcam.printInbound = 0
+knowledge-linguistics-v2vcam.record = 0
+
+# knowledge-gcdc16-v2viclcm
+knowledge-gcdc16-v2viclcm.printOutbound = 0
+knowledge-gcdc16-v2viclcm.printInbound = 0
+knowledge-gcdc16-v2viclcm.record = 0
+knowledge-gcdc16-v2viclcm.participantsReady = 0
+
+# knowledge-identity
+knowledge-identity.stationId = 110
+knowledge-identity.stationType = 8 #heavy truck
+knowledge-identity.vehicleLength = 7.3
+knowledge-identity.vehicleWidth = 2.55 
+knowledge-identity.vehicleRole = 0
+knowledge-identity.rearAxleLocation = 5.0
+
+# knowledge-scene
+knowledge-scene.mergeDistance = 4.0
+knowledge-scene.validUntilDuration = 1
+knowledge-scene.memoryCapacity = 1.0 # seconds
+knowledge-scene.debug = 0
+
+# perception-detectlane
+perception-detectlane.intensityThreshold = 200
+perception-detectlane.cannyThreshold = 60
+perception-detectlane.houghThreshold = 150
+perception-detectlane.memThreshold = 0.5 #seconds
+perception-detectlane.upperLaneLimit = 270
+perception-detectlane.lowerLaneLimit = 620
+perception-detectlane.screenWidth = 1280
+perception-detectlane.screenHeight = 720
+perception-detectlane.roiX = 205
+perception-detectlane.roiY = 195
+perception-detectlane.roiWidth = 1075
+perception-detectlane.roiHeight = 515
+perception-detectlane.debug = 0
+
+# sensation-audition
+
+# sensation-echolocation
+sensation-echolocation.memoryThreshold = 0
+sensation-echolocation.pointCloudSizeMinimum = 3 #number of points
+sensation-echolocation.pointCloudRadius = 2 # meters
+
+# proxy-trimble
+proxy-trimble.ip = 10.42.42.112
+proxy-trimble.port = 9999
+proxy-trimble.debug = 0
+
+# proxy-camera-axis
+proxy-camera-axis.type = opencv-ip-axis
+proxy-camera-axis.name = front-left
+proxy-camera-axis.address = 10.42.42.90
+proxy-camera-axis.username = root
+proxy-camera-axis.password = gcdc
+proxy-camera-axis.width = 1280
+proxy-camera-axis.height = 720
+proxy-camera-axis.bpp = 3
+proxy-camera-axis.mount.x = 3.1
+proxy-camera-axis.mount.y = 0.5
+proxy-camera-axis.mount.z = 1.0
+proxy-camera-axis.mount.roll = 0.0
+proxy-camera-axis.mount.pitch = -0.1
+proxy-camera-axis.mount.yaw = 0.2
+proxy-camera-axis.debug = 0
+
+# proxy-fh16
+proxy-fh16.devicenode = can2        # SocketCAN device.
+proxy-fh16.record_gcm = 0           # 1 = dump generic CAN messages.
+proxy-fh16.record_mapped_data = 0   # 1 = record mapped containers.
+proxy-fh16.read-only = 1            # 1 = read-only , 0 = read/write
+
+# proxy-sick
+proxy-sick.type = sick
+proxy-sick.port = /dev/ttyS1
+proxy-sick.baudrate = 9600
+proxy-sick.mount.x = 1.25
+proxy-sick.mount.y = 0.0
+proxy-sick.mount.z = 1.0
+proxy-sick.mount.roll = 0.0
+proxy-sick.mount.pitch = 0.0
+proxy-sick.mount.yaw = 0.0
+proxy-sick.record = 0  # Set to 1 to dump Lidar data in .rec format.
+
+# proxy-v2v
+proxy-v2v.comboxIp = 10.42.42.61
+proxy-v2v.comboxPort = 5003
+proxy-v2v.listenPort = 5000
+proxy-v2v.debug = 0

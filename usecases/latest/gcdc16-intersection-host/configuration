@@ -1,0 +1,123 @@
+# This is the "one-and-only" configuration for OpenDaVINCI.
+# Its format is like:
+#
+# section.key=value
+#
+# If you have several modules of the same type, the following configuration
+# scheme applies:
+#
+# global.key=value # <-- This configuration applies for all modules.
+#
+# section.key=value # <-- This configuration applies for all modules of type "section".
+#
+# section:ID.key=value # <-- This configuration applies for the module "ID" of type "section".
+
+
+###############################################################################
+###############################################################################
+#
+# GLOBAL CONFIGURATION
+#
+
+# The following attributes define the buffer sizes for recording and
+# replaying. You need to adjust these parameters depending on the
+# camera resolution for example (640x480x3 --> 1000000 for memorySegment,
+# 1280x720x3 --> 2800000).
+global.buffer.memorySegmentSize = 2800000 # Size of a memory segment in bytes.
+global.buffer.numberOfMemorySegments = 4  # Number of memory segments.
+
+# The following key describes the list of modules expected to participate in this --cid session.
+global.session.expectedModules = action-communicate,knowledge-gcdc16-v2viclcm,knowledge-identity,knowledge-linguistics-v2vcam,sensation-audition,proxy-roadscape,proxy-v2v
+
+
+###############################################################################
+###############################################################################
+#
+# NEXT, THE CONFIGURATION FOR OpenDaVINCI TOOLS FOLLOWS. 
+#
+###############################################################################
+###############################################################################
+#
+# CONFIGURATION FOR ODSUPERCOMPONENT
+#
+
+# If the managed level is pulse_shift, all connected modules will be informed
+# about the supercomponent's real time by this increment per module. Thus, the
+# execution times per modules are better aligned with supercomponent and the
+# data exchange is somewhat more predictable.
+odsupercomponent.pulseshift.shift = 10000 # (in microseconds)
+
+# If the managed level is pulse_time_ack, this is the timeout for waiting for
+# an ACK message from a connected client.
+odsupercomponent.pulsetimeack.timeout = 5000 # (in milliseconds)
+
+# If the managed level is pulse_time_ack, the modules are triggered sequentially
+# by sending pulses and waiting for acknowledgment messages. To allow the modules
+# to deliver their respective containers, this yielding time is used to sleep
+# before supercomponent sends the pulse messages the next module in this execution
+# cycle. This value needs to be adjusted for networked simulations to ensure
+# deterministic execution. 
+odsupercomponent.pulsetimeack.yield = 5000 # (in microseconds)
+
+# List of modules (without blanks) that will not get a pulse message from odsupercomponent.
+odsupercomponent.pulsetimeack.exclude = odcockpit
+
+
+###############################################################################
+###############################################################################
+#
+# CONFIGURATION FOR ODRECORDER
+#
+#odrecorder.output = file://recorder.rec
+odrecorder.remoteControl = 0 # 0 = no remote control, 1 = allowing remote control (i.e. start and stop recording)
+odrecorder.dumpSharedData = 1 # 0 = do not dump shared images and shared images, 1 = otherwise
+
+#odrecorderh264.output = file://recorder.rec
+odrecorderh264.remoteControl = 0 # 0 = no remote control, 1 = allowing remote control (i.e. start and stop recording)
+odrecorderh264.dumpSharedData = 1 # 0 = do not dump shared images and shared images, 1 = otherwise
+odrecorderh264.lossless = 1 # Set to 1 to enable h264 lossless encoding.
+odrecorderh264.portbaseforchildprocesses = 29000 # Every spawned child processes is connecting to the parent process via TCP using the base port plus its increasing ID.
+
+
+###############################################################################
+###############################################################################
+#
+# NEXT, THE CONFIGURATION FOR OPENDLV SOFTWARE FOLLOWS. 
+#
+
+# action-communicate
+
+# knowledge-gcdc16-v2viclcm
+knowledge-gcdc16-v2viclcm.printOutbound = 0
+knowledge-gcdc16-v2viclcm.printInbound = 0
+knowledge-gcdc16-v2viclcm.record = 0
+knowledge-gcdc16-v2viclcm.participantsReady = 0
+
+# knowledge-identity
+knowledge-identity.stationId = 1
+knowledge-identity.stationType = 2
+knowledge-identity.vehicleLength = 4.2
+knowledge-identity.vehicleWidth = 2.4
+knowledge-identity.vehicleRole = 3
+knowledge-identity.rearAxleLocation = 1.1
+
+# knowledge-linguistics-v2vcam
+knowledge-linguistics-v2vcam.printOutbound = 0
+knowledge-linguistics-v2vcam.printInbound = 1
+knowledge-linguistics-v2vcam.record = 0
+knowledge-linguistics-v2vcam.debug = 0
+
+# sensation-audition
+
+# sensation-geolocation
+sensation-geolocation.debug = 1
+
+## proxy-roadscape
+proxy-applanix.ip = 10.42.42.40
+proxy-applanix.port = 5602
+
+# proxy-v2v
+proxy-v2v.comboxIp = 10.42.42.61
+proxy-v2v.comboxPort = 5003
+proxy-v2v.listenPort = 5000
+proxy-v2v.debug = 0

@@ -30,7 +30,7 @@ namespace tools {
 namespace signaladapter {
 
 /**
- * This class decodes data from the Trimble unit.
+ * This class decodes data from open udp port.
  */
 class SignalStringListener : public odcore::io::StringListener {
    private:
@@ -38,13 +38,14 @@ class SignalStringListener : public odcore::io::StringListener {
     SignalStringListener &operator=(SignalStringListener const &) = delete;
 
    public:
-    SignalStringListener(odcore::io::conference::ContainerConference &);
+    SignalStringListener(odcore::io::conference::ContainerConference &, bool &);
     virtual ~SignalStringListener();
 
     virtual void nextString(const std::string &);
 
    private:
     odcore::io::conference::ContainerConference &m_conference;
+    bool &m_debug;
 };
 
 } // signaladapter

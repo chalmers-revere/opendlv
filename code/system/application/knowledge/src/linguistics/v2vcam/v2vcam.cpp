@@ -55,13 +55,37 @@ namespace v2vcam {
 V2vCam::V2vCam(int32_t const &a_argc, char **a_argv)
     : TimeTriggeredConferenceClientModule(
       a_argc, a_argv, "knowledge-linguistics-v2vcam")
-    , m_initialised(false)
     , m_sendLog()
     , m_receiveLog()
     , m_timeType2004()
     , m_printInbound()
     , m_printOutbound()
     , m_record()
+    , m_debug(false)
+    , m_receivedGeolocation(false)
+    , m_messageId(2)
+    , m_stationId(0)
+    , m_generationDeltaTime(0)
+    , m_containerMask(0)
+    , m_stationType(0)
+    , m_latitude(90.0000001)
+    , m_longitude(180.0000001)
+    , m_semiMajorConfidence(-1)
+    , m_semiMinorConfidence(-1)
+    , m_semiMajorOrientation(-1)
+    , m_altitude(8000.01)
+    , m_heading(-1)
+    , m_headingConfidence(-1)
+    , m_speed(-1)
+    , m_speedConfidence(-1)
+    , m_vehicleLength(-1)
+    , m_vehicleWidth(-1)
+    , m_longitudinalAcc(-1)
+    , m_longitudinalAccConf(-1)
+    , m_yawRateValue(0)
+    , m_yawRateConfidence(-1)
+    , m_vehicleRole(0)
+
 {
 }
 
@@ -73,11 +97,16 @@ void V2vCam::setUp()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
 
-  m_printOutbound =(kv.getValue<int32_t>("knowledge-linguistics-v2vcam.printOutbound") == 1);
-  m_printInbound =(kv.getValue<int32_t>("knowledge-linguistics-v2vcam.printInbound") == 1);
-  m_record = (kv.getValue<int32_t>("knowledge-linguistics-v2vcam.record") == 1);
-  std::cout << "Print outbound: " << m_printOutbound << " Print inbound: " << m_printInbound << " Record: " << m_record << std::endl;
-  if(m_record) {
+  m_printOutbound = kv.getValue<bool>("knowledge-linguistics-v2vcam.printOutbound");
+  m_printInbound = kv.getValue<bool>("knowledge-linguistics-v2vcam.printInbound");
+  m_record = kv.getValue<bool>("knowledge-linguistics-v2vcam.record");
+  m_debug = kv.getValue<bool>("knowledge-linguistics-v2vcam.debug");
+  
+  std::cout << "Print outbound: " << m_printOutbound << " Print inbound: " 
+      << m_printInbound << " Record: " << m_record << " Debug: " << m_debug 
+      << std::endl;
+  
+  if (m_record) {
     struct stat st;
     if (::stat("var/application/knowledge/linguistics/v2vcam", &st) == -1) {
       ::system("mkdir -p ./var/application/knowledge/linguistics/v2vcam");
@@ -134,8 +163,6 @@ void V2vCam::setUp()
         };
     m_timeType2004 = timegm(&tm);
   }
-
-  m_initialised = true;
 }
 
 void V2vCam::tearDown()
@@ -256,9 +283,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode V2vCam::body()
  */
 void V2vCam::nextContainer(odcore::data::Container &a_c)
 {
-  if(!m_initialised) {
-    return;
-  } else if (a_c.getDataType() == (opendlv::knowledge::Insight::ID() + 400)) {
+  // TODO: Change how Identity works (remove the +400 hack).
+  if (a_c.getDataType() == (opendlv::knowledge::Insight::ID() + 400)) {
     opendlv::knowledge::Insight insight = 
         a_c.getData<opendlv::knowledge::Insight>();
     ReadInsight(insight);
@@ -269,33 +295,14 @@ void V2vCam::nextContainer(odcore::data::Container &a_c)
   } else if (a_c.getDataType() == opendlv::model::DynamicState::ID()) {
     opendlv::model::DynamicState dynamicState = 
         a_c.getData<opendlv::model::DynamicState>();
-    int16_t frameId = dynamicState.getFrameId();
-    if (frameId == 0) {
-      ReadDynamicState(dynamicState);
-    }
-  } else if(a_c.getDataType() == opendlv::sensation::Voice::ID()) {
+    ReadDynamicState(dynamicState);
+  } else if (a_c.getDataType() == opendlv::sensation::Voice::ID()) {
     opendlv::sensation::Voice voice = a_c.getData<opendlv::sensation::Voice>();
-    if(strcmp(voice.getType().c_str(),"cam") != 0) {
-      std::cout << "Message type not CAM." << std::endl;
+    if(strcmp(voice.getType().c_str(), "cam") != 0) {
+      // std::cout << "Message type not CAM." << std::endl;
       return;
     }
     ReadVoice(voice);
-  }
-  else if(a_c.getDataType() == opendlv::data::environment::WGS84Coordinate::ID()) {
-    opendlv::data::environment::WGS84Coordinate temp = a_c.getData<opendlv::data::environment::WGS84Coordinate>();
-    m_latitude = temp.getLatitude();
-    m_longitude = temp.getLongitude();
-  }
-  else if(a_c.getDataType() == opendlv::proxy::GpsReading::ID()) {
-    opendlv::proxy::GpsReading temp = a_c.getData<opendlv::proxy::GpsReading>();
-    m_latitude = temp.getLatitude();
-    m_longitude = temp.getLongitude();
-    // m_speed = temp.getSpeed();
-    if(temp.getHasHeading()) {
-      m_heading = temp.getNorthHeading();
-    } else {
-      m_heading = -1;
-    }
   }
 }
 
@@ -317,20 +324,29 @@ void V2vCam::ReadInsight(opendlv::knowledge::Insight const &a_insight)
       m_vehicleRole = std::stoi(information[1]);
     }
   }
+    
+  if (m_debug) {
+    std::cout << "Insight received - '" << str << "'" << std::endl; 
+  }
 }
 
 void V2vCam::ReadDynamicState(
     opendlv::model::DynamicState const &a_dynamicState)
 {
-  m_speed = a_dynamicState.getVelocity().getX();
-  // std::cout << a_dynamicState.getVelocity().getX() << std::endl;
-  m_speedConfidence = a_dynamicState.getVelocityConfidence().getX();
-  // std::cout << a_dynamicState.getVelocityConfidence().getX() << std::endl;
-  m_yawRateValue = a_dynamicState.getAngularVelocity().getZ();
-  // std::cout << a_dynamicState.getAngularVelocity().getZ() << std::endl;
-  m_yawRateConfidence = a_dynamicState.getAngularVelocityConfidence().getZ();
-  m_longitudinalAcc = a_dynamicState.getAcceleration().getX();
-  m_longitudinalAccConf = a_dynamicState.getAccelerationConfidence().getX();
+  int16_t frameId = a_dynamicState.getFrameId();
+  if (frameId == 0) {
+    m_speed = a_dynamicState.getVelocity().getX();
+    m_speedConfidence = a_dynamicState.getVelocityConfidence().getX();
+    m_yawRateValue = a_dynamicState.getAngularVelocity().getZ();
+    m_yawRateConfidence = a_dynamicState.getAngularVelocityConfidence().getZ();
+    m_longitudinalAcc = a_dynamicState.getAcceleration().getX();
+    m_longitudinalAccConf = a_dynamicState.getAccelerationConfidence().getX();
+  
+    if (m_debug) {
+      std::cout << "DynamicState received (frame 0) - speed=" << m_speed << " yawRatevalue=" 
+        << m_yawRateValue << " longitudinalAcceleration=" << m_longitudinalAcc << std::endl; 
+    }
+  }
 }
 
 void V2vCam::ReadGeolocation(
@@ -339,15 +355,24 @@ void V2vCam::ReadGeolocation(
   m_latitude = a_geolocation.getLatitude();
   m_longitude = a_geolocation.getLongitude();
   m_altitude = a_geolocation.getAltitude();
-  // TODO heading from Geolocation
-  // m_heading = a_geolocation.getHeading();
-  // std::cout << a_geolocation.getHeading() << std::endl;
+  m_heading = a_geolocation.getHeading();
+  while (m_heading < 0) {
+    m_heading += 2.0 * M_PI;
+  }
+  while (m_heading > 2*M_PI) {
+    m_heading -= 2.0 * M_PI;
+  }
   m_headingConfidence = a_geolocation.getHeadingConfidence();
-  // std::cout << a_geolocation.getHeadingConfidence() << std::endl;
-
   m_semiMajorConfidence = a_geolocation.getLatitudeConfidence();
   m_semiMinorConfidence = a_geolocation.getLongitudeConfidence();
-  // m_semiMajorOrientation 
+
+  m_receivedGeolocation = true;
+
+  if (m_debug) {
+    std::cout << "Geolocation received - longitude=" << m_longitude << " latitude=" 
+        << m_latitude << " altitude=" << m_altitude << " heading=" 
+        << m_heading << std::endl; 
+  }
 }
 
 void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
@@ -435,95 +460,97 @@ void V2vCam::ReadVoice(opendlv::sensation::Voice const &a_voice)
         + "," + std::to_string(vehicleRole);
     m_receiveLog << std::endl; 
   }
-  std::cout << "Our heading: " << m_heading << std::endl;
-  if(latitude != 900000001 && longitude != 1800000001 && (m_heading > -M_PI && m_heading <= M_PI)) { //Dont make object if position is unavailable
-    //This is where the objects are constructed which are to be sent out
-    opendlv::data::environment::WGS84Coordinate ourGpsReference = 
-        opendlv::data::environment::WGS84Coordinate(m_latitude, m_longitude);
 
-    opendlv::data::environment::WGS84Coordinate theirGpsReference(
-        latitude / std::pow(10,7),
-        longitude / std::pow(10,7));
+  if (m_receivedGeolocation) { 
+    odcore::data::TimeStamp now;
+    std::string type = "vehicle";
+    float typeConfidence = 1.0f;
 
+    opendlv::data::environment::WGS84Coordinate ourGeolocation(
+        m_latitude, m_longitude);
+    opendlv::data::environment::WGS84Coordinate theirGeolocation(
+        latitude / std::pow(10,7), longitude / std::pow(10,7));
     opendlv::data::environment::Point3 currentObjectCartesianLocation =
-        ourGpsReference.transform(theirGpsReference);
-
+        ourGeolocation.transform(theirGeolocation);
     double xOffset = currentObjectCartesianLocation.getX();
     double yOffset = currentObjectCartesianLocation.getY();
-    // std::cout << "x: "<< m_xOffset << std::endl;
-    // std::cout << "y: "<< m_yOffset << std::endl;
-    double azimuth;
+    double heading1 = m_heading;
+    while (heading1 < -M_PI) {
+      heading1 += 2.0 * M_PI;
+    }
+    while (heading1 > M_PI) {
+      heading1 -= 2.0 * M_PI;
+    }
 
-    azimuth = std::atan2(yOffset, xOffset) - M_PI*0.5;
-    azimuth = azimuth - m_heading;    
+    double azimuth = std::atan2(yOffset, xOffset) - heading1;
+    while (azimuth < -M_PI) {
+      azimuth += 2.0 * M_PI;
+    }
+    while (azimuth > M_PI) {
+      azimuth -= 2.0 * M_PI;
+    }
     
-    while (azimuth < -3.14159) {
-      azimuth += 2*3.14159;
+    opendlv::model::Direction objectDirection(azimuth, 0.0f);
+    float objectDirectionConfidence = 0.5f;
+
+    opendlv::model::Direction objectDirectionRate(0.0f, 0.0f);
+    float objectDirectionRateConfidence = -1.0f;
+
+    float distance = std::sqrt((xOffset * xOffset) + (yOffset * yOffset));
+    float distanceConfidence = 0.5f;
+
+    if(m_debug) {
+      std::cout << "Snowfox position: (" << xOffset << "," << yOffset << "), distance: " << distance << ", azmiuth: " << azimuth <<  ", our heading: " << heading1  << std::endl;
     }
-    while (azimuth > 3.14159) {
-      azimuth -= 2*3.14159;
-    }
+    
+    double localXOffset = std::sin(azimuth) * static_cast<double>(distance);
+    double localYOffset = std::cos(azimuth) * static_cast<double>(distance);
 
+    // TODO: Simplification where we assume that the other vehicle has the same heading as ourselves.
+    double azimuthCorner = std::atan2(localYOffset - vehicleWidth / 2.0, localXOffset);
 
-    std::cout << "m_azimuth: " << azimuth << std::endl;
+    float angularSize = static_cast<float>(2.0 * (azimuth - azimuthCorner));
+    float angularSizeConfidence = 0.5f;
+    float angularSizeRate = 0.0f;
+    float angularSizeRateConfidence = -1.0f;
 
+    float confidence = 1.0f;
 
-    // TODO ANGULAR SIZE
-    // double rearX = m_xOffset - (vehicleLength / 10.0);
-    // double leftRearY = m_yOffset + (vehicleWidth / 20.0);
-    // double rightRearY = m_yOffset - (vehicleWidth / 20.0);
+    std::vector<std::string> sources;
+    sources.push_back("v2vcam");
 
-
-    // double leftLength = sqrt(leftRearY*leftRearY + rearX*rearX);
-    // double rightLength = sqrt(rightRearY*rightRearY + rearX*rearX);
-
-    // c² = a² + b²  - 2ab cos(alpha)
-    // alpha = cos⁻1 ((a²+b² - c²) / (2ab))
-
-    // double alpha = acos( (leftLength*leftLength +rightLength*rightLength - vehicleWidth*vehicleWidth) / (2*leftLength*rightLength));
-    float alpha = 0;
-
-    odcore::data::TimeStamp now;
-    std::string m_type = "vehicle";
-    float m_typeConfidence = 1.0f;
-    opendlv::model::Direction m_objectDirection(azimuth, 0.0f);
-    float m_objectDirectionConfidence = 0.5f;
-    opendlv::model::Direction m_objectDirectionRate(0.0f, 0.0f);
-    float m_objectDirectionRateConfidence = -1.0f;
-    float m_distance = std::sqrt((xOffset * xOffset) + (yOffset * yOffset));
-    float m_distanceConfidence = 0.5f;
-    float m_angularSize = alpha;
-    float m_angularSizeConfidence = -1.0f;
-    float m_angularSizeRate = 0.0f;
-    float m_angularSizeRateConfidence = -1.0f;
-    float m_confidence = 1.0f;
-    std::vector<std::string> m_sources;
-    m_sources.push_back("v2vcam");
-    std::vector<std::string> m_properties;
-    m_properties.push_back("Station Id: " + std::to_string(stationId));
-    m_properties.push_back("Vehicle length: " + std::to_string(vehicleLength));
-    m_properties.push_back("Vehicle width: " + std::to_string(vehicleWidth));
-    uint16_t m_objectId = -1;
-    // std::cout << "Object send" << std::endl;
+    std::vector<std::string> properties;
+    properties.push_back("Station Id: " + std::to_string(stationId));
+    properties.push_back("Vehicle length: " + std::to_string(vehicleLength));
+    properties.push_back("Vehicle width: " + std::to_string(vehicleWidth));
+    
+    uint16_t objectId = -1;
+    
     opendlv::perception::Object detectedObject(now,
-        m_type, 
-        m_typeConfidence, 
-        m_objectDirection, 
-        m_objectDirectionConfidence, 
-        m_objectDirectionRate, 
-        m_objectDirectionRateConfidence,
-        m_distance, 
-        m_distanceConfidence, 
-        m_angularSize,
-        m_angularSizeConfidence, 
-        m_angularSizeRate, 
-        m_angularSizeRateConfidence, 
-        m_confidence, 
-        m_sources, 
-        m_properties, 
-        m_objectId);
+        type, 
+        typeConfidence, 
+        objectDirection, 
+        objectDirectionConfidence, 
+        objectDirectionRate, 
+        objectDirectionRateConfidence,
+        distance, 
+        distanceConfidence, 
+        angularSize,
+        angularSizeConfidence, 
+        angularSizeRate, 
+        angularSizeRateConfidence, 
+        confidence, 
+        sources, 
+        properties, 
+        objectId);
     odcore::data::Container objectContainer(detectedObject);
     getConference().send(objectContainer);
+
+    if (m_debug) {
+      std::cout << "Object detected - stationId=" << stationId << " distance=" 
+        << distance << " direction=" << azimuth << " angularSize=" 
+        << angularSize << std::endl;
+    }
   }
 }
 
@@ -664,7 +691,7 @@ int32_t V2vCam::GetHeading() const
 {
   double conversion = opendlv::Constants::RAD2DEG;
   int32_t scale = std::pow(10,1);
-  double val = (m_heading + M_PI)*scale*conversion;
+  double val = m_heading*scale*conversion;
   if(val < 0 || val > 3600 || std::isnan(val)){
     return 3601;
   }

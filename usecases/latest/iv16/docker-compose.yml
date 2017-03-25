@@ -1,0 +1,127 @@
+# docker-compose.yml - Composition of micro-services to run OpenDLV software.
+# Copyright (C) 2016 Christian Berger
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+# Date: 2016-10-13
+
+version: '2'
+
+services:
+    odsupercomponent:
+        build: .
+        network_mode: "host"
+        volumes:
+        - .:/opt/opendlv.data
+        command: "/opt/od4/bin/odsupercomponent --cid=${CID} --verbose=1 --configuration=/opt/opendlv.data/configuration"
+
+
+#    # micro service for proxy-fh16.
+#    proxy-fh16:
+#        build: .
+#        network_mode: "host"
+#        privileged: true
+#        depends_on:
+#            - odsupercomponent
+#        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-fh16 --cid=${CID} --freq=100"
+
+
+#    # microservice for proxy-sick
+#    proxy-lidar:
+#        build: .
+#        network_mode: "host"
+#        user: root  # This parameter will be replaced as soon as group_add parameter is available in docker-compose, cf. https://github.com/docker/compose/pull/3709.
+#        devices:
+#            - "/dev/ttyS1:/dev/ttyS1"
+#        depends_on:
+#            - odsupercomponent
+#        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-sick --cid=${CID} --freq=2"
+
+
+    # microservice for knowledge-scene
+    knowledge-scene:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv/bin"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv/bin/opendlv-system-application-knowledge-scene --cid=${CID} --freq=10"
+
+
+    # microservice for knowledge-ivrule
+    knowledge-ivrule:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv/bin"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv/bin/opendlv-system-application-knowledge-ivrule --cid=${CID} --freq=10"
+
+
+    # microservice for sensation-echolocation to create objects from lidar input
+    sensation-echolocation:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv/bin"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv/bin/opendlv-system-application-sensation-echolocation --cid=${CID} --freq=11"
+
+    # microservice for action-act
+    action-act:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv/bin"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv/bin/opendlv-system-application-action-act --cid=${CID} --freq=100"
+
+
+    # microservice for action-setopticalrotation
+    action-setopticalrotation:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv/bin"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv/bin/opendlv-system-application-action-setopticalrotation --cid=${CID}"
+
+
+    # microservice for action-setopticalflow
+    action-setopticalflow:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv/bin"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv/bin/opendlv-system-application-action-setopticalflow --cid=${CID}"
+
+
+    # microservice for action-keepobjectsize
+    action-keepobjectsize:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv/bin"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv/bin/opendlv-system-application-action-keepobjectsize --cid=${CID}"
+
