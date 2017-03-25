@@ -1,5 +1,5 @@
 # OpenDLV - OpenDLV based on OpenDaVINCI
-# Copyright (C) 2016 Chalmers
+# Copyright (C) 2016 Chalmers Revere
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -32,12 +32,12 @@ cmake_minimum_required(VERSION 2.8)
 # OPENDAVINCI_DIR specifies where OpenDaVINCI is installed (if different from /usr/include and /usr/lib).
 # CXXTEST_INCLUDE_DIR specifies where the UnitTest environment CxxTest can be found.
 
-project(chalmersrevere.opendlv)
+project(opendlv)
 
 ###########################################################################
 # If dpkg and rpmbuild are available, .deb and .rpm packages will be
 # created. Otherwise, the software is simply installed.
-IF(     NOT("${DPKG_EXECUTABLE}" STREQUAL "DPKG_EXECUTABLE-NOTFOUND")
+IF(NOT("${DPKG_EXECUTABLE}" STREQUAL "DPKG_EXECUTABLE-NOTFOUND")
     AND NOT("${RPMBUILD_EXECUTABLE}" STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
     AND ("${PACKAGING_ENABLED}" STREQUAL "YES") )
     MESSAGE(STATUS "Enabling building .deb and .rpm packages.")
@@ -85,8 +85,6 @@ message(STATUS "Installing Chalmers Revere OpenDLV to ${INSTALL_DIR}.")
 set(PROJECT_ROOT ${CMAKE_SOURCE_DIR})
 
 ###########################################################################
-###########################################################################
-###########################################################################
 # This "external project" simply deletes the existing libodvdopendlvdata.
 ExternalProject_Add (libodvdopendlvdata-cleanup
     DOWNLOAD_COMMAND ""
@@ -113,41 +111,46 @@ ExternalProject_Add (libodvdopendlvdata
     TEST_COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_PARAMETERS}
     INSTALL_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/libodvdopendlvdata-prefix/src/libodvdopendlvdata-build --target install COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/libodvdopendlvdata-prefix/src/libodvdopendlvdata-build --target ${MAKE_PACKAGE})
 
-###############################################################################
-# This "external project" builds and installs the system software stack.
-ExternalProject_Add(system
-    DEPENDS libodvdopendlvdata
-    DOWNLOAD_COMMAND ""
-    UPDATE_COMMAND ""
-    SOURCE_DIR "${CMAKE_SOURCE_DIR}/code/system"
-    CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
-    CMAKE_ARGS "-DOPENDAVINCI_DIR=${OPENDAVINCI_DIR}"
-    CMAKE_ARGS "-DODVDVEHICLE_DIR=${ODVDVEHICLE_DIR}"
-    CMAKE_ARGS "-DODVDV2V_DIR=${ODVDV2V_DIR}"
-    CMAKE_ARGS "-DODVDFH16TRUCK_DIR=${ODVDFH16TRUCK_DIR}"
-    CMAKE_ARGS "-DODVDTRIMBLE_DIR=${ODVDTRIMBLE_DIR}"
-    CMAKE_ARGS "-DODVDIMU_DIR=${ODVDIMU_DIR}"
-    CMAKE_ARGS "-DCXXTEST_INCLUDE_DIR=${CXXTEST_INCLUDE_DIR}"
-    CMAKE_ARGS "-DEIGEN3_INCLUDE_DIR=${OPENDAVINCI_DIR}/include/opendavinci"
-    CMAKE_ARGS "-DKALMAN_INCLUDE_DIR=${KALMAN_INCLUDE_DIR}"
-    CMAKE_ARGS "-DTINYCNN_INCLUDE_DIR=${TINYCNN_INCLUDE_DIR}"
-    TEST_BEFORE_INSTALL 1
-    INSTALL_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/system-prefix/src/system-build --target install)
 
-###############################################################################
-# This "external project" builds and installs the tools software stack.
-ExternalProject_Add(tools
-    DEPENDS libodvdopendlvdata
-    DOWNLOAD_COMMAND ""
-    UPDATE_COMMAND ""
-    SOURCE_DIR "${CMAKE_SOURCE_DIR}/code/tools"
+###########################################################################
+# This "external project" builds and installs the software stack.
+ExternalProject_Add (gui
+  DEPENDS libodvdopendlvdata
+  DOWNLOAD_COMMAND ""
+  UPDATE_COMMAND ""
+  SOURCE_DIR "${CMAKE_SOURCE_DIR}/code/gui"
     CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
     CMAKE_ARGS "-DOPENDAVINCI_DIR=${OPENDAVINCI_DIR}"
-    CMAKE_ARGS "-DODVDVEHICLE_DIR=${ODVDVEHICLE_DIR}"
-    CMAKE_ARGS "-DODVDFH16TRUCK_DIR=${ODVDFH16TRUCK_DIR}"
     CMAKE_ARGS "-DCXXTEST_INCLUDE_DIR=${CXXTEST_INCLUDE_DIR}"
-    CMAKE_ARGS "-DEIGEN3_INCLUDE_DIR=${OPENDAVINCI_DIR}/include/opendavinci"
-    CMAKE_ARGS "-DKALMAN_INCLUDE_DIR=${KALMAN_INCLUDE_DIR}"
-    CMAKE_ARGS "-DTINYCNN_INCLUDE_DIR=${TINYCNN_INCLUDE_DIR}"
-    TEST_BEFORE_INSTALL 1
-    INSTALL_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/tools-prefix/src/tools-build --target install)
+  TEST_BEFORE_INSTALL 1
+  INSTALL_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/gui-prefix/src/gui-build --target install COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/gui-prefix/src/gui-build --target ${MAKE_PACKAGE})
+
+#ExternalProject_Add (logic
+#  DEPENDS libodvdopendlvdata
+#  DOWNLOAD_COMMAND ""
+#  UPDATE_COMMAND ""
+#  SOURCE_DIR "${CMAKE_SOURCE_DIR}/code/logic"
+#    CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
+#    CMAKE_ARGS "-DOPENDAVINCI_DIR=${OPENDAVINCI_DIR}"
+#    CMAKE_ARGS "-DODVDVEHICLE_DIR=${ODVDVEHICLE_DIR}"
+#    CMAKE_ARGS "-DODVDV2V_DIR=${ODVDV2V_DIR}"
+#    CMAKE_ARGS "-DODVDFH16TRUCK_DIR=${ODVDFH16TRUCK_DIR}"
+#    CMAKE_ARGS "-DODVDTRIMBLE_DIR=${ODVDTRIMBLE_DIR}"
+#    CMAKE_ARGS "-DODVDIMU_DIR=${ODVDIMU_DIR}"
+#    CMAKE_ARGS "-DCXXTEST_INCLUDE_DIR=${CXXTEST_INCLUDE_DIR}"
+#    CMAKE_ARGS "-DEIGEN3_INCLUDE_DIR=${OPENDAVINCI_DIR}/include/opendavinci"
+#    CMAKE_ARGS "-DKALMAN_INCLUDE_DIR=${KALMAN_INCLUDE_DIR}"
+#    CMAKE_ARGS "-DTINYCNN_INCLUDE_DIR=${TINYCNN_INCLUDE_DIR}"
+#  TEST_BEFORE_INSTALL 1
+#  INSTALL_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/logic-prefix/src/logic-build --target install COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/logic-prefix/src/logic-build --target ${MAKE_PACKAGE})
+
+#ExternalProject_Add (tool
+#  DEPENDS libodvdopendlvdata
+#  DOWNLOAD_COMMAND ""
+#  UPDATE_COMMAND ""
+#  SOURCE_DIR "${CMAKE_SOURCE_DIR}/code/tool"
+#    CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
+#    CMAKE_ARGS "-DOPENDAVINCI_DIR=${OPENDAVINCI_DIR}"
+#    CMAKE_ARGS "-DCXXTEST_INCLUDE_DIR=${CXXTEST_INCLUDE_DIR}"
+#  TEST_BEFORE_INSTALL 1
+#  INSTALL_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/tool-prefix/src/tool-build --target install COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/tool-prefix/src/tool-build --target ${MAKE_PACKAGE})

@@ -1,0 +1,72 @@
+###########################################################################
+# Enable CPack to create .deb and .rpm.
+#
+# Read version from first line of ChangeLog
+file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/../../ChangeLog" BUILD_NUMBER)
+macro(setup_package_version_variables _packageName)
+  string(REGEX MATCHALL "[0-9]+" _versionComponents "${_packageName}")
+  list(LENGTH _versionComponents _len)
+  if(${_len} GREATER 0)
+    list(GET _versionComponents 0 MAJOR)
+  endif()
+  if(${_len} GREATER 1)
+    list(GET _versionComponents 1 MINOR)
+  endif()
+  if(${_len} GREATER 2)
+    list(GET _versionComponents 2 PATCH)
+  endif()
+endmacro()
+setup_package_version_variables(${BUILD_NUMBER})
+
+if((UNIX)
+    AND (NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "DragonFly")
+    AND (NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "OpenBSD")
+    AND (NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "NetBSD") )
+  set(CPACK_GENERATOR "DEB;RPM")
+
+  set(CPACK_PACKAGE_CONTACT "Christian Berger")
+  set(CPACK_PACKAGE_VENDOR "${CPACK_PACKAGE_CONTACT}")
+  set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "OpenDLV drives autonomous vehicles.")
+  set(CPACK_PACKAGE_NAME "opendlv")
+  set(CPACK_PACKAGE_VERSION_MAJOR "${MAJOR}")
+  set(CPACK_PACKAGE_VERSION_MINOR "${MINOR}")
+  set(CPACK_PACKAGE_VERSION_PATCH "${PATCH}")
+  set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+  set(CPACK_COMPONENTS_ALL opendlv)
+
+  # Debian packages:
+  set(CPACK_DEBIAN_PACKAGE_SECTION "main")
+  set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
+  if("${ARMHF}" STREQUAL "YES")
+    set(ARCH "armhf")
+  else()
+    if("${CMAKE_SIZEOF_VOID_P}" STREQUAL "8")
+      set(ARCH "amd64")
+    else()
+      set(ARCH "i386")
+    endif()
+  endif()
+  set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "${ARCH}")
+  set(CPACK_DEB_COMPONENT_INSTALL ON)
+  set(CPACK_DEBIAN_PACKAGE_DEPENDS "opendavinci-lib")
+
+  # RPM packages:
+  if("${ARMHF}" STREQUAL "YES")
+    set(ARCH "armhf")
+  else()
+    if("${CMAKE_SIZEOF_VOID_P}" STREQUAL "8")
+      set(ARCH "x86_64")
+    else()
+      set(ARCH "i686")
+    endif()
+  endif()
+  set(CPACK_RPM_PACKAGE_BUILDARCH "Buildarch: ${CPACK_RPM_PACKAGE_ARCHITECTURE}")
+  set(CPACK_RPM_COMPONENT_INSTALL ON)
+  set(CPACK_RPM_PACKAGE_LICENSE "GPL")
+  set(CPACK_RPM_PACKAGE_REQUIRES "opendavinci-lib")
+
+  # Resulting package name:
+  set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}_${ARCH})
+endif()
+
+include(CPack)
