@@ -203,8 +203,7 @@ services:
         build: .
         network_mode: "host"
         restart: always
-        devices:
-        - "/dev/pcanpci2:/dev/pcan2"
+        privileged: true
         depends_on:
             - odsupercomponent
         command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-fh16 --cid=${CID} --freq=100"

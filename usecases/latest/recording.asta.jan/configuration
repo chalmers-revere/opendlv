@@ -91,20 +91,20 @@ odrecorderh264.portbaseforchildprocesses = 29000 # Every spawned child processes
 # CONFIGURATION FOR PROXY
 #
 
-proxy-fh16.devicenode = /dev/pcan2  # PEAK CAN device.
+proxy-fh16.devicenode = can2        # SocketCAN device.
 proxy-fh16.record_gcm = 0           # 1 = dump generic CAN messages.
 proxy-fh16.record_mapped_data = 0   # 1 = record mapped containers.
 proxy-fh16.enableActuationBrake = 0
 proxy-fh16.enableActuationSteering = 1
 proxy-fh16.enableActuationThrottle = 0
 
-proxy-badger-kingpin.devicenode = /dev/pcan1 # PEAK CAN device.
+proxy-badger-kingpin.devicenode = can1     # SocketCAN device.
 proxy-badger-kingpin.debug = 0
 
-proxy-badger-ets:1.devicenode = /dev/pcan2 # PEAK CAN device.
+proxy-badger-ets:1.devicenode = can2       # SocketCAN device.
 proxy-badger-ets:1.debug = 0
 
-proxy-badger-ets:2.devicenode = /dev/pcan3 # PEAK CAN device.
+proxy-badger-ets:2.devicenode = can3       # SocketCAN device.
 proxy-badger-ets:2.debug = 0
 
 proxy-trimble:1.ip = 10.42.42.112    # Change to Trimble IP.

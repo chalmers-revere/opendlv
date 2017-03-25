@@ -80,7 +80,7 @@ DOCKER_IMAGE_NAME_DEV_SHORT_NAME=$(REPOSITORY)/$(PRODUCT)$(IMAGE)$(BASE_IMAGE_DE
 
 ###############################################################################
 
-.PHONY: all buildComplete createDockerImage clean cleanAll cleanDocker removeExitedContainers removeNoneImagesFromDocker removeExistingImagesForBaseImageFromDocker removeExistingImagesForBaseImageDevFromDocker updateDockerImages updateDockerBaseImage updateDockerBaseImageDev updateBuildComplete
+.PHONY: all buildComplete createDockerImage clean cleanAll cleanDocker removeExitedContainers removeNoneImagesFromDocker removeExistingImagesForBaseImageFromDocker removeExistingImagesForBaseImageDevFromDocker updateDockerBaseImage updateDockerBaseImageDev updateDockerBaseImageNonDev updateBuildComplete
 
 ###############################################################################
 
