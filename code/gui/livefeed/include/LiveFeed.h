@@ -16,8 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef GUI_LIVEFEED_H
-#define GUI_LIVEFEED_H
+#ifndef GUI_LIVEFEED_LIVEFEED_H
+#define GUI_LIVEFEED_LIVEFEED_H
 
 #include <opendavinci/odcore/base/Mutex.h>
 #include <opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h>
@@ -31,9 +31,9 @@ class LiveFeed : public odcore::base::module::DataTriggeredConferenceClientModul
     LiveFeed(LiveFeed const &) = delete;
     LiveFeed &operator=(LiveFeed const &) = delete;
     virtual ~LiveFeed();
-    virtual void nextContainer(odcore::data::Container const &);
 
    private:
+    void nextContainer(odcore::data::Container &);
     virtual void setUp();
     virtual void tearDown();
     virtual odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();

@@ -1,19 +1,35 @@
-###########################################################################
-# Enable CPack to create .deb and .rpm.
+# OpenDLV - OpenDLV based on OpenDaVINCI
+# Copyright (C) 2017 Chalmers Revere
 #
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+
+# Enable CPack to create .deb and .rpm.
 # Read version from first line of ChangeLog
-file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/../../ChangeLog" BUILD_NUMBER)
-macro(setup_package_version_variables _packageName)
-  string(REGEX MATCHALL "[0-9]+" _versionComponents "${_packageName}")
-  list(LENGTH _versionComponents _len)
-  if(${_len} GREATER 0)
-    list(GET _versionComponents 0 MAJOR)
+file(STRINGS "${CHANGELOG_PATH}" BUILD_NUMBER)
+macro(setup_package_version_variables PACKAGENAME)
+  string(REGEX MATCHALL "[0-9]+" VERSION_COMPONENTS "${PACKAGENAME}")
+  list(LENGTH VERSION_COMPONENTS LEN)
+  if(${LEN} GREATER 0)
+    list(GET VERSION_COMPONENTS 0 MAJOR)
   endif()
-  if(${_len} GREATER 1)
-    list(GET _versionComponents 1 MINOR)
+  if(${LEN} GREATER 1)
+    list(GET VERSION_COMPONENTS 1 MINOR)
   endif()
-  if(${_len} GREATER 2)
-    list(GET _versionComponents 2 PATCH)
+  if(${LEN} GREATER 2)
+    list(GET VERSION_COMPONENTS 2 PATCH)
   endif()
 endmacro()
 setup_package_version_variables(${BUILD_NUMBER})

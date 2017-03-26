@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Chalmers Revere
+ * Copyright (C) 2017 Chalmers Revere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,8 +17,8 @@
  * USA.
  */
 
-#ifndef SIGNALADAPTER_SIGNALSTRINGLISTENER_HPP
-#define SIGNALADAPTER_SIGNALSTRINGLISTENER_HPP
+#ifndef TOOL_SIGNALADAPTER_SIGNALSTRINGLISTENER_HPP
+#define TOOL_SIGNALADAPTER_SIGNALSTRINGLISTENER_HPP
 
 #include <sstream>
 
@@ -26,8 +26,7 @@
 #include <opendavinci/odcore/io/conference/ContainerConference.h>
 
 namespace opendlv {
-namespace tools {
-namespace signaladapter {
+namespace tool {
 
 /**
  * This class decodes data from open udp port.
@@ -48,8 +47,7 @@ class SignalStringListener : public odcore::io::StringListener {
     bool &m_debug;
 };
 
-} // signaladapter
-} // tools
-} // opendlv
+}
+}
 
 #endif

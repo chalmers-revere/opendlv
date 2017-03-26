@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Chalmers Revere
+ * Copyright (C) 2017 Chalmers Revere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,16 +17,15 @@
  * USA.
  */
 
-#ifndef SIGNALADAPTER_SIGNALSENDERBUFFERED_HPP_
-#define SIGNALADAPTER_SIGNALSENDERBUFFERED_HPP_
+#ifndef TOOL_SIGNALADAPTER_SIGNALSENDERBUFFERED_HPP_
+#define TOOL_SIGNALADAPTER_SIGNALSENDERBUFFERED_HPP_
 
 #include <opendavinci/odcore/base/Mutex.h>
 
 #include "signalsender.hpp"
 
 namespace opendlv {
-namespace tools {
-namespace signaladapter {
+namespace tool {
 
 class SignalSenderBuffered : public SignalSender {
  public:
@@ -49,8 +48,7 @@ class SignalSenderBuffered : public SignalSender {
   odcore::base::Mutex m_mutex;
 };
 
-} // signaladapter
-} // tools
-} // opendlv
+}
+}
 
 #endif

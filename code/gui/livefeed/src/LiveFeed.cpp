@@ -43,7 +43,7 @@ void LiveFeed::tearDown()
 {
 }
 
-void LiveFeed::nextContainer(odcore::data::Container const &a_container) 
+void LiveFeed::nextContainer(odcore::data::Container &a_container) 
 {
   (void) a_container;
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Chalmers Revere
+ * Copyright (C) 2017 Chalmers Revere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,14 +17,13 @@
  * USA.
  */
 
-#ifndef SIGNALADAPTER_SIGNALSENDERMULTIPORT_HPP_
-#define SIGNALADAPTER_SIGNALSENDERMULTIPORT_HPP_
+#ifndef TOOL_SIGNALADAPTER_SIGNALSENDERMULTIPORT_HPP_
+#define TOOL_SIGNALADAPTER_SIGNALSENDERMULTIPORT_HPP_
 
 #include "signalsender.hpp"
 
 namespace opendlv {
-namespace tools {
-namespace signaladapter {
+namespace tool {
 
 class SignalSenderMultiPort : public SignalSender {
  public:
@@ -41,8 +40,7 @@ class SignalSenderMultiPort : public SignalSender {
   std::map<uint32_t, std::shared_ptr<odcore::io::udp::UDPSender>> m_udpSenders;
 };
 
-} // signaladapter
-} // tools
-} // opendlv
+}
+}
 
 #endif

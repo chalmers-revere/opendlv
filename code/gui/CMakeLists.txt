@@ -49,4 +49,7 @@ set(LIBRARIES ${OPENDAVINCI_LIBRARIES})
 # Add subfolders with sources.
 add_subdirectory(livefeed)
 
+###########################################################################
+# Create packages for selected Linux distributions.
+set(CHANGELOG_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../ChangeLog")
 include(CreatePackages)

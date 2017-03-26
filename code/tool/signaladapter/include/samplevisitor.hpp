@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Chalmers REVERE
+ * Copyright (C) 2017 Chalmers Revere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,8 +17,8 @@
  * USA.
  */
 
-#ifndef SIGNALADAPTER_SAMPLEVISITOR_HPP_
-#define SIGNALADAPTER_SAMPLEVISITOR_HPP_
+#ifndef TOOL_SIGNALADAPTER_SAMPLEVISITOR_HPP_
+#define TOOL_SIGNALADAPTER_SAMPLEVISITOR_HPP_
 
 #include <memory>
 #include <string>
@@ -28,8 +28,7 @@
 
 
 namespace opendlv {
-namespace tools {
-namespace signaladapter {
+namespace tool {
 
 class SampleBuffer;
 
@@ -79,8 +78,7 @@ class SampleVisitor
   std::shared_ptr<SampleBuffer> m_sampleBuffer;
 };
 
-} // signaladapter
-} // tools
-} // opendlv
+}
+}
 
 #endif

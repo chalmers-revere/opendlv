@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Chalmers REVERE
+ * Copyright (C) 2017 Chalmers Revere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,8 +26,7 @@
 #include "samplevisitor.hpp"
 
 namespace opendlv {
-namespace tools {
-namespace signaladapter {
+namespace tool {
 
 
 SampleVisitor::SampleVisitor(std::shared_ptr<SampleBuffer> a_sampleBuffer)
@@ -150,6 +149,5 @@ void SampleVisitor::visit(uint32_t const &, std::string const &,
   m_sampleBuffer->AppendBytes(dataVec);
 }
 
-} // signaladapter
-} // tools
-} // opendlv
+}
+}

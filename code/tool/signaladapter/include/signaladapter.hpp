@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Chalmers REVERE
+ * Copyright (C) 2017 Chalmers Revere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,8 +17,8 @@
  * USA.
  */
 
-#ifndef SIGNALADAPTER_SIGNALADAPTER_HPP_
-#define SIGNALADAPTER_SIGNALADAPTER_HPP_
+#ifndef TOOL_SIGNALADAPTER_SIGNALADAPTER_HPP_
+#define TOOL_SIGNALADAPTER_SIGNALADAPTER_HPP_
 
 #include <map>
 #include <memory>
@@ -28,8 +28,7 @@
 #include <opendavinci/odcore/io/udp/UDPReceiver.h>
 
 namespace opendlv {
-namespace tools {
-namespace signaladapter {
+namespace tool {
 
 class SignalSender;
 class SignalStringListener;
@@ -58,8 +57,7 @@ class SignalAdapter
   bool m_debug;
 };
 
-} // signaladapter
-} // tools
-} // opendlv
+}
+}
 
 #endif

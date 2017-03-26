@@ -16,15 +16,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef GUI_LIVEFEED_TESTSUITE_H
-#define GUI_LIVEFEED_TESTSUITE_H
+#ifndef TOOL_SIGNALADAPTER_TESTSUITE_H
+#define TOOL_SIGNALADAPTER_TESTSUITE_H
 
 #include "cxxtest/TestSuite.h"
 
 // Include local header files.
-#include "../include/LiveFeed.h"
+#include "../include/signaladapter.hpp"
 
-class LiveFeedTest : public CxxTest::TestSuite {
+class SignalAdapterTest : public CxxTest::TestSuite {
    public:
     void setUp() {}
 

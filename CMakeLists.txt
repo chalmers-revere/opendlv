@@ -144,13 +144,13 @@ ExternalProject_Add (gui
 #  TEST_BEFORE_INSTALL 1
 #  INSTALL_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/logic-prefix/src/logic-build --target install COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/logic-prefix/src/logic-build --target ${MAKE_PACKAGE})
 
-#ExternalProject_Add (tool
-#  DEPENDS libodvdopendlvdata
-#  DOWNLOAD_COMMAND ""
-#  UPDATE_COMMAND ""
-#  SOURCE_DIR "${CMAKE_SOURCE_DIR}/code/tool"
-#    CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
-#    CMAKE_ARGS "-DOPENDAVINCI_DIR=${OPENDAVINCI_DIR}"
-#    CMAKE_ARGS "-DCXXTEST_INCLUDE_DIR=${CXXTEST_INCLUDE_DIR}"
-#  TEST_BEFORE_INSTALL 1
-#  INSTALL_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/tool-prefix/src/tool-build --target install COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/tool-prefix/src/tool-build --target ${MAKE_PACKAGE})
+ExternalProject_Add (tool
+  DEPENDS libodvdopendlvdata
+  DOWNLOAD_COMMAND ""
+  UPDATE_COMMAND ""
+  SOURCE_DIR "${CMAKE_SOURCE_DIR}/code/tool"
+    CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
+    CMAKE_ARGS "-DOPENDAVINCI_DIR=${OPENDAVINCI_DIR}"
+    CMAKE_ARGS "-DCXXTEST_INCLUDE_DIR=${CXXTEST_INCLUDE_DIR}"
+  TEST_BEFORE_INSTALL 1
+  INSTALL_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/tool-prefix/src/tool-build --target install COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/tool-prefix/src/tool-build --target ${MAKE_PACKAGE})

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Chalmers Revere
+ * Copyright (C) 2017 Chalmers Revere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,31 +17,18 @@
  * USA.
  */
 
-#ifndef SIGNALADAPTER_SIGNALSENDER_HPP_
-#define SIGNALADAPTER_SIGNALSENDER_HPP_
+#ifndef TOOL_SIGNALADAPTER_SIGNALSENDER_HPP_
+#define TOOL_SIGNALADAPTER_SIGNALSENDER_HPP_
 
 #include <map>
 #include <memory>
 
 #include <opendavinci/odcore/data/Container.h>
 #include <opendavinci/odcore/io/udp/UDPSender.h>
-#include <opendavinci/odcore/reflection/Helper.h>
+#include <opendavinci/odcore/reflection/MessageResolver.h>
 
 namespace opendlv {
-namespace tools {
-namespace signaladapter {
-
-class HelperEntry {
- public:
-  HelperEntry();
-  HelperEntry(HelperEntry const &);
-  HelperEntry &operator=(HelperEntry const &);
-  virtual ~HelperEntry();
-
-  std::string m_library;
-  void *m_dynamicObjectHandle;
-  odcore::reflection::Helper *m_helper;
-};
+namespace tool {
 
 class SignalSender {
  public:
@@ -56,21 +43,13 @@ class SignalSender {
   virtual void Update() = 0;
 
  protected:
+  std::unique_ptr<odcore::reflection::MessageResolver> m_messageResolver;
   std::vector<uint32_t> m_messageIds;
   std::vector<uint32_t> m_senderStamps;
   bool m_debug;
-
- private:
-  void FindAndLoadSharedLibraries();
-  void UnloadSharedLibraries();
-  std::vector<std::string> GetListOfLibrariesToLoad(std::vector<std::string> const &);
-
-  std::vector<std::string> m_listOfLibrariesToLoad;
-  std::vector<HelperEntry> m_listOfHelpers;
 };
 
-} // signaladapter
-} // tools
-} // opendlv
+}
+}
 
 #endif

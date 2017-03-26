@@ -1,5 +1,5 @@
-# OpenDLV vision tools 
-# Copyright (C) 2015 Chalmers REVERE
+# gui-livefeed - A web-based data live feed.
+# Copyright (C) 2017 Chalmers Revere
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -15,29 +15,25 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-project(opendlv-tools-signaladapter)
+cmake_minimum_required(VERSION 2.8)
 
-# Set include directories
+project(opendlv-tool-signaladapter)
+
 include_directories(include)
 
-# Set libraries
+###############################################################################
+# Build this project.
+file(GLOB_RECURSE thisproject-sources "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+add_library(${PROJECT_NAME}-static STATIC ${thisproject-sources})
+add_executable(${PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/apps/${PROJECT_NAME}.cpp")
+target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}-static ${LIBRARIES}) 
 
-# Build
-file(GLOB_RECURSE thisproject-sources 
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
-  )
-
-
-add_library(${PROJECT_NAME}lib-static STATIC ${thisproject-sources})
-
-message("Library " ${LIBRARIES})
-
-add_executable(${PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
-target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}lib-static ${LIBRARIES}) 
-
-
-# Test
 include(RunTests)
 
-# Install
-install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin COMPONENT tools)
+###############################################################################
+# Install this project.
+install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin COMPONENT ${CMAKE_PROJECT_NAME})
+install(TARGETS ${PROJECT_NAME}-static DESTINATION lib COMPONENT ${CMAKE_PROJECT_NAME})
+install(FILES man/${PROJECT_NAME}.1 DESTINATION man/man1 COMPONENT ${CMAKE_PROJECT_NAME})
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/" DESTINATION include/${CMAKE_PROJECT_NAME} COMPONENT ${CMAKE_PROJECT_NAME})
+

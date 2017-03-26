@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Chalmers REVERE
+ * Copyright (C) 2017 Chalmers Revere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,8 +26,7 @@
 #include "samplebuffer.hpp"
 
 namespace opendlv {
-namespace tools {
-namespace signaladapter {
+namespace tool {
 
 SampleBuffer::Iterator::Iterator(SampleBuffer const *a_outer_buffer):
     m_outer_buffer(a_outer_buffer),
@@ -334,6 +333,5 @@ uint32_t SampleBuffer::GetSize() const
   return m_bytes.size();
 }
 
-} // signaladapter
-} // tools
-} // opendlv
+}
+}

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Chalmers REVERE
+ * Copyright (C) 2017 Chalmers Revere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -34,8 +34,7 @@
 #include "signalstringlistener.hpp"
 
 namespace opendlv {
-namespace tools {
-namespace signaladapter {
+namespace tool {
 
 SignalStringListener::SignalStringListener(odcore::io::conference::ContainerConference &a_conference, bool &a_debug)
     : m_conference(a_conference)
@@ -74,7 +73,6 @@ void SignalStringListener::nextString(std::string const &a_string)
             acceleration, steering, isValid);
         odcore::data::Container actuationRequestContainer(actuationRequest);
         m_conference.send(actuationRequestContainer);
-
         break;
       }
     case 164:
@@ -96,6 +94,5 @@ void SignalStringListener::nextString(std::string const &a_string)
   }
 }
 
-} // signaladapter
-} // tools
-} // opendlv
+}
+}

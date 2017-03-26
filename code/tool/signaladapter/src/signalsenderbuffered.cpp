@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Chalmers Revere
+ * Copyright (C) 2017 Chalmers Revere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -41,8 +41,7 @@
 #include "signalsenderbuffered.hpp"
 
 namespace opendlv {
-namespace tools {
-namespace signaladapter {
+namespace tool {
 
 SignalSenderBuffered::SignalSenderBuffered(std::string const &a_messageIds,
     std::string const &a_senderStamps, std::string const &a_address, 
@@ -175,6 +174,5 @@ void SignalSenderBuffered::Update()
   m_udpSender->send(data);
 }
 
-} // signaladapter
-} // tools
-} // opendlv
+}
+}

@@ -54,6 +54,12 @@ message opendlv.model.DynamicState [id = 154] {
   int16 frameId [id = 9];
 }
 
+message opendlv.proxy.ActuationRequest [id = 160] {
+  float acceleration [id = 1];
+  float steering [id = 2];
+  bool isValid [id = 3];
+}
+
 message opendlv.proxy.AnalogRequest [id = 164] {
   double value [id = 1];
   uint32 target [id = 2];

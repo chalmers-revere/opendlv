@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Chalmers REVERE
+ * Copyright (C) 2017 Chalmers Revere
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -37,12 +37,11 @@
 #include "signalstringlistener.hpp"
 
 namespace opendlv {
-namespace tools {
-namespace signaladapter {
+namespace tool {
 
 SignalAdapter::SignalAdapter(int32_t const &a_argc, char **a_argv)
     : odcore::base::module::TimeTriggeredConferenceClientModule(
-      a_argc, a_argv, "tools-signaladapter"),
+      a_argc, a_argv, "tool-signaladapter"),
       m_signalSender(),
       m_signalStringListener(),
       m_udpReceivers(),
@@ -63,22 +62,22 @@ void SignalAdapter::setUp()
 void SignalAdapter::SetUpSender()
 {
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
-  m_debug = kv.getValue<bool>("tools-signaladapter.debug");
+  m_debug = kv.getValue<bool>("tool-signaladapter.debug");
   std::string const searchPath = 
-    kv.getValue<std::string>("tools-signaladapter.directoriesForSharedLibaries");
+    kv.getValue<std::string>("tool-signaladapter.directoriesForSharedLibaries");
   
   std::string const address = 
-    kv.getValue<std::string>("tools-signaladapter.sender.address");
+    kv.getValue<std::string>("tool-signaladapter.sender.address");
 
   std::string const messageIds = 
-    kv.getValue<std::string>("tools-signaladapter.sender.messageIds");
+    kv.getValue<std::string>("tool-signaladapter.sender.messageIds");
   std::string const senderStamps = 
-    kv.getValue<std::string>("tools-signaladapter.sender.senderStamps");
+    kv.getValue<std::string>("tool-signaladapter.sender.senderStamps");
   std::string const ports =
-    kv.getValue<std::string>("tools-signaladapter.sender.ports");
+    kv.getValue<std::string>("tool-signaladapter.sender.ports");
 
   std::string const mode =
-    kv.getValue<std::string>("tools-signaladapter.sender.mode");
+    kv.getValue<std::string>("tool-signaladapter.sender.mode");
 
   if (mode == "multiport") {
     m_signalSender.reset(new SignalSenderMultiPort(messageIds, senderStamps, 
@@ -97,9 +96,9 @@ void SignalAdapter::SetUpReceivers()
 
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
   std::string const messageIds = 
-      kv.getValue<std::string>("tools-signaladapter.receiver.messageIds");
+      kv.getValue<std::string>("tool-signaladapter.receiver.messageIds");
   std::string const ports =
-      kv.getValue<std::string>("tools-signaladapter.receiver.ports");
+      kv.getValue<std::string>("tool-signaladapter.receiver.ports");
   std::vector<std::string> messageIdStrings = 
       odcore::strings::StringToolbox::split(messageIds, ',');
   std::vector<std::string> portStrings = 
@@ -145,6 +144,5 @@ void SignalAdapter::nextContainer(odcore::data::Container &a_container)
   m_signalSender->AddContainer(a_container);
 }
 
-} // signaladapter
-} // tools
-} // opendlv
+}
+}
