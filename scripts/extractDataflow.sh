@@ -38,7 +38,6 @@ done
 
 # Find lines where the content of a Container is queried. Such lines are usually
 # found when a Container has been received.
-#grep ".*getDataType().*==.*::ID()" -r . | sed -e 's/\:.*\=\=//g' | sed -e 's/.{//g' > containers.received
 grep ".*getDataType().*==.*::ID()" -r . | sed -e 's/\:.*\=\=//g' | sed -e 's/.{//g' > out
 cat out | rev | cut -f3- -d":" | rev | sed -e 's/ /;receives;/' >> containers.io && rm -f out
 
