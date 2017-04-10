@@ -1,3 +1,4 @@
+0.6.0 - Complete refactoring
 0.5.0 - SocketCAN and split Docker images
 0.4.9 - Propagating OpenDLV.core v0.8.10 to OpenDLV
 0.4.8 - Propagating OpenDLV.core 0.8.9 to OpenDLV

@@ -16,7 +16,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 if(CXXTEST_FOUND)
-  file(GLOB TESTSUITES "${CMAKE_CURRENT_SOURCE_DIR}/testsuites/*.h")
+  file(GLOB TESTSUITES "${CMAKE_CURRENT_SOURCE_DIR}/testsuites/*.hpp")
     
   foreach(TESTSUITE ${TESTSUITES})
     string(REPLACE "/" ";" TESTSUITE_LIST ${TESTSUITE})
@@ -27,19 +27,7 @@ if(CXXTEST_FOUND)
 
     set(CXXTEST_TESTGEN_ARGS ${CXXTEST_TESTGEN_ARGS} --world=${PROJECT_NAME}-${TESTSUITE-FILENAME})
     CXXTEST_ADD_TEST(${TESTSUITE-FILENAME}-TestSuite ${TESTSUITE-FILENAME}-TestSuite.cpp ${TESTSUITE})
-    if(UNIX)
-      if((("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
-          OR ("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD")
-          OR ("${CMAKE_SYSTEM_NAME}" STREQUAL "DragonFly"))
-          AND (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
-        set_source_files_properties(${TESTSUITE-FILENAME}-TestSuite.cpp PROPERTIES COMPILE_FLAGS "-Wno-effc++ -Wno-float-equal -Wno-error=switch-default -Wno-error=suggest-attribute=noreturn")
-      else()
-        set_source_files_properties(${TESTSUITE-FILENAME}-TestSuite.cpp PROPERTIES COMPILE_FLAGS "-Wno-effc++ -Wno-float-equal")
-      endif()
-    endif()
-    if(WIN32)
-      set_source_files_properties(${TESTSUITE-FILENAME}-TestSuite.cpp PROPERTIES COMPILE_FLAGS "")
-    endif()
+
     set_tests_properties(${TESTSUITE-FILENAME}-TestSuite PROPERTIES TIMEOUT 3000)
     target_link_libraries(${TESTSUITE-FILENAME}-TestSuite ${PROJECT_NAME}-static ${LIBRARIES})
   endforeach()

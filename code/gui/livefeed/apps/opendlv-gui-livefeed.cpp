@@ -1,5 +1,4 @@
 /**
- * gui-livefeed - GUI interface to show live OpenDLV data.
  * Copyright (C) 2017 Chalmers Revere
  *
  * This program is free software; you can redistribute it and/or
@@ -17,9 +16,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#include "LiveFeed.h"
+#include "livefeed.hpp"
 
 int32_t main(int32_t argc, char **argv) {
-  opendlv::gui::LiveFeed liveFeed(argc, argv);
-  return liveFeed.runModule();
+  opendlv::gui::LiveFeed app(argc, argv);
+  return app.runModule();
 }

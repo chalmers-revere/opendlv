@@ -1,5 +1,4 @@
 /**
- * gui-livefeed - GUI interface to show live OpenDLV data.
  * Copyright (C) 2017 Chalmers Revere
  *
  * This program is free software; you can redistribute it and/or
@@ -20,6 +19,6 @@
 #include "signaladapter.hpp"
 
 int32_t main(int32_t argc, char **argv) {
-  opendlv::tool::SignalAdapter signalAdapter(argc, argv);
-  return signalAdapter.runModule();
+  opendlv::tool::SignalAdapter app(argc, argv);
+  return app.runModule();
 }

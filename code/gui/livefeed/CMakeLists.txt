@@ -1,4 +1,3 @@
-# gui-livefeed - A web-based data live feed.
 # Copyright (C) 2017 Chalmers Revere
 #
 # This program is free software; you can redistribute it and/or
