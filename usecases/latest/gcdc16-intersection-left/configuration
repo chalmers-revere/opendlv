@@ -27,7 +27,7 @@ global.buffer.memorySegmentSize = 2800000 # Size of a memory segment in bytes.
 global.buffer.numberOfMemorySegments = 4  # Number of memory segments.
 
 # The following key describes the list of modules expected to participate in this --cid session.
-global.session.expectedModules = action-act,action-communicate,action-removeloomingconflict,action-setgroundspeed,action-setopticalrotation,knowledge-gcdc16-rule-intersection,knowledge-gcdc16-v2viclcm,knowledge-identity,knowledge-linguistics-v2vcam,knowledge-scene,perception-detectlane,sensation-audition,sensation-echolocation,proxy-trimble,proxy-camera-axis,proxy-fh16,proxy-sick,proxy-v2v
+global.session.expectedModules = action-act,action-communicate,action-removeloomingconflict,action-setgroundspeed,action-setopticalrotation,knowledge-gcdc16-rule-intersection,knowledge-gcdc16-v2viclcm,knowledge-identity,knowledge-linguistics-v2vcam,knowledge-scene,perception-detectlane,sensation-audition,proxy-trimble,proxy-camera-axis,proxy-fh16,proxy-v2v
 
 
 ###############################################################################
@@ -170,10 +170,8 @@ perception-detectlane.debug = 0
 
 # sensation-audition
 
-# sensation-echolocation
-sensation-echolocation.memoryThreshold = 0
-sensation-echolocation.pointCloudSizeMinimum = 3 #number of points
-sensation-echolocation.pointCloudRadius = 2 # meters
+# sensation-geolocation
+sensation-geolocation.debug = 1
 
 # proxy-trimble
 proxy-trimble.ip = 10.42.42.112
@@ -198,21 +196,10 @@ proxy-camera-axis.mount.yaw = 0.2
 proxy-camera-axis.debug = 0
 
 # proxy-fh16
-proxy-fh16.devicenode = /dev/pcan2 # PEAK CAN device.
+proxy-fh16.devicenode = can2        # SocketCAN device.
 proxy-fh16.record_gcm = 0           # 1 = dump generic CAN messages.
 proxy-fh16.record_mapped_data = 0   # 1 = record mapped containers.
-
-# proxy-sick
-proxy-sick.type = sick
-proxy-sick.port = /dev/ttyS1
-proxy-sick.baudrate = 9600
-proxy-sick.mount.x = 1.25
-proxy-sick.mount.y = 0.0
-proxy-sick.mount.z = 1.0
-proxy-sick.mount.roll = 0.0
-proxy-sick.mount.pitch = 0.0
-proxy-sick.mount.yaw = 0.0
-proxy-sick.record = 0  # Set to 1 to dump Lidar data in .rec format.
+proxy-fh16.read-only = 0            # 1 = read-only , 0 = read/write
 
 # proxy-v2v
 proxy-v2v.comboxIp = 10.42.42.61

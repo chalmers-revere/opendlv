@@ -156,6 +156,16 @@ services:
         depends_on:
             - odsupercomponent
         command: "/opt/opendlv/bin/opendlv-system-application-sensation-audition --cid=${CID}"
+    
+    #microservice for sensation-geolocation
+    sensation-geolocation:
+        build: .
+        network_mode: "host"
+        working_dir: "/opt/opendlv/bin"
+        restart: always
+        depends_on:
+            - odsupercomponent
+        command: "/opt/opendlv/bin/opendlv-system-application-sensation-geolocation --cid=${CID} --freq=20"
 
     # microservice for sensation-echolocation to create objects from lidar input
     sensation-echolocation:
@@ -193,8 +203,7 @@ services:
         build: .
         network_mode: "host"
         restart: always
-        devices:
-        - "/dev/pcanpci2:/dev/pcan2"
+        privileged: true
         depends_on:
             - odsupercomponent
         command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-fh16 --cid=${CID} --freq=100"

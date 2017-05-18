@@ -32,7 +32,9 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-#include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
+
+#include "opendavinci/GeneratedHeaders_OpenDaVINCI.h"
+#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/base/Mutex.h"
 #include "opendavinci/odcore/data/Container.h"
 #include "opendavinci/odcore/data/TimeStamp.h"
@@ -45,7 +47,7 @@ namespace detectlane {
  * This class provides the ability to detect lanes given an image source.
  */
 class DetectLane
-: public odcore::base::module::TimeTriggeredConferenceClientModule {
+: public odcore::base::module::DataTriggeredConferenceClientModule {
  public:
   DetectLane(int32_t const &, char **);
   DetectLane(DetectLane const &) = delete;
@@ -56,14 +58,40 @@ class DetectLane
  private:
   void setUp();
   void tearDown();
-  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+
+  bool ExtractSharedImage(odcore::data::image::SharedImage *);
+  void UpdateVisualMemory();
+  void UpdateVisualLines();
+  std::vector<cv::Vec2f> GetGrouping(std::vector<cv::Vec2f>, double);
+  std::vector<std::pair<cv::Vec2f, cv::Vec2f>> GetParametricRepresentation(std::vector<cv::Vec2f>);
+  void UpdatePointsOnLines(std::vector<std::pair<cv::Vec2f, cv::Vec2f>>);
+  std::vector<uint16_t> GetLanes() const;
+  std::vector<uint16_t> GetCurrentLane() const;
+  Eigen::MatrixXd ReadMatrix(std::string const, uint8_t const, uint8_t const) const;
+  Eigen::Vector3d TransformPointToGlobalFrame(Eigen::Vector3d) const;
+  void DrawWindows();
 
   bool m_initialized;
-  cv::Mat m_image;
+  cv::Mat m_currentImg;
+  uint16_t m_blurKernelSize; 
+  cv::Mat m_cannyImg;
+  cv::Mat m_adapThreshImg;
   std::deque<std::pair<odcore::data::TimeStamp, cv::Mat>> m_visualMemory;
-  uint16_t m_intensityThreshold;
+  uint8_t m_adapThreshKernelSize;
+  uint8_t m_adapThreshConst;
   uint16_t m_cannyThreshold;
   uint16_t m_houghThreshold;
+  std::vector<cv::Vec2f> m_linesRaw;
+  std::vector<cv::Vec2f> m_linesProcessed;
+  std::vector<uint16_t> m_laneLineIds;
+  std::vector<uint16_t> m_currentLaneLineIds;
+  std::vector<cv::Vec2f> m_xScreenP;
+  std::vector<cv::Vec2f> m_yScreenP;
+  std::vector<cv::Vec2f> m_xWorldP;
+  std::vector<cv::Vec2f> m_yWorldP;
+  float m_lineDiff;
+  float m_OneLineDiff;
+  float m_HorisontalLimit;
   double m_memThreshold;
   double m_upperLaneLimit;
   double m_lowerLaneLimit;
@@ -71,22 +99,8 @@ class DetectLane
   int16_t m_roi[4];
   odcore::base::Mutex m_mtx;
   bool m_debug;
+  std::string m_cameraName; 
   Eigen::Matrix3d m_transformationMatrix;
-
-  void GetGrouping(std::vector<cv::Vec2f> &, std::vector<cv::Vec2f> &, double);
-  void GetParametricRepresentation(std::vector<cv::Vec2f> &,std::vector<cv::Vec2f> &,std::vector<cv::Vec2f> &);
-  void GetPointsOnLine(std::vector<cv::Vec2f> &a_xPoints
-    , std::vector<cv::Vec2f> &a_yPoints
-    , std::vector<cv::Vec2f> &a_X
-    , std::vector<cv::Vec2f> &a_Y
-    , std::vector<cv::Vec2f> &a_p
-    , std::vector<cv::Vec2f> &a_m);
-  void GetLinePairs(std::vector<cv::Vec2f> &, std::vector<int8_t> &);
-  Eigen::MatrixXd ReadMatrix(std::string fileName, uint8_t nRows, uint8_t nCols);
-  void TransformPointToGlobalFrame(Eigen::Vector3d &point);
-
-
-
 
 };
 

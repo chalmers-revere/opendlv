@@ -21,6 +21,8 @@ cmake_minimum_required(VERSION 2.8)
 #
 # PATH=/opt/od4/bin:$PATH cmake -D CMAKE_INSTALL_PREFIX=<Where shall Chalmers.Revere.OpenDLV be installed?> 
 #                               -D OPENDAVINCI_DIR=<Where is OpenDaVINCI installed?> 
+#                               -D ODVDVEHICLE_DIR=<Where is ODVDVEHICLE_DIR installed?> 
+#                               -D ODVDV2V_DIR=<Where is ODVDV2V_DIR installed?> 
 #                               -D KALMAN_INCLUDE_DIR=<Where is Kalman installed?> 
 #                               -D TINYCNN_INCLUDE_DIR=<Where is TinyCNN installed?> 
 #                               -D CXXTEST_INCLUDE_DIR=<Where is CxxTest installed?> ..
@@ -36,13 +38,14 @@ project(chalmersrevere.opendlv)
 # If dpkg and rpmbuild are available, .deb and .rpm packages will be
 # created. Otherwise, the software is simply installed.
 IF(     NOT("${DPKG_EXECUTABLE}" STREQUAL "DPKG_EXECUTABLE-NOTFOUND")
-    AND NOT("${RPMBUILD_EXECUTABLE}" STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND") )
+    AND NOT("${RPMBUILD_EXECUTABLE}" STREQUAL "RPMBUILD_EXECUTABLE-NOTFOUND")
+    AND ("${PACKAGING_ENABLED}" STREQUAL "YES") )
     MESSAGE(STATUS "Enabling building .deb and .rpm packages.")
     SET(MAKE_PACKAGE package)
 ELSE()
     # If the platform does not provide dpkg and rpmbuild, make package is
-    # replaced with make install.
-    SET(MAKE_PACKAGE install)
+    # replaced with make help to simply have a no-op.
+    SET(MAKE_PACKAGE help)
 ENDIF()
 
 ###########################################################################
@@ -120,6 +123,10 @@ ExternalProject_Add(system
     CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
     CMAKE_ARGS "-DOPENDAVINCI_DIR=${OPENDAVINCI_DIR}"
     CMAKE_ARGS "-DODVDVEHICLE_DIR=${ODVDVEHICLE_DIR}"
+    CMAKE_ARGS "-DODVDV2V_DIR=${ODVDV2V_DIR}"
+    CMAKE_ARGS "-DODVDFH16TRUCK_DIR=${ODVDFH16TRUCK_DIR}"
+    CMAKE_ARGS "-DODVDTRIMBLE_DIR=${ODVDTRIMBLE_DIR}"
+    CMAKE_ARGS "-DODVDIMU_DIR=${ODVDIMU_DIR}"
     CMAKE_ARGS "-DCXXTEST_INCLUDE_DIR=${CXXTEST_INCLUDE_DIR}"
     CMAKE_ARGS "-DEIGEN3_INCLUDE_DIR=${OPENDAVINCI_DIR}/include/opendavinci"
     CMAKE_ARGS "-DKALMAN_INCLUDE_DIR=${KALMAN_INCLUDE_DIR}"
@@ -137,6 +144,7 @@ ExternalProject_Add(tools
     CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
     CMAKE_ARGS "-DOPENDAVINCI_DIR=${OPENDAVINCI_DIR}"
     CMAKE_ARGS "-DODVDVEHICLE_DIR=${ODVDVEHICLE_DIR}"
+    CMAKE_ARGS "-DODVDFH16TRUCK_DIR=${ODVDFH16TRUCK_DIR}"
     CMAKE_ARGS "-DCXXTEST_INCLUDE_DIR=${CXXTEST_INCLUDE_DIR}"
     CMAKE_ARGS "-DEIGEN3_INCLUDE_DIR=${OPENDAVINCI_DIR}/include/opendavinci"
     CMAKE_ARGS "-DKALMAN_INCLUDE_DIR=${KALMAN_INCLUDE_DIR}"

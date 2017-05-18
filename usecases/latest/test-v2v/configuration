@@ -76,6 +76,7 @@ odsupercomponent.pulsetimeack.exclude = odcockpit
 knowledge-linguistics-v2vcam.printOutbound = 0
 knowledge-linguistics-v2vcam.printInbound = 0
 knowledge-linguistics-v2vcam.record = 0
+knowledge-linguistics-v2vcam.debug = 0
 
 # knowledge-gcdc16-v2viclcm
 knowledge-gcdc16-v2viclcm.printOutbound = 0
@@ -109,3 +110,16 @@ proxy-v2v.comboxIp = 10.42.42.61
 proxy-v2v.comboxPort = 5003
 proxy-v2v.listenPort = 5000
 proxy-v2v.debug = 0
+
+# sensation-geolocation
+sensation-geolocation.debug = 1
+
+# proxy-imu
+proxy-imu.type = pololu.altimu10
+proxy-imu.pololu.altimu10.device_node = /dev/i2c-2
+proxy-imu.calibrationfile = /opt/opendlv.core.configuration/calibration.txt
+proxy-imu.mount.roll = 0.0
+proxy-imu.mount.pitch = 0.0
+proxy-imu.mount.yaw = 70.0
+proxy-imu.debug = 1
+proxy-imu.lockcalibration = 1
