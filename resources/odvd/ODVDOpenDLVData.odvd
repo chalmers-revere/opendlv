@@ -190,9 +190,16 @@ message opendlv.perception.Object [id = 181] {
 }
 
 
-
-
-
+// message between vehicle detection and tracking
+message opendlv.perception.VehicleVision [id = 201] {
+  odcore::data::TimeStamp identified [id = 1];
+  int16 vehicleId [id = 2];
+  int16 x [id = 3];
+  int16 y [id = 4];
+  int16 w [id = 5];
+  int16 h [id = 6];
+  int16 found [id = 7];
+}
 
 message opendlv.perception.Environment [id = 189] {
   odcore::data::TimeStamp validUntil [id = 1];
@@ -244,17 +251,6 @@ message opendlv.perception.StimulusAngularSizeAlignment [id = 183] {
   opendlv.model.Direction direction [id = 2];
   float angularSize [id = 3];
   float desiredAngularSize [id = 4];
-}
-
-// message between vehicle detection and tracking
-message opendlv.perception.VehicleVision [id = 201] {
-  odcore::data::TimeStamp identified [id = 1];
-  int16 vehicleId [id = 2];
-  int16 x [id = 3];
-  int16 y [id = 4];
-  int16 w [id = 5];
-  int16 h [id = 6];
-  int16 found [id = 7];
 }
 
 message opendlv.knowledge.Message [id = 185] {

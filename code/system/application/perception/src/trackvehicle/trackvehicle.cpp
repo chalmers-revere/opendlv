@@ -27,16 +27,12 @@
 #include "opencv2/features2d/features2d.hpp"
 //#include "opencv2/nonfree/nonfree.hpp"
 
-
-
 #include "opendavinci/GeneratedHeaders_OpenDaVINCI.h"
 #include "opendavinci/odcore/wrapper/SharedMemoryFactory.h"
 #include "opendavinci/odcore/wrapper/SharedMemory.h"
 
 #include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
 
-#include "detectvehicle/vehicle_s.hpp"
-#include "trackvehicle/vehicle_tex.hpp"
 #include "trackvehicle/trackvehicle.hpp"
 
 
@@ -56,6 +52,8 @@ TrackVehicle::TrackVehicle(int32_t const &a_argc, char **a_argv)
       a_argc, a_argv, "perception-trackvehicle")
     , m_initialised(false)
     , m_debug()
+    , vehicle_buffer()
+    , vehicle_buffer_t()
 {
 }
 
@@ -79,69 +77,67 @@ void TrackVehicle::tearDown()
  */
 void TrackVehicle::nextContainer(odcore::data::Container &c)
 {
+  if (!m_initialised) {
+    return;
+  }
 
   if (c.getDataType() == opendlv::perception::VehicleVision::ID() && m_initialised) {
-     opendlv::perception::VehicleVision vehicleToTrack = c.getData<opendlv::perception::VehicleVision>();
+    opendlv::perception::VehicleVision vehicleToTrack = c.getData<opendlv::perception::VehicleVision>();
     std::cout<<vehicleToTrack.getVehicleId()<<std::endl;
 
-     vehicle_t data;
-     data.id=vehicleToTrack.getVehicleId();
-     data.x=vehicleToTrack.getVehicleX();
-     data.y=vehicleToTrack.getVehicleY();
-     data.w=vehicleToTrack.getVehicleW();
-     data.h=vehicleToTrack.getVehicleH();
-     data.found=vehicleToTrack.getVehicleFound();
-     updateBuffer(data);
+    vehicle_t data;
+    data.id=vehicleToTrack.getVehicleId();
+    data.x=vehicleToTrack.getX();
+    data.y=vehicleToTrack.getY();
+    data.w=vehicleToTrack.getW();
+    data.h=vehicleToTrack.getH();
+    data.found=vehicleToTrack.getFound();
+    updateBuffer(data);
 
     return;
   }
 
-  if (c.getDataType() != odcore::data::image::SharedImage::ID() || !m_initialised) {
+  if(c.getDataType() == odcore::data::image::SharedImage::ID()) {
+    odcore::data::image::SharedImage mySharedImg = c.getData<odcore::data::image::SharedImage>();
 
-    return;
+    std::string cameraName = mySharedImg.getName();
+    // std::cout << "Received image from camera " << cameraName  << "!" << std::endl;
+
+    //TODO compare the source name to keep track different camera sources
+
+    std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(
+        odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(
+            mySharedImg.getName()));
+
+    const uint32_t nrChannels = mySharedImg.getBytesPerPixel();
+    const uint32_t imgWidth = mySharedImg.getWidth();
+    const uint32_t imgHeight = mySharedImg.getHeight();
+
+    IplImage* myIplImage;
+    myIplImage = cvCreateImage(cvSize(
+        imgWidth, imgHeight), IPL_DEPTH_8U, nrChannels);
+    cv::Mat myImage(myIplImage);
+
+    if (!sharedMem->isValid()) {
+      return;
+    }
+
+    {
+      sharedMem->lock();
+      memcpy(myImage.data, sharedMem->getSharedMemory(),
+          imgWidth*imgHeight*nrChannels);
+      sharedMem->unlock();
+    }
+
+    cv::imshow("frames",myImage);
+    cv::waitKey(1);
+    cvReleaseImage(&myIplImage);
   }
 
 
 
 
 
-  odcore::data::image::SharedImage mySharedImg = c.getData<odcore::data::image::SharedImage>();
-
-
-  std::string cameraName = mySharedImg.getName();
-  // std::cout << "Received image from camera " << cameraName  << "!" << std::endl;
-
-  //TODO compare the source name to keep track different camera sources
-
-  std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(
-      odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(
-          mySharedImg.getName()));
-
-  const uint32_t nrChannels = mySharedImg.getBytesPerPixel();
-  const uint32_t imgWidth = mySharedImg.getWidth();
-  const uint32_t imgHeight = mySharedImg.getHeight();
-
-  IplImage* myIplImage;
-  myIplImage = cvCreateImage(cvSize(
-      imgWidth, imgHeight), IPL_DEPTH_8U, nrChannels);
-  cv::Mat myImage(myIplImage);
-
-  if (!sharedMem->isValid()) {
-    return;
-  }
-
-  {
-    sharedMem->lock();
-    memcpy(myImage.data, sharedMem->getSharedMemory(),
-        imgWidth*imgHeight*nrChannels);
-    sharedMem->unlock();
-  }
-
-
-
-  cv::imshow("frames",myImage);
-  cv::waitKey(1);
-  cvReleaseImage(&myIplImage);
 }
 
 void TrackVehicle::doTrack(cv::Mat frame){
@@ -198,6 +194,9 @@ void TrackVehicle::pushToBuffer(vehicle_tex data){
 
 // returns img_matches
 cv::Mat TrackVehicle::matchFeatures(cv::Mat img_object,cv::Mat img_scene){
+  (void) img_object;
+  (void) img_scene;
+  return cv::Mat();
 /*
 
   //-- Step 1: Detect the keypoints using SURF Detector

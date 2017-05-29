@@ -27,17 +27,28 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include "detectvehicle/vehicle_s.hpp"
-#include "trackvehicle/vehicle_tex.hpp"
-
 
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
 
-
 namespace opendlv {
 namespace perception {
 namespace trackvehicle {
+
+struct vehicle_t {
+  int id;
+  int x;
+  int y;
+  int w;
+  int h;
+  int found;  // AKA Rank
+};
+
+struct vehicle_tex {
+  vehicle_t vehicle;
+  cv::Mat image;
+};
+
 
 /**
  * This class provides a module with capability of keeping track of vehicle in a given series of images

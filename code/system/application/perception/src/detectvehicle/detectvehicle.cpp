@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Chalmers REVERE
+ * Copyright (C) 2017 Chalmers REVERE
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
  */
 
 
-//---
+#include <cmath>
 #include <ctype.h>
 #include <cstring>
 #include <iostream>
@@ -30,18 +30,12 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc_c.h>
-#include "opendavinci/GeneratedHeaders_OpenDaVINCI.h"
-#include "opendavinci/odcore/wrapper/SharedMemoryFactory.h"
-#include "opendavinci/odcore/wrapper/SharedMemory.h"
+#include <opendavinci/GeneratedHeaders_OpenDaVINCI.h>
+#include <opendavinci/odcore/wrapper/SharedMemoryFactory.h>
+#include <opendavinci/odcore/wrapper/SharedMemory.h>
 
-#include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
-
-//#include "detectvehicle/vehicle_s.hpp"
-#include "detectvehicle/detectvehicle.hpp"
-
-
-
-
+#include <odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h>
+#include <detectvehicle/detectvehicle.hpp>
 
 namespace opendlv {
 namespace perception {
@@ -57,6 +51,9 @@ namespace detectvehicle {
 DetectVehicle::DetectVehicle(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(
       a_argc, a_argv, "perception-detectvehicle")
+    , vehicle_buffer()
+    , cascade()
+    , storage()
     , m_initialised(false)
     , m_debug()
 {
@@ -351,8 +348,9 @@ void DetectVehicle::drawROI(IplImage* frame){
   *  @param vehicle     The vehicle to send
   * Message [id=201 ] VehicleVision
   */
-void DetectVehicle::sendVehicle(vehicle_t vehicle,odcore::data::TimeStamp timeStampOfFrame){
-std::cout << "BRODCASTING VEHICLE ID=" << vehicle.id << std::endl;
+void DetectVehicle::sendVehicle(vehicle_t vehicle, odcore::data::TimeStamp timeStampOfFrame)
+{
+  std::cout << "BRODCASTING VEHICLE ID=" << vehicle.id << std::endl;
   opendlv::perception::VehicleVision detectedObject(
       timeStampOfFrame,
       vehicle.id,

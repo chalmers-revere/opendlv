@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 Chalmers REVERE
+ * Copyright (C) 2017 Chalmers REVERE
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,21 +20,9 @@
 #ifndef DETECTVEHICLE_DETECTVEHICLE_HPP_
 #define DETECTVEHICLE_DETECTVEHICLE_HPP_
 
-#include <memory>
 #include <vector>
-#include <cmath>
 
-#include <string>
-#include <stdio.h>
-#include <math.h> /* sqrt */
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
-//#include "opencv2/objdetect/objdetect_c.h"
- #include <opencv2/objdetect/objdetect.hpp>
-
-#include "detectvehicle/vehicle_s.hpp"
-
+#include <opencv2/objdetect/objdetect.hpp>
 
 #include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
@@ -45,7 +33,14 @@ namespace opendlv {
 namespace perception {
 namespace detectvehicle {
 
-
+struct vehicle_t {
+  int id;
+  int x;
+  int y;
+  int w;
+  int h;
+  int found;  // AKA Rank
+};
 
 /**
  * This class provides a module with ability of detect vehicle.
@@ -66,43 +61,34 @@ class DetectVehicle
   void setUp();
   void tearDown();
 
-  /* --- GLOBALS(MEMBERS) ---*/
-std::vector<vehicle_t> vehicle_buffer = std::vector<vehicle_t>();
-CvHaarClassifierCascade* cascade;
-//CascadeClassifier cascade;
-CvMemStorage* storage;
-
-
-//void sendObjectInformation();
-
+  std::vector<vehicle_t> vehicle_buffer = std::vector<vehicle_t>();
+  CvHaarClassifierCascade* cascade;
+  CvMemStorage* storage;
   bool m_initialised;
   bool m_debug;
 
+  /* --- CONFIGURATIONS (USER DEFINED) ---*/
+  int input_resize_percent = 90;
+  int NEIGHBOURS=3;
+  int SHOW_POINT = 3; // MINUMUM RANK
+  int REMOVE_POINT = -3;
+  int SUCCESS_POINT=30; //
+  int SHOW_RIO=0;
+  int HORIZON=400;
+  int id_counter = 0;
+  int MAX_DISTANCE = 30;  // 30 pixels shift at most for each car from one frame to another
 
 
 
-/* --- CONFIGURATIONS (USER DEFINED) ---*/
-int input_resize_percent = 90;
-int NEIGHBOURS=3;
-int SHOW_POINT = 3; // MINUMUM RANK
-int REMOVE_POINT = -3;
-int SUCCESS_POINT=30; //
-int SHOW_RIO=0;
-int HORIZON=400;
-int id_counter = 0;
-int MAX_DISTANCE = 30;  // 30 pixels shift at most for each car from one frame to another
-
-
-
-/* --- METHODS ---*/
-void init();
-int checkMatch(vehicle_t vehicle);
-void drawRec(IplImage* img, vehicle_t vehicle);
-void detect(IplImage* img,odcore::data::TimeStamp timeStampOfFrame);
-double distance(int x1, int x2, int y1, int y2);
-void updateBuffer();
-void drawROI(IplImage* frame);
-void sendVehicle(vehicle_t vehicle,odcore::data::TimeStamp timeStampOfFrame);  // TODO
+  /* --- METHODS ---*/
+  void init();
+  int checkMatch(vehicle_t vehicle);
+  void drawRec(IplImage* img, vehicle_t vehicle);
+  void detect(IplImage* img,odcore::data::TimeStamp timeStampOfFrame);
+  double distance(int x1, int x2, int y1, int y2);
+  void updateBuffer();
+  void drawROI(IplImage* frame);
+  void sendVehicle(vehicle_t vehicle,odcore::data::TimeStamp timeStampOfFrame);  // TODO
 
 
 };
