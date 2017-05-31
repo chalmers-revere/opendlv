@@ -65,19 +65,6 @@ message opendlv.proxy.AnalogRequest [id = 164] {
   uint32 target [id = 2];
 }
 
-//message opendlv.proxy.AccelerometerReading [id = 161] {
-//  float acceleration[3] [id = 1];
-//}
-
-//message opendlv.proxy.AltimeterReading [id = 162] {
-//  float altitude [id = 1];
-//}
-
-//message opendlv.proxy.CompassReading [id = 163] {
-//  float heading[3] [id = 1];
-//}
-
-
 message opendlv.proxy.ControlState [id = 165] {
   bool isAutonomous [id = 1];
 }
@@ -103,32 +90,10 @@ message opendlv.proxy.GpsReading [id = 167] {
   bool hasRtk [id = 11];
 }
 
-//message opendlv.proxy.GyroscopeReading [id = 168] {
-//  float orientation[3] [id = 1];
-//}
-
 message opendlv.proxy.LedRequest [id = 169] {
   uint8 numberOfLeds [id = 1];
   string data [id = 2];
 }
-
-message opendlv.proxy.RelayRequest [id = 170] {
-  bool relayValue [id = 1];
-  uint8 relayIndex [id = 2];
-  string deviceId [id = 3];
-}
-
-// This message is already migrated to OpenDLV.core. DO NOT CHANGE CONTENT OR IDENTIFIERS HERE!*/
-// message opendlv.proxy.V2vReading [id = 171] {
-//   uint32 size [id = 1];
-//   string data [id = 2];
-// }
-
-// This message is already migrated to OpenDLV.core. DO NOT CHANGE CONTENT OR IDENTIFIERS HERE!*/
-// message opendlv.proxy.V2vRequest [id = 172] {
-//   uint32 size [id = 1];
-//   string data [id = 2];
-// }
 
 message opendlv.sensation.Voice [id = 175] {
   string type [id = 1];
