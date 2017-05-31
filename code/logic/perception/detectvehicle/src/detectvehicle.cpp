@@ -24,15 +24,12 @@
 #include <iostream>
 #include <string>
 
-#include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc_c.h>
 
 #include <opendavinci/odcore/data/Container.h>
 #include <opendavinci/odcore/wrapper/SharedMemoryFactory.h>
 #include <opendavinci/odcore/wrapper/SharedMemory.h>
-#include <opendavinci/GeneratedHeaders_OpenDaVINCI.h>
 
 #include <odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h>
 
@@ -54,6 +51,7 @@ DetectVehicle::DetectVehicle(int32_t const &a_argc, char **a_argv)
     , vehicle_buffer()
     , cascade()
     , storage()
+    , m_currentImg()
     , m_initialised(false)
     , m_debug()
 {
@@ -98,73 +96,71 @@ void DetectVehicle::nextContainer(odcore::data::Container &c)
     return;
   }
   if (c.getDataType() == odcore::data::image::SharedImage::ID()) {
-    odcore::data::image::SharedImage mySharedImg = 
+    odcore::data::image::SharedImage sharedImg = 
         c.getData<odcore::data::image::SharedImage>();
-    std::string cameraName = mySharedImg.getName();
+    // std::string cameraName = mySharedImg.getName();
     //std::cout << "Received image from camera " << cameraName  << "!" << std::endl;
     //TODO compare the source name to keep track different camera sources
 
-    std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(
-        odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(
-            mySharedImg.getName()));
-
-    const uint32_t nrChannels = mySharedImg.getBytesPerPixel();
-    const uint32_t imgWidth = mySharedImg.getWidth();
-    const uint32_t imgHeight = mySharedImg.getHeight();
-
-    IplImage* myIplImage;
-    myIplImage = cvCreateImage(cvSize(
-        imgWidth, imgHeight), IPL_DEPTH_8U, nrChannels);
-
-    cv::Mat myImage(myIplImage);
-
-    if (!sharedMem->isValid()) {
+    if (!ExtractSharedImage(&sharedImg)) {
+      std::cout << "[" << getName() << "] " << "[Unable to extract shared image."
+          << std::endl;
       return;
     }
 
-    {
-      sharedMem->lock();
-      memcpy(myImage.data, sharedMem->getSharedMemory(),
-          imgWidth*imgHeight*nrChannels);
+    //COPY MAT TO IPLIMAGE
+    cv::Mat frame = m_currentImg.clone();
+    //THE RESIZE FRAME
+    cv::Mat frame1;
+    const int32_t sizeWidth = 640/2;
+    const int32_t windowHeight = 400/2;    
+    cv::resize(frame, frame1, cv::Size(sizeWidth , windowHeight), 0, 0, cv::INTER_LINEAR);
 
-      sharedMem->unlock();
-    }
-
-
-  //COPY MAT TO IPLIMAGE
-  IplImage* frame = cvCreateImage(cvSize(myImage.cols, myImage.rows), 8, 3);
-  IplImage frame2 = myImage;
-  cvCopy(&frame2, frame);
-
-
-  //  IplImage* frame = new IplImage( myImage );
-
-  //THE RESIZE FRAME
-    IplImage* frame1;
-    frame1 = cvCreateImage(
-        cvSize((int)((frame->width * input_resize_percent) / 100),
-               (int)((frame->height * input_resize_percent) / 100)),
-        frame->depth, frame->nChannels);
-    cvResize(frame, frame1);
-
-    //std::cout << "DETECTING!" << std::endl;
-
-    detect(frame1,c.getReceivedTimeStamp());
+    detect(frame1, c.getReceivedTimeStamp());
     cv::waitKey(1);
-    cvReleaseImage(&myIplImage);
-    
   }
 
 }
 
 
+bool DetectVehicle::ExtractSharedImage(
+      odcore::data::image::SharedImage *a_sharedImage)
+{
+  bool isExtracted = false;
+  std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(
+      odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(
+          a_sharedImage->getName()));
+  if (sharedMem->isValid()) {
+    const uint32_t nrChannels = a_sharedImage->getBytesPerPixel();
+    const uint32_t imgWidth = a_sharedImage->getWidth();
+    const uint32_t imgHeight = a_sharedImage->getHeight();
+    IplImage* myIplImage = 
+        cvCreateImage(cvSize(imgWidth,imgHeight), IPL_DEPTH_8U, nrChannels);
+    cv::Mat bufferImage = cv::Mat(myIplImage);
+    sharedMem->lock();
+    memcpy(bufferImage.data, sharedMem->getSharedMemory(), 
+        imgWidth*imgHeight*nrChannels);
+    sharedMem->unlock();
+    m_currentImg.release();
+    m_currentImg = bufferImage.clone();
+    bufferImage.release();
+    cvReleaseImage(&myIplImage);
+    isExtracted = true;
+  } else {
+    std::cout << "[" << getName() << "] " << "Shared image memory is not valid." << std::endl;
+  }
+  return isExtracted;
+}
+
+
 /**
-  *  Detects vehicles in a fram
+  *  Detects vehicles in a frame
   *
   * @param img The frame captured from the camera
   */
-void DetectVehicle::detect(IplImage* img,odcore::data::TimeStamp timeStampOfFrame){
-  CvSize img_size = cvGetSize(img);
+void DetectVehicle::detect(cv::Mat a_img, odcore::data::TimeStamp timeStampOfFrame){
+  cv::Size img_size = a_img.size();
+  IplImage* img = new IplImage(a_img);
 
   CvSeq* object = cvHaarDetectObjects(
       img, cascade, storage,
@@ -352,7 +348,6 @@ void DetectVehicle::drawROI(IplImage* frame){
   */
 void DetectVehicle::sendVehicle(vehicle_t vehicle, odcore::data::TimeStamp timeStampOfFrame)
 {
-  std::cout << "BRODCASTING VEHICLE ID=" << vehicle.id << std::endl;
   opendlv::perception::VehicleVision detectedObject(
       timeStampOfFrame,
       vehicle.id,
@@ -363,6 +358,7 @@ void DetectVehicle::sendVehicle(vehicle_t vehicle, odcore::data::TimeStamp timeS
       vehicle.found);
   odcore::data::Container objectContainer(detectedObject);
   getConference().send(objectContainer);
+  std::cout << "[<" << getName() << "] Sending: " << detectedObject.toString() << std::endl;
 
 }
 

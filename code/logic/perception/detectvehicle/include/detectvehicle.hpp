@@ -22,13 +22,13 @@
 
 #include <vector>
 
+#include <opencv2/core/core.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
 
-#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
-#include "opendavinci/odcore/data/Container.h"
+#include <opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h>
+#include <opendavinci/odcore/data/Container.h>
+#include <opendavinci/GeneratedHeaders_OpenDaVINCI.h>
  
-#include <Eigen/Dense>
-
 namespace opendlv {
 namespace logic {
 namespace perception {
@@ -55,8 +55,6 @@ class DetectVehicle
   virtual ~DetectVehicle();
   virtual void nextContainer(odcore::data::Container &);
 
-
-
  private:
   void setUp();
   void tearDown();
@@ -64,6 +62,7 @@ class DetectVehicle
   std::vector<vehicle_t> vehicle_buffer = std::vector<vehicle_t>();
   CvHaarClassifierCascade* cascade;
   CvMemStorage* storage;
+  cv::Mat m_currentImg;
   bool m_initialised;
   bool m_debug;
 
@@ -81,15 +80,15 @@ class DetectVehicle
 
 
   /* --- METHODS ---*/
+  bool ExtractSharedImage(odcore::data::image::SharedImage *);
   void init();
   int checkMatch(vehicle_t vehicle);
   void drawRec(IplImage* img, vehicle_t vehicle);
-  void detect(IplImage* img,odcore::data::TimeStamp timeStampOfFrame);
+  void detect(cv::Mat, odcore::data::TimeStamp timeStampOfFrame);
   double distance(int x1, int x2, int y1, int y2);
   void updateBuffer();
   void drawROI(IplImage* frame);
   void sendVehicle(vehicle_t vehicle,odcore::data::TimeStamp timeStampOfFrame);  // TODO
-
 
 };
 

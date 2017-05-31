@@ -234,7 +234,7 @@ bool DetectLane::ExtractSharedImage(
     cvReleaseImage(&myIplImage);
     isExtracted = true;
   } else {
-    std::cout << "[" << getName() << "] " << "Sharedmem is not valid." << std::endl;
+    std::cout << "[" << getName() << "] " << "Shared image memory is not valid." << std::endl;
   }
   return isExtracted;
 }
