@@ -115,13 +115,8 @@ void DetectLane::setUp()
   m_roi[3] = kv.getValue<uint16_t>("logic-perception-detectlane.roiHeight");
   m_debug = (kv.getValue<int32_t>("logic-perception-detectlane.debug") == 1);
   m_cameraName = kv.getValue<std::string>("logic-perception-detectlane.camera");
-  if (m_cameraName == "front-left") {
-    std::string const projectionFilename = 
-        "/opt/opendlv.data/" + m_cameraName + "-pixel2world-matrix.csv";
-    m_transformationMatrix = ReadMatrix(projectionFilename,3,3);
-  } else {
-    std::cout << "[" << getName() << "] " << "Projection matrix not available." << std::endl;
-  }
+  std::string const projectionFilename = m_cameraName + "-pixel2world-matrix.csv";
+  m_transformationMatrix = ReadMatrix(projectionFilename,3,3);
   m_initialized = true;
 }
 
