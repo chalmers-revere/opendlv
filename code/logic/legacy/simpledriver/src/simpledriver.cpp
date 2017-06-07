@@ -41,6 +41,7 @@
 #include <opendlv/scenario/LaneVisitor.h>
 
 #include "automotivedata/GeneratedHeaders_AutomotiveData.h"
+#include "odvdopendlvstandardmessageset/GeneratedHeaders_ODVDOpenDLVStandardMessageSet.h"
 #include "odvdvehicle/generated/opendlv/proxy/ActuationRequest.h"
 
 #include "simpledriver.hpp"
@@ -112,12 +113,11 @@ void SimpleDriver::nextContainer(odcore::data::Container &c) {
 
     m_oldPosition = currentPosition;
     m_receveivedFirstWGS84Position = true;
+  } else if (c.getDataType() == opendlv::proxy::GroundSpeedReading::ID()) {
+    Lock l(m_currentSpeedMutex);
+    auto groundSpeed = c.getData<opendlv::proxy::GroundSpeedReading>();
+    m_currentSpeed = groundSpeed.getGroundSpeed();
   }
- // else if (c.getDataType() == opendlv::proxy::reverexc90::CarSpeed::ID()) {
- //   Lock l(m_currentSpeedMutex);
- //   auto carSpeed = c.getData<opendlv::proxy::reverexc90::CarSpeed>();
- //   m_currentSpeed = carSpeed.getVehicleLgtSpeed();
- // }
 }
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SimpleDriver::body()
