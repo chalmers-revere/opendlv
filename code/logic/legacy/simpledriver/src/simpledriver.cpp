@@ -41,6 +41,7 @@
 #include <opendlv/scenario/LaneVisitor.h>
 
 #include "automotivedata/GeneratedHeaders_AutomotiveData.h"
+#include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
 #include "odvdopendlvstandardmessageset/GeneratedHeaders_ODVDOpenDLVStandardMessageSet.h"
 #include "odvdvehicle/generated/opendlv/proxy/ActuationRequest.h"
 
@@ -425,14 +426,23 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SimpleDriver::body()
           cout << "[" << getName() << "]: " << "Longitudinal control: current speed = " << currentSpeed << ", speed error = " << speedError << ", K = " << kPart << ", I = " << iPart << ", sum or errors = " << m_speedErrorSum << ", acceleration request: " << accelerationRequest << endl;
         }
 
-        // Create vehicle control data.
-        opendlv::proxy::ActuationRequest ar;
-        ar.setAcceleration(accelerationRequest);
-        ar.setSteering(steeringWheelAngle);
-        ar.setIsValid(true);
 
-        c = Container(ar);
+        odcore::data::TimeStamp now;
+        opendlv::model::Direction direction(0.0f, 0.0f);
+        opendlv::model::Direction desiredDirection(static_cast<float>(aimPointAngle), 0.0f);
+        opendlv::perception::StimulusDirectionOfMovement stimulus(now, desiredDirection, direction);
+     
+        c = odcore::data::Container(stimulus);
         getConference().send(c);
+
+        // Create vehicle control data.
+      //  opendlv::proxy::ActuationRequest ar;
+      //  ar.setAcceleration(accelerationRequest);
+      //  ar.setSteering(steeringWheelAngle);
+      //  ar.setIsValid(true);
+
+      //  c = Container(ar);
+      //  getConference().send(c);
         
         hasSentActuation = true;
       }
