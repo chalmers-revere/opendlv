@@ -20,6 +20,16 @@ project(opendlv-tool-signaladapter)
 
 include_directories(include)
 
+set (CMAKE_MODULE_PATH "${ODVDOPENDLVSTANDARDMESSAGESET_DIR}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules" ${CMAKE_MODULE_PATH})
+find_package (ODVDOpenDLVStandardMessageSet REQUIRED)
+include_directories(SYSTEM ${ODVDOPENDLVSTANDARDMESSAGESET_INCLUDE_DIRS})
+set(LIBRARIES ${LIBRARIES} ${ODVDOPENDLVSTANDARDMESSAGESET_LIBRARIES})
+
+set (CMAKE_MODULE_PATH "${ODVDVEHICLE_DIR}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules" ${CMAKE_MODULE_PATH})
+find_package (ODVDVehicle REQUIRED)
+include_directories(SYSTEM ${ODVDVEHICLE_INCLUDE_DIRS})
+set(LIBRARIES ${LIBRARIES} ${ODVDVEHICLE_LIBRARIES})
+
 ###############################################################################
 # Build this project.
 file(GLOB_RECURSE thisproject-sources "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")

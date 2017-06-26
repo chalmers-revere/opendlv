@@ -1,0 +1,128 @@
+# This is the "one-and-only" configuration for OpenDaVINCI.
+# Its format is like:
+#
+# section.key=value
+#
+# If you have several modules of the same type, the following configuration
+# scheme applies:
+#
+# global.key=value # <-- This configuration applies for all modules.
+#
+# section.key=value # <-- This configuration applies for all modules of type "section".
+#
+# section:ID.key=value # <-- This configuration applies for the module "ID" of type "section".
+
+
+###############################################################################
+###############################################################################
+#
+# GLOBAL CONFIGURATION
+#
+
+global.scenario = file://Track.scnx
+
+# Umeå Airport
+global.reference.WGS84.latitude = 63.792379
+global.reference.WGS84.longitude = 20.285961
+
+# AstaZero Rural Road:
+#global.reference.WGS84.latitude = 57.77145065 
+#global.reference.WGS84.longitude = 12.77508563
+
+
+# The following attributes define the buffer sizes for recording and
+# replaying. You need to adjust these parameters depending on the
+# camera resolution for example (640x480x3 --> 1000000 for memorySegment,
+# 1280x720x3 --> 2800000).
+global.buffer.memorySegmentSize = 2800000 # Size of a memory segment in bytes.
+global.buffer.numberOfMemorySegments = 4  # Number of memory segments.
+
+# The following key describes the list of modules expected to participate in this --cid session.
+global.session.expectedModules = copplar-control-example
+
+
+###############################################################################
+###############################################################################
+#
+# CONFIGURATION FOR ODCOCKPIT
+#
+#odcockpit.plugins = configurationviewer,healthstatusviewer,livefeed,logmessage,sessionviewer,sharedimageviewer # List of modules to show in odcockpit; leave blank to show all.
+odcockpit.directoriesForSharedLibaries = /opt # List of directories to search for libodvd*.so files.
+
+
+###############################################################################
+###############################################################################
+#
+# NEXT, THE CONFIGURATION FOR OpenDaVINCI TOOLS FOLLOWS. 
+#
+###############################################################################
+###############################################################################
+#
+# CONFIGURATION FOR ODSUPERCOMPONENT
+#
+
+# If the managed level is pulse_shift, all connected modules will be informed
+# about the supercomponent's real time by this increment per module. Thus, the
+# execution times per modules are better aligned with supercomponent and the
+# data exchange is somewhat more predictable.
+odsupercomponent.pulseshift.shift = 10000 # (in microseconds)
+
+# If the managed level is pulse_time_ack, this is the timeout for waiting for
+# an ACK message from a connected client.
+odsupercomponent.pulsetimeack.timeout = 5000 # (in milliseconds)
+
+# If the managed level is pulse_time_ack, the modules are triggered sequentially
+# by sending pulses and waiting for acknowledgment messages. To allow the modules
+# to deliver their respective containers, this yielding time is used to sleep
+# before supercomponent sends the pulse messages the next module in this execution
+# cycle. This value needs to be adjusted for networked simulations to ensure
+# deterministic execution. 
+odsupercomponent.pulsetimeack.yield = 5000 # (in microseconds)
+
+# List of modules (without blanks) that will not get a pulse message from odsupercomponent.
+odsupercomponent.pulsetimeack.exclude = odcockpit
+
+###############################################################################
+###############################################################################
+#
+# NEXT, THE CONFIGURATION FOR OPENDLV SOFTWARE FOLLOWS.
+#
+
+###############################################################################
+#
+# CONFIGURATION FOR simpledriver
+#
+# 
+#logic-legacy-simpledriver.startWaypoint = 1.1.1.1   # Uncomment these two lines for automated demo.
+#logic-legacy-simpledriver.endWaypoint = 1.1.1.4850  # Uncomment this and the previous line for automated demo.  
+#
+
+logic-legacy-simpledriver.startWaypoint = 1.1.1.1
+logic-legacy-simpledriver.endWaypoint = 1.1.7.2
+
+logic-legacy-simpledriver.slow_speed = 15 #2.7
+logic-legacy-simpledriver.fast_speed = 20 #23.0
+logic-legacy-simpledriver.look_ahead_distance = 180.0 
+logic-legacy-simpledriver.turn_mean_angle_threshold_deg = 0.07 # degrees per meter 
+logic-legacy-simpledriver.aim_point_gain_fast_speed = 2.5 # 2.0
+logic-legacy-simpledriver.aim_point_gain_slow_speed = 4.0 # 6.0
+logic-legacy-simpledriver.lateral_offset_gain = 0.0
+logic-legacy-simpledriver.speed_control_k = 0.15
+logic-legacy-simpledriver.speed_control_i = 0.08
+logic-legacy-simpledriver.speed_control_global_limit = 1.5
+logic-legacy-simpledriver.speed_control_error_sum_limit = 1.0
+logic-legacy-simpledriver.minimum_preview_distance = 10.0 # To get rid of localization uncertainties, normally not changed
+logic-legacy-simpledriver.aim_point_inclusion_angle_deg = 220.0 # In degrees, normally not changed
+logic-legacy-simpledriver.discard_threshold_distance = 3.0 # Alternative 1
+logic-legacy-simpledriver.discard_threshold_time_headway = 2.0 # Alternative 2
+
+
+tool-signaladapter.directoriesForSharedLibaries = /opt/opendlv.core/lib,/opt/dlv.snowfox/lib
+tool-signaladapter.sender.address = 10.10.10.2
+tool-signaladapter.sender.messageIds = 160
+tool-signaladapter.sender.senderStamps = 1
+tool-signaladapter.sender.ports = 6702
+tool-signaladapter.sender.mode = buffered # buffered, multiport
+tool-signaladapter.receiver.messageIds = 512,19
+tool-signaladapter.receiver.ports = 6801,6800
+tool-signaladapter.debug = 0

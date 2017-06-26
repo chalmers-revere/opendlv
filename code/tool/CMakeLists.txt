@@ -36,6 +36,8 @@ include(CheckCxxTestEnvironment)
 ###########################################################################
 # Find OpenDaVINCI.
 find_package(OpenDaVINCI REQUIRED)
+find_package(OpenDLV REQUIRED)
+find_package(AutomotiveData REQUIRED)
 
 ###########################################################################
 # Find ODVDOpenDLVData.
@@ -44,11 +46,16 @@ find_package(ODVDOpenDLVData REQUIRED)
 ###########################################################################
 # Set common include directories.
 include_directories(SYSTEM ${OPENDAVINCI_INCLUDE_DIRS})
+include_directories(SYSTEM ${OPENDLV_INCLUDE_DIRS})
+include_directories(SYSTEM ${AUTOMOTIVEDATA_INCLUDE_DIRS})
 include_directories(SYSTEM ${ODVDOPENDLVDATA_INCLUDE_DIRS})
+include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 
 ###########################################################################
 # Set libraries to link against.
 set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
+  ${OPENDLV_LIBRARIES}
+  ${AUTOMOTIVEDATA_LIBRARIES}
   ${ODVDOPENDLVDATA_LIBRARIES})
 
 ###########################################################################

@@ -26,9 +26,11 @@
 #include <string>
 #include <limits.h>
 
+#include <opendlv/data/environment/WGS84Coordinate.h>
 #include <opendavinci/odcore/data/Container.h>
 
 #include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
+#include "odvdopendlvstandardmessageset/GeneratedHeaders_ODVDOpenDLVStandardMessageSet.h"
 
 #include "samplebuffer.hpp"
 #include "signalstringlistener.hpp"
@@ -64,6 +66,16 @@ void SignalStringListener::nextString(std::string const &a_string)
   }
 
   switch (messageId) {
+    case 19:
+      {
+        double latitude = it->ReadFloat64();
+        double longitude = it->ReadFloat64();
+        opendlv::data::environment::WGS84Coordinate wgs84(latitude, longitude);
+        odcore::data::Container wgs84Container(wgs84);
+        m_conference.send(wgs84Container);
+
+        break;
+      }
     case 160:
       {
         float acceleration = it->ReadFloat32();
@@ -83,6 +95,15 @@ void SignalStringListener::nextString(std::string const &a_string)
             value, target);
         odcore::data::Container analogRequestContainer(analogRequest);
         m_conference.send(analogRequestContainer);
+
+        break;
+      }
+    case 215:
+      {
+        double groundSpeed = it->ReadFloat64();
+        opendlv::proxy::GroundSpeedReading groundSpeedReading(groundSpeed);
+        odcore::data::Container groundSpeedReadingContainer(groundSpeedReading);
+        m_conference.send(groundSpeedReadingContainer);
 
         break;
       }
