@@ -144,8 +144,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SimpleDriver::body()
 
   // Try to load coordinates from configuration.
   try {
-    startWaypoint = getKeyValueConfiguration().getValue<string>("simpledriver.startwaypoint");
-    endWaypoint = getKeyValueConfiguration().getValue<string>("simpledriver.endwaypoint");
+    startWaypoint = getKeyValueConfiguration().getValue<string>("logic-legacy-simpledriver.startwaypoint");
+    endWaypoint = getKeyValueConfiguration().getValue<string>("logic-legacy-simpledriver.endwaypoint");
   }
   catch (...) {
     startWaypoint = "";
@@ -251,14 +251,14 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SimpleDriver::body()
 
         previousHeading = heading;
 
-        double const minPreviewDistance = getKeyValueConfiguration().getValue<double>("simpledriver.minimum_preview_distance");
+        double const minPreviewDistance = getKeyValueConfiguration().getValue<double>("logic-legacy-simpledriver.minimum_preview_distance");
         Point3 minPreviewPoint(minPreviewDistance, 0, 0);
         minPreviewPoint.rotateZ(heading);
         minPreviewPoint += currentPosition;
 
         // Skip points
         if (!hasSentActuation) {
-          double const inclusionAngle = getKeyValueConfiguration().getValue<double>("simpledriver.aim_point_inclusion_angle_deg") * 0.0175;
+          double const inclusionAngle = getKeyValueConfiguration().getValue<double>("logic-legacy-simpledriver.aim_point_inclusion_angle_deg") * 0.0175;
           double anglePadding = (inclusionAngle - cartesian::Constants::PI) / 2.0;
           bool const isBehindToLeft = !minPreviewPoint.isInFront(nextPoint, heading + anglePadding);
           bool const isBehindToRight = !minPreviewPoint.isInFront(nextPoint, heading - anglePadding);
@@ -268,7 +268,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SimpleDriver::body()
           }
 
         } else {
-          double discardThresholdTimeHeadway = getKeyValueConfiguration().getValue<double>("simpledriver.discard_threshold_time_headway");
+          double discardThresholdTimeHeadway = getKeyValueConfiguration().getValue<double>("logic-legacy-simpledriver.discard_threshold_time_headway");
           double discardThresholdDistance = currentSpeed * discardThresholdTimeHeadway;
 
           double nextPointDistance = (nextPoint - currentPosition).lengthXY();
@@ -292,12 +292,12 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SimpleDriver::body()
         }
 
 
-        double const slowSpeed = getKeyValueConfiguration().getValue<double>("simpledriver.slow_speed");
-        double const fastSpeed = getKeyValueConfiguration().getValue<double>("simpledriver.fast_speed");
+        double const slowSpeed = getKeyValueConfiguration().getValue<double>("logic-legacy-simpledriver.slow_speed");
+        double const fastSpeed = getKeyValueConfiguration().getValue<double>("logic-legacy-simpledriver.fast_speed");
 
         // Look ahead to detect a turn.
-        double const lookAheadDistance = getKeyValueConfiguration().getValue<double>("simpledriver.look_ahead_distance");
-        double const turnAngleThreshold = getKeyValueConfiguration().getValue<double>("simpledriver.turn_mean_angle_threshold_deg") * 0.0175;
+        double const lookAheadDistance = getKeyValueConfiguration().getValue<double>("logic-legacy-simpledriver.look_ahead_distance");
+        double const turnAngleThreshold = getKeyValueConfiguration().getValue<double>("logic-legacy-simpledriver.turn_mean_angle_threshold_deg") * 0.0175;
 
         Point3 futureNextPoint = nextPoint;
         bool isEndOfRoad = true;
@@ -368,9 +368,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SimpleDriver::body()
         double phi = (perpendicularPoint - currentPosition).getAngleXY();
         double lateralOffset = -(nextPoint - currentPosition).lengthXY() * cos(phi - theta);
 
-        double const aimPointGainSlowSpeed = getKeyValueConfiguration().getValue<double>("simpledriver.aim_point_gain_slow_speed");
-        double const aimPointGainFastSpeed = getKeyValueConfiguration().getValue<double>("simpledriver.aim_point_gain_fast_speed");
-        double lateralOffsetGain = getKeyValueConfiguration().getValue<double>("simpledriver.lateral_offset_gain");
+        double const aimPointGainSlowSpeed = getKeyValueConfiguration().getValue<double>("logic-legacy-simpledriver.aim_point_gain_slow_speed");
+        double const aimPointGainFastSpeed = getKeyValueConfiguration().getValue<double>("logic-legacy-simpledriver.aim_point_gain_fast_speed");
+        double lateralOffsetGain = getKeyValueConfiguration().getValue<double>("logic-legacy-simpledriver.lateral_offset_gain");
 
         double aimPointGain = aimPointGainSlowSpeed;
         if (fabs(targetSpeed - fastSpeed) < 1e-3) {
@@ -406,10 +406,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SimpleDriver::body()
 
         double speedError = targetSpeed - currentSpeed;
 
-        double const pidK = getKeyValueConfiguration().getValue<double>("simpledriver.speed_control_k");
-        double const pidI = getKeyValueConfiguration().getValue<double>("simpledriver.speed_control_i");
-        double const accelerationRequestLimit = getKeyValueConfiguration().getValue<double>("simpledriver.speed_control_global_limit");
-        double const speedErrorSumLimit = getKeyValueConfiguration().getValue<double>("simpledriver.speed_control_error_sum_limit");;
+        double const pidK = getKeyValueConfiguration().getValue<double>("logic-legacy-simpledriver.speed_control_k");
+        double const pidI = getKeyValueConfiguration().getValue<double>("logic-legacy-simpledriver.speed_control_i");
+        double const accelerationRequestLimit = getKeyValueConfiguration().getValue<double>("logic-legacy-simpledriver.speed_control_global_limit");
+        double const speedErrorSumLimit = getKeyValueConfiguration().getValue<double>("logic-legacy-simpledriver.speed_control_error_sum_limit");;
 
         double kPart = pidK * speedError;
 
