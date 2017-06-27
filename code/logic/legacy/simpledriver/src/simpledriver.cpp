@@ -61,15 +61,16 @@ using namespace opendlv::data::environment;
 
 SimpleDriver::SimpleDriver(const int32_t &argc, char **argv)
     : TimeTriggeredConferenceClientModule(argc, argv, "logic-legacy-simpledriver"),
-      m_receveivedFirstWGS84Position(false),
-      WGS84Reference(),
+      m_egoState(),
       m_oldPosition(),
       m_oldPositionForDirection(),
-      m_egoStateMutex(),
-      m_egoState(),
+      m_wgs84Reference(),
       m_currentSpeedMutex(),
+      m_egoStateMutex(),
       m_currentSpeed(),
-      m_speedErrorSum()
+      m_speedErrorSum(),
+      m_receivedFirstPosition(false),
+      m_receivedHeading(false)
 {
 }
 
@@ -84,7 +85,7 @@ void SimpleDriver::setUp()
   double const latitude = getKeyValueConfiguration().getValue<double>("global.reference.WGS84.latitude");
   double const longitude = getKeyValueConfiguration().getValue<double>("global.reference.WGS84.longitude");
 
-  WGS84Reference = WGS84Coordinate(latitude, longitude);
+  m_wgs84Reference = WGS84Coordinate(latitude, longitude);
 }
 
 void SimpleDriver::tearDown()
@@ -95,9 +96,9 @@ void SimpleDriver::nextContainer(odcore::data::Container &c) {
   // TODO: Create a microservice from the following lines.
   if (c.getDataType() == opendlv::data::environment::WGS84Coordinate::ID()) {
     WGS84Coordinate WGS84current = c.getData<WGS84Coordinate>();
-    Point3 currentPosition = WGS84Reference.transform(WGS84current);
+    Point3 currentPosition = m_wgs84Reference.transform(WGS84current);
 
-    if (m_receveivedFirstWGS84Position) {
+    if (m_receivedFirstPosition) {
       Lock l(m_egoStateMutex);
 
       double const d = (currentPosition - m_oldPositionForDirection).lengthXY();
@@ -106,6 +107,7 @@ void SimpleDriver::nextContainer(odcore::data::Container &c) {
         Point3 direction = (currentPosition - m_oldPositionForDirection);
         m_egoState.setRotation(direction);
         m_oldPositionForDirection = currentPosition;
+        m_receivedHeading = true;
       }
       m_egoState.setPosition(currentPosition);
       c = Container(m_egoState);
@@ -113,7 +115,7 @@ void SimpleDriver::nextContainer(odcore::data::Container &c) {
     }
 
     m_oldPosition = currentPosition;
-    m_receveivedFirstWGS84Position = true;
+    m_receivedFirstPosition = true;
   } else if (c.getDataType() == opendlv::proxy::GroundSpeedReading::ID()) {
     Lock l(m_currentSpeedMutex);
     auto groundSpeed = c.getData<opendlv::proxy::GroundSpeedReading>();
@@ -213,10 +215,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SimpleDriver::body()
     }
 
 
-    uint32_t waitingBeforeStart = 2;
-    while (waitingBeforeStart > 0) {
-      cout << "[" << getName() << "]: " << "Still waiting " << waitingBeforeStart << " seconds..." << endl;
-      waitingBeforeStart--;
+    while (!m_receivedHeading) {
+      std::cout << "[" << getName() << "]: " << "Still waiting for heading.." << std::endl;
       Thread::usleepFor(1 * 1000 * 1000);
     }
 
@@ -427,22 +427,22 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SimpleDriver::body()
         }
 
 
-        odcore::data::TimeStamp now;
-        opendlv::model::Direction direction(0.0f, 0.0f);
-        opendlv::model::Direction desiredDirection(static_cast<float>(aimPointAngle), 0.0f);
-        opendlv::perception::StimulusDirectionOfMovement stimulus(now, desiredDirection, direction);
+      //  odcore::data::TimeStamp now;
+      //  opendlv::model::Direction direction(0.0f, 0.0f);
+      //  opendlv::model::Direction desiredDirection(static_cast<float>(aimPointAngle), 0.0f);
+      //  opendlv::perception::StimulusDirectionOfMovement stimulus(now, desiredDirection, direction);
      
-        c = odcore::data::Container(stimulus);
-        getConference().send(c);
+     //   c = odcore::data::Container(stimulus);
+     //   getConference().send(c);
 
         // Create vehicle control data.
-      //  opendlv::proxy::ActuationRequest ar;
-      //  ar.setAcceleration(accelerationRequest);
-      //  ar.setSteering(steeringWheelAngle);
-      //  ar.setIsValid(true);
+        opendlv::proxy::ActuationRequest ar;
+        ar.setAcceleration(accelerationRequest);
+        ar.setSteering(steeringWheelAngle);
+        ar.setIsValid(true);
 
-      //  c = Container(ar);
-      //  getConference().send(c);
+        c = Container(ar);
+        getConference().send(c);
         
         hasSentActuation = true;
       }

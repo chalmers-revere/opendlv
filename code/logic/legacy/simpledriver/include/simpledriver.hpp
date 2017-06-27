@@ -42,19 +42,17 @@ class SimpleDriver : public odcore::base::module::TimeTriggeredConferenceClientM
  private:
   virtual void setUp();
   virtual void tearDown();
-       
-  bool m_receveivedFirstWGS84Position;
-  opendlv::data::environment::WGS84Coordinate WGS84Reference;
+
+  opendlv::data::environment::EgoState m_egoState;
   opendlv::data::environment::Point3 m_oldPosition;
   opendlv::data::environment::Point3 m_oldPositionForDirection;
-
-  odcore::base::Mutex m_egoStateMutex;
-  opendlv::data::environment::EgoState m_egoState;
-
+  opendlv::data::environment::WGS84Coordinate m_wgs84Reference;
   odcore::base::Mutex m_currentSpeedMutex;
+  odcore::base::Mutex m_egoStateMutex;
   double m_currentSpeed;
-
   double m_speedErrorSum;
+  bool m_receivedFirstPosition;
+  bool m_receivedHeading;
 };
 
 }

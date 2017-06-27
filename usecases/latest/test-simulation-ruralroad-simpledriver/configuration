@@ -98,7 +98,7 @@ odsupercomponent.pulsetimeack.exclude = odcockpit
 #
 
 logic-legacy-simpledriver.startWaypoint = 1.1.1.1
-logic-legacy-simpledriver.endWaypoint = 1.1.7.2
+logic-legacy-simpledriver.endWaypoint = 1.7.1.2
 
 logic-legacy-simpledriver.slow_speed = 15 #2.7
 logic-legacy-simpledriver.fast_speed = 20 #23.0
