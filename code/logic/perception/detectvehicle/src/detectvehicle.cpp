@@ -73,17 +73,7 @@ void DetectVehicle::setUp()
   odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
   m_sourceName = kv.getValue<std::string>("logic-perception-detectvehicle.source");
 
-  std::string path = "/opt/opendlv/share/opendlv/tools/vision/projection/";
-
-  if (m_sourceName == "front-left") {
-    m_pixel2World = ReadMatrix(path+"leftCameraTransformationMatrix.csv",3,3);
-  }
-  else if (m_sourceName == "front-right") {
-    m_pixel2World = ReadMatrix(path+"rightCameraTransformationMatrix.csv",3,3);
-  }
-  else {
-    std::cout << "Cannot load transformation matrix for " << m_sourceName << ". Undefined camera source." << std::endl;
-  }
+  m_pixel2World = ReadMatrix(m_sourceName + "-pixel2world-matrix.csv",3,3);
   m_debugMode = (kv.getValue<int32_t> ("logic-perception-detectvehicle.debug") == 1);
   std::cout << "Debug mode: " << m_debugMode << std::endl;
   std::cout << "This DetectVehicle instance will receive images from " << m_sourceName << "." << std::endl;
@@ -188,7 +178,9 @@ Eigen::MatrixXd DetectVehicle::ReadMatrix(std::string fileName, int nRows,
         matrix(i,j) = item;
       }
     }
-  }  
+  } else {
+    std::cerr << "[" << getName() << "] Error reading the pixel2world matrix file: " << fileName << std::endl;
+  }
   file.close();
   return matrix;
 }

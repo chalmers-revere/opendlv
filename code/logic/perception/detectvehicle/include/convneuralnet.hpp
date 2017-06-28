@@ -89,9 +89,9 @@ class ConvNeuralNet {
   double m_normStdB;
 
   const std::string m_pathTrainedCnn = 
-      "share/opendlv/system/application/perception/detectvehicle/trained_cnn";
+      "trained_cnn";
   const std::string m_pathNormalizationConstants = 
-      "share/opendlv/system/application/perception/detectvehicle/normalization_constants";
+      "normalization_constants";
 
   std::vector<cv::Rect> m_detectedVehicles;
 
