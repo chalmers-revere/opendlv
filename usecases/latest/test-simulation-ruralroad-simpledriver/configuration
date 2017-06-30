@@ -98,21 +98,21 @@ odsupercomponent.pulsetimeack.exclude = odcockpit
 #
 
 logic-legacy-simpledriver.startWaypoint = 1.1.1.1
-logic-legacy-simpledriver.endWaypoint = 1.7.1.2
+logic-legacy-simpledriver.endWaypoint = 1.7.1.5
 
-logic-legacy-simpledriver.slow_speed = 15 #2.7
-logic-legacy-simpledriver.fast_speed = 20 #23.0
+logic-legacy-simpledriver.slow_speed = 2.7
+logic-legacy-simpledriver.fast_speed = 22
 logic-legacy-simpledriver.look_ahead_distance = 180.0 
 logic-legacy-simpledriver.turn_mean_angle_threshold_deg = 0.07 # degrees per meter 
-logic-legacy-simpledriver.aim_point_gain_fast_speed = 2.5 # 2.0
-logic-legacy-simpledriver.aim_point_gain_slow_speed = 4.0 # 6.0
+logic-legacy-simpledriver.aim_point_gain_fast_speed = 2.0
+logic-legacy-simpledriver.aim_point_gain_slow_speed = 6.0
 logic-legacy-simpledriver.lateral_offset_gain = 0.0
 logic-legacy-simpledriver.speed_control_k = 0.15
 logic-legacy-simpledriver.speed_control_i = 0.08
 logic-legacy-simpledriver.speed_control_global_limit = 1.5
 logic-legacy-simpledriver.speed_control_error_sum_limit = 1.0
 logic-legacy-simpledriver.minimum_preview_distance = 10.0 # To get rid of localization uncertainties, normally not changed
-logic-legacy-simpledriver.aim_point_inclusion_angle_deg = 220.0 # In degrees, normally not changed
+logic-legacy-simpledriver.aim_point_inclusion_angle_deg = 180.0 # In degrees, normally not changed
 logic-legacy-simpledriver.discard_threshold_distance = 3.0 # Alternative 1
 logic-legacy-simpledriver.discard_threshold_time_headway = 2.0 # Alternative 2
 

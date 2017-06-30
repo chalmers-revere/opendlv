@@ -35,7 +35,7 @@ services:
         working_dir: "/opt/opendlv.data"
         depends_on:
             - odsupercomponent
-        command: "/opt/opendlv/bin/opendlv-logic-legacy-simpledriver --cid=${CID} --freq=100 --id=1 --verbose=0"
+        command: "/opt/opendlv/bin/opendlv-logic-legacy-simpledriver --cid=${CID} --freq=100 --id=1 --verbose=1"
 
     tool-signaladapter:
         build: .

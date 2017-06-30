@@ -86,6 +86,20 @@ void SimpleDriver::setUp()
   double const longitude = getKeyValueConfiguration().getValue<double>("global.reference.WGS84.longitude");
 
   m_wgs84Reference = WGS84Coordinate(latitude, longitude);
+
+
+  double heading = 3.5;
+
+  opendlv::data::environment::Point3 position(latitude, longitude, 0.0);
+  opendlv::data::environment::Point3 rotation(1.0, 0.0, 0.0);
+
+  rotation.rotateZ(heading);
+  rotation.normalize();
+    
+  Lock l(m_egoStateMutex);
+  
+  m_egoState.setPosition(position);
+  m_egoState.setRotation(rotation);
 }
 
 void SimpleDriver::tearDown()
@@ -110,8 +124,6 @@ void SimpleDriver::nextContainer(odcore::data::Container &c) {
         m_receivedHeading = true;
       }
       m_egoState.setPosition(currentPosition);
-      c = Container(m_egoState);
-      getConference().send(c);
     }
 
     m_oldPosition = currentPosition;
@@ -125,6 +137,8 @@ void SimpleDriver::nextContainer(odcore::data::Container &c) {
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SimpleDriver::body()
 {
+  Container c;
+
   odcore::io::URL const urlOfSCNXFile(getKeyValueConfiguration().getValue<string>("global.scenario"));
 
   core::wrapper::graph::DirectedGraph m_graph;
@@ -199,7 +213,6 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SimpleDriver::body()
     cout << "[" << getName() << "]: " << "Shortest route from " << v1.toString() << " to " << v2.toString() << ": " << endl;
     cout << route.toString() << endl;
 
-    Container c;
     if (route.getSize() < 500) {
       c = Container(route);
       getConference().send(c);
@@ -215,8 +228,10 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SimpleDriver::body()
     }
 
 
-    while (!m_receivedHeading) {
-      std::cout << "[" << getName() << "]: " << "Still waiting for heading.." << std::endl;
+    uint32_t waitingBeforeStart = 2;
+    while (waitingBeforeStart > 0) {
+      cout << "[" << getName() << "]: " << "Still waiting " << waitingBeforeStart << " seconds..." << endl;
+      waitingBeforeStart--;
       Thread::usleepFor(1 * 1000 * 1000);
     }
 
@@ -240,6 +255,9 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SimpleDriver::body()
 
           Lock l2(m_currentSpeedMutex);
           currentSpeed = m_currentSpeed;
+
+          c = Container(m_egoState);
+          getConference().send(c);
         }
 
         // Get our current position.
@@ -458,7 +476,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode SimpleDriver::body()
   ar.setIsValid(true);
 
   // Create container for finally sending the data.
-  Container c(ar);
+  c = Container(ar);
   // Send container.
   getConference().send(c);
 
