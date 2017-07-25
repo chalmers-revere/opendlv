@@ -330,7 +330,7 @@ std::vector<std::pair<cv::Vec2f, cv::Vec2f>> DetectLane::GetParametricRepresenta
     std::vector<cv::Vec2f> a_groups)
 {
   std::vector<std::pair<cv::Vec2f, cv::Vec2f>> lineParamRep;
-  for (uint i = 0; i < a_groups.size(); i++) {
+  for (uint16_t i = 0; i < a_groups.size(); i++) {
     float rho = a_groups[i][0];
     float theta = a_groups[i][1];
     float x0 = cosf(theta)*rho;

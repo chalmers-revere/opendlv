@@ -36,8 +36,21 @@ include(CheckCxxTestEnvironment)
 ###########################################################################
 # Find OpenDaVINCI.
 find_package(OpenDaVINCI REQUIRED)
+set(OPENDLV_DIR ${OPENDAVINCI_DIR})
 find_package(OpenDLV REQUIRED)
+set(AUTOMOTIVEDATA_DIR ${OPENDAVINCI_DIR})
 find_package(AutomotiveData REQUIRED)
+
+###########################################################################
+# Find OpenCV.
+IF( (EXISTS "/usr/pkg/include/opencv") OR (EXISTS "/usr/pkg/include/opencv2") )
+    SET(OPENCV_ROOT_DIR "/usr/pkg")
+ENDIF()
+FIND_PACKAGE(OpenCV REQUIRED)
+
+###############################################################################
+# Set header files from OpenCV.
+INCLUDE_DIRECTORIES (SYSTEM ${OpenCV_INCLUDE_DIRS})
 
 ###########################################################################
 # Find ODVDOpenDLVData.
