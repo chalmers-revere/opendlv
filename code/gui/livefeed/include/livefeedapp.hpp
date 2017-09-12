@@ -16,34 +16,35 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef GUI_LIVEFEED_LIVEFEED_HPP
-#define GUI_LIVEFEED_LIVEFEED_HPP
+#ifndef GUI_LIVEFEED_LIVEFEEDAPP_HPP
+#define GUI_LIVEFEED_LIVEFEEDAPP_HPP
 
-#include <Wt/WServer>
+#include <Wt/WApplication>
+#include <Wt/WLineEdit>
+#include <Wt/WText>
 
-#include <opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h>
+#include <opendavinci/odcore/data/Container.h>
+#include <opendavinci/odcore/base/Mutex.h>
 
 namespace opendlv {
 namespace gui {
 
-class LiveFeedApp;
-
-class LiveFeed : public odcore::base::module::DataTriggeredConferenceClientModule {
+class LiveFeedApp : public Wt::WApplication {
    public:
-    LiveFeed(int32_t const &, char **);
-    LiveFeed(LiveFeed const &) = delete;
-    LiveFeed &operator=(LiveFeed const &) = delete;
-    virtual ~LiveFeed();
+    LiveFeedApp(Wt::WEnvironment const &);
+    LiveFeedApp(LiveFeedApp const &) = delete;
+    LiveFeedApp &operator=(LiveFeedApp const &) = delete;
+    virtual ~LiveFeedApp();
+    void AddContainer(odcore::data::Container &);
 
    private:
-    void nextContainer(odcore::data::Container &);
-    virtual void setUp();
-    virtual void tearDown();
-    virtual odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
-    static Wt::WApplication *CreateApplication(Wt::WEnvironment const &);
+    void Greet();
 
-    Wt::WServer *m_server;
-    static std::vector<LiveFeedApp *> g_applications;
+    odcore::data::Container m_container;
+    odcore::base::Mutex m_mutex;
+    Wt::WLineEdit *m_nameEdit;
+    Wt::WText *m_greeting;
+    bool m_isInitialized;
 };
 
 }

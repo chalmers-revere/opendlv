@@ -35,6 +35,7 @@ include(CheckCxxTestEnvironment)
 
 ###########################################################################
 # Find OpenDaVINCI.
+find_package(Wt REQUIRED)
 find_package(OpenDaVINCI REQUIRED)
 
 ###########################################################################
@@ -48,7 +49,9 @@ include_directories(SYSTEM ${ODVDOPENDLVDATA_INCLUDE_DIRS})
 
 ###########################################################################
 # Set libraries to link against.
-set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
+set(LIBRARIES 
+  ${Wt_LIBRARY} ${Wt_HTTP_LIBRARY} ${Wt_EXT_LIBRARY}  
+  ${OPENDAVINCI_LIBRARIES}
   ${ODVDOPENDLVDATA_LIBRARIES})
 
 ###########################################################################
