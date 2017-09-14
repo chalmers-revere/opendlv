@@ -30,15 +30,30 @@ cd /opt/opendlv.build
 
 echo "[opendlv Docker builder] Incremental build."
 
-mkdir -p build.system && cd build.system
-CCACHE_DIR=/opt/ccache PATH=/usr/lib/ccache:/opt/od4/bin:$PATH cmake -D CXXTEST_INCLUDE_DIR=/opt/opendlv.sources/thirdparty/cxxtest -D OPENDAVINCI_DIR=/opt/od4 -D ODVDOPENDLVSTANDARDMESSAGESET_DIR=/opt/opendlv.core -D ODVDVEHICLE_DIR=/opt/opendlv.core -D ODVDFH16TRUCK_DIR=/opt/opendlv.core -D ODVDTRIMBLE_DIR=/opt/opendlv.core -D ODVDIMU_DIR=/opt/opendlv.core -D ODVDV2V_DIR=/opt/opendlv.core -D EIGEN3_INCLUDE_DIR=/opt/od4/include/opendavinci -D KALMAN_INCLUDE_DIR=/opt/opendlv.sources/thirdparty/kalman/include -D TINYCNN_INCLUDE_DIR=/opt/opendlv.sources/thirdparty/tiny-cnn -D CMAKE_INSTALL_PREFIX=/opt/opendlv /opt/opendlv.sources/code/system
+mkdir -p build.gui && cd build.gui
+CCACHE_DIR=/opt/ccache PATH=/usr/lib/ccache:/opt/od4/bin:$PATH cmake -D CXXTEST_INCLUDE_DIR=/opt/opendlv.sources/thirdparty/cxxtest -D OPENDAVINCI_DIR=/opt/od4 -D ODVDOPENDLVSTANDARDMESSAGESET_DIR=/opt/opendlv.core -D ODVDVEHICLE_DIR=/opt/opendlv.core -D ODVDFH16TRUCK_DIR=/opt/opendlv.core -D ODVDTRIMBLE_DIR=/opt/opendlv.core -D ODVDIMU_DIR=/opt/opendlv.core -D ODVDV2V_DIR=/opt/opendlv.core -D EIGEN3_INCLUDE_DIR=/opt/od4/include/opendavinci -D KALMAN_INCLUDE_DIR=/opt/opendlv.sources/thirdparty/kalman/include -D TINYCNN_INCLUDE_DIR=/opt/opendlv.sources/thirdparty/tiny-cnn -D CMAKE_INSTALL_PREFIX=/opt/opendlv /opt/opendlv.sources/code/gui
 
 CCACHE_DIR=/opt/ccache PATH=/usr/lib/ccache:/opt/od4/bin:$PATH make -j4 && make test && make install
+
+cd ..
+
+mkdir -p build.logic && cd build.logic
+CCACHE_DIR=/opt/ccache PATH=/usr/lib/ccache:/opt/od4/bin:$PATH cmake -D CXXTEST_INCLUDE_DIR=/opt/opendlv.sources/thirdparty/cxxtest -D OPENDAVINCI_DIR=/opt/od4 -D ODVDOPENDLVSTANDARDMESSAGESET_DIR=/opt/opendlv.core -D ODVDVEHICLE_DIR=/opt/opendlv.core -D ODVDFH16TRUCK_DIR=/opt/opendlv.core -D ODVDTRIMBLE_DIR=/opt/opendlv.core -D ODVDIMU_DIR=/opt/opendlv.core -D ODVDV2V_DIR=/opt/opendlv.core -D EIGEN3_INCLUDE_DIR=/opt/od4/include/opendavinci -D KALMAN_INCLUDE_DIR=/opt/opendlv.sources/thirdparty/kalman/include -D TINYCNN_INCLUDE_DIR=/opt/opendlv.sources/thirdparty/tiny-cnn -D CMAKE_INSTALL_PREFIX=/opt/opendlv /opt/opendlv.sources/code/logic
+
+CCACHE_DIR=/opt/ccache PATH=/usr/lib/ccache:/opt/od4/bin:$PATH make -j4 && make test && make install
+
+cd ..
+
+mkdir -p build.tool && cd build.tool
+CCACHE_DIR=/opt/ccache PATH=/usr/lib/ccache:/opt/od4/bin:$PATH cmake -D CXXTEST_INCLUDE_DIR=/opt/opendlv.sources/thirdparty/cxxtest -D OPENDAVINCI_DIR=/opt/od4 -D ODVDOPENDLVSTANDARDMESSAGESET_DIR=/opt/opendlv.core -D ODVDVEHICLE_DIR=/opt/opendlv.core -D ODVDFH16TRUCK_DIR=/opt/opendlv.core -D ODVDTRIMBLE_DIR=/opt/opendlv.core -D ODVDIMU_DIR=/opt/opendlv.core -D ODVDV2V_DIR=/opt/opendlv.core -D EIGEN3_INCLUDE_DIR=/opt/od4/include/opendavinci -D KALMAN_INCLUDE_DIR=/opt/opendlv.sources/thirdparty/kalman/include -D TINYCNN_INCLUDE_DIR=/opt/opendlv.sources/thirdparty/tiny-cnn -D CMAKE_INSTALL_PREFIX=/opt/opendlv /opt/opendlv.sources/code/tool
+
+CCACHE_DIR=/opt/ccache PATH=/usr/lib/ccache:/opt/od4/bin:$PATH make -j4 && make test && make install
+
 EOF
 
 chmod 755 /opt/opendlv.build/build.sh
 chown $UID_AS:$UID_AS /opt/opendlv.build/build.sh
-chown -R $UID_AS:$UID_AS /opt
+#chown -R $UID_AS:$UID_AS /opt
 
 su -m `getent passwd $UID_AS|cut -f1 -d":"` -c /opt/opendlv.build/build.sh
 
