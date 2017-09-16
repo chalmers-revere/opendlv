@@ -44,9 +44,9 @@ namespace legacy {
 VehicleFollower::VehicleFollower(int32_t const &a_argc, char **a_argv)
   : TimeTriggeredConferenceClientModule(a_argc, a_argv, 
       "logic-legacy-vehiclefollower"),
+  m_referenceMutex(),
   m_egoVehicle(),
-  m_targetVehicle(),
-  m_speedErrorSum()
+  m_targetVehicle()
 {
 }
 
@@ -72,6 +72,7 @@ void VehicleFollower::tearDown()
     
 void VehicleFollower::nextContainer(odcore::data::Container &a_container) {
   if (a_container.getDataType() == opendlv::data::environment::WGS84Coordinate::ID()) {
+
     uint32_t const egoVehicleId = getKeyValueConfiguration().getValue<uint32_t>(
         "logic-legacy-vehiclefollower.ego-vehicle-id");
     uint32_t const targetVehicleId = getKeyValueConfiguration().getValue<uint32_t>(
@@ -80,11 +81,26 @@ void VehicleFollower::nextContainer(odcore::data::Container &a_container) {
     auto wgs84Position = a_container.getData<opendlv::data::environment::WGS84Coordinate>();
     
     if (a_container.getSenderStamp() == egoVehicleId) {
+     // double distanceFromReferenceLimit = 
+     //   getKeyValueConfiguration().getValue<double>("logic-legacy-vehiclefollower.distance_from_reference_limit");
+
       m_egoVehicle->updatePosition(wgs84Position);
+      //double distanceFromReference = m_egoVehicle->updatePosition(wgs84Position);
+    /*  if (distanceFromReference > distanceFromReferenceLimit) {
+        odcore::base::Lock l(m_referenceMutex);
+        m_egoVehicle->updateReference(wgs84Position);
+        m_targetVehicle->updateReference(wgs84Position);
+
+        if (isVerbose()) {
+          std::cout << "[" << getName() << "]: " << "Reference updated." << std::endl;
+        }
+      }*/
     } else if (a_container.getSenderStamp() == targetVehicleId) {
+      odcore::base::Lock l(m_referenceMutex);
       m_targetVehicle->updatePosition(wgs84Position);
     } 
   } else if (a_container.getDataType() == opendlv::proxy::GroundSpeedReading::ID()) {
+    
     uint32_t const egoVehicleId = getKeyValueConfiguration().getValue<uint32_t>(
         "logic-legacy-vehiclefollower.ego-vehicle-id");
     uint32_t const targetVehicleId = getKeyValueConfiguration().getValue<uint32_t>(
@@ -103,6 +119,16 @@ void VehicleFollower::nextContainer(odcore::data::Container &a_container) {
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VehicleFollower::body()
 {
+
+  // Send some zeros first to fix acceleration.
+  opendlv::proxy::ActuationRequest initAr;
+  initAr.setAcceleration(0.0);
+  initAr.setSteering(0.0);
+  initAr.setIsValid(true);
+
+  odcore::data::Container initC(initAr);
+  getConference().send(initC);
+
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
 
     if (!m_egoVehicle->isUpdated() || !m_targetVehicle->isUpdated()) {
@@ -134,7 +160,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VehicleFollower::body(
       aimPointAngle -= 2.0 * cartesian::Constants::PI;
     }
 
-    double const aimPointGain = getKeyValueConfiguration().getValue<double>("vehiclefollower.aim_point_gain");
+    double const aimPointGain = getKeyValueConfiguration().getValue<double>("logic-legacy-vehiclefollower.aim_point_gain");
     double steeringWheelAngle = aimPointGain * aimPointAngle;
 
     //steeringWheelAngle = (steeringWheelAngle > 3.0 * cartesian::Constants::PI) ? 9.3 : steeringWheelAngle;
@@ -166,66 +192,51 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VehicleFollower::body(
     // Get speeds and TTC.
     double const egoSpeed = m_egoVehicle->getSpeed();
     double const targetSpeed = m_targetVehicle->getSpeed();
-    double const distance = aimPoint.getX();
+    double const distance = aimPoint.lengthXY();
     //double const timeToCollision = distance / (egoSpeed - targetSpeed);
 
     
     double const desiredDistance = 
-      getKeyValueConfiguration().getValue<double>("vehiclefollower.desired_distance");
+      getKeyValueConfiguration().getValue<double>("logic-legacy-vehiclefollower.desired_distance");
     double const desiredDistanceCorrectionTime = 
-      getKeyValueConfiguration().getValue<double>("vehiclefollower.desired_distance_correction_time");
+      getKeyValueConfiguration().getValue<double>("logic-legacy-vehiclefollower.desired_distance_correction_time");
     double const distanceError = distance - desiredDistance;
+
 
     double const desiredDistanceCorrectionSpeed = targetSpeed + 
       distanceError / desiredDistanceCorrectionTime;
 
     
-    double const maxSpeed = 
-      getKeyValueConfiguration().getValue<double>("vehiclefollower.maximum_speed");
-    double const desiredSpeed = (desiredDistanceCorrectionSpeed < 0.0) ? 0.0 :
-      (desiredDistanceCorrectionSpeed > maxSpeed) ? maxSpeed : desiredDistanceCorrectionSpeed;
+  //  double const maxSpeed = 
+  //    getKeyValueConfiguration().getValue<double>("logic-legacy-vehiclefollower.maximum_speed");
+  //  double const desiredSpeed = (desiredDistanceCorrectionSpeed < 0.0) ? 0.0 :
+  //    (desiredDistanceCorrectionSpeed > maxSpeed) ? maxSpeed : desiredDistanceCorrectionSpeed;
 
-    double speedError = desiredSpeed - egoSpeed;
+    double speedError = desiredDistanceCorrectionSpeed - egoSpeed;
 
-    double const pidK = getKeyValueConfiguration().getValue<double>("vehiclefollower.speed_control_k");
-    double const pidI = getKeyValueConfiguration().getValue<double>("vehiclefollower.speed_control_i");
-    double const accelerationRequestLimit = getKeyValueConfiguration().getValue<double>("vehiclefollower.speed_control_global_limit");
-    double const speedErrorSumLimit = getKeyValueConfiguration().getValue<double>("vehiclefollower.speed_control_error_sum_limit");;
+    double accelerationRequest;
+    if (speedError > 0.0) {
+      double const pidK = getKeyValueConfiguration().getValue<double>("logic-legacy-vehiclefollower.acceleration_k");
+      double const accelerationLimit = getKeyValueConfiguration().getValue<double>("logic-legacy-vehiclefollower.acceleration_limit");
 
-    double kPart = pidK * speedError;
+      accelerationRequest = pidK * speedError;
+      accelerationRequest = (accelerationRequest > accelerationLimit) ? accelerationLimit : accelerationRequest;
+    } else {
+      double const pidK = getKeyValueConfiguration().getValue<double>("logic-legacy-vehiclefollower.deceleration_k");
+      double const decelerationLimit = getKeyValueConfiguration().getValue<double>("logic-legacy-vehiclefollower.deceleration_limit");
 
-    m_speedErrorSum += speedError;
-    m_speedErrorSum = (m_speedErrorSum > speedErrorSumLimit) ? speedErrorSumLimit : m_speedErrorSum;
-    m_speedErrorSum = (m_speedErrorSum < -speedErrorSumLimit) ? -speedErrorSumLimit : m_speedErrorSum;
-    double iPart = pidI * m_speedErrorSum;
-
-    double accelerationRequest = kPart + iPart;
-    accelerationRequest = (accelerationRequest > accelerationRequestLimit) ? accelerationRequestLimit : accelerationRequest;
-    accelerationRequest = (accelerationRequest < -accelerationRequestLimit) ? -accelerationRequestLimit : accelerationRequest;
-    
-    double const accelerationLimit = getKeyValueConfiguration().getValue<double>("vehiclefollower.acceleration_limit");
-    double const decelerationLimit = getKeyValueConfiguration().getValue<double>("vehiclefollower.deceleration_limit");
-    if (accelerationRequest < decelerationLimit) {
-      if (isVerbose()) {
-        std::cout << "[" << getName() << "]: " << "Warning: Deceleration limited from " << accelerationRequest << " to " << decelerationLimit << std::endl;
-      }
-      accelerationRequest = decelerationLimit;
-    }
-    if (accelerationRequest > accelerationLimit) {
-      if (isVerbose()) {
-        std::cout << "[" << getName() << "]: " << "Warning: Acceleration limited from " << accelerationRequest << " to " << accelerationLimit << std::endl;
-      }
-      accelerationRequest = accelerationLimit;
+      accelerationRequest = pidK * speedError;
+      accelerationRequest = (accelerationRequest < decelerationLimit) ? decelerationLimit : accelerationRequest;
     }
 
     if (isVerbose()) {
-      std::cout << "[" << getName() << "]: " << "Longitudinal control: current speed = " << egoSpeed << ", speed error = " << speedError << ", K = " << kPart << ", I = " << iPart << ", sum or errors = " << m_speedErrorSum << ", acceleration request: " << accelerationRequest << std::endl;
+      std::cout << "[" << getName() << "]: " << "Longitudinal control: current speed = " << egoSpeed << ", speed error = " << speedError << ", distance error = " << distanceError << ", acceleration request = " << accelerationRequest << std::endl;
     }
 
     // Create vehicle control data.
     opendlv::proxy::ActuationRequest ar;
-    ar.setAcceleration(accelerationRequest);
-    ar.setSteering(steeringWheelAngle);
+    ar.setAcceleration(static_cast<float>(accelerationRequest));
+    ar.setSteering(static_cast<float>(steeringWheelAngle));
     ar.setIsValid(true);
 
     odcore::data::Container c = odcore::data::Container(ar);
@@ -234,7 +245,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VehicleFollower::body(
 
   // Stop vehicle.
   opendlv::proxy::ActuationRequest ar;
-  ar.setAcceleration(-3.0);
+  ar.setAcceleration(-2.0);
   ar.setSteering(0.0);
   ar.setIsValid(true);
 

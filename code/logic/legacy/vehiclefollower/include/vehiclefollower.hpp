@@ -45,10 +45,9 @@ class VehicleFollower : public odcore::base::module::TimeTriggeredConferenceClie
   virtual void setUp();
   virtual void tearDown();
 
+  odcore::base::Mutex m_referenceMutex;
   std::unique_ptr<Vehicle> m_egoVehicle;
   std::unique_ptr<Vehicle> m_targetVehicle;
-
-  double m_speedErrorSum;
 };
 
 }

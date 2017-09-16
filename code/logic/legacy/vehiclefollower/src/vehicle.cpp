@@ -59,16 +59,17 @@ bool Vehicle::isUpdated() const
   return m_isUpdatedPosition && m_isUpdatedSpeed;
 }
 
-void Vehicle::updatePosition(
+double Vehicle::updatePosition(
     opendlv::data::environment::WGS84Coordinate const &a_wgs84CurrentPosition)
 {
+  odcore::base::Lock l(m_egoStateMutex);
+
   double const positionUpdateDeltaThreshold = 0.2;
 
   opendlv::data::environment::Point3 currentPosition = 
     m_wgs84Reference.transform(a_wgs84CurrentPosition);
 
   if (m_receveivedFirstWgs84Position) {
-    odcore::base::Lock l(m_egoStateMutex);
 
     double const d = (currentPosition - m_oldPositionForDirection).lengthXY();
     if (d > positionUpdateDeltaThreshold) {
@@ -84,6 +85,14 @@ void Vehicle::updatePosition(
 
   m_oldPosition = currentPosition;
   m_receveivedFirstWgs84Position = true;
+
+  return currentPosition.lengthXY();
+}
+
+void Vehicle::updateReference(opendlv::data::environment::WGS84Coordinate a_wgs84Reference)
+{
+  odcore::base::Lock l(m_egoStateMutex);
+  m_wgs84Reference = a_wgs84Reference;
 }
 
 void Vehicle::updateSpeed(double a_speed)

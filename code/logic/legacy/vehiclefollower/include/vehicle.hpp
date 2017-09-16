@@ -38,8 +38,9 @@ class Vehicle {
   opendlv::data::environment::EgoState getEgoState();
   double getSpeed();
   bool isUpdated() const;
-  void updatePosition(opendlv::data::environment::WGS84Coordinate const &);
+  double updatePosition(opendlv::data::environment::WGS84Coordinate const &);
   void updateSpeed(double);
+  void updateReference(opendlv::data::environment::WGS84Coordinate);
 
  private:
   opendlv::data::environment::EgoState m_egoState;
