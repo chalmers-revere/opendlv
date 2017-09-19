@@ -46,7 +46,8 @@ VehicleFollower::VehicleFollower(int32_t const &a_argc, char **a_argv)
       "logic-legacy-vehiclefollower"),
   m_referenceMutex(),
   m_egoVehicle(),
-  m_targetVehicle()
+  m_targetVehicle(),
+  m_steeringWheelAngle()
 {
 }
 
@@ -142,6 +143,8 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VehicleFollower::body(
       continue;
     }
 
+    double const dt = 1.0 / static_cast<double>(getFrequency());
+
     opendlv::data::environment::EgoState egoState = m_egoVehicle->getEgoState();
     opendlv::data::environment::EgoState targetEgoState = 
       m_targetVehicle->getEgoState();
@@ -161,13 +164,19 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VehicleFollower::body(
     }
 
     double const aimPointGain = getKeyValueConfiguration().getValue<double>("logic-legacy-vehiclefollower.aim_point_gain");
-    double steeringWheelAngle = aimPointGain * aimPointAngle;
+    double const steeringFilterCoefficient = getKeyValueConfiguration().getValue<double>("logic-legacy-vehiclefollower.steering_filter_coefficient");
+    double const steeringWheelAngleUnfiltered = aimPointGain * aimPointAngle;
 
-    //steeringWheelAngle = (steeringWheelAngle > 3.0 * cartesian::Constants::PI) ? 9.3 : steeringWheelAngle;
-    //steeringWheelAngle = (steeringWheelAngle < -3.0 * cartesian::Constants::PI) ? -9.3 : steeringWheelAngle;
+    double const steeringWheelAngleRate = steeringFilterCoefficient * 
+      (steeringWheelAngleUnfiltered - m_steeringWheelAngle);
+    m_steeringWheelAngle += steeringWheelAngleRate * dt;
+
+
+    m_steeringWheelAngle = (m_steeringWheelAngle > 3.0 * cartesian::Constants::PI) ? 9.3 : m_steeringWheelAngle;
+    m_steeringWheelAngle = (m_steeringWheelAngle < -3.0 * cartesian::Constants::PI) ? -9.3 : m_steeringWheelAngle;
 
     if (isVerbose()) {
-      std::cout << "[" << getName() << "]: " << "Longitudinal control: Aim point angle = " << aimPointAngle << ", steering wheel angle: " << steeringWheelAngle << std::endl;
+      std::cout << "[" << getName() << "]: " << "Longitudinal control: Aim point angle = " << aimPointAngle << ", steering wheel angle: " << m_steeringWheelAngle << std::endl;
     }
 
     {
@@ -236,7 +245,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VehicleFollower::body(
     // Create vehicle control data.
     opendlv::proxy::ActuationRequest ar;
     ar.setAcceleration(static_cast<float>(accelerationRequest));
-    ar.setSteering(static_cast<float>(steeringWheelAngle));
+    ar.setSteering(static_cast<float>(m_steeringWheelAngle));
     ar.setIsValid(true);
 
     odcore::data::Container c = odcore::data::Container(ar);

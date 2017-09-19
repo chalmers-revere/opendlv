@@ -32,7 +32,7 @@ Vehicle::Vehicle(opendlv::data::environment::WGS84Coordinate a_wgs84Reference):
   m_egoStateMutex(),
   m_speedMutex(),
   m_speed(),
-  m_isUpdatedPosition(false),
+  m_isUpdatedHeading(false),
   m_isUpdatedSpeed(false),
   m_receveivedFirstWgs84Position(false)
 {
@@ -56,7 +56,7 @@ double Vehicle::getSpeed()
 
 bool Vehicle::isUpdated() const
 {
-  return m_isUpdatedPosition && m_isUpdatedSpeed;
+  return m_isUpdatedHeading && m_isUpdatedSpeed;
 }
 
 double Vehicle::updatePosition(
@@ -64,7 +64,7 @@ double Vehicle::updatePosition(
 {
   odcore::base::Lock l(m_egoStateMutex);
 
-  double const positionUpdateDeltaThreshold = 0.2;
+  double const positionUpdateDeltaThreshold = 2.0;
 
   opendlv::data::environment::Point3 currentPosition = 
     m_wgs84Reference.transform(a_wgs84CurrentPosition);
@@ -77,7 +77,7 @@ double Vehicle::updatePosition(
         (currentPosition - m_oldPositionForDirection);
       m_egoState.setRotation(direction);
       m_oldPositionForDirection = currentPosition;
-      m_isUpdatedPosition = true;
+      m_isUpdatedHeading = true;
     }
 
     m_egoState.setPosition(currentPosition);

@@ -50,7 +50,7 @@ class Vehicle {
   odcore::base::Mutex m_egoStateMutex;
   odcore::base::Mutex m_speedMutex;
   double m_speed;
-  bool m_isUpdatedPosition;
+  bool m_isUpdatedHeading;
   bool m_isUpdatedSpeed;
   bool m_receveivedFirstWgs84Position;
 };
