@@ -31,6 +31,7 @@
 #include <opendlv/data/environment/Polygon.h>
 
 #include <automotivedata/GeneratedHeaders_AutomotiveData.h>
+#include <odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h>
 #include <odvdopendlvstandardmessageset/GeneratedHeaders_ODVDOpenDLVStandardMessageSet.h>
 #include <odvdvehicle/generated/opendlv/proxy/ActuationRequest.h>
 
@@ -82,20 +83,7 @@ void VehicleFollower::nextContainer(odcore::data::Container &a_container) {
     auto wgs84Position = a_container.getData<opendlv::data::environment::WGS84Coordinate>();
     
     if (a_container.getSenderStamp() == egoVehicleId) {
-     // double distanceFromReferenceLimit = 
-     //   getKeyValueConfiguration().getValue<double>("logic-legacy-vehiclefollower.distance_from_reference_limit");
-
       m_egoVehicle->updatePosition(wgs84Position);
-      //double distanceFromReference = m_egoVehicle->updatePosition(wgs84Position);
-    /*  if (distanceFromReference > distanceFromReferenceLimit) {
-        odcore::base::Lock l(m_referenceMutex);
-        m_egoVehicle->updateReference(wgs84Position);
-        m_targetVehicle->updateReference(wgs84Position);
-
-        if (isVerbose()) {
-          std::cout << "[" << getName() << "]: " << "Reference updated." << std::endl;
-        }
-      }*/
     } else if (a_container.getSenderStamp() == targetVehicleId) {
       odcore::base::Lock l(m_referenceMutex);
       m_targetVehicle->updatePosition(wgs84Position);
@@ -163,6 +151,17 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VehicleFollower::body(
       aimPointAngle -= 2.0 * cartesian::Constants::PI;
     }
 
+
+    // To support LED strip.
+    odcore::data::TimeStamp identified;
+    opendlv::model::Direction desiredDirectionOfMovement(aimPointAngle, 0.0f);
+    opendlv::model::Direction directionOfMovement(0.0f, 0.0f);
+    opendlv::perception::StimulusDirectionOfMovement stimulusDirectionOfMovement(
+        identified, desiredDirectionOfMovement, directionOfMovement);
+    odcore::data::Container directionContainer(stimulusDirectionOfMovement);
+    getConference().send(directionContainer);
+
+
     double const aimPointGain = getKeyValueConfiguration().getValue<double>("logic-legacy-vehiclefollower.aim_point_gain");
     double const steeringFilterCoefficient = getKeyValueConfiguration().getValue<double>("logic-legacy-vehiclefollower.steering_filter_coefficient");
     double const steeringWheelAngleUnfiltered = aimPointGain * aimPointAngle;
@@ -202,8 +201,6 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VehicleFollower::body(
     double const egoSpeed = m_egoVehicle->getSpeed();
     double const targetSpeed = m_targetVehicle->getSpeed();
     double const distance = aimPoint.lengthXY();
-    //double const timeToCollision = distance / (egoSpeed - targetSpeed);
-
     
     double const desiredDistance = 
       getKeyValueConfiguration().getValue<double>("logic-legacy-vehiclefollower.desired_distance");
@@ -214,12 +211,6 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode VehicleFollower::body(
 
     double const desiredDistanceCorrectionSpeed = targetSpeed + 
       distanceError / desiredDistanceCorrectionTime;
-
-    
-  //  double const maxSpeed = 
-  //    getKeyValueConfiguration().getValue<double>("logic-legacy-vehiclefollower.maximum_speed");
-  //  double const desiredSpeed = (desiredDistanceCorrectionSpeed < 0.0) ? 0.0 :
-  //    (desiredDistanceCorrectionSpeed > maxSpeed) ? maxSpeed : desiredDistanceCorrectionSpeed;
 
     double speedError = desiredDistanceCorrectionSpeed - egoSpeed;
 

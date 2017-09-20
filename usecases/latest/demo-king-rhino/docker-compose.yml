@@ -22,7 +22,5 @@ version: '2'
 services:
     logic-legacy-vehiclefollower:
       image: ${IMAGE}
-      depends_on:
-        - odsupercomponent
       network_mode: "host"
       command: "/opt/opendlv/bin/opendlv-logic-legacy-vehiclefollower --cid=${CID} --verbose=1 --freq=10"
