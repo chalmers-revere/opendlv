@@ -82,8 +82,11 @@ logic-perception-detectvehicle.debug = 1
 
 
 
-core-tool-camera-replay.debug = 0      # 1 = show recording (requires X11), 0 = otherwise.
-core-tool-camera-replay.sourcename = cam-axis
-core-tool-camera-replay.filepath = Sample.mp4
-core-tool-camera-replay.width = 1920
-core-tool-camera-replay.height = 1080
+proxy-camera-axis.debug = 0               # 1 = show recording (requires X11), 0 = otherwise.
+proxy-camera-axis.name = cam-axis
+proxy-camera-axis.address = 10.10.10.200
+proxy-camera-axis.username = root
+proxy-camera-axis.password = gcdc
+proxy-camera-axis.width = 1280
+proxy-camera-axis.height = 720
+proxy-camera-axis.calibrationfile = /opt/opendlv.core.configuration/file.yml  # This file must be accessible from within the Docker container.
