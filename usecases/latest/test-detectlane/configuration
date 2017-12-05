@@ -76,30 +76,33 @@ knowledge-scene.memoryCapacity = 5.0 # seconds
 knowledge-scene.debug = 0
 
 # perception-detectlane
-perception-detectlane.intensityThreshold = 140
-perception-detectlane.adapThreshKernelSize = 5
-perception-detectlane.adapThreshConst = 25
-perception-detectlane.cannyThreshold = 180 #220
-perception-detectlane.houghThreshold = 80 #80,100
-perception-detectlane.lineDiff = 2.1 #1.6
-perception-detectlane.HorisontalLimit = 12 # meters on each side we should consider
-perception-detectlane.OneLineDiff = 5.0 #how much a line can differ between the two points
-perception-detectlane.memThreshold = 0.5 #seconds
-perception-detectlane.upperLaneLimit = 250
-perception-detectlane.lowerLaneLimit = 450
-perception-detectlane.screenWidth = 1280
-perception-detectlane.screenHeight = 720
-perception-detectlane.debug = 0
-perception-detectlane.camera = front-left
-perception-detectlane.blurKernelSize = 3
-perception-detectlane.roiX = 30 #205 Pixels away from the upper left corner in X
-perception-detectlane.roiWidth = 1000 #110 Done Pixel width of the captured box in X
-perception-detectlane.roiY = 150 #200 Pixels away from the upper part of picture in Y
-perception-detectlane.roiHeight = 550 #300 Pixel height of the captured box in Y
+logic-perception-detectlane.intensityThreshold = 140
+logic-perception-detectlane.adapThreshKernelSize = 5
+logic-perception-detectlane.adapThreshConst = 25
+logic-perception-detectlane.cannyThreshold = 180 #220
+logic-perception-detectlane.houghThreshold = 80 #80,100
+logic-perception-detectlane.lineDiff = 2.1 #1.6
+logic-perception-detectlane.HorisontalLimit = 12 # meters on each side we should consider
+logic-perception-detectlane.OneLineDiff = 5.0 #how much a line can differ between the two points
+logic-perception-detectlane.memThreshold = 0.5 #seconds
+logic-perception-detectlane.upperLaneLimit = 250
+logic-perception-detectlane.lowerLaneLimit = 450
+logic-perception-detectlane.screenWidth = 1280
+logic-perception-detectlane.screenHeight = 720
+logic-perception-detectlane.debug = 1
+logic-perception-detectlane.camera = front-left
+logic-perception-detectlane.blurKernelSize = 3
+logic-perception-detectlane.roiX = 30 #205 Pixels away from the upper left corner in X
+logic-perception-detectlane.roiWidth = 1000 #110 Done Pixel width of the captured box in X
+logic-perception-detectlane.roiY = 150 #200 Pixels away from the upper part of picture in Y
+logic-perception-detectlane.roiHeight = 550 #300 Pixel height of the captured box in Y
 
 
-core-tool-camera-replay.debug = 0       # 1 = show recording (requires X11), 0 = otherwise.
-core-tool-camera-replay.sourcename = front-left
-core-tool-camera-replay.filename = edited.mp4
-core-tool-camera-replay.width = 1280
-core-tool-camera-replay.height = 720
+proxy-camera-axis.debug = 0               # 1 = show recording (requires X11), 0 = otherwise.
+proxy-camera-axis:1.name = front-left
+proxy-camera-axis:1.address = 10.42.42.28
+proxy-camera-axis.username = root
+proxy-camera-axis.password = gcdc
+proxy-camera-axis.width = 1280
+proxy-camera-axis.height = 720
+proxy-camera-axis.calibrationfile = /opt/opendlv.core.configuration/file.yml  # This file must be accessible from within the Docker container.

@@ -27,6 +27,8 @@
 #include "opendavinci/odcore/base/KeyValueConfiguration.h"
 #include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
 
+#include "opendavinci/odcore/data/TimeStamp.h"
+
 #include <opendavinci/odcore/base/Lock.h>
 
 
@@ -115,13 +117,8 @@ void DetectLane::setUp()
   m_roi[3] = kv.getValue<uint16_t>("logic-perception-detectlane.roiHeight");
   m_debug = (kv.getValue<int32_t>("logic-perception-detectlane.debug") == 1);
   m_cameraName = kv.getValue<std::string>("logic-perception-detectlane.camera");
-  if (m_cameraName == "front-left") {
-    std::string const projectionFilename = 
-        "/opt/opendlv.data/" + m_cameraName + "-pixel2world-matrix.csv";
-    m_transformationMatrix = ReadMatrix(projectionFilename,3,3);
-  } else {
-    std::cout << "[" << getName() << "] " << "Projection matrix not available." << std::endl;
-  }
+  std::string const projectionFilename = m_cameraName + "-pixel2world-matrix.csv";
+  m_transformationMatrix = ReadMatrix(projectionFilename,3,3);
   m_initialized = true;
 }
 
@@ -175,6 +172,30 @@ void DetectLane::nextContainer(odcore::data::Container &a_c)
     for (auto it = m_currentLaneLineIds.begin(); it != m_currentLaneLineIds.end(); it++) {
       edges.push_back(opendlv::model::Cartesian3(m_xWorldP[*it][0], m_yWorldP[*it][0],0));
       edges.push_back(opendlv::model::Cartesian3(m_xWorldP[*it][1], m_yWorldP[*it][1],0));
+    }
+
+    // TODO: Should not be sent from this module
+    if (edges.size() >= 4) {
+      double x1 = edges[0].getX();
+      double y1 = edges[0].getY();
+      double x2 = edges[2].getX();
+      double y2 = edges[2].getY();
+
+      double xAim = (x1 + x2) / 2.0;
+      double yAim = (y1 + y2) / 2.0;
+
+      double aimAngle = atan2(yAim, xAim);
+
+      std::cout << "Aim point: " << xAim << ":" << yAim << std::endl;
+      std::cout << "Aim angle: " << aimAngle << std::endl;
+
+      odcore::data::TimeStamp now;
+      opendlv::model::Direction direction(0.0f, 0.0f);
+      opendlv::model::Direction desiredDirection(static_cast<float>(aimAngle), 0.0f);
+      opendlv::perception::StimulusDirectionOfMovement stimulus(now, desiredDirection, direction);
+     
+      odcore::data::Container c(stimulus);
+      getConference().send(c);
     }
 
     float edgesConfidence = 1;
@@ -309,7 +330,7 @@ std::vector<std::pair<cv::Vec2f, cv::Vec2f>> DetectLane::GetParametricRepresenta
     std::vector<cv::Vec2f> a_groups)
 {
   std::vector<std::pair<cv::Vec2f, cv::Vec2f>> lineParamRep;
-  for (uint i = 0; i < a_groups.size(); i++) {
+  for (uint16_t i = 0; i < a_groups.size(); i++) {
     float rho = a_groups[i][0];
     float theta = a_groups[i][1];
     float x0 = cosf(theta)*rho;

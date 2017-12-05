@@ -1,4 +1,17 @@
+0.7.4 - Lifting OpenDLV.core 0.11.0 to this repository
+0.7.3 - Lifting updates from lower layer to this repository.
+0.7.2 - Lifting updates from lower layer to this repository.
+0.7.1 - Lifting updates from lower layer to this repository.
+0.7.0 - Lifting to OpenDLV.core 0.10.0
+0.6.5 - Lifting OpenDLV.core 0.9.7 to OpenDLV
+0.6.4 - Lifting OpenDLV.core 0.9.6 to OpenDLV
+0.6.3 - Integrating OpenDLV Standard Message Set
+0.6.2 - Detect lane now sends aim poit, and simpledriver is updated.
+0.6.1 - Detect lane fix.
 0.6.0 - Complete refactoring
+0.5.4 - Propagating OpenDLV.core 0.9.4 to OpenDLV
+0.5.3 - Lifting OpenDLV.core to OpenDLV
+0.5.2 - Propagating OpenDLV.core 0.9.2 to OpenDLV
 0.5.1 - Propagating OpenDLV.core 0.9.1 to OpenDLV
 0.5.0 - SocketCAN and split Docker images
 0.4.9 - Propagating OpenDLV.core v0.8.10 to OpenDLV

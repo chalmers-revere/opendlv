@@ -73,6 +73,9 @@ class SampleVisitor
       std::string const &, std::string &);
   virtual void visit(uint32_t const &, std::string const &, 
       std::string const &, void *, uint32_t const &);
+  virtual void visit(const uint32_t &id, const std::string &longName, 
+     const std::string &shortName, void *data, const uint32_t &count, 
+     const odcore::TYPE_ &t);
 
  private:
   std::shared_ptr<SampleBuffer> m_sampleBuffer;

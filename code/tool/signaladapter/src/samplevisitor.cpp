@@ -17,6 +17,7 @@
  * USA.
  */
 
+#include <iostream>
 #include <vector>
 
 #include <opendavinci/odcore/serialization/Serializable.h>
@@ -148,6 +149,11 @@ void SampleVisitor::visit(uint32_t const &, std::string const &,
   }
   m_sampleBuffer->AppendBytes(dataVec);
 }
+
+void SampleVisitor::visit(const uint32_t &/*id*/, const std::string &/*longName*/, const std::string &/*shortName*/, void */*data*/, const uint32_t &/*count*/, const odcore::TYPE_ &/*t*/) {
+  std::cerr << "SampleVisitor::visit not implemented." << std::endl;
+}
+
 
 }
 }

@@ -20,54 +20,41 @@
 #define LOGIC_LEGACY_SIMPLEDRIVER_SIMPLEDRIVER_HPP
 
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
+#include "opendavinci/odcore/base/Mutex.h"
+#include "opendlv/data/environment/EgoState.h"
+#include "opendlv/data/environment/Point3.h"
+#include "opendlv/data/environment/WGS84Coordinate.h"
 
 namespace opendlv {
 namespace logic {
 namespace legacy {
 
-using namespace std;
-
-/**
- * This class is a skeleton to send driving commands to Hesperia-light's vehicle driving dynamics simulation.
- */
 class SimpleDriver : public odcore::base::module::TimeTriggeredConferenceClientModule {
-   private:
-    /**
-     * "Forbidden" copy constructor. Goal: The compiler should warn
-     * already at compile time for unwanted bugs caused by any misuse
-     * of the copy constructor.
-     *
-     * @param obj Reference to an object of this class.
-     */
-    SimpleDriver(const SimpleDriver & /*obj*/);
+ public:
+  SimpleDriver(const int32_t &argc, char **argv);
+  SimpleDriver(SimpleDriver const &) = delete;
+  SimpleDriver &operator=(SimpleDriver const &) = delete;
+  virtual ~SimpleDriver();
 
-    /**
-     * "Forbidden" assignment operator. Goal: The compiler should warn
-     * already at compile time for unwanted bugs caused by any misuse
-     * of the assignment operator.
-     *
-     * @param obj Reference to an object of this class.
-     * @return Reference to this instance.
-     */
-    SimpleDriver &operator=(const SimpleDriver & /*obj*/);
+  virtual void nextContainer(odcore::data::Container &c);
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
-   public:
-    /**
-     * Constructor.
-     *
-     * @param argc Number of command line arguments.
-     * @param argv Command line arguments.
-     */
-    SimpleDriver(const int32_t &argc, char **argv);
+ private:
+  virtual void setUp();
+  virtual void tearDown();
+       
+  bool m_receveivedFirstWGS84Position;
+  opendlv::data::environment::WGS84Coordinate WGS84Reference;
+  opendlv::data::environment::Point3 m_oldPosition;
+  opendlv::data::environment::Point3 m_oldPositionForDirection;
 
-    virtual ~SimpleDriver();
+  odcore::base::Mutex m_egoStateMutex;
+  opendlv::data::environment::EgoState m_egoState;
 
-    odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+  odcore::base::Mutex m_currentSpeedMutex;
+  double m_currentSpeed;
 
-   private:
-    virtual void setUp();
-
-    virtual void tearDown();
+  double m_speedErrorSum;
 };
 
 }
