@@ -28,12 +28,12 @@
 /**
  * define to enable OMP parallelization
  */
-// #define CNN_USE_OMP
+#define CNN_USE_OMP
 
 /**
  * define to enable Grand Central Dispatch parallelization
  */
-//#define CNN_USE_GCD
+// #define CNN_USE_GCD
 
 /**
  * define to use exceptions
@@ -58,7 +58,7 @@
  * Enable Image API support.
  * Currently we use stb by default.
  **/
-//#define DNN_USE_IMAGE_API
+#define DNN_USE_IMAGE_API
 
 /**
  * Enable Gemmlowp support.
@@ -90,11 +90,5 @@ typedef double float_t;
 #else
 typedef float float_t;
 #endif
-
-/**
- * size of layer, model, data etc.
- * change to smaller type if memory footprint is severe
- **/
-typedef std::uint32_t serial_size_t;
 
 }  // namespace tiny_dnn

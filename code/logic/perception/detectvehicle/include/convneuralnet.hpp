@@ -23,7 +23,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <tiny_cnn/tiny_cnn.h>
+#include <tiny_dnn/tiny_dnn.h>
 
 namespace opendlv {
 namespace logic {
@@ -45,38 +45,38 @@ class ConvNeuralNet {
  private:
   void GetConvNet(
       int32_t a_width, int32_t a_height,
-      tiny_cnn::network<tiny_cnn::sequential>* a_cnn,
+      tiny_dnn::network<tiny_dnn::sequential>* a_cnn,
       bool a_isTrainingNetwork);
 
   void ConvertImageRGB(
       const std::string& a_directory,
       int32_t a_width,
       int32_t a_height,
-      std::vector<tiny_cnn::vec_t>& a_data);
+      std::vector<tiny_dnn::vec_t>& a_data);
 
   void ConvertImageRGB(
       cv::Mat a_img,
       int32_t a_width,
       int32_t a_height,
-      std::vector<tiny_cnn::vec_t>& a_data);
+      std::vector<tiny_dnn::vec_t>& a_data);
 
   void ConvertImageDirectory(
       const std::string& a_directory,
       int32_t a_width,
       int32_t a_height,
-      std::vector<tiny_cnn::vec_t>& a_data,
-      std::vector<tiny_cnn::label_t>& a_labels);
+      std::vector<tiny_dnn::vec_t>& a_data,
+      std::vector<tiny_dnn::label_t>& a_labels);
 
-  void NormalizeDataRGB(std::vector<tiny_cnn::vec_t>& a_data);
+  void NormalizeDataRGB(std::vector<tiny_dnn::vec_t>& a_data);
 
-  void ApplyNormalizationRGB(std::vector<tiny_cnn::vec_t>& a_data,
-      double normAvgR, double normStdR,
-      double normAvgG, double normStdG,
-      double normAvgB, double normStdB);
+  void ApplyNormalizationRGB(std::vector<tiny_dnn::vec_t>& a_data,
+      float normAvgR, float normStdR,
+      float normAvgG, float normStdG,
+      float normAvgB, float normStdB);
 
-  cv::Mat ImageToMat(tiny_cnn::image<>& a_img, int32_t a_sizeIncrease);
+  cv::Mat ImageToMat(tiny_dnn::image<>& a_img, int32_t a_sizeIncrease);
 
-  tiny_cnn::network<tiny_cnn::sequential> m_cnn;
+  tiny_dnn::network<tiny_dnn::sequential> m_cnn;
 
   int32_t m_inputWidth;
   int32_t m_inputHeight;
