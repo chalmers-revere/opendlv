@@ -31,9 +31,9 @@
 
 //#include "odvdfh16truck/GeneratedHeaders_ODVDFH16Truck.h"
 //#include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
-//#include "odvdtrimble/GeneratedHeaders_ODVDTrimble.h"
-//#include "odvdimu/GeneratedHeaders_ODVDIMU.h"
-
+#include "odvdtrimble/GeneratedHeaders_ODVDTrimble.h"
+#include "odvdimu/GeneratedHeaders_ODVDIMU.h"
+#include "odvdopendlvstandardmessageset/GeneratedHeaders_ODVDOpenDLVStandardMessageSet.h"
 //Include cfsd??
 //#include <odvdcfsd18/GeneratedHeaders_ODVDcfsd18.h>
 
@@ -54,6 +54,17 @@ class Geolocation : public odcore::base::module::TimeTriggeredConferenceClientMo
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
   void setUp();
   void tearDown();
+  MatrixXd sigmaPoints(MatrixXd &states, MatrixXd &P);
+  MatrixXd UKFPrediction(MatrixXd &states, MatrixXd &P,double &T,MatrixXd &Q);
+  MatrixXd UKFUpdate(MatrixXd &states, MatrixXd &P, MatrixXd &R);
+  bool m_recievedGroundSpeed;
+  bool m_recievedAccReading;
+  bool m_receivedGyrReading;
+  bool m_recievedGpsReading;
+  bool m_recievedHeadingReading;
+  odcore::data::TimeStamp m_refTimeStamp;
+  bool m_sensorDataToFilterSynch;
+
   //void nextContainer(odcore::data::Container &);
 };
 
