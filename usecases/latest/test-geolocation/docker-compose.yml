@@ -32,5 +32,5 @@ services:
         depends_on:
             - odsupercomponent
         network_mode: host
-        command: "/opt/opendlv/bin/opendlv-system-application-sensation-geolocation --cid=${CID} --freq=20"
+        command: "/opt/opendlv/bin/opendlv-logic-sensation-geolocation --cid=${CID} --freq=20"
 
