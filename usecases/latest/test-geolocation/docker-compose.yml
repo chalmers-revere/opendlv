@@ -22,27 +22,15 @@ version: '2'
 services:
     odsupercomponent:
         build: .
-        network_mode: "host"
+        network_mode: host
         volumes:
         - .:/opt/opendlv.data
         command: "/opt/od4/bin/odsupercomponent --cid=${CID} --verbose=1 --configuration=/opt/opendlv.data/configuration"
         
     sensation-geolocation:
         build: .
-        network_mode: "host"
-        working_dir: "/opt/opendlv/bin"
-        restart: always
         depends_on:
             - odsupercomponent
-        command: "/opt/opendlv/bin/opendlv-system-application-sensation-geolocation --cid=${CID} --freq=2"
-
-    # microservice for proxy-trimble
-    proxy-trimble:
-        build: .
-        network_mode: "host"
-        working_dir: "/opt/opendlv.core/bin"
-        restart: always
-        depends_on:
-            - odsupercomponent
-        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-trimble --cid=${CID} --freq=20"
+        network_mode: host
+        command: "/opt/opendlv/bin/opendlv-system-application-sensation-geolocation --cid=${CID} --freq=20"
 

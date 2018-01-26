@@ -21,62 +21,40 @@
 #define LOGIC_SENSATION_GEOLOCATION_GEOLOCATION_HPP
 
 #include <memory>
-    
-#include "opendavinci/odcore/base/Mutex.h"
+
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
+#include <opendavinci/odcore/wrapper/Eigen.h>
 
-#include "opendlv/data/environment/Point3.h"
-#include "opendlv/data/environment/WGS84Coordinate.h"
+//#include "opendlv/data/environment/Point3.h"
+//#include "opendlv/data/environment/WGS84Coordinate.h"
 
-#include "odvdfh16truck/GeneratedHeaders_ODVDFH16Truck.h"
-#include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
-#include "odvdtrimble/GeneratedHeaders_ODVDTrimble.h"
-#include "odvdimu/GeneratedHeaders_ODVDIMU.h"
+//#include "odvdfh16truck/GeneratedHeaders_ODVDFH16Truck.h"
+//#include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
+//#include "odvdtrimble/GeneratedHeaders_ODVDTrimble.h"
+//#include "odvdimu/GeneratedHeaders_ODVDIMU.h"
 
-#include "kalman/ExtendedKalmanFilter.hpp"
-
-#include "kinematicmodel.hpp"
-#include "kinematicobservationmodel.hpp"
+//Include cfsd??
+//#include <odvdcfsd18/GeneratedHeaders_ODVDcfsd18.h>
 
 namespace opendlv {
 namespace logic {
 namespace sensation {
 
-class Geolocation
-: public odcore::base::module::TimeTriggeredConferenceClientModule {
+class Geolocation : public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
   Geolocation(int32_t const &, char **);
   Geolocation(Geolocation const &) = delete;
   Geolocation &operator=(Geolocation const &) = delete;
   virtual ~Geolocation();
-  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+  virtual void nextContainer(odcore::data::Container &);
+  
 
  private:
+  odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
   void setUp();
   void tearDown();
-  void nextContainer(odcore::data::Container &);
-  double calculatePositionConfidence(bool &);
-  double calculateHeadingConfidence(bool &);
-  double calculateHeadingRateConfidence(bool &);
-  double calculateSpeedConfidence(bool &);
-  void filterReset(opendlv::data::environment::Point3 &, opendlv::core::sensors::trimble::GpsReading &);
-
-  odcore::base::Mutex m_gpsReadingMutex;
-
-  Kalman::ExtendedKalmanFilter<State<double>> m_ekf;
-  opendlv::data::environment::WGS84Coordinate m_gpsReading;
-
-  opendlv::proxy::MagnetometerReading m_magnetometerReading; 
-  opendlv::proxy::AccelerometerReading m_accelerometerReading;
-  opendlv::proxy::reverefh16::Steering m_steeringReading;
-  opendlv::proxy::reverefh16::Propulsion m_propulsionReading;
-
-  bool m_debug;
-
-  bool m_initialised;
-  double m_gpsToCoGDisplacement[3] = {-1.0f,-2.3f,-22.0f};
-  double m_steeringToWheelRatio = -22.0f;
+  //void nextContainer(odcore::data::Container &);
 };
 
 }
