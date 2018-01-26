@@ -91,6 +91,7 @@ add_subdirectory(sensation/directionofmovement)
 add_subdirectory(sensation/echolocation)
 add_subdirectory(sensation/geolocation)
 add_subdirectory(sensation/opticalflow)
+add_subdirectory(sensation/selflocalization)
 
 ###########################################################################
 # Create packages for selected Linux distributions.
