@@ -68,5 +68,29 @@ odsupercomponent.pulsetimeack.exclude = odcockpit
 # CONFIGURATION FOR OPENDLV
 #
 
-sensation-geolocation.debug = 1
+%%%%%MODEL UNCERTAINTIES%%%%%% 
+logic-sensation-geolocation.Q.X = 1
+logic-sensation-geolocation.Q.Y = 1
+logic-sensation-geolocation.Q.VelX = 1
+logic-sensation-geolocation.Q.VelY = 1
+logic-sensation-geolocation.Q.Yaw = 1
+logic-sensation-geolocation.Q.Heading = 1
+
+%%%%%MEASUREMENT UNCERTAINTIES%%%%%
+logic-sensation-geolocation.R.X = 1
+logic-sensation-geolocation.R.Y = 1
+logic-sensation-geolocation.R.VelX = 1
+logic-sensation-geolocation.R.AccX = 1
+logic-sensation-geolocation.R.AccY = 1
+logic-sensation-geolocation.R.Yaw = 1
+logic-sensation-geolocation.R.Heading = 1
+
+%%%%%VEHICLE MODEL PARAMETERS%%%%%
+logic-sensation-geolocation.vehicle-parameter.m = 188 #kg
+logic-sensation-geolocation.vehicle-parameter.Iz = 105 #kgm^2
+logic-sensation-geolocation.vehicle-parameter.g = 9.82 #m/s2
+logic-sensation-geolocation.vehicle-parameter.l = 1.53 #m
+logic-sensation-geolocation.vehicle-parameter.lf = 0.765 #m (l*0.5)
+logic-sensation-geolocation.vehicle-parameter.lr = 0.765 #m (l*0.5)
+logic-sensation-geolocation.vehicle-parameter.mu = 0.9
 

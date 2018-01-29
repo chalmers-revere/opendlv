@@ -25,6 +25,9 @@
 #include "opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h"
 #include "opendavinci/odcore/data/Container.h"
 #include <opendavinci/odcore/wrapper/Eigen.h>
+#include <opendavinci/odcore/base/Lock.h>
+#include "opendlv/data/environment/Point3.h"
+#include "opendlv/data/environment/WGS84Coordinate.h"
 
 //#include "opendlv/data/environment/Point3.h"
 //#include "opendlv/data/environment/WGS84Coordinate.h"
@@ -54,16 +57,24 @@ class Geolocation : public odcore::base::module::TimeTriggeredConferenceClientMo
   odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
   void setUp();
   void tearDown();
-  MatrixXd sigmaPoints(MatrixXd &states, MatrixXd &P);
-  MatrixXd UKFPrediction(MatrixXd &states, MatrixXd &P,double &T,MatrixXd &Q);
-  MatrixXd UKFUpdate(MatrixXd &states, MatrixXd &P, MatrixXd &R);
-  bool m_recievedGroundSpeed;
-  bool m_recievedAccReading;
-  bool m_receivedGyrReading;
-  bool m_recievedGpsReading;
-  bool m_recievedHeadingReading;
-  odcore::data::TimeStamp m_refTimeStamp;
-  bool m_sensorDataToFilterSynch;
+  MatrixXd UKFWeights();
+  MatrixXd sigmaPoints(MatrixXd &states);
+  MatrixXd UKFPrediction(MatrixXd &states);
+  MatrixXd UKFUpdate(MatrixXd &states);
+  odcore::data::TimeStamp m_gpsTimeStamp;
+  odcore::data::TimeStamp m_accTimeStamp;
+  odcore::data::TimeStamp m_gyrTimeStamp;
+  odcore::data::TimeStamp m_groundSpeedTimeStamp;
+  odcore::base::Mutex m_sensorMutex;
+  MatrixXf m_accXYReading;
+  float m_yawReading;
+  MatrixXd m_gpsReading;
+  opendlv::data::environment::WGS84Coordinate m_gpsReference;
+  MatrixXd m_Q;
+  MatrixXd m_R;
+  MatrixXd m_stateCovP;
+  MatrixXd m_vehicleModelParameters;
+  //odcore::base::Mutex m_egoStateMutex;
 
   //void nextContainer(odcore::data::Container &);
 };
