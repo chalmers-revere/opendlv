@@ -57,20 +57,21 @@ Geolocation::Geolocation(int32_t const &a_argc, char **a_argv)
     , m_sampleTime()
     , m_headingReading()
     , m_groundSpeedReading()
+    , m_states()
 
 
 {
 
-	std::cout << "T1" << std::endl;
+	
 	m_gpsReference = opendlv::data::environment::WGS84Coordinate(0.0, 0.0); //How to collect???
-	std::cout << "T1.1" << std::endl;
 	m_gpsReading = MatrixXd::Zero(2,1);
+	m_accXYReading = MatrixXf::Zero(2,1);
 	m_Q = MatrixXd::Zero(6,6); //Six states
 	m_R = MatrixXd::Zero(7,7); //Seven Measurements
 	m_stateCovP = MatrixXd::Identity(6,6); //Initialize P
 	m_stateCovP = m_stateCovP*0.1;
+	m_states = MatrixXd::Zero(6,1);
 	m_vehicleModelParameters = MatrixXd::Zero(7,1);
-	std::cout << "T1.2" << std::endl;
 
 
 
@@ -101,8 +102,8 @@ void Geolocation::nextContainer(odcore::data::Container &a_container)
 	 	odcore::base::Lock l(m_sensorMutex);
 	 	m_accTimeStamp = a_container.getReceivedTimeStamp();
 	 	auto accReading = a_container.getData<opendlv::proxy::AccelerometerReading>();
-	 	m_accXYReading(0,0) = accReading.getAccelerationX();
-	 	m_accXYReading(1,0) = accReading.getAccelerationY();
+	 	m_accXYReading << accReading.getAccelerationX(),
+	 					  accReading.getAccelerationY();
 
 	 }
 
@@ -164,13 +165,19 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
    
-  	//Kolla alla sensor timestamps, om för lång tid gått ändra Q till att lite på modellen
+  	//Check sensor plausability
 
   	odcore::base::Lock l(m_sensorMutex);
+
+  	m_states = UKFPrediction(m_states);
+
+  	m_states = UKFUpdate(m_states);
 
   	//prediction
 
   	//update
+
+  	stateSender(m_states);
    	
 
   }
@@ -214,7 +221,6 @@ void Geolocation::setUp()
 	  		 0,0,0,0,0,0,rHeading;
 
 	//%%%%%%%%%%%%VEHICLE MODEL PARAMETERS%%%%%%%%%%%%%%%%%%%
-
 	double const vM = kv.getValue<double>("logic-sensation-geolocation.vehicle-parameter.m");
 	double const vIz = kv.getValue<double>("logic-sensation-geolocation.vehicle-parameter.Iz");
 	double const vG = kv.getValue<double>("logic-sensation-geolocation.vehicle-parameter.g");
@@ -229,14 +235,22 @@ void Geolocation::setUp()
 
 	std::cout << "UKF initialized!" << std::endl;
 
-	Eigen::MatrixXd states = MatrixXd::Zero(6,1);
-	states << 0,0,17.96,0,0.45,0.5205;
-	Eigen::MatrixXd H = UKFWeights();
-	Eigen::MatrixXd F = sigmaPoints(states);
-
-	std::cout << H << std::endl;
-	std::cout << "--------------" << std::endl;
-	std::cout << F << std::endl;
+		m_gpsReading(0,0) = 15;
+		std::cout << "T1.1" << std::endl; 
+		 m_gpsReading(1,0) = 5;
+		 std::cout << "T1.2" << std::endl;
+		 m_groundSpeedReading = 2;
+		 std::cout << "T1.3" << std::endl;
+		 m_accXYReading(0,0) = 0.2;
+		 std::cout << "T1.4" << std::endl;
+		 m_accXYReading(1,0)= 0.02;
+		 std::cout << "T1.5" << std::endl;
+		 m_yawReading = 0.4;
+		 m_headingReading = 1;
+		 std::cout << "T1" << std::endl;
+	m_states = UKFPrediction(m_states);
+	std::cout << "T2" << std::endl;
+  	m_states = UKFUpdate(m_states);
 
 }
 
@@ -314,31 +328,37 @@ MatrixXd Geolocation::sigmaPoints(MatrixXd &x)
 
 MatrixXd Geolocation::UKFPrediction(MatrixXd &x)
 {	
-
+	std::cout << "T1.00" << std::endl;
 	MatrixXd Wmc = UKFWeights();
+	std::cout << "T1.01" << std::endl;
 	MatrixXd SP = sigmaPoints(x);
+	std::cout << "T1.02" << std::endl;
 	double const n = x.rows();
 	
 
-	 
+	 std::cout << "T1.1" << std::endl;
 	//Predictions
 
 	MatrixXd x_hat = MatrixXd::Zero(n,1);
 	MatrixXd sigmaPoint, sigmaStates;
-
+	std::cout << "T1.2" << std::endl;
 	//Calculate Mean
-	for(int i = 0; i < 2*n+1;){
+
+	for(int i = 0; i < 2*n+1; i++){
 
 		sigmaPoint = SP.col(i);
+		std::cout << "T1.21" << std::endl;
 		sigmaStates = vehicleModel(sigmaPoint);
+		std::cout << "T1.22" << std::endl;
 		x_hat = x_hat + sigmaStates*Wmc(0,i);
 
 	}
+	std::cout << "T1.3" << std::endl;
 
 	//Calculate Covariance
 
 	MatrixXd P_temp = MatrixXd::Zero(n,n); 
-	for(int i = 0; i < 2*n+1;){
+	for(int i = 0; i < 2*n+1; i++){
 
 		sigmaPoint = SP.col(i);
 		sigmaStates = vehicleModel(sigmaPoint);
@@ -347,9 +367,10 @@ MatrixXd Geolocation::UKFPrediction(MatrixXd &x)
 		P_temp = P_temp + (sigmaStates-x_hat)*(sigmaStates-x_hat).transpose()*Wmc(1,i);
 
 	}
+	std::cout << "T1.4" << std::endl;
 
 	P_temp = P_temp + m_Q;
-
+	std::cout << "T1.5" << std::endl;
 	m_stateCovP = (P_temp + P_temp.transpose())/2;
 		/*
 	        %Generate sigma points
@@ -381,31 +402,37 @@ MatrixXd Geolocation::UKFUpdate(MatrixXd &x)
 		double const n = x.rows();
 
 
+		std::cout << "T2.1" << std::endl;
 
-		MatrixXd y_hat = MatrixXd::Zero(n,1);
+		MatrixXd y_hat = MatrixXd::Zero(7,1);
 		MatrixXd sigmaPoint, sigmaStates;
 
+		std::cout << "T2.1" << std::endl;
 		//Calculate Mean
-	for(int i = 0; i < 2*n+1;){
+	for(int i = 0; i < 2*n+1;i++){
 
 		sigmaPoint = SP.col(i);
+		std::cout << "T2.2" << std::endl;
 		sigmaStates = measurementModel(sigmaPoint);
+		std::cout << "T2.3" << std::endl;
 		y_hat = y_hat + sigmaStates*Wmc(0,i);
 
 	}
 
-	MatrixXd Pxy = MatrixXd::Zero(n,n);
+	MatrixXd Pxy = MatrixXd::Zero(6,7);
 	//Innovation covariance
 
+	std::cout << "T2.4" << std::endl;
 	MatrixXd S = m_R;
-	for(int i = 0; i < 2*n+1;){
+	std::cout << "T2.5" << std::endl;
+	for(int i = 0; i < 2*n+1; i++){
 
 		sigmaPoint = SP.col(i);
-		sigmaStates = vehicleModel(sigmaPoint);
+		sigmaStates = measurementModel(sigmaPoint);
 
-
-		Pxy = Pxy + (sigmaStates-x)*(sigmaStates-y_hat).transpose()*Wmc(1,i);
-
+		std::cout << "T2.51" << std::endl;
+		Pxy = Pxy + (sigmaPoint-x)*(sigmaStates-y_hat).transpose()*Wmc(1,i);
+		std::cout << "T2.52" << std::endl;
 		S = S + (sigmaStates-y_hat)*(sigmaStates-y_hat).transpose()*Wmc(1,i);
 
 	}
@@ -413,17 +440,17 @@ MatrixXd Geolocation::UKFUpdate(MatrixXd &x)
 	//Collect measurements from sensor
 
 	MatrixXd y = MatrixXd::Zero(7,1);
-
-	y << m_gpsReading(0), 
-		 m_gpsReading(1),
+	std::cout << "T2.6" << std::endl;
+	y << m_gpsReading(0,0), 
+		 m_gpsReading(1,0),
 		 m_groundSpeedReading,
-		 m_accXYReading(0),
-		 m_accXYReading(1),
+		 m_accXYReading(0,0),
+		 m_accXYReading(1,0),
 		 m_yawReading,
 		 m_headingReading;
 
 	//State update
-
+	std::cout << "T2.7" << std::endl;
 	x = x + Pxy*S.inverse()*(y-y_hat);
 
 	m_stateCovP = m_stateCovP - Pxy*S.inverse()*Pxy.transpose();
@@ -608,6 +635,23 @@ double Geolocation::rackTravelToFrontWheelSteering(double &rackTravel)
 	double delta = rackTravelToSteeringAngleLineSlope*rackTravel*3.14159/180; 
 
 	return delta;
+}
+
+void Geolocation::stateSender(MatrixXd &x)
+{
+
+	//Send position
+	std::cout << "---------------------------" << std::endl;
+	std::cout << x << std::endl;
+	std::cout << "--------------------------" << std::endl;
+	std::cout << m_stateCovP << std::endl;
+
+
+	/*  opendlv::logic::sensation::Point conePoint = Cartesian2Spherical(cones(0,n), cones(1,n), cones(2,n));
+     	odcore::data::Container c1(conePoint);
+		getConference().send(c1);*/
+
+
 }
 
 }

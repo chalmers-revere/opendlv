@@ -65,6 +65,7 @@ class Geolocation : public odcore::base::module::TimeTriggeredConferenceClientMo
   MatrixXd measurementModel(MatrixXd &x);
   double magicFormula(double &alpha, double &Fz, double const &mu);
   double rackTravelToFrontWheelSteering(double &rackTravel);
+  void stateSender(MatrixXd &x);
   odcore::data::TimeStamp m_gpsTimeStamp;
   odcore::data::TimeStamp m_accTimeStamp;
   odcore::data::TimeStamp m_gyrTimeStamp;
@@ -82,6 +83,7 @@ class Geolocation : public odcore::base::module::TimeTriggeredConferenceClientMo
   double m_sampleTime;
   double m_headingReading;
   double m_groundSpeedReading;
+  MatrixXd m_states;
   //odcore::base::Mutex m_egoStateMutex;
 
   //void nextContainer(odcore::data::Container &);
