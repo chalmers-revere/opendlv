@@ -72,12 +72,12 @@ odsupercomponent.pulsetimeack.exclude = odcockpit
 logic-sensation-geolocation.T = 0.1; #Check in docker compose
 
 %%%%%MODEL UNCERTAINTIES%%%%%% 
-logic-sensation-geolocation.Q.X = 1
-logic-sensation-geolocation.Q.Y = 1
-logic-sensation-geolocation.Q.VelX = 1
-logic-sensation-geolocation.Q.VelY = 1
-logic-sensation-geolocation.Q.Yaw = 1
-logic-sensation-geolocation.Q.Heading = 1
+logic-sensation-geolocation.Q.X = 0.1
+logic-sensation-geolocation.Q.Y = 0.1
+logic-sensation-geolocation.Q.VelX = 0.1
+logic-sensation-geolocation.Q.VelY = 0.1
+logic-sensation-geolocation.Q.Yaw = 0.1
+logic-sensation-geolocation.Q.Heading = 0.1
 
 %%%%%MEASUREMENT UNCERTAINTIES%%%%%
 logic-sensation-geolocation.R.X = 1
