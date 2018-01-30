@@ -32,7 +32,7 @@
 //#include "opendlv/data/environment/Point3.h"
 //#include "opendlv/data/environment/WGS84Coordinate.h"
 
-//#include "odvdfh16truck/GeneratedHeaders_ODVDFH16Truck.h"
+#include "odvdfh16truck/GeneratedHeaders_ODVDFH16Truck.h"
 //#include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
 #include "odvdtrimble/GeneratedHeaders_ODVDTrimble.h"
 #include "odvdimu/GeneratedHeaders_ODVDIMU.h"
@@ -58,9 +58,13 @@ class Geolocation : public odcore::base::module::TimeTriggeredConferenceClientMo
   void setUp();
   void tearDown();
   MatrixXd UKFWeights();
-  MatrixXd sigmaPoints(MatrixXd &states);
-  MatrixXd UKFPrediction(MatrixXd &states);
-  MatrixXd UKFUpdate(MatrixXd &states);
+  MatrixXd sigmaPoints(MatrixXd &x);
+  MatrixXd UKFPrediction(MatrixXd &x);
+  MatrixXd UKFUpdate(MatrixXd &x);
+  MatrixXd vehicleModel(MatrixXd &x);
+  MatrixXd measurementModel(MatrixXd &x);
+  double magicFormula(double &alpha, double &Fz, double const &mu);
+  double rackTravelToFrontWheelSteering(double &rackTravel);
   odcore::data::TimeStamp m_gpsTimeStamp;
   odcore::data::TimeStamp m_accTimeStamp;
   odcore::data::TimeStamp m_gyrTimeStamp;
@@ -74,6 +78,10 @@ class Geolocation : public odcore::base::module::TimeTriggeredConferenceClientMo
   MatrixXd m_R;
   MatrixXd m_stateCovP;
   MatrixXd m_vehicleModelParameters;
+  double m_delta;
+  double m_sampleTime;
+  double m_headingReading;
+  double m_groundSpeedReading;
   //odcore::base::Mutex m_egoStateMutex;
 
   //void nextContainer(odcore::data::Container &);

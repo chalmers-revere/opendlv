@@ -68,6 +68,9 @@ odsupercomponent.pulsetimeack.exclude = odcockpit
 # CONFIGURATION FOR OPENDLV
 #
 
+%%%%%SAMPLE TIME%%%%%%
+logic-sensation-geolocation.T = 0.1; #Check in docker compose
+
 %%%%%MODEL UNCERTAINTIES%%%%%% 
 logic-sensation-geolocation.Q.X = 1
 logic-sensation-geolocation.Q.Y = 1
