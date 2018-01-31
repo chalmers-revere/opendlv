@@ -63,7 +63,7 @@ Geolocation::Geolocation(int32_t const &a_argc, char **a_argv)
 {
 
 	
-	m_gpsReference = opendlv::data::environment::WGS84Coordinate(0.0, 0.0); //How to collect???
+	m_gpsReference = opendlv::data::environment::WGS84Coordinate(0.0, 0.0);
 	m_gpsReading = MatrixXd::Zero(2,1);
 	m_accXYReading = MatrixXf::Zero(2,1);
 	m_Q = MatrixXd::Zero(6,6); //Six states
@@ -84,13 +84,7 @@ Geolocation::~Geolocation()
 void Geolocation::nextContainer(odcore::data::Container &a_container)
 {
 
-
-
-	//m_groundSpeedTimeStamp = a_container.getReceivedTimeStamp();
-
-	//Groundspeed
-
-	
+	//Groundspeed	
 	if (a_container.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()){
 		odcore::base::Lock l(m_sensorMutex);
 	 	m_groundSpeedTimeStamp = a_container.getReceivedTimeStamp();
@@ -106,7 +100,6 @@ void Geolocation::nextContainer(odcore::data::Container &a_container)
 	 					  accReading.getAccelerationY();
 
 	 }
-
 	 //Gyro
 	 if (a_container.getDataType() == opendlv::proxy::GyroscopeReading::ID()){
 	 	odcore::base::Lock l(m_sensorMutex);
@@ -114,7 +107,6 @@ void Geolocation::nextContainer(odcore::data::Container &a_container)
 		auto gyrReading = a_container.getData<opendlv::proxy::GyroscopeReading>();
 		m_yawReading = gyrReading.getAngularVelocityZ();
 	 }
-
 	 //GPS
 	 if (a_container.getDataType() == opendlv::core::sensors::trimble::GpsReading::ID()){
 	 	odcore::base::Lock l(m_sensorMutex);
@@ -127,18 +119,9 @@ void Geolocation::nextContainer(odcore::data::Container &a_container)
 		opendlv::data::environment::Point3 gpsTransform = m_gpsReference.transform(gpsCurrent);
 		m_gpsReading << gpsTransform.getX(),
 						gpsTransform.getY();
-
-		/*
-
-		WGS84Reference = WGS84Coordinate(latitude, longitude);
-		WGS84Coordinate WGS84current = c.getData<WGS84Coordinate>();
-		Point3 currentPosition = WGS84Reference.transform(WGS84current);*/
-
-
 	 }
 
 	 //Racktravel
-
 	 if (a_container.getDataType() == opendlv::proxy::reverefh16::Steering::ID()){
 
 	 	odcore::base::Lock l(m_sensorMutex);
@@ -146,17 +129,7 @@ void Geolocation::nextContainer(odcore::data::Container &a_container)
 
 		double rT = racktravel.getSteeringwheelangle();
 		m_delta = rackTravelToFrontWheelSteering(rT);
-
-		//RACKTRAVELTODELTA??
-
-
-		//
-
 	 }
-
-	 /*if (a_container.getDataType() == opendlv::proxy::GeodeticHeadingReading::ID()){
-	 	
-	 } */
 } 
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
@@ -169,15 +142,13 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 
   	odcore::base::Lock l(m_sensorMutex);
 
-  	m_states = UKFPrediction(m_states);
+  	//ADD TIME CHECK!!!
 
-  	m_states = UKFUpdate(m_states);
-
+  	
   	//prediction
-
+  	m_states = UKFPrediction(m_states);
   	//update
-  	m_gpsReading(0.0) += 0.4;
-  	m_delta = 0;
+  	m_states = UKFUpdate(m_states);
 
   	stateSender(m_states);
    	
@@ -236,7 +207,7 @@ void Geolocation::setUp()
 	m_sampleTime = kv.getValue<double>("logic-sensation-geolocation.T");
 
 	std::cout << "UKF initialized!" << std::endl;
-
+	/*
 		m_gpsReading(0,0) = 15;
 		 m_gpsReading(1,0) = 0;
 		 m_groundSpeedReading = 2;
@@ -246,7 +217,7 @@ void Geolocation::setUp()
 		 m_headingReading = 1;
 		 m_states << 14.7, 0, 2.2, 0, 0, 1.1;
 	m_states = UKFPrediction(m_states);
-  	m_states = UKFUpdate(m_states);
+  	m_states = UKFUpdate(m_states);*/
 
 }
 
@@ -357,24 +328,7 @@ MatrixXd Geolocation::UKFPrediction(MatrixXd &x)
 
 	P_temp = P_temp + m_Q;
 	m_stateCovP = (P_temp + P_temp.transpose())/2;
-		/*
-	        %Generate sigma points
-        [SP,Wm,Wc] = sigmaPoints(x, P, type);
-        %Calculate state prediction
-        for i = 1:(2*n+1)
-            x_hat = x_hat+f(SP(:,i),T,u,param)*Wm(i);
-        end
-        x = x_hat;
-        %Calculate Error Covariance prediction
-        for i = 1:(2*n+1)
-           P_t = P_t + (f(SP(:,i),T,u,param)-x_hat)*(f(SP(:,i),T,u,param)-x_hat)'*Wc(i);
-        end
-         P = P_t+Q;
-         P = (P+P')/2;*/
 
-
-
-	std::cout << x << std::endl;
 	return x_hat;
 }
 
@@ -428,32 +382,6 @@ MatrixXd Geolocation::UKFUpdate(MatrixXd &x)
 	m_stateCovP = m_stateCovP - Pxy*S.inverse()*Pxy.transpose();
 
 	m_stateCovP = (m_stateCovP + m_stateCovP.transpose())/2;
-
-	/*        %Generate measurement models
-        [hx, Hx] = h(x,s,delta,param);
-        y_hat = zeros(numel(hx),1);
-        %Generate Sigma Points
-        [SP,Wm,Wc] = sigmaPoints(x, P, type);
-        
-        %Calculate measurement estimate
-        for i = 1:2*n+1
-            y_hat = y_hat + h(SP(:,i),s,delta,param)*Wm(i);
-        end
-        S = R;
-        Pxy = zeros(n,numel(hx));
-        for i = 1:2*n+1
-            %Calculate Covariance
-            Pxy = Pxy + (SP(:,i)-x)*(h(SP(:,i),s,delta,param)-y_hat)'*Wc(i);
-            %Calculate innovation covariance
-            S = S + (h(SP(:,i),s,delta,param)-y_hat)*(h(SP(:,i),s,delta,param)-y_hat)'*Wc(i);
-        end
-        Pxy*inv(S)
-        %State update
-        x = x + Pxy*inv(S)*(y-y_hat);
-        %Error covariance matrix update
-        P = P - Pxy*inv(S)*Pxy';
-        P = (P+P')/2;*/
-
 	
 	return x;
 }
@@ -466,14 +394,6 @@ MatrixXd Geolocation::vehicleModel(MatrixXd &x)
 
 		x(2) = 0.01;
 	}
-	/*
-	double const m = m_vehicleModelParameters(1);
-	double const Iz = m_vehicleModelParameters(2);
-	double const g = m_vehicleModelParameters(3);
-	double const lf = m_vehicleModelParameters(4);
-	double const lr = m_vehicleModelParameters(5);
-	double const mu = m_vehicleModelParameters(6);
-	*/
 
 	double alphaF = std::atan((m_vehicleModelParameters(3)*x(4)) + x(3)/x(2)) - m_delta;
 	double alphaR = std::atan((x(3)-m_vehicleModelParameters(4)*x(4))/x(2));
@@ -497,53 +417,10 @@ MatrixXd Geolocation::vehicleModel(MatrixXd &x)
 
 	MatrixXd fx = x + xdot*m_sampleTime;
 
-
-	/*
-	m = param(1);
-	Iz = param(2);
-	g = param(3);
-	lf = param(4);
-	lr = param(5);
-	mu = param(6);
-
-	if x(3) < 0.0001
-    x(3) = 0.01;
-	end
-
-	%Create N.L motion model
-
-	alphaF = atan((lf*x(5) + x(4))/x(3)) - delta;
-	alphaR = atan((x(4)-lr*x(5))/x(3));
-
-	%linear tire model
-	% Ff = -cf*alphaF;
-	% Fr = -cr*alphaR;
-	%NL tire model
-	Fzf = m*g*(lr/(lr+lf));
-	Fzr = m*g*(lf/(lr+lf));
-	Fyf = magicFormula(alphaF,Fzf,mu);
-	Fyr = magicFormula(alphaR,Fzr,mu);
-
-	xdot = [x(3);...
-	    x(4);...
-	    -Fyf*sin(delta)/m + x(5)*x(4);...
-	    (Fyf*cos(delta)+Fyr)/m - x(5)*x(4);...
-	    (lf*Fyf*cos(delta)-lr*Fyr)/Iz;...
-	    x(5)];
-	fx = x + xdot*T;
-	Fx = 0;*/
-
 	return fx;
 }
 MatrixXd Geolocation::measurementModel(MatrixXd &x)
 {
-
-	/*	double const m = m_vehicleModelParameters(1);
-	double const Iz = m_vehicleModelParameters(2);
-	double const g = m_vehicleModelParameters(3);
-	double const lf = m_vehicleModelParameters(4);
-	double const lr = m_vehicleModelParameters(5);
-	double const mu = m_vehicleModelParameters(6);*/
 
 	MatrixXd hx = MatrixXd::Zero(7,1);
 	double alphaF = std::atan((m_vehicleModelParameters(3)*x(4)) + x(3)/x(2)) - m_delta;
@@ -565,13 +442,6 @@ MatrixXd Geolocation::measurementModel(MatrixXd &x)
 		  x(4),
 		  x(5);
 
-	/*hx = [x(1);...
-      x(2);...
-      x(3);...
-      -Fyf*sin(delta)/m;...
-      (Fyf*cos(delta)+Fyr)/m;...
-      x(5)
-      x(6)];*/
 	return hx;
 }
 double Geolocation::magicFormula(double &alpha, double &Fz, double const &mu)
@@ -582,18 +452,6 @@ double Geolocation::magicFormula(double &alpha, double &Fz, double const &mu)
 	double const B = c_alpha/C/mu/Fz;
 	double const E = -2;
 	double Fy = mu*Fz*std::sin(C*std::atan(B*alpha - E*(B*alpha - std::atan(B*alpha))));
-	/*
-		%mu = 0.9;
-	C = 1;
-	c_alpha = 2.5229e4;
-	%Fz = 598.4142; 
-	B = c_alpha/C/mu/Fz;
-	E = -2;
-
-	%alpha = 0:pi/180:pi/18;
-
-	Fy = mu*Fz*sin(C*atan(B*alpha - E*(B*alpha - atan(B*alpha))));
-	*/
 
 	return Fy;
 }
