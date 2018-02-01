@@ -40,10 +40,8 @@ namespace sensation {
 
 Geolocation::Geolocation(int32_t const &a_argc, char **a_argv)
     : TimeTriggeredConferenceClientModule(a_argc, a_argv, "logic-sensation-geolocation")
-    , m_gpsTimeStamp()
-    , m_accTimeStamp()
-    , m_gyrTimeStamp()
-    , m_groundSpeedTimeStamp()
+    , m_measurementsTimeStamp()
+    , m_paramVecR()
     , m_sensorMutex()
     , m_accXYReading()
     , m_yawReading()
@@ -61,9 +59,8 @@ Geolocation::Geolocation(int32_t const &a_argc, char **a_argv)
 
 
 {
-
-	
-	m_gpsReference = opendlv::data::environment::WGS84Coordinate(0.0, 0.0);
+	m_measurementsTimeStamp = MatrixXd::Zero(7,1);
+	m_paramVecR = MatrixXd::Zero(7,1);
 	m_gpsReading = MatrixXd::Zero(2,1);
 	m_accXYReading = MatrixXf::Zero(2,1);
 	m_Q = MatrixXd::Zero(6,6); //Six states
@@ -84,17 +81,22 @@ Geolocation::~Geolocation()
 void Geolocation::nextContainer(odcore::data::Container &a_container)
 {
 
+		
 	//Groundspeed	
 	if (a_container.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()){
 		odcore::base::Lock l(m_sensorMutex);
-	 	m_groundSpeedTimeStamp = a_container.getReceivedTimeStamp();
+	 	odcore::data::TimeStamp containerStamp = a_container.getReceivedTimeStamp();
+	 	m_measurementsTimeStamp(2,0) = containerStamp.toMicroseconds();
+
 	 	auto groundspeed = a_container.getData<opendlv::proxy::reverefh16::Propulsion>();
 	 	m_groundSpeedReading = groundspeed.getPropulsionShaftVehicleSpeed();
 	}
 	//Accelerometer
 	 if (a_container.getDataType() == opendlv::proxy::AccelerometerReading::ID()){
 	 	odcore::base::Lock l(m_sensorMutex);
-	 	m_accTimeStamp = a_container.getReceivedTimeStamp();
+	 	odcore::data::TimeStamp containerStamp = a_container.getReceivedTimeStamp();
+	 	m_measurementsTimeStamp(3,0) = containerStamp.toMicroseconds();
+	 	m_measurementsTimeStamp(4,0) = containerStamp.toMicroseconds();
 	 	auto accReading = a_container.getData<opendlv::proxy::AccelerometerReading>();
 	 	m_accXYReading << accReading.getAccelerationX(),
 	 					  accReading.getAccelerationY();
@@ -103,14 +105,19 @@ void Geolocation::nextContainer(odcore::data::Container &a_container)
 	 //Gyro
 	 if (a_container.getDataType() == opendlv::proxy::GyroscopeReading::ID()){
 	 	odcore::base::Lock l(m_sensorMutex);
-		m_gyrTimeStamp = a_container.getReceivedTimeStamp();
+	 	odcore::data::TimeStamp containerStamp = a_container.getReceivedTimeStamp();
+	 	m_measurementsTimeStamp(5,0) = containerStamp.toMicroseconds();
 		auto gyrReading = a_container.getData<opendlv::proxy::GyroscopeReading>();
 		m_yawReading = gyrReading.getAngularVelocityZ();
 	 }
 	 //GPS
 	 if (a_container.getDataType() == opendlv::core::sensors::trimble::GpsReading::ID()){
 	 	odcore::base::Lock l(m_sensorMutex);
-	 	m_gpsTimeStamp = a_container.getReceivedTimeStamp();
+	 	odcore::data::TimeStamp containerStamp = a_container.getReceivedTimeStamp();
+	 	m_measurementsTimeStamp(0,0) = containerStamp.toMicroseconds();
+	 	m_measurementsTimeStamp(1,0) = containerStamp.toMicroseconds();
+	 	m_measurementsTimeStamp(6,0) = containerStamp.toMicroseconds();
+
 		auto gpsReading = a_container.getData<opendlv::core::sensors::trimble::GpsReading>();
 		double longitude = gpsReading.getLongitude();
 		double latitude = gpsReading.getLatitude();
@@ -135,15 +142,25 @@ void Geolocation::nextContainer(odcore::data::Container &a_container)
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 {
   
+  
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
    
-  	//Check sensor plausability
-
   	odcore::base::Lock l(m_sensorMutex);
+  	odcore::data::TimeStamp currentTime;
+	
+	//Check last recieved measurement from each sensor, if longer than 1 sec, start trusting the model more  	
+  	for(int i = 0; i < 7; i++){
+  		
+  		if(currentTime.toMicroseconds()-m_measurementsTimeStamp(i,0) > 1000000){
+  			
+  			m_R(i,i) = m_paramVecR(i,0)*1000;
 
-  	//ADD TIME CHECK!!!
-
+  		}else
+  		{
+  			m_R(i,i) = m_paramVecR(i,0);
+  		}
+  	}
   	
   	//prediction
   	m_states = UKFPrediction(m_states);
@@ -151,6 +168,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
   	m_states = UKFUpdate(m_states);
 
   	stateSender(m_states);
+  	
    	
 
   }
@@ -185,6 +203,7 @@ void Geolocation::setUp()
 	  double const rAccY = kv.getValue<double>("logic-sensation-geolocation.R.AccY");
 	  double const rYaw = kv.getValue<double>("logic-sensation-geolocation.R.Yaw");
 	  double const rHeading = kv.getValue<double>("logic-sensation-geolocation.R.Heading");
+	  m_paramVecR << rX,rY,rVelX,rAccX,rAccY,rYaw,rHeading;
 	  m_R << rX,0,0,0,0,0,0,
 	  		 0,rY,0,0,0,0,0,
 	  		 0,0,rVelX,0,0,0,0,
@@ -204,9 +223,17 @@ void Geolocation::setUp()
 
 	m_vehicleModelParameters << vM,vIz,vG,vL,vLf,vLr,vMu;
 
+	//%%%%%%%%%%%%System Params%%%%%%%%%%%%%%%%%%%%%%
+
+	double const latitude = getKeyValueConfiguration().getValue<double>("logic-sensation-geolocation.GPSreference.latitude");
+	double const longitude = getKeyValueConfiguration().getValue<double>("logic-sensation-geolocation.GPSreference.longitude");
+	m_gpsReference = opendlv::data::environment::WGS84Coordinate(latitude,longitude);
+
 	m_sampleTime = kv.getValue<double>("logic-sensation-geolocation.T");
 
 	std::cout << "UKF initialized!" << std::endl;
+
+
 	/*
 		m_gpsReading(0,0) = 15;
 		 m_gpsReading(1,0) = 0;
@@ -327,6 +354,8 @@ MatrixXd Geolocation::UKFPrediction(MatrixXd &x)
 	}
 
 	P_temp = P_temp + m_Q;
+
+	//Dirty trick to keep numerical stability
 	m_stateCovP = (P_temp + P_temp.transpose())/2;
 
 	return x_hat;
@@ -381,6 +410,7 @@ MatrixXd Geolocation::UKFUpdate(MatrixXd &x)
 
 	m_stateCovP = m_stateCovP - Pxy*S.inverse()*Pxy.transpose();
 
+	//Dirty trick to keep numerical stability
 	m_stateCovP = (m_stateCovP + m_stateCovP.transpose())/2;
 	
 	return x;
@@ -471,10 +501,11 @@ void Geolocation::stateSender(MatrixXd &x)
 {
 
 	//Send position
-	std::cout << "---------------------------" << std::endl;
+	/*std::cout << "---------------------------" << std::endl;
 	std::cout << x << std::endl;
 	std::cout << "--------------------------" << std::endl;
-	std::cout << m_stateCovP << std::endl;
+	std::cout << m_stateCovP << std::endl;*/
+	x = x;
 
 
 	/*  opendlv::logic::sensation::Point conePoint = Cartesian2Spherical(cones(0,n), cones(1,n), cones(2,n));
