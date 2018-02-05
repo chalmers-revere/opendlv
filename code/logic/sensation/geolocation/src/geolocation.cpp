@@ -63,6 +63,10 @@ Geolocation::Geolocation(int32_t const &a_argc, char **a_argv)
 	m_paramVecR = MatrixXd::Zero(7,1);
 	m_gpsReading = MatrixXd::Zero(2,1);
 	m_accXYReading = MatrixXf::Zero(2,1);
+	m_yawReading = 0;
+	m_delta = 0;
+	m_headingReading = 0;
+	m_groundSpeedReading = 0;
 	m_Q = MatrixXd::Zero(6,6); //Six states
 	m_R = MatrixXd::Zero(7,7); //Seven Measurements
 	m_stateCovP = MatrixXd::Identity(6,6); //Initialize P
@@ -98,8 +102,7 @@ void Geolocation::nextContainer(odcore::data::Container &a_container)
 	 	m_measurementsTimeStamp(3,0) = containerStamp.toMicroseconds();
 	 	m_measurementsTimeStamp(4,0) = containerStamp.toMicroseconds();
 	 	auto accReading = a_container.getData<opendlv::proxy::AccelerometerReading>();
-	 	m_accXYReading << accReading.getAccelerationX(),
-	 					  accReading.getAccelerationY();
+
 
 	 }
 	 //Gyro
@@ -155,6 +158,7 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
   		if(currentTime.toMicroseconds()-m_measurementsTimeStamp(i,0) > 1000000){
   			
   			m_R(i,i) = m_paramVecR(i,0)*1000;
+			std::cout << "Not trusting sensor " << i << std::endl;
 
   		}else
   		{
@@ -501,8 +505,9 @@ void Geolocation::stateSender(MatrixXd &x)
 {
 
 	//Send position
-	/*std::cout << "---------------------------" << std::endl;
+	std::cout << "---------------------------" << std::endl;
 	std::cout << x << std::endl;
+/*
 	std::cout << "--------------------------" << std::endl;
 	std::cout << m_stateCovP << std::endl;*/
 	x = x;
