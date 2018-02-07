@@ -22,8 +22,24 @@
 
 #include <memory>
 
-#include "opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h"
-#include "opendavinci/odcore/data/Container.h"
+#include <iostream>
+#include <memory>
+#include <vector>
+#include <cmath>
+#include <opendavinci/odcore/data/TimeStamp.h>
+#include <opendavinci/odcore/strings/StringToolbox.h>
+#include <opendavinci/odcore/wrapper/Eigen.h>
+#include <opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h>
+#include <opendavinci/odcore/data/Container.h>
+#include "opendavinci/GeneratedHeaders_OpenDaVINCI.h"
+#include "opendavinci/odcore/wrapper/SharedMemoryFactory.h"
+#include "opendavinci/odcore/wrapper/SharedMemory.h"
+#include "opendavinci/generated/odcore/data/CompactPointCloud.h"
+
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/calib3d/calib3d.hpp>
 
 namespace opendlv {
 namespace logic {
@@ -39,8 +55,11 @@ class Selflocalization
   virtual void nextContainer(odcore::data::Container &);
 
  private:
+
+  cv::Mat ExtractSharedImage(odcore::data::image::SharedImage *a_sharedImage);
   void setUp();
   void tearDown();
+  bool m_cameraType;
 };
 
 }
