@@ -102,6 +102,8 @@ void Geolocation::nextContainer(odcore::data::Container &a_container)
 	 	m_measurementsTimeStamp(3,0) = containerStamp.toMicroseconds();
 	 	m_measurementsTimeStamp(4,0) = containerStamp.toMicroseconds();
 	 	auto accReading = a_container.getData<opendlv::proxy::AccelerometerReading>();
+		m_accXYReading << accReading.getAccelerationX(),
+				accReading.getAccelerationY();
 
 
 	 }
