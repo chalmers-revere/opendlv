@@ -52,13 +52,11 @@ Selflocalization::~Selflocalization()
 /*
 *Takes data from conference, in our case image?
 */
-void Selflocalization::nextContainer(odcore::data::Container &a_c) 
+void Selflocalization::nextContainer(odcore::data::Container &/*a_c*/) 
 {
 
 
-    odcore::data::Container container(nextMessage);
-    getConference().send(container);
-  }
+  
 }
 
 void Selflocalization::setUp()
