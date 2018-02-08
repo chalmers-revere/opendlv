@@ -70,7 +70,6 @@ Geolocation::Geolocation(int32_t const &a_argc, char **a_argv)
 	m_Q = MatrixXd::Zero(6,6); //Six states
 	m_R = MatrixXd::Zero(7,7); //Seven Measurements
 	m_stateCovP = MatrixXd::Identity(6,6); //Initialize P
-	m_stateCovP = m_stateCovP*0.1;
 	m_states = MatrixXd::Zero(6,1);
 	m_vehicleModelParameters = MatrixXd::Zero(7,1);
 
@@ -87,13 +86,13 @@ void Geolocation::nextContainer(odcore::data::Container &a_container)
 
 		
 	//Groundspeed	
-	if (a_container.getDataType() == opendlv::proxy::reverefh16::Propulsion::ID()){
+	if (a_container.getDataType() == opendlv::proxy::GroundSpeedReading::ID()){
 		odcore::base::Lock l(m_sensorMutex);
 	 	odcore::data::TimeStamp containerStamp = a_container.getReceivedTimeStamp();
 	 	m_measurementsTimeStamp(2,0) = containerStamp.toMicroseconds();
 
-	 	auto groundspeed = a_container.getData<opendlv::proxy::reverefh16::Propulsion>();
-	 	m_groundSpeedReading = groundspeed.getPropulsionShaftVehicleSpeed();
+	 	auto groundspeed = a_container.getData<opendlv::proxy::GroundSpeedReading>();
+	 	m_groundSpeedReading = groundspeed.getGroundSpeed();
 	}
 	//Accelerometer
 	 if (a_container.getDataType() == opendlv::proxy::AccelerometerReading::ID()){
@@ -103,7 +102,7 @@ void Geolocation::nextContainer(odcore::data::Container &a_container)
 	 	m_measurementsTimeStamp(4,0) = containerStamp.toMicroseconds();
 	 	auto accReading = a_container.getData<opendlv::proxy::AccelerometerReading>();
 		m_accXYReading << accReading.getAccelerationX(),
-				accReading.getAccelerationY();
+						  accReading.getAccelerationY();
 
 
 	 }
@@ -115,31 +114,43 @@ void Geolocation::nextContainer(odcore::data::Container &a_container)
 		auto gyrReading = a_container.getData<opendlv::proxy::GyroscopeReading>();
 		m_yawReading = gyrReading.getAngularVelocityZ();
 	 }
-	 //GPS
-	 if (a_container.getDataType() == opendlv::core::sensors::trimble::GpsReading::ID()){
+
+	 //GPS Position
+	 if (a_container.getDataType() == opendlv::proxy::GeodeticWgs84Reading::ID()){
 	 	odcore::base::Lock l(m_sensorMutex);
 	 	odcore::data::TimeStamp containerStamp = a_container.getReceivedTimeStamp();
 	 	m_measurementsTimeStamp(0,0) = containerStamp.toMicroseconds();
 	 	m_measurementsTimeStamp(1,0) = containerStamp.toMicroseconds();
-	 	m_measurementsTimeStamp(6,0) = containerStamp.toMicroseconds();
 
-		auto gpsReading = a_container.getData<opendlv::core::sensors::trimble::GpsReading>();
+		auto gpsReading = a_container.getData<opendlv::proxy::GeodeticWgs84Reading>();
 		double longitude = gpsReading.getLongitude();
 		double latitude = gpsReading.getLatitude();
-		m_headingReading = gpsReading.getNorthHeading();
 		opendlv::data::environment::WGS84Coordinate gpsCurrent = opendlv::data::environment::WGS84Coordinate(latitude, longitude);
 		opendlv::data::environment::Point3 gpsTransform = m_gpsReference.transform(gpsCurrent);
 		m_gpsReading << gpsTransform.getX(),
 						gpsTransform.getY();
 	 }
 
+	 //Heading
+
+	 if (a_container.getDataType() == opendlv::proxy::GeodeticHeadingReading::ID()){
+	 	odcore::base::Lock l(m_sensorMutex);
+	 	odcore::data::TimeStamp containerStamp = a_container.getReceivedTimeStamp();
+	 	m_measurementsTimeStamp(6,0) = containerStamp.toMicroseconds();
+
+
+		auto gpsHeadingReading = a_container.getData<opendlv::proxy::GeodeticHeadingReading>();
+		m_headingReading = gpsHeadingReading,getNorthHeading();
+
+	 }
+
 	 //Racktravel
-	 if (a_container.getDataType() == opendlv::proxy::reverefh16::Steering::ID()){
+	 if (a_container.getDataType() == opendlv::proxy::GroundSteeringReading::ID()){
 
 	 	odcore::base::Lock l(m_sensorMutex);
-		auto racktravel = a_container.getData<opendlv::proxy::reverefh16::Steering>();
+		auto racktravel = a_container.getData<opendlv::proxy::GroundSteeringReading>();
 
-		double rT = racktravel.getSteeringwheelangle();
+		double rT = racktravel.getGroundSteering();
 		m_delta = rackTravelToFrontWheelSteering(rT);
 	 }
 } 
@@ -512,7 +523,7 @@ void Geolocation::stateSender(MatrixXd &x)
 /*
 	std::cout << "--------------------------" << std::endl;
 	std::cout << m_stateCovP << std::endl;*/
-	x = x;
+	
 
 
 	/*  opendlv::logic::sensation::Point conePoint = Cartesian2Spherical(cones(0,n), cones(1,n), cones(2,n));
