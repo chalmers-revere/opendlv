@@ -27,7 +27,7 @@ global.buffer.memorySegmentSize = 2800000 # Size of a memory segment in bytes.
 global.buffer.numberOfMemorySegments = 4  # Number of memory segments.
 
 # The following key describes the list of modules expected to participate in this --cid session.
-global.session.expectedModules = logic-sensation-selflocalization
+global.session.expectedModules = logic-sensation-selflocalization,proxy-camera
 
 
 ###############################################################################
@@ -68,5 +68,58 @@ odsupercomponent.pulsetimeack.exclude = odcockpit
 # CONFIGURATION FOR OPENDLV
 #
 
-logic-sensation-selflocalization.cameratype = 0  #(Camera type is stereo == 1, otherwise 0)
+logic-sensation-selflocalization.cameratype = 1  #(Camera type is stereo == 1, otherwise 0)
 logic-sensation-selflocalization.vocabularyfilepath = tjena	#In absolutepath 
+
+###############################################################################
+###############################################################################
+#
+# CONFIGURATION FOR ODPLAYER
+#
+odplayer.input = file://recorder.rec
+odplayer.autoRewind = 0 # 0 = no rewind in the case of EOF, 1 = rewind.
+odplayer.remoteControl = 0 # 0 = no remote control, 1 = allowing remote control (i.e. play, pause, rewind, step_forward)
+odplayer.timeScale = 1.0 # A time scale factor of 1.0 means real time, a factor of 0 means as fast as possible. The smaller the time scale factor is the faster runs the replay.
+
+odplayerh264.input = file://recorder.rec
+odplayerh264.autoRewind = 0 # 0 = no rewind in the case of EOF, 1 = rewind.
+odplayerh264.remoteControl = 0 # 0 = no remote control, 1 = allowing remote control (i.e. play, pause, rewind, step_forward)
+odplayerh264.timeScale = 1.0 # A time scale factor of 1.0 means real time, a factor of 0 means as fast as possible. The smaller the time scale factor is the faster runs the replay.
+odplayerh264.portbaseforchildprocesses = 28000 # Every spawned child processes is connecting to the parent process via TCP using the base port plus its increasing ID.
+
+
+###############################################################################
+###############################################################################
+#
+# CONFIGURATION FOR ODRECORDER
+#
+#odrecorder.output = file://recorder.rec
+odrecorder.remoteControl = 0 # 0 = no remote control, 1 = allowing remote control (i.e. start and stop recording)
+odrecorder.dumpSharedData = 1 # 0 = do not dump shared images and shared images, 1 = otherwise
+
+#odrecorderh264.output = file://recorder.rec
+odrecorderh264.remoteControl = 0 # 0 = no remote control, 1 = allowing remote control (i.e. start and stop recording)
+odrecorderh264.dumpSharedData = 1 # 0 = do not dump shared images and shared images, 1 = otherwise
+odrecorderh264.lossless = 1 # Set to 1 to enable h264 lossless encoding.
+odrecorderh264.portbaseforchildprocesses = 29000 # Every spawned child processes is connecting to the parent process via TCP using the base port plus its increasing ID.
+
+###############################################################################
+###############################################################################
+#
+# CONFIGURATION FOR PROXY
+#
+#proxy-camera.camera.debug = 1
+#proxy-camera.camera.name = ZED
+#proxy-camera.camera.id = 0 # Select here the proper ID for OpenCV
+#proxy-camera.camera.width = 2560 
+#proxy-camera.camera.height = 720
+#proxy-camera.camera.bpp = 3
+#proxy-camera.camera.flipped = 0 # 1=flipped image, 0=not flipped image
+
+proxy-camera.camera.debug = 1
+proxy-camera.camera.name = ZED
+proxy-camera.camera.id = 0 # Select here the proper ID for OpenCV
+proxy-camera.camera.width = 2560 
+proxy-camera.camera.height = 720
+proxy-camera.camera.bpp = 3
+proxy-camera.camera.flipped = 0 # 1=flipped image, 0=not flipped image

@@ -32,5 +32,22 @@ services:
         depends_on:
             - odsupercomponent
         network_mode: host
+        volumes:
+        - .:/opt/opendlv.data
         command: "/opt/opendlv/bin/opendlv-logic-sensation-selflocalization --cid=${CID}"
-
+    proxy1:
+        image: ${IMAGE}
+        network_mode: host
+        depends_on:
+            - odsupercomponent
+        group_add:
+            - video
+        ipc: host
+        user: root
+        devices:
+            - "/dev/video0:/dev/video0"
+        environment:
+            - DISPLAY=$DISPLAY
+        volumes:
+            - /tmp/.X11-unix:/tmp/.X11-unix
+        command: "/opt/opendlv.core/bin/opendlv-core-system-proxy-camera --cid=${CID}  --id=1 --freq=20"
