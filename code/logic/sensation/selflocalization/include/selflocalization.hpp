@@ -57,9 +57,29 @@ class Selflocalization
  private:
 
   cv::Mat ExtractSharedImage(odcore::data::image::SharedImage *a_sharedImage);
+	void saveImg(cv::Mat img);
   void setUp();
   void tearDown();
   bool m_cameraType;
+	int m_saveCounter = 0;
+	
+	/*Variables needed to initialize threads and databases*/
+  /*
+	
+	std::shared_ptr<OrbVocabulary> m_pVocabulary;
+	std::shared_ptr<Map> m_pMap;
+	std::shared_ptr<KeyFrameDatabase> m_pKeyFrameDatabase;
+	std::shared_ptr<Tracking> m_pTracker;
+	std::shared_ptr<Mapping> m_pMapper;
+	std::shared_ptr<LoopClosing> m_pLoopCloser;
+
+	std::shared_ptr<std::thread> m_pMappingThread;
+	std::shared_ptr<std::thread> m_pLoopClosingThread;
+
+
+*/
+
+	
 };
 
 }

@@ -44,11 +44,39 @@ namespace sensation {
 Selflocalization::Selflocalization(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(a_argc, a_argv, "logic-sensation-selflocalization")
     , m_cameraType()
+		, m_saveCounter()
 
-{
+{	
 
+	/*
+	m_pVocabulary = new OrbVocabulary();
+	m_pVocabulary->loadFromTextFile(vocFilePath);
+
+	m_pKeyFrameDatabase = new KeyFrameDatabase(m_pVocabulary);
+
+	m_pMap = new Map();
+
+	m_pTracker = new Tracking(this,m_pVocavulary,m_pKeyFrameDatabase,m_pMap);
+	
+	m_pMapper = new Mapping(m_pMap);
+	m_pMappingThread = new Thread(Mapping::Run(),m_pMapper);	
+
+	
+	m_pLoopCloser = new LoopClosing(m_pVocabulary,m_pMap,m_pKeyFrameDatabase);
+	m_pLoopClosingThread = new Thread(LoopClosing::Run(),m_pLoopCloser);
+
+	mpTracker->SetLocalMapper(m_pMapper);
+	mpTracker->SetLoopClosing(m_pLoopCloser);
+
+	mpLocalMapper->SetTracker(m_pTracker);
+	mpLocalMapper->SetLoopCloser(m_pLoopCloser);
+
+	mpLoopCloser->SetTracker(m_pTracker);
+	mpLoopCloser->SetLocalMapper(m_pMapper);
+	*/
+	
 	//Initialization
-
+	
 	//Orb vocabulary - global pointer
 	//KeyframDatabase - global pointer
 	//Map - global pointer
@@ -94,16 +122,25 @@ void Selflocalization::nextContainer(odcore::data::Container &a_container)
 //if stereo
    	if(m_cameraType){
 
-	   	int width = img.cols;
-  		int height = img.rows;
+   	int width = img.cols;
+ 		int height = img.rows;
  		cv::Mat imgL(img, cv::Rect(0, 0, width/2, height));
 		cv::Mat imgR(img, cv::Rect(width/2, 0, width/2, height));
+		saveImg(imgL);
+		saveImg(imgR);		
 	}else{
 
 
 		//MONO
 	}
 
+}
+
+void Selflocalization::saveImg(cv::Mat img) {
+	if(m_saveCounter > 20){
+  	std::string img_name = std::to_string(m_saveCounter);
+  	cv::imwrite("Images/"+img_name+".png", img);
+	}
 }
 
 cv::Mat Selflocalization::ExtractSharedImage(odcore::data::image::SharedImage *a_sharedImage)
@@ -139,12 +176,41 @@ cv::Mat Selflocalization::ExtractSharedImage(odcore::data::image::SharedImage *a
 
 void Selflocalization::setUp()
 {
-	  auto kv = getKeyValueConfiguration();
-	  //Model uncertainties params
-	  std::cout << "test 1" << std::endl;
-	  m_cameraType = (kv.getValue<int32_t>("logic-sensation-selflocalization.cameratype") == 1);
+	auto kv = getKeyValueConfiguration();
+  //Model uncertainties params
+  std::cout << "test 1" << std::endl;
+  m_cameraType = (kv.getValue<int32_t>("logic-sensation-selflocalization.cameratype") == 1);
+	std::cout << "test 2" << std::endl;
+	string vocFilePath = kv.getValue<string>("logic-sensation-selflocalization.vocabularyfilepath");
+  std::cout << vocFilePath << std::endl;
+		/*
+	m_pVocabulary = new OrbVocabulary();
+	m_pVocabulary->loadFromTextFile(vocFilePath);
 
-	  std::cout << "test 2" << std::endl;
+	m_pKeyFrameDatabase = new KeyFrameDatabase(m_pVocabulary);
+
+	m_pMap = new Map();
+
+	m_pTracker = new Tracking(this,m_pVocavulary,m_pKeyFrameDatabase,m_pMap);
+	
+	m_pMapper = new Mapping(m_pMap);
+	m_pMappingThread = new Thread(Mapping::Run(),m_pMapper);	
+
+	
+	m_pLoopCloser = new LoopClosing(m_pVocabulary,m_pMap,m_pKeyFrameDatabase);
+	m_pLoopClosingThread = new Thread(LoopClosing::Run(),m_pLoopCloser);
+
+	mpTracker->SetLocalMapper(m_pMapper);
+	mpTracker->SetLoopClosing(m_pLoopCloser);
+
+	mpLocalMapper->SetTracker(m_pTracker);
+	mpLocalMapper->SetLoopCloser(m_pLoopCloser);
+
+	mpLoopCloser->SetTracker(m_pTracker);
+	mpLoopCloser->SetLocalMapper(m_pMapper);
+	*/
+	
+
 }
 
 void Selflocalization::tearDown()
