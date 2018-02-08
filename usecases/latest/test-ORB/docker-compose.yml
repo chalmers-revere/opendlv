@@ -29,11 +29,14 @@ services:
         
     sensation-selflocalization:
         image: ${IMAGE}
+        network_mode: host
         depends_on:
             - odsupercomponent
-        network_mode: host
+        user: odv
+        ipc: host
         volumes:
         - .:/opt/opendlv.data
+        working_dir: /opt/opendlv.data
         command: "/opt/opendlv/bin/opendlv-logic-sensation-selflocalization --cid=${CID}"
     proxy1:
         image: ${IMAGE}
@@ -43,7 +46,7 @@ services:
         group_add:
             - video
         ipc: host
-        user: root
+        user: odv
         devices:
             - "/dev/video0:/dev/video0"
         environment:

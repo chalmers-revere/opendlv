@@ -106,18 +106,13 @@ Selflocalization::~Selflocalization()
 void Selflocalization::nextContainer(odcore::data::Container &a_container) 
 {
 	cv::Mat img;
-	//Use sharedimage and then proceed??
 	if (a_container.getDataType() == odcore::data::image::SharedImage::ID()){
 
     	odcore::data::image::SharedImage sharedImg = a_container.getData<odcore::data::image::SharedImage>();
-    	//Check image plausabilitu???
     	img = ExtractSharedImage(&sharedImg);
 
    			//std::cout << "[" << getName() << "] " << "[Unable to extract shared image." << std::endl;
    	}
-
-//if mono
-
 
 //if stereo
    	if(m_cameraType){
@@ -126,18 +121,20 @@ void Selflocalization::nextContainer(odcore::data::Container &a_container)
  		int height = img.rows;
  		cv::Mat imgL(img, cv::Rect(0, 0, width/2, height));
 		cv::Mat imgR(img, cv::Rect(width/2, 0, width/2, height));
+
+		//GO TO TRACKING
 		saveImg(imgL);
 		saveImg(imgR);		
 	}else{
 
-
-		//MONO
+		//GO TO TRACKING
+		saveImg(img);
 	}
 
 }
 
 void Selflocalization::saveImg(cv::Mat img) {
-	if(m_saveCounter > 20){
+	if(m_saveCounter < 20){
   		std::string img_name = std::to_string(m_saveCounter);
   		cv::imwrite("Images/"+img_name+".png", img);
 		m_saveCounter++;
