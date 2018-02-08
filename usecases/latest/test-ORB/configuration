@@ -27,7 +27,7 @@ global.buffer.memorySegmentSize = 2800000 # Size of a memory segment in bytes.
 global.buffer.numberOfMemorySegments = 4  # Number of memory segments.
 
 # The following key describes the list of modules expected to participate in this --cid session.
-global.session.expectedModules = sensation-selflocalization
+global.session.expectedModules = logic-sensation-selflocalization
 
 
 ###############################################################################
@@ -68,5 +68,5 @@ odsupercomponent.pulsetimeack.exclude = odcockpit
 # CONFIGURATION FOR OPENDLV
 #
 
-logic-sensation-selflocalization.cameratype = 1  #(Camera type is stereo == 1, otherwise 0)
-
+logic-sensation-selflocalization.cameratype = 0  #(Camera type is stereo == 1, otherwise 0)
+logic-sensation-selflocalization.vocabularyfilepath = tjena	#In absolutepath 
