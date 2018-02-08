@@ -138,8 +138,9 @@ void Selflocalization::nextContainer(odcore::data::Container &a_container)
 
 void Selflocalization::saveImg(cv::Mat img) {
 	if(m_saveCounter > 20){
-  	std::string img_name = std::to_string(m_saveCounter);
-  	cv::imwrite("Images/"+img_name+".png", img);
+  		std::string img_name = std::to_string(m_saveCounter);
+  		cv::imwrite("Images/"+img_name+".png", img);
+		m_saveCounter++;
 	}
 }
 
