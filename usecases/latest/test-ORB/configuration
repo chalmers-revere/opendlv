@@ -69,6 +69,7 @@ odsupercomponent.pulsetimeack.exclude = odcockpit
 #
 
 logic-sensation-selflocalization.cameratype = 1  #(Camera type is stereo == 1, otherwise 0)
+logic-sensation-selflocalization.camera.channelorder.RGB = 1 #(Channel order is RGB == 1, BGR == 0);
 logic-sensation-selflocalization.vocabularyfilepath = tjena	#In absolutepath 
 
 ###############################################################################
@@ -118,7 +119,7 @@ odrecorderh264.portbaseforchildprocesses = 29000 # Every spawned child processes
 
 proxy-camera.camera.debug = 1
 proxy-camera.camera.name = ZED
-proxy-camera.camera.id = 0 # Select here the proper ID for OpenCV
+proxy-camera.camera.id = 1 # Select here the proper ID for OpenCV
 proxy-camera.camera.width = 2560 
 proxy-camera.camera.height = 720
 proxy-camera.camera.bpp = 3

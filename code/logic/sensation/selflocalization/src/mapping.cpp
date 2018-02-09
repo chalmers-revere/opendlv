@@ -25,7 +25,7 @@ namespace logic {
 namespace sensation {
 
 Mapping::Mapping(/*std::shared_ptr<Map> pMap,*/bool stereo):
-	m_bStereo(Stereo)
+	m_bStereo(stereo)
 	//,m_pMap(pMap)
 {
 	std::cout << "Mapping Calling, Stereo: " << m_bStereo << std::endl;

@@ -48,7 +48,7 @@ services:
         ipc: host
         user: odv
         devices:
-            - "/dev/video0:/dev/video0"
+            - "/dev/video1:/dev/video1"
         environment:
             - DISPLAY=$DISPLAY
         volumes:

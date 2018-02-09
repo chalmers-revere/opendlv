@@ -31,6 +31,7 @@
 
 #include "selflocalization.hpp"
 
+
 namespace opendlv {
 namespace logic {
 namespace sensation {
@@ -44,9 +45,12 @@ namespace sensation {
 Selflocalization::Selflocalization(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(a_argc, a_argv, "logic-sensation-selflocalization")
     , m_cameraType()
-		, m_saveCounter()
+	, m_saveCounter()
+	, m_pTracker()
+	, m_pMapper()
 
 {	
+	
 
 	/*
 	m_pVocabulary = new OrbVocabulary();
@@ -56,7 +60,7 @@ Selflocalization::Selflocalization(int32_t const &a_argc, char **a_argv)
 
 	m_pMap = new Map();
 
-	m_pTracker = new Tracking(this,m_pVocavulary,m_pKeyFrameDatabase,m_pMap);
+	
 	
 	m_pMapper = new Mapping(m_pMap);
 	m_pMappingThread = new Thread(Mapping::Run(),m_pMapper);	
@@ -106,30 +110,35 @@ Selflocalization::~Selflocalization()
 void Selflocalization::nextContainer(odcore::data::Container &a_container) 
 {
 	cv::Mat img;
+	
 	if (a_container.getDataType() == odcore::data::image::SharedImage::ID()){
 
+		odcore::data::TimeStamp currTime = a_container.getReceivedTimeStamp();
+		double currentTime = currTime.toMicroseconds();
     	odcore::data::image::SharedImage sharedImg = a_container.getData<odcore::data::image::SharedImage>();
     	img = ExtractSharedImage(&sharedImg);
+
+    	if(m_cameraType){
+
+   			int width = img.cols;
+ 			int height = img.rows;
+ 			cv::Mat imgL(img, cv::Rect(0, 0, width/2, height));
+			cv::Mat imgR(img, cv::Rect(width/2, 0, width/2, height));
+
+			//GO TO TRACKING
+
+			cv::Mat Tcw = m_pTracker->ImageToGreyscaleStereo(imgL,imgR,currentTime);	
+		}else{
+
+			//GO TO TRACKING
+			
+		}
 
    			//std::cout << "[" << getName() << "] " << "[Unable to extract shared image." << std::endl;
    	}
 
 //if stereo
-   	if(m_cameraType){
 
-   	int width = img.cols;
- 		int height = img.rows;
- 		cv::Mat imgL(img, cv::Rect(0, 0, width/2, height));
-		cv::Mat imgR(img, cv::Rect(width/2, 0, width/2, height));
-
-		//GO TO TRACKING
-		saveImg(imgL);
-		saveImg(imgR);		
-	}else{
-
-		//GO TO TRACKING
-		saveImg(img);
-	}
 
 }
 
@@ -175,12 +184,13 @@ cv::Mat Selflocalization::ExtractSharedImage(odcore::data::image::SharedImage *a
 void Selflocalization::setUp()
 {
 	auto kv = getKeyValueConfiguration();
-  //Model uncertainties params
-  std::cout << "test 1" << std::endl;
-  m_cameraType = (kv.getValue<int32_t>("logic-sensation-selflocalization.cameratype") == 1);
-	std::cout << "test 2" << std::endl;
+    m_cameraType = (kv.getValue<int32_t>("logic-sensation-selflocalization.cameratype") == 1);
 	string vocFilePath = kv.getValue<string>("logic-sensation-selflocalization.vocabularyfilepath");
-  std::cout << vocFilePath << std::endl;
+
+	m_pTracker = std::shared_ptr<Tracking>(new Tracking(std::shared_ptr<Selflocalization>(this)/*, std::shared_ptr<auto>(kv) ,m_pVocavulary,m_pKeyFrameDatabase,m_pMap*/));
+	m_pMapper = std::shared_ptr<Mapping>(new Mapping(m_cameraType));
+  
+  
 		/*
 	m_pVocabulary = new OrbVocabulary();
 	m_pVocabulary->loadFromTextFile(vocFilePath);
