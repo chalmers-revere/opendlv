@@ -16,15 +16,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef LOGIC_SENSATION_GEOLOCATION_TESTSUITE_HPP
-#define LOGIC_SENSATION_GEOLOCATION_TESTSUITE_HPP
+#ifndef LOGIC_SENSATION_GEOLOCATOR_TESTSUITE_HPP
+#define LOGIC_SENSATION_GEOLOCATOR_TESTSUITE_HPP
 
 #include "cxxtest/TestSuite.h"
 
 // Include local header files.
-#include "../include/geolocation.hpp"
+#include "../include/geolocator.hpp"
 
-class GeolocationTest : public CxxTest::TestSuite {
+class GeolocatorTest : public CxxTest::TestSuite {
    public:
     void setUp() {}
 

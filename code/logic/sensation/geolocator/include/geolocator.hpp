@@ -17,8 +17,8 @@
  * USA.
  */
 
-#ifndef LOGIC_SENSATION_GEOLOCATION_GEOLOCATION_HPP
-#define LOGIC_SENSATION_GEOLOCATION_GEOLOCATION_HPP
+#ifndef LOGIC_SENSATION_GEOLOCATOR_HPP
+#define LOGIC_SENSATION_GEOLOCATOR_HPP
 
 #include <memory>
 
@@ -29,29 +29,18 @@
 #include "opendlv/data/environment/Point3.h"
 #include "opendlv/data/environment/WGS84Coordinate.h"
 
-//#include "opendlv/data/environment/Point3.h"
-//#include "opendlv/data/environment/WGS84Coordinate.h"
-
-//#include "odvdfh16truck/GeneratedHeaders_ODVDFH16Truck.h"
-#include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
-//#include "odvdtrimble/GeneratedHeaders_ODVDTrimble.h"
-//#include "odvdimu/GeneratedHeaders_ODVDIMU.h"
 #include "odvdopendlvstandardmessageset/GeneratedHeaders_ODVDOpenDLVStandardMessageSet.h"
-#include "odvdopendlv/GeneratedHeaders_ODVDOpenDLV.h"
-
-//Include cfsd??
-//#include <odvdcfsd18/GeneratedHeaders_ODVDcfsd18.h>
 
 namespace opendlv {
 namespace logic {
 namespace sensation {
 
-class Geolocation : public odcore::base::module::TimeTriggeredConferenceClientModule {
+class Geolocator : public odcore::base::module::TimeTriggeredConferenceClientModule {
  public:
-  Geolocation(int32_t const &, char **);
-  Geolocation(Geolocation const &) = delete;
-  Geolocation &operator=(Geolocation const &) = delete;
-  virtual ~Geolocation();
+  Geolocator(int32_t const &, char **);
+  Geolocator(Geolocator const &) = delete;
+  Geolocator &operator=(Geolocator const &) = delete;
+  virtual ~Geolocator();
   virtual void nextContainer(odcore::data::Container &);
   
 

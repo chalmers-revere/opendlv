@@ -25,21 +25,16 @@
 #include <iostream>
 #include <math.h>
 
-#include <opendavinci/odcore/base/Lock.h>
-#include <opendavinci/odcore/data/Container.h>
 #include <opendavinci/odcore/data/TimeStamp.h>
 
-
-//#include <odvdfh16truck/GeneratedHeaders_ODVDFH16Truck.h>
-
-#include "geolocation.hpp"
+#include "geolocator.hpp"
 
 namespace opendlv {
 namespace logic {
 namespace sensation {
 
-Geolocation::Geolocation(int32_t const &a_argc, char **a_argv)
-    : TimeTriggeredConferenceClientModule(a_argc, a_argv, "logic-sensation-geolocation")
+Geolocator::Geolocator(int32_t const &a_argc, char **a_argv)
+    : TimeTriggeredConferenceClientModule(a_argc, a_argv, "logic-sensation-geolocator")
     , m_measurementsTimeStamp()
     , m_paramVecR()
     , m_sensorMutex()
@@ -65,26 +60,21 @@ Geolocation::Geolocation(int32_t const &a_argc, char **a_argv)
 	m_accXYReading = MatrixXf::Zero(2,1);
 	m_yawReading = 0;
 	m_delta = 0;
-	m_headingReading = 0;
+	m_headingReading = 0.0;
 	m_groundSpeedReading = 0;
 	m_Q = MatrixXd::Zero(6,6); //Six states
 	m_R = MatrixXd::Zero(7,7); //Seven Measurements
 	m_stateCovP = MatrixXd::Identity(6,6); //Initialize P
 	m_states = MatrixXd::Zero(6,1);
 	m_vehicleModelParameters = MatrixXd::Zero(7,1);
-
-
-
 }
 
-Geolocation::~Geolocation()
+Geolocator::~Geolocator()
 {
 }
 
-void Geolocation::nextContainer(odcore::data::Container &a_container)
+void Geolocator::nextContainer(odcore::data::Container &a_container)
 {
-
-		
 	//Groundspeed	
 	if (a_container.getDataType() == opendlv::proxy::GroundSpeedReading::ID()){
 		odcore::base::Lock l(m_sensorMutex);
@@ -94,24 +84,25 @@ void Geolocation::nextContainer(odcore::data::Container &a_container)
 	 	auto groundspeed = a_container.getData<opendlv::proxy::GroundSpeedReading>();
 	 	m_groundSpeedReading = groundspeed.getGroundSpeed();
 	}
+
 	//Accelerometer
-	 if (a_container.getDataType() == opendlv::proxy::AccelerometerReading::ID()){
+	 if (a_container.getDataType() == opendlv::proxy::AccelerationReading::ID()){
 	 	odcore::base::Lock l(m_sensorMutex);
 	 	odcore::data::TimeStamp containerStamp = a_container.getReceivedTimeStamp();
 	 	m_measurementsTimeStamp(3,0) = containerStamp.toMicroseconds();
 	 	m_measurementsTimeStamp(4,0) = containerStamp.toMicroseconds();
-	 	auto accReading = a_container.getData<opendlv::proxy::AccelerometerReading>();
+	 	auto accReading = a_container.getData<opendlv::proxy::AccelerationReading>();
 		m_accXYReading << accReading.getAccelerationX(),
 						  accReading.getAccelerationY();
 
 
 	 }
 	 //Gyro
-	 if (a_container.getDataType() == opendlv::proxy::GyroscopeReading::ID()){
+	 if (a_container.getDataType() == opendlv::proxy::AngularVelocityReading::ID()){
 	 	odcore::base::Lock l(m_sensorMutex);
 	 	odcore::data::TimeStamp containerStamp = a_container.getReceivedTimeStamp();
 	 	m_measurementsTimeStamp(5,0) = containerStamp.toMicroseconds();
-		auto gyrReading = a_container.getData<opendlv::proxy::GyroscopeReading>();
+		auto gyrReading = a_container.getData<opendlv::proxy::AngularVelocityReading>();
 		m_yawReading = gyrReading.getAngularVelocityZ();
 	 }
 
@@ -140,7 +131,7 @@ void Geolocation::nextContainer(odcore::data::Container &a_container)
 
 
 		auto gpsHeadingReading = a_container.getData<opendlv::proxy::GeodeticHeadingReading>();
-		m_headingReading = gpsHeadingReading,getNorthHeading();
+		m_headingReading = gpsHeadingReading.getNorthHeading();
 
 	 }
 
@@ -155,7 +146,7 @@ void Geolocation::nextContainer(odcore::data::Container &a_container)
 	 }
 } 
 
-odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
+odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocator::body()
 {
   
   
@@ -193,17 +184,17 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocation::body()
 
   return odcore::data::dmcp::ModuleExitCodeMessage::OKAY;
 }
-void Geolocation::setUp()
+void Geolocator::setUp()
 {
   	//%%%%%%%%%%%%%%%%%%%%%%%CONFIG STUFF%%%%%%%%%%%%%%%%%%%%%%
 	  auto kv = getKeyValueConfiguration();
 	  //Model uncertainties params
-	  double const qX = kv.getValue<double>("logic-sensation-geolocation.Q.X");
-	  double const qY = kv.getValue<double>("logic-sensation-geolocation.Q.Y");
-	  double const qVelX = kv.getValue<double>("logic-sensation-geolocation.Q.VelX");
-	  double const qVelY = kv.getValue<double>("logic-sensation-geolocation.Q.VelY");
-	  double const qYaw = kv.getValue<double>("logic-sensation-geolocation.Q.Yaw");
-	  double const qHeading= kv.getValue<double>("logic-sensation-geolocation.Q.Heading");
+	  double const qX = kv.getValue<double>("logic-sensation-geolocator.Q.X");
+	  double const qY = kv.getValue<double>("logic-sensation-geolocator.Q.Y");
+	  double const qVelX = kv.getValue<double>("logic-sensation-geolocator.Q.VelX");
+	  double const qVelY = kv.getValue<double>("logic-sensation-geolocator.Q.VelY");
+	  double const qYaw = kv.getValue<double>("logic-sensation-geolocator.Q.Yaw");
+	  double const qHeading= kv.getValue<double>("logic-sensation-geolocator.Q.Heading");
 
 	  m_Q << qX,0,0,0,0,0,
 	  		 0,qY,0,0,0,0,
@@ -213,13 +204,13 @@ void Geolocation::setUp()
 	  		 0,0,0,0,0,qHeading;
 
 	  //Measurement uncertainies params
-	  double const rX = kv.getValue<double>("logic-sensation-geolocation.R.X");
-	  double const rY = kv.getValue<double>("logic-sensation-geolocation.R.Y");
-	  double const rVelX = kv.getValue<double>("logic-sensation-geolocation.R.VelX");
-	  double const rAccX = kv.getValue<double>("logic-sensation-geolocation.R.AccX");
-	  double const rAccY = kv.getValue<double>("logic-sensation-geolocation.R.AccY");
-	  double const rYaw = kv.getValue<double>("logic-sensation-geolocation.R.Yaw");
-	  double const rHeading = kv.getValue<double>("logic-sensation-geolocation.R.Heading");
+	  double const rX = kv.getValue<double>("logic-sensation-geolocator.R.X");
+	  double const rY = kv.getValue<double>("logic-sensation-geolocator.R.Y");
+	  double const rVelX = kv.getValue<double>("logic-sensation-geolocator.R.VelX");
+	  double const rAccX = kv.getValue<double>("logic-sensation-geolocator.R.AccX");
+	  double const rAccY = kv.getValue<double>("logic-sensation-geolocator.R.AccY");
+	  double const rYaw = kv.getValue<double>("logic-sensation-geolocator.R.Yaw");
+	  double const rHeading = kv.getValue<double>("logic-sensation-geolocator.R.Heading");
 	  m_paramVecR << rX,rY,rVelX,rAccX,rAccY,rYaw,rHeading;
 	  m_R << rX,0,0,0,0,0,0,
 	  		 0,rY,0,0,0,0,0,
@@ -230,23 +221,23 @@ void Geolocation::setUp()
 	  		 0,0,0,0,0,0,rHeading;
 
 	//%%%%%%%%%%%%VEHICLE MODEL PARAMETERS%%%%%%%%%%%%%%%%%%%
-	double const vM = kv.getValue<double>("logic-sensation-geolocation.vehicle-parameter.m");
-	double const vIz = kv.getValue<double>("logic-sensation-geolocation.vehicle-parameter.Iz");
-	double const vG = kv.getValue<double>("logic-sensation-geolocation.vehicle-parameter.g");
-	double const vL = kv.getValue<double>("logic-sensation-geolocation.vehicle-parameter.l");
-	double const vLf = kv.getValue<double>("logic-sensation-geolocation.vehicle-parameter.lf");
-	double const vLr = kv.getValue<double>("logic-sensation-geolocation.vehicle-parameter.lr");
-	double const vMu = kv.getValue<double>("logic-sensation-geolocation.vehicle-parameter.mu");
+	double const vM = kv.getValue<double>("logic-sensation-geolocator.vehicle-parameter.m");
+	double const vIz = kv.getValue<double>("logic-sensation-geolocator.vehicle-parameter.Iz");
+	double const vG = kv.getValue<double>("logic-sensation-geolocator.vehicle-parameter.g");
+	double const vL = kv.getValue<double>("logic-sensation-geolocator.vehicle-parameter.l");
+	double const vLf = kv.getValue<double>("logic-sensation-geolocator.vehicle-parameter.lf");
+	double const vLr = kv.getValue<double>("logic-sensation-geolocator.vehicle-parameter.lr");
+	double const vMu = kv.getValue<double>("logic-sensation-geolocator.vehicle-parameter.mu");
 
 	m_vehicleModelParameters << vM,vIz,vG,vL,vLf,vLr,vMu;
 
 	//%%%%%%%%%%%%System Params%%%%%%%%%%%%%%%%%%%%%%
 
-	double const latitude = getKeyValueConfiguration().getValue<double>("logic-sensation-geolocation.GPSreference.latitude");
-	double const longitude = getKeyValueConfiguration().getValue<double>("logic-sensation-geolocation.GPSreference.longitude");
+	double const latitude = getKeyValueConfiguration().getValue<double>("logic-sensation-geolocator.GPSreference.latitude");
+	double const longitude = getKeyValueConfiguration().getValue<double>("logic-sensation-geolocator.GPSreference.longitude");
 	m_gpsReference = opendlv::data::environment::WGS84Coordinate(latitude,longitude);
 
-	m_sampleTime = kv.getValue<double>("logic-sensation-geolocation.T");
+	m_sampleTime = kv.getValue<double>("logic-sensation-geolocator.T");
 
 	std::cout << "UKF initialized!" << std::endl;
 
@@ -265,12 +256,12 @@ void Geolocation::setUp()
 
 }
 
-void Geolocation::tearDown()
+void Geolocator::tearDown()
 {
 }
 
 
-MatrixXd Geolocation::UKFWeights()
+MatrixXd Geolocator::UKFWeights()
 {
 
  	double const n = 6; //Amount of states
@@ -301,7 +292,7 @@ MatrixXd Geolocation::UKFWeights()
 	return Wmc;
 
 }
-MatrixXd Geolocation::sigmaPoints(MatrixXd &x)
+MatrixXd Geolocator::sigmaPoints(MatrixXd &x)
 {
 
 	double const n = x.rows(); //Amount of states
@@ -337,7 +328,7 @@ MatrixXd Geolocation::sigmaPoints(MatrixXd &x)
 
 }
 
-MatrixXd Geolocation::UKFPrediction(MatrixXd &x)
+MatrixXd Geolocator::UKFPrediction(MatrixXd &x)
 {	
 
 	MatrixXd Wmc = UKFWeights();
@@ -378,7 +369,7 @@ MatrixXd Geolocation::UKFPrediction(MatrixXd &x)
 	return x_hat;
 }
 
-MatrixXd Geolocation::UKFUpdate(MatrixXd &x)
+MatrixXd Geolocator::UKFUpdate(MatrixXd &x)
 {
 
 
@@ -433,7 +424,7 @@ MatrixXd Geolocation::UKFUpdate(MatrixXd &x)
 	return x;
 }
 
-MatrixXd Geolocation::vehicleModel(MatrixXd &x)
+MatrixXd Geolocator::vehicleModel(MatrixXd &x)
 {
 
 
@@ -466,7 +457,7 @@ MatrixXd Geolocation::vehicleModel(MatrixXd &x)
 
 	return fx;
 }
-MatrixXd Geolocation::measurementModel(MatrixXd &x)
+MatrixXd Geolocator::measurementModel(MatrixXd &x)
 {
 
 	MatrixXd hx = MatrixXd::Zero(7,1);
@@ -491,7 +482,7 @@ MatrixXd Geolocation::measurementModel(MatrixXd &x)
 
 	return hx;
 }
-double Geolocation::magicFormula(double &alpha, double &Fz, double const &mu)
+double Geolocator::magicFormula(double &alpha, double &Fz, double const &mu)
 {
 
 	double const C = 1;
@@ -503,7 +494,7 @@ double Geolocation::magicFormula(double &alpha, double &Fz, double const &mu)
 	return Fy;
 }
 
-double Geolocation::rackTravelToFrontWheelSteering(double &rackTravel)
+double Geolocator::rackTravelToFrontWheelSteering(double &rackTravel)
 {
 
 	double const rackTravelToSteeringAngleLineSlope = -1.225;
@@ -514,7 +505,7 @@ double Geolocation::rackTravelToFrontWheelSteering(double &rackTravel)
 	return delta;
 }
 
-void Geolocation::stateSender(MatrixXd &x)
+void Geolocator::stateSender(MatrixXd &x)
 {
 
 	//Send position

@@ -16,9 +16,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#include "geolocation.hpp"
+#include "geolocator.hpp"
 
 int32_t main(int32_t argc, char **argv) {
-  opendlv::logic::sensation::Geolocation app(argc, argv);
+  opendlv::logic::sensation::Geolocator app(argc, argv);
   return app.runModule();
 }

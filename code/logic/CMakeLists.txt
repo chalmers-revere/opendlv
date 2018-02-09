@@ -24,6 +24,7 @@ project(opendlv-logic)
 SET (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../cmake.Modules" ${CMAKE_MODULE_PATH})
 SET (CMAKE_MODULE_PATH "${CMAKE_INSTALL_PREFIX}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules" ${CMAKE_MODULE_PATH})
 SET (CMAKE_MODULE_PATH "${OPENDAVINCI_DIR}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules" ${CMAKE_MODULE_PATH})
+SET (CMAKE_MODULE_PATH "${ODVDOPENDLVSTANDARDMESSAGESET_DIR}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules" ${CMAKE_MODULE_PATH})
 
 ###########################################################################
 # Global compile flags.
@@ -57,11 +58,16 @@ INCLUDE_DIRECTORIES (SYSTEM ${OpenCV_INCLUDE_DIRS})
 find_package(ODVDOpenDLVData REQUIRED)
 
 ###########################################################################
+# Find ODVDopendlv.
+find_package(ODVDOpenDLVStandardMessageSet REQUIRED)
+
+###########################################################################
 # Set common include directories.
 include_directories(SYSTEM ${OPENDAVINCI_INCLUDE_DIRS})
 include_directories(SYSTEM ${OPENDLV_INCLUDE_DIRS})
 include_directories(SYSTEM ${AUTOMOTIVEDATA_INCLUDE_DIRS})
 include_directories(SYSTEM ${ODVDOPENDLVDATA_INCLUDE_DIRS})
+include_directories(SYSTEM ${ODVDOPENDLVSTANDARDMESSAGESET_INCLUDE_DIRS})
 include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 
 ###########################################################################
@@ -69,6 +75,7 @@ include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 set(LIBRARIES ${OPENDAVINCI_LIBRARIES}
   ${OPENDLV_LIBRARIES}
   ${AUTOMOTIVEDATA_LIBRARIES}
+  ${ODVDOPENDLVSTANDARDMESSAGESET_LIBRARIES}
   ${ODVDOPENDLVDATA_LIBRARIES})
 
 ###########################################################################
@@ -89,7 +96,7 @@ add_subdirectory(perception/detectvehicle)
 add_subdirectory(sensation/audition)
 add_subdirectory(sensation/directionofmovement)
 add_subdirectory(sensation/echolocation)
-add_subdirectory(sensation/geolocation)
+add_subdirectory(sensation/geolocator)
 add_subdirectory(sensation/opticalflow)
 
 ###########################################################################
