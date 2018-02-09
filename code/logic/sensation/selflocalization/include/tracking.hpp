@@ -39,7 +39,7 @@ class Selflocalization;
 class Tracking
  {
  public:
-  Tracking(std::shared_ptr<Selflocalization> pSelfLocalization/*, std::shared_ptr<auto> kv, std::shared_ptr<OrbVocabulary> m_pVocabulary, std::shared_ptr<KeyFrameDatabase> m_pKeyFrameDatabase, std::shared_ptr<Map> m_pMap*/);
+  Tracking(std::shared_ptr<Selflocalization> pSelfLocalization, odcore::base::KeyValueConfiguration kv/*, std::shared_ptr<OrbVocabulary> m_pVocabulary, std::shared_ptr<KeyFrameDatabase> m_pKeyFrameDatabase, std::shared_ptr<Map> m_pMap*/);
   Tracking(Tracking const &) = delete;
   Tracking &operator=(Tracking const &) = delete;
   virtual ~Tracking();

@@ -183,11 +183,11 @@ cv::Mat Selflocalization::ExtractSharedImage(odcore::data::image::SharedImage *a
 
 void Selflocalization::setUp()
 {
-	auto kv = getKeyValueConfiguration();
-    m_cameraType = (kv.getValue<int32_t>("logic-sensation-selflocalization.cameratype") == 1);
+	odcore::base::KeyValueConfiguration kv = getKeyValueConfiguration();
+    	m_cameraType = (kv.getValue<int32_t>("logic-sensation-selflocalization.cameratype") == 1);
 	string vocFilePath = kv.getValue<string>("logic-sensation-selflocalization.vocabularyfilepath");
 
-	m_pTracker = std::shared_ptr<Tracking>(new Tracking(std::shared_ptr<Selflocalization>(this)/*, std::shared_ptr<auto>(kv) ,m_pVocavulary,m_pKeyFrameDatabase,m_pMap*/));
+	m_pTracker = std::shared_ptr<Tracking>(new Tracking(std::shared_ptr<Selflocalization>(this), kv /*,m_pVocavulary,m_pKeyFrameDatabase,m_pMap*/));
 	m_pMapper = std::shared_ptr<Mapping>(new Mapping(m_cameraType));
   
   

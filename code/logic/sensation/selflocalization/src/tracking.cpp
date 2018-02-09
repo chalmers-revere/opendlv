@@ -37,17 +37,16 @@ namespace sensation {
   * @param a_argc Number of command line arguments.
   * @param a_argv Command line arguments.
   */
-Tracking::Tracking(std::shared_ptr<Selflocalization> pSelfLocalization/*, std::shared_ptr<auto> kv, std::shared_ptr<OrbVocabulary> m_pVocabulary, std::shared_ptr<KeyFrameDatabase> m_pKeyFrameDatabase, std::shared_ptr<Map> m_pMap*/)
+Tracking::Tracking(std::shared_ptr<Selflocalization> pSelfLocalization, odcore::base::KeyValueConfiguration kv/*, std::shared_ptr<OrbVocabulary> m_pVocabulary, std::shared_ptr<KeyFrameDatabase> m_pKeyFrameDatabase, std::shared_ptr<Map> m_pMap*/)
 : m_imGreyLeft()
 , m_RGB()
 , m_pSelfLocalization(pSelfLocalization)
 {
   
 
-  //auto kv = getKeyValueConfiguration();
 
-  //m_RGB = (kv->getValue<int32_t>("logic-sensation-selflocalization.camera.channelorder.RGB") == 1);
-	m_RGB = true;
+  	m_RGB = (kv.getValue<int32_t>("logic-sensation-selflocalization.camera.channelorder.RGB") == 1);
+	std::cout << "RGB is " << m_RGB << std::endl;
 }
 
 cv::Mat Tracking::ImageToGreyscaleStereo(cv::Mat &imgL, cv::Mat &imgR, double &timeStamp)
