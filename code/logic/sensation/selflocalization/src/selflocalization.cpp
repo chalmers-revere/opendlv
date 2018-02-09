@@ -132,6 +132,7 @@ void Selflocalization::nextContainer(odcore::data::Container &a_container)
 
 			//GO TO TRACKING
 			
+			cv::Mat Tcw = m_pTracker->ImageToGreyscaleMono(img,currentTime);
 		}
 
    			//std::cout << "[" << getName() << "] " << "[Unable to extract shared image." << std::endl;

@@ -68,7 +68,7 @@ odsupercomponent.pulsetimeack.exclude = odcockpit
 # CONFIGURATION FOR OPENDLV
 #
 
-logic-sensation-selflocalization.cameratype = 1  #(Camera type is stereo == 1, otherwise 0)
+logic-sensation-selflocalization.cameratype = 0  #(Camera type is stereo == 1, otherwise 0)
 logic-sensation-selflocalization.camera.channelorder.RGB = 1 #(Channel order is RGB == 1, BGR == 0);
 logic-sensation-selflocalization.vocabularyfilepath = tjena	#In absolutepath 
 
