@@ -39,8 +39,7 @@ namespace sensation {
   * @param a_argv Command line arguments.
   */
 Tracking::Tracking(std::shared_ptr<Selflocalization> pSelfLocalization, odcore::base::KeyValueConfiguration kv/*, std::shared_ptr<OrbVocabulary> m_pVocabulary, std::shared_ptr<KeyFrameDatabase> m_pKeyFrameDatabase, std::shared_ptr<Map> m_pMap*/)
-: m_imGrey()
-, m_RGB()
+: m_RGB()
 , m_pSelfLocalization(pSelfLocalization)
 {
   

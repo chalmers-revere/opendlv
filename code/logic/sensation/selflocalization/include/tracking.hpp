@@ -28,7 +28,6 @@
 #include <cmath>
 #include "opendavinci/odcore/base/KeyValueConfiguration.h"
 #include "selflocalization.hpp"
-#include "imageextractor.hpp"
 
 
 namespace opendlv {
@@ -44,11 +43,8 @@ class Tracking
   Tracking(Tracking const &) = delete;
   Tracking &operator=(Tracking const &) = delete;
   virtual ~Tracking();
-  cv::Mat ImageToGreyscaleStereo(cv::Mat &imgL, cv::Mat &imgR, double &timeStamp);
-  cv::Mat ImageToGreyscaleMono(cv::Mat &img, double &timeStamp);
 
  private:
- cv::Mat m_imGrey;
  bool m_RGB; //Order of colour channels
  std::shared_ptr<Selflocalization> m_pSelfLocalization;
 	

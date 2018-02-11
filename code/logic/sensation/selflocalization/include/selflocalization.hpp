@@ -43,6 +43,7 @@
 
 #include "tracking.hpp"
 #include "mapping.hpp"
+#include "imageextractor.hpp"
 
 namespace opendlv {
 namespace logic {
