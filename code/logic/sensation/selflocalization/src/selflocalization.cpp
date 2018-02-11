@@ -116,7 +116,7 @@ void Selflocalization::nextContainer(odcore::data::Container &a_container)
 		odcore::data::TimeStamp currTime = a_container.getReceivedTimeStamp();
 		double currentTime = currTime.toMicroseconds();
     	odcore::data::image::SharedImage sharedImg = a_container.getData<odcore::data::image::SharedImage>();
-    	img = ExtractSharedImage(&sharedImg);
+    	img = m_pImageGrab->ExtractSharedImage(&sharedImg);
 
     	if(m_cameraType){
 
@@ -145,35 +145,7 @@ void Selflocalization::nextContainer(odcore::data::Container &a_container)
 
 
 
-cv::Mat Selflocalization::ExtractSharedImage(odcore::data::image::SharedImage *a_sharedImage)
-{
-  
-  cv::Mat img;
-  std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(a_sharedImage->getName()));
-  if (sharedMem->isValid()) {
-    const uint32_t nrChannels = a_sharedImage->getBytesPerPixel();
-    const uint32_t imgWidth = a_sharedImage->getWidth();
-    const uint32_t imgHeight = a_sharedImage->getHeight();
-    IplImage* myIplImage = cvCreateImage(cvSize(imgWidth,imgHeight), IPL_DEPTH_8U, nrChannels);
-    cv::Mat bufferImage = cv::Mat(myIplImage);
-    	{
-      		sharedMem->lock();
-      		memcpy(bufferImage.data, sharedMem->getSharedMemory()
-        	, imgWidth*imgHeight*nrChannels);
-      		sharedMem->unlock();
-    	}
-    	img.release();
-    	img = bufferImage.clone();
-    	bufferImage.release();
-    	cvReleaseImage(&myIplImage);
-   
-  }else{
 
-    std::cout << "[" << getName() << "] " << "Sharedmem is not valid." << std::endl;
-  }
-
-  return img;
-}
 
 
 void Selflocalization::setUp()

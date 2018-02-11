@@ -20,20 +20,25 @@
 #ifndef LOGIC_SENSATION_SELFLOCALIZATION_IMAGEEXTRACTOR_HPP
 #define LOGIC_SENSATION_SELFLOCALIZATION_IMAGEEXTRACTOR_HPP
 
-#include <memory>
-
 #include <iostream>
 #include <memory>
 #include <vector>
 #include <cmath>
-#include "opendavinci/odcore/base/KeyValueConfiguration.h"
+#include <opendavinci/odcore/data/TimeStamp.h>
+#include <opendavinci/odcore/strings/StringToolbox.h>
+#include <opendavinci/odcore/wrapper/Eigen.h>
+#include <opendavinci/odcore/base/module/DataTriggeredConferenceClientModule.h>
+#include <opendavinci/odcore/data/Container.h>
+#include "opendavinci/GeneratedHeaders_OpenDaVINCI.h"
+#include "opendavinci/odcore/wrapper/SharedMemoryFactory.h"
+#include "opendavinci/odcore/wrapper/SharedMemory.h"
+#include "opendavinci/generated/odcore/data/CompactPointCloud.h"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
-
-#include "opendavinci/GeneratedHeaders_OpenDaVINCI.h"
+#include "opendavinci/odcore/base/KeyValueConfiguration.h"
 //#include "selflocalization.hpp"
 
 
@@ -52,6 +57,7 @@ class ImageExtractor
   virtual ~ImageExtractor();
   cv::Mat ImageToGreyscaleStereo(cv::Mat &imgL, cv::Mat &imgR, double &timeStamp);
   cv::Mat ImageToGreyscaleMono(cv::Mat &img, double &timeStamp);
+  cv::Mat ExtractSharedImage(odcore::data::image::SharedImage *a_sharedImage);
   void saveImg(cv::Mat &img);
 
  private:

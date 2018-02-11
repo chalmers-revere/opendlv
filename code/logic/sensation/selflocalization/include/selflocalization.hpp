@@ -62,8 +62,6 @@ class Selflocalization
   virtual void nextContainer(odcore::data::Container &);
 
  private:
-
-  cv::Mat ExtractSharedImage(odcore::data::image::SharedImage *a_sharedImage);
   void setUp();
   void tearDown();
   bool m_cameraType;

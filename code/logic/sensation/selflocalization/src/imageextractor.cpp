@@ -146,6 +146,37 @@ cv::Mat ImageExtractor::ImageToGreyscaleMono(cv::Mat &img, double &timeStamp)
 
 }
 
+cv::Mat ImageExtractor::ExtractSharedImage(odcore::data::image::SharedImage *a_sharedImage)
+{
+  
+  cv::Mat img;
+  std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(a_sharedImage->getName()));
+  if (sharedMem->isValid()) {
+    const uint32_t nrChannels = a_sharedImage->getBytesPerPixel();
+    const uint32_t imgWidth = a_sharedImage->getWidth();
+    const uint32_t imgHeight = a_sharedImage->getHeight();
+    IplImage* myIplImage = cvCreateImage(cvSize(imgWidth,imgHeight), IPL_DEPTH_8U, nrChannels);
+    cv::Mat bufferImage = cv::Mat(myIplImage);
+    	{
+      		sharedMem->lock();
+      		memcpy(bufferImage.data, sharedMem->getSharedMemory()
+        	, imgWidth*imgHeight*nrChannels);
+      		sharedMem->unlock();
+    	}
+    	img.release();
+    	img = bufferImage.clone();
+    	bufferImage.release();
+    	cvReleaseImage(&myIplImage);
+   
+  }else{
+
+    //std::cout << "[" << getName() << "] " << "Sharedmem is not valid." << std::endl;
+    std::cout << "[" << "getName()" << "] " << "Sharedmem is not valid." << std::endl;
+  }
+
+  return img;
+}
+
 void ImageExtractor::saveImg(cv::Mat &img) {
 	if(m_saveCounter < 50){
   		std::string img_name = std::to_string(m_saveCounter);
