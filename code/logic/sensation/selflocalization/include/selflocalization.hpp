@@ -49,7 +49,8 @@ namespace logic {
 namespace sensation {
 
 class Tracking;
-class Mapping;	
+class Mapping;
+class ImageExtractor;	
 
 class Selflocalization
 : public odcore::base::module::DataTriggeredConferenceClientModule {
@@ -59,7 +60,6 @@ class Selflocalization
   Selflocalization &operator=(Selflocalization const &) = delete;
   virtual ~Selflocalization();
   virtual void nextContainer(odcore::data::Container &);
-  void saveImg(cv::Mat img);
 
  private:
 
@@ -69,7 +69,8 @@ class Selflocalization
   bool m_cameraType;
   int m_saveCounter = 0;
   std::shared_ptr<Tracking> m_pTracker;
-  std::shared_ptr<Mapping> m_pMapper;	
+  std::shared_ptr<Mapping> m_pMapper;
+  std::shared_ptr<ImageExtractor> m_pImageGrab;	
 	/*Variables needed to initialize threads and databases*/
   /*
 	

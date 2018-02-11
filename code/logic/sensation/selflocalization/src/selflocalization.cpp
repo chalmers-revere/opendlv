@@ -45,9 +45,9 @@ namespace sensation {
 Selflocalization::Selflocalization(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(a_argc, a_argv, "logic-sensation-selflocalization")
     , m_cameraType()
-	, m_saveCounter()
 	, m_pTracker()
 	, m_pMapper()
+	, m_pImageGrab()
 
 {	
 	
@@ -127,12 +127,12 @@ void Selflocalization::nextContainer(odcore::data::Container &a_container)
 
 			//GO TO TRACKING
 
-			cv::Mat Tcw = m_pTracker->ImageToGreyscaleStereo(imgL,imgR,currentTime);	
+			cv::Mat Tcw = m_pImageGrab->ImageToGreyscaleStereo(imgL,imgR,currentTime);	
 		}else{
 
 			//GO TO TRACKING
 			
-			cv::Mat Tcw = m_pTracker->ImageToGreyscaleMono(img,currentTime);
+			cv::Mat Tcw = m_pImageGrab->ImageToGreyscaleMono(img,currentTime);
 		}
 
    			//std::cout << "[" << getName() << "] " << "[Unable to extract shared image." << std::endl;
@@ -143,13 +143,7 @@ void Selflocalization::nextContainer(odcore::data::Container &a_container)
 
 }
 
-void Selflocalization::saveImg(cv::Mat img) {
-	if(m_saveCounter < 20){
-  		std::string img_name = std::to_string(m_saveCounter);
-  		cv::imwrite("Images/"+img_name+".png", img);
-		m_saveCounter++;
-	}
-}
+
 
 cv::Mat Selflocalization::ExtractSharedImage(odcore::data::image::SharedImage *a_sharedImage)
 {
@@ -190,7 +184,7 @@ void Selflocalization::setUp()
 
 	m_pTracker = std::shared_ptr<Tracking>(new Tracking(std::shared_ptr<Selflocalization>(this), kv /*,m_pVocavulary,m_pKeyFrameDatabase,m_pMap*/));
 	m_pMapper = std::shared_ptr<Mapping>(new Mapping(m_cameraType));
-  
+    m_pImageGrab = std::shared_ptr<ImageExtractor>(new ImageExtractor(kv));
   
 		/*
 	m_pVocabulary = new OrbVocabulary();

@@ -17,8 +17,8 @@
  * USA.
  */
 
-#ifndef LOGIC_SENSATION_SELFLOCALIZATION_TRACKING_HPP
-#define LOGIC_SENSATION_SELFLOCALIZATION_TRACKING_HPP
+#ifndef LOGIC_SENSATION_SELFLOCALIZATION_IMAGEEXTRACTOR_HPP
+#define LOGIC_SENSATION_SELFLOCALIZATION_IMAGEEXTRACTOR_HPP
 
 #include <memory>
 
@@ -27,8 +27,14 @@
 #include <vector>
 #include <cmath>
 #include "opendavinci/odcore/base/KeyValueConfiguration.h"
-#include "selflocalization.hpp"
-#include "imageextractor.hpp"
+
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/calib3d/calib3d.hpp>
+
+#include "opendavinci/GeneratedHeaders_OpenDaVINCI.h"
+//#include "selflocalization.hpp"
 
 
 namespace opendlv {
@@ -36,21 +42,22 @@ namespace logic {
 namespace sensation {
 
 
-class Selflocalization;
-class Tracking
+
+class ImageExtractor
  {
  public:
-  Tracking(std::shared_ptr<Selflocalization> pSelfLocalization, odcore::base::KeyValueConfiguration kv/*, std::shared_ptr<OrbVocabulary> m_pVocabulary, std::shared_ptr<KeyFrameDatabase> m_pKeyFrameDatabase, std::shared_ptr<Map> m_pMap*/);
-  Tracking(Tracking const &) = delete;
-  Tracking &operator=(Tracking const &) = delete;
-  virtual ~Tracking();
+  ImageExtractor(odcore::base::KeyValueConfiguration kv);
+  ImageExtractor(ImageExtractor const &) = delete;
+  ImageExtractor &operator=(ImageExtractor const &) = delete;
+  virtual ~ImageExtractor();
   cv::Mat ImageToGreyscaleStereo(cv::Mat &imgL, cv::Mat &imgR, double &timeStamp);
   cv::Mat ImageToGreyscaleMono(cv::Mat &img, double &timeStamp);
+  void saveImg(cv::Mat &img);
 
  private:
  cv::Mat m_imGrey;
  bool m_RGB; //Order of colour channels
- std::shared_ptr<Selflocalization> m_pSelfLocalization;
+ int m_saveCounter = 0;
 	
 };
 

@@ -119,8 +119,8 @@ odrecorderh264.portbaseforchildprocesses = 29000 # Every spawned child processes
 
 proxy-camera.camera.debug = 1
 proxy-camera.camera.name = ZED
-proxy-camera.camera.id = 1 # Select here the proper ID for OpenCV
-proxy-camera.camera.width = 2560 
+proxy-camera.camera.id = 0 # Select here the proper ID for OpenCV
+proxy-camera.camera.width = 1280 
 proxy-camera.camera.height = 720
 proxy-camera.camera.bpp = 3
 proxy-camera.camera.flipped = 0 # 1=flipped image, 0=not flipped image
