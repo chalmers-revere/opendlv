@@ -27,10 +27,10 @@ services:
         - .:/opt/opendlv.data
         command: "/opt/od4/bin/odsupercomponent --cid=${CID} --verbose=1 --configuration=/opt/opendlv.data/configuration"
         
-    sensation-geolocation:
+    sensation-geolocator:
         image: ${IMAGE}
         depends_on:
             - odsupercomponent
         network_mode: host
-        command: "/opt/opendlv/bin/opendlv-logic-sensation-geolocation --cid=${CID} --freq=10"
+        command: "/opt/opendlv/bin/opendlv-logic-sensation-geolocator --cid=${CID} --freq=10"
 

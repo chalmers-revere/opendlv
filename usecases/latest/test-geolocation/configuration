@@ -69,33 +69,33 @@ odsupercomponent.pulsetimeack.exclude = odcockpit
 #
 
 %%%%%SAMPLE TIME & GPS REFERENCE%%%%%%
-logic-sensation-geolocation.T = 0.1; #Check in docker compose
-logic-sensation-geolocation.GPSreference.latitude = 0
-logic-sensation-geolocation.GPSreference.longitude = 0
+logic-sensation-geolocator.T = 0.1; #Check in docker compose
+logic-sensation-geolocator.GPSreference.latitude = 0
+logic-sensation-geolocator.GPSreference.longitude = 0
 
 %%%%%MODEL UNCERTAINTIES%%%%%% 
-logic-sensation-geolocation.Q.X = 0.1
-logic-sensation-geolocation.Q.Y = 0.1
-logic-sensation-geolocation.Q.VelX = 0.1
-logic-sensation-geolocation.Q.VelY = 0.1
-logic-sensation-geolocation.Q.Yaw = 0.1
-logic-sensation-geolocation.Q.Heading = 0.1
+logic-sensation-geolocator.Q.X = 0.1
+logic-sensation-geolocator.Q.Y = 0.1
+logic-sensation-geolocator.Q.VelX = 0.1
+logic-sensation-geolocator.Q.VelY = 0.1
+logic-sensation-geolocator.Q.Yaw = 0.1
+logic-sensation-geolocator.Q.Heading = 0.1
 
 %%%%%MEASUREMENT UNCERTAINTIES%%%%%
-logic-sensation-geolocation.R.X = 1
-logic-sensation-geolocation.R.Y = 1
-logic-sensation-geolocation.R.VelX = 1
-logic-sensation-geolocation.R.AccX = 1
-logic-sensation-geolocation.R.AccY = 1
-logic-sensation-geolocation.R.Yaw = 1
-logic-sensation-geolocation.R.Heading = 1
+logic-sensation-geolocator.R.X = 1
+logic-sensation-geolocator.R.Y = 1
+logic-sensation-geolocator.R.VelX = 1
+logic-sensation-geolocator.R.AccX = 1
+logic-sensation-geolocator.R.AccY = 1
+logic-sensation-geolocator.R.Yaw = 1
+logic-sensation-geolocator.R.Heading = 1
 
 %%%%%VEHICLE MODEL PARAMETERS%%%%%
-logic-sensation-geolocation.vehicle-parameter.m = 188 #kg
-logic-sensation-geolocation.vehicle-parameter.Iz = 105 #kgm^2
-logic-sensation-geolocation.vehicle-parameter.g = 9.82 #m/s2
-logic-sensation-geolocation.vehicle-parameter.l = 1.53 #m
-logic-sensation-geolocation.vehicle-parameter.lf = 0.765 #m (l*0.5)
-logic-sensation-geolocation.vehicle-parameter.lr = 0.765 #m (l*0.5)
-logic-sensation-geolocation.vehicle-parameter.mu = 0.9
+logic-sensation-geolocator.vehicle-parameter.m = 188 #kg
+logic-sensation-geolocator.vehicle-parameter.Iz = 105 #kgm^2
+logic-sensation-geolocator.vehicle-parameter.g = 9.82 #m/s2
+logic-sensation-geolocator.vehicle-parameter.l = 1.53 #m
+logic-sensation-geolocator.vehicle-parameter.lf = 0.765 #m (l*0.5)
+logic-sensation-geolocator.vehicle-parameter.lr = 0.765 #m (l*0.5)
+logic-sensation-geolocator.vehicle-parameter.mu = 0.9
 

@@ -241,19 +241,6 @@ void Geolocator::setUp()
 
 	std::cout << "UKF initialized!" << std::endl;
 
-
-	/*
-		m_gpsReading(0,0) = 15;
-		 m_gpsReading(1,0) = 0;
-		 m_groundSpeedReading = 2;
-		 m_accXYReading(0,0) = 1;
-		 m_accXYReading(1,0)= 0;
-		 m_yawReading = 0;
-		 m_headingReading = 1;
-		 m_states << 14.7, 0, 2.2, 0, 0, 1.1;
-	m_states = UKFPrediction(m_states);
-  	m_states = UKFUpdate(m_states);*/
-
 }
 
 void Geolocator::tearDown()
@@ -508,19 +495,19 @@ double Geolocator::rackTravelToFrontWheelSteering(double &rackTravel)
 void Geolocator::stateSender(MatrixXd &x)
 {
 
-	//Send position
-	std::cout << "---------------------------" << std::endl;
-	std::cout << x << std::endl;
-/*
-	std::cout << "--------------------------" << std::endl;
-	std::cout << m_stateCovP << std::endl;*/
-	
+	opendlv::logic::sensation::Geolocation geoState;
+	geoState.setLatitude(x(0));
+	geoState.setLongitude(x(1));
+	geoState.setHeading(x(5));
+	odcore::data::Container c1(geoState);
+	getConference().send(c1);
 
-
-	/*  opendlv::logic::sensation::Point conePoint = Cartesian2Spherical(cones(0,n), cones(1,n), cones(2,n));
-     	odcore::data::Container c1(conePoint);
-		getConference().send(c1);*/
-
+	opendlv::logic::sensation::Equilibrioception kinematicState;
+	kinematicState.setVx(x(2));
+	kinematicState.setVx(x(3));
+	kinematicState.setYawRate(x(4));
+	odcore::data::Container c2(kinematicState);
+	getConference().send(c2);
 
 }
 
