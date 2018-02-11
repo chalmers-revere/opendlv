@@ -16,20 +16,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  */
-#include "orbframe.hpp"
 
+#ifndef OPENDLV_ORBEXTRACTOR_HPP
+#define OPENDLV_ORBEXTRACTOR_HPP
 
 namespace opendlv {
 namespace logic {
 namespace sensation {
-OrbFrame::OrbFrame()
-    : m_keyframes()
-{
-}
-OrbFrame::~OrbFrame()
-{
-}
+
+class OrbExtractor {
+ public:
+  OrbExtractor();
+  ~OrbExtractor();
+};
 
 } // namespace sensation
 } // namespace logic
 } // namespace opendlv
+
+#endif //OPENDLV_ORBEXTRACTOR_HPP

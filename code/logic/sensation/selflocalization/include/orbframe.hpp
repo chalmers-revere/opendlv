@@ -39,6 +39,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include "orbkeyframe.hpp"
 
 namespace opendlv {
 namespace logic {
@@ -46,8 +47,12 @@ namespace sensation {
 
 class OrbFrame {
  public:
-    OrbFrame();
-    ~OrbFrame();
+  OrbFrame();
+  ~OrbFrame();
+
+ private:
+    std::vector<OrbKeyFrame> m_keyframes;
+
 };
 
 } // namespace sensation
