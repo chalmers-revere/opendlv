@@ -29,16 +29,7 @@
 #include "opendlv/data/environment/Point3.h"
 #include "opendlv/data/environment/WGS84Coordinate.h"
 
-//#include "opendlv/data/environment/Point3.h"
-//#include "opendlv/data/environment/WGS84Coordinate.h"
-
-#include "odvdfh16truck/GeneratedHeaders_ODVDFH16Truck.h"
-#include "odvdopendlvdata/GeneratedHeaders_ODVDOpenDLVData.h"
-#include "odvdtrimble/GeneratedHeaders_ODVDTrimble.h"
-#include "odvdimu/GeneratedHeaders_ODVDIMU.h"
 #include "odvdopendlvstandardmessageset/GeneratedHeaders_ODVDOpenDLVStandardMessageSet.h"
-//Include cfsd??
-//#include <odvdcfsd18/GeneratedHeaders_ODVDcfsd18.h>
 
 namespace opendlv {
 namespace logic {

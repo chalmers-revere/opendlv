@@ -29,9 +29,6 @@
 #include <opendavinci/odcore/data/Container.h>
 #include <opendavinci/odcore/data/TimeStamp.h>
 
-
-//#include <odvdfh16truck/GeneratedHeaders_ODVDFH16Truck.h>
-
 #include "geolocationtest.hpp"
 
 namespace opendlv {

@@ -20,23 +20,6 @@ project(opendlv-logic-sensation-geolocationtest)
 
 include_directories(include)
 
-include_directories(SYSTEM ${KALMAN_INCLUDE_DIR})
-
-set (CMAKE_MODULE_PATH "${ODVDFH16TRUCK_DIR}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules" ${CMAKE_MODULE_PATH})
-find_package (ODVDFH16Truck REQUIRED)
-include_directories(SYSTEM ${ODVDFH16TRUCK_INCLUDE_DIRS})
-set(LIBRARIES ${LIBRARIES} ${ODVDFH16TRUCK_LIBRARIES})
-
-set (CMAKE_MODULE_PATH "${ODVDIMU_DIR}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules" ${CMAKE_MODULE_PATH})
-find_package (ODVDIMU REQUIRED)
-include_directories(SYSTEM ${ODVDIMU_INCLUDE_DIRS})
-set(LIBRARIES ${LIBRARIES} ${ODVDIMU_LIBRARIES})
-
-set (CMAKE_MODULE_PATH "${ODVDTRIMBLE_DIR}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules" ${CMAKE_MODULE_PATH})
-find_package (ODVDTrimble REQUIRED)
-include_directories(SYSTEM ${ODVDTRIMBLE_INCLUDE_DIRS})
-set(LIBRARIES ${LIBRARIES} ${ODVDTRIMBLE_LIBRARIES})
-
 ###############################################################################
 # Build this project.
 file(GLOB_RECURSE thisproject-sources "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")

@@ -75,6 +75,7 @@ Geolocator::~Geolocator()
 
 void Geolocator::nextContainer(odcore::data::Container &a_container)
 {
+	std::cout << "HEjHEJ" << std::endl;
 	//Groundspeed	
 	if (a_container.getDataType() == opendlv::proxy::GroundSpeedReading::ID()){
 		odcore::base::Lock l(m_sensorMutex);
@@ -84,7 +85,6 @@ void Geolocator::nextContainer(odcore::data::Container &a_container)
 	 	auto groundspeed = a_container.getData<opendlv::proxy::GroundSpeedReading>();
 	 	m_groundSpeedReading = groundspeed.getGroundSpeed();
 	}
-	std::cout << "HEjHEJ" << std::endl;
 	//Accelerometer
 	 if (a_container.getDataType() == opendlv::proxy::AccelerationReading::ID()){
 	 	odcore::base::Lock l(m_sensorMutex);

@@ -96,6 +96,7 @@ add_subdirectory(perception/detectvehicle)
 add_subdirectory(sensation/audition)
 add_subdirectory(sensation/directionofmovement)
 add_subdirectory(sensation/echolocation)
+add_subdirectory(sensation/geolocationtest)
 add_subdirectory(sensation/geolocator)
 add_subdirectory(sensation/opticalflow)
 
