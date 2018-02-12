@@ -33,4 +33,13 @@ services:
             - odsupercomponent
         network_mode: host
         command: "/opt/opendlv/bin/opendlv-logic-sensation-geolocator --cid=${CID} --freq=10"
+    
+    sensation-geolocationtest:
+        image: ${IMAGE}
+        depends_on:
+            - odsupercomponent
+        network_mode: host
+        volumes:
+        - .:/opt/opendlv.data
+        command: "/opt/opendlv/bin/opendlv-logic-sensation-geolocationtest --cid=${CID} --freq=10"
 
