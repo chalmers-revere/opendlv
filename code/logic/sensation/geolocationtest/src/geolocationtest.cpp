@@ -37,12 +37,16 @@ namespace sensation {
 
 Geolocationtest::Geolocationtest(int32_t const &a_argc, char **a_argv)
     : TimeTriggeredConferenceClientModule(a_argc, a_argv, "logic-sensation-geolocationtest")
+    , m_sensorMutex()
+    , m_states()
+    , m_dataCollector()
 
 
 
 {
-
-
+ 
+ m_states = MatrixXd::Zero(6,1);
+ m_dataCollector = MatrixXd::Zero(3000,6);
 }
 
 Geolocationtest::~Geolocationtest()
@@ -51,15 +55,48 @@ Geolocationtest::~Geolocationtest()
 
 void Geolocationtest::nextContainer(odcore::data::Container &a_container)
 {
-	auto datatype = a_container.getDataType();
-	std::cout << datatype << std::endl;
+
+	//Groundspeed	
+	if (a_container.getDataType() == opendlv::logic::sensation::Geolocation::ID()){
+		odcore::base::Lock l(m_sensorMutex);
+
+	 	auto gpsState = a_container.getData<opendlv::logic::sensation::Geolocation>();
+	 	m_states(0) = gpsState.getLatitude();
+	 	m_states(1) = gpsState.getLongitude();
+	 	m_states(5) = gpsState.getHeading();
+	}
+
+	if (a_container.getDataType() == opendlv::logic::sensation::Equilibrioception::ID()){
+		odcore::base::Lock l(m_sensorMutex);
+
+	 	auto eqState = a_container.getData<opendlv::logic::sensation::Equilibrioception>();
+	 	m_states(2) = eqState.getVx();
+	 	m_states(3) = eqState.getVy();
+	 	m_states(4) = eqState.getYawRate();
+
+	}
+
+	/*
+	opendlv::logic::sensation::Geolocation geoState;
+	geoState.setLatitude(x(0));
+	geoState.setLongitude(x(1));
+	geoState.setHeading(x(5));
+	odcore::data::Container c1(geoState);
+	getConference().send(c1);
+
+	opendlv::logic::sensation::Equilibrioception kinematicState;
+	kinematicState.setVx(x(2));
+	kinematicState.setVx(x(3));
+	kinematicState.setYawRate(x(4));
+	odcore::data::Container c2(kinematicState);
+	getConference().send(c2);*/
 } 
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocationtest::body()
 {
   
-
-  while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING && m_iterator<500) {
+   
+  while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING && m_iterator<3000) {
    	
    	opendlv::proxy::GroundSpeedReading propulsion;
 	propulsion.setGroundSpeed(m_groundspeeds[m_iterator]);
@@ -93,10 +130,15 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocationtest::body(
 	odcore::data::Container c6(heading);
 	getConference().send(c6);
 
-	std::cout << m_lons[m_iterator] << std::endl;
+	//std::cout << m_lons[m_iterator] << std::endl;
 	m_iterator++;
-	
-	
+    odcore::base::Lock l(m_sensorMutex);
+    m_dataCollector.row(m_iterator-1) = m_states.transpose();
+    std::cout << "------------------------------" << std::endl;
+	std::cout << "recieved states:" << m_states.transpose() << std::endl;
+	std::cout << "------------------------------" << std::endl;
+
+
   }
 
 
@@ -104,22 +146,24 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocationtest::body(
 }
 void Geolocationtest::setUp()
 {	
-	std::cout << "Setting up" << std::endl;
+	std::cout << "Setting up test data" << std::endl;
 	getDataFromFile();
 }
 
 void Geolocationtest::tearDown()
 {
+	std::cout << m_dataCollector << std::endl;
+	writeDataToFile();
 }
 
 void Geolocationtest::getDataFromFile(){
-	int nLine = 500;
+	int nLine = 3000;
 	int i = 0;
 	std::string line;
 	std::string const HOME = "/opt/opendlv.data/";
 	std::string infile = HOME + "myFile.txt";
 	std::ifstream myFile(infile, std::ifstream::in);
-	std::cout << infile << std::endl;
+	//std::cout << infile << std::endl;
 	if(myFile.is_open()){
 		std::cout << "File open" << std::endl;
 		while(i<nLine){
@@ -157,7 +201,7 @@ void Geolocationtest::getDataFromFile(){
 	}
 	else{
 		std::string outfile = HOME + "vafan.txt";
-		std::cout << outfile << std::endl;
+		//std::cout << outfile << std::endl;
 		std::ofstream afile(outfile, std::ios::app);
 		if(afile.is_open()){
 			std::cout << "Sad" << std::endl;
@@ -167,6 +211,23 @@ void Geolocationtest::getDataFromFile(){
 	}
 
 }
+void Geolocationtest::writeDataToFile()
+{
+
+	std::string const HOME = "/opt/opendlv.data/";
+	std::string outfile = HOME + "filteredStateOldCarData.txt";
+		//std::cout << outfile << std::endl;
+		std::ofstream afile(outfile, std::ios::trunc);
+		if(afile.is_open()){
+			for(int i = 0; i< 3000; i++){				
+				afile << m_dataCollector.row(i) << std::endl;
+			}
+		}
+		afile.close();
+
+}
+
+
 }
 }
 }

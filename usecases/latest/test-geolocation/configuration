@@ -69,17 +69,17 @@ odsupercomponent.pulsetimeack.exclude = odcockpit
 #
 
 %%%%%SAMPLE TIME & GPS REFERENCE%%%%%%
-logic-sensation-geolocator.T = 0.1; #Check in docker compose
-logic-sensation-geolocator.GPSreference.latitude = 0
-logic-sensation-geolocator.GPSreference.longitude = 0
+logic-sensation-geolocator.T = 0.02; #Check in docker compose
+logic-sensation-geolocator.GPSreference.latitude = 49.198656333333275
+logic-sensation-geolocator.GPSreference.longitude = 8.339645267676774
 
 %%%%%MODEL UNCERTAINTIES%%%%%% 
-logic-sensation-geolocator.Q.X = 0.1
-logic-sensation-geolocator.Q.Y = 0.1
-logic-sensation-geolocator.Q.VelX = 0.1
-logic-sensation-geolocator.Q.VelY = 0.1
-logic-sensation-geolocator.Q.Yaw = 0.1
-logic-sensation-geolocator.Q.Heading = 0.1
+logic-sensation-geolocator.Q.X = 1
+logic-sensation-geolocator.Q.Y = 1
+logic-sensation-geolocator.Q.VelX = 0.5
+logic-sensation-geolocator.Q.VelY = 0.5
+logic-sensation-geolocator.Q.Yaw = 0.5
+logic-sensation-geolocator.Q.Heading = 0.7
 
 %%%%%MEASUREMENT UNCERTAINTIES%%%%%
 logic-sensation-geolocator.R.X = 1

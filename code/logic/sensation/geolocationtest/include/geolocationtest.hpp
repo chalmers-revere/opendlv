@@ -49,6 +49,7 @@ class Geolocationtest : public odcore::base::module::TimeTriggeredConferenceClie
   void setUp();
   void tearDown();
   void getDataFromFile();
+  void writeDataToFile();
   //odcore::base::Mutex m_egoStateMutex;
   vector<double> m_times = {};
   vector<double> m_lats = {};
@@ -60,6 +61,9 @@ class Geolocationtest : public odcore::base::module::TimeTriggeredConferenceClie
   vector<double> m_heading = {};
   vector<double> m_racktravel = {};
   int m_iterator = 0;
+  odcore::base::Mutex m_sensorMutex;
+  MatrixXd m_states;
+  MatrixXd m_dataCollector;
   
 
   //void nextContainer(odcore::data::Container &);

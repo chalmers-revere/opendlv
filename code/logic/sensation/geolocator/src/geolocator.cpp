@@ -75,7 +75,7 @@ Geolocator::~Geolocator()
 
 void Geolocator::nextContainer(odcore::data::Container &a_container)
 {
-	std::cout << "HEjHEJ" << std::endl;
+
 	//Groundspeed	
 	if (a_container.getDataType() == opendlv::proxy::GroundSpeedReading::ID()){
 		odcore::base::Lock l(m_sensorMutex);
@@ -504,10 +504,12 @@ void Geolocator::stateSender(MatrixXd &x)
 
 	opendlv::logic::sensation::Equilibrioception kinematicState;
 	kinematicState.setVx(x(2));
-	kinematicState.setVx(x(3));
+	kinematicState.setVy(x(3));
 	kinematicState.setYawRate(x(4));
 	odcore::data::Container c2(kinematicState);
 	getConference().send(c2);
+
+	std::cout << "States sent" << x.transpose() << std::endl;
 
 }
 
