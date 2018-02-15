@@ -45,9 +45,9 @@ namespace sensation {
 Selflocalization::Selflocalization(int32_t const &a_argc, char **a_argv)
     : DataTriggeredConferenceClientModule(a_argc, a_argv, "logic-sensation-selflocalization")
     , m_cameraType()
-	, m_saveCounter()
 	, m_pTracker()
 	, m_pMapper()
+	, m_pImageGrab()
 
 {	
 	
@@ -116,7 +116,7 @@ void Selflocalization::nextContainer(odcore::data::Container &a_container)
 		odcore::data::TimeStamp currTime = a_container.getReceivedTimeStamp();
 		double currentTime = currTime.toMicroseconds();
     	odcore::data::image::SharedImage sharedImg = a_container.getData<odcore::data::image::SharedImage>();
-    	img = ExtractSharedImage(&sharedImg);
+    	img = m_pImageGrab->ExtractSharedImage(&sharedImg);
 
     	if(m_cameraType){
 
@@ -127,12 +127,12 @@ void Selflocalization::nextContainer(odcore::data::Container &a_container)
 
 			//GO TO TRACKING
 
-			cv::Mat Tcw = m_pTracker->ImageToGreyscaleStereo(imgL,imgR,currentTime);	
+			cv::Mat Tcw = m_pImageGrab->ImageToGreyscaleStereo(imgL,imgR,currentTime);	
 		}else{
 
 			//GO TO TRACKING
 			
-			cv::Mat Tcw = m_pTracker->ImageToGreyscaleMono(img,currentTime);
+			cv::Mat Tcw = m_pImageGrab->ImageToGreyscaleMono(img,currentTime);
 		}
 
    			//std::cout << "[" << getName() << "] " << "[Unable to extract shared image." << std::endl;
@@ -143,43 +143,9 @@ void Selflocalization::nextContainer(odcore::data::Container &a_container)
 
 }
 
-void Selflocalization::saveImg(cv::Mat img) {
-	if(m_saveCounter < 20){
-  		std::string img_name = std::to_string(m_saveCounter);
-  		cv::imwrite("Images/"+img_name+".png", img);
-		m_saveCounter++;
-	}
-}
 
-cv::Mat Selflocalization::ExtractSharedImage(odcore::data::image::SharedImage *a_sharedImage)
-{
-  
-  cv::Mat img;
-  std::shared_ptr<odcore::wrapper::SharedMemory> sharedMem(odcore::wrapper::SharedMemoryFactory::attachToSharedMemory(a_sharedImage->getName()));
-  if (sharedMem->isValid()) {
-    const uint32_t nrChannels = a_sharedImage->getBytesPerPixel();
-    const uint32_t imgWidth = a_sharedImage->getWidth();
-    const uint32_t imgHeight = a_sharedImage->getHeight();
-    IplImage* myIplImage = cvCreateImage(cvSize(imgWidth,imgHeight), IPL_DEPTH_8U, nrChannels);
-    cv::Mat bufferImage = cv::Mat(myIplImage);
-    	{
-      		sharedMem->lock();
-      		memcpy(bufferImage.data, sharedMem->getSharedMemory()
-        	, imgWidth*imgHeight*nrChannels);
-      		sharedMem->unlock();
-    	}
-    	img.release();
-    	img = bufferImage.clone();
-    	bufferImage.release();
-    	cvReleaseImage(&myIplImage);
-   
-  }else{
 
-    std::cout << "[" << getName() << "] " << "Sharedmem is not valid." << std::endl;
-  }
 
-  return img;
-}
 
 
 void Selflocalization::setUp()
@@ -190,7 +156,7 @@ void Selflocalization::setUp()
 
 	m_pTracker = std::shared_ptr<Tracking>(new Tracking(std::shared_ptr<Selflocalization>(this), kv /*,m_pVocavulary,m_pKeyFrameDatabase,m_pMap*/));
 	m_pMapper = std::shared_ptr<Mapping>(new Mapping(m_cameraType));
-  
+    m_pImageGrab = std::shared_ptr<ImageExtractor>(new ImageExtractor(kv));
   
 		/*
 	m_pVocabulary = new OrbVocabulary();

@@ -27,6 +27,7 @@
 
 #include "tracking.hpp"
 
+
 namespace opendlv {
 namespace logic {
 namespace sensation {
@@ -38,112 +39,16 @@ namespace sensation {
   * @param a_argv Command line arguments.
   */
 Tracking::Tracking(std::shared_ptr<Selflocalization> pSelfLocalization, odcore::base::KeyValueConfiguration kv/*, std::shared_ptr<OrbVocabulary> m_pVocabulary, std::shared_ptr<KeyFrameDatabase> m_pKeyFrameDatabase, std::shared_ptr<Map> m_pMap*/)
-: m_imGrey()
-, m_RGB()
+: m_RGB()
 , m_pSelfLocalization(pSelfLocalization)
 {
   
 
 
   	m_RGB = (kv.getValue<int32_t>("logic-sensation-selflocalization.camera.channelorder.RGB") == 1);
-	std::cout << "RGB is " << m_RGB << std::endl;
+	
 }
 
-cv::Mat Tracking::ImageToGreyscaleStereo(cv::Mat &imgL, cv::Mat &imgR, double &timeStamp)
-{
-	m_imGrey = imgL;
-	cv::Mat imGrayRight = imgR;
-	timeStamp = timeStamp;
-
-	if(m_imGrey.channels() == 3){
-
-		if(m_RGB){
-
-			cv::cvtColor(m_imGrey,m_imGrey,cv::COLOR_RGB2GRAY);
-			cv::cvtColor(imGrayRight,imGrayRight,cv::COLOR_RGB2GRAY);
-			
-		}else{
-
-			cv::cvtColor(m_imGrey,m_imGrey,cv::COLOR_BGR2GRAY);
-			cv::cvtColor(imGrayRight,imGrayRight,cv::COLOR_BGR2GRAY);
-
-		}
-
-	}else if(m_imGrey.channels() == 4){ //In case of Alpha channel
-
-
-		if(m_RGB){
-
-			cv::cvtColor(m_imGrey,m_imGrey,cv::COLOR_RGBA2GRAY);
-			cv::cvtColor(imGrayRight,imGrayRight,cv::COLOR_RGBA2GRAY);
-			
-		}else{
-
-			cv::cvtColor(m_imGrey,m_imGrey,cv::COLOR_BGRA2GRAY);
-			cv::cvtColor(imGrayRight,imGrayRight,cv::COLOR_BGRA2GRAY);
-
-		}
-
-	}
-
-	m_pSelfLocalization->saveImg(m_imGrey);
-	m_pSelfLocalization->saveImg(imGrayRight);
-	/*mCurrentFrame = Frame(mImGray,imGrayRight,timestamp,mpORBextractorLeft,mpORBextractorRight,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth);
-
-    Track();
-
-	return mCurrentFrame.mTcw.clone();*/
-
-
-
-	return m_imGrey; //CHANGE RETURN TO FRAME
-
-}
-
-cv::Mat Tracking::ImageToGreyscaleMono(cv::Mat &img, double &timeStamp)
-{
-	m_imGrey = img;
-	timeStamp = timeStamp;
-
-	if(m_imGrey.channels() == 3){
-
-		if(m_RGB){
-
-			cv::cvtColor(m_imGrey,m_imGrey,cv::COLOR_RGB2GRAY);
-			
-		}else{
-
-			cv::cvtColor(m_imGrey,m_imGrey,cv::COLOR_BGR2GRAY);
-
-		}
-
-	}else if(m_imGrey.channels() == 4){ //In case of Alpha channel
-
-
-		if(m_RGB){
-
-			cv::cvtColor(m_imGrey,m_imGrey,cv::COLOR_RGBA2GRAY);
-			
-		}else{
-
-			cv::cvtColor(m_imGrey,m_imGrey,cv::COLOR_BGRA2GRAY);
-
-		}
-
-	}
-
-	m_pSelfLocalization->saveImg(m_imGrey);
-	/*mCurrentFrame = Frame(mImGray,imGrayRight,timestamp,mpORBextractorLeft,mpORBextractorRight,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth);
-
-    Track();
-
-	return mCurrentFrame.mTcw.clone();*/
-
-
-
-	return m_imGrey; //CHANGE RETURN TO FRAME
-
-}
 
 Tracking::~Tracking()
 {
