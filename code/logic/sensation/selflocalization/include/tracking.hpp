@@ -27,7 +27,7 @@
 #include <vector>
 #include <cmath>
 #include "opendavinci/odcore/base/KeyValueConfiguration.h"
-#include "selflocalization.hpp"
+
 
 
 namespace opendlv {

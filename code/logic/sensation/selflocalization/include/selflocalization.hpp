@@ -47,11 +47,7 @@
 
 namespace opendlv {
 namespace logic {
-namespace sensation {
-
-class Tracking;
-class Mapping;
-class ImageExtractor;	
+namespace sensation {	
 
 class Selflocalization
 : public odcore::base::module::DataTriggeredConferenceClientModule {
