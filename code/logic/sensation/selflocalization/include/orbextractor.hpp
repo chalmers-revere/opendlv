@@ -41,6 +41,20 @@ namespace opendlv {
 namespace logic {
 namespace sensation {
 
+class ExtractorNode
+{
+public:
+    //ExtractorNode():bNoMore(false){}
+    ExtractorNode();
+    ~ExtractorNode();
+    void DivideNode(ExtractorNode &n1, ExtractorNode &n2, ExtractorNode &n3, ExtractorNode &n4);
+
+    std::vector<cv::KeyPoint> vKeys;
+    cv::Point2i UL, UR, BL, BR;
+    std::list<ExtractorNode>::iterator nodeIterator;
+    bool bNoMore;
+};
+
 class OrbExtractor {
  public:
   OrbExtractor(int nFeatures, float scaleFactor, int nLevels, int initialFastTh, int minFastTh);
@@ -50,15 +64,16 @@ class OrbExtractor {
 
   std::vector<cv::Mat> m_vImagePyramid;
  private:
-   float IC_Angle(const cv::Mat& img, cv::Point2f point,  const std::vector<int> & u_max);
-   void computeOrbDescriptor(const cv::KeyPoint& kpt, const cv::Mat& img, const cv::Point* pattern, uchar* desc);
-   void ComputeKeyPointsOld(std::vector<std::vector<cv::KeyPoint> >& allKeypoints);
+   //float IC_Angle(const cv::Mat& img, cv::Point2f point,  const std::vector<int> & u_max);
+   //void computeOrbDescriptor(const cv::KeyPoint& kpt, const cv::Mat& img, const cv::Point* pattern, uchar* desc);
+   void computeOrientation(const cv::Mat& image, std::vector<cv::KeyPoint>& keypoints, const std::vector<int>& umax);
+   //void computeDescriptors(const cv::Mat& image, std::vector<cv::KeyPoint>& keypoints, cv::Mat& descriptors, const std::vector<cv::Point>& pattern);
    void ComputePyramid(cv::Mat image);
    
    void ComputeKeyPointsOctTree(std::vector<std::vector<cv::KeyPoint> >& allKeypoints);    
    
    std::vector<cv::KeyPoint> DistributeOctTree(const std::vector<cv::KeyPoint>& vToDistributeKeys, const int &minX,
-                                           const int &maxX, const int &minY, const int &maxY, const int &nFeatures, const int &level);
+                                           const int &maxX, const int &minY, const int &maxY, const int &nFeatures);
 
    std::vector<cv::Point> m_vPattern;
 
