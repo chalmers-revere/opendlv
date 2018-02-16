@@ -44,6 +44,7 @@
 #include "tracking.hpp"
 #include "mapping.hpp"
 #include "imageextractor.hpp"
+#include "orbextractor.hpp"
 
 namespace opendlv {
 namespace logic {
@@ -65,7 +66,8 @@ class Selflocalization
   int m_saveCounter = 0;
   std::shared_ptr<Tracking> m_pTracker;
   std::shared_ptr<Mapping> m_pMapper;
-  std::shared_ptr<ImageExtractor> m_pImageGrab;	
+  std::shared_ptr<ImageExtractor> m_pImageGrab;
+  std::shared_ptr<OrbExtractor> m_pExtractOrb;	
 	/*Variables needed to initialize threads and databases*/
   /*
 	

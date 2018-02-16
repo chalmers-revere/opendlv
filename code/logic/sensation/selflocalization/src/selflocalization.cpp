@@ -48,6 +48,7 @@ Selflocalization::Selflocalization(int32_t const &a_argc, char **a_argv)
 	, m_pTracker()
 	, m_pMapper()
 	, m_pImageGrab()
+	, m_pExtractOrb()
 
 {	
 	
@@ -127,12 +128,18 @@ void Selflocalization::nextContainer(odcore::data::Container &a_container)
 
 			//GO TO TRACKING
 
-			cv::Mat Tcw = m_pImageGrab->ImageToGreyscaleStereo(imgL,imgR,currentTime);	
+			cv::Mat Tcw = m_pImageGrab->ImageToGreyscaleStereo(imgL,imgR,currentTime);
+
+
 		}else{
 
 			//GO TO TRACKING
 			
 			cv::Mat Tcw = m_pImageGrab->ImageToGreyscaleMono(img,currentTime);
+			std::vector<cv::KeyPoint> TestMat;
+			cv::Mat testArr;
+			m_pExtractOrb->ExtractFeatures(Tcw, TestMat, testArr);
+
 		}
 
    			//std::cout << "[" << getName() << "] " << "[Unable to extract shared image." << std::endl;
@@ -157,6 +164,15 @@ void Selflocalization::setUp()
 	m_pTracker = std::shared_ptr<Tracking>(new Tracking(std::shared_ptr<Selflocalization>(this), kv /*,m_pVocavulary,m_pKeyFrameDatabase,m_pMap*/));
 	m_pMapper = std::shared_ptr<Mapping>(new Mapping(m_cameraType));
     m_pImageGrab = std::shared_ptr<ImageExtractor>(new ImageExtractor(kv));
+
+    int nFeatures = 1000;
+    float scaleFactor = 1.2f;
+    int nLevels = 8;
+    int initialFastTh = 20;
+    int minFastTh = 7;
+
+    m_pExtractOrb = std::shared_ptr<OrbExtractor>(new OrbExtractor(nFeatures, scaleFactor, nLevels, initialFastTh, minFastTh));
+
   
 		/*
 	m_pVocabulary = new OrbVocabulary();
