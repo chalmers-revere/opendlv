@@ -33,9 +33,9 @@ public:
 #ifndef OPENDLV_ORBEXTRACTOR_HPP
 #define OPENDLV_ORBEXTRACTOR_HPP
 
-#include<vector>
-#include<list>
-#include<opencv/cv.h>
+#include <vector>
+#include <list>
+#include <opencv/cv.h>
 
 namespace opendlv {
 namespace logic {
@@ -50,15 +50,15 @@ class OrbExtractor {
 
   std::vector<cv::Mat> m_vImagePyramid;
  private:
+   float IC_Angle(const cv::Mat& img, cv::Point2f point,  const std::vector<int> & u_max);
+   void computeOrbDescriptor(const cv::KeyPoint& kpt, const cv::Mat& img, const cv::Point* pattern, uchar* desc);
+   void ComputeKeyPointsOld(std::vector<std::vector<cv::KeyPoint> >& allKeypoints);
    void ComputePyramid(cv::Mat image);
    
    void ComputeKeyPointsOctTree(std::vector<std::vector<cv::KeyPoint> >& allKeypoints);    
    
    std::vector<cv::KeyPoint> DistributeOctTree(const std::vector<cv::KeyPoint>& vToDistributeKeys, const int &minX,
                                            const int &maxX, const int &minY, const int &maxY, const int &nFeatures, const int &level);
-
-   void ComputeKeyPointsOld(std::vector<std::vector<cv::KeyPoint> >& allKeypoints);
-   
 
    std::vector<cv::Point> m_vPattern;
 

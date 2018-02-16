@@ -37,7 +37,8 @@ OrbExtractor::OrbExtractor(int nFeatures, float scaleFactor, int nLevels, int in
 	, m_vLevelSigma2()
 	, m_vInvLevelSigma2()
 	{
-		m_vScaleFactor.resize(nLevels);
+	
+    m_vScaleFactor.resize(nLevels);
     m_vLevelSigma2.resize(nLevels);
     m_vScaleFactor[0]=1.0f;
     m_vLevelSigma2[0]=1.0f;
@@ -70,8 +71,9 @@ OrbExtractor::OrbExtractor(int nFeatures, float scaleFactor, int nLevels, int in
     }
     m_nFeaturesPerLevel[nLevels-1] = std::max(nFeatures - sumFeatures, 0);
 
+
     //const int npoints = 512;
-    //const Point* pattern0 = (const Point*)bit_pattern_31_;
+    //const pt* pattern0 = (const pt*)bit_pattern_31_;
     //std::copy(pattern0, pattern0 + npoints, std::back_inserter(pattern));
 
     //This is for orientation
@@ -93,9 +95,85 @@ OrbExtractor::OrbExtractor(int nFeatures, float scaleFactor, int nLevels, int in
         ++v0;
 		}*/
 	}
+
+
 OrbExtractor::~OrbExtractor()
 {
 }
+    const int patchSize = 31;
+    const int halfPatchSize = 15;
+    const int edgeThreshold = 19;
+float OrbExtractor::IC_Angle(const cv::Mat& image, cv::Point2f pt,  const std::vector<int> & u_max) //Static??
+{
+    int m_01 = 0, m_10 = 0;
+
+    const uchar* center = &image.at<uchar> (cvRound(pt.y), cvRound(pt.x));
+
+    // Treat the center line differently, v=0
+    for (int u = -halfPatchSize; u <= halfPatchSize; ++u)
+        m_10 += u * center[u];
+
+    // Go line by line in the circuI853lar patch
+    int step = (int)image.step1();
+    for (int v = 1; v <= halfPatchSize; ++v)
+    {
+        // Proceed over the two lines
+        int v_sum = 0;
+        int d = u_max[v];
+        for (int u = -d; u <= d; ++u)
+        {
+            int val_plus = center[u + v*step], val_minus = center[u - v*step];
+            v_sum += (val_plus - val_minus);
+            m_10 += u * (val_plus + val_minus);
+        }
+        m_01 += v * v_sum;
+    }
+
+    return cv::fastAtan2((float)m_01, (float)m_10);
+}
+
+
+//const double dPI = CV_PI/180.0;
+const float factorPI = static_cast<double>(CV_PI/180.0);
+void OrbExtractor::computeOrbDescriptor(const cv::KeyPoint& kpt, const cv::Mat& img, const cv::Point* pattern, uchar* desc)//Static??
+{
+    float angle = (float)kpt.angle*factorPI;
+    float a = (float)std::cos(angle), b = (float)std::sin(angle);
+
+    const uchar* center = &img.at<uchar>(cvRound(kpt.pt.y), cvRound(kpt.pt.x));
+    const int step = (int)img.step;
+
+    #define GET_VALUE(idx) \
+        center[cvRound(pattern[idx].x*b + pattern[idx].y*a)*step + \
+               cvRound(pattern[idx].x*a - pattern[idx].y*b)]
+
+
+    for (int i = 0; i < 32; ++i, pattern += 16)
+    {
+        int t0, t1, val;
+        t0 = GET_VALUE(0); t1 = GET_VALUE(1);
+        val = t0 < t1;
+        t0 = GET_VALUE(2); t1 = GET_VALUE(3);
+        val |= (t0 < t1) << 1;
+        t0 = GET_VALUE(4); t1 = GET_VALUE(5);
+        val |= (t0 < t1) << 2;
+        t0 = GET_VALUE(6); t1 = GET_VALUE(7);
+        val |= (t0 < t1) << 3;
+        t0 = GET_VALUE(8); t1 = GET_VALUE(9);
+        val |= (t0 < t1) << 4;
+        t0 = GET_VALUE(10); t1 = GET_VALUE(11);
+        val |= (t0 < t1) << 5;
+        t0 = GET_VALUE(12); t1 = GET_VALUE(13);
+        val |= (t0 < t1) << 6;
+        t0 = GET_VALUE(14); t1 = GET_VALUE(15);
+        val |= (t0 < t1) << 7;
+
+        desc[i] = (uchar)val;
+    }
+
+    #undef GET_VALUE
+}
+
 } // namespace sensation
 } // namespace logic
 } // namespace opendlv
