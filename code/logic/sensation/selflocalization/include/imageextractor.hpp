@@ -17,9 +17,8 @@
  * USA.
  */
 
-#ifndef LOGIC_SENSATION_SELFLOCALIZATION_SELFLOCALIZATION_HPP
-#define LOGIC_SENSATION_SELFLOCALIZATION_SELFLOCALIZATION_HPP
-
+#ifndef LOGIC_SENSATION_SELFLOCALIZATION_IMAGEEXTRACTOR_HPP
+#define LOGIC_SENSATION_SELFLOCALIZATION_IMAGEEXTRACTOR_HPP
 
 #include <iostream>
 #include <memory>
@@ -40,50 +39,31 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
 #include "opendavinci/odcore/base/KeyValueConfiguration.h"
+//#include "selflocalization.hpp"
 
-#include "tracking.hpp"
-#include "mapping.hpp"
-#include "imageextractor.hpp"
-#include "orbextractor.hpp"
 
 namespace opendlv {
 namespace logic {
-namespace sensation {	
+namespace sensation {
 
-class Selflocalization
-: public odcore::base::module::DataTriggeredConferenceClientModule {
+
+
+class ImageExtractor
+ {
  public:
-  Selflocalization(int32_t const &, char **);
-  Selflocalization(Selflocalization const &) = delete;
-  Selflocalization &operator=(Selflocalization const &) = delete;
-  virtual ~Selflocalization();
-  virtual void nextContainer(odcore::data::Container &);
+  ImageExtractor(odcore::base::KeyValueConfiguration kv);
+  ImageExtractor(ImageExtractor const &) = delete;
+  ImageExtractor &operator=(ImageExtractor const &) = delete;
+  virtual ~ImageExtractor();
+  cv::Mat ImageToGreyscaleStereo(cv::Mat &imgL, cv::Mat &imgR, double &timeStamp);
+  cv::Mat ImageToGreyscaleMono(cv::Mat &img, double &timeStamp);
+  cv::Mat ExtractSharedImage(odcore::data::image::SharedImage *a_sharedImage);
+  void saveImg(cv::Mat &img);
 
  private:
-  void setUp();
-  void tearDown();
-  bool m_cameraType;
-  int m_saveCounter = 0;
-  std::shared_ptr<Tracking> m_pTracker;
-  std::shared_ptr<Mapping> m_pMapper;
-  std::shared_ptr<ImageExtractor> m_pImageGrab;
-  std::shared_ptr<OrbExtractor> m_pExtractOrb;	
-	/*Variables needed to initialize threads and databases*/
-  /*
-	
-	std::shared_ptr<OrbVocabulary> m_pVocabulary;
-	std::shared_ptr<Map> m_pMap;
-	std::shared_ptr<KeyFrameDatabase> m_pKeyFrameDatabase;
-	
-	std::shared_ptr<Mapping> m_pMapper;
-	std::shared_ptr<LoopClosing> m_pLoopCloser;
-
-	std::shared_ptr<std::thread> m_pMappingThread;
-	std::shared_ptr<std::thread> m_pLoopClosingThread;
-
-
-*/
-
+ cv::Mat m_imGrey;
+ bool m_RGB; //Order of colour channels
+ int m_saveCounter = 0;
 	
 };
 
