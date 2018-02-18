@@ -87,7 +87,7 @@ class OrbExtractor {
    std::vector<int> m_umax;
 
    std::vector<float> m_vScaleFactor;
-   std::vector<float> m_vInvScaleFactor;    
+   std::vector<float> m_vInvScaleFactor;
    std::vector<float> m_vLevelSigma2;
    std::vector<float> m_vInvLevelSigma2;
 };

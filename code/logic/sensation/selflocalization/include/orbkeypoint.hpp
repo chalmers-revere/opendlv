@@ -16,26 +16,29 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  */
-#include "orbframe.hpp"
 
+#ifndef OPENDLV_KEYPOINT_HPP
+#define OPENDLV_KEYPOINT_HPP
 
 namespace opendlv {
 namespace logic {
 namespace sensation {
 
-//Stereo constructor
-OrbFrame::OrbFrame(cv::Mat leftGreyImage, cv::Mat rightGreyImage, std::shared_ptr<OrbExtractor> leftOrbExtractor, 
-                    std::shared_ptr<OrbExtractor> rightOrbExtractor, std::shared_ptr<OrbVocabulary> orbVocabulary, 
-                    cv::Mat mK, cv::Mat distanceCoefficent, float stereoBaseLine, float depthThreshold)
+class OrbKeyPoint
 {
-    
-}
+public:
+    OrbKeyPoint(cv::KeyPoint, float depth, bool outlier);
 
-OrbFrame::~OrbFrame()
-{
+    ~OrbKeyPoint();
 
-}
+private:
+    cv::KeyPoint m_keyPoint;
+    float m_depth;
+    bool m_outlier;
+};
 
 } // namespace sensation
 } // namespace logic
 } // namespace opendlv
+
+#endif //OPENDLV_KEYPOINT_HPP
