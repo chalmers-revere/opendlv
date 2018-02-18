@@ -23,9 +23,6 @@ namespace opendlv {
 namespace logic {
 namespace sensation {
 
-Suggested structure:
-
-Contructor takes left/right mat, timestamp, vector<OrbKeyPoint>
 
 //Stereo constructor
 OrbFrame::OrbFrame(cv::Mat leftGreyImage, cv::Mat rightGreyImage, std::vector<OrbKeyPoint> keyPoints): 

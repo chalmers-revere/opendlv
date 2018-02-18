@@ -39,10 +39,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <orbkeyframe.hpp>
-#include <orbextractor.hpp>
-#include <orbvocabulary.hpp>
-#include <orbmappoint.hpp>
+#include <orbkeypoint.hpp>
 
 namespace opendlv {
 namespace logic {
@@ -52,7 +49,7 @@ class OrbFrame
 {
 public:
     // Copy constructor.
-    OrbFrame(cv::Mat leftGreyImage, cv::Mat rightGreyImage, std::vector<OrbKeyPoint>)
+    OrbFrame(cv::Mat leftGreyImage, cv::Mat rightGreyImage, std::vector<OrbKeyPoint>);
     ~OrbFrame();
 
 private:

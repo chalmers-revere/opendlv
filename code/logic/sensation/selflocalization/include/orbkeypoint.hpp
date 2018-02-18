@@ -19,6 +19,8 @@
 
 #ifndef OPENDLV_KEYPOINT_HPP
 #define OPENDLV_KEYPOINT_HPP
+#include <opencv/cv.h>
+
 
 namespace opendlv {
 namespace logic {
