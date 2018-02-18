@@ -39,19 +39,26 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include "orbkeyframe.hpp"
+#include <orbkeyframe.hpp>
+#include <orbextractor.hpp>
+#include <orbvocabulary.hpp>
+#include <orbmappoint.hpp>
 
 namespace opendlv {
 namespace logic {
 namespace sensation {
 
-class OrbFrame {
- public:
-  OrbFrame();
-  ~OrbFrame();
+class OrbFrame 
+{
+public:
+    // Copy constructor.
+    OrbFrame(cv::Mat leftGreyImage, cv::Mat rightGreyImage, std::shared_ptr<OrbExtractor> leftOrbExtractor, 
+            std::shared_ptr<OrbExtractor> rightOrbExtractor, std::shared_ptr<OrbVocabulary> orbVocabulary, 
+            cv::Mat mK, cv::Mat distanceCoefficent, float stereoBaseLine, float depthThreshold);
+    ~OrbFrame();
 
- private:
-    std::vector<OrbKeyFrame> m_keyframes;
+private:
+    std::shared_ptr<OrbExtractor> leftOrbExtractor, rightOrbExtractor;
 
 };
 

@@ -22,12 +22,18 @@
 namespace opendlv {
 namespace logic {
 namespace sensation {
-OrbFrame::OrbFrame()
-    : m_keyframes()
+
+//Stereo constructor
+OrbFrame::OrbFrame(cv::Mat leftGreyImage, cv::Mat rightGreyImage, std::shared_ptr<OrbExtractor> leftOrbExtractor, 
+                    std::shared_ptr<OrbExtractor> rightOrbExtractor, std::shared_ptr<OrbVocabulary> orbVocabulary, 
+                    cv::Mat mK, cv::Mat distanceCoefficent, float stereoBaseLine, float depthThreshold)
 {
+
 }
+
 OrbFrame::~OrbFrame()
 {
+
 }
 
 } // namespace sensation

@@ -25,9 +25,10 @@ namespace logic {
 namespace sensation {
 
 class OrbKeyFrame {
- public:
-  OrbKeyFrame();
-  ~OrbKeyFrame();
+  public:
+    OrbKeyFrame();
+
+    ~OrbKeyFrame();
 };
 
 } // namespace sensation
