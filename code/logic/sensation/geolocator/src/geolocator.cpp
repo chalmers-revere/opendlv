@@ -494,10 +494,14 @@ double Geolocator::rackTravelToFrontWheelSteering(double &rackTravel)
 
 void Geolocator::stateSender(MatrixXd &x)
 {
-
+	opendlv::data::environment::Point3 xyz;
+	xyz.setX(x(0));
+	xyz.setY(x(1));
+	xyz.setZ(0);
+	opendlv::data::environment::WGS84Coordinate gpsCurrent = m_gpsReference.transform(xyz);
 	opendlv::logic::sensation::Geolocation geoState;
-	geoState.setLatitude(x(0));
-	geoState.setLongitude(x(1));
+	geoState.setLatitude(gpsCurrent.getLatitude());
+	geoState.setLongitude(gpsCurrent.getLongitude());
 	geoState.setHeading(x(5));
 	odcore::data::Container c1(geoState);
 	getConference().send(c1);
