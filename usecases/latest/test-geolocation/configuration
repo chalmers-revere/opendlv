@@ -74,8 +74,8 @@ logic-sensation-geolocator.GPSreference.latitude = 49.198656333333275
 logic-sensation-geolocator.GPSreference.longitude = 8.339645267676774
 
 %%%%%MODEL UNCERTAINTIES%%%%%% 
-logic-sensation-geolocator.Q.X = 1
-logic-sensation-geolocator.Q.Y = 1
+logic-sensation-geolocator.Q.X = 0.1
+logic-sensation-geolocator.Q.Y = 0.1
 logic-sensation-geolocator.Q.VelX = 0.5
 logic-sensation-geolocator.Q.VelY = 0.5
 logic-sensation-geolocator.Q.Yaw = 0.3
