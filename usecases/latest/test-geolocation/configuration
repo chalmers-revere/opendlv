@@ -110,4 +110,5 @@ odrecorderh264.remoteControl = 0 # 0 = no remote control, 1 = allowing remote co
 odrecorderh264.dumpSharedData = 1 # 0 = do not dump shared images and shared images, 1 = otherwise
 odrecorderh264.lossless = 1 # Set to 1 to enable h264 lossless encoding.
 odrecorderh264.portbaseforchildprocesses = 29000 # Every spawned child processes is connecting to the parent process via TCP using 
+odcockpit.directoriesForSharedLibaries = /opt
 
