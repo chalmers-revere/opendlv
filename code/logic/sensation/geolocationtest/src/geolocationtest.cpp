@@ -98,11 +98,6 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocationtest::body(
    
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING && m_iterator<3000) {
    	
-   	opendlv::proxy::GroundSpeedReading propulsion;
-	propulsion.setGroundSpeed(m_groundspeeds[m_iterator]);
-	odcore::data::Container c1(propulsion);
-	getConference().send(c1);
-		
 	opendlv::proxy::AccelerationReading accelerometerReading;
 	accelerometerReading.setAccelerationX(m_ax[m_iterator]);
 	accelerometerReading.setAccelerationY(m_ay[m_iterator]);
@@ -129,6 +124,12 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocationtest::body(
 	heading.setNorthHeading(m_heading[m_iterator]);
 	odcore::data::Container c6(heading);
 	getConference().send(c6);
+	if(m_iterator < 1500){
+   		opendlv::proxy::GroundSpeedReading propulsion;
+		propulsion.setGroundSpeed(m_groundspeeds[m_iterator]);
+		odcore::data::Container c1(propulsion);
+		getConference().send(c1);
+	}
 
 	//std::cout << m_lons[m_iterator] << std::endl;
 	m_iterator++;
