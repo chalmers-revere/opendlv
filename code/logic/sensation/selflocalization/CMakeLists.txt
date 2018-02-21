@@ -20,10 +20,6 @@ project(opendlv-logic-sensation-selflocalization)
 
 include_directories(include)
 
-set (CMAKE_MODULE_PATH "${ODVDV2V_DIR}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules" ${CMAKE_MODULE_PATH})
-find_package (ODVDV2V REQUIRED)
-include_directories(SYSTEM ${ODVDV2V_INCLUDE_DIRS})
-set(LIBRARIES ${LIBRARIES} ${ODVDV2V_LIBRARIES})
 
 ###############################################################################
 # Build this project.
