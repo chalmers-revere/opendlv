@@ -34,8 +34,11 @@ services:
             - odsupercomponent
         user: odv
         ipc: host
+        environment:
+            - DISPLAY=$DISPLAY
         volumes:
-        - .:/opt/opendlv.data
+            - /tmp/.X11-unix:/tmp/.X11-unix
+            - .:/opt/opendlv.data
         working_dir: /opt/opendlv.data
         command: "/opt/opendlv/bin/opendlv-logic-sensation-selflocalization --cid=${CID}"
     proxy1:

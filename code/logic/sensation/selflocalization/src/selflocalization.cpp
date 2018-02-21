@@ -139,6 +139,11 @@ void Selflocalization::nextContainer(odcore::data::Container &a_container)
 			std::vector<cv::KeyPoint> TestMat;
 			cv::Mat testArr;
 			m_pExtractOrb->ExtractFeatures(Tcw, TestMat, testArr);
+			/*Example code for drawing something in an image and plotting stuff in it*/
+			cv::rectangle( Tcw, cv::Point( 15, 20 ), cv::Point( 70, 50), cv::Scalar( 0, 0, 255 ), +1, 4 );
+			cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );// Create a window for display.
+    			cv::imshow( "Display window", Tcw );                   // Show our image inside it.
+			cv::waitKey(0);
 
 		}
 
@@ -170,7 +175,7 @@ void Selflocalization::setUp()
     int nLevels = 8;
     int initialFastTh = 20;
     int minFastTh = 7;
-
+    std::cout << "Hello" << std::endl;
     m_pExtractOrb = std::shared_ptr<OrbExtractor>(new OrbExtractor(nFeatures, scaleFactor, nLevels, initialFastTh, minFastTh));
 
   

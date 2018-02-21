@@ -18,7 +18,6 @@
  */
 #include "orbextractor.hpp"
 
-
 namespace opendlv {
 namespace logic {
 namespace sensation {
@@ -452,7 +451,7 @@ OrbExtractor::OrbExtractor(int nFeatures, float scaleFactor, int nLevels, int in
     , m_vLevelSigma2()
     , m_vInvLevelSigma2()
     {
-    
+    std::cout << "Making extractor" << std::endl;
     m_vScaleFactor.resize(nLevels);
     m_vLevelSigma2.resize(nLevels);
     m_vScaleFactor[0]=1.0f;
@@ -568,7 +567,7 @@ void OrbExtractor::ExtractFeatures(cv::InputArray inputImage,std::vector<cv::Key
     // Scale keypoint coordinates
     if (level != 0)
     {
-        float scale = m_vScaleFactor[level]; //getScale(level, firstLevel, scaleFactor);
+        float scale = m_vScaleFactor[level];
         for (std::vector<cv::KeyPoint>::iterator keypoint = keypoints.begin(),
              keypointEnd = keypoints.end(); keypoint != keypointEnd; ++keypoint)
              keypoint->pt *= scale;
@@ -684,8 +683,8 @@ void OrbExtractor::ComputeKeyPointsOctTree(std::vector<std::vector<cv::KeyPoint>
        std::vector<cv::KeyPoint> & keypoints = allKeypoints[level];
        keypoints.reserve(m_nFeatures);
 
-       //keypoints = DistributeOctTree(vToDistributeKeys, minBorderX, maxBorderX,
-         //                             minBorderY, maxBorderY,m_nFeaturesPerLevel[level], level);
+       keypoints = DistributeOctTree(vToDistributeKeys, minBorderX, maxBorderX,
+                                     minBorderY, maxBorderY,m_nFeaturesPerLevel[level]);
 
         const int scaledPatchSize = PATCH_SIZE*m_vScaleFactor[level];
 
@@ -701,8 +700,8 @@ void OrbExtractor::ComputeKeyPointsOctTree(std::vector<std::vector<cv::KeyPoint>
     }
 
     // compute orientations
-    //for (int level = 0; level < m_nLevels; ++level)
-        //computeOrientation(m_vImagePyramid[level], allKeypoints[level], umax);
+    for (int level = 0; level < m_nLevels; ++level)
+        computeOrientation(m_vImagePyramid[level], allKeypoints[level], m_umax);
 }
 
 std::vector<cv::KeyPoint> OrbExtractor::DistributeOctTree(const std::vector<cv::KeyPoint>& vToDistributeKeys, const int &minX,
