@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef __D_T_F_ORB__
-#define __D_T_F_ORB__
+#ifndef LOGIC_SENSATION_SELFLOCALIZATION_ORBDESCRIPTOR_HPP
+#define LOGIC_SENSATION_SELFLOCALIZATION_ORBDESCRIPTOR_HPP
 
 #include <opencv2/core/core.hpp>
 #include <vector>

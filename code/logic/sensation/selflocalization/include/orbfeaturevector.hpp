@@ -12,7 +12,7 @@
 #define LOGIC_SENSATION_SELFLOCALIZATION_ORBFEATUREVECTOR_HPP
 
 
-//#include "BowVector.hpp"
+#include "orbbowvector.hpp"
 #include <map>
 #include <vector>
 #include <iostream>
