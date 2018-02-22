@@ -70,7 +70,7 @@ odsupercomponent.pulsetimeack.exclude = odcockpit
 
 logic-sensation-selflocalization.cameratype = 0  #(Camera type is stereo == 1, otherwise 0)
 logic-sensation-selflocalization.camera.channelorder.RGB = 1 #(Channel order is RGB == 1, BGR == 0);
-logic-sensation-selflocalization.vocabularyfilepath = tjena	#In absolutepath 
+logic-sensation-selflocalization.vocabularyfilepath = ORBvoc.txt #In absolutepath 
 
 ###############################################################################
 ###############################################################################

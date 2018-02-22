@@ -48,6 +48,7 @@ Selflocalization::Selflocalization(int32_t const &a_argc, char **a_argv)
 	, m_pTracker()
 	, m_pMapper()
 	, m_pImageGrab()
+     , m_pVocabulary()
 
 {	
 	
@@ -154,21 +155,20 @@ void Selflocalization::setUp()
     	m_cameraType = (kv.getValue<int32_t>("logic-sensation-selflocalization.cameratype") == 1);
 	string vocFilePath = kv.getValue<string>("logic-sensation-selflocalization.vocabularyfilepath");
 
+	m_pVocabulary = std::shared_ptr<OrbVocabulary>(new OrbVocabulary(vocFilePath));
+	int size = m_pVocabulary->getSize();
+	std::cout << "Size of Vocabulary: " << size << std::endl;
+
 	m_pTracker = std::shared_ptr<Tracking>(new Tracking(std::shared_ptr<Selflocalization>(this), kv /*,m_pVocavulary,m_pKeyFrameDatabase,m_pMap*/));
 	m_pMapper = std::shared_ptr<Mapping>(new Mapping(m_cameraType));
-    m_pImageGrab = std::shared_ptr<ImageExtractor>(new ImageExtractor(kv));
+       m_pImageGrab = std::shared_ptr<ImageExtractor>(new ImageExtractor(kv));
   
-		/*
-	m_pVocabulary = new OrbVocabulary();
-	m_pVocabulary->loadFromTextFile(vocFilePath);
 
+	/*
 	m_pKeyFrameDatabase = new KeyFrameDatabase(m_pVocabulary);
 
 	m_pMap = new Map();
 
-	m_pTracker = new Tracking(this,m_pVocavulary,m_pKeyFrameDatabase,m_pMap);
-	
-	m_pMapper = new Mapping(m_pMap);
 	m_pMappingThread = new Thread(Mapping::Run(),m_pMapper);	
 
 	
