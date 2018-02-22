@@ -30,6 +30,8 @@
 #include <cmath>
 #include <iostream>
 #include <memory>
+#include <mutex>
+
 #include <opendavinci/odcore/data/TimeStamp.h>
 #include <opendavinci/odcore/strings/StringToolbox.h>
 #include <opendavinci/odcore/wrapper/Eigen.h>
@@ -40,6 +42,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <orbkeypoint.hpp>
+#include <orbmappoint.hpp>
 
 namespace opendlv {
 namespace logic {
@@ -49,13 +52,65 @@ class OrbFrame
 {
 public:
     // Copy constructor.
-    OrbFrame(cv::Mat leftGreyImage, cv::Mat rightGreyImage, std::vector<OrbKeyPoint>);
+    OrbFrame(cv::Mat leftGreyImage, cv::Mat rightGreyImage, std::vector<OrbKeyPoint>, cv::Mat tcw);
     ~OrbFrame();
+
+    void SetPose(const cv::Mat &Tcw);
+    cv::Mat GetPose();
+    cv::Mat GetPoseInverse();
+    cv::Mat GetCameraCenter();
+    cv::Mat GetStereoCenter();
+    cv::Mat GetRotation();
+    cv::Mat GetTranslation();
+
+    void ComputeBoW();
+
+    void AddConnection(std::shared_ptr<OrbFrame> frame, const int &weight);
+    void EraseConnection(std::shared_ptr<OrbFrame> frame);
+    void UpdateConnections();
+    void UpdateBestCovisibles();
+
+    std::set<std::shared_ptr<OrbFrame>> GetConnectedKeyFrames();
+    std::vector<std::shared_ptr<OrbFrame>> GetVectorCovisibleKeyFrames();
+    std::vector<std::shared_ptr<OrbFrame>> GetBestCovisibilityKeyFrames(const int &N);
+    std::vector<std::shared_ptr<OrbFrame>> GetCovisiblesByWeight(const int &weight);
+    int GetWeight(std::shared_ptr<OrbFrame> frame);
+
+    void AddChild(std::shared_ptr<OrbFrame> frame);
+    void EraseChild(std::shared_ptr<OrbFrame> frame);
+    void ChangeParent(std::shared_ptr<OrbFrame> frame);
+    std::set<std::shared_ptr<OrbFrame>> GetChilds();
+    std::shared_ptr<OrbFrame> GetParent();
+    bool hasChild(std::shared_ptr<OrbFrame> frame);
+
+    void AddLoopEdge(std::shared_ptr<OrbFrame> pKF);
+    std::set<std::shared_ptr<OrbFrame>> GetLoopEdges();
+
+    void AddMapPoint(std::shared_ptr<OrbMapPoint> pMP, const size_t &idx);
+    void EraseMapPointMatch(const size_t &idx);
+    void EraseMapPointMatch(std::shared_ptr<OrbMapPoint> pMP);
+    void ReplaceMapPointMatch(const size_t &idx, std::shared_ptr<OrbMapPoint> pMP);
+    std::set<std::shared_ptr<OrbMapPoint>> GetMapPoints();
+    std::vector<std::shared_ptr<OrbMapPoint>> GetMapPointMatches();
+    int TrackedMapPoints(const int &minObs);
+    std::shared_ptr<OrbMapPoint> GetMapPoint(const size_t &idx);
 
 private:
     std::vector<OrbKeyPoint> m_keypoints;
     cv::Mat m_leftGreyImage, m_rightGreyImage;
 
+    cv::Mat m_tcw = {};
+    cv::Mat m_twc = {};
+    cv::Mat m_ow = {};
+
+    cv::Mat m_cw = {};
+
+    std::map<std::shared_ptr<OrbFrame>,int> m_connectedKeyFrameWeights = {};
+
+    std::mutex m_mutexPose = {};
+    std::mutex m_mutexConnections = {};
+
+    float m_halfBaseline = 0.0f;
 };
 
 } // namespace sensation
