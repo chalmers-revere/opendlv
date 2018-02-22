@@ -16,22 +16,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  */
-#ifndef ORBMAPPOINT_HPP
-#define ORBMAPPOINT_HPP
+#include "orbmappoint.hpp"
+
 
 namespace opendlv {
 namespace logic {
 namespace sensation {
-
-class OrbMapPoint
+OrbMapPoint::OrbMapPoint()
 {
-    public:
-        OrbMapPoint();
-        ~OrbMapPoint();
-};
-
 }
+OrbMapPoint::~OrbMapPoint()
+{
 }
-}
-
-#endif // ORBMAPPOINT_HPP
+} // namespace sensation
+} // namespace logic
+} // namespace opendlv

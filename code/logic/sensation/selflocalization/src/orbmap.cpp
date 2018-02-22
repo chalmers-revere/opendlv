@@ -22,13 +22,55 @@
 namespace opendlv {
 namespace logic {
 namespace sensation {
-OrbMap::OrbMap()
+OrbMap::OrbMap():m_keyFrames(), m_mapPoints(), mvpKeyFrameOrigins()
 {
 }
 OrbMap::~OrbMap()
 {
-}
 
+}
+void OrbMap::pushOrbKeyFrame(std::shared_ptr<OrbFrame> orbKeyFrame) {
+    this->m_keyFrames.push_back(orbKeyFrame);
+}
+void OrbMap::pushOrbMapPoint(std::shared_ptr<OrbMapPoint> orbMapPoint) {
+    this->m_mapPoints.push_back(orbMapPoint);
+}
+void OrbMap::deleteOrbMapPoint(std::shared_ptr<OrbMapPoint> orbMapPoint) {
+
+}
+void OrbMap::deleteOrbKeyFrame(std::shared_ptr<OrbFrame> orbKeyFrame) {
+
+}
+void OrbMap::setReferenceMapPoints(std::vector<std::shared_ptr<OrbMapPoint>> referenceMapPoints) {
+
+}
+std::vector<std::shared_ptr<OrbFrame>> OrbMap::GetAllKeyFrames() {
+    return this->m_keyFrames;
+}
+std::vector<std::shared_ptr<OrbMapPoint>> OrbMap::GetAllMapPoints() {
+    return this->m_keyPoints;
+}
+std::vector<std::shared_ptr<OrbMapPoint>> OrbMap::GetReferenceMapPoints() {
+    return this->m_referenceMapPoints;
+}
+void OrbMap::InformNewBigChange(){
+
+}
+int  OrbMap::GetLastBigChangeIdx(){
+    return 0;
+}
+long unsigned int OrbMap::MapPointsInMap(){
+    return 0;
+}
+long unsigned  OrbMap::KeyFramesInMap(){
+    return 0;
+}
+long unsigned int OrbMap::GetMaxKFid(){
+    return 0;
+}
+void OrbMap::clear(){
+
+}
 } // namespace sensation
 } // namespace logic
 } // namespace opendlv

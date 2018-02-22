@@ -20,14 +20,53 @@
 #ifndef ORBMAP_HPP
 #define ORBMAP_HPP
 
+#include <orbframe.hpp>
+#include <orbmappoint.hpp>
+#include <mutex>
+
 namespace opendlv {
 namespace logic {
 namespace sensation {
 
 class OrbMap {
  public:
-  OrbMap();
-  ~OrbMap();
+    OrbMap();
+    ~OrbMap();
+    void pushOrbKeyFrame(std::shared_ptr<OrbFrame> orbKeyFrame);
+    void pushOrbMapPoint(std::shared_ptr<OrbMapPoint> orbMapPoint);
+    void deleteOrbMapPoint(std::shared_ptr<OrbMapPoint> orbMapPoint);
+    void deleteOrbKeyFrame(std::shared_ptr<OrbFrame> orbKeyFrame);
+    void setReferenceMapPoints(std::vector<std::shared_ptr<OrbMapPoint>> referenceMapPoints);
+    std::vector<std::shared_ptr<OrbFrame>> GetAllKeyFrames();
+    std::vector<std::shared_ptr<OrbMapPoint>> GetAllMapPoints();
+    std::vector<std::shared_ptr<OrbMapPoint>> GetReferenceMapPoints();
+
+    void InformNewBigChange();
+    int GetLastBigChangeIdx();
+
+    long unsigned int MapPointsInMap();
+    long unsigned  KeyFramesInMap();
+
+    long unsigned int GetMaxKFid();
+
+    void clear();
+
+    std::vector<std::shared_ptr<OrbFrame>> mvpKeyFrameOrigins;
+
+    std::mutex mMutexMapUpdate = {};
+
+    
+    std::mutex mMutexPointCreation = {};
+
+ private:
+    std::vector<std::shared_ptr<OrbFrame>> m_keyFrames;
+    std::vector<std::shared_ptr<OrbMapPoint>> m_mapPoints;
+    std::vector<std::shared_ptr<OrbMapPoint>> m_referenceMapPoints;
+
+    std::mutex mMutexMap = {};
+    long unsigned int mnMaxKFid;
+
+    int mnBigChangeIdx;
 };
 
 } // namespace sensation
