@@ -14,3 +14,6 @@
 [submodule "opendlv-signal-viewer"]
 	path = opendlv-signal-viewer
 	url = https://github.com/chalmers-revere/opendlv-signal-viewer.git
+[submodule "opendlv-vehicle-view"]
+	path = opendlv-vehicle-view
+	url = https://github.com/chalmers-revere/opendlv-vehicle-view.git
