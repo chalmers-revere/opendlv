@@ -38,7 +38,7 @@ project as it ships the following dependencies as part of the source distributio
 
 
 ## Usage
-The following microservices are provided:
+We are providing the following microservices as multi-platform (amd64/x86_64, armhf, aarch64) Docker images:
 
 * Complete ArchLinux-based [OpenDLV OS](https://github.com/chalmers-revere/opendlv.os) Operating System (start here if you want to initialize a blank computing unit - *WARNING!* All data will be erased!)
 * Hardware/software interfaces:

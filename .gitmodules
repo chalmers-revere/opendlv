@@ -17,3 +17,6 @@
 [submodule "opendlv-vehicle-view"]
 	path = opendlv-vehicle-view
 	url = https://github.com/chalmers-revere/opendlv-vehicle-view.git
+[submodule "opendlv-device-gps-pos"]
+	path = opendlv-device-gps-pos
+	url = https://github.com/chalmers-revere/opendlv-device-gps-pos.git
