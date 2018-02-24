@@ -40,7 +40,15 @@ The following microservices are provided:
 
 ## Build from sources on the example of Ubuntu 16.04 LTS
 To build this software, you need cmake, C++14 or newer, and make. Having these
-preconditions, just run `cmake` and `make` as follows:
+preconditions, just update the contained submodules.
+
+```
+git submodule update --init --recursive
+git submodule update --remote --merge
+git submodule status
+```
+
+Now, run `cmake` and `make` as follows:
 
 ```
 mkdir build && cd build
