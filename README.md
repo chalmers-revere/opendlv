@@ -5,6 +5,16 @@ testing of self-driving vehicles. Its design principle is based on microservices
 and the provided software handles communication, safety and override functions,
 sensor fusion, decision making, and visualisation.
 
+Applications based on OpenDLV are usually grouped in UDP multicast sessions
+belonging to `225.0.0.X`, where X is from the range [1,254]. The actual group
+number is expressed using the commandline parameter `--cid=111`. Only the
+microservices that belong to the same `CID` can communicate with each other.
+When a microservice shall be used to interface with multiple hardware units of
+the same type (e.g., multiple GPS units from the same vendor), simply add
+`--id=Y`, where Y is a positive number to differentiate between messages of the
+same type. At the receiving end, the value Y is made available in `Envelope`'s
+field `senderStamp`.
+
 It is written entirely in high-quality, standard C++14 with a strong focus is on
 code clarity, portability, and performance.
 
