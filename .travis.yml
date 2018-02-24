@@ -3,8 +3,6 @@ language: cpp
 branches:
   only:
   - "/^new$/"
-#  - "/^master$/"
-#  - "/^pre-release$/"
 
 cache: ccache
 
@@ -23,6 +21,7 @@ install:
 - "[ $CXX = g++ ] && export CXX=g++-6 || true"
 
 script:
+- git submodule update --init --recursive && git submodule update --remote --merge && git submodule status
 - mkdir -p build && cd build && cmake .. && make && make test
 
 notifications:
@@ -30,4 +29,4 @@ notifications:
     on_success: never
     on_failure: never
   slack:
-    secure: Yov3d50y7Y1CGLGgUz+ymZlW2+fScbgufTkLME+OeSy/n5h+l6xyqo0YexSm1ZLpT97NBdaMoL5+QYZZRIgIU9xkeB9RXizA7+zp0SsppI1qo7305hFPImNP9j6bn/J0oqaf1wAAtYksMAPeSE6848Mm2p/bN9Ce7V/osKnsgw1fQU60AKditKL3dQq8OVeivHk+IMhOcWDDLLxzENvOZMEdXq4bV7JGdMi/MamYX5Qs7kQhF46XJKM15DZtBNyWMfanATC8XCW+7ejLDxL84cedBDC7rsHt0rYQ1oTr968FklMX0ZbIsZTg2Y5Jh3vtc9I6OAEMvUhfyqjH3w9mTBgetXtDOVQRWhHzBKUYEaYKQCAgZDuMvIuFMp+0EVbqFrqHbM0zTXGQzMJWdrBgWVokybnhF+8ynr2vHTGPepS0Br5Chylq2Gdu5R232cZM41GlzZRTNvaucFbxStA0uAjPuUq3MlcoqL2AdIjW9iVine9KMzexuJlrWD3/GKwPPkZnADebapfFXGLD4hpjSYVSg+n9yrtPH/Uy4v0ze2CAgqwFwBg6jGVJNlPtyFIvInsIEl1HKmbJXVLx5O7NMNNuICl4lLg6hr4AJFRCcajpOCitgPl84srDyDZnonuc7ADQFWJ33fKyxsOmnFWK7arSGwuDn7dUviFrn7m9GM0=
+    secure: x93BCw4xMiqV7fPeNZ4Uf5S60z8xzT6BQak82yOHLjTf2TZnMqZQ+0dObgXsgMoYJtRMm5x5m57dBoA8sVv/Kj1EH3MEPJsXGmwyxlhIWA3HxgQTosiTX1MqdRs61CCESt11vxQCneHHMH7X7jN04MbNF+QufzwBuP+Ewp+ekLqMGwSfZnseZLbUyD9TG1UBtay704D37XDxB7hkglp4vD6GdxwemfGBxvcLOX02PXirvW8EJdg+OmG5seTVdi31zGMHz4ibKhZeyQE4T9D6R+OvAyQCvHXHnRpWxSYL3+iGcshSeBveKr15JyT3wE50oSSQFntQmpq7RIA64LEtnr0tfjzJgQ2vgE6Q86JHVTi4SiHgFMcrh6WVXPxDmXbV+r+V0pdL214he5cyf1OI5DJLEouJ481jLZDXku0EY/MJBzvV9Ex4cD9jnTag8GcetVT9UbJNy306cR/v+eBQG9ZdefO5HpWrSqMhFwQYPMDPABBPpjI6ss0nuxnYDCEf6SwTupaCsOb1w9glH0x2tV7EVaiBiHXVy11ihDS20koMSHcbaCclRbgDtBn/CqqISQnQfbF0G/YDAp6mMzbgELuNJMmmz41EycuTvyFhRT4Y0qvOqOjtIfkz4ob1q8YBKWNvBm5zaYMJi/+qoPytYJYRCuSjvl+CVdSOvhVbin8=
