@@ -1,0 +1,12 @@
+[submodule "opendlv-device-gps-nmea"]
+	path = opendlv-device-gps-nmea
+	url = git@github.com:chalmers-revere/opendlv-device-gps-nmea.git
+[submodule "opendlv-device-gps-ncom"]
+	path = opendlv-device-gps-ncom
+	url = git@github.com:chalmers-revere/opendlv-device-gps-ncom.git
+[submodule "opendlv-standard-message-set"]
+	path = opendlv-standard-message-set
+	url = git@github.com:chalmers-revere/opendlv.standard-message-set.git
+[submodule "opendlv-device-lidar-hdl32e"]
+	path = opendlv-device-lidar-hdl32e
+	url = git@github.com:chalmers-revere/opendlv-device-lidar-hdl32e.git
