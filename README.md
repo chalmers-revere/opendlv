@@ -1,4 +1,4 @@
-## OpenDLV
+## OpenDLV - A modern microservice-based software ecosystem for self-driving vehicles.
 
 OpenDLV is an open source software environment to support the development and
 testing of self-driving vehicles. Its design principle is based on microservices
@@ -30,6 +30,7 @@ project as it ships the following dependencies as part of the source distributio
 ## Usage
 The following microservices are provided:
 
+* Complete ArchLinux-based [OpenDLV OS](https://github.com/chalmers-revere/opendlv.os) Operating System (start here if you want to initialize a blank computing unit - *WARNING!* All data will be erased!)
 * Hardware/software interfaces:
   * GPS:
     * [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-gps-ncom.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-gps-ncom) [opendlv-device-gps-ncom](https://github.com/chalmers-revere/opendlv-device-gps-ncom) to interface with OXTS GPS/INSS units: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-ncom-multi:v0.0.2 opendlv-device-gps-ncom --ncom_ip=0.0.0.0 --ncom_port=3000 --cid=111 --verbose`
