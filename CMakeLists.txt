@@ -21,3 +21,5 @@ ADD_SUBDIRECTORY (opendlv-device-gps-ncom)
 ADD_SUBDIRECTORY (opendlv-device-gps-nmea)
 ADD_SUBDIRECTORY (opendlv-device-lidar-hdl32e)
 
+enable_testing()
+
