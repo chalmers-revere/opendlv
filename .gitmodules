@@ -11,3 +11,6 @@
 	path = opendlv-device-lidar-hdl32e
 	url = https://github.com/chalmers-revere/opendlv-device-lidar-hdl32e.git
 
+[submodule "opendlv-signal-viewer"]
+	path = opendlv-signal-viewer
+	url = https://github.com/chalmers-revere/opendlv-signal-viewer.git
