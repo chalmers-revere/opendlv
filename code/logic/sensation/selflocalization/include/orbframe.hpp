@@ -32,6 +32,7 @@
 #include <mutex>
 #include <vector>
 #include <list>
+#include <utility>
 
 #include <opendavinci/odcore/data/TimeStamp.h>
 #include <opendavinci/odcore/strings/StringToolbox.h>
@@ -96,6 +97,11 @@ public:
     std::vector<std::shared_ptr<OrbMapPoint>> GetMapPointMatches();
     int TrackedMapPoints(const int &minObs);
     std::shared_ptr<OrbMapPoint> GetMapPoint(const size_t &idx);
+
+    static bool WeightComp( int a, int b)
+    {
+        return a>b;
+    }
 
     long unsigned int Id;
     static long unsigned int NextId;
