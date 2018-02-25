@@ -107,6 +107,9 @@ private:
 
     std::map<std::shared_ptr<OrbFrame>,int> m_connectedKeyFrameWeights = {};
 
+    std::shared_ptr<OrbFrame> m_parent = {};
+    std::set<std::shared_ptr<OrbFrame> > m_spanningChildren = {};
+
     std::mutex m_mutexPose = {};
     std::mutex m_mutexConnections = {};
 

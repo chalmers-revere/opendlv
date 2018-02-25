@@ -142,6 +142,44 @@ void OrbFrame::UpdateBestCovisibles()
 
 }
 
+void OrbFrame::AddChild(std::shared_ptr<OrbFrame> keyFrame)
+{
+    std::unique_lock<std::mutex> lockConnections(m_mutexConnections);
+    m_spanningChildren.insert(keyFrame);
+}
+
+void OrbFrame::EraseChild(std::shared_ptr<OrbFrame> keyFrame)
+{
+    std::unique_lock<std::mutex> lockConnections(m_mutexConnections);
+    m_spanningChildren.erase(keyFrame);
+}
+
+void OrbFrame::ChangeParent(std::shared_ptr<OrbFrame> keyFrame)
+{
+    std::unique_lock<std::mutex> lockConnections(m_mutexConnections);
+    m_parent = keyFrame;
+    keyFrame->AddChild(std_shared_ptr<OrbFrame>(this));
+}
+
+std::set<std::shared_ptr<OrbFrame>> OrbFrame::GetChilds()
+{
+    std::unique_lock<std::mutex> lockConnections(m_mutexConnections);
+    return m_spanningChildren;
+}
+
+std::shared_ptr<OrbFrame> OrbFrame::GetParent()
+{
+    std::unique_lock<std::mutex> lockConnections(m_mutexConnections);
+    return m_parent;
+}
+
+bool OrbFrame::hasChild(std::shared_ptr<OrbFrame> keyFrame)
+{
+    std::unique_lock<std::mutex> lockConnections(m_mutexConnections);
+    return m_spanningChildren.count(keyFrame);
+}
+
+
 
 
 } // namespace sensation
