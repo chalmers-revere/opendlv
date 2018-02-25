@@ -20,22 +20,22 @@
 #ifndef LOGIC_SENSATION_SELFLOCALIZATION_ORBFRAME_HPP
 #define LOGIC_SENSATION_SELFLOCALIZATION_ORBFRAME_HPP
 
-#include <memory>
-
 #include "opendavinci/GeneratedHeaders_OpenDaVINCI.h"
 #include "opendavinci/generated/odcore/data/CompactPointCloud.h"
 #include "opendavinci/odcore/base/Mutex.h"
 #include "opendavinci/odcore/wrapper/SharedMemory.h"
 #include "opendavinci/odcore/wrapper/SharedMemoryFactory.h"
+#include <memory>
 #include <cmath>
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <vector>
+#include <list>
 
 #include <opendavinci/odcore/data/TimeStamp.h>
 #include <opendavinci/odcore/strings/StringToolbox.h>
 #include <opendavinci/odcore/wrapper/Eigen.h>
-#include <vector>
 
 #include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/core/core.hpp>
@@ -47,6 +47,8 @@
 namespace opendlv {
 namespace logic {
 namespace sensation {
+
+class OrbMapPoint;
 
 class OrbFrame 
 {
@@ -95,7 +97,11 @@ public:
     int TrackedMapPoints(const int &minObs);
     std::shared_ptr<OrbMapPoint> GetMapPoint(const size_t &idx);
 
+    long unsigned int Id;
+    static long unsigned int NextId;
+
 private:
+
     std::vector<OrbKeyPoint> m_keypoints;
     cv::Mat m_leftGreyImage, m_rightGreyImage;
 
@@ -105,12 +111,23 @@ private:
 
     cv::Mat m_cw = {};
 
+    std::vector<std::shared_ptr<OrbMapPoint> > m_mapPoints = {};
+
     std::map<std::shared_ptr<OrbFrame>,int> m_connectedKeyFrameWeights = {};
+    std::vector<std::shared_ptr<OrbFrame>> m_orderedConnectedKeyFrames = {};
+    std::vector<int> m_orderedWeights = {};
+
+    bool m_firstConnection = true;
+    std::shared_ptr<OrbFrame> m_parent = {};
+    std::set<std::shared_ptr<OrbFrame> > m_spanningChildren = {};
+    std::set<std::shared_ptr<OrbFrame> > m_loopEdges = {};
+
+    bool m_dontErase = false;
+
+    float m_halfBaseline = 0.0f;
 
     std::mutex m_mutexPose = {};
     std::mutex m_mutexConnections = {};
-
-    float m_halfBaseline = 0.0f;
 };
 
 } // namespace sensation

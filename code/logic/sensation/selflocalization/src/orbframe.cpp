@@ -23,10 +23,11 @@ namespace opendlv {
 namespace logic {
 namespace sensation {
 
+long unsigned int OrbFrame::NextId=0;
 
-//Stereo constructor
-OrbFrame::OrbFrame(cv::Mat leftGreyImage, cv::Mat rightGreyImage, std::vector<OrbKeyPoint> keyPoints, cv::Mat tcw): 
-m_keypoints(keyPoints), m_leftGreyImage(leftGreyImage), m_rightGreyImage(rightGreyImage), m_tcw(tcw)
+    //Stereo constructor
+OrbFrame::OrbFrame(cv::Mat leftGreyImage, cv::Mat rightGreyImage, std::vector<OrbKeyPoint> keyPoints, cv::Mat tcw):
+        Id(NextId++), m_keypoints(keyPoints), m_leftGreyImage(leftGreyImage), m_rightGreyImage(rightGreyImage), m_tcw(tcw)
 {
     SetPose(m_tcw);
 }
@@ -134,7 +135,93 @@ void OrbFrame::EraseConnection(std::shared_ptr<OrbFrame> keyFrame)
 
 void OrbFrame::UpdateConnections()
 {
+    std::map<std::shared_ptr<OrbFrame>,int> frameCounter;
 
+    std::vector<std::shared_ptr<OrbMapPoint> > mapPoints;
+
+    {
+        std::unique_lock<std::mutex> lockMapPoints(m_mutexConnections);
+        mapPoints = m_mapPoints;
+    }
+
+    //For all map points in keyframe check in which other keyframes are they seen
+    //Increase counter for those keyframes
+    for(std::vector<std::shared_ptr<OrbMapPoint>>::iterator vectorIterator=mapPoints.begin(), vectorEnd=mapPoints.end(); vectorIterator!=vectorEnd; vectorIterator++)
+    {
+        std::shared_ptr<OrbMapPoint> mapPoint = *vectorIterator;
+
+        if(!mapPoint)
+            continue;
+
+        if(mapPoint->IsBad())
+            continue;
+
+        std::map<std::shared_ptr<OrbFrame>,size_t> observations = mapPoint->GetObservations();
+
+        for(std::map<std::shared_ptr<OrbFrame>,size_t>::iterator mapIterator=observations.begin(), mapEnd=observations.end(); mapIterator!=mapEnd; mapIterator++)
+        {
+            if(mapIterator->first->Id==Id)
+                continue;
+            frameCounter[mapIterator->first]++;
+        }
+    }
+
+    // This should not happen
+    if(frameCounter.empty())
+        return;
+
+    //If the counter is greater than threshold add connection
+    //In case no keyframe counter is over threshold add the one with maximum counter
+    int max=0;
+    std::shared_ptr<OrbFrame> maxKeyFrame=NULL;
+    int th = 15;
+
+    std::vector<std::pair<int,std::shared_ptr<OrbFrame> > > vectorPairs;
+    vectorPairs.reserve(frameCounter.size());
+    for(std::map<std::shared_ptr<OrbFrame>,int>::iterator mapIterator=frameCounter.begin(), mapEnd=frameCounter.end(); mapIterator!=mapEnd; mapIterator++)
+    {
+        if(mapIterator->second>max)
+        {
+            max=mapIterator->second;
+            maxKeyFrame=mapIterator->first;
+        }
+        if(mapIterator->second>=th)
+        {
+            vectorPairs.push_back(make_pair(mapIterator->second,mapIterator->first));
+            (mapIterator->first)->AddConnection(std::shared_ptr<OrbFrame>(this),mapIterator->second);
+        }
+    }
+
+    if(vectorPairs.empty())
+    {
+        vectorPairs.push_back(make_pair(max,maxKeyFrame));
+        maxKeyFrame->AddConnection(std::shared_ptr<OrbFrame>(this),max);
+    }
+
+    std::sort(vectorPairs.begin(),vectorPairs.end());
+    std::list<std::shared_ptr<OrbFrame>> keyFrameList;
+    std::list<int> weightList;
+    for(size_t i=0; i<vectorPairs.size();i++)
+    {
+        keyFrameList.push_front(vectorPairs[i].second);
+        weightList.push_front(vectorPairs[i].first);
+    }
+
+    {
+        std::unique_lock<std::mutex> lock(m_mutexConnections);
+
+        m_connectedKeyFrameWeights = frameCounter;
+        m_orderedConnectedKeyFrames = std::vector<std::shared_ptr<OrbFrame>>(keyFrameList.begin(),keyFrameList.end());
+        m_orderedWeights = std::vector<int>(weightList.begin(), weightList.end());
+
+        if(m_firstConnection && Id!=0)
+        {
+            m_parent = m_orderedConnectedKeyFrames.front();
+            m_parent->AddChild(std::shared_ptr<OrbFrame>(this));
+            m_firstConnection = false;
+        }
+
+    }
 }
 
 void OrbFrame::UpdateBestCovisibles()
@@ -142,7 +229,55 @@ void OrbFrame::UpdateBestCovisibles()
 
 }
 
+void OrbFrame::AddChild(std::shared_ptr<OrbFrame> keyFrame)
+{
+    std::unique_lock<std::mutex> lockConnections(m_mutexConnections);
+    m_spanningChildren.insert(keyFrame);
+}
 
+void OrbFrame::EraseChild(std::shared_ptr<OrbFrame> keyFrame)
+{
+    std::unique_lock<std::mutex> lockConnections(m_mutexConnections);
+    m_spanningChildren.erase(keyFrame);
+}
+
+void OrbFrame::ChangeParent(std::shared_ptr<OrbFrame> keyFrame)
+{
+    std::unique_lock<std::mutex> lockConnections(m_mutexConnections);
+    m_parent = keyFrame;
+    keyFrame->AddChild(std::shared_ptr<OrbFrame>(this));
+}
+
+std::set<std::shared_ptr<OrbFrame>> OrbFrame::GetChilds()
+{
+    std::unique_lock<std::mutex> lockConnections(m_mutexConnections);
+    return m_spanningChildren;
+}
+
+std::shared_ptr<OrbFrame> OrbFrame::GetParent()
+{
+    std::unique_lock<std::mutex> lockConnections(m_mutexConnections);
+    return m_parent;
+}
+
+bool OrbFrame::hasChild(std::shared_ptr<OrbFrame> keyFrame)
+{
+    std::unique_lock<std::mutex> lockConnections(m_mutexConnections);
+    return m_spanningChildren.count(keyFrame);
+}
+
+void OrbFrame::AddLoopEdge(std::shared_ptr<OrbFrame> keyFrame)
+{
+    std::unique_lock<std::mutex> lockConnections(m_mutexConnections);
+    m_dontErase = true;
+    m_loopEdges.insert(keyFrame);
+}
+
+std::set<std::shared_ptr<OrbFrame>> OrbFrame::GetLoopEdges()
+{
+    std::unique_lock<std::mutex> lockConnections(m_mutexConnections);
+    return m_loopEdges;
+}
 
 } // namespace sensation
 } // namespace logic
