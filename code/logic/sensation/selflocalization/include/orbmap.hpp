@@ -31,43 +31,74 @@ namespace sensation {
 
 class OrbMap {
  public:
+    /**
+     *  Çonstructor
+     */
     OrbMap();
     ~OrbMap();
-    void pushOrbKeyFrame(std::shared_ptr<OrbFrame> orbKeyFrame);
-    void pushOrbMapPoint(std::shared_ptr<OrbMapPoint> orbMapPoint);
-    void deleteOrbMapPoint(std::shared_ptr<OrbMapPoint> orbMapPoint);
-    void deleteOrbKeyFrame(std::shared_ptr<OrbFrame> orbKeyFrame);
-    void setReferenceMapPoints(std::vector<std::shared_ptr<OrbMapPoint>> referenceMapPoints);
+    /**
+     * PushOrbKeyFrame - Push Keyframe to Map.
+     */
+    void PushOrbKeyFrame(std::shared_ptr<OrbFrame> orbKeyFrame);
+    /**
+     * PushOrbMapPoint - Push OrbMapPoint to Map.
+     */
+    void PushOrbMapPoint(std::shared_ptr<OrbMapPoint> orbMapPoint);
+    /**
+     * DeleteOrbMapPoint - Deletes OrbMapPoint from if it exists in Map.
+     */
+    void DeleteOrbMapPoint(std::shared_ptr<OrbMapPoint> orbMapPoint);
+    /**
+     * DeleteOrbKeyFrame - Deletes OrbKeyFrame from if it exists in Map.
+     */
+    void DeleteOrbKeyFrame(std::shared_ptr<OrbFrame> orbKeyFrame);
+    /**
+     * SetReferenceMapPoints - Set reference Map Points in Map.
+     */
+    void SetReferenceMapPoints(std::vector<std::shared_ptr<OrbMapPoint>> referenceMapPoints);
+    /**
+     * GetAllKeyFrames - Returns all OrbKeyFrames
+     */
     std::vector<std::shared_ptr<OrbFrame>> GetAllKeyFrames();
+    /**
+     * GetAllMapPoints - Returns all OrbMapPoints
+     */
     std::vector<std::shared_ptr<OrbMapPoint>> GetAllMapPoints();
+    /**
+     * GetReferenceMapPoints - Returns all ReferenceMapPoints
+     */
     std::vector<std::shared_ptr<OrbMapPoint>> GetReferenceMapPoints();
+    void OnMajorChange();
+    int LastMajorChangeIndex();
+    /**
+     *  OrbMapPointsCount - return total number of OrbMapPoints in Map.
+     */
+    long unsigned int OrbMapPointsCount();
+    /**
+     *  OrbKeyFramesCount - return total number of OrbKeyFrames in Map.
+     */
+    long unsigned  OrbKeyFramesCount();
+    /**
+     * MaxKeyFrameId - Return the maximum OrbKeyFrame Id.
+     */
+    long unsigned int MaxKeyFrameId();
+    /**
+     * Reset - Resets the Map.
+     */
+    void Reset();
 
-    void InformNewBigChange();
-    int GetLastBigChangeIdx();
-
-    long unsigned int MapPointsInMap();
-    long unsigned  KeyFramesInMap();
-
-    long unsigned int GetMaxKFid();
-
-    void clear();
-
-    std::vector<std::shared_ptr<OrbFrame>> mvpKeyFrameOrigins;
-
-    std::mutex mMutexMapUpdate = {};
-
-    
-    std::mutex mMutexPointCreation = {};
 
  private:
+    std::vector<std::shared_ptr<OrbFrame>> m_OrbKeyFrameOrigins;
     std::vector<std::shared_ptr<OrbFrame>> m_keyFrames;
     std::vector<std::shared_ptr<OrbMapPoint>> m_mapPoints;
     std::vector<std::shared_ptr<OrbMapPoint>> m_referenceMapPoints;
+    long unsigned int m_maxOrbKeyFrameId;
 
-    std::mutex mMutexMap = {};
-    long unsigned int mnMaxKFid;
-
-    int mnBigChangeIdx;
+    int m_majorChangeIndex;
+    std::mutex m_mapMutex = {};
+    std::mutex m_MapUpdateMutex = {};
+    std::mutex m_orbMapPointCreationMutex = {};
 };
 
 } // namespace sensation
