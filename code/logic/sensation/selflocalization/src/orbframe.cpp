@@ -249,6 +249,64 @@ void OrbFrame::UpdateBestCovisibles()
     m_orderedWeights = std::vector<int>(weightList.begin(), weightList.end());
 }
 
+std::set<std::shared_ptr<OrbFrame>> OrbFrame::GetConnectedKeyFrames()
+{
+    std::unique_lock<std::mutex> lockConnections(m_mutexConnections);
+    std::set<std::shared_ptr<OrbFrame>> set;
+    for(std::map<std::shared_ptr<OrbFrame>,int>::iterator mapIterator=m_connectedKeyFrameWeights.begin();mapIterator!=m_connectedKeyFrameWeights.end();mapIterator++)
+        set.insert(mapIterator->first);
+    return set;
+}
+
+std::vector<std::shared_ptr<OrbFrame>> OrbFrame::GetVectorCovisibleKeyFrames()
+{
+    std::unique_lock<std::mutex> lockConnections(m_mutexConnections);
+    return m_orderedConnectedKeyFrames;
+}
+
+std::vector<std::shared_ptr<OrbFrame>> OrbFrame::GetBestCovisibilityKeyFrames(const int &n)
+{
+    std::unique_lock<std::mutex> lockConnections(m_mutexConnections);
+    if((int)m_orderedConnectedKeyFrames.size()<n)
+    {
+        return m_orderedConnectedKeyFrames;
+    }
+    else
+    {
+        return std::vector<std::shared_ptr<OrbFrame>>(m_orderedConnectedKeyFrames.begin(),m_orderedConnectedKeyFrames.begin()+n);
+    }
+}
+
+std::vector<std::shared_ptr<OrbFrame>> OrbFrame::GetCovisiblesByWeight(const int &weight)
+{
+    std::unique_lock<std::mutex> lockConnections(m_mutexConnections);
+
+    if(m_orderedConnectedKeyFrames.empty())
+    {
+        return std::vector<std::shared_ptr<OrbFrame>>();
+    }
+
+    std::vector<int>::iterator iterator = upper_bound(m_orderedWeights.begin(),m_orderedWeights.end(),weight,OrbFrame::WeightComp);
+    if(iterator==m_orderedWeights.end())
+    {
+        return std::vector<std::shared_ptr<OrbFrame>>();
+    }
+    else
+    {
+        int n = iterator-m_orderedWeights.begin();
+        return std::vector<std::shared_ptr<OrbFrame>>(m_orderedConnectedKeyFrames.begin(), m_orderedConnectedKeyFrames.begin()+n);
+    }
+}
+
+int OrbFrame::GetWeight(std::shared_ptr<OrbFrame>keyFrame)
+{
+    std::unique_lock<std::mutex> lockConnections(m_mutexConnections);
+    if(m_connectedKeyFrameWeights.count(keyFrame))
+        return m_connectedKeyFrameWeights[keyFrame];
+    else
+        return 0;
+}
+
 void OrbFrame::AddChild(std::shared_ptr<OrbFrame> keyFrame)
 {
     std::unique_lock<std::mutex> lockConnections(m_mutexConnections);
