@@ -32,6 +32,7 @@
 #include <mutex>
 #include <vector>
 #include <list>
+#include <utility>
 
 #include <opendavinci/odcore/data/TimeStamp.h>
 #include <opendavinci/odcore/strings/StringToolbox.h>

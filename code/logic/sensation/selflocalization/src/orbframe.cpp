@@ -176,7 +176,7 @@ void OrbFrame::UpdateConnections()
     std::shared_ptr<OrbFrame> maxKeyFrame=NULL;
     int th = 15;
 
-    std::vector<std::pair<int,std::shared_ptr<OrbFrame> > > vectorPairs;
+    std::vector<std::pair<int,std::shared_ptr<OrbFrame>>> vectorPairs;
     vectorPairs.reserve(frameCounter.size());
     for(std::map<std::shared_ptr<OrbFrame>,int>::iterator mapIterator=frameCounter.begin(), mapEnd=frameCounter.end(); mapIterator!=mapEnd; mapIterator++)
     {
@@ -220,13 +220,33 @@ void OrbFrame::UpdateConnections()
             m_parent->AddChild(std::shared_ptr<OrbFrame>(this));
             m_firstConnection = false;
         }
-
     }
 }
 
 void OrbFrame::UpdateBestCovisibles()
 {
+    std::unique_lock<std::mutex> lockConnections(m_mutexConnections);
 
+    std::vector<std::pair<int,std::shared_ptr<OrbFrame>>> vectorPairs;
+
+    vectorPairs.reserve(m_connectedKeyFrameWeights.size());
+
+    for(std::map<std::shared_ptr<OrbFrame>,int>::iterator mapIterator=m_connectedKeyFrameWeights.begin(), mapEnd=m_connectedKeyFrameWeights.end(); mapIterator!=mapEnd; mapIterator++)
+    {
+        vectorPairs.push_back(std::make_pair(mapIterator->second,mapIterator->first));
+    }
+
+    std::sort(vectorPairs.begin(),vectorPairs.end());
+    std::list<std::shared_ptr<OrbFrame>> keyFrameList;
+    std::list<int> weightList;
+    for(size_t i=0, iend=vectorPairs.size(); i<iend;i++)
+    {
+        keyFrameList.push_front(vectorPairs[i].second);
+        weightList.push_front(vectorPairs[i].first);
+    }
+
+    m_orderedConnectedKeyFrames = std::vector<std::shared_ptr<OrbFrame>>(keyFrameList.begin(),keyFrameList.end());
+    m_orderedWeights = std::vector<int>(weightList.begin(), weightList.end());
 }
 
 void OrbFrame::AddChild(std::shared_ptr<OrbFrame> keyFrame)
