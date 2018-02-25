@@ -68,8 +68,7 @@ std::vector<std::shared_ptr<OrbMapPoint>> OrbMap::GetReferenceMapPoints() {
 }
 void OrbMap::IncrementMajorChangeIndex(){
     std::lock_guard<std::mutex> lock(this->m_mapMutex);
-    this->m_majorChangeIndex+=1;
-    printf("hello\n");
+    this->m_majorChangeIndex+=1;;
 }
 int  OrbMap::LastMajorChangeIndex() {
     std::lock_guard<std::mutex> lock(this->m_mapMutex);
