@@ -18,6 +18,9 @@ field `senderStamp`.
 It is written entirely in high-quality, standard C++14 with a strong focus is on
 code clarity, portability, and performance.
 
+Next to the source code for OpenDLV's microservices, we also provide *turn-key*
+solutions with Docker images for `amd64`, `armhf`, and `aarch64`.
+
 [![Build Status](https://travis-ci.org/chalmers-revere/opendlv.svg?branch=new)](https://travis-ci.org/chalmers-revere/opendlv) [![License: GPLv3](https://img.shields.io/badge/license-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.txt)
 
 
