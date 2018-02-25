@@ -19,15 +19,28 @@
 #ifndef ORBMAPPOINT_HPP
 #define ORBMAPPOINT_HPP
 
+#include <map>
+#include <memory>
+
+#include <orbframe.hpp>
+
 namespace opendlv {
 namespace logic {
 namespace sensation {
 
+class OrbFrame;
+
 class OrbMapPoint
 {
-    public:
-        OrbMapPoint();
-        ~OrbMapPoint();
+public:
+    OrbMapPoint();
+    ~OrbMapPoint();
+
+    std::map<std::shared_ptr<OrbFrame>,size_t> GetObservations();
+
+    bool IsBad();
+
+    long unsigned int Id = 0;
 };
 
 }
