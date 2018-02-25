@@ -68,7 +68,7 @@ class OrbMap {
      * GetReferenceMapPoints - Returns all ReferenceMapPoints
      */
     std::vector<std::shared_ptr<OrbMapPoint>> GetReferenceMapPoints();
-    void OnMajorChange();
+    void IncrementMajorChangeIndex();
     int LastMajorChangeIndex();
     /**
      *  OrbMapPointsCount - return total number of OrbMapPoints in Map.
@@ -94,8 +94,8 @@ class OrbMap {
     std::vector<std::shared_ptr<OrbMapPoint>> m_mapPoints;
     std::vector<std::shared_ptr<OrbMapPoint>> m_referenceMapPoints;
     long unsigned int m_maxOrbKeyFrameId;
-
     int m_majorChangeIndex;
+    
     std::mutex m_mapMutex = {};
     std::mutex m_MapUpdateMutex = {};
     std::mutex m_orbMapPointCreationMutex = {};

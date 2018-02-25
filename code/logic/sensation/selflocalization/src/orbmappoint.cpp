@@ -28,6 +28,13 @@ OrbMapPoint::OrbMapPoint()
 OrbMapPoint::~OrbMapPoint()
 {
 }
+std::map<std::shared_ptr<OrbFrame>,size_t> OrbMapPoint::GetObservations(){
+    return std::map<std::shared_ptr<OrbFrame>,size_t>{}; 
+}
+
+bool OrbMapPoint::IsBad(){
+    return false;
+}
 } // namespace sensation
 } // namespace logic
 } // namespace opendlv
