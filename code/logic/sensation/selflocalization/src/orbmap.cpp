@@ -22,7 +22,7 @@
 namespace opendlv {
 namespace logic {
 namespace sensation {
-OrbMap::OrbMap():m_keyFrames(), m_mapPoints(), mvpKeyFrameOrigins()
+OrbMap::OrbMap():mvpKeyFrameOrigins(), m_keyFrames(), m_mapPoints(), m_referenceMapPoints(), mnMaxKFid(), mnBigChangeIdx()
 {
 }
 OrbMap::~OrbMap()
@@ -36,19 +36,21 @@ void OrbMap::pushOrbMapPoint(std::shared_ptr<OrbMapPoint> orbMapPoint) {
     this->m_mapPoints.push_back(orbMapPoint);
 }
 void OrbMap::deleteOrbMapPoint(std::shared_ptr<OrbMapPoint> orbMapPoint) {
-
+    m_mapPoints.erase(std::remove(m_mapPoints.begin(), m_mapPoints.end(), orbMapPoint),
+               m_mapPoints.end());
 }
 void OrbMap::deleteOrbKeyFrame(std::shared_ptr<OrbFrame> orbKeyFrame) {
-
+    m_keyFrames.erase(std::remove(m_keyFrames.begin(), m_keyFrames.end(), orbKeyFrame),
+               m_keyFrames.end());
 }
 void OrbMap::setReferenceMapPoints(std::vector<std::shared_ptr<OrbMapPoint>> referenceMapPoints) {
-
+    this->m_referenceMapPoints = referenceMapPoints;
 }
 std::vector<std::shared_ptr<OrbFrame>> OrbMap::GetAllKeyFrames() {
     return this->m_keyFrames;
 }
 std::vector<std::shared_ptr<OrbMapPoint>> OrbMap::GetAllMapPoints() {
-    return this->m_keyPoints;
+    return this->m_mapPoints;
 }
 std::vector<std::shared_ptr<OrbMapPoint>> OrbMap::GetReferenceMapPoints() {
     return this->m_referenceMapPoints;
