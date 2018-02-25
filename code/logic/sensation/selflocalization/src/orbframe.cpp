@@ -158,7 +158,7 @@ void OrbFrame::ChangeParent(std::shared_ptr<OrbFrame> keyFrame)
 {
     std::unique_lock<std::mutex> lockConnections(m_mutexConnections);
     m_parent = keyFrame;
-    keyFrame->AddChild(std_shared_ptr<OrbFrame>(this));
+    keyFrame->AddChild(std::shared_ptr<OrbFrame>(this));
 }
 
 std::set<std::shared_ptr<OrbFrame>> OrbFrame::GetChilds()
