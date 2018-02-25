@@ -23,6 +23,7 @@
 #include <orbframe.hpp>
 #include <orbmappoint.hpp>
 #include <mutex>
+#include <algorithm>
 
 namespace opendlv {
 namespace logic {
