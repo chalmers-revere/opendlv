@@ -65,7 +65,7 @@ std::vector<std::shared_ptr<OrbMapPoint>> OrbMap::GetReferenceMapPoints() {
     return this->m_referenceMapPoints;
 }
 void OrbMap::OnMajorChange(){
-
+    // TODO
 }
 int  OrbMap::LastMajorChangeIndex() {
     std::lock_guard<std::mutex> lock(this->m_mapMutex);
