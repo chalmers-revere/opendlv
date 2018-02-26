@@ -20,3 +20,6 @@
 [submodule "opendlv-device-gps-pos"]
 	path = opendlv-device-gps-pos
 	url = https://github.com/chalmers-revere/opendlv-device-gps-pos.git
+[submodule "opendlv-device-lidar-vlp16"]
+	path = opendlv-device-lidar-vlp16
+	url = https://github.com/chalmers-revere/opendlv-device-lidar-vlp16.git
