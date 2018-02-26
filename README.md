@@ -1,27 +1,15 @@
 ## OpenDLV - A modern microservice-based software ecosystem for self-driving vehicles.
 
 OpenDLV is an open source software environment to support the development and
-testing of self-driving vehicles. Its design principle is based on microservices
-and the provided software handles communication, safety and override functions,
-sensor fusion, decision making, and visualisation.
+testing of self-driving vehicles driven by the following design principles
 
-Applications based on OpenDLV are usually grouped in UDP multicast sessions
-belonging to `225.0.0.X`, where X is from the range [1,254]. The actual group
-number is expressed using the commandline parameter `--cid=111`. Only the
-microservices that belong to the same `CID` can communicate with each other.
-When a microservice shall be used to interface with multiple hardware units of
-the same type (e.g., multiple GPS units from the same vendor), simply add
-`--id=Y`, where Y is a positive number to differentiate between messages of the
-same type. At the receiving end, the value Y is made available in `Envelope`'s
-field `senderStamp`.
-
-It is written entirely in high-quality, standard C++14 with a strong focus is on
-code clarity, portability, and performance.
-
-Next to the source code for OpenDLV's microservices, we also provide *turn-key*
-solutions with Docker images for `amd64`, `armhf`, and `aarch64`.
-
-[![Build Status](https://travis-ci.org/chalmers-revere/opendlv.svg?branch=new)](https://travis-ci.org/chalmers-revere/opendlv) [![License: GPLv3](https://img.shields.io/badge/license-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.txt)
+* Implemented using high quality and modern C++14 with a strong focus is on code clarity, portability, and performance.
+* Based on [libcluon](https://github.com/chrberger/libcluon) - the world's first and only header-only, single-file middleware for distributed systems as found in robotic applications
+* Based entirely on [microservices](https://martinfowler.com/articles/microservices.html)
+* Strong focus on deployment and ease of use: All our microservices are automatically built on Docker hub
+* CI-Status: [![Build Status](https://travis-ci.org/chalmers-revere/opendlv.svg?branch=new)](https://travis-ci.org/chalmers-revere/opendlv)
+* License: [![License: GPLv3](https://img.shields.io/badge/license-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.txt)
+* Our team also provides *turn-key* solutions with Docker images for `amd64`, `armhf`, and `aarch64`
 
 
 ## Table of Contents
@@ -29,6 +17,39 @@ solutions with Docker images for `amd64`, `armhf`, and `aarch64`.
 * [Usage](#usage)
 * [Build from sources on the example of Ubuntu 16.04 LTS](#build-from-sources-on-the-example-of-ubuntu-1604-lts)
 * [License](#license)
+
+
+## What is an OpenDLV session?
+
+Applications based on OpenDLV are grouped in UDP multicast sessions
+belonging to IPv4 address `225.0.0.X`, where X is from the within the range
+`[1,254]`. All microservices belonging to the same UDP multicast group are
+able to communicate with each other; thus, two applications running in different
+UDP multicast sessions do not see each other and are completely separated.
+
+The actual UDP multicast session is configured using the commandline parameter
+`--cid=111`, where `111` would resolve to the UDP multicast address `225.0.0.111`.
+Microservices exchange data using the message [`Envelope`](https://github.com/chrberger/libcluon/blob/master/libcluon/resources/cluonDataStructures.odvd#L23-L30)
+that contains next to the actual message to be exchange further meta information
+like sent and received timestamp and the point in time when the contained
+message (the payload) was actually sampled. All messages are encoded in
+Google's [Protobuf](https://developers.google.com/protocol-buffers/) data
+format ([example](https://wandbox.org/permlink/rXayIZxXyVDt5Jgn)) that has
+been adjusted to preserve forwards and backwards compatibility. As such,
+an `Envelope` contains in its field `serializedData` the actually message
+to be exchanged that is encoded in Protobuf. Furthermore, the `Envelope`
+itself is also encoded in Protobuf but prepended with the byte sequence
+`0x0D 0xA4` as magic number, followed by three bytes `0xXX 0xYY 0xZZ`
+describing the length in bytes of the Protobuf-encoded `Envelope`. The
+sequence `0xA4 0xXX 0xYY 0xZZ` is encoded in little endian and `0xZZ`
+is usually 0 in practice.
+
+
+When a microservice shall be used to interface with multiple hardware units of
+the same type (e.g., multiple GPS units from the same vendor), simply add
+`--id=Y`, where Y is a positive number to differentiate between messages of the
+same type. At the receiving end, the value Y is made available in `Envelope`'s
+field `senderStamp`.
 
 
 ## Dependencies
