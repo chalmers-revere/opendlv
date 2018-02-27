@@ -1,15 +1,14 @@
 ## OpenDLV - A modern microservice-based software ecosystem for self-driving vehicles.
 
-OpenDLV is an open source software environment to support the development and
-testing of self-driving vehicles driven by the following design principles
+OpenDLV is a modern open source software environment to support the development and
+testing of self-driving vehicles driven by the following design principles:
 
 * Implemented using high quality and modern C++14 with a strong focus is on code clarity, portability, and performance.
-* Based on [libcluon](https://github.com/chrberger/libcluon) - the world's first and only header-only, single-file middleware for distributed systems as found in robotic applications
-* Based entirely on [microservices](https://martinfowler.com/articles/microservices.html)
-* Strong focus on deployment and ease of use: All our microservices are automatically built on Docker hub
+* Based entirely on [microservices](https://martinfowler.com/articles/microservices.html).
+* Strong focus on deployment and ease of use: All our microservices are automatically built on Docker hub: We provide *turn-key* solutions with Docker images for `amd64`, `armhf`, and `aarch64`
+* Realized with [libcluon](https://github.com/chrberger/libcluon) - the world's first and only single-file, header-only middleware for distributed systems for robotic applications.
 * CI-Status: [![Build Status](https://travis-ci.org/chalmers-revere/opendlv.svg?branch=new)](https://travis-ci.org/chalmers-revere/opendlv)
 * License: [![License: GPLv3](https://img.shields.io/badge/license-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.txt)
-* Our team also provides *turn-key* solutions with Docker images for `amd64`, `armhf`, and `aarch64`
 
 
 ## Table of Contents
@@ -28,16 +27,19 @@ belonging to IPv4 address `225.0.0.X`, where X is from the within the range
 able to communicate with each other; thus, two applications running in different
 UDP multicast sessions do not see each other and are completely separated.
 
-The actual UDP multicast session is configured using the commandline parameter
-`--cid=111`, where `111` would resolve to the UDP multicast address `225.0.0.111`.
+The actual UDP multicast session is selected using the commandline parameter
+`--cid=111`, where `111` would define the UDP multicast address `225.0.0.111`.
 Microservices exchange data using the message [`Envelope`](https://github.com/chrberger/libcluon/blob/master/libcluon/resources/cluonDataStructures.odvd#L23-L30)
-that contains next to the actual message to be exchange further meta information
+that contains besides the actual message to send further meta information
 like sent and received timestamp and the point in time when the contained
-message (the payload) was actually sampled. All messages are encoded in
+message was actually sampled. All messages are encoded in
 Google's [Protobuf](https://developers.google.com/protocol-buffers/) data
 format ([example](https://wandbox.org/permlink/rXayIZxXyVDt5Jgn)) that has
-been adjusted to preserve forwards and backwards compatibility. As such,
-an `Envelope` contains in its field `serializedData` the actually message
+been adjusted to preserve forwards and backwards compatibility using
+[libcluon](https://wandbox.org/permlink/rXayIZxXyVDt5Jgn)'s native implementation
+of Protobuf.
+
+An `Envelope` contains in its field `serializedData` the actually message
 to be exchanged that is encoded in Protobuf. Furthermore, the `Envelope`
 itself is also encoded in Protobuf but prepended with the byte sequence
 `0x0D 0xA4` as magic number, followed by three bytes `0xXX 0xYY 0xZZ`
@@ -53,20 +55,24 @@ which is referring to a message identifier (for instance, `Envelope`'s
 is 1).
 
 OpenDLV's microservices conform to the [OpenDLV Standard Message Set](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd) that enables exchangability across
-hardware/software interfaces to decouple high-level logic from low-level
-device drivers. For instance, OpenDLV's hardware/software interface to
+hardware/software interfaces to decouple high-level application logic from
+low-level device drivers. For instance, OpenDLV's hardware/software interface to
 access an *Applanix GPS unit* is called [opendlv-device-gps-pos](https://github.com/chalmers-revere/opendlv-device-gps-pos)
-according to Applanix' internal data format that is used across several
+according to Applanix' internal data format POS that is used across several
 units in their product portfolio. The microservice [opendlv-device-gps-pos](https://github.com/chalmers-revere/opendlv-device-gps-pos)
 provides GPS information in messages [`GeodeticWgs84Reading`](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L137-L140)
 and [`GeodeticHeadingReading`](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L133-L135).
 
 As the microservices for the various GPS units (like, for instance Trimble and
-Applanix) all broadcast the aforementioned messages, it is necessary to distinguish
-between the various units. Therefore, a user can simply add the commandline parameter
-`--id=Y`, where Y is a positive number to differentiate between messages of the
+Applanix) all broadcast the aforementioned messages, the hardware units can be
+exchanged transparently for the high-level application logic. However, when
+several GPS units shall be operated in parallel, it is necessary to distinguish
+between them. Therefore, the commandline parameter `--id=Y` can be provided,
+where Y is a positive number to differentiate between messages of the
 same type. At the receiving end, the value Y is made available in `Envelope`'s
-field `senderStamp`.
+field `senderStamp`. As an example, when using an Applanix unit next to a
+Trimble unit, the respective microservices could be supplied with the suffixes
+`--id=1` and `--id=2`.
 
 
 ## Dependencies
@@ -101,7 +107,7 @@ We are providing the following microservices as multi-platform (amd64/x86_64, ar
 
 ## Build from sources on the example of Ubuntu 16.04 LTS
 To build this software, you need cmake, C++14 or newer, and make. Having these
-preconditions, just update the contained submodules.
+preconditions, update the contained submodules first.
 
 ```
 git submodule update --init --recursive
@@ -120,5 +126,5 @@ make && make test && make install
 
 ## License
 
-* This project is released under the terms of the GNU GPLv3 License
+* This project is released under the terms of the GNU GPLv3 License.
 
