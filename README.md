@@ -17,6 +17,7 @@ testing of self-driving vehicles driven by the following design principles:
 * [Usage](#usage)
 * [Build from sources on the example of Ubuntu 16.04 LTS](#build-from-sources-on-the-example-of-ubuntu-1604-lts)
 * [License](#license)
+* [Publications](#publications)
 
 
 ## What is an OpenDLV session?
@@ -137,3 +138,22 @@ make && make test && make install
 
 * This project is released under the terms of the GNU GPLv3 License.
 
+
+## Publications
+
+The following list contains publications related to the OpenDLV Software Ecosystem:
+
+* O. Benderius, C. Berger, V. Malmsten Lundgren: ["The Best Rated Human-Machine Interface Design for Autonomous Vehicles in the 2016 Grand Cooperative Driving Challenge"](http://ieeexplore.ieee.org/abstract/document/8057581/).
+* H. Yin, C. Berger: ["When to use what data set for your self-driving car algorithm: An overview of publicly available driving datasets"](https://www.researchgate.net/publication/320475411_When_to_use_what_data_set_for_your_self-driving_car_algorithm_An_overview_of_publicly_available_driving_datasets)
+* F. Giaimo, C. Berger, C. Kirchner: ["Considerations About Continuous Experimentation for Resource-Constrained Platforms in Self-driving Vehicles"](https://link.springer.com/chapter/10.1007/978-3-319-65831-5_6)
+* H. Yin, C. Berger: ["Mastering data complexity for autonomous driving with adaptive point clouds for urban environments"](http://ieeexplore.ieee.org/document/7995901/)
+* C. Berger, B. Nguyen, O. Benderius: ["Containerized Development and Microservices for Self-Driving Vehicles: Experiences & Best Practices"](http://ieeexplore.ieee.org/abstract/document/7958428/)
+* F. Giaimo, C. Berger: ["Design Criteria to Architect Continuous Experimentation for Self-Driving Vehicles"](http://ieeexplore.ieee.org/document/7930218/)
+* P. Masek, M. Thulin, H. Andrade, C. Berger, O. Benderius: ["Systematic Evaluation of Sandboxed Software Deployment for Real-time Software on the Example of a Self-Driving Heavy Vehicle"](https://arxiv.org/abs/1608.06759)
+* C. Berger: ["An Open Continuous Deployment Infrastructure for a Self-driving Vehicle Ecosystem"](https://link.springer.com/chapter/10.1007/978-3-319-39225-7_14)
+* F. Giaimo, C. Berger, I. Crnkovic: ["
+Continuous Experimentation on Cyber-Physical Systems: Challenges and Opportunities"](https://dl.acm.org/citation.cfm?id=2962709)
+* H. Yin, F. Giaimo, H. Andrade, C. Berger, I. Crnkovic: ["Adaptive Message Restructuring Using Model-Driven Engineering"](https://link.springer.com/chapter/10.1007/978-3-319-32467-8_67)
+* H. Andrade, F. Giaimo, C. Berger, I. Crnkovic: ["Systematic evaluation of three data marshalling approaches for distributed software systems"](https://dl.acm.org/citation.cfm?id=2846705)
+* F. Giaimo, H. Andrade, C. Berger, I. Crnkovic: ["Improving Bandwidth Efficiency with Self-Adaptation for Data Marshalling on the Example of a Self-Driving Miniature Car"](https://dl.acm.org/citation.cfm?id=2797454)
+* C. Berger: ["Accelerating Regression Testing for Scaled Self-Driving Cars with Lightweight Virtualization - A Case Study"](http://ieeexplore.ieee.org/document/7173936/)
