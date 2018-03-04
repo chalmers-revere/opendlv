@@ -34,8 +34,8 @@ class OrbFrame;
 class OrbMapPoint
 {
 public:
-    OrbMapPoint(const cv::Mat &Position, std::shared_ptr<OrbFrame> refenceKeyFrame, std::shared_ptr<OrbMap> map);
-    OrbMapPoint((const cv::Mat &Position, std::shared_ptr<OrbFrame> refenceKeyFrame, std::shared_ptr<OrbMap> map, const int &keyPointIndex)
+    OrbMapPoint(const cv::Mat &position, std::shared_ptr<OrbFrame> refenceKeyFrame, std::shared_ptr<OrbMap> map);
+    OrbMapPoint(const cv::Mat &position, std::shared_ptr<OrbFrame> refenceKeyFrame, std::shared_ptr<OrbMap> map, const int &keyPointIndex);
     ~OrbMapPoint();
 
     std::map<std::shared_ptr<OrbFrame>,size_t> GetObservations();
@@ -76,10 +76,10 @@ public:
     float GetMaxDistanceInvariance();
     int PredictScale(const float &currentDist, KeyFrame*pKF);
     int PredictScale(const float &currentDist, Frame* pF);
-    static long unsigned int nNextId;
+    static long unsigned int m_nextId;
 
 private:
-    long unsigned int SequenceId = 0;
+    long unsigned int m_sequenceId = 0;
     long int mnFirstKFid;
     long int mnFirstFrame;
     int nObs;
@@ -117,7 +117,7 @@ private:
      std::map<KeyFrame*,size_t> mObservations;
 
      // Mean viewing direction
-     cv::Mat mNormalVector;
+     cv::Mat m_normalVector;
 
      // Best descriptor to fast matching
      cv::Mat mDescriptor;
@@ -138,7 +138,11 @@ private:
      float mfMaxDistance;
 
      std::shared_ptr<OrbMap> m_map;
+<<<<<<< Updated upstream
     std::mutex m_constructorMutex;
+=======
+
+>>>>>>> Stashed changes
      std::mutex mMutexPos;
      std::mutex mMutexFeatures;
 };

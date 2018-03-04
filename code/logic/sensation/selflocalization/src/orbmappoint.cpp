@@ -22,9 +22,23 @@
 namespace opendlv {
 namespace logic {
 namespace sensation {
-OrbMapPoint::OrbMapPoint()
+
+
+OrbMapPoint(const cv::Mat &position, std::shared_ptr<OrbFrame> refenceKeyFrame, std::shared_ptr<OrbMap> map)
 {
+    position.copyTo(m_worldPosition);
+    m_normalVector = cv::Mat::zeros(3,1,CV_32F);
+
+    // MapPoints can be created from Tracking and Local Mapping. This mutex avoid conflicts with id.
+    std::unique_lock<std::mutex> lock(m_map->m_constructorMutex);
+    m_sequenceId=m_nextId++;
 }
+
+OrbMapPoint(const cv::Mat &position, std::shared_ptr<OrbFrame> refenceKeyFrame, std::shared_ptr<OrbMap> map, const int &keyPointIndex)
+{
+
+}
+
 OrbMapPoint::~OrbMapPoint()
 {
 }
