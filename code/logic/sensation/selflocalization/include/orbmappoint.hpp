@@ -22,14 +22,18 @@
 
 #include <map>
 #include <memory>
+#include <mutex>
+#include <vector>
 
 #include <orbframe.hpp>
+#include <orbmap.hpp>
 
 namespace opendlv {
 namespace logic {
 namespace sensation {
 
 class OrbFrame;
+class OrbMap;
 
 class OrbMapPoint
 {
@@ -54,7 +58,7 @@ public:
     bool KeyFrameInObservingKeyFrames(std::shared_ptr<OrbFrame> keyFrame);
 
     void SetCorruptFlag();
-    bool isCorrupt();
+    bool IsCorrupt();
 
     void Replace(std::shared_ptr<OrbMapPoint> orbMapPoint);    
     std::shared_ptr<OrbMapPoint> GetReplaced();
@@ -62,12 +66,10 @@ public:
     void IncreaseVisible(int n=1);
     void IncreaseFound(int n=1);
     float GetFoundRatio();
-    inline int GetFound(){
-        return mnFound;
-    }
-    float getTrackProjX(){}
-    float getTrackProjY(){}
-    float getTrackProjXR(){}
+    inline int GetFound() { return mnFound; }
+    float getTrackProjX() { return mTrackProjX; }
+    float getTrackProjY() { return mTrackProjY; }
+    float getTrackProjXR() { return mTrackProjXR; }
 
     void ComputeDistinctiveDescriptors();
 
@@ -77,8 +79,8 @@ public:
 
     float GetMinDistanceInvariance();
     float GetMaxDistanceInvariance();
-    int PredictScale(const float &currentDist, KeyFrame*pKF);
-    int PredictScale(const float &currentDist, Frame* pF);
+    int PredictScale(const float &currentDist, std::shared_ptr<OrbFrame>pKF);
+    int PredictScale(const float &currentDist, std::shared_ptr<OrbFrame> pF);
 
     static long unsigned int m_NextId;
 
@@ -144,7 +146,7 @@ private:
      cv::Mat m_worldPosition;
 
      // Keyframes observing the point and associated index in keyframe
-     std::map<KeyFrame*,size_t> m_ObservingKeyframes;
+     std::map<std::shared_ptr<OrbFrame>,size_t> m_ObservingKeyframes;
 
      // Mean viewing direction
      cv::Mat m_meanViewingDirection;

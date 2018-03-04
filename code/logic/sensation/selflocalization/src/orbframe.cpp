@@ -151,24 +151,32 @@ void OrbFrame::UpdateConnections()
         std::shared_ptr<OrbMapPoint> mapPoint = *vectorIterator;
 
         if(!mapPoint)
+        {
             continue;
-
-        if(mapPoint->IsBad())
+        }
+        if(mapPoint->IsCorrupt())
+        {
             continue;
+        }
 
         std::map<std::shared_ptr<OrbFrame>,size_t> observations = mapPoint->GetObservations();
 
         for(std::map<std::shared_ptr<OrbFrame>,size_t>::iterator mapIterator=observations.begin(), mapEnd=observations.end(); mapIterator!=mapEnd; mapIterator++)
         {
             if(mapIterator->first->Id==Id)
+            {
                 continue;
+            }
+
             frameCounter[mapIterator->first]++;
         }
     }
 
     // This should not happen
     if(frameCounter.empty())
+    {
         return;
+    }
 
     //If the counter is greater than threshold add connection
     //In case no keyframe counter is over threshold add the one with maximum counter
