@@ -123,7 +123,7 @@ private:
      cv::Mat mDescriptor;
 
      // Reference KeyFrame
-     KeyFrame* mpRefKF;
+     std::shared_ptr<OrbFrame> m_refenceKeyFrame;
 
      // Tracking counters
      int mnVisible;
@@ -134,17 +134,14 @@ private:
      MapPoint* mpReplaced;
 
      // Scale invariance distances
-     float mfMinDistance;
-     float mfMaxDistance;
+     float m_minDistance;
+     float m_maxDistance;
 
      std::shared_ptr<OrbMap> m_map;
-<<<<<<< Updated upstream
-    std::mutex m_constructorMutex;
-=======
 
->>>>>>> Stashed changes
-     std::mutex mMutexPos;
-     std::mutex mMutexFeatures;
+    std::mutex m_constructorMutex;
+    std::mutex mMutexPos;
+    std::mutex mMutexFeatures;
 };
 
 }

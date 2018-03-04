@@ -98,6 +98,29 @@ public:
     int TrackedMapPoints(const int &minObs);
     std::shared_ptr<OrbMapPoint> GetMapPoint(const size_t &idx);
 
+    std::vector<cv::KeyPoint> GetUndistortedKeyPoints() { return m_undistortedKeyPoints; }
+
+    cv::Mat GetDescriptors() { return m_descriptors; }
+    void SetDescriptors(cv::Mat descriptors) { m_descriptors = descriptors; }
+
+    int GetScaleLevels() { return m_scaleLevels; }
+    void SetScaleLevels(int scaleLevels) { m_scaleLevels = scaleLevels; }
+
+    float GetScaleFactor() { return m_scaleFactor; }
+    void SetScaleFactor(float scaleFactor) { m_scaleFactor = scaleFactor; }
+
+    float GetLogScaleFactor() { return m_logScaleFactor; }
+    void SetLogScaleFactor(float logScaleFactor) { m_logScaleFactor = logScaleFactor; }
+
+    std::vector<float> GetScaleFactors() { return m_scaleFactors; }
+    void SetScaleFactors(std::vector<float> scaleFactors) { m_scaleFactors = scaleFactors; }
+
+    std::vector<float> GetLevelSigma2() { return m_levelSigma2; }
+    void SetLevelSigma2(std::vector<float> levelSigma2) { m_levelSigma2 = levelSigma2; }
+
+    std::vector<float> GetInverseLevelSigma2() { return m_inverseLevelSigma2; }
+    void SetInverseLevelSigma2(std::vector<float> inverseLevelSigma2) { m_inverseLevelSigma2 = inverseLevelSigma2; }
+
     static bool WeightComp( int a, int b)
     {
         return a>b;
@@ -110,8 +133,21 @@ private:
 
     int m_numberOfKeypoints = 0;
 
+    std::vector<cv::KeyPoint> m_keyPoints, m_keyPointsRight;
+    std::vector<cv::KeyPoint> m_undistortedKeyPoints;
+    std::vector<float> m_right; // negative value for monocular points
+    std::vector<float> m_depth; // negative value for monocular points
+    cv::Mat m_descriptors;
+
     std::vector<OrbKeyPoint> m_keypoints;
     cv::Mat m_leftGreyImage, m_rightGreyImage;
+
+    int m_scaleLevels;
+    float m_scaleFactor;
+    float m_logScaleFactor;
+    std::vector<float> m_scaleFactors;
+    std::vector<float> m_levelSigma2;
+    std::vector<float> m_inverseLevelSigma2;
 
     cv::Mat m_tcw = {};
     cv::Mat m_twc = {};

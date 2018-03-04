@@ -25,6 +25,7 @@ namespace sensation {
 
 
 OrbMapPoint(const cv::Mat &position, std::shared_ptr<OrbFrame> refenceKeyFrame, std::shared_ptr<OrbMap> map)
+: mnFirstKFid(refenceKeyFrame->Id), mnFirstFrame(refenceKeyFrame->Id), m_refenceKeyFrame(refenceKeyFrame), m_map(map)
 {
     position.copyTo(m_worldPosition);
     m_normalVector = cv::Mat::zeros(3,1,CV_32F);
@@ -34,14 +35,34 @@ OrbMapPoint(const cv::Mat &position, std::shared_ptr<OrbFrame> refenceKeyFrame, 
     m_sequenceId=m_nextId++;
 }
 
-OrbMapPoint(const cv::Mat &position, std::shared_ptr<OrbFrame> refenceKeyFrame, std::shared_ptr<OrbMap> map, const int &keyPointIndex)
+OrbMapPoint(const cv::Mat &position, std::shared_ptr<OrbFrame> frame, std::shared_ptr<OrbMap> map, const int &keyPointIndex)
 {
+    position.copyTo(m_worldPosition);
+    cv::Mat cameraCenter = frame->GetCameraCenter();
+    m_normalVector = m_worldPosition - cameraCenter;
+    m_normalVector = m_normalVector/cv::norm(m_normalVector);
 
+    cv::Mat offset = position - cameraCenter;
+    const float distance = cv::norm(offset);
+    const int level = frame->GetUndistortedKeyPoints()[keyPointIndex].octave;
+    const float levelScaleFactor = frame->GetScaleFactors()[level];
+    const int levels = frame->GetScaleLevels();
+
+    m_maxDistance = distance*levelScaleFactor;
+    m_minDistance = m_maxDistance/frame->GetScaleFactors[levels-1];
+
+    frame->GetDescriptors().row(keyPointIndex).copyTo(m_descriptor);
+
+    // MapPoints can be created from Tracking and Local Mapping. This mutex avoid conflicts with id.
+    std::unique_lock<std::mutex> lock(m_constructorMutex);
+    m_sequenceId=m_nextId++;
 }
 
 OrbMapPoint::~OrbMapPoint()
 {
+
 }
+
 std::map<std::shared_ptr<OrbFrame>,size_t> OrbMapPoint::GetObservations(){
     return std::map<std::shared_ptr<OrbFrame>,size_t>{}; 
 }
