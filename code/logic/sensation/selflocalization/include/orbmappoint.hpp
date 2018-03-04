@@ -79,7 +79,7 @@ public:
     float GetMaxDistanceInvariance();
     int PredictScale(const float &currentDist, KeyFrame*pKF);
     int PredictScale(const float &currentDist, Frame* pF);
-    static long unsigned int m_NextId;
+    KeyFrame*   static long unsigned int m_NextId;
 
     int GetTrackScaleLevel();
     bool GetTrackInView();
@@ -144,28 +144,28 @@ private:
      cv::Mat m_worldPosition;
 
      // Keyframes observing the point and associated index in keyframe
-     std::map<KeyFrame*,size_t> mObservations;
+     std::map<KeyFrame*,size_t> m_ObservingKeyframes;
 
      // Mean viewing direction
      cv::Mat m_meanViewingDirection;
 
      // Best descriptor to fast matching
-     cv::Mat mDescriptor;
+     cv::Mat m_descriptor;
 
      // Reference KeyFrame
-     KeyFrame* mpRefKF;
+    std::shared_ptr<OrbKeyFrame> m_referenceKeyFrame;
 
      // Tracking counters
-     int mnVisible;
-     int mnFound;
+     int m_visibleCounter;
+     int m_foundCounter;
 
      // Bad flag (we do not currently erase MapPoint from memory)
-     bool mbBad;
-     MapPoint* mpReplaced;
+     bool m_corrupt;
+    std::shared_ptr<OrbMapPoint> m_replaced;
 
      // Scale invariance distances
-     float mfMinDistance;
-     float mfMaxDistance;
+     float m_minDistance;
+     float m_maxDistance;
 
      std::shared_ptr<OrbMap> m_map;
     std::mutex m_constructorMutex;
