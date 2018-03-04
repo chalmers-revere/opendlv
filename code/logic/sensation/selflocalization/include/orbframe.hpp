@@ -84,7 +84,7 @@ public:
     void ChangeParent(std::shared_ptr<OrbFrame> frame);
     std::set<std::shared_ptr<OrbFrame>> GetChilds();
     std::shared_ptr<OrbFrame> GetParent();
-    bool hasChild(std::shared_ptr<OrbFrame> frame);
+    bool HasChild(std::shared_ptr<OrbFrame> frame);
 
     void AddLoopEdge(std::shared_ptr<OrbFrame> pKF);
     std::set<std::shared_ptr<OrbFrame>> GetLoopEdges();
@@ -107,6 +107,8 @@ public:
     static long unsigned int NextId;
 
 private:
+
+    int m_numberOfKeypoints = 0;
 
     std::vector<OrbKeyPoint> m_keypoints;
     cv::Mat m_leftGreyImage, m_rightGreyImage;
@@ -134,6 +136,7 @@ private:
 
     std::mutex m_mutexPose = {};
     std::mutex m_mutexConnections = {};
+    std::mutex m_mutexFeatures = {};
 };
 
 } // namespace sensation

@@ -338,7 +338,7 @@ std::shared_ptr<OrbFrame> OrbFrame::GetParent()
     return m_parent;
 }
 
-bool OrbFrame::hasChild(std::shared_ptr<OrbFrame> keyFrame)
+bool OrbFrame::HasChild(std::shared_ptr<OrbFrame> keyFrame)
 {
     std::unique_lock<std::mutex> lockConnections(m_mutexConnections);
     return m_spanningChildren.count(keyFrame);
@@ -355,6 +355,75 @@ std::set<std::shared_ptr<OrbFrame>> OrbFrame::GetLoopEdges()
 {
     std::unique_lock<std::mutex> lockConnections(m_mutexConnections);
     return m_loopEdges;
+}
+
+void OrbFrame::AddMapPoint(std::shared_ptr<OrbMapPoint> mapPoint, const size_t &index)
+{
+    std::unique_lock<std::mutex> lockFeatures(m_mutexFeatures);
+    m_mapPoints[index]=mapPoint;
+}
+
+void OrbFrame::EraseMapPointMatch(const size_t &index)
+{
+    std::unique_lock<std::mutex> lockFeatures(m_mutexFeatures);
+    m_mapPoints[index]=NULL;
+}
+
+void OrbFrame::EraseMapPointMatch(std::shared_ptr<OrbMapPoint> mapPoint)
+{
+    int index = mapPoint->GetIndexInOrbFrame(this);
+    if(index>=0)
+    {
+        m_mapPoints[index]=static_cast<std::shared_ptr<OrbMapPoint>>(NULL);
+    }
+}
+
+void OrbFrame::ReplaceMapPointMatch(const size_t &index, std::shared_ptr<OrbMapPoint> mapPoint)
+{
+    m_mapPoints[index]=mapPoint;
+}
+
+std::vector<std::shared_ptr<OrbMapPoint>> OrbFrame::GetMapPointMatches()
+{
+    std::unique_lock<std::mutex> lockFeatures(m_mutexFeatures);
+    return m_mapPoints;
+}
+
+int OrbFrame::TrackedMapPoints(const int &minimumObservations)
+{
+    std::unique_lock<std::mutex> lockFeatures(m_mutexFeatures);
+
+    int points=0;
+    const bool checkObservations = minimumObservations>0;
+    for(int i=0; i<m_numberOfKeypoints; i++)
+    {
+        std::shared_ptr<OrbMapPoint> mapPoint = m_mapPoints[i];
+        if(mapPoint)
+        {
+            if(!mapPoint->isBad())
+            {
+                if(checkObservations)
+                {
+                    if(m_mapPoints[i]->Observations()>=minimumObservations)
+                    {
+                        points++;
+                    }
+                }
+                else
+                {
+                    points++;
+                }
+            }
+        }
+    }
+
+    return points;
+}
+
+std::shared_ptr<OrbMapPoint> OrbFrame::GetMapPoint(const size_t &index)
+{
+    std::unique_lock<std::mutex> lockFeatures(m_mutexFeatures);
+    return m_mapPoints[index];
 }
 
 } // namespace sensation

@@ -29,6 +29,7 @@ cat <<EOF > /opt/opendlv.build/build.sh
 #!/bin/bash
 export PATH=/usr/lib/ccache:$PATH
 export CCACHE_DIR=/opt/ccache
+export CTEST_OUTPUT_ON_FAILURE=1
 
 cd /opt/opendlv.build
 
