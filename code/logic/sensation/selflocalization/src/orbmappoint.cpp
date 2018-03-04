@@ -28,7 +28,7 @@ OrbMapPoint(const cv::Mat &position, std::shared_ptr<OrbFrame> refenceKeyFrame, 
 : mnFirstKFid(refenceKeyFrame->Id), mnFirstFrame(refenceKeyFrame->Id), m_refenceKeyFrame(refenceKeyFrame), m_map(map)
 {
     position.copyTo(m_worldPosition);
-    m_normalVector = cv::Mat::zeros(3,1,CV_32F);
+    m_meanViewingDirection = cv::Mat::zeros(3,1,CV_32F);
 
     // MapPoints can be created from Tracking and Local Mapping. This mutex avoid conflicts with id.
     std::unique_lock<std::mutex> lock(m_map->m_constructorMutex);
@@ -39,8 +39,8 @@ OrbMapPoint(const cv::Mat &position, std::shared_ptr<OrbFrame> frame, std::share
 {
     position.copyTo(m_worldPosition);
     cv::Mat cameraCenter = frame->GetCameraCenter();
-    m_normalVector = m_worldPosition - cameraCenter;
-    m_normalVector = m_normalVector/cv::norm(m_normalVector);
+    m_meanViewingDirection = m_worldPosition - cameraCenter;
+    m_meanViewingDirection = m_meanViewingDirection/cv::norm(m_meanViewingDirection);
 
     cv::Mat offset = position - cameraCenter;
     const float distance = cv::norm(offset);

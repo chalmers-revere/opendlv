@@ -38,26 +38,26 @@ public:
     OrbMapPoint(const cv::Mat &position, std::shared_ptr<OrbFrame> refenceKeyFrame, std::shared_ptr<OrbMap> map, const int &keyPointIndex);
     ~OrbMapPoint();
 
-    std::map<std::shared_ptr<OrbFrame>,size_t> GetObservations();
+    std::map<std::shared_ptr<OrbFrame>,size_t> GetObservingKeyframes();
 
     void SetWorldPosition(const cv::Mat &Position);
-    cv::Mat GetWorldPos();
+    cv::Mat GetWorldPosition();
 
-    cv::Mat GetNormal();
-    KeyFrame* GetReferenceKeyFrame();
-    int Observations();
-    int getSequenceId();
-    void AddObservation(KeyFrame* pKF,size_t idx);
-    void EraseObservation(KeyFrame* pKF);
+    cv::Mat GetMeanViewingDirection();
+    std::shared_ptr<OrbFrame> GetReferenceKeyFrame();
+    int GetObservingKeyFrameCount();
+    int GetSequenceId();
+    void AddObservingKeyframe(std::shared_ptr<OrbFrame> keyFrame,size_t idx);
+    void EraseObservingKeyframe(std::shared_ptr<OrbFrame> keyFrame);
 
-    int GetIndexInKeyFrame(KeyFrame* pKF);
-    bool IsInKeyFrame(KeyFrame* pKF);
+    int GetObeservationIndexOfKeyFrame(std::shared_ptr<OrbFrame> keyFrame);
+    bool KeyFrameInObservingKeyFrames(std::shared_ptr<OrbFrame> keyFrame);
 
-    void SetBadFlag();
-    bool isBad();
+    void SetCorruptFlag();
+    bool isCorrupt();
 
-    void Replace(MapPoint* pMP);    
-    MapPoint* GetReplaced();
+    void Replace(std::shared_ptr<OrbMapPoint> orbMapPoint);    
+    std::shared_ptr<OrbMapPoint> GetReplaced();
 
     void IncreaseVisible(int n=1);
     void IncreaseFound(int n=1);
@@ -65,24 +65,54 @@ public:
     inline int GetFound(){
         return mnFound;
     }
+    float getTrackProjX(){}
+    float getTrackProjY(){}
+    float getTrackProjXR(){}
 
     void ComputeDistinctiveDescriptors();
 
     cv::Mat GetDescriptor();
 
-    void UpdateNormalAndDepth();
+    void UpdateMeanAndDepthValues();
 
     float GetMinDistanceInvariance();
     float GetMaxDistanceInvariance();
     int PredictScale(const float &currentDist, KeyFrame*pKF);
     int PredictScale(const float &currentDist, Frame* pF);
-    static long unsigned int m_nextId;
+
+    static long unsigned int m_NextId;
+
+    int GetTrackScaleLevel();
+    bool GetTrackInView();
+    float GTrackViewCos();
+    long unsigned int GetTrackReferenceForFrame();
+    long unsigned int GetLastFrameSeen();
+    long unsigned int GetBALocalForKF();
+    long unsigned int GetFuseCandidateForKF();
+    long unsigned int GetLoopPointForKF();
+    long unsigned int GetCorrectedByKF();
+    long unsigned int GetCorrectedReference();
+    cv::Mat GetPosGBA();
+    long unsigned int GetBAGlobalForKF();
+
+    void SetTrackScaleLevel(long unsigned int TrackScaleLevel);
+    void SetTrackInView(long unsigned int TrackInView);
+    void SetackViewCos(long unsigned int ackViewCos);
+    void SetTrackReferenceForFrame(long unsigned int TrackReferenceForFrame);
+    void SetLastFrameSeen(long unsigned int LastFrameSeen);
+    void SetBALocalForKF(long unsigned int BALocalForKF);
+    void SetFuseCandidateForKF(long unsigned int FuseCandidateForKF);
+    void SetLoopPointForKF(long unsigned int LoopPointForKF);
+    void SetCorrectedByKF(long unsigned int CorrectedByKF);
+    void SetCorrectedReference(long unsigned int CorrectedReference);
+    void SetPosGBA(long unsigned int PosGBA);
+    void SetBAGlobalForKF(long unsigned int BAGlobalForKF);
 
 private:
-    long unsigned int m_sequenceId = 0;
-    long int mnFirstKFid;
-    long int mnFirstFrame;
-    int nObs;
+    long unsigned int SequenceId = 0;
+    long int m_firstKeyframeId;
+    long int m_FirstKeyFrame;
+    int m_observingKeyFramesCount;
 
     // Variables used by the tracking
     float mTrackProjX;
@@ -117,7 +147,7 @@ private:
      std::map<KeyFrame*,size_t> mObservations;
 
      // Mean viewing direction
-     cv::Mat m_normalVector;
+     cv::Mat m_meanViewingDirection;
 
      // Best descriptor to fast matching
      cv::Mat mDescriptor;
