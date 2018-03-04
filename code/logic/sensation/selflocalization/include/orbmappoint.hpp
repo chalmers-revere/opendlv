@@ -81,31 +81,31 @@ public:
     int PredictScale(const float &currentDist, Frame* pF);
     static long unsigned int m_NextId;
 
-int GetTrackScaleLevel();
-bool GetTrackInView();
-float GTrackViewCos();
-long unsigned int GetTrackReferenceForFrame();
-long unsigned int GetLastFrameSeen();
-long unsigned int GetBALocalForKF();
-long unsigned int GetFuseCandidateForKF();
-long unsigned int GetLoopPointForKF();
-long unsigned int GetCorrectedByKF();
-long unsigned int GetCorrectedReference();
-cv::Mat GetPosGBA();
-long unsigned int GetBAGlobalForKF();
+    int GetTrackScaleLevel();
+    bool GetTrackInView();
+    float GTrackViewCos();
+    long unsigned int GetTrackReferenceForFrame();
+    long unsigned int GetLastFrameSeen();
+    long unsigned int GetBALocalForKF();
+    long unsigned int GetFuseCandidateForKF();
+    long unsigned int GetLoopPointForKF();
+    long unsigned int GetCorrectedByKF();
+    long unsigned int GetCorrectedReference();
+    cv::Mat GetPosGBA();
+    long unsigned int GetBAGlobalForKF();
 
-void SetTrackScaleLevel(long unsigned int TrackScaleLevel);
-void SetTrackInView(long unsigned int TrackInView);
-void SetackViewCos(long unsigned int ackViewCos);
-void SetTrackReferenceForFrame(long unsigned int TrackReferenceForFrame);
-void SetLastFrameSeen(long unsigned int LastFrameSeen);
-void SetBALocalForKF(long unsigned int BALocalForKF);
-void SetFuseCandidateForKF(long unsigned int FuseCandidateForKF);
-void SetLoopPointForKF(long unsigned int LoopPointForKF);
-void SetCorrectedByKF(long unsigned int CorrectedByKF);
-void SetCorrectedReference(long unsigned int CorrectedReference);
-void SetPosGBA(long unsigned int PosGBA);
-void SetBAGlobalForKF(long unsigned int BAGlobalForKF);
+    void SetTrackScaleLevel(long unsigned int TrackScaleLevel);
+    void SetTrackInView(long unsigned int TrackInView);
+    void SetackViewCos(long unsigned int ackViewCos);
+    void SetTrackReferenceForFrame(long unsigned int TrackReferenceForFrame);
+    void SetLastFrameSeen(long unsigned int LastFrameSeen);
+    void SetBALocalForKF(long unsigned int BALocalForKF);
+    void SetFuseCandidateForKF(long unsigned int FuseCandidateForKF);
+    void SetLoopPointForKF(long unsigned int LoopPointForKF);
+    void SetCorrectedByKF(long unsigned int CorrectedByKF);
+    void SetCorrectedReference(long unsigned int CorrectedReference);
+    void SetPosGBA(long unsigned int PosGBA);
+    void SetBAGlobalForKF(long unsigned int BAGlobalForKF);
 
 
 private:
