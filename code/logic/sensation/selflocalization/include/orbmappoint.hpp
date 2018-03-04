@@ -5,7 +5,8 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- *
+ *cmake -E remove_directory .
+
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -39,7 +40,7 @@ public:
 
     std::map<std::shared_ptr<OrbFrame>,size_t> GetObservations();
 
-    void SetWorldPos(const cv::Mat &Pos);
+    void SetWorldPosition(const cv::Mat &Position);
     cv::Mat GetWorldPos();
 
     cv::Mat GetNormal();
@@ -110,7 +111,7 @@ private:
     // mutexed below
 
      // Position in absolute coordinates
-     cv::Mat m_WorldPosition;
+     cv::Mat m_worldPosition;
 
      // Keyframes observing the point and associated index in keyframe
      std::map<KeyFrame*,size_t> mObservations;
@@ -136,8 +137,8 @@ private:
      float mfMinDistance;
      float mfMaxDistance;
 
-     Map* mpMap;
-
+     std::shared_ptr<OrbMap> m_map;
+    std::mutex m_constructorMutex;
      std::mutex mMutexPos;
      std::mutex mMutexFeatures;
 };
