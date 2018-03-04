@@ -144,24 +144,24 @@ private:
      cv::Mat m_worldPosition;
 
      // Keyframes observing the point and associated index in keyframe
-     std::map<KeyFrame*,size_t> mObservations;
+     std::map<KeyFrame*,size_t> m_ObservingKeyframes;
 
      // Mean viewing direction
      cv::Mat m_meanViewingDirection;
 
      // Best descriptor to fast matching
-     cv::Mat mDescriptor;
+     cv::Mat m_descriptor;
 
      // Reference KeyFrame
      std::shared_ptr<OrbFrame> m_refenceKeyFrame;
 
      // Tracking counters
-     int mnVisible;
-     int mnFound;
+     int m_visibleCounter;
+     int m_foundCounter;
 
      // Bad flag (we do not currently erase MapPoint from memory)
-     bool mbBad;
-     MapPoint* mpReplaced;
+     bool m_corrupt;
+    std::shared_ptr<OrbMapPoint> m_replaced;
 
      // Scale invariance distances
      float m_minDistance;
