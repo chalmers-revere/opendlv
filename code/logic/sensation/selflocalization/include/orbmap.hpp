@@ -29,6 +29,9 @@ namespace opendlv {
 namespace logic {
 namespace sensation {
 
+class OrmFrame;
+class OrbMapPoint;
+
 class OrbMap {
  public:
     /**
