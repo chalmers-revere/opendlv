@@ -146,7 +146,7 @@ private:
      cv::Mat m_worldPosition;
 
      // Keyframes observing the point and associated index in keyframe
-     std::map<std::shared_ptr<OrbFrame>,size_t> m_ObservingKeyframes;
+     std::map<std::shared_ptr<OrbFrame>,size_t> m_observingKeyframes;
 
      // Mean viewing direction
      cv::Mat m_meanViewingDirection;

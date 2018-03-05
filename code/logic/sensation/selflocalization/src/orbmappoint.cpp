@@ -24,7 +24,7 @@ namespace logic {
 namespace sensation {
 
 
-OrbMapPoint(const cv::Mat &position, std::shared_ptr<OrbFrame> refenceKeyFrame, std::shared_ptr<OrbMap> map)
+OrbMapPoint::OrbMapPoint(const cv::Mat &position, std::shared_ptr<OrbFrame> refenceKeyFrame, std::shared_ptr<OrbMap> map)
 : mnFirstKFid(refenceKeyFrame->Id), mnFirstFrame(refenceKeyFrame->Id), m_refenceKeyFrame(refenceKeyFrame), m_map(map)
 {
     position.copyTo(m_worldPosition);
@@ -35,7 +35,7 @@ OrbMapPoint(const cv::Mat &position, std::shared_ptr<OrbFrame> refenceKeyFrame, 
     m_sequenceId=m_nextId++;
 }
 
-OrbMapPoint(const cv::Mat &position, std::shared_ptr<OrbFrame> frame, std::shared_ptr<OrbMap> map, const int &keyPointIndex)
+OrbMapPoint::OrbMapPoint(const cv::Mat &position, std::shared_ptr<OrbFrame> frame, std::shared_ptr<OrbMap> map, const int &keyPointIndex)
 {
     position.copyTo(m_worldPosition);
     cv::Mat cameraCenter = frame->GetCameraCenter();
@@ -63,8 +63,9 @@ OrbMapPoint::~OrbMapPoint()
 
 }
 
-std::map<std::shared_ptr<OrbFrame>,size_t> OrbMapPoint::GetObservations(){
-    return std::map<std::shared_ptr<OrbFrame>,size_t>{}; 
+std::map<std::shared_ptr<OrbFrame>,size_t> OrbMapPoint::GetObservingKeyframes()
+{
+    return m_observingKeyframes;
 }
 
 bool OrbMapPoint::IsCorrupt()
