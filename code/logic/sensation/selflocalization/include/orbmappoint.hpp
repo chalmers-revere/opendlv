@@ -49,6 +49,7 @@ public:
 
     cv::Mat GetMeanViewingDirection();
     std::shared_ptr<OrbFrame> GetReferenceKeyFrame();
+
     int GetObservingKeyFrameCount();
     int GetSequenceId();
     void AddObservingKeyframe(std::shared_ptr<OrbFrame> keyFrame,size_t idx);
@@ -66,7 +67,7 @@ public:
     void IncreaseVisible(int n=1);
     void IncreaseFound(int n=1);
     float GetFoundRatio();
-    inline int GetFound() { return mnFound; }
+    inline int GetFound() { return m_foundCounter; }
     float getTrackProjX() { return mTrackProjX; }
     float getTrackProjY() { return mTrackProjY; }
     float getTrackProjXR() { return mTrackProjXR; }
