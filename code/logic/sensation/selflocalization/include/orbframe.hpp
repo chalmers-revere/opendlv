@@ -133,21 +133,21 @@ private:
 
     int m_numberOfKeypoints = 0;
 
-    std::vector<cv::KeyPoint> m_keyPoints, m_keyPointsRight;
-    std::vector<cv::KeyPoint> m_undistortedKeyPoints;
-    std::vector<float> m_right; // negative value for monocular points
-    std::vector<float> m_depth; // negative value for monocular points
-    cv::Mat m_descriptors;
+    std::vector<cv::KeyPoint> m_keyPoints, m_keyPointsRight = {};
+    std::vector<cv::KeyPoint> m_undistortedKeyPoints = {};
+    std::vector<float> m_right = {}; // negative value for monocular points
+    std::vector<float> m_depth = {}; // negative value for monocular points
+    cv::Mat m_descriptors = {};
 
-    std::vector<OrbKeyPoint> m_keypoints;
-    cv::Mat m_leftGreyImage, m_rightGreyImage;
+    std::vector<OrbKeyPoint> m_keypoints = {};
+    cv::Mat m_leftGreyImage, m_rightGreyImage = {};
 
-    int m_scaleLevels;
-    float m_scaleFactor;
-    float m_logScaleFactor;
-    std::vector<float> m_scaleFactors;
-    std::vector<float> m_levelSigma2;
-    std::vector<float> m_inverseLevelSigma2;
+    int m_scaleLevels = 0;
+    float m_scaleFactor = 0;
+    float m_logScaleFactor = 0;
+    std::vector<float> m_scaleFactors = {};
+    std::vector<float> m_levelSigma2 = {};
+    std::vector<float> m_inverseLevelSigma2 = {};
 
     cv::Mat m_tcw = {};
     cv::Mat m_twc = {};
