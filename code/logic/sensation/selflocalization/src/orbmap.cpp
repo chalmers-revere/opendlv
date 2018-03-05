@@ -17,7 +17,8 @@
  * USA.
  */
 #include "orbmap.hpp"
-
+#include "orbframe.hpp"
+#include <orbmappoint.hpp>
 
 namespace opendlv {
 namespace logic {

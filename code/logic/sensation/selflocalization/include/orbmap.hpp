@@ -20,16 +20,23 @@
 #ifndef ORBMAP_HPP
 #define ORBMAP_HPP
 
-#include <orbframe.hpp>
-#include <orbmappoint.hpp>
+
 #include <mutex>
 #include <algorithm>
+#include <memory>
+#include <cmath>
+#include <iostream>
+#include <memory>
+#include <mutex>
+#include <vector>
+#include <list>
+#include <utility>
 
 namespace opendlv {
 namespace logic {
 namespace sensation {
 
-class OrmFrame;
+class OrbFrame;
 class OrbMapPoint;
 
 class OrbMap {
@@ -42,7 +49,7 @@ class OrbMap {
     /**
      * PushOrbKeyFrame - Push Keyframe to Map.
      */
-    void PushOrbKeyFrame(std::shared_ptr<OrbFrame> orbKeyFrame);
+    void PushOrbKeyFrame(std::shared_ptr<OrbFrame> keyFrame);
     /**
      * PushOrbMapPoint - Push OrbMapPoint to Map.
      */
