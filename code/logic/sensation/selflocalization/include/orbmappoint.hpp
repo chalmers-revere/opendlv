@@ -82,7 +82,7 @@ public:
     float GetMaxDistanceInvariance();
     int PredictScale(const float &currentDist, std::shared_ptr<OrbFrame> keyFrame);
 
-    static long unsigned int m_NextId;
+    static long unsigned int m_nextId;
 
     int GetTrackScaleLevel();
     bool GetTrackInView();

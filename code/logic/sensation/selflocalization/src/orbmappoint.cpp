@@ -49,7 +49,7 @@ OrbMapPoint::OrbMapPoint(const cv::Mat &position, std::shared_ptr<OrbFrame> fram
     const int levels = frame->GetScaleLevels();
 
     m_maxDistance = distance*levelScaleFactor;
-    m_minDistance = m_maxDistance/frame->GetScaleFactors[levels-1];
+    m_minDistance = m_maxDistance/frame->GetScaleFactors()[levels-1];
 
     frame->GetDescriptors().row(keyPointIndex).copyTo(m_descriptor);
 

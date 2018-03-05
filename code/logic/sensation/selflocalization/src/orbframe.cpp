@@ -408,7 +408,7 @@ int OrbFrame::TrackedMapPoints(const int &minimumObservations)
         std::shared_ptr<OrbMapPoint> mapPoint = m_mapPoints[i];
         if(mapPoint)
         {
-            if(!mapPoint->isBad())
+            if(!mapPoint->IsCorrupt())
             {
                 if(checkObservations)
                 {
