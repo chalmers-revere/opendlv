@@ -159,7 +159,7 @@ void OrbFrame::UpdateConnections()
             continue;
         }
 
-        std::map<std::shared_ptr<OrbFrame>,size_t> observations = mapPoint->GetObservations();
+        std::map<std::shared_ptr<OrbFrame>,size_t> observations = mapPoint->GetObservingKeyframes();
 
         for(std::map<std::shared_ptr<OrbFrame>,size_t>::iterator mapIterator=observations.begin(), mapEnd=observations.end(); mapIterator!=mapEnd; mapIterator++)
         {
@@ -412,7 +412,7 @@ int OrbFrame::TrackedMapPoints(const int &minimumObservations)
             {
                 if(checkObservations)
                 {
-                    if(m_mapPoints[i]->Observations()>=minimumObservations)
+                    if(m_mapPoints[i]->GetObservingKeyFrameCount()>=minimumObservations)
                     {
                         points++;
                     }

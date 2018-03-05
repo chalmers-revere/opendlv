@@ -49,6 +49,7 @@ public:
 
     cv::Mat GetMeanViewingDirection();
     std::shared_ptr<OrbFrame> GetReferenceKeyFrame();
+
     int GetObservingKeyFrameCount();
     int GetSequenceId();
     void AddObservingKeyframe(std::shared_ptr<OrbFrame> keyFrame,size_t idx);
