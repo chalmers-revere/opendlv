@@ -66,7 +66,7 @@ public:
     void IncreaseVisible(int n=1);
     void IncreaseFound(int n=1);
     float GetFoundRatio();
-    inline int GetFound() { return mnFound; }
+    inline int GetFound() { return m_foundCounter; }
     float getTrackProjX() { return mTrackProjX; }
     float getTrackProjY() { return mTrackProjY; }
     float getTrackProjXR() { return mTrackProjXR; }

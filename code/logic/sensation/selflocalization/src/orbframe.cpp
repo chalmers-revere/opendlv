@@ -379,7 +379,7 @@ void OrbFrame::EraseMapPointMatch(const size_t &index)
 
 void OrbFrame::EraseMapPointMatch(std::shared_ptr<OrbMapPoint> mapPoint)
 {
-    int index = mapPoint->GetIndexInOrbFrame(this);
+    int index = mapPoint->GetObeservationIndexOfKeyFrame(std::shared_ptr<OrbFrame>(this));
     if(index>=0)
     {
         m_mapPoints[index]=static_cast<std::shared_ptr<OrbMapPoint>>(NULL);
