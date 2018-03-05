@@ -79,8 +79,7 @@ public:
 
     float GetMinDistanceInvariance();
     float GetMaxDistanceInvariance();
-    int PredictScale(const float &currentDist, std::shared_ptr<OrbFrame>pKF);
-    int PredictScale(const float &currentDist, std::shared_ptr<OrbFrame> pF);
+    int PredictScale(const float &currentDist, std::shared_ptr<OrbFrame> keyFrame);
 
     static long unsigned int m_NextId;
 
