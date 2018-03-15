@@ -60,6 +60,7 @@ class Geolocator : public odcore::base::module::TimeTriggeredConferenceClientMod
   MatrixXd m_measurementsTimeStamp;
   MatrixXd m_paramVecR;
   odcore::base::Mutex m_sensorMutex;
+  odcore::base::Mutex m_deltaMutex;
   MatrixXf m_accXYReading;
   float m_yawReading;
   MatrixXd m_gpsReading;

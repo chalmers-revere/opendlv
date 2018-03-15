@@ -38,6 +38,7 @@ Geolocator::Geolocator(int32_t const &a_argc, char **a_argv)
     , m_measurementsTimeStamp()
     , m_paramVecR()
     , m_sensorMutex()
+    , m_deltaMutex()
     , m_accXYReading()
     , m_yawReading()
     , m_gpsReading()
@@ -138,10 +139,11 @@ void Geolocator::nextContainer(odcore::data::Container &a_container)
 	 //Racktravel
 	 if (a_container.getDataType() == opendlv::proxy::GroundSteeringReading::ID()){
 
-	 	odcore::base::Lock l(m_sensorMutex);
+	 	odcore::base::Lock ld(m_deltaMutex);
 		auto racktravel = a_container.getData<opendlv::proxy::GroundSteeringReading>();
 
 		double rT = racktravel.getGroundSteering();
+		
 		m_delta = rackTravelToFrontWheelSteering(rT);
 	 }
 } 
@@ -153,7 +155,6 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocator::body()
 
   while (getModuleStateAndWaitForRemainingTimeInTimeslice() == odcore::data::dmcp::ModuleStateMessage::RUNNING) {
    
-  	odcore::base::Lock l(m_sensorMutex);
   	odcore::data::TimeStamp currentTime;
 	
 	//Check last recieved measurement from each sensor, if longer than 1 sec, start trusting the model more  	
@@ -392,6 +393,9 @@ MatrixXd Geolocator::UKFUpdate(MatrixXd &x)
 	//Collect measurements from sensor
 
 	MatrixXd y = MatrixXd::Zero(7,1);
+
+	{
+  	odcore::base::Lock l(m_sensorMutex);
 	y << m_gpsReading(0,0), 
 		 m_gpsReading(1,0),
 		 m_groundSpeedReading,
@@ -399,6 +403,7 @@ MatrixXd Geolocator::UKFUpdate(MatrixXd &x)
 		 m_accXYReading(1,0),
 		 m_yawReading,
 		 m_headingReading;
+	}
 
 	//State update
 	x = x + Pxy*S.inverse()*(y-y_hat);
@@ -414,6 +419,8 @@ MatrixXd Geolocator::UKFUpdate(MatrixXd &x)
 MatrixXd Geolocator::vehicleModel(MatrixXd &x)
 {
 
+
+	odcore::base::Lock ld(m_deltaMutex);
 
 	if(x(2) < 0.0001){
 
@@ -447,6 +454,8 @@ MatrixXd Geolocator::vehicleModel(MatrixXd &x)
 MatrixXd Geolocator::measurementModel(MatrixXd &x)
 {
 
+
+	odcore::base::Lock ld(m_deltaMutex);
 	MatrixXd hx = MatrixXd::Zero(7,1);
 	double alphaF = std::atan((m_vehicleModelParameters(3)*x(4)) + x(3)/x(2)) - m_delta;
 	double alphaR = std::atan((x(3)-m_vehicleModelParameters(4)*x(4))/x(2));
@@ -508,7 +517,7 @@ void Geolocator::stateSender(MatrixXd &x)
 
 	opendlv::logic::sensation::Equilibrioception kinematicState;
 	kinematicState.setVx(x(2));
-	kinematicState.setVx(x(3));
+	kinematicState.setVy(x(3));
 	kinematicState.setYawRate(x(4));
 	odcore::data::Container c2(kinematicState);
 	getConference().send(c2);
