@@ -20,7 +20,7 @@ project(opendlv-logic-perception-detectvehicle)
 
 include_directories(include)
 
-include_directories(SYSTEM ${TINYCNN_INCLUDE_DIR})
+include_directories(SYSTEM ${TINYDNN_INCLUDE_DIR})
 
 ###############################################################################
 # Build this project.

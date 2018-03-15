@@ -163,7 +163,6 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocator::body()
   		if(currentTime.toMicroseconds()-m_measurementsTimeStamp(i,0) > 1000000){
   			
   			m_R(i,i) = m_paramVecR(i,0)*1000;
-			std::cout << "Not trusting sensor " << i << std::endl;
 
   		}else
   		{
