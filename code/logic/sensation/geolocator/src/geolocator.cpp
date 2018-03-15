@@ -162,7 +162,6 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocator::body()
   		if(currentTime.toMicroseconds()-m_measurementsTimeStamp(i,0) > 1000000){
   			
   			m_R(i,i) = m_paramVecR(i,0)*1000;
-			std::cout << "Not trusting sensor " << i << std::endl;
 
   		}else
   		{
@@ -508,7 +507,7 @@ void Geolocator::stateSender(MatrixXd &x)
 
 	opendlv::logic::sensation::Equilibrioception kinematicState;
 	kinematicState.setVx(x(2));
-	kinematicState.setVx(x(3));
+	kinematicState.setVy(x(3));
 	kinematicState.setYawRate(x(4));
 	odcore::data::Container c2(kinematicState);
 	getConference().send(c2);
