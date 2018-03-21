@@ -140,12 +140,16 @@ void Geolocator::nextContainer(odcore::data::Container &a_container)
 	 if (a_container.getDataType() == opendlv::proxy::GroundSteeringReading::ID()){
 
 	 	odcore::base::Lock ld(m_deltaMutex);
-		auto racktravel = a_container.getData<opendlv::proxy::GroundSteeringReading>();
 
+
+	 	//For CFSD18
+		auto racktravel = a_container.getData<opendlv::proxy::GroundSteeringReading>();
 		double rT = racktravel.getGroundSteering();
-		
 		m_delta = rackTravelToFrontWheelSteering(rT);
 	 }
+
+
+    m_initialMessagesRecieved = (m_initialMessagesRecieved < 110)?(m_initialMessagesRecieved + 1):(m_initialMessagesRecieved);
 } 
 
 odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocator::body()
@@ -157,27 +161,28 @@ odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode Geolocator::body()
    
   	odcore::data::TimeStamp currentTime;
 	
+	if(m_initialMessagesRecieved > 100){
 	//Check last recieved measurement from each sensor, if longer than 1 sec, start trusting the model more  	
-  	for(int i = 0; i < 7; i++){
+  		for(int i = 0; i < 7; i++){
   		
-  		if(currentTime.toMicroseconds()-m_measurementsTimeStamp(i,0) > 1000000){
+  			if(currentTime.toMicroseconds()-m_measurementsTimeStamp(i,0) > 1000000){
   			
-  			m_R(i,i) = m_paramVecR(i,0)*1000;
+  				m_R(i,i) = m_paramVecR(i,0)*1000;
 
-  		}else
-  		{
-  			m_R(i,i) = m_paramVecR(i,0);
+  			}else
+  			{
+  				m_R(i,i) = m_paramVecR(i,0);
+  			}
   		}
-  	}
   	
-  	//prediction
-  	m_states = UKFPrediction(m_states);
-  	//update
-  	m_states = UKFUpdate(m_states);
+  		//prediction
+  		m_states = UKFPrediction(m_states);
+  		//update
+  		m_states = UKFUpdate(m_states);
 
-  	stateSender(m_states);
-  	
-   	
+  		stateSender(m_states);
+
+  	}
 
   }
 
