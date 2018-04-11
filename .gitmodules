@@ -26,3 +26,6 @@
 [submodule "cluon-livefeed"]
 	path = cluon-livefeed
 	url = https://github.com/chrberger/cluon-livefeed.git
+[submodule "cluon-rec2fuse"]
+	path = cluon-rec2fuse
+	url = https://github.com/chrberger/cluon-rec2fuse.git
