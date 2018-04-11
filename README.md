@@ -77,37 +77,41 @@ Trimble unit, the respective microservices could be supplied with the suffixes
 
 
 ## Dependencies
-**No dependencies!** You just need a C++14-compliant compiler to compile this
-project as it ships the following dependencies as part of the source distribution:
+You need a C++14-compliant compiler to compile this project as it ships the following dependencies as part of the source distribution:
 
 * [libcluon](https://github.com/chrberger/libcluon) - [![License: GPLv3](https://img.shields.io/badge/license-GPL--3-blue.svg
 )](https://www.gnu.org/licenses/gpl-3.0.txt)
 * [Unit Test Framework Catch2](https://github.com/catchorg/Catch2/releases/tag/v2.1.2) - [![License: Boost Software License v1.0](https://img.shields.io/badge/License-Boost%20v1-blue.svg)](http://www.boost.org/LICENSE_1_0.txt)
 
+For building [cluon-rec2fuse](https://github.com/chrberger/cluon-rec2fuse), [libfuse](https://github.com/libfuse/libfuse) is required.
 
 ## Usage
 We are providing the following microservices as multi-platform (amd64/x86_64, armhf, aarch64) Docker images:
 
-* Complete ArchLinux-based [OpenDLV OS](https://github.com/chalmers-revere/opendlv.os) Operating System (start here if you want to initialize a blank computing unit - *WARNING!* All data will be erased!)
-* Hardware/software interfaces:
-  * GPS:
-    * [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-gps-ncom.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-gps-ncom) [opendlv-device-gps-ncom](https://github.com/chalmers-revere/opendlv-device-gps-ncom) to interface with **OxTS GPS/INSS** units: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-ncom-multi:v0.0.2 opendlv-device-gps-ncom --ncom_ip=0.0.0.0 --ncom_port=3000 --cid=111 --verbose`
+### OpenDLV.OS
+
+Complete ArchLinux-based [OpenDLV OS](https://github.com/chalmers-revere/opendlv.os) Operating System (start here if you want to initialize a blank computing unit - *WARNING!* All data will be erased!)
+
+### Hardware/software interfaces:
+* GPS:
+  * [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-gps-ncom.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-gps-ncom) [opendlv-device-gps-ncom](https://github.com/chalmers-revere/opendlv-device-gps-ncom) to interface with **OxTS GPS/INSS** units: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-ncom-multi:v0.0.2 opendlv-device-gps-ncom --ncom_ip=0.0.0.0 --ncom_port=3000 --cid=111 --verbose`
+    * Provides: [Latitude/Longitude](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L137-L140)
+    * Provides: [Heading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L133-L135)
+  * [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-gps-nmea.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-gps-nmea) [opendlv-device-gps-nmea](https://github.com/chalmers-revere/opendlv-device-gps-nmea) to interface with **Trimble GPS/INSS** units: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-nmea-multi:v0.0.3 opendlv-device-gps-nmea --nmea_ip=10.42.42.112 --nmea_port=9999 --cid=111 --verbose`
       * Provides: [Latitude/Longitude](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L137-L140)
       * Provides: [Heading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L133-L135)
-    * [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-gps-nmea.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-gps-nmea) [opendlv-device-gps-nmea](https://github.com/chalmers-revere/opendlv-device-gps-nmea) to interface with **Trimble GPS/INSS** units: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-nmea-multi:v0.0.3 opendlv-device-gps-nmea --nmea_ip=10.42.42.112 --nmea_port=9999 --cid=111 --verbose`
-      * Provides: [Latitude/Longitude](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L137-L140)
-      * Provides: [Heading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L133-L135)
-    * [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-gps-pos.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-gps-pos) [opendlv-device-gps-pos](https://github.com/chalmers-revere/opendlv-device-gps-pos) to interface with **Applanix POS GPS/INSS** units: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-pos-multi:v0.0.1 opendlv-device-gps-pos --pos_ip=192.168.1.77 --pos_port=5602 --cid=111 --verbose`
+  * [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-gps-pos.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-gps-pos) [opendlv-device-gps-pos](https://github.com/chalmers-revere/opendlv-device-gps-pos) to interface with **Applanix POS GPS/INSS** units: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-pos-multi:v0.0.1 opendlv-device-gps-pos --pos_ip=192.168.1.77 --pos_port=5602 --cid=111 --verbose`
       * Provides: [Latitude/Longitude](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L137-L140)
       * Provides: [Heading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L133-L135)
       * Provides: [device-specific messages](https://github.com/chalmers-revere/opendlv-device-gps-pos/blob/master/src/pos-message-set.odvd)
-  * LIDAR:
-    * [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-vlp16.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-vlp16) [opendlv-device-lidar-vlp16](https://github.com/chalmers-revere/opendlv-device-lidar-vlp16) to interface with **Velodyne VLP16** lidar units: `docker run --init --rm --net=host chalmersrevere/opendlv-device-lidar-vlp16-multi:v0.0.1 opendlv-device-lidar-vlp16 --vlp16_ip=0.0.0.0 --vlp16_port=2368 --cid=111 --verbose`
+* LIDAR:
+  * [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-vlp16.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-vlp16) [opendlv-device-lidar-vlp16](https://github.com/chalmers-revere/opendlv-device-lidar-vlp16) to interface with **Velodyne VLP16** lidar units: `docker run --init --rm --net=host chalmersrevere/opendlv-device-lidar-vlp16-multi:v0.0.1 opendlv-device-lidar-vlp16 --vlp16_ip=0.0.0.0 --vlp16_port=2368 --cid=111 --verbose`
       * Provides: [PointCloudReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L152-L158)
-    * [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-hdl32e.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-hdl32e) [opendlv-device-lidar-hdl32e](https://github.com/chalmers-revere/opendlv-device-lidar-hdl32e) to interface with **Velodyne HDL32e** lidar units: `docker run --init --rm --net=host chalmersrevere/opendlv-device-lidar-hdl32e-multi:v0.0.2 opendlv-device-lidar-hdl32e --hdl32e_ip=0.0.0.0 --hdl32e_port=2368 --cid=111 --verbose`
+  * [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-hdl32e.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-hdl32e) [opendlv-device-lidar-hdl32e](https://github.com/chalmers-revere/opendlv-device-lidar-hdl32e) to interface with **Velodyne HDL32e** lidar units: `docker run --init --rm --net=host chalmersrevere/opendlv-device-lidar-hdl32e-multi:v0.0.2 opendlv-device-lidar-hdl32e --hdl32e_ip=0.0.0.0 --hdl32e_port=2368 --cid=111 --verbose`
       * Provides: [PointCloudReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L152-L158)
-* Data Post Processing:
-  * [cluon-rec2fuse](https://github.com/chrberger/cluon-rec2fuse) to *mount* a recording file to a folder and dynamically map its content as .csv files: 
+      
+### Data Post Processing:
+* [cluon-rec2fuse](https://github.com/chrberger/cluon-rec2fuse) to *mount* a recording file to a folder and dynamically map its content as .csv files: 
   ```
   docker run --rm -ti -v $PWD/myrecording.rec:/opt/input.rec \
                     -v $PWD/opendlv.odvd:/opt/odvd \
@@ -124,15 +128,14 @@ We are providing the following microservices as multi-platform (amd64/x86_64, ar
                     && tail -f /dev/null"
   ```
   [![asciicast](https://asciinema.org/a/tMLc9lvmnTKlcwSHSIuepF4It.png)](https://asciinema.org/a/tMLc9lvmnTKlcwSHSIuepF4It?autoplay=1)
-* Visualizations:
-  * [cluon-livefeed](https://github.com/chrberger/cluon-livefeed) to display any messages exchanged in the communication session 111 on console: `docker run --rm -ti --init --net=host chrberger/cluon-livefeed-multi:v0.0.59 --cid=111` [![asciicast](https://asciinema.org/a/zT1Mr5aKUGx3k43ax8a9eapBb.png)](https://asciinema.org/a/zT1Mr5aKUGx3k43ax8a9eapBb?autoplay=1)
-  
-  * [opendlv-signal-viewer](https://github.com/chalmers-revere/opendlv-signal-viewer) to view any messages from the OpenDLV Standard Message Set exchanged in the communication session 111 (after starting this microservice, point your web-browser to the computer's IP address, port 8080): `docker run --rm --net=host -p 8080:8080 chalmersrevere/opendlv-signal-viewer-multi:v0.0.4 --cid=111`
+
+### Visualizations:
+* [cluon-livefeed](https://github.com/chrberger/cluon-livefeed) to display any messages exchanged in the communication session 111 on console: `docker run --rm -ti --init --net=host chrberger/cluon-livefeed-multi:v0.0.59 --cid=111` [![asciicast](https://asciinema.org/a/zT1Mr5aKUGx3k43ax8a9eapBb.png)](https://asciinema.org/a/zT1Mr5aKUGx3k43ax8a9eapBb?autoplay=1)
+* [opendlv-signal-viewer](https://github.com/chalmers-revere/opendlv-signal-viewer) to view any messages from the OpenDLV Standard Message Set exchanged in the communication session 111 (after starting this microservice, point your web-browser to the computer's IP address, port 8080): `docker run --rm --net=host -p 8080:8080 chalmersrevere/opendlv-signal-viewer-multi:v0.0.4 --cid=111`
 ![screenshot from signal viewer](https://raw.githubusercontent.com/chalmers-revere/opendlv-signal-viewer/master/signal-viewer.gif)
-  * [opendlv-vehicle-view](https://github.com/chalmers-revere/opendlv-vehicle-view) to view vehicle messages from the OpenDLV Standard Message Set exchanged in the communication session 111 (after starting this microservice, point your web-browser to the computer's IP address, port 8081): `docker run --rm --net=host -p 8081:8081 chalmersrevere/opendlv-vehicle-view-multi:v0.0.8 --cid=111`
+* [opendlv-vehicle-view](https://github.com/chalmers-revere/opendlv-vehicle-view) to view vehicle messages from the OpenDLV Standard Message Set exchanged in the communication session 111 (after starting this microservice, point your web-browser to the computer's IP address, port 8081): `docker run --rm --net=host -p 8081:8081 chalmersrevere/opendlv-vehicle-view-multi:v0.0.8 --cid=111`
 
   ![screenshot from vehicle view](https://raw.githubusercontent.com/chalmers-revere/opendlv-vehicle-view/master/vehicle-view-animated.gif)
-
 
 
 ## Build from sources on the example of Ubuntu 16.04 LTS
