@@ -29,3 +29,6 @@
 [submodule "cluon-rec2fuse"]
 	path = cluon-rec2fuse
 	url = https://github.com/chrberger/cluon-rec2fuse.git
+[submodule "opendlv-device-ultrasonic-srf08"]
+	path = opendlv-device-ultrasonic-srf08
+	url = https://github.com/chalmers-revere/opendlv-device-ultrasonic-srf08.git
