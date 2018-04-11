@@ -106,6 +106,24 @@ We are providing the following microservices as multi-platform (amd64/x86_64, ar
       * Provides: [PointCloudReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L152-L158)
     * [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-hdl32e.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-hdl32e) [opendlv-device-lidar-hdl32e](https://github.com/chalmers-revere/opendlv-device-lidar-hdl32e) to interface with **Velodyne HDL32e** lidar units: `docker run --init --rm --net=host chalmersrevere/opendlv-device-lidar-hdl32e-multi:v0.0.2 opendlv-device-lidar-hdl32e --hdl32e_ip=0.0.0.0 --hdl32e_port=2368 --cid=111 --verbose`
       * Provides: [PointCloudReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L152-L158)
+* Data Post Processing:
+  * [cluon-rec2fuse](https://github.com/chrberger/cluon-rec2fuse) to *mount* a recording file to a folder and dynamically map its content as .csv files: 
+  ```
+  docker run --rm -ti -v $PWD/myrecording.rec:/opt/input.rec \
+                    -v $PWD/opendlv.odvd:/opt/odvd \
+                    -v $PWD/mnt:/opt/output:shared \
+                    --cap-add SYS_ADMIN \
+                    --cap-add MKNOD \
+                    --security-opt apparmor:unconfined \
+                    --device=/dev/fuse \
+                    -v /etc/passwd:/etc/passwd:ro \
+                    -v /etc/group:/etc/group \
+                    chrberger/cluon-rec2fuse-amd64:v0.0.70 \
+                    /bin/sh -c "chown $UID:$UID /opt/output && \
+                    su -s /bin/sh $USER -c 'cluon-rec2fuse --rec=/opt/input.rec --odvd=/opt/odvd -f /opt/output' \
+                    && tail -f /dev/null"
+  ```
+  [![asciicast](https://asciinema.org/a/tMLc9lvmnTKlcwSHSIuepF4It.png)](https://asciinema.org/a/tMLc9lvmnTKlcwSHSIuepF4It?autoplay=1)
 * Visualizations:
   * [cluon-livefeed](https://github.com/chrberger/cluon-livefeed) to display any messages exchanged in the communication session 111 on console: `docker run --rm -ti --init --net=host chrberger/cluon-livefeed-multi:v0.0.59 --cid=111` [![asciicast](https://asciinema.org/a/zT1Mr5aKUGx3k43ax8a9eapBb.png)](https://asciinema.org/a/zT1Mr5aKUGx3k43ax8a9eapBb?autoplay=1)
   
