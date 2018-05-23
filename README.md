@@ -94,24 +94,25 @@ Complete ArchLinux-based [OpenDLV OS](https://github.com/chalmers-revere/opendlv
 
 ### Hardware/Software Interfaces:
 * GPS:
-  * [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-gps-ncom.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-gps-ncom) [opendlv-device-gps-ncom](https://github.com/chalmers-revere/opendlv-device-gps-ncom) to interface with **OxTS GPS/INSS** units: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-ncom-multi:v0.0.5 opendlv-device-gps-ncom --ncom_ip=0.0.0.0 --ncom_port=3000 --cid=111 --verbose`
-    * Provides: [Latitude/Longitude](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L137-L140)
-    * Provides: [Heading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L133-L135)
+  * [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-gps-ncom.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-gps-ncom) [opendlv-device-gps-ncom](https://github.com/chalmers-revere/opendlv-device-gps-ncom) to interface with **OxTS GPS/INSS** units: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-ncom-multi:v0.0.6 opendlv-device-gps-ncom --ncom_ip=0.0.0.0 --ncom_port=3000 --cid=111 --verbose`
+    * Provides: [Latitude/Longitude](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L145-L148)
+    * Provides: [Heading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L141-L143)
+    * Provides: [GroundSpeed](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L129-L131)
   * [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-gps-nmea.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-gps-nmea) [opendlv-device-gps-nmea](https://github.com/chalmers-revere/opendlv-device-gps-nmea) to interface with **Trimble GPS/INSS** units: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-nmea-multi:v0.0.6 opendlv-device-gps-nmea --nmea_ip=10.42.42.112 --nmea_port=9999 --cid=111 --verbose`
-      * Provides: [Latitude/Longitude](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L137-L140)
-      * Provides: [Heading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L133-L135)
+      * Provides: [Latitude/Longitude](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L145-L148)
+      * Provides: [Heading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L141-L143)
   * [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-gps-pos.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-gps-pos) [opendlv-device-gps-pos](https://github.com/chalmers-revere/opendlv-device-gps-pos) to interface with **Applanix POS GPS/INSS** units: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-pos-multi:v0.0.4 opendlv-device-gps-pos --pos_ip=192.168.1.77 --pos_port=5602 --cid=111 --verbose`
-      * Provides: [Latitude/Longitude](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L137-L140)
-      * Provides: [Heading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L133-L135)
+      * Provides: [Latitude/Longitude](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L145-L148)
+      * Provides: [Heading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L141-L143)
       * Provides: [device-specific messages](https://github.com/chalmers-revere/opendlv-device-gps-pos/blob/master/src/pos-message-set.odvd)
 * LIDAR:
   * [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-vlp16.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-vlp16) [opendlv-device-lidar-vlp16](https://github.com/chalmers-revere/opendlv-device-lidar-vlp16) to interface with **Velodyne VLP16** lidar units: `docker run --init --rm --net=host chalmersrevere/opendlv-device-lidar-vlp16-multi:v0.0.7 opendlv-device-lidar-vlp16 --vlp16_ip=0.0.0.0 --vlp16_port=2368 --cid=111 --verbose`
-      * Provides: [PointCloudReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L152-L158)
+      * Provides: [PointCloudReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L160-L166)
   * [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-hdl32e.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-hdl32e) [opendlv-device-lidar-hdl32e](https://github.com/chalmers-revere/opendlv-device-lidar-hdl32e) to interface with **Velodyne HDL32e** lidar units: `docker run --init --rm --net=host chalmersrevere/opendlv-device-lidar-hdl32e-multi:v0.0.8 opendlv-device-lidar-hdl32e --hdl32e_ip=0.0.0.0 --hdl32e_port=2368 --cid=111 --verbose`
-      * Provides: [PointCloudReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L152-L158)
+      * Provides: [PointCloudReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L160-L166)
 * Ultrasonic:
   * [opendlv-device-ultrasonic-srf08](https://github.com/chalmers-revere/opendlv-device-ultrasonic-srf08.git) to interface with an SRF08 ultrasound device connected via I2C bus: `docker run --rm -ti --net=host --privileged --device=/dev/i2c-1 chalmersrevere/opendlv-device-ultrasonic-srf08-amd64:v0.0.9 opendlv-device-ultrasonic-srf08 --dev=/dev/i2c-1 --bus-address=112 --cid=111 --freq=5 --id=0`
-      * Provides: [DistanceReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L113-L115)
+      * Provides: [PointCloudReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L160-L166)
 
 ### Data Post Processing:
 * [cluon-rec2fuse](https://github.com/chrberger/cluon-rec2fuse) to *mount* a recording file to a folder and dynamically map its content as .csv files: 
