@@ -94,10 +94,14 @@ Complete ArchLinux-based [OpenDLV OS](https://github.com/chalmers-revere/opendlv
 
 ### Hardware/Software Interfaces:
 * GPS:
-  * [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-gps-ncom.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-gps-ncom) [opendlv-device-gps-ncom](https://github.com/chalmers-revere/opendlv-device-gps-ncom) to interface with **OxTS GPS/INSS** units: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-ncom-multi:v0.0.6 opendlv-device-gps-ncom --ncom_ip=0.0.0.0 --ncom_port=3000 --cid=111 --verbose`
+  * [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-gps-ncom.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-gps-ncom) [opendlv-device-gps-ncom](https://github.com/chalmers-revere/opendlv-device-gps-ncom) to interface with **OxTS GPS/INSS** units: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-ncom-multi:v0.0.9 opendlv-device-gps-ncom --ncom_ip=0.0.0.0 --ncom_port=3000 --cid=111 --verbose`
     * Provides: [Latitude/Longitude](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L145-L148)
+    * Provides: [Altitude](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L89-L91)
     * Provides: [Heading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L141-L143)
+    * Provides: [Latitude/Longitude/Altitude/Heading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L267-L272)
     * Provides: [GroundSpeed](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L129-L131)
+    * Provides: [Acceleration X/Y/Z](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L71-L75)
+    * Provides: [Angular Velocity X/Y/Z](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L77-L81)
   * [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-gps-nmea.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-gps-nmea) [opendlv-device-gps-nmea](https://github.com/chalmers-revere/opendlv-device-gps-nmea) to interface with **Trimble GPS/INSS** units: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-nmea-multi:v0.0.6 opendlv-device-gps-nmea --nmea_ip=10.42.42.112 --nmea_port=9999 --cid=111 --verbose`
       * Provides: [Latitude/Longitude](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L145-L148)
       * Provides: [Heading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L141-L143)
