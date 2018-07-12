@@ -55,7 +55,7 @@ which is referring to a message identifier (for instance, `Envelope`'s
 [message identifier](https://github.com/chrberger/libcluon/blob/master/libcluon/resources/cluonDataStructures.odvd#L23)
 is 1).
 
-OpenDLV's microservices conform to the [OpenDLV Standard Message Set](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd) that enables exchangability across
+OpenDLV's microservices conform to the [OpenDLV Standard Message Set](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd) that enables exchangeability across
 hardware/software interfaces to decouple high-level application logic from
 low-level device drivers. For instance, OpenDLV's hardware/software interface to
 access an *Applanix GPS unit* is called [opendlv-device-gps-pos](https://github.com/chalmers-revere/opendlv-device-gps-pos)
