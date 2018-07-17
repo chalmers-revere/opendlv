@@ -197,10 +197,26 @@ Complete ArchLinux-based [OpenDLV OS](https://github.com/chalmers-revere/opendlv
 ### Visualizations:
 * [cluon-livefeed](https://github.com/chrberger/cluon-livefeed) to display any messages exchanged in the communication session 111 on console: `docker run --rm -ti --init --net=host chrberger/cluon-livefeed-multi:v0.0.104 --cid=111` [![asciicast](https://asciinema.org/a/zT1Mr5aKUGx3k43ax8a9eapBb.png)](https://asciinema.org/a/zT1Mr5aKUGx3k43ax8a9eapBb?autoplay=1)
 * [opendlv-signal-viewer](https://github.com/chalmers-revere/opendlv-signal-viewer) to view any messages from the OpenDLV Standard Message Set exchanged in the communication session 111 (after starting this microservice, point your web-browser to the computer's IP address, port 8080): `docker run --rm --net=host -p 8080:8080 chalmersrevere/opendlv-signal-viewer-multi:v0.0.8 --cid=111`
+```yml
+    signal-viewer:
+        image: chalmersrevere/opendlv-signal-viewer-multi:v0.0.8
+        restart: on-failure
+        network_mode: "host"
+        ports:
+        - "8080:8080"
+        command: "--cid=111"
+```
 ![screenshot from signal viewer](https://raw.githubusercontent.com/chalmers-revere/opendlv-signal-viewer/master/signal-viewer.gif)
 * [opendlv-vehicle-view](https://github.com/chalmers-revere/opendlv-vehicle-view) to view vehicle messages from the OpenDLV Standard Message Set exchanged in the communication session 111 (after starting this microservice, point your web-browser to the computer's IP address, port 8081): `docker run --rm --net=host -p 8081:8081 chalmersrevere/opendlv-vehicle-view-multi:v0.0.19 --cid=111`
-
-  ![screenshot from vehicle view](https://raw.githubusercontent.com/chalmers-revere/opendlv-vehicle-view/master/vehicle-view-animated.gif)
+```yml
+   vehicle-view:
+        image: chalmersrevere/opendlv-vehicle-view-multi:v0.0.19
+        restart: on-failure
+        network_mode: "host"
+        ports:
+        - "8081:8081"
+```
+![screenshot from vehicle view](https://raw.githubusercontent.com/chalmers-revere/opendlv-vehicle-view/master/vehicle-view-animated.gif)
 
 
 ## Build from sources on the example of Ubuntu 16.04 LTS
@@ -213,7 +229,7 @@ git submodule update --remote --merge
 git submodule status
 ```
 
-Now, run `cmake` and `make` as follows:
+Now, you can change into the various sub-folders and run `cmake` and `make` as follows:
 
 ```
 mkdir build && cd build
