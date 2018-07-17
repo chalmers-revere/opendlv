@@ -22,7 +22,7 @@ install:
 
 script:
 - git submodule update --init --recursive && git submodule update --remote --merge && git submodule status
-- for i in cluon-rec2fuse opendlv-device-gps-ncom opendlv-device-gps-nmea opendlv-device-gps-pos opendlv-device-lidar-hdl32e opendlv-device-lidar-vlp16 opendlv-device-ultrasonic-srf08; do mkdir build.$i && cd build.$i && cmake ../$i && make && make test && cd .. && rm -fr build.$i; done
+- for i in opendlv-device-gps-ncom opendlv-device-gps-nmea opendlv-device-gps-pos opendlv-device-lidar-hdl32e opendlv-device-lidar-vlp16; do mkdir build.$i && cd build.$i && cmake ../$i && make && make test && cd .. && rm -fr build.$i; done
 
 notifications:
   email:
