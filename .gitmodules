@@ -32,3 +32,9 @@
 [submodule "opendlv-device-ultrasonic-srf08"]
 	path = opendlv-device-ultrasonic-srf08
 	url = https://github.com/chalmers-revere/opendlv-device-ultrasonic-srf08.git
+[submodule "opendlv-video-h264-encoder"]
+	path = opendlv-video-h264-encoder
+	url = https://github.com/chalmers-revere/opendlv-video-h264-encoder.git
+[submodule "opendlv-video-h264-decoder"]
+	path = opendlv-video-h264-decoder
+	url = https://github.com/chalmers-revere/opendlv-video-h264-decoder.git
