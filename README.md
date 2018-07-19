@@ -174,10 +174,11 @@ Complete ArchLinux-based [OpenDLV OS](https://github.com/chalmers-revere/opendlv
         - "/dev/i2c-1:/dev/i2c-1"
         command: "opendlv-device-ultrasonic-srf08 --dev=/dev/i2c-1 --bus-address=112 --cid=111 --freq=5 --range=100 --gain=1 --id=0 --cid=111"
     ```
+
 * Video: OpenDLV contains an easy-to-use framework to grab video frames from various cameras, share them via shared memory, and encode/decode them into h264 frames to broadcast into an OD4Session.
   * [opendlv-video-h264-encoder](https://github.com/chalmers-revere/opendlv-video-h264-encoder.git) to encode video frames from a shared memory into h264 frames (OpenH264 Video Codec provided by Cisco Systems, Inc.) as [ImageReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L150-L155):
   * Section for `docker-compose.yml`:
-    ```yml
+```yml
  video-h264-encoder-amd64:
         build:
             context: https://github.com/chalmers-revere/opendlv-video-h264-encoder.git
@@ -188,10 +189,11 @@ Complete ArchLinux-based [OpenDLV OS](https://github.com/chalmers-revere/opendlv
         volumes:
         - /tmp:/tmp
         command: "--cid=111 --name=camera02 --width=640 --height=480 --yuyv422"
-    ```
+```
+  
   * [opendlv-video-h264-decoder](https://github.com/chalmers-revere/opendlv-video-h264-decoder.git) to decode h264 video frames from an [ImageReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L150-L155) into a shared memory into (OpenH264 Video Codec provided by Cisco Systems, Inc.):
     * Section for `docker-compose.yml`:
-    ```yml
+ ```yml
     video-h264-decoder-amd64:
         build:
             context: https://github.com/chalmers-revere/opendlv-video-h264-decoder.git
@@ -202,7 +204,7 @@ Complete ArchLinux-based [OpenDLV OS](https://github.com/chalmers-revere/opendlv
         volumes:
         - /tmp:/tmp
         command: "--cid=111 --name=imageData"
-    ```
+```
 
 ### Data Post Processing:
 * [cluon-rec2fuse](https://github.com/chrberger/cluon-rec2fuse) to *mount* a recording file to a folder and dynamically map its content as .csv files: 
