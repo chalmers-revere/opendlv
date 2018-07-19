@@ -161,7 +161,7 @@ Complete ArchLinux-based [OpenDLV OS](https://github.com/chalmers-revere/opendlv
     ```
 * Ultrasonic:
   * [opendlv-device-ultrasonic-srf08](https://github.com/chalmers-revere/opendlv-device-ultrasonic-srf08.git) to interface with an SRF08 ultrasound device connected via I2C bus:
-      * Provides: [PointCloudReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L160-L166)
+      * Provides: [PointCloudReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L165-L171)
     * Command to run with Docker: `docker run --rm -ti --net=host --privileged --device=/dev/i2c-1 chalmersrevere/opendlv-device-ultrasonic-srf08-multi:v0.0.10 opendlv-device-ultrasonic-srf08 --dev=/dev/i2c-1 --bus-address=112 --cid=111 --freq=5 --id=0`
     * Section for `docker-compose.yml`:
     ```yml
@@ -173,6 +173,36 @@ Complete ArchLinux-based [OpenDLV OS](https://github.com/chalmers-revere/opendlv
         devices:
         - "/dev/i2c-1:/dev/i2c-1"
         command: "opendlv-device-ultrasonic-srf08 --dev=/dev/i2c-1 --bus-address=112 --cid=111 --freq=5 --range=100 --gain=1 --id=0 --cid=111"
+    ```
+* Video: OpenDLV contains an easy-to-use framework to grab video frames from various cameras, share them via shared memory, and encode/decode them into h264 frames to broadcast into an OD4Session.
+  * [opendlv-video-h264-encoder](https://github.com/chalmers-revere/opendlv-video-h264-encoder.git) to encode video frames from a shared memory into h264 frames (OpenH264 Video Codec provided by Cisco Systems, Inc.):
+    * Provides: [ImageReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L150-L155)
+    * Section for `docker-compose.yml`:
+    ```yml
+ video-h264-encoder-amd64:
+        build:
+            context: https://github.com/chalmers-revere/opendlv-video-h264-encoder.git
+            dockerfile: Dockerfile.amd64
+        restart: on-failure
+        network_mode: "host"
+        ipc: "host"
+        volumes:
+        - /tmp:/tmp
+        command: "--cid=111 --name=camera02 --width=640 --height=480 --yuyv422"
+    ```
+  * [opendlv-video-h264-decoder](https://github.com/chalmers-revere/opendlv-video-h264-decoder.git) to decode h264 video frames from an [ImageReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L150-L155) into a shared memory into (OpenH264 Video Codec provided by Cisco Systems, Inc.):
+    * Section for `docker-compose.yml`:
+    ```yml
+    video-h264-decoder-amd64:
+        build:
+            context: https://github.com/chalmers-revere/opendlv-video-h264-decoder.git
+            dockerfile: Dockerfile.amd64
+        restart: on-failure
+        network_mode: "host"
+        ipc: "host"
+        volumes:
+        - /tmp:/tmp
+        command: "--cid=111 --name=imageData"
     ```
 
 ### Data Post Processing:
