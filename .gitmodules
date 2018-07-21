@@ -38,3 +38,6 @@
 [submodule "opendlv-video-h264-decoder"]
 	path = opendlv-video-h264-decoder
 	url = https://github.com/chalmers-revere/opendlv-video-h264-decoder.git
+[submodule "rec2csv-png"]
+	path = rec2csv-png
+	url = https://github.com/chalmers-revere/rec2csv-png.git
