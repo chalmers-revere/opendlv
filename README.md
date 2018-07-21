@@ -195,7 +195,7 @@ Complete ArchLinux-based [OpenDLV OS](https://github.com/chalmers-revere/opendlv
         command: "--cid=111 --name=camera02 --width=640 --height=480 --yuyv422"
 ```
   
-##### [opendlv-video-h264-decoder](https://github.com/chalmers-revere/opendlv-video-h264-decoder.git) to decode h264 video frames from an [ImageReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L150-L155) into a shared memory into (OpenH264 Video Codec provided by Cisco Systems, Inc.):
+##### [opendlv-video-h264-decoder](https://github.com/chalmers-revere/opendlv-video-h264-decoder.git) to decode h264 video frames from an [ImageReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L150-L155) into a shared memory (OpenH264 Video Codec provided by Cisco Systems, Inc.):
 * Section for `docker-compose.yml`:
  ```yml
     video-h264-decoder-amd64:
@@ -211,7 +211,23 @@ Complete ArchLinux-based [OpenDLV OS](https://github.com/chalmers-revere/opendlv
 ```
 
 ### Data Post Processing:
-* [cluon-rec2fuse](https://github.com/chrberger/cluon-rec2fuse) to *mount* a recording file to a folder and dynamically map its content as .csv files: 
+#### [rec2csv-png](https://github.com/chalmers-revere/rec2csv-png) to extract messages as .csv and h264 frames as separate .png files from a .rec file from a recorded OpenDLV session (OpenH264 Video Codec provided by Cisco Systems, Inc.):
+* Example for a `docker-compose.yml`:
+ ```yml
+ version: '2'
+ services:
+     rec2csv_png:
+        build:
+            context: https://github.com/chalmers-revere/rec2csv-png.git
+            dockerfile: Dockerfile.amd64
+        restart: on-failure
+        volumes:
+        - .:/opt/data
+        working_dir: /opt/data
+        command: "--rec=YourRecording.rec --odvd=YourMessageSpec.odvd"
+```
+        
+#### [cluon-rec2fuse](https://github.com/chrberger/cluon-rec2fuse) to *mount* a recording file to a folder and dynamically map its content as .csv files: 
 ```
   docker run --rm -ti -v $PWD/myrecording.rec:/opt/input.rec \
                     -v $PWD/opendlv.odvd:/opt/odvd \
