@@ -10,7 +10,6 @@ testing of self-driving vehicles driven by the following design principles:
 * CI-Status: [![Build Status](https://travis-ci.org/chalmers-revere/opendlv.svg?branch=new)](https://travis-ci.org/chalmers-revere/opendlv)
 * License: [![License: GPLv3](https://img.shields.io/badge/license-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.txt)
 
-
 ## Table of Contents
 * [What is an OpenDLV session?](#what-is-an-opendlv-session)
 * [Dependencies](#dependencies)
@@ -18,7 +17,6 @@ testing of self-driving vehicles driven by the following design principles:
 * [Build from sources on the example of Ubuntu 16.04 LTS](#build-from-sources-on-the-example-of-ubuntu-1604-lts)
 * [License](#license)
 * [Publications](#publications)
-
 
 ## What is an OpenDLV session?
 
@@ -75,6 +73,7 @@ field `senderStamp`. As an example, when using an Applanix unit next to a
 Trimble unit, the respective microservices could be supplied with the suffixes
 `--id=1` and `--id=2`.
 
+---
 
 ## Dependencies
 You need a C++14-compliant compiler to compile this project as it ships the following dependencies as part of the source distribution:
@@ -84,6 +83,8 @@ You need a C++14-compliant compiler to compile this project as it ships the foll
 * [Unit Test Framework Catch2](https://github.com/catchorg/Catch2/releases/tag/v2.1.2) - [![License: Boost Software License v1.0](https://img.shields.io/badge/License-Boost%20v1-blue.svg)](http://www.boost.org/LICENSE_1_0.txt)
 
 For building [cluon-rec2fuse](https://github.com/chrberger/cluon-rec2fuse), [libfuse](https://github.com/libfuse/libfuse) is required.
+
+---
 
 ## Usage
 We are providing the following microservices as multi-platform (amd64/x86_64, armhf, aarch64) Docker images:
@@ -113,7 +114,7 @@ services:    # Must be present exactly once at the beginning of the docker-compo
         network_mode: "host"
         command: "opendlv-device-gps-ncom --ncom_ip=0.0.0.0 --ncom_port=3000 --cid=111"
 ```
-
+---
 #### GPS: Interface to **Trimble GPS/INSS** units [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-gps-nmea.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-gps-nmea) [opendlv-device-gps-nmea](https://github.com/chalmers-revere/opendlv-device-gps-nmea):
 * Provides: [Latitude/Longitude](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L145-L148)
 * Provides: [Heading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L141-L143)
