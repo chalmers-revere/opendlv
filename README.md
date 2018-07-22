@@ -192,13 +192,16 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 
 #### Interface to **Video4Linux** cameras (e.g., /dev/video0) [![opendlv-device-camera-v4l](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-camera-v4l")](https://github.com/chalmers-revere/opendlv-device-camera-v4l) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-v4l-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-v4l-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-v4l-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-v4l-aarch64/tags/) [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-camera-v4l.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-camera-v4l):
 * This microservice interfaces with a Video4Linux-supported camera and provides both, an [I420-encoded image](https://wiki.videolan.org/YUV/#I420) and an ARGB-encoded image residing in two separate shared memory areas. Other OpenDLV microservices can attach to this shared memory area for further processing (for instance [opendlv-video-h264-encoder](https://github.com/chalmers-revere/opendlv-video-h264-encoder)).
-* Command to run with Docker: `docker run --rm -ti --init --ipc=host -v /tmp:/tmp -e DISPLAY=$DISPLAY --device /dev/video0 chalmersrevere/opendlv-device-camera-v4l-multi:v0.0.2 --camera=/dev/video0 --width=640 --height=480 --freq=20 --verbose`
+* The following image formats are supported:
+  * MJPEG
+  * YUYV422
+* Command to run with Docker: `docker run --rm -ti --init --ipc=host -v /tmp:/tmp -e DISPLAY=$DISPLAY --device /dev/video0 chalmersrevere/opendlv-device-camera-v4l-multi:v0.0.3 --camera=/dev/video0 --width=640 --height=480 --freq=20 --verbose`
 * Section for `docker-compose.yml`:
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-camera-v4l:
-        image: chalmersrevere/opendlv-device-camera-v4l-multi:v0.0.2
+        image: chalmersrevere/opendlv-device-camera-v4l-multi:v0.0.3
         restart: on-failure
         ipc: "host"
         volumes:
