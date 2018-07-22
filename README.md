@@ -105,6 +105,8 @@ Complete ArchLinux-based [OpenDLV OS](https://github.com/chalmers-revere/opendlv
 * Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-ncom-multi:v0.0.12 opendlv-device-gps-ncom --ncom_ip=0.0.0.0 --ncom_port=3000 --cid=111 --verbose`
 * Section for `docker-compose.yml`:
 ```yml
+version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
+services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-gps-ncom:
         image: chalmersrevere/opendlv-device-gps-ncom-multi:v0.0.12
         restart: on-failure
@@ -118,6 +120,8 @@ Complete ArchLinux-based [OpenDLV OS](https://github.com/chalmers-revere/opendlv
 * Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-nmea-multi:v0.0.7 opendlv-device-gps-nmea --nmea_ip=10.42.42.112 --nmea_port=9999 --cid=111 --verbose`
 * Section for `docker-compose.yml`:
 ```yml
+version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
+services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-gps-nmea:
         image: chalmersrevere/opendlv-device-gps-nmea-multi:v0.0.7
         restart: on-failure
@@ -132,6 +136,8 @@ Complete ArchLinux-based [OpenDLV OS](https://github.com/chalmers-revere/opendlv
 * Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-pos-multi:v0.0.5 opendlv-device-gps-pos --pos_ip=192.168.1.77 --pos_port=5602 --cid=111 --verbose`
 * Section for `docker-compose.yml`:
 ```yml
+version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
+services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-gps-pos:
         image: chalmersrevere/opendlv-device-gps-pos-multi:v0.0.5
         restart: on-failure
@@ -144,6 +150,8 @@ Complete ArchLinux-based [OpenDLV OS](https://github.com/chalmers-revere/opendlv
 * Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-lidar-vlp16-multi:v0.0.8 opendlv-device-lidar-vlp16 --vlp16_ip=0.0.0.0 --vlp16_port=2368 --cid=111 --verbose`
 * Section for `docker-compose.yml`:
 ```yml
+version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
+services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-lidar-vlp16c:
         image: chalmersrevere/opendlv-device-lidar-vlp16-multi:v0.0.8
         restart: on-failure
@@ -156,6 +164,8 @@ Complete ArchLinux-based [OpenDLV OS](https://github.com/chalmers-revere/opendlv
 * Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-lidar-hdl32e-multi:v0.0.9 opendlv-device-lidar-hdl32e --hdl32e_ip=0.0.0.0 --hdl32e_port=2368 --cid=111 --verbose`
 * Section for `docker-compose.yml`:
 ```yml
+version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
+services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-lidar-hdl32e:
         image: chalmersrevere/opendlv-device-lidar-hdl32e-multi:v0.0.9
         restart: on-failure
@@ -168,6 +178,8 @@ Complete ArchLinux-based [OpenDLV OS](https://github.com/chalmers-revere/opendlv
 * Command to run with Docker: `docker run --rm -ti --net=host --privileged --device=/dev/i2c-1 chalmersrevere/opendlv-device-ultrasonic-srf08-multi:v0.0.10 opendlv-device-ultrasonic-srf08 --dev=/dev/i2c-1 --bus-address=112 --cid=111 --freq=5 --id=0`
 * Section for `docker-compose.yml`:
 ```yml
+version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
+services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-ultrasonic-srf08:
         image: chalmersrevere/opendlv-device-ultrasonic-srf08-multi:v0.0.10
         restart: on-failure
@@ -183,6 +195,8 @@ Complete ArchLinux-based [OpenDLV OS](https://github.com/chalmers-revere/opendlv
 ##### [opendlv-video-h264-encoder](https://github.com/chalmers-revere/opendlv-video-h264-encoder.git) to encode video frames from a shared memory into h264 frames (OpenH264 Video Codec provided by Cisco Systems, Inc.) as [ImageReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L150-L155):
 * Section for `docker-compose.yml`:
 ```yml
+version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
+services:    # Must be present exactly once at the beginning of the docker-compose.yml file
  video-h264-encoder-amd64:
         build:
             context: https://github.com/chalmers-revere/opendlv-video-h264-encoder.git
@@ -198,6 +212,8 @@ Complete ArchLinux-based [OpenDLV OS](https://github.com/chalmers-revere/opendlv
 ##### [opendlv-video-h264-decoder](https://github.com/chalmers-revere/opendlv-video-h264-decoder.git) to decode h264 video frames from an [ImageReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L150-L155) into a shared memory (OpenH264 Video Codec provided by Cisco Systems, Inc.):
 * Section for `docker-compose.yml`:
  ```yml
+version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
+services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     video-h264-decoder-amd64:
         build:
             context: https://github.com/chalmers-revere/opendlv-video-h264-decoder.git
@@ -214,8 +230,8 @@ Complete ArchLinux-based [OpenDLV OS](https://github.com/chalmers-revere/opendlv
 #### [rec2csv-png](https://github.com/chalmers-revere/rec2csv-png) to extract messages as .csv and h264 frames as separate .png files from a .rec file from a recorded OpenDLV session (OpenH264 Video Codec provided by Cisco Systems, Inc.):
 * Example for a `docker-compose.yml`:
  ```yml
- version: '2'
- services:
+version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
+services:    # Must be present exactly once at the beginning of the docker-compose.yml file
      rec2csv_png:
         build:
             context: https://github.com/chalmers-revere/rec2csv-png.git
@@ -250,6 +266,8 @@ Complete ArchLinux-based [OpenDLV OS](https://github.com/chalmers-revere/opendlv
 
 #### [opendlv-signal-viewer](https://github.com/chalmers-revere/opendlv-signal-viewer) to view any messages from the OpenDLV Standard Message Set exchanged in the communication session 111 (after starting this microservice, point your web-browser to the computer's IP address, port 8080): `docker run --rm --net=host -p 8080:8080 chalmersrevere/opendlv-signal-viewer-multi:v0.0.8 --cid=111`
 ```yml
+version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
+services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     signal-viewer:
         image: chalmersrevere/opendlv-signal-viewer-multi:v0.0.8
         restart: on-failure
@@ -262,6 +280,8 @@ Complete ArchLinux-based [OpenDLV OS](https://github.com/chalmers-revere/opendlv
 
 #### [opendlv-vehicle-view](https://github.com/chalmers-revere/opendlv-vehicle-view) to view vehicle messages from the OpenDLV Standard Message Set exchanged in the communication session 111 (after starting this microservice, point your web-browser to the computer's IP address, port 8081): `docker run --rm --net=host -p 8081:8081 chalmersrevere/opendlv-vehicle-view-multi:v0.0.19 --cid=111`
 ```yml
+version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
+services:    # Must be present exactly once at the beginning of the docker-compose.yml file
    vehicle-view:
         image: chalmersrevere/opendlv-vehicle-view-multi:v0.0.19
         restart: on-failure
