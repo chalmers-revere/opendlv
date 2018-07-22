@@ -41,3 +41,6 @@
 [submodule "rec2csv-png"]
 	path = rec2csv-png
 	url = https://github.com/chalmers-revere/rec2csv-png.git
+[submodule "opendlv-device-camera-v4l"]
+	path = opendlv-device-camera-v4l
+	url = https://github.com/chalmers-revere/opendlv-device-camera-v4l.git

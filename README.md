@@ -171,7 +171,7 @@ services:    # Must be present exactly once at the beginning of the docker-compo
         command: "opendlv-device-lidar-hdl32e --hdl32e_ip=0.0.0.0 --hdl32e_port=2368 --cid=111"
 ```
 ---
-#### Ultrasonic: Interface to SRF08 ultrasound devices connected via I2C bus [![opendlv-device-ultrasonic-srf08](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-ultrasonic-srf08")](https://github.com/chalmers-revere/opendlv-device-ultrasonic-srf08)
+#### Ultrasonic: Interface to SRF08 ultrasound devices connected via I2C bus [![opendlv-device-ultrasonic-srf08](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-ultrasonic-srf08")](https://github.com/chalmers-revere/opendlv-device-ultrasonic-srf08) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-ultrasonic-srf08-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-ultrasonic-srf08-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-ultrasonic-srf08-armhf/tags/):
 * Provides: [PointCloudReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L165-L171)
 * Command to run with Docker: `docker run --rm -ti --net=host --privileged --device=/dev/i2c-1 chalmersrevere/opendlv-device-ultrasonic-srf08-multi:v0.0.10 opendlv-device-ultrasonic-srf08 --dev=/dev/i2c-1 --bus-address=112 --cid=111 --freq=5 --id=0`
 * Section for `docker-compose.yml`:
@@ -190,12 +190,31 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 ---
 #### Video: OpenDLV contains an easy-to-use framework to grab video frames from various cameras, share them via shared memory, and encode/decode them into h264 frames to broadcast into an OD4Session.
 
-##### [opendlv-video-h264-encoder](https://github.com/chalmers-revere/opendlv-video-h264-encoder.git) to encode video frames from a shared memory into h264 frames (OpenH264 Video Codec provided by Cisco Systems, Inc.) as [ImageReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L150-L155):
+#### Video4Linux: Interface to **Video4Linux** camera (e.g., /dev/video0) [![opendlv-device-camera-v4l](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-camera-v4l")](https://github.com/chalmers-revere/opendlv-device-camera-v4l) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-v4l-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-v4l-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-v4l-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-v4l-aarch64/tags/) [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-camera-v4l.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-camera-v4l):
+* This microservice interfaces with a Video4Linux-supported camera and provides both, an [I420-encoded image](https://wiki.videolan.org/YUV/#I420) and an ARGB-encoded image residing in two separate shared memory areas. Other OpenDLV microservices can attach to this shared memory area for further processing (for instance [opendlv-video-h264-encoder](https://github.com/chalmers-revere/opendlv-video-h264-encoder)).
+* Command to run with Docker: `docker run --rm -ti --init --ipc=host -v /tmp:/tmp -e DISPLAY=$DISPLAY --device /dev/video0 chalmersrevere/opendlv-device-camera-v4l-multi:v0.0.2 --camera=/dev/video0 --width=640 --height=480 --freq=20 --verbose`
 * Section for `docker-compose.yml`:
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
- video-h264-encoder-amd64:
+    dev-camera-v4l:
+        image: chalmersrevere/opendlv-device-camera-v4l-multi:v0.0.2
+        restart: on-failure
+        ipc: "host"
+        volumes:
+        - /tmp:/tmp
+        devices:
+        - "/dev/video0:/dev/video0"
+        command: "--camera=/dev/video0 --width=640 --height=480 --freq=20"
+```
+---
+##### [opendlv-video-h264-encoder](https://github.com/chalmers-revere/opendlv-video-h264-encoder) to encode video frames from a shared memory into h264 frames (OpenH264 Video Codec provided by Cisco Systems, Inc.) as [ImageReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L150-L155):
+* This microservice attaches to a I420-encoded image residing in a shared memory area to encode it into an h264 frame to be broadcasted to other OpenDLV microservices.
+* Section for `docker-compose.yml`:
+```yml
+version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
+services:    # Must be present exactly once at the beginning of the docker-compose.yml file
+    video-h264-encoder-amd64:
         build:
             context: https://github.com/chalmers-revere/opendlv-video-h264-encoder.git
             dockerfile: Dockerfile.amd64
@@ -204,7 +223,7 @@ services:    # Must be present exactly once at the beginning of the docker-compo
         ipc: "host"
         volumes:
         - /tmp:/tmp
-        command: "--cid=111 --name=camera02 --width=640 --height=480 --yuyv422"
+        command: "--cid=111 --name=camera.i420 --width=640 --height=480"
 ```
   
 ##### [opendlv-video-h264-decoder](https://github.com/chalmers-revere/opendlv-video-h264-decoder.git) to decode h264 video frames from an [ImageReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L150-L155) into a shared memory (OpenH264 Video Codec provided by Cisco Systems, Inc.):
