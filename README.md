@@ -73,8 +73,6 @@ field `senderStamp`. As an example, when using an Applanix unit next to a
 Trimble unit, the respective microservices could be supplied with the suffixes
 `--id=1` and `--id=2`.
 
----
-
 ## Dependencies
 You need a C++14-compliant compiler to compile this project as it ships the following dependencies as part of the source distribution:
 
@@ -83,8 +81,6 @@ You need a C++14-compliant compiler to compile this project as it ships the foll
 * [Unit Test Framework Catch2](https://github.com/catchorg/Catch2/releases/tag/v2.1.2) - [![License: Boost Software License v1.0](https://img.shields.io/badge/License-Boost%20v1-blue.svg)](http://www.boost.org/LICENSE_1_0.txt)
 
 For building [cluon-rec2fuse](https://github.com/chrberger/cluon-rec2fuse), [libfuse](https://github.com/libfuse/libfuse) is required.
-
----
 
 ## Usage
 We are providing the following microservices as multi-platform (amd64/x86_64, armhf, aarch64) Docker images:
@@ -95,6 +91,7 @@ Complete ArchLinux-based [OpenDLV OS](https://github.com/chalmers-revere/opendlv
 
 ### Hardware/Software Interfaces:
 
+---
 #### GPS: Interface to **OxTS GPS/INSS** units  [![opendlv-device-gps-ncom](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-gps-ncom")](https://github.com/chalmers-revere/opendlv-device-gps-ncom) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-gps-ncom-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-gps-ncom-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-gps-ncom-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-gps-ncom-aarch64/tags/) [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-gps-ncom.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-gps-ncom):
 * Provides: [Latitude/Longitude](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L145-L148)
 * Provides: [Altitude](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L89-L91)
@@ -115,7 +112,7 @@ services:    # Must be present exactly once at the beginning of the docker-compo
         command: "opendlv-device-gps-ncom --ncom_ip=0.0.0.0 --ncom_port=3000 --cid=111"
 ```
 ---
-#### GPS: Interface to **Trimble GPS/INSS** units [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-gps-nmea.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-gps-nmea) [opendlv-device-gps-nmea](https://github.com/chalmers-revere/opendlv-device-gps-nmea):
+#### GPS: Interface to **Trimble GPS/INSS** units [![opendlv-device-gps-nmea](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-gps-nmea")](https://github.com/chalmers-revere/opendlv-device-gps-nmea) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-gps-nmea-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-gps-nmea-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-gps-nmea-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-gps-nmea-aarch64/tags/) [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-gps-nmea.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-gps-nmea):
 * Provides: [Latitude/Longitude](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L145-L148)
 * Provides: [Heading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L141-L143)
 * Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-nmea-multi:v0.0.7 opendlv-device-gps-nmea --nmea_ip=10.42.42.112 --nmea_port=9999 --cid=111 --verbose`
@@ -129,8 +126,8 @@ services:    # Must be present exactly once at the beginning of the docker-compo
         network_mode: "host"
         command: "opendlv-device-gps-nmea --nmea_ip=10.42.42.112 --nmea_port=9999 --cid=111"
 ```
-
-#### GPS: Interface to **Applanix POS GPS/INSS** units [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-gps-pos.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-gps-pos) [opendlv-device-gps-pos](https://github.com/chalmers-revere/opendlv-device-gps-pos):
+---
+#### GPS: Interface to **Applanix POS GPS/INSS** units [![opendlv-device-gps-pos](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-gps-pos")](https://github.com/chalmers-revere/opendlv-device-gps-pos) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-gps-pos-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-gps-pos-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-gps-pos-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-gps-pos-aarch64/tags/) [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-gps-pos.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-gps-pos):
 * Provides: [Latitude/Longitude](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L145-L148)
 * Provides: [Heading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L141-L143)
 * Provides: [device-specific messages](https://github.com/chalmers-revere/opendlv-device-gps-pos/blob/master/src/pos-message-set.odvd)
@@ -145,8 +142,8 @@ services:    # Must be present exactly once at the beginning of the docker-compo
         network_mode: "host"
         command: "opendlv-device-gps-pos --pos_ip=10.42.42.40 --pos_port=5602 --cid=111"
 ```
-
-#### LIDAR: Interface to **Velodyne VLP16** lidar units [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-vlp16.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-vlp16) [opendlv-device-lidar-vlp16](https://github.com/chalmers-revere/opendlv-device-lidar-vlp16):
+---
+#### LIDAR: Interface to **Velodyne VLP16** lidar units [![opendlv-device-lidar-vlp16](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-lidar-vlp16")](https://github.com/chalmers-revere/opendlv-device-lidar-vlp16) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-vlp16-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-vlp16-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-vlp16-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-vlp16-aarch64/tags/) [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-vlp16.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-vlp16):
 * Provides: [PointCloudReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L160-L166)
 * Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-lidar-vlp16-multi:v0.0.8 opendlv-device-lidar-vlp16 --vlp16_ip=0.0.0.0 --vlp16_port=2368 --cid=111 --verbose`
 * Section for `docker-compose.yml`:
@@ -159,8 +156,8 @@ services:    # Must be present exactly once at the beginning of the docker-compo
         network_mode: "host"
         command: "opendlv-device-lidar-vlp16 --vlp16_ip=0.0.0.0 --vlp16_port=2368 --cid=111"
 ```
-
-#### LIDAR: Interface to **Velodyne HDL32e** lidar units [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-hdl32e.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-hdl32e) [opendlv-device-lidar-hdl32e](https://github.com/chalmers-revere/opendlv-device-lidar-hdl32e):
+---
+#### LIDAR: Interface to **Velodyne HDL32e** lidar units [![opendlv-device-lidar-hdl32e](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-lidar-hdl32e")](https://github.com/chalmers-revere/opendlv-device-lidar-hdl32e) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-hdl32e-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-hdl32e-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-hdl32e-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-hdl32e-aarch64/tags/) [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-hdl32e.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-hdl32e):
 * Provides: [PointCloudReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L160-L166)
 * Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-lidar-hdl32e-multi:v0.0.9 opendlv-device-lidar-hdl32e --hdl32e_ip=0.0.0.0 --hdl32e_port=2368 --cid=111 --verbose`
 * Section for `docker-compose.yml`:
@@ -173,8 +170,8 @@ services:    # Must be present exactly once at the beginning of the docker-compo
         network_mode: "host"
         command: "opendlv-device-lidar-hdl32e --hdl32e_ip=0.0.0.0 --hdl32e_port=2368 --cid=111"
 ```
-
-#### Ultrasonic: Interface to SRF08 ultrasound devices connected via I2C bus [opendlv-device-ultrasonic-srf08](https://github.com/chalmers-revere/opendlv-device-ultrasonic-srf08.git):
+---
+#### Ultrasonic: Interface to SRF08 ultrasound devices connected via I2C bus [![opendlv-device-ultrasonic-srf08](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-ultrasonic-srf08")](https://github.com/chalmers-revere/opendlv-device-ultrasonic-srf08)
 * Provides: [PointCloudReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L165-L171)
 * Command to run with Docker: `docker run --rm -ti --net=host --privileged --device=/dev/i2c-1 chalmersrevere/opendlv-device-ultrasonic-srf08-multi:v0.0.10 opendlv-device-ultrasonic-srf08 --dev=/dev/i2c-1 --bus-address=112 --cid=111 --freq=5 --id=0`
 * Section for `docker-compose.yml`:
@@ -190,7 +187,7 @@ services:    # Must be present exactly once at the beginning of the docker-compo
         - "/dev/i2c-1:/dev/i2c-1"
         command: "opendlv-device-ultrasonic-srf08 --dev=/dev/i2c-1 --bus-address=112 --cid=111 --freq=5 --range=100 --gain=1 --id=0 --cid=111"
 ```
-
+---
 #### Video: OpenDLV contains an easy-to-use framework to grab video frames from various cameras, share them via shared memory, and encode/decode them into h264 frames to broadcast into an OD4Session.
 
 ##### [opendlv-video-h264-encoder](https://github.com/chalmers-revere/opendlv-video-h264-encoder.git) to encode video frames from a shared memory into h264 frames (OpenH264 Video Codec provided by Cisco Systems, Inc.) as [ImageReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L150-L155):
@@ -226,7 +223,7 @@ services:    # Must be present exactly once at the beginning of the docker-compo
         - /tmp:/tmp
         command: "--cid=111 --name=imageData"
 ```
-
+---
 ### Data Post Processing:
 #### [rec2csv-png](https://github.com/chalmers-revere/rec2csv-png) to extract messages as .csv and h264 frames as separate .png files from a .rec file from a recorded OpenDLV session (OpenH264 Video Codec provided by Cisco Systems, Inc.):
 * Example for a `docker-compose.yml`:
@@ -261,7 +258,7 @@ services:    # Must be present exactly once at the beginning of the docker-compo
                     && tail -f /dev/null"
 ```
 [![asciicast](https://asciinema.org/a/tMLc9lvmnTKlcwSHSIuepF4It.png)](https://asciinema.org/a/tMLc9lvmnTKlcwSHSIuepF4It?autoplay=1)
-
+---
 ### Visualizations:
 #### [cluon-livefeed](https://github.com/chrberger/cluon-livefeed) to display any messages exchanged in the communication session 111 on console: `docker run --rm -ti --init --net=host chrberger/cluon-livefeed-multi:v0.0.104 --cid=111` [![asciicast](https://asciinema.org/a/zT1Mr5aKUGx3k43ax8a9eapBb.png)](https://asciinema.org/a/zT1Mr5aKUGx3k43ax8a9eapBb?autoplay=1)
 
