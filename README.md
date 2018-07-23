@@ -243,6 +243,8 @@ services:    # Must be present exactly once at the beginning of the docker-compo
         ipc: "host"
         volumes:
         - /tmp:/tmp
+        environment:
+        - DISPLAY=${DISPLAY}
         command: "--cid=111 --name=imageData"
 ```
 ---
