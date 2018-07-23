@@ -44,3 +44,6 @@
 [submodule "opendlv-device-camera-v4l"]
 	path = opendlv-device-camera-v4l
 	url = https://github.com/chalmers-revere/opendlv-device-camera-v4l.git
+[submodule "opendlv-device-camera-opencv"]
+	path = opendlv-device-camera-opencv
+	url = https://github.com/chalmers-revere/opendlv-device-camera-opencv.git
