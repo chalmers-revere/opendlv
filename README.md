@@ -231,7 +231,7 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 ```
 ---
 ##### [opendlv-video-h264-encoder](https://github.com/chalmers-revere/opendlv-video-h264-encoder) to encode video frames from a shared memory into h264 frames (OpenH264 Video Codec provided by Cisco Systems, Inc.) as [ImageReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L150-L155):
-* This microservice attaches to a I420-encoded image residing in a shared memory area to encode it into an h264 frame to be broadcasted to other OpenDLV microservices.
+* This microservice attaches to an I420-encoded image residing in a shared memory area to encode it into an h264 frame to be broadcasted to other OpenDLV microservices.
 * Section for `docker-compose.yml`:
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
