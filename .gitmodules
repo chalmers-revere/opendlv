@@ -47,3 +47,9 @@
 [submodule "opendlv-device-camera-opencv"]
 	path = opendlv-device-camera-opencv
 	url = https://github.com/chalmers-revere/opendlv-device-camera-opencv.git
+[submodule "opendlv-video-vpx-encoder"]
+	path = opendlv-video-vpx-encoder
+	url = https://github.com/chalmers-revere/opendlv-video-vpx-encoder.git
+[submodule "opendlv-video-vpx-decoder"]
+	path = opendlv-video-vpx-decoder
+	url = https://github.com/chalmers-revere/opendlv-video-vpx-decoder.git
