@@ -220,13 +220,13 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 ```
 #### **OpenCV-supported** cameras: [![opendlv-device-camera-opencv](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-camera-opencv")](https://github.com/chalmers-revere/opendlv-device-camera-opencv) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-opencv-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-opencv-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-opencv-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-opencv-aarch64/tags/) [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-camera-opencv.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-camera-opencv)
 * This microservice interfaces with an OpenCV-supported camera and provides both, an [I420-encoded image](https://wiki.videolan.org/YUV/#I420) and an ARGB-encoded image residing in two separate shared memory areas. Other OpenDLV microservices can attach to this shared memory area for further processing (for instance [opendlv-video-h264-encoder](https://github.com/chalmers-revere/opendlv-video-h264-encoder)). This microservice also allows to interface with network-attached cameras (i.e., those providing an MJPEG stream for example).
-* Command to run with Docker: `docker run --rm -ti --init --ipc=host -e DISPLAY=$DISPLAY --device /dev/video0 -v /tmp:/tmp chalmersrevere/opendlv-device-camera-opencv-multi:v0.0.6 --camera=/dev/video0 --width=640 --height=480 --freq=20`
+* Command to run with Docker: `docker run --rm -ti --init --ipc=host -e DISPLAY=$DISPLAY --device /dev/video0 -v /tmp:/tmp chalmersrevere/opendlv-device-camera-opencv-multi:v0.0.8 --camera=/dev/video0 --width=640 --height=480 --freq=20`
 * Section for `docker-compose.yml`:
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-camera-opencv:
-        image: chalmersrevere/opendlv-device-camera-opencv-multi:v0.0.6
+        image: chalmersrevere/opendlv-device-camera-opencv-multi:v0.0.8
         restart: on-failure
         ipc: "host"
         volumes:
