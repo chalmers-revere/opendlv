@@ -56,3 +56,6 @@
 [submodule "opendlv-video-x264-encoder"]
 	path = opendlv-video-x264-encoder
 	url = https://github.com/chalmers-revere/opendlv-video-x264-encoder.git
+[submodule "opendlv-device-camera-rpi"]
+	path = opendlv-device-camera-rpi
+	url = https://github.com/chalmers-revere/opendlv-device-camera-rpi.git
