@@ -203,13 +203,13 @@ OpenDLV contains a highly modular and easy-to-use framework to grab video frames
 * The following image formats are supported:
   * MJPEG
   * YUYV422
-* Command to run with Docker: `docker run --rm -ti --init --ipc=host -v /tmp:/tmp -e DISPLAY=$DISPLAY --device /dev/video0 chalmersrevere/opendlv-device-camera-v4l-multi:v0.0.4 --camera=/dev/video0 --width=640 --height=480 --freq=20 --verbose`
+* Command to run with Docker: `docker run --rm -ti --init --ipc=host -v /tmp:/tmp -e DISPLAY=$DISPLAY --device /dev/video0 chalmersrevere/opendlv-device-camera-v4l-multi:v0.0.5 --camera=/dev/video0 --width=640 --height=480 --freq=20 --verbose`
 * Section for `docker-compose.yml`:
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-camera-v4l:
-        image: chalmersrevere/opendlv-device-camera-v4l-multi:v0.0.4
+        image: chalmersrevere/opendlv-device-camera-v4l-multi:v0.0.5
         restart: on-failure
         ipc: "host"
         volumes:
