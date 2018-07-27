@@ -53,3 +53,6 @@
 [submodule "opendlv-video-vpx-decoder"]
 	path = opendlv-video-vpx-decoder
 	url = https://github.com/chalmers-revere/opendlv-video-vpx-decoder.git
+[submodule "opendlv-video-x264-encoder"]
+	path = opendlv-video-x264-encoder
+	url = https://github.com/chalmers-revere/opendlv-video-x264-encoder.git
