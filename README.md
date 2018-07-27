@@ -236,7 +236,7 @@ services:    # Must be present exactly once at the beginning of the docker-compo
         command: "--camera=/dev/video0 --width=640 --height=480 --freq=20"
 ```
 ---
-##### [opendlv-video-h264-encoder](https://github.com/chalmers-revere/opendlv-video-h264-encoder) to encode video frames from a shared memory into h264 frames (OpenH264 Video Codec provided by Cisco Systems, Inc.) as [ImageReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L150-L155):
+#### [opendlv-video-h264-encoder](https://github.com/chalmers-revere/opendlv-video-h264-encoder) to encode video frames from a shared memory into h264 frames (OpenH264 Video Codec provided by Cisco Systems, Inc.) as [ImageReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L150-L155):
 * This microservice attaches to an I420-encoded image residing in a shared memory area to encode it into an h264 frame to be broadcasted to other OpenDLV microservices.
 * During the Docker-ized build process for this microservice, Cisco's binary library is downloaded from Cisco's webserver and installed on the user's computer due to legal implications arising from the patents around the [AVC/h264 format](http://www.mpegla.com/main/programs/avc/pages/intro.aspx).
 * End user's notice according to [AVC/H.264 Patent Portfolio License Conditions](https://www.openh264.org/BINARY_LICENSE.txt):
@@ -257,7 +257,7 @@ services:    # Must be present exactly once at the beginning of the docker-compo
         command: "--cid=111 --name=video0.i420 --width=640 --height=480"
 ```
 
-##### [opendlv-video-h264-decoder](https://github.com/chalmers-revere/opendlv-video-h264-decoder.git) to decode h264 video frames from an [ImageReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L150-L155) into a shared memory (OpenH264 Video Codec provided by Cisco Systems, Inc.):
+#### [opendlv-video-h264-decoder](https://github.com/chalmers-revere/opendlv-video-h264-decoder.git) to decode h264 video frames from an [ImageReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L150-L155) into a shared memory (OpenH264 Video Codec provided by Cisco Systems, Inc.):
 * During the Docker-ized build process for this microservice, Cisco's binary library is downloaded from Cisco's webserver and installed on the user's computer due to legal implications arising from the patents around the [AVC/h264 format](http://www.mpegla.com/main/programs/avc/pages/intro.aspx).
 * End user's notice according to [AVC/H.264 Patent Portfolio License Conditions](https://www.openh264.org/BINARY_LICENSE.txt):
 **When you are using this software and build scripts from this repository, you are agreeing to and obeying the terms under which Cisco is making the binary library available.**
@@ -279,7 +279,7 @@ services:    # Must be present exactly once at the beginning of the docker-compo
         command: "--cid=111 --name=imageData"
 ```
 
-##### [opendlv-video-x264-encoder](https://github.com/chalmers-revere/opendlv-video-x264-encoder) to encode video frames from a shared memory into h264 frames as [ImageReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L150-L155):
+#### [opendlv-video-x264-encoder](https://github.com/chalmers-revere/opendlv-video-x264-encoder) to encode video frames from a shared memory into h264 frames as [ImageReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L150-L155):
 * This microservice attaches to an I420-encoded image residing in a shared memory area to encode it into an h264 frame to be broadcasted to other OpenDLV microservices.
 * Due to legal implications arising from the patents around the [AVC/h264 format](http://www.mpegla.com/main/programs/avc/pages/intro.aspx), we are not distributing binaries or Docker images but only provide build instructions that can be easily integrated with a `docker-compose.yml` file.
 * Section for `docker-compose.yml` to build for `amd64`:
@@ -312,7 +312,7 @@ services:    # Must be present exactly once at the beginning of the docker-compo
         - /tmp:/tmp
         command: "--cid=111 --name=video0.i420 --width=640 --height=480"
 ```
-* Section for `docker-compose.yml` to build for `aarch`:
+* Section for `docker-compose.yml` to build for `aarch64`:
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
@@ -328,7 +328,7 @@ services:    # Must be present exactly once at the beginning of the docker-compo
         command: "--cid=111 --name=video0.i420 --width=640 --height=480"
 ```
 
-##### [opendlv-video-vpx-encoder](https://github.com/chalmers-revere/opendlv-video-vpx-encoder.git) to encode video frames from a shared memory into VP8 or VP9 frames as [ImageReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L150-L155): [![opendlv-video-vpx-encoder](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-video-vpx-encoder")](https://github.com/chalmers-revere/opendlv-video-vpx-encoder) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-encoder-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-encoder-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-encoder-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-encoder-aarch64/tags/)
+#### [opendlv-video-vpx-encoder](https://github.com/chalmers-revere/opendlv-video-vpx-encoder.git) to encode video frames from a shared memory into VP8 or VP9 frames as [ImageReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L150-L155): [![opendlv-video-vpx-encoder](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-video-vpx-encoder")](https://github.com/chalmers-revere/opendlv-video-vpx-encoder) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-encoder-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-encoder-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-encoder-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-encoder-aarch64/tags/)
 * Command to run with Docker: `docker run --rm -ti --init --net=host --ipc=host -v /tmp:/tmp chalmersrevere/opendlv-video-vpx-encoder-multi:v0.0.3 --cid=111 --name=video0.i420 --width=640 --height=480 --vp8`
 * Section for `docker-compose.yml`:
  ```yml
@@ -346,7 +346,7 @@ services:    # Must be present exactly once at the beginning of the docker-compo
         command: "--cid=111 --name=video0.i420 --width=640 --height=480 --vp8"
 ```
 
-##### [opendlv-video-vpx-decoder](https://github.com/chalmers-revere/opendlv-video-vpx-decoder.git) to decode h264 video frames from an [ImageReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L150-L155) into a shared memory: [![opendlv-video-vpx-decoder](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-video-vpx-decoder")](https://github.com/chalmers-revere/opendlv-video-vpx-decoder) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-decoder-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-decoder-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-decoder-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-decoder-aarch64/tags/)
+#### [opendlv-video-vpx-decoder](https://github.com/chalmers-revere/opendlv-video-vpx-decoder.git) to decode h264 video frames from an [ImageReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L150-L155) into a shared memory: [![opendlv-video-vpx-decoder](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-video-vpx-decoder")](https://github.com/chalmers-revere/opendlv-video-vpx-decoder) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-decoder-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-decoder-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-decoder-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-decoder-aarch64/tags/)
 * Command to run with Docker: `docker run --rm -ti --init --net=host --ipc=host -v /tmp:/tmp -e DISPLAY=$DISPLAY chalmersrevere/opendlv-video-vpx-decoder-multi:v0.0.3 --cid=253 --name=video0.arg0 --verbose`
 * Section for `docker-compose.yml`:
  ```yml
