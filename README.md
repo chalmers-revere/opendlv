@@ -118,13 +118,13 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 * Provides: [GroundSpeed](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L129-L131)
 * Provides: [Acceleration X/Y/Z](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L71-L75)
 * Provides: [Angular Velocity X/Y/Z](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L77-L81)
-* Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-ncom-multi:v0.0.12 opendlv-device-gps-ncom --ncom_ip=0.0.0.0 --ncom_port=3000 --cid=111 --verbose`
+* Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-ncom-multi:v0.0.13 opendlv-device-gps-ncom --ncom_ip=0.0.0.0 --ncom_port=3000 --cid=111 --verbose`
 * Section for `docker-compose.yml`:
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-gps-ncom:
-        image: chalmersrevere/opendlv-device-gps-ncom-multi:v0.0.12
+        image: chalmersrevere/opendlv-device-gps-ncom-multi:v0.0.13
         restart: on-failure
         network_mode: "host"
         command: "opendlv-device-gps-ncom --ncom_ip=0.0.0.0 --ncom_port=3000 --cid=111"
@@ -344,13 +344,13 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 ```
 
 #### [opendlv-video-vpx-encoder](https://github.com/chalmers-revere/opendlv-video-vpx-encoder.git) to encode video frames from a shared memory into VP8 or VP9 frames as [ImageReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L150-L155): [![opendlv-video-vpx-encoder](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-video-vpx-encoder")](https://github.com/chalmers-revere/opendlv-video-vpx-encoder) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-encoder-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-encoder-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-encoder-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-encoder-aarch64/tags/)
-* Command to run with Docker: `docker run --rm -ti --init --net=host --ipc=host -v /tmp:/tmp chalmersrevere/opendlv-video-vpx-encoder-multi:v0.0.3 --cid=111 --name=video0.i420 --width=640 --height=480 --vp8`
+* Command to run with Docker: `docker run --rm -ti --init --net=host --ipc=host -v /tmp:/tmp chalmersrevere/opendlv-video-vpx-encoder-multi:v0.0.4 --cid=111 --name=video0.i420 --width=640 --height=480 --vp8`
 * Section for `docker-compose.yml`:
  ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     video-vpx-encoder:
-        image: chalmersrevere/opendlv-video-vpx-encoder-multi:v0.0.3
+        image: chalmersrevere/opendlv-video-vpx-encoder-multi:v0.0.4
         restart: on-failure
         network_mode: "host"
         ipc: "host"
@@ -362,13 +362,13 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 ```
 
 #### [opendlv-video-vpx-decoder](https://github.com/chalmers-revere/opendlv-video-vpx-decoder.git) to decode h264 video frames from an [ImageReading](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L150-L155) into a shared memory: [![opendlv-video-vpx-decoder](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-video-vpx-decoder")](https://github.com/chalmers-revere/opendlv-video-vpx-decoder) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-decoder-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-decoder-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-decoder-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-decoder-aarch64/tags/)
-* Command to run with Docker: `docker run --rm -ti --init --net=host --ipc=host -v /tmp:/tmp -e DISPLAY=$DISPLAY chalmersrevere/opendlv-video-vpx-decoder-multi:v0.0.3 --cid=253 --name=video0.arg0 --verbose`
+* Command to run with Docker: `docker run --rm -ti --init --net=host --ipc=host -v /tmp:/tmp -e DISPLAY=$DISPLAY chalmersrevere/opendlv-video-vpx-decoder-multi:v0.0.4 --cid=253 --name=video0.arg0 --verbose`
 * Section for `docker-compose.yml`:
  ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     video-vpx-decoder:
-        image: chalmersrevere/opendlv-video-vpx-decoder-multi:v0.0.3
+        image: chalmersrevere/opendlv-video-vpx-decoder-multi:v0.0.4
         restart: on-failure
         network_mode: "host"
         ipc: "host"
