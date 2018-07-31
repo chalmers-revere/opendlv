@@ -316,7 +316,7 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
-    video-x264-encoder-amd64:
+    video-x264-encoder-armhf:
         build:
             context: https://github.com/chalmers-revere/opendlv-video-x264-encoder.git
             dockerfile: Dockerfile.armhf
@@ -331,7 +331,7 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
-    video-x264-encoder-amd64:
+    video-x264-encoder-aarch64:
         build:
             context: https://github.com/chalmers-revere/opendlv-video-x264-encoder.git
             dockerfile: Dockerfile.aarch64
