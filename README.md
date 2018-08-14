@@ -203,13 +203,13 @@ OpenDLV contains a highly modular and easy-to-use framework to grab video frames
 * The following image formats are supported:
   * MJPEG
   * YUYV422
-* Command to run with Docker: `docker run --rm -ti --init --ipc=host -v /tmp:/tmp -e DISPLAY=$DISPLAY --device /dev/video0 chalmersrevere/opendlv-device-camera-v4l-multi:v0.0.5 --camera=/dev/video0 --width=640 --height=480 --freq=20 --verbose`
+* Command to run with Docker: `docker run --rm -ti --init --ipc=host -v /tmp:/tmp -e DISPLAY=$DISPLAY --device /dev/video0 chalmersrevere/opendlv-device-camera-v4l-multi:v0.0.6 --camera=/dev/video0 --width=640 --height=480 --freq=20 --verbose`
 * Section for `docker-compose.yml`:
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-camera-v4l:
-        image: chalmersrevere/opendlv-device-camera-v4l-multi:v0.0.5
+        image: chalmersrevere/opendlv-device-camera-v4l-multi:v0.0.6
         restart: on-failure
         ipc: "host"
         volumes:
@@ -220,13 +220,13 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 ```
 #### **OpenCV-supported** cameras: [![opendlv-device-camera-opencv](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-camera-opencv")](https://github.com/chalmers-revere/opendlv-device-camera-opencv) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-opencv-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-opencv-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-opencv-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-opencv-aarch64/tags/) [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-camera-opencv.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-camera-opencv)
 * This microservice interfaces with an OpenCV-supported camera and provides both, an [I420-encoded image](https://wiki.videolan.org/YUV/#I420) and an ARGB-encoded image residing in two separate shared memory areas. Other OpenDLV microservices can attach to this shared memory area for further processing (for instance [opendlv-video-h264-encoder](https://github.com/chalmers-revere/opendlv-video-h264-encoder)). This microservice also allows to interface with network-attached cameras (i.e., those providing an MJPEG stream for example).
-* Command to run with Docker: `docker run --rm -ti --init --ipc=host -e DISPLAY=$DISPLAY --device /dev/video0 -v /tmp:/tmp chalmersrevere/opendlv-device-camera-opencv-multi:v0.0.9 --camera=/dev/video0 --width=640 --height=480 --freq=20`
+* Command to run with Docker: `docker run --rm -ti --init --ipc=host -e DISPLAY=$DISPLAY --device /dev/video0 -v /tmp:/tmp chalmersrevere/opendlv-device-camera-opencv-multi:v0.0.10 --camera=/dev/video0 --width=640 --height=480 --freq=20`
 * Section for `docker-compose.yml`:
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-camera-opencv:
-        image: chalmersrevere/opendlv-device-camera-opencv-multi:v0.0.9
+        image: chalmersrevere/opendlv-device-camera-opencv-multi:v0.0.10
         restart: on-failure
         ipc: "host"
         volumes:
@@ -237,13 +237,13 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 ```
 #### RaspberryPi camera: [![opendlv-device-camera-rpi](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-camera-rpi")](https://github.com/chalmers-revere/opendlv-device-camera-rpi) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-rpi-armhf/tags/)
 * This microservice interfaces with an RPi camera and provides both, an [I420-encoded image](https://wiki.videolan.org/YUV/#I420) and an ARGB-encoded image residing in two separate shared memory areas. Other OpenDLV microservices can attach to this shared memory area for further processing (for instance [opendlv-video-h264-encoder](https://github.com/chalmers-revere/opendlv-video-h264-encoder)).
-* Command to run with Docker: `docker run --rm -ti --init --ipc=host -e DISPLAY=$DISPLAY --device /dev/video0 -v /tmp:/tmp chalmersrevere/opendlv-device-camera-rpi-armhf:v0.0.4 --width=640 --height=480 --freq=20`
+* Command to run with Docker: `docker run --rm -ti --init --ipc=host -e DISPLAY=$DISPLAY --device /dev/video0 -v /tmp:/tmp chalmersrevere/opendlv-device-camera-rpi-armhf:v0.0.5 --width=640 --height=480 --freq=20`
 * Section for `docker-compose.yml`:
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-camera-rpi:
-        image: chalmersrevere/opendlv-device-camera-rpi-armhf:v0.0.4
+        image: chalmersrevere/opendlv-device-camera-rpi-armhf:v0.0.5
         restart: on-failure
         ipc: "host"
         volumes:
@@ -344,13 +344,13 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 ```
 
 #### [opendlv-video-vpx-encoder](https://github.com/chalmers-revere/opendlv-video-vpx-encoder.git) to encode video frames from a shared memory into VP8 or VP9 frames as [ImageReading (OpenDLV Standard Message Set v0.9.6)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/40f0cdb83632c3d122d2f35e028331494313330f/opendlv.odvd#L150-L155): [![opendlv-video-vpx-encoder](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-video-vpx-encoder")](https://github.com/chalmers-revere/opendlv-video-vpx-encoder) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-encoder-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-encoder-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-encoder-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-encoder-aarch64/tags/)
-* Command to run with Docker: `docker run --rm -ti --init --net=host --ipc=host -v /tmp:/tmp chalmersrevere/opendlv-video-vpx-encoder-multi:v0.0.4 --cid=111 --name=video0.i420 --width=640 --height=480 --vp8`
+* Command to run with Docker: `docker run --rm -ti --init --net=host --ipc=host -v /tmp:/tmp chalmersrevere/opendlv-video-vpx-encoder-multi:v0.0.5 --cid=111 --name=video0.i420 --width=640 --height=480 --vp8`
 * Section for `docker-compose.yml`:
  ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     video-vpx-encoder:
-        image: chalmersrevere/opendlv-video-vpx-encoder-multi:v0.0.4
+        image: chalmersrevere/opendlv-video-vpx-encoder-multi:v0.0.5
         restart: on-failure
         network_mode: "host"
         ipc: "host"
@@ -363,13 +363,13 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 
 * Command to run with Docker: `docker run --rm -ti --init --net=host --ipc=host -v /tmp:/tmp -e DISPLAY=$DISPLAY chalmersrevere/opendlv-video-vpx-decoder-multi:v0.0.4 --cid=253 --name=video0.arg0 --verbose`
 #### [opendlv-video-vpx-decoder](https://github.com/chalmers-revere/opendlv-video-vpx-decoder.git) to decode h264 video frames from an [ImageReading (OpenDLV Standard Message Set v0.9.6)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/40f0cdb83632c3d122d2f35e028331494313330f/opendlv.odvd#L150-L155) into a shared memory: [![opendlv-video-vpx-decoder](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-video-vpx-decoder")](https://github.com/chalmers-revere/opendlv-video-vpx-decoder) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-decoder-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-decoder-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-decoder-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-decoder-aarch64/tags/)
-* Command to run with Docker: `docker run --rm -ti --init --net=host --ipc=host -v /tmp:/tmp -e DISPLAY=$DISPLAY chalmersrevere/opendlv-video-vpx-decoder-multi:v0.0.4 --cid=253 --name=video0.arg0 --verbose`
+* Command to run with Docker: `docker run --rm -ti --init --net=host --ipc=host -v /tmp:/tmp -e DISPLAY=$DISPLAY chalmersrevere/opendlv-video-vpx-decoder-multi:v0.0.5 --cid=253 --name=video0.arg0 --verbose`
 * Section for `docker-compose.yml`:
  ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     video-vpx-decoder:
-        image: chalmersrevere/opendlv-video-vpx-decoder-multi:v0.0.4
+        image: chalmersrevere/opendlv-video-vpx-decoder-multi:v0.0.5
         restart: on-failure
         network_mode: "host"
         ipc: "host"
