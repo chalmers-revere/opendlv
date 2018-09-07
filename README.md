@@ -161,18 +161,18 @@ services:    # Must be present exactly once at the beginning of the docker-compo
         command: "opendlv-device-lidar-hdl32e --hdl32e_ip=0.0.0.0 --hdl32e_port=2368 --cid=111"
 ```
 ---
-#### **Velodyne HDL32c** lidar units: [![opendlv-device-lidar-hdl32c](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-lidar-hdl32c")](https://github.com/chalmers-revere/opendlv-device-lidar-hdl32c) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-hdl32c-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-hdl32c-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-hdl32c-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-hdl32c-aarch64/tags/) [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-hdl32c.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-hdl32c)
-* Provides: [PointCloudReading (OpenDLV Standard Message Set v0.9.6)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/40f0cdb83632c3d122d2f35e028331494313330f/opendlv.odvd#L165-L171)
-* Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-lidar-hdl32c-multi:v0.0.1 opendlv-device-lidar-hdl32c --hdl32c_ip=0.0.0.0 --hdl32c_port=2368 --cid=111 --verbose`
+#### **Velodyne VLP32c** lidar units: [![opendlv-device-lidar-vlp32c](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-lidar-vlp32c")](https://github.com/chalmers-revere/opendlv-device-lidar-vlp32c) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-vlp32c-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-vlp32c-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-vlp32c-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-vlp32c-aarch64/tags/) [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-vlp32c.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-vlp32c)
+* Provides: [PointCloudReading (OpenDLV Standard Message Set v0.9.7)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/bd5007e7723654563c388129a96a70b559f7fef6/opendlv.odvd#L165-L172)
+* Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-lidar-vlp32c-multi:v0.0.1 opendlv-device-lidar-vlp32c --vlp32c_ip=0.0.0.0 --vlp32c_port=2368 --cid=111 --verbose`
 * Section for `docker-compose.yml`:
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
-    dev-lidar-hdl32c:
-        image: chalmersrevere/opendlv-device-lidar-hdl32c-multi:v0.0.1
+    dev-lidar-vlp32c:
+        image: chalmersrevere/opendlv-device-lidar-vlp32c-multi:v0.0.1
         restart: on-failure
         network_mode: "host"
-        command: "opendlv-device-lidar-hdl32c --hdl32c_ip=0.0.0.0 --hdl32c_port=2368 --cid=111"
+        command: "opendlv-device-lidar-vlp32c --vlp32c_ip=0.0.0.0 --vlp32c_port=2368 --cid=111"
 ```
 ---
 #### **Velodyne VLP16** lidar units: [![opendlv-device-lidar-vlp16](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-lidar-vlp16")](https://github.com/chalmers-revere/opendlv-device-lidar-vlp16) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-vlp16-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-vlp16-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-vlp16-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-vlp16-aarch64/tags/) [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-vlp16.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-vlp16)

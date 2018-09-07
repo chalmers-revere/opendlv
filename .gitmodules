@@ -62,6 +62,6 @@
 [submodule "opendlv-device-ps3controller"]
 	path = opendlv-device-ps3controller
 	url = https://github.com/chalmers-revere/opendlv-device-ps3controller
-[submodule "opendlv-device-lidar-hdl32c"]
-	path = opendlv-device-lidar-hdl32c
-	url = https://github.com/chalmers-revere/opendlv-device-lidar-hdl32c
+[submodule "opendlv-device-lidar-vlp32c"]
+	path = opendlv-device-lidar-vlp32c
+	url = https://github.com/chalmers-revere/opendlv-device-lidar-vlp32c
