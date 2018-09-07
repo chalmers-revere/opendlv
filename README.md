@@ -161,6 +161,20 @@ services:    # Must be present exactly once at the beginning of the docker-compo
         command: "opendlv-device-lidar-hdl32e --hdl32e_ip=0.0.0.0 --hdl32e_port=2368 --cid=111"
 ```
 ---
+#### **Velodyne HDL32c** lidar units: [![opendlv-device-lidar-hdl32c](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-lidar-hdl32c")](https://github.com/chalmers-revere/opendlv-device-lidar-hdl32c) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-hdl32c-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-hdl32c-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-hdl32c-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-hdl32c-aarch64/tags/) [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-hdl32c.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-hdl32c)
+* Provides: [PointCloudReading (OpenDLV Standard Message Set v0.9.6)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/40f0cdb83632c3d122d2f35e028331494313330f/opendlv.odvd#L165-L171)
+* Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-lidar-hdl32c-multi:v0.0.1 opendlv-device-lidar-hdl32c --hdl32c_ip=0.0.0.0 --hdl32c_port=2368 --cid=111 --verbose`
+* Section for `docker-compose.yml`:
+```yml
+version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
+services:    # Must be present exactly once at the beginning of the docker-compose.yml file
+    dev-lidar-hdl32c:
+        image: chalmersrevere/opendlv-device-lidar-hdl32c-multi:v0.0.1
+        restart: on-failure
+        network_mode: "host"
+        command: "opendlv-device-lidar-hdl32c --hdl32c_ip=0.0.0.0 --hdl32c_port=2368 --cid=111"
+```
+---
 #### **Velodyne VLP16** lidar units: [![opendlv-device-lidar-vlp16](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-lidar-vlp16")](https://github.com/chalmers-revere/opendlv-device-lidar-vlp16) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-vlp16-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-vlp16-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-vlp16-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-vlp16-aarch64/tags/) [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-vlp16.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-vlp16)
 * Provides: [PointCloudReading (OpenDLV Standard Message Set v0.9.1)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/0b85a1c4b151258c21b2368295a3c203232675e9/opendlv.odvd#L152-L158)
 * Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-lidar-vlp16-multi:v0.0.8 opendlv-device-lidar-vlp16 --vlp16_ip=0.0.0.0 --vlp16_port=2368 --cid=111 --verbose`
@@ -432,13 +446,13 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 ```
 ![screenshot from signal viewer](https://raw.githubusercontent.com/chalmers-revere/opendlv-signal-viewer/master/signal-viewer.gif)
 
-#### [opendlv-vehicle-view](https://github.com/chalmers-revere/opendlv-vehicle-view) to view vehicle messages from the OpenDLV Standard Message Set exchanged in the communication session 111 (after starting this microservice, point your web-browser to the computer's IP address, port 8081): `docker run --rm --net=host --name=opendlv-vehicle-view -v ~/recordings:/opt/vehicle-view/recordings -v /var/run/docker.sock:/var/run/docker.sock -p 8081:8081 chalmersrevere/opendlv-vehicle-view-multi:v0.0.36`
+#### [opendlv-vehicle-view](https://github.com/chalmers-revere/opendlv-vehicle-view) to view vehicle messages from the OpenDLV Standard Message Set exchanged in the communication session 111 (after starting this microservice, point your web-browser to the computer's IP address, port 8081): `docker run --rm --net=host --name=opendlv-vehicle-view -v ~/recordings:/opt/vehicle-view/recordings -v /var/run/docker.sock:/var/run/docker.sock -p 8081:8081 chalmersrevere/opendlv-vehicle-view-multi:v0.0.37`
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     vehicle-view:
         container_name: opendlv-vehicle-view
-        image: chalmersrevere/opendlv-vehicle-view-multi:v0.0.36
+        image: chalmersrevere/opendlv-vehicle-view-multi:v0.0.37
         restart: on-failure
         network_mode: "host"
         volumes:
