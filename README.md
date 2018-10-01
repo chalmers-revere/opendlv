@@ -93,13 +93,13 @@ Complete ArchLinux-based [OpenDLV OS](https://github.com/chalmers-revere/opendlv
 ---
 #### **PS3Controller**: [![opendlv-device-ps3controller](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-ps3controller")](https://github.com/chalmers-revere/opendlv-device-ps3controller) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-ps3controller-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-ps3controller-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-ps3controller-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-ps3controller-aarch64/tags/) [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-ps3controller.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-ps3controller)
 * Provides: [device-specific messages](https://github.com/chalmers-revere/opendlv-device-ps3controller/blob/master/src/actuationrequestmessage.odvd)
-* Command to run with Docker: `docker run --rm -ti --init --net=host --device /dev/input/js0 chalmersrevere/opendlv-device-ps3controller-multi:v0.0.2 --device=/dev/input/js0 --freq=100 --acc_min=0 --acc_max=50 --dec_min=0 --dec_max=-10 --steering_min=-10 --steering_max=10 --cid=111 --verbose`
+* Command to run with Docker: `docker run --rm -ti --init --net=host --device /dev/input/js0 chalmersrevere/opendlv-device-ps3controller-multi:v0.0.4 --device=/dev/input/js0 --freq=100 --acc_min=0 --acc_max=50 --dec_min=0 --dec_max=-10 --steering_min=-10 --steering_max=10 --cid=111 --verbose`
 * Section for `docker-compose.yml`:
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-ps3controller:
-        image: chalmersrevere/opendlv-device-ps3controller-multi:v0.0.2
+        image: chalmersrevere/opendlv-device-ps3controller-multi:v0.0.4
         restart: on-failure
         network_mode: "host"
         devices:
