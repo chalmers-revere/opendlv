@@ -65,3 +65,6 @@
 [submodule "opendlv-device-lidar-vlp32c"]
 	path = opendlv-device-lidar-vlp32c
 	url = https://github.com/chalmers-revere/opendlv-device-lidar-vlp32c
+[submodule "opendlv-device-gamepad"]
+	path = opendlv-device-gamepad
+	url = https://github.com/chalmers-revere/opendlv-device-gamepad
