@@ -93,20 +93,20 @@ Complete ArchLinux-based [OpenDLV OS](https://github.com/chalmers-revere/opendlv
 ---
 #### **Gamepad** (such as PS3 or PS4 controllers): [![opendlv-device-gamepad](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-gamepad")](https://github.com/chalmers-revere/opendlv-device-gamepad) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-gamepad-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-gamepad-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-gamepad-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-gamepad-aarch64/tags/) [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-gamepad.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-gamepad)
 * Provides: [device-specific messages](https://github.com/chalmers-revere/opendlv-device-gamepad/blob/master/src/actuationrequestmessage.odvd)
-* Command to run with Docker for PS3 controllers: `docker run --rm -ti --init --net=host --device /dev/input/js0 chalmersrevere/opendlv-device-gamepad-multi:v0.0.8 --device=/dev/input/js0 --axis_leftright=0 --axis_updown=4 --freq=100 --acc_min=0 --acc_max=50 --dec_min=0 --dec_max=-10 --steering_min=-10 --steering_max=10 --cid=111 --verbose`
-* Command to run with Docker for PS4 controllers: `docker run --rm -ti --init --net=host --device /dev/input/js0 chalmersrevere/opendlv-device-gamepad-multi:v0.0.8 --device=/dev/input/js0 --axis_leftright=0 --axis_updown=5 --freq=100 --acc_min=0 --acc_max=50 --dec_min=0 --dec_max=-10 --steering_min=-10 --steering_max=10 --cid=111 --verbose`
+* Command to run with Docker for PS3 controllers: `docker run --rm -ti --init --net=host --device /dev/input/js0 chalmersrevere/opendlv-device-gamepad-multi:v0.0.10 --device=/dev/input/js0 --axis_leftright=0 --axis_updown=3 --freq=100 --acc_min=0 --acc_max=50 --dec_min=0 --dec_max=-10 --steering_min=-10 --steering_max=10 --steering_max_rate=5.0 --cid=111 --verbose`
+* Command to run with Docker for PS4 controllers: `docker run --rm -ti --init --net=host --device /dev/input/js0 chalmersrevere/opendlv-device-gamepad-multi:v0.0.10 --device=/dev/input/js0 --axis_leftright=0 --axis_updown=4 --freq=100 --acc_min=0 --acc_max=50 --dec_min=0 --dec_max=-10 --steering_min=-10 --steering_max=10 --steering_max_rate=5.0 --cid=111 --verbose`
 * Section for `docker-compose.yml` for PS3 controllers:
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-ps3controller:
         container_name: dev-ps3controller
-        image: chalmersrevere/opendlv-device-gamepad-multi:v0.0.8
+        image: chalmersrevere/opendlv-device-gamepad-multi:v0.0.10
         restart: on-failure
         network_mode: "host"
         devices:
         - "/dev/input/js0:/dev/input/js0"
-        command: "--device=/dev/input/js0 --axis_leftright=0 --axis_updown=4 --freq=100 --acc_min=0 --acc_max=50 --dec_min=0 --dec_max=-10 --steering_min=-10 --steering_max=10 --cid=111"
+        command: "--device=/dev/input/js0 --axis_leftright=0 --axis_updown=3 --freq=100 --acc_min=0 --acc_max=50 --dec_min=0 --dec_max=-10 --steering_min=-10 --steering_max=10 --steering_max_rate=5.0 --cid=111"
 ```
 * Section for `docker-compose.yml` for PS4 controllers:
 ```yml
@@ -114,12 +114,12 @@ version: '2' # Must be present exactly once at the beginning of the docker-compo
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-ps4controller:
         container_name: dev-ps4controller
-        image: chalmersrevere/opendlv-device-gamepad-multi:v0.0.8
+        image: chalmersrevere/opendlv-device-gamepad-multi:v0.0.10
         restart: on-failure
         network_mode: "host"
         devices:
         - "/dev/input/js0:/dev/input/js0"
-        command: "--device=/dev/input/js0 --axis_leftright=0 --axis_updown=5 --freq=100 --acc_min=0 --acc_max=50 --dec_min=0 --dec_max=-10 --steering_min=-10 --steering_max=10 --cid=111"
+        command: "--device=/dev/input/js0 --axis_leftright=0 --axis_updown=4 --freq=100 --acc_min=0 --acc_max=50 --dec_min=0 --dec_max=-10 --steering_min=-10 --steering_max=10 --steering_max_rate=5.0 --cid=111"
 ```
 ---
 ### GPS devices
@@ -165,14 +165,14 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 #### **Trimble GPS/INSS** units: [![opendlv-device-gps-nmea](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-gps-nmea")](https://github.com/chalmers-revere/opendlv-device-gps-nmea) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-gps-nmea-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-gps-nmea-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-gps-nmea-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-gps-nmea-aarch64/tags/) [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-gps-nmea.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-gps-nmea)
 * Provides: [Latitude/Longitude (OpenDLV Standard Message Set v0.9.1)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/0b85a1c4b151258c21b2368295a3c203232675e9/opendlv.odvd#L137-L140)
 * Provides: [Heading (OpenDLV Standard Message Set v0.9.1)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/0b85a1c4b151258c21b2368295a3c203232675e9/opendlv.odvd#L133-L135)
-* Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-nmea-multi:v0.0.8 --nmea_ip=10.42.42.112 --nmea_port=9999 --cid=111 --verbose`
+* Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-nmea-multi:v0.0.9 --nmea_ip=10.42.42.112 --nmea_port=9999 --cid=111 --verbose`
 * Section for `docker-compose.yml`:
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-gps-nmea:
         container_name: dev-gps-nmea
-        image: chalmersrevere/opendlv-device-gps-nmea-multi:v0.0.8
+        image: chalmersrevere/opendlv-device-gps-nmea-multi:v0.0.9
         restart: on-failure
         network_mode: "host"
         command: "--nmea_ip=10.42.42.112 --nmea_port=9999 --cid=111"
