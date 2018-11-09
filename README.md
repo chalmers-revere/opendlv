@@ -247,7 +247,7 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 ---
 ### Camera devices and video processing
 
-OpenDLV contains a highly modular and easy-to-use framework to grab video frames from various cameras, share them via shared memory, and encode/decode them into h264 frames to broadcast into an OD4Session for OpenDLV. The microservices are divided into video sources (e.g., [opendlv-device-camera-v4l](https://github.com/chalmers-revere/opendlv-device-camera-v4l), [opendlv-device-camera-opencv](https://github.com/chalmers-revere/opendlv-device-camera-opencv), or [opendlv-device-camera-rpi](https://github.com/chalmers-revere/opendlv-device-camera-rpi)) and video sinks (e.g., [opendlv-video-h264-encoder](https://github.com/chalmers-revere/opendlv-video-h264-encoder)) to process incoming video frames. Video sinks provide frames in two image formats: [I420-encoded image](https://wiki.videolan.org/YUV/#I420) and ARGB. The former format can be directly used for video compression (e.g., h264 encoding), while the latter can be directly used for image detection algorithms ([opendlv-examples](https://github.com/chalmers-revere/opendlv-examples)).
+OpenDLV contains a highly modular and easy-to-use framework to grab video frames from various cameras, share them via shared memory, and encode/decode them into h264 frames to broadcast into an OD4Session for OpenDLV. The microservices are divided into video sources (e.g., [opendlv-device-camera-v4l](https://github.com/chalmers-revere/opendlv-device-camera-v4l), [opendlv-device-camera-opencv](https://github.com/chalmers-revere/opendlv-device-camera-opencv), [opendlv-device-camera-ueye](https://github.com/chalmers-revere/opendlv-device-camera-ueye)), or [opendlv-device-camera-rpi](https://github.com/chalmers-revere/opendlv-device-camera-rpi)) and video sinks (e.g., [opendlv-video-h264-encoder](https://github.com/chalmers-revere/opendlv-video-h264-encoder)) to process incoming video frames. Video sinks provide frames in two image formats: [I420-encoded image](https://wiki.videolan.org/YUV/#I420) and ARGB. The former format can be directly used for video compression (e.g., h264 encoding), while the latter can be directly used for image detection algorithms ([opendlv-examples](https://github.com/chalmers-revere/opendlv-examples)).
 
 #### **Video4Linux** cameras (e.g., /dev/video0): [![opendlv-device-camera-v4l](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-camera-v4l")](https://github.com/chalmers-revere/opendlv-device-camera-v4l) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-v4l-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-v4l-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-v4l-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-v4l-aarch64/tags/) [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-camera-v4l.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-camera-v4l)
 * This microservice interfaces with a Video4Linux-supported camera and provides both, an [I420-encoded image](https://wiki.videolan.org/YUV/#I420) and an ARGB-encoded image residing in two separate shared memory areas. Other OpenDLV microservices can attach to this shared memory area for further processing (for instance [opendlv-video-h264-encoder](https://github.com/chalmers-revere/opendlv-video-h264-encoder)).
@@ -303,6 +303,24 @@ services:    # Must be present exactly once at the beginning of the docker-compo
         volumes:
         - /tmp:/tmp
         command: "--width=640 --height=480 --freq=20"
+```
+#### IDS uEye cameras: [![opendlv-device-camera-ueye](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-camera-ueye")](https://github.com/chalmers-revere/opendlv-device-camera-ueye) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-ueye-amd64/tags/)
+* This microservice interfaces with an IDS uEye camera and provides both, an [I420-encoded image](https://wiki.videolan.org/YUV/#I420) and an ARGB-encoded image residing in two separate shared memory areas. Other OpenDLV microservices can attach to this shared memory area for further processing (for instance [opendlv-video-h264-encoder](https://github.com/chalmers-revere/opendlv-video-h264-encoder)).
+* Command to run with Docker: `docker run --rm -ti --init --ipc=host -v /tmp:/tmp --pid=host -v /var/run:/var/run -e DISPLAY=$DISPLAY chalmersrevere/opendlv-device-camera-ueye-amd64:v0.0.1 --width=752 --height=480 --pixel_clock=10 --freq=20`
+* Section for `docker-compose.yml`:
+```yml
+version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
+services:    # Must be present exactly once at the beginning of the docker-compose.yml file
+    dev-camera-ueye:
+        container_name: dev-camera-ueye
+        image: chalmersrevere/opendlv-device-camera-ueye-amd64:v0.0.1
+        restart: on-failure
+        ipc: "host"
+        pid: "host"
+        volumes:
+        - /tmp:/tmp
+        - /var/run:/var/run
+        command: "--width=752 --height=480 --pixel_clock=10 --freq=20"
 ```
 ---
 #### [opendlv-video-h264-encoder](https://github.com/chalmers-revere/opendlv-video-h264-encoder) to encode video frames from a shared memory into h264 frames (OpenH264 Video Codec provided by Cisco Systems, Inc.) as [ImageReading (OpenDLV Standard Message Set v0.9.6)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/40f0cdb83632c3d122d2f35e028331494313330f/opendlv.odvd#L150-L155):

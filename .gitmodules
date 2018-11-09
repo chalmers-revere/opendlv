@@ -68,3 +68,6 @@
 [submodule "opendlv-device-gamepad"]
 	path = opendlv-device-gamepad
 	url = https://github.com/chalmers-revere/opendlv-device-gamepad
+[submodule "opendlv-device-camera-ueye"]
+	path = opendlv-device-camera-ueye
+	url = https://github.com/chalmers-revere/opendlv-device-camera-ueye
