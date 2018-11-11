@@ -288,7 +288,7 @@ services:    # Must be present exactly once at the beginning of the docker-compo
         - "/dev/video0:/dev/video0"
         command: "--camera=/dev/video0 --width=640 --height=480 --freq=20"
 ```
-#### RaspberryPi camera: [![opendlv-device-camera-rpi](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-camera-rpi")](https://github.com/chalmers-revere/opendlv-device-camera-rpi) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-rpi-armhf/tags/)
+#### **RaspberryPi** camera: [![opendlv-device-camera-rpi](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-camera-rpi")](https://github.com/chalmers-revere/opendlv-device-camera-rpi) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-rpi-armhf/tags/)
 * This microservice interfaces with an RPi camera and provides both, an [I420-encoded image](https://wiki.videolan.org/YUV/#I420) and an ARGB-encoded image residing in two separate shared memory areas. Other OpenDLV microservices can attach to this shared memory area for further processing (for instance [opendlv-video-h264-encoder](https://github.com/chalmers-revere/opendlv-video-h264-encoder)).
 * Command to run with Docker: `docker run --rm -ti --init --ipc=host -e DISPLAY=$DISPLAY --device /dev/video0 -v /tmp:/tmp chalmersrevere/opendlv-device-camera-rpi-armhf:v0.0.5 --width=640 --height=480 --freq=20`
 * Section for `docker-compose.yml`:
@@ -304,16 +304,16 @@ services:    # Must be present exactly once at the beginning of the docker-compo
         - /tmp:/tmp
         command: "--width=640 --height=480 --freq=20"
 ```
-#### IDS uEye cameras: [![opendlv-device-camera-ueye](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-camera-ueye")](https://github.com/chalmers-revere/opendlv-device-camera-ueye) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-ueye-amd64/tags/)
+#### **IDS uEye** cameras: [![opendlv-device-camera-ueye](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-camera-ueye")](https://github.com/chalmers-revere/opendlv-device-camera-ueye) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-ueye-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-ueye-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-ueye-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-ueye-aarch64/tags/) [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-camera-ueye.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-camera-ueye)
 * This microservice interfaces with an IDS uEye camera and provides both, an [I420-encoded image](https://wiki.videolan.org/YUV/#I420) and an ARGB-encoded image residing in two separate shared memory areas. Other OpenDLV microservices can attach to this shared memory area for further processing (for instance [opendlv-video-h264-encoder](https://github.com/chalmers-revere/opendlv-video-h264-encoder)).
-* Command to run with Docker: `docker run --rm -ti --init --ipc=host -v /tmp:/tmp --pid=host -v /var/run:/var/run -e DISPLAY=$DISPLAY chalmersrevere/opendlv-device-camera-ueye-amd64:v0.0.2 --width=752 --height=480 --pixel_clock=10 --freq=20`
+* Command to run with Docker: `docker run --rm -ti --init --ipc=host -v /tmp:/tmp --pid=host -v /var/run:/var/run -e DISPLAY=$DISPLAY chalmersrevere/opendlv-device-camera-ueye-multi:v0.0.4 --width=752 --height=480 --pixel_clock=10 --freq=20`
 * Section for `docker-compose.yml`:
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-camera-ueye:
         container_name: dev-camera-ueye
-        image: chalmersrevere/opendlv-device-camera-ueye-amd64:v0.0.2
+        image: chalmersrevere/opendlv-device-camera-ueye-multi:v0.0.4
         restart: on-failure
         ipc: "host"
         pid: "host"
