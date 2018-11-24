@@ -71,3 +71,6 @@
 [submodule "opendlv-device-camera-ueye"]
 	path = opendlv-device-camera-ueye
 	url = https://github.com/chalmers-revere/opendlv-device-camera-ueye
+[submodule "opendlv-device-lidar-rplidar"]
+	path = opendlv-device-lidar-rplidar
+	url = https://github.com/chalmers-revere/opendlv-device-lidar-rplidar.git
