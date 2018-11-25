@@ -226,14 +226,14 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 ```
 #### **RPLidar** lidar units: [![opendlv-device-lidar-rplidar](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-lidar-rplidar")](https://github.com/chalmers-revere/opendlv-device-lidar-rplidar) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-rplidar-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-rplidar-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-rplidar-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-rplidar-aarch64/tags/) [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-rplidar.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-rplidar)
 * Provides: [PointCloudReading (OpenDLV Standard Message Set v0.9.9)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/6c6ac1f893ab181bbcd7c8a913ad117067fd6f4c/opendlv.odvd#L165-L178)
-* Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-lidar-rplidar-multi:v0.0.2 --device=/dev/ttyUSB0 --cid=111 --verbose`
+* Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-lidar-rplidar-multi:v0.0.3 --device=/dev/ttyUSB0 --cid=111 --verbose`
 * Section for `docker-compose.yml`:
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-lidar-rplidar:
         container_name: dev-lidar-rplidar
-        image: chalmersrevere/opendlv-device-lidar-rplidar-multi:v0.0.2
+        image: chalmersrevere/opendlv-device-lidar-rplidar-multi:v0.0.3
         restart: on-failure
         network_mode: "host"
         devices:
