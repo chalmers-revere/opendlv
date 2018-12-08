@@ -340,25 +340,6 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 ```
 #### **Pylon-based GiGE** cameras (ie., Basler): [![opendlv-device-camera-pylon](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-camera-pylon")](https://github.com/chalmers-revere/opendlv-device-camera-pylon):
 * This microservice interfaces with a pylon-based GiGE camera (eg., Basler cameras) and provides both, an [I420-encoded image](https://wiki.videolan.org/YUV/#I420) and an ARGB-encoded image residing in two separate shared memory areas. Other OpenDLV microservices can attach to this shared memory area for further processing (for instance [opendlv-video-h264-encoder](https://github.com/chalmers-revere/opendlv-video-h264-encoder)).
-* Command to run with Docker: `docker run --rm -ti --init --ipc=host -v /tmp:/tmp --pid=host -v /var/run:/var/run -e DISPLAY=$DISPLAY chalmersrevere/opendlv-device-camera-ueye-multi:v0.0.4 --width=752 --height=480 --pixel_clock=10 --freq=20`
-* Section for `docker-compose.yml`:
-```yml
-version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
-services:    # Must be present exactly once at the beginning of the docker-compose.yml file
-    dev-camera-ueye:
-        container_name: dev-camera-ueye
-        image: chalmersrevere/opendlv-device-camera-ueye-multi:v0.0.4
-        restart: on-failure
-        ipc: "host"
-        pid: "host"
-        volumes:
-        - /tmp:/tmp
-        - /var/run:/var/run
-        command: "--width=752 --height=480 --pixel_clock=10 --freq=20"
-```
----
-#### [opendlv-video-h264-encoder](https://github.com/chalmers-revere/opendlv-video-h264-encoder) to encode video frames from a shared memory into h264 frames (OpenH264 Video Codec provided by Cisco Systems, Inc.) as [ImageReading (OpenDLV Standard Message Set v0.9.6)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/40f0cdb83632c3d122d2f35e028331494313330f/opendlv.odvd#L150-L155):
-* This microservice attaches to an I420-encoded image residing in a shared memory area to encode it into an h264 frame to be broadcasted to other OpenDLV microservices.
 * Section for `docker-compose.yml`:
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
@@ -372,6 +353,27 @@ services:    # Must be present exactly once at the beginning of the docker-compo
         volumes:
         - /tmp:/tmp
         command: "--camera=0 --width=640 --height=480"
+```
+---
+#### [opendlv-video-h264-encoder](https://github.com/chalmers-revere/opendlv-video-h264-encoder) to encode video frames from a shared memory into h264 frames (OpenH264 Video Codec provided by Cisco Systems, Inc.) as [ImageReading (OpenDLV Standard Message Set v0.9.6)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/40f0cdb83632c3d122d2f35e028331494313330f/opendlv.odvd#L150-L155):
+* This microservice attaches to an I420-encoded image residing in a shared memory area to encode it into an h264 frame to be broadcasted to other OpenDLV microservices.
+* During the Docker-ized build process for this microservice, Cisco's binary library is downloaded from Cisco's webserver and installed on the user's computer due to legal implications arising from the patents around the [AVC/h264 format](http://www.mpegla.com/main/programs/avc/pages/intro.aspx).
+* End user's notice according to [AVC/H.264 Patent Portfolio License Conditions](https://www.openh264.org/BINARY_LICENSE.txt):
+**When you are using this software and build scripts from this repository, you are agreeing to and obeying the terms under which Cisco is making the binary library available.**
+* Section for `docker-compose.yml`:
+```yml
+version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
+services:    # Must be present exactly once at the beginning of the docker-compose.yml file
+    video-h264-encoder-amd64:
+        build:
+            context: https://github.com/chalmers-revere/opendlv-video-h264-encoder.git
+            dockerfile: Dockerfile.amd64
+        restart: on-failure
+        network_mode: "host"
+        ipc: "host"
+        volumes:
+        - /tmp:/tmp
+        command: "--cid=111 --name=video0.i420 --width=640 --height=480"
 ```
 
 #### [opendlv-video-h264-decoder](https://github.com/chalmers-revere/opendlv-video-h264-decoder.git) to decode h264 video frames from an [ImageReading (OpenDLV Standard Message Set v0.9.6)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/40f0cdb83632c3d122d2f35e028331494313330f/opendlv.odvd#L150-L155) into a shared memory (OpenH264 Video Codec provided by Cisco Systems, Inc.):
