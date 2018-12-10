@@ -182,14 +182,14 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 
 #### **Velodyne HDL32e** lidar units: [![opendlv-device-lidar-hdl32e](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-lidar-hdl32e")](https://github.com/chalmers-revere/opendlv-device-lidar-hdl32e) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-hdl32e-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-hdl32e-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-hdl32e-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-hdl32e-aarch64/tags/) [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-hdl32e.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-hdl32e)
 * Provides: [PointCloudReading (OpenDLV Standard Message Set v0.9.1)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/0b85a1c4b151258c21b2368295a3c203232675e9/opendlv.odvd#L152-L158)
-* Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-lidar-hdl32e-multi:v0.0.12 --hdl32e_ip=0.0.0.0 --hdl32e_port=2368 --cid=111 --nogpstime --verbose`
+* Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-lidar-hdl32e-multi:v0.0.13 --hdl32e_ip=0.0.0.0 --hdl32e_port=2368 --cid=111 --nogpstime --verbose`
 * Section for `docker-compose.yml`:
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-lidar-hdl32e:
         container_name: dev-lidar-hdl32e
-        image: chalmersrevere/opendlv-device-lidar-hdl32e-multi:v0.0.12
+        image: chalmersrevere/opendlv-device-lidar-hdl32e-multi:v0.0.13
         restart: on-failure
         network_mode: "host"
         command: "--hdl32e_ip=0.0.0.0 --hdl32e_port=2368 --nogpstime --cid=111"
