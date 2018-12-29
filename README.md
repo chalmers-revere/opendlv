@@ -128,14 +128,14 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 * Provides: [Latitude/Longitude (OpenDLV Standard Message Set v0.9.1)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/0b85a1c4b151258c21b2368295a3c203232675e9/opendlv.odvd#L137-L140)
 * Provides: [Heading (OpenDLV Standard Message Set v0.9.1)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/0b85a1c4b151258c21b2368295a3c203232675e9/opendlv.odvd#L133-L135)
 * Provides: [device-specific messages](https://github.com/chalmers-revere/opendlv-device-gps-pos/blob/master/src/pos-message-set.odvd)
-* Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-pos-multi:v0.0.7 --pos_ip=192.168.1.77 --pos_port=5602 --cid=111 --verbose`
+* Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-pos-multi:v0.0.10 --pos_ip=192.168.1.77 --pos_port=5602 --cid=111 --verbose`
 * Section for `docker-compose.yml`:
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-gps-pos:
         container_name: dev-gps-pos
-        image: chalmersrevere/opendlv-device-gps-pos-multi:v0.0.7
+        image: chalmersrevere/opendlv-device-gps-pos-multi:v0.0.10
         restart: on-failure
         network_mode: "host"
         command: "--pos_ip=10.42.42.40 --pos_port=5602 --cid=111"
@@ -182,14 +182,14 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 
 #### **Velodyne HDL32e** lidar units: [![opendlv-device-lidar-hdl32e](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-lidar-hdl32e")](https://github.com/chalmers-revere/opendlv-device-lidar-hdl32e) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-hdl32e-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-hdl32e-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-hdl32e-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-hdl32e-aarch64/tags/) [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-hdl32e.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-hdl32e)
 * Provides: [PointCloudReading (OpenDLV Standard Message Set v0.9.1)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/0b85a1c4b151258c21b2368295a3c203232675e9/opendlv.odvd#L152-L158)
-* Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-lidar-hdl32e-multi:v0.0.10 --hdl32e_ip=0.0.0.0 --hdl32e_port=2368 --cid=111 --verbose`
+* Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-lidar-hdl32e-multi:v0.0.13 --hdl32e_ip=0.0.0.0 --hdl32e_port=2368 --cid=111 --verbose`
 * Section for `docker-compose.yml`:
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-lidar-hdl32e:
         container_name: dev-lidar-hdl32e
-        image: chalmersrevere/opendlv-device-lidar-hdl32e-multi:v0.0.10
+        image: chalmersrevere/opendlv-device-lidar-hdl32e-multi:v0.0.13
         restart: on-failure
         network_mode: "host"
         command: "--hdl32e_ip=0.0.0.0 --hdl32e_port=2368 --cid=111"
@@ -197,14 +197,14 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 ---
 #### **Velodyne VLP32c** lidar units: [![opendlv-device-lidar-vlp32c](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-lidar-vlp32c")](https://github.com/chalmers-revere/opendlv-device-lidar-vlp32c) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-vlp32c-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-vlp32c-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-vlp32c-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-vlp32c-aarch64/tags/) [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-vlp32c.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-vlp32c)
 * Provides: [PointCloudReading (OpenDLV Standard Message Set v0.9.7)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/bd5007e7723654563c388129a96a70b559f7fef6/opendlv.odvd#L165-L172)
-* Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-lidar-vlp32c-multi:v0.0.2 --vlp32c_ip=0.0.0.0 --vlp32c_port=2368 --cid=111 --verbose`
+* Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-lidar-vlp32c-multi:v0.0.3 --vlp32c_ip=0.0.0.0 --vlp32c_port=2368 --cid=111 --verbose`
 * Section for `docker-compose.yml`:
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-lidar-vlp32c:
         container_name: dev-lidar-vlp32c
-        image: chalmersrevere/opendlv-device-lidar-vlp32c-multi:v0.0.2
+        image: chalmersrevere/opendlv-device-lidar-vlp32c-multi:v0.0.3
         restart: on-failure
         network_mode: "host"
         command: "--vlp32c_ip=0.0.0.0 --vlp32c_port=2368 --cid=111"
@@ -212,14 +212,14 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 ---
 #### **Velodyne VLP16** lidar units: [![opendlv-device-lidar-vlp16](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-lidar-vlp16")](https://github.com/chalmers-revere/opendlv-device-lidar-vlp16) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-vlp16-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-vlp16-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-vlp16-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-lidar-vlp16-aarch64/tags/) [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-vlp16.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-lidar-vlp16)
 * Provides: [PointCloudReading (OpenDLV Standard Message Set v0.9.1)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/0b85a1c4b151258c21b2368295a3c203232675e9/opendlv.odvd#L152-L158)
-* Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-lidar-vlp16-multi:v0.0.9 --vlp16_ip=0.0.0.0 --vlp16_port=2368 --cid=111 --verbose`
+* Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-lidar-vlp16-multi:v0.0.10 --vlp16_ip=0.0.0.0 --vlp16_port=2368 --cid=111 --verbose`
 * Section for `docker-compose.yml`:
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-lidar-vlp16c:
         container_name: dev-lidar-vlp16c
-        image: chalmersrevere/opendlv-device-lidar-vlp16-multi:v0.0.9
+        image: chalmersrevere/opendlv-device-lidar-vlp16-multi:v0.0.10
         restart: on-failure
         network_mode: "host"
         command: "--vlp16_ip=0.0.0.0 --vlp16_port=2368 --cid=111"
@@ -270,14 +270,14 @@ OpenDLV contains a highly modular and easy-to-use framework to grab video frames
 * The following image formats are supported:
   * MJPEG
   * YUYV422
-* Command to run with Docker: `docker run --rm -ti --init --ipc=host -v /tmp:/tmp -e DISPLAY=$DISPLAY --device /dev/video0 chalmersrevere/opendlv-device-camera-v4l-multi:v0.0.6 --camera=/dev/video0 --width=640 --height=480 --freq=20 --verbose`
+* Command to run with Docker: `docker run --rm -ti --init --ipc=host -v /tmp:/tmp -e DISPLAY=$DISPLAY --device /dev/video0 chalmersrevere/opendlv-device-camera-v4l-multi:v0.0.8 --camera=/dev/video0 --width=640 --height=480 --freq=20 --verbose`
 * Section for `docker-compose.yml`:
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-camera-v4l:
         container_name: dev-camera-v4l
-        image: chalmersrevere/opendlv-device-camera-v4l-multi:v0.0.6
+        image: chalmersrevere/opendlv-device-camera-v4l-multi:v0.0.8
         restart: on-failure
         ipc: "host"
         volumes:
@@ -288,14 +288,14 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 ```
 #### **OpenCV-supported** cameras: [![opendlv-device-camera-opencv](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-camera-opencv")](https://github.com/chalmers-revere/opendlv-device-camera-opencv) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-opencv-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-opencv-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-opencv-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-opencv-aarch64/tags/) [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-camera-opencv.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-camera-opencv)
 * This microservice interfaces with an OpenCV-supported camera and provides both, an [I420-encoded image](https://wiki.videolan.org/YUV/#I420) and an ARGB-encoded image residing in two separate shared memory areas. Other OpenDLV microservices can attach to this shared memory area for further processing (for instance [opendlv-video-h264-encoder](https://github.com/chalmers-revere/opendlv-video-h264-encoder)). This microservice also allows to interface with network-attached cameras (i.e., those providing an MJPEG stream for example).
-* Command to run with Docker: `docker run --rm -ti --init --ipc=host -e DISPLAY=$DISPLAY --device /dev/video0 -v /tmp:/tmp chalmersrevere/opendlv-device-camera-opencv-multi:v0.0.10 --camera=/dev/video0 --width=640 --height=480 --freq=20`
+* Command to run with Docker: `docker run --rm -ti --init --ipc=host -e DISPLAY=$DISPLAY --device /dev/video0 -v /tmp:/tmp chalmersrevere/opendlv-device-camera-opencv-multi:v0.0.11 --camera=/dev/video0 --width=640 --height=480 --freq=20`
 * Section for `docker-compose.yml`:
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-camera-opencv:
         container_name: dev-camera-opencv
-        image: chalmersrevere/opendlv-device-camera-opencv-multi:v0.0.10
+        image: chalmersrevere/opendlv-device-camera-opencv-multi:v0.0.11
         restart: on-failure
         ipc: "host"
         volumes:
@@ -306,14 +306,14 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 ```
 #### **RaspberryPi** camera: [![opendlv-device-camera-rpi](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-camera-rpi")](https://github.com/chalmers-revere/opendlv-device-camera-rpi) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-camera-rpi-armhf/tags/)
 * This microservice interfaces with an RPi camera and provides both, an [I420-encoded image](https://wiki.videolan.org/YUV/#I420) and an ARGB-encoded image residing in two separate shared memory areas. Other OpenDLV microservices can attach to this shared memory area for further processing (for instance [opendlv-video-h264-encoder](https://github.com/chalmers-revere/opendlv-video-h264-encoder)).
-* Command to run with Docker: `docker run --rm -ti --init --ipc=host -e DISPLAY=$DISPLAY --device /dev/video0 -v /tmp:/tmp chalmersrevere/opendlv-device-camera-rpi-armhf:v0.0.5 --width=640 --height=480 --freq=20`
+* Command to run with Docker: `docker run --rm -ti --init --ipc=host -e DISPLAY=$DISPLAY --device /dev/video0 -v /tmp:/tmp chalmersrevere/opendlv-device-camera-rpi-armhf:v0.0.6 --width=640 --height=480 --freq=20`
 * Section for `docker-compose.yml`:
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-camera-rpi:
         container_name: dev-camera-rpi
-        image: chalmersrevere/opendlv-device-camera-rpi-armhf:v0.0.5
+        image: chalmersrevere/opendlv-device-camera-rpi-armhf:v0.0.6
         restart: on-failure
         ipc: "host"
         volumes:
@@ -437,14 +437,14 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 ```
 
 #### [opendlv-video-vpx-encoder](https://github.com/chalmers-revere/opendlv-video-vpx-encoder.git) to encode video frames from a shared memory into VP8 or VP9 frames as [ImageReading (OpenDLV Standard Message Set v0.9.6)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/40f0cdb83632c3d122d2f35e028331494313330f/opendlv.odvd#L150-L155): [![opendlv-video-vpx-encoder](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-video-vpx-encoder")](https://github.com/chalmers-revere/opendlv-video-vpx-encoder) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-encoder-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-encoder-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-encoder-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-encoder-aarch64/tags/)
-* Command to run with Docker: `docker run --rm -ti --init --net=host --ipc=host -v /tmp:/tmp chalmersrevere/opendlv-video-vpx-encoder-multi:v0.0.5 --cid=111 --name=video0.i420 --width=640 --height=480 --vp8`
+* Command to run with Docker: `docker run --rm -ti --init --net=host --ipc=host -v /tmp:/tmp chalmersrevere/opendlv-video-vpx-encoder-multi:v0.0.6 --cid=111 --name=video0.i420 --width=640 --height=480 --vp8`
 * Section for `docker-compose.yml`:
  ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     video-vpx-encoder:
         container_name: video-vpx-encoder
-        image: chalmersrevere/opendlv-video-vpx-encoder-multi:v0.0.5
+        image: chalmersrevere/opendlv-video-vpx-encoder-multi:v0.0.6
         restart: on-failure
         network_mode: "host"
         ipc: "host"
@@ -456,14 +456,14 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 ```
 
 #### [opendlv-video-vpx-decoder](https://github.com/chalmers-revere/opendlv-video-vpx-decoder.git) to decode h264 video frames from an [ImageReading (OpenDLV Standard Message Set v0.9.6)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/40f0cdb83632c3d122d2f35e028331494313330f/opendlv.odvd#L150-L155) into a shared memory: [![opendlv-video-vpx-decoder](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-video-vpx-decoder")](https://github.com/chalmers-revere/opendlv-video-vpx-decoder) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-decoder-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-decoder-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-decoder-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-video-vpx-decoder-aarch64/tags/)
-* Command to run with Docker: `docker run --rm -ti --init --net=host --ipc=host -v /tmp:/tmp -e DISPLAY=$DISPLAY chalmersrevere/opendlv-video-vpx-decoder-multi:v0.0.5 --cid=253 --name=video0.arg0 --verbose`
+* Command to run with Docker: `docker run --rm -ti --init --net=host --ipc=host -v /tmp:/tmp -e DISPLAY=$DISPLAY chalmersrevere/opendlv-video-vpx-decoder-multi:v0.0.6 --cid=253 --name=video0.arg0 --verbose`
 * Section for `docker-compose.yml`:
  ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     video-vpx-decoder:
         container_name: video-vpx-decoder
-        image: chalmersrevere/opendlv-video-vpx-decoder-multi:v0.0.5
+        image: chalmersrevere/opendlv-video-vpx-decoder-multi:v0.0.6
         restart: on-failure
         network_mode: "host"
         ipc: "host"
@@ -528,13 +528,13 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 ```
 ![screenshot from signal viewer](https://raw.githubusercontent.com/chalmers-revere/opendlv-signal-viewer/master/signal-viewer.gif)
 
-#### [opendlv-vehicle-view](https://github.com/chalmers-revere/opendlv-vehicle-view) to view vehicle messages from the OpenDLV Standard Message Set exchanged in the communication session 111 (after starting this microservice, point your web-browser to the computer's IP address, port 8081): `docker run --rm --net=host --name=opendlv-vehicle-view -v ~/recordings:/opt/vehicle-view/recordings -v /var/run/docker.sock:/var/run/docker.sock -p 8081:8081 chalmersrevere/opendlv-vehicle-view-multi:v0.0.51`
+#### [opendlv-vehicle-view](https://github.com/chalmers-revere/opendlv-vehicle-view) to view vehicle messages from the OpenDLV Standard Message Set exchanged in the communication session 111 (after starting this microservice, point your web-browser to the computer's IP address, port 8081): `docker run --rm --net=host --name=opendlv-vehicle-view -v ~/recordings:/opt/vehicle-view/recordings -v /var/run/docker.sock:/var/run/docker.sock -p 8081:8081 chalmersrevere/opendlv-vehicle-view-multi:v0.0.54`
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     vehicle-view:
         container_name: opendlv-vehicle-view
-        image: chalmersrevere/opendlv-vehicle-view-multi:v0.0.51
+        image: chalmersrevere/opendlv-vehicle-view-multi:v0.0.54
         restart: on-failure
         network_mode: "host"
         volumes:
