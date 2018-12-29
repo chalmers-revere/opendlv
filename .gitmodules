@@ -74,3 +74,6 @@
 [submodule "opendlv-device-lidar-rplidar"]
 	path = opendlv-device-lidar-rplidar
 	url = https://github.com/chalmers-revere/opendlv-device-lidar-rplidar.git
+[submodule "opendlv-device-camera-pylon"]
+	path = opendlv-device-camera-pylon
+	url = https://github.com/chalmers-revere/opendlv-device-camera-pylon.git
