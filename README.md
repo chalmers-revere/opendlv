@@ -128,14 +128,14 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 * Provides: [Latitude/Longitude (OpenDLV Standard Message Set v0.9.1)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/0b85a1c4b151258c21b2368295a3c203232675e9/opendlv.odvd#L137-L140)
 * Provides: [Heading (OpenDLV Standard Message Set v0.9.1)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/0b85a1c4b151258c21b2368295a3c203232675e9/opendlv.odvd#L133-L135)
 * Provides: [device-specific messages](https://github.com/chalmers-revere/opendlv-device-gps-pos/blob/master/src/pos-message-set.odvd)
-* Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-pos-multi:v0.0.10 --pos_ip=192.168.1.77 --pos_port=5602 --cid=111 --verbose`
+* Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-pos-multi:v0.0.11 --pos_ip=192.168.1.77 --pos_port=5602 --cid=111 --verbose`
 * Section for `docker-compose.yml`:
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-gps-pos:
         container_name: dev-gps-pos
-        image: chalmersrevere/opendlv-device-gps-pos-multi:v0.0.10
+        image: chalmersrevere/opendlv-device-gps-pos-multi:v0.0.11
         restart: on-failure
         network_mode: "host"
         command: "--pos_ip=10.42.42.40 --pos_port=5602 --cid=111"
