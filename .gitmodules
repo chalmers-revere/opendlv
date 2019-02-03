@@ -77,3 +77,6 @@
 [submodule "opendlv-device-camera-pylon"]
 	path = opendlv-device-camera-pylon
 	url = https://github.com/chalmers-revere/opendlv-device-camera-pylon.git
+[submodule "opendlv-device-cangw-rhino"]
+	path = opendlv-device-cangw-rhino
+	url = https://github.com/chalmers-revere/opendlv-device-cangw-rhino.git
