@@ -172,14 +172,14 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 * Provides: [AngularVelocityReading (OpenDLV Standard Message Set v0.9.7)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/bd5007e7723654563c388129a96a70b559f7fef6/opendlv.odvd#L77-L81)
 * Provides: [MagneticFieldReading (OpenDLV Standard Message Set v0.9.7)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/bd5007e7723654563c388129a96a70b559f7fef6/opendlv.odvd#L83-L87)
 * Provides: [device-specific messages](https://github.com/chalmers-revere/opendlv-device-gps-peak/blob/master/src/peak-can.odvd)
-* Command to run with Docker: `docker run --init --rm --net=host --privileged chalmersrevere/opendlv-device-gps-peak-multi:v0.0.3 --can=can0 --cid=111 --verbose`
+* Command to run with Docker: `docker run --init --rm --net=host --privileged chalmersrevere/opendlv-device-gps-peak-multi:v0.0.4 --can=can0 --cid=111 --verbose`
 * Section for `docker-compose.yml`:
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-gps-peak:
         container_name: dev-gps-peak
-        image: chalmersrevere/opendlv-device-gps-peak-multi:v0.0.3
+        image: chalmersrevere/opendlv-device-gps-peak-multi:v0.0.4
         restart: on-failure
         network_mode: "host"
         privileged: true
