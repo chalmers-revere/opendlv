@@ -83,3 +83,6 @@
 [submodule "opendlv-device-gps-peak"]
 	path = opendlv-device-gps-peak
 	url = https://github.com/chalmers-revere/opendlv-device-gps-peak.git
+[submodule "cluon-record"]
+	path = cluon-record
+	url = https://github.com/chrberger/cluon-record.git

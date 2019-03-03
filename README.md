@@ -513,6 +513,23 @@ services:    # Must be present exactly once at the beginning of the docker-compo
         command: "--cid=111 --name=imageData"
 ```
 ---
+### Streaming Tools:
+#### [cluon-record](https://github.com/chrberger/cluon-record) to record Envelopes from a running OD4Session with remote control start/stop for recordings; the remote control can be triggered from OpenDLV Vehicle View:
+* Example for a `docker-compose.yml`:
+ ```yml
+version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
+services:    # Must be present exactly once at the beginning of the docker-compose.yml file
+     cluon-record:
+        container_name: cluon-record
+        image: chrberger/cluon-record-multi:v0.0.1
+        restart: on-failure
+        network_mode: "host"
+        volumes:
+        - ~/recordings:/recordings
+        working_dir: /recordings
+        command: "--cid=111 --remote"
+
+---
 ### Data Post Processing:
 #### [rec2csv-png](https://github.com/chalmers-revere/rec2csv-png) to extract messages as .csv and h264 frames as separate .png files from a .rec file from a recorded OpenDLV session (OpenH264 Video Codec provided by Cisco Systems, Inc.):
 * Example for a `docker-compose.yml`:
