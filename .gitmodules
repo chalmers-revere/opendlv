@@ -80,3 +80,6 @@
 [submodule "opendlv-device-cangw-rhino"]
 	path = opendlv-device-cangw-rhino
 	url = https://github.com/chalmers-revere/opendlv-device-cangw-rhino.git
+[submodule "opendlv-device-gps-peak"]
+	path = opendlv-device-gps-peak
+	url = https://github.com/chalmers-revere/opendlv-device-gps-peak.git
