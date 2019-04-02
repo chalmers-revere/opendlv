@@ -149,14 +149,15 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 * Provides: [GroundSpeed (OpenDLV Standard Message Set v0.9.5)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/fb11778810a37d76d45e83e52ea054dac2e2a350/opendlv.odvd#L129-L131)
 * Provides: [Acceleration X/Y/Z (OpenDLV Standard Message Set v0.9.5)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/fb11778810a37d76d45e83e52ea054dac2e2a350/opendlv.odvd#L71-L75)
 * Provides: [Angular Velocity X/Y/Z (OpenDLV Standard Message Set v0.9.5)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/fb11778810a37d76d45e83e52ea054dac2e2a350/opendlv.odvd#L77-L81)
-* Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-ncom-multi:v0.0.16 --ncom_ip=0.0.0.0 --ncom_port=3000 --cid=111 --verbose`
+* Provides: [Equilibrioception (OpenDLV Standard Message Set v0.9.5)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/fb11778810a37d76d45e83e52ea054dac2e2a350/opendlv.odvd#L274-L281)
+* Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-ncom-multi:v0.0.17 --ncom_ip=0.0.0.0 --ncom_port=3000 --cid=111 --verbose`
 * Section for `docker-compose.yml`:
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-gps-ncom:
         container_name: dev-gps-ncom
-        image: chalmersrevere/opendlv-device-gps-ncom-multi:v0.0.16
+        image: chalmersrevere/opendlv-device-gps-ncom-multi:v0.0.17
         restart: on-failure
         network_mode: "host"
         command: "--ncom_ip=0.0.0.0 --ncom_port=3000 --cid=111"
