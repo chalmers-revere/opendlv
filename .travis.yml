@@ -27,7 +27,7 @@ install:
 
 script:
 - git submodule update --init --recursive && git submodule update --remote --merge && git submodule status
-- for i in opendlv-device-gps-ncom opendlv-device-gps-nmea opendlv-device-gps-pos opendlv-device-lidar-hdl32e opendlv-device-lidar-vlp16; do cd $i && docker build -f Dockerfile.amd64 && cd ..; done
+- for i in opendlv-device-gps-ncom opendlv-device-gps-nmea opendlv-device-gps-pos opendlv-device-lidar-hdl32e opendlv-device-lidar-vlp16; do cd $i && docker build -f Dockerfile.amd64 . && cd ..; done
 
 notifications:
   email:
