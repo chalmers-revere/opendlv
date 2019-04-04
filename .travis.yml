@@ -11,7 +11,7 @@ branches:
 
 script:
 - git submodule update --init --recursive && git submodule update --remote --merge && git submodule status
-- for i in opendlv-device-* opendlv-video-*; do cd $i && docker build -f Dockerfile.amd64 . && cd ..; done
+- for i in opendlv-device-* opendlv-video-*; do if [ -f $i/Dockerfile.amd64 ]; then cd $i && docker build -f Dockerfile.amd64 . && cd ..; fi; done
 
 notifications:
   email:
