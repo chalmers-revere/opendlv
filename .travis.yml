@@ -1,5 +1,10 @@
 language: cpp
 
+# The following two lines are required to use Docker.
+sudo: required
+services:
+    - docker
+
 branches:
   only:
   - "/^new$/"
@@ -22,7 +27,7 @@ install:
 
 script:
 - git submodule update --init --recursive && git submodule update --remote --merge && git submodule status
-- for i in opendlv-device-gps-ncom opendlv-device-gps-nmea opendlv-device-gps-pos opendlv-device-lidar-hdl32e opendlv-device-lidar-vlp16; do mkdir build.$i && cd build.$i && cmake ../$i && make && make test && cd .. && rm -fr build.$i; done
+- for i in opendlv-device-gps-ncom opendlv-device-gps-nmea opendlv-device-gps-pos opendlv-device-lidar-hdl32e opendlv-device-lidar-vlp16; do cd $i && docker build -f Dockerfile.amd64 && cd ..; done
 
 notifications:
   email:
