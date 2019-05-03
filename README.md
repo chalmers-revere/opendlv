@@ -190,17 +190,29 @@ services:    # Must be present exactly once at the beginning of the docker-compo
 #### **Trimble GPS/INSS** units: [![opendlv-device-gps-nmea](https://raw.githubusercontent.com/encharm/Font-Awesome-SVG-PNG/master/black/png/24/github.png "opendlv-device-gps-nmea")](https://github.com/chalmers-revere/opendlv-device-gps-nmea) [![Docker (multi)](https://img.shields.io/badge/Docker-multi-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-gps-nmea-multi/tags/) [![Docker (amd64)](https://img.shields.io/badge/Docker-amd64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-gps-nmea-amd64/tags/) [![Docker (armhf)](https://img.shields.io/badge/Docker-armhf-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-gps-nmea-armhf/tags/) [![Docker (aarch64)](https://img.shields.io/badge/Docker-aarch64-blue.svg)](https://hub.docker.com/r/chalmersrevere/opendlv-device-gps-nmea-aarch64/tags/) [![Build Status](https://travis-ci.org/chalmers-revere/opendlv-device-gps-nmea.svg?branch=master)](https://travis-ci.org/chalmers-revere/opendlv-device-gps-nmea)
 * Provides: [Latitude/Longitude (OpenDLV Standard Message Set v0.9.1)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/0b85a1c4b151258c21b2368295a3c203232675e9/opendlv.odvd#L137-L140)
 * Provides: [Heading (OpenDLV Standard Message Set v0.9.1)](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/0b85a1c4b151258c21b2368295a3c203232675e9/opendlv.odvd#L133-L135)
-* Command to run with Docker: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-nmea-multi:v0.0.13 --nmea_ip=10.42.42.112 --nmea_port=9999 --cid=111 --verbose`
-* Section for `docker-compose.yml`:
+* Command to run with Docker to connect to an NMEA stream provided from a given TCP server: `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-nmea-multi:v0.0.14 --nmea_ip=10.42.42.112 --nmea_port=9999 --cid=111 --verbose`
+* Command to run with Docker to let an NMEA stream reach this microservice with UDP (this application is listening for incoming UDP packets): `docker run --init --rm --net=host chalmersrevere/opendlv-device-gps-nmea-multi:v0.0.14 --udp --nmea_ip=0.0.0.0 --nmea_port=9999 --cid=111 --verbose`
+* Section for `docker-compose.yml` (to connect to a TCP server):
 ```yml
 version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
 services:    # Must be present exactly once at the beginning of the docker-compose.yml file
     dev-gps-nmea:
         container_name: dev-gps-nmea
-        image: chalmersrevere/opendlv-device-gps-nmea-multi:v0.0.13
+        image: chalmersrevere/opendlv-device-gps-nmea-multi:v0.0.14
         restart: on-failure
         network_mode: "host"
         command: "--nmea_ip=10.42.42.112 --nmea_port=9999 --cid=111"
+```
+* Section for `docker-compose.yml` (to let this microservice listen for UDP packets):
+```yml
+version: '2' # Must be present exactly once at the beginning of the docker-compose.yml file
+services:    # Must be present exactly once at the beginning of the docker-compose.yml file
+    dev-gps-nmea:
+        container_name: dev-gps-nmea
+        image: chalmersrevere/opendlv-device-gps-nmea-multi:v0.0.14
+        restart: on-failure
+        network_mode: "host"
+        command: "--udp --nmea_ip=0.0.0.0 --nmea_port=9999 --cid=111"
 ```
 ---
 ### LIDAR devices
