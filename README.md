@@ -1,3 +1,5 @@
+Moved to https://git.opendlv.org.
+
 # OpenDLV has moved to its own GitLab environment at [git.opendlv.org/explore](https://git.opendlv.org/explore). Tutorials were also added att [opendlv.org/learn.html](https://opendlv.org/learn.html).
 
 ## OpenDLV - A modern microservice-based software ecosystem for self-driving vehicles.
